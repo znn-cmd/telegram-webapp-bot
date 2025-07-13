@@ -810,24 +810,34 @@ def api_download_pdf():
 
 @app.route('/api/user_balance', methods=['POST'])
 def api_user_balance():
-    """Получение баланса пользователя"""
+    """Получение или списание баланса пользователя"""
     data = request.json or {}
     telegram_id = data.get('telegram_id')
-    
+    deduct = data.get('deduct', False)
     if not telegram_id:
         return jsonify({'error': 'telegram_id required'}), 400
-    
     try:
         result = supabase.table('users').select('balance').eq('telegram_id', telegram_id).execute()
         if result.data:
             balance = result.data[0].get('balance', 0)
         else:
             balance = 0
-        
+        # Если нужно списать $1
+        if deduct:
+            if balance >= 1:
+                new_balance = balance - 1
+                update_result = supabase.table('users').update({'balance': new_balance}).eq('telegram_id', telegram_id).execute()
+                # Проверяем, что обновление прошло успешно
+                if hasattr(update_result, 'data') or update_result:
+                    return jsonify({'success': True, 'balance': new_balance})
+                else:
+                    return jsonify({'error': 'Не удалось обновить баланс'}), 500
+            else:
+                return jsonify({'error': 'Недостаточно средств', 'balance': balance}), 400
+        # Просто возвращаем баланс
         return jsonify({'balance': balance})
-        
     except Exception as e:
-        logger.error(f"Error getting user balance: {e}")
+        logger.error(f"Error getting/updating user balance: {e}")
         return jsonify({'error': 'Internal error'}), 500
 
 @app.route('/api/send_pdf_to_client', methods=['POST'])
