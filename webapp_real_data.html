@@ -305,15 +305,19 @@
         }
 
         async function confirmPrice() {
-            const price = document.getElementById('priceInput').value.trim();
+            const priceInput = document.getElementById('priceInput');
+            const price = priceInput.value.trim();
             const bedrooms = document.getElementById('bedroomsSelect').value;
             document.getElementById('price-error').style.display = 'none';
-            
+
             if (!price || price < 10000) {
                 showError('price-error', 'Пожалуйста, введите корректную цену (минимум 10,000 евро).');
+                priceInput.disabled = false;
+                priceInput.readOnly = false;
+                priceInput.focus();
                 return;
             }
-            
+
             showStep('loading');
             try {
                 const res = await fetch('/api/generate_report', {
@@ -396,7 +400,50 @@
         }
 
         function showFullReportStub() {
-            alert('Механика в разработке');
+            // Получаем telegram_id (заглушка или из Telegram WebApp)
+            let telegram_id = 1952374904;
+            if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe && window.Telegram.WebApp.initDataUnsafe.user && window.Telegram.WebApp.initDataUnsafe.user.id) {
+                telegram_id = window.Telegram.WebApp.initDataUnsafe.user.id;
+            }
+            fetch('/api/user_balance', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ telegram_id })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.balance > 1) {
+                    alert('Генерация полного отчета... (заглушка)');
+                } else {
+                    showBalanceModal();
+                }
+            })
+            .catch(() => {
+                alert('Ошибка проверки баланса');
+            });
+        }
+
+        function showBalanceModal() {
+            // Удаляем старое модальное окно если есть
+            let oldModal = document.getElementById('balance-modal');
+            if (oldModal) oldModal.remove();
+            // Создаем модальное окно
+            const modal = document.createElement('div');
+            modal.id = 'balance-modal';
+            modal.style = 'position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.25);z-index:1000;display:flex;align-items:center;justify-content:center;';
+            modal.innerHTML = `
+                <div style="background:#fff;border-radius:18px;box-shadow:0 4px 24px rgba(102,126,234,0.18);padding:32px 24px 24px 24px;max-width:340px;width:90vw;text-align:center;">
+                    <div style="font-size:19px;font-weight:700;color:#667eea;margin-bottom:16px;">Недостаточно баланса</div>
+                    <div style="font-size:16px;color:#333;margin-bottom:22px;">Ваш баланс не достаточен для формирования полного отчета, пожалуйста пополните его.</div>
+                    <button class="btn btn-primary" style="width:100%;font-size:17px;" onclick="closeBalanceModal();alert('Заглушка: переход к пополнению баланса');">Баланс</button>
+                    <button class="btn btn-secondary" style="width:100%;margin-top:10px;font-size:16px;" onclick="closeBalanceModal()">Закрыть</button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+        function closeBalanceModal() {
+            let modal = document.getElementById('balance-modal');
+            if (modal) modal.remove();
         }
 
         // Инициализация
