@@ -41,77 +41,77 @@ WEBAPP_URL = "https://aaadvisor-zaicevn.amvera.io/webapp"
 # Google Maps API ключ
 GOOGLE_MAPS_API_KEY = "AIzaSyBrDkDpNKNAIyY147MQ78hchBkeyCAxhEw"
 
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    """Обработчик команды /start"""
-    user = update.effective_user
-    if not user or not hasattr(user, 'id'):
-        await update.message.reply_text("Ошибка: не удалось определить пользователя.")
-        return
+# async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+#     """Обработчик команды /start"""
+#     user = update.effective_user
+#     if not user or not hasattr(user, 'id'):
+#         await update.message.reply_text("Ошибка: не удалось определить пользователя.")
+#         return
     
-    # Проверяем, есть ли пользователь в базе данных
-    try:
-        result = supabase.table('users').select('*').eq('telegram_id', user.id).execute()
+#     # Проверяем, есть ли пользователь в базе данных
+#     try:
+#         result = supabase.table('users').select('*').eq('telegram_id', user.id).execute()
         
-        if result.data:
-            # Пользователь уже существует
-            welcome_message = f"С возвращением, {getattr(user, 'first_name', 'Пользователь')}! 👋"
-        else:
-            # Новый пользователь
-            welcome_message = f"Привет, {getattr(user, 'first_name', 'Пользователь')}! Добро пожаловать! 🎉"
+#         if result.data:
+#             # Пользователь уже существует
+#             welcome_message = f"С возвращением, {getattr(user, 'first_name', 'Пользователь')}! 👋"
+#         else:
+#             # Новый пользователь
+#             welcome_message = f"Привет, {getattr(user, 'first_name', 'Пользователь')}! Добро пожаловать! 🎉"
             
-            # Сохраняем пользователя в базу данных
-            supabase.table('users').insert({
-                'telegram_id': user.id,
-                'username': getattr(user, 'username', None),
-                'first_name': getattr(user, 'first_name', None),
-                'last_name': getattr(user, 'last_name', None)
-            }).execute()
+#             # Сохраняем пользователя в базу данных
+#             supabase.table('users').insert({
+#                 'telegram_id': user.id,
+#                 'username': getattr(user, 'username', None),
+#                 'first_name': getattr(user, 'first_name', None),
+#                 'last_name': getattr(user, 'last_name', None)
+#             }).execute()
             
-    except Exception as e:
-        logger.error(f"Ошибка при работе с базой данных: {e}")
-        welcome_message = f"Привет, {getattr(user, 'first_name', 'Пользователь')}! Добро пожаловать! 🎉"
+#     except Exception as e:
+#         logger.error(f"Ошибка при работе с базой данных: {e}")
+#         welcome_message = f"Привет, {getattr(user, 'first_name', 'Пользователь')}! Добро пожаловать! 🎉"
     
-    # Создаем кнопку для запуска WebApp
-    keyboard = [
-        [KeyboardButton("🚀 Запустить WebApp", web_app=WebAppInfo(url=WEBAPP_URL))]
-    ]
-    reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
+#     # Создаем кнопку для запуска WebApp
+#     keyboard = [
+#         [KeyboardButton("🚀 Запустить WebApp", web_app=WebAppInfo(url=WEBAPP_URL))]
+#     ]
+#     reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
     
-    await update.message.reply_text(
-        welcome_message,
-        reply_markup=reply_markup
-    )
+#     await update.message.reply_text(
+#         welcome_message,
+#         reply_markup=reply_markup
+#     )
 
-async def webapp_data(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    """Обработчик данных от WebApp"""
-    data = update.message.web_app_data.data
-    user = update.effective_user
+# async def webapp_data(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+#     """Обработчик данных от WebApp"""
+#     data = update.message.web_app_data.data
+#     user = update.effective_user
     
-    await update.message.reply_text(
-        f"Получены данные от WebApp: {data}\n"
-        f"Пользователь: {getattr(user, 'first_name', 'Пользователь')}"
-    )
+#     await update.message.reply_text(
+#         f"Получены данные от WebApp: {data}\n"
+#         f"Пользователь: {getattr(user, 'first_name', 'Пользователь')}"
+#     )
 
-async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    """Обработчик обычных сообщений"""
-    user = update.effective_user
-    await update.message.reply_text(
-        f"Привет, {getattr(user, 'first_name', 'Пользователь')}! Используйте кнопку WebApp для тестирования."
-    )
+# async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+#     """Обработчик обычных сообщений"""
+#     user = update.effective_user
+#     await update.message.reply_text(
+#         f"Привет, {getattr(user, 'first_name', 'Пользователь')}! Используйте кнопку WebApp для тестирования."
+#     )
 
-def main() -> None:
-    """Запуск бота"""
-    logger.info("Запуск Telegram-бота...")
-    # Создаем приложение
-    application = Application.builder().token(TOKEN).build()
+# def main() -> None:
+#     """Запуск бота"""
+#     logger.info("Запуск Telegram-бота...")
+#     # Создаем приложение
+#     application = Application.builder().token(TOKEN).build()
 
-    # Добавляем обработчики
-    application.add_handler(CommandHandler("start", start))
-    application.add_handler(MessageHandler(filters.StatusUpdate.WEB_APP_DATA, webapp_data))
-    application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
+#     # Добавляем обработчики
+#     application.add_handler(CommandHandler("start", start))
+#     application.add_handler(MessageHandler(filters.StatusUpdate.WEB_APP_DATA, webapp_data))
+#     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
 
-    # Запускаем бота (закомментировано для WebApp)
-    # application.run_polling(allowed_updates=Update.ALL_TYPES)
+#     # Запускаем бота (закомментировано для WebApp)
+#     # application.run_polling(allowed_updates=Update.ALL_TYPES)
 
 # Flask маршруты для WebApp
 @app.route('/webapp')
@@ -1104,10 +1104,5 @@ def run_flask():
     app.run(host='0.0.0.0', port=8080, debug=False)
 
 if __name__ == '__main__':
-    # Запускаем Flask в отдельном потоке
-    flask_thread = threading.Thread(target=run_flask)
-    flask_thread.daemon = True
-    flask_thread.start()
-    
-    # Запускаем Telegram бота
-    main() 
+    # Для WebApp запускаем только Flask
+    run_flask() 
