@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aaadviser - Главное меню</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 20px;
+            background: white;
+            min-height: 100vh;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px 0;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 8px;
+        }
+
+        .slogan {
+            font-size: 14px;
+            color: #666;
+            font-style: italic;
+        }
+
+        .user-info {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+            text-align: center;
+            border-left: 4px solid #667eea;
+        }
+
+        .user-name {
+            font-size: 16px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .user-balance {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .balance-amount {
+            font-weight: bold;
+            color: #007bff;
+        }
+
+        .menu-section {
+            margin: 30px 0;
+        }
+
+        .menu-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .menu-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            margin: 8px 0;
+            padding: 16px 20px;
+            width: 100%;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: left;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .menu-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .menu-btn:active {
+            transform: translateY(0);
+        }
+
+        .menu-btn-icon {
+            margin-right: 12px;
+            font-size: 18px;
+        }
+
+        .menu-btn-text {
+            font-weight: 500;
+        }
+
+        .menu-btn-description {
+            font-size: 12px;
+            opacity: 0.8;
+            margin-top: 4px;
+            display: block;
+        }
+
+        .language-selector {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+
+        .language-title {
+            font-size: 14px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .language-buttons {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .lang-btn {
+            background: white;
+            color: #333;
+            border: 1px solid #ddd;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .lang-btn.selected {
+            background: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+
+        .lang-btn:hover {
+            background: #f0f0f0;
+        }
+
+        .lang-btn.selected:hover {
+            background: #0056b3;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">Aaadviser</div>
+            <div class="slogan" id="slogan">Инсайты рынка недвижимости</div>
+        </div>
+
+        <!-- Информация о пользователе -->
+        <div class="user-info" id="userInfo">
+            <div class="user-name" id="userName">Загрузка...</div>
+            <div class="user-balance">
+                Баланс: <span class="balance-amount" id="userBalance">$0</span>
+            </div>
+        </div>
+
+        <!-- Выбор языка -->
+        <div class="language-selector">
+            <div class="language-title" id="languageTitle">Выберите язык</div>
+            <div class="language-buttons">
+                <button class="lang-btn selected" data-lang="ru" onclick="setLanguage('ru')">🇷🇺 Русский</button>
+                <button class="lang-btn" data-lang="en" onclick="setLanguage('en')">🇺🇸 English</button>
+                <button class="lang-btn" data-lang="de" onclick="setLanguage('de')">🇩🇪 Deutsch</button>
+                <button class="lang-btn" data-lang="fr" onclick="setLanguage('fr')">🇫🇷 Français</button>
+                <button class="lang-btn" data-lang="tr" onclick="setLanguage('tr')">🇹🇷 Türkçe</button>
+            </div>
+        </div>
+
+        <!-- Главное меню -->
+        <div class="menu-section">
+            <div class="menu-title" id="menuTitle">Главное меню</div>
+            
+            <button class="menu-btn" onclick="startNewReport()">
+                <span class="menu-btn-icon">📊</span>
+                <span class="menu-btn-text" id="newReportBtn">Получить новый отчет</span>
+                <span class="menu-btn-description" id="newReportDesc">Анализ недвижимости по адресу</span>
+            </button>
+
+            <button class="menu-btn" onclick="showMarketStats()">
+                <span class="menu-btn-icon">📈</span>
+                <span class="menu-btn-text" id="marketStatsBtn">Статистика рынка</span>
+                <span class="menu-btn-description" id="marketStatsDesc">Анализ трендов и цен</span>
+            </button>
+
+            <button class="menu-btn" onclick="showSavedReports()">
+                <span class="menu-btn-icon">💾</span>
+                <span class="menu-btn-text" id="savedReportsBtn">Мои сохраненные отчеты</span>
+                <span class="menu-btn-description" id="savedReportsDesc">История ваших анализов</span>
+            </button>
+
+            <button class="menu-btn" onclick="showProfile()">
+                <span class="menu-btn-icon">👤</span>
+                <span class="menu-btn-text" id="profileBtn">Личный кабинет</span>
+                <span class="menu-btn-description" id="profileDesc">Настройки и баланс</span>
+            </button>
+        </div>
+
+        <!-- Загрузка -->
+        <div id="loading" class="loading hidden">
+            <div class="spinner"></div>
+            <p id="loadingText">Загрузка...</p>
+        </div>
+    </div>
+
+    <script>
+        let tg = window.Telegram.WebApp;
+        tg.expand();
+        tg.ready();
+
+        let userData = null;
+        let currentLanguage = 'ru';
+
+        // Получаем данные пользователя
+        if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
+            userData = tg.initDataUnsafe.user;
+            currentLanguage = userData.language_code || 'ru';
+        }
+
+        // Локализации
+        const locales = {
+            'ru': {
+                'slogan': 'Инсайты рынка недвижимости',
+                'loading': 'Загрузка...',
+                'balance': 'Баланс: ',
+                'languageTitle': 'Выберите язык',
+                'menuTitle': 'Главное меню',
+                'newReportBtn': 'Получить новый отчет',
+                'newReportDesc': 'Анализ недвижимости по адресу',
+                'marketStatsBtn': 'Статистика рынка',
+                'marketStatsDesc': 'Анализ трендов и цен',
+                'savedReportsBtn': 'Мои сохраненные отчеты',
+                'savedReportsDesc': 'История ваших анализов',
+                'profileBtn': 'Личный кабинет',
+                'profileDesc': 'Настройки и баланс',
+                'welcome_new': 'Добро пожаловать в Aaadvisor',
+                'welcome_back': 'С возвращением!'
+            },
+            'en': {
+                'slogan': 'Real Estate Market Insights',
+                'loading': 'Loading...',
+                'balance': 'Balance: ',
+                'languageTitle': 'Select language',
+                'menuTitle': 'Main menu',
+                'newReportBtn': 'Get new report',
+                'newReportDesc': 'Property analysis by address',
+                'marketStatsBtn': 'Market statistics',
+                'marketStatsDesc': 'Trend and price analysis',
+                'savedReportsBtn': 'My saved reports',
+                'savedReportsDesc': 'Your analysis history',
+                'profileBtn': 'Profile',
+                'profileDesc': 'Settings and balance',
+                'welcome_new': 'Welcome to Aaadvisor',
+                'welcome_back': 'Welcome back!'
+            },
+            'de': {
+                'slogan': 'Immobilienmarkt-Einblicke',
+                'loading': 'Laden...',
+                'balance': 'Kontostand: ',
+                'languageTitle': 'Sprache auswählen',
+                'menuTitle': 'Hauptmenü',
+                'newReportBtn': 'Neuen Bericht erstellen',
+                'newReportDesc': 'Immobilienanalyse nach Adresse',
+                'marketStatsBtn': 'Marktstatistiken',
+                'marketStatsDesc': 'Trend- und Preisanalyse',
+                'savedReportsBtn': 'Meine gespeicherten Berichte',
+                'savedReportsDesc': 'Ihre Analysehistorie',
+                'profileBtn': 'Profil',
+                'profileDesc': 'Einstellungen und Kontostand',
+                'welcome_new': 'Willkommen bei Aaadvisor',
+                'welcome_back': 'Willkommen zurück!'
+            },
+            'fr': {
+                'slogan': 'Aperçus du marché immobilier',
+                'loading': 'Chargement...',
+                'balance': 'Solde: ',
+                'languageTitle': 'Sélectionner la langue',
+                'menuTitle': 'Menu principal',
+                'newReportBtn': 'Obtenir un nouveau rapport',
+                'newReportDesc': 'Analyse immobilière par adresse',
+                'marketStatsBtn': 'Statistiques du marché',
+                'marketStatsDesc': 'Analyse des tendances et prix',
+                'savedReportsBtn': 'Mes rapports enregistrés',
+                'savedReportsDesc': 'Historique de vos analyses',
+                'profileBtn': 'Profil',
+                'profileDesc': 'Paramètres et solde',
+                'welcome_new': 'Bienvenue sur Aaadvisor',
+                'welcome_back': 'Bon retour!'
+            },
+            'tr': {
+                'slogan': 'Gayrimenkul Piyasası İçgörüleri',
+                'loading': 'Yükleniyor...',
+                'balance': 'Bakiye: ',
+                'languageTitle': 'Dil seçin',
+                'menuTitle': 'Ana menü',
+                'newReportBtn': 'Yeni rapor al',
+                'newReportDesc': 'Adrese göre mülk analizi',
+                'marketStatsBtn': 'Piyasa istatistikleri',
+                'marketStatsDesc': 'Trend ve fiyat analizi',
+                'savedReportsBtn': 'Kayıtlı raporlarım',
+                'savedReportsDesc': 'Analiz geçmişiniz',
+                'profileBtn': 'Profil',
+                'profileDesc': 'Ayarlar ve bakiye',
+                'welcome_new': 'Aaadvisor\'a hoş geldiniz',
+                'welcome_back': 'Tekrar hoş geldiniz!'
+            }
+        };
+
+        // Функция для получения локализованного текста
+        function getText(key) {
+            const locale = locales[currentLanguage] || locales['ru'];
+            return locale[key] || key;
+        }
+
+        // Обновление текста на странице
+        function updatePageText() {
+            document.getElementById('slogan').textContent = getText('slogan');
+            document.getElementById('languageTitle').textContent = getText('languageTitle');
+            document.getElementById('menuTitle').textContent = getText('menuTitle');
+            document.getElementById('newReportBtn').textContent = getText('newReportBtn');
+            document.getElementById('newReportDesc').textContent = getText('newReportDesc');
+            document.getElementById('marketStatsBtn').textContent = getText('marketStatsBtn');
+            document.getElementById('marketStatsDesc').textContent = getText('marketStatsDesc');
+            document.getElementById('savedReportsBtn').textContent = getText('savedReportsBtn');
+            document.getElementById('savedReportsDesc').textContent = getText('savedReportsDesc');
+            document.getElementById('profileBtn').textContent = getText('profileBtn');
+            document.getElementById('profileDesc').textContent = getText('profileDesc');
+            document.getElementById('loadingText').textContent = getText('loading');
+        }
+
+        // Установка языка
+        function setLanguage(lang) {
+            currentLanguage = lang;
+            
+            // Обновляем кнопки языка
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            document.querySelector(`[data-lang="${lang}"]`).classList.add('selected');
+            
+            // Обновляем текст на странице
+            updatePageText();
+            
+            // Сохраняем выбор языка
+            if (userData) {
+                fetch('/api/set_language', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        telegram_id: userData.id,
+                        language: lang
+                    })
+                });
+            }
+        }
+
+        // Загрузка данных пользователя
+        async function loadUserData() {
+            if (!userData) {
+                document.getElementById('userName').textContent = 'Гость';
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/user', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        telegram_id: userData.id,
+                        username: userData.username,
+                        first_name: userData.first_name,
+                        last_name: userData.last_name
+                    })
+                });
+
+                if (response.ok) {
+                    const userInfo = await response.json();
+                    const isNewUser = userInfo.is_new_user;
+                    
+                    // Приветственное сообщение
+                    const welcomeText = isNewUser ? getText('welcome_new') : getText('welcome_back');
+                    document.getElementById('userName').textContent = welcomeText;
+                    
+                    // Загружаем баланс
+                    await loadUserBalance();
+                }
+            } catch (error) {
+                console.log('Ошибка загрузки данных пользователя:', error);
+                document.getElementById('userName').textContent = userData.first_name || 'Пользователь';
+            }
+        }
+
+        // Загрузка баланса пользователя
+        async function loadUserBalance() {
+            try {
+                const response = await fetch('/api/user-balance', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        telegram_id: userData.id
+                    })
+                });
+
+                if (response.ok) {
+                    const balanceData = await response.json();
+                    document.getElementById('userBalance').textContent = `$${balanceData.balance}`;
+                }
+            } catch (error) {
+                console.log('Ошибка загрузки баланса:', error);
+            }
+        }
+
+        // Функции меню
+        function startNewReport() {
+            showLoading();
+            // Переходим к странице создания отчета
+            window.location.href = '/webapp_report';
+        }
+
+        function showMarketStats() {
+            showLoading();
+            // Переходим к странице статистики рынка
+            window.location.href = '/webapp_stats';
+        }
+
+        function showSavedReports() {
+            showLoading();
+            // Переходим к странице сохраненных отчетов
+            window.location.href = '/webapp_saved';
+        }
+
+        function showProfile() {
+            showLoading();
+            // Переходим к странице профиля
+            window.location.href = '/webapp_profile';
+        }
+
+        function showLoading() {
+            document.getElementById('loading').classList.remove('hidden');
+        }
+
+        // Инициализация
+        updatePageText();
+        loadUserData();
+    </script>
+</body>
+</html> 
