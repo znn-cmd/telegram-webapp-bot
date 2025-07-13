@@ -412,8 +412,8 @@
             })
             .then(res => res.json())
             .then(data => {
-                if (data.balance > 1) {
-                    alert('Генерация полного отчета... (заглушка)');
+                if (data.balance >= 1) {
+                    showFullReportConfirmModal();
                 } else {
                     showBalanceModal();
                 }
@@ -421,6 +421,63 @@
             .catch(() => {
                 alert('Ошибка проверки баланса');
             });
+        }
+
+        function showFullReportConfirmModal() {
+            // Получаем параметры из текущего отчета (берем из DOM)
+            const address = document.querySelector('#reportResult b')?.nextSibling?.textContent?.trim() || '';
+            const bedrooms = document.querySelector('#reportResult').innerText.match(/Спален:\s*(\d+)/)?.[1] || '';
+            const price = document.querySelector('#reportResult').innerText.match(/Цена объекта:\s*€([\d\s]+)/)?.[1] || '';
+            // Удаляем старое модальное окно если есть
+            let oldModal = document.getElementById('full-report-modal');
+            if (oldModal) oldModal.remove();
+            // Получаем telegram_id
+            let telegram_id = 1952374904;
+            if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe && window.Telegram.WebApp.initDataUnsafe.user && window.Telegram.WebApp.initDataUnsafe.user.id) {
+                telegram_id = window.Telegram.WebApp.initDataUnsafe.user.id;
+            }
+            // Создаем модальное окно
+            const modal = document.createElement('div');
+            modal.id = 'full-report-modal';
+            modal.style = 'position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.25);z-index:1000;display:flex;align-items:center;justify-content:center;';
+            modal.innerHTML = `
+                <div style=\"background:#fff;border-radius:18px;box-shadow:0 4px 24px rgba(102,126,234,0.18);padding:32px 24px 24px 24px;max-width:340px;width:90vw;text-align:center;\">
+                    <div style=\"font-size:19px;font-weight:700;color:#667eea;margin-bottom:16px;\">Подтвердите параметры полного отчета</div>
+                    <div style=\"font-size:16px;color:#333;margin-bottom:10px;\"><b>Адрес:</b> ${address}</div>
+                    <div style=\"font-size:16px;color:#333;margin-bottom:10px;\"><b>Спален:</b> ${bedrooms}</div>
+                    <div style=\"font-size:16px;color:#333;margin-bottom:18px;\"><b>Цена объекта:</b> €${price}</div>
+                    <div style=\"font-size:15px;color:#555;margin-bottom:18px;\">Стоимость полного отчета: <b>$1</b></div>
+                    <button class=\"btn btn-primary\" style=\"width:100%;font-size:17px;\" onclick=\"deductAndGenerateFullReport(${telegram_id})\">Да, продолжить (1$)</button>
+                    <button class=\"btn btn-secondary\" style=\"width:100%;margin-top:10px;font-size:16px;\" onclick=\"closeFullReportModal();goToMainMenu();\">Нет, полный отчет не нужен</button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        function deductAndGenerateFullReport(telegram_id) {
+            fetch('/api/user_balance', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ telegram_id, deduct: true })
+            })
+            .then(res => res.json())
+            .then(data => {
+                closeFullReportModal();
+                if (data.success) {
+                    alert('Полный анализ недвижимости (заглушка)');
+                } else {
+                    alert('Ошибка списания баланса: ' + (data.error || 'Не удалось списать $1'));
+                }
+            })
+            .catch(() => {
+                closeFullReportModal();
+                alert('Ошибка списания баланса');
+            });
+        }
+
+        function closeFullReportModal() {
+            let modal = document.getElementById('full-report-modal');
+            if (modal) modal.remove();
         }
 
         function showBalanceModal() {
