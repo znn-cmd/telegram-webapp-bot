@@ -620,98 +620,154 @@ def api_similar_properties():
 
 @app.route('/api/full_report', methods=['POST'])
 def api_full_report():
-    """Получение полного отчета (платный)"""
     data = request.json or {}
     telegram_id = data.get('telegram_id')
-    object_data = data.get('object_data')
-    client_name = data.get('client_name')
-    add_realtor_contacts = data.get('add_realtor_contacts', False)
-    add_client_name = data.get('add_client_name', False)
-    
-    if not telegram_id:
-        return jsonify({'error': 'telegram_id required'}), 400
-    
+    address = data.get('address')
+    lat = data.get('lat')
+    lng = data.get('lng')
+    bedrooms = data.get('bedrooms')
+    price = data.get('price')
+    force_update = data.get('force_update', False)
+    created_at = datetime.datetime.now().isoformat()
     try:
-        # Проверяем баланс пользователя
-        balance_result = supabase.table('users').select('balance').eq('telegram_id', telegram_id).execute()
-        if balance_result.data:
-            balance = balance_result.data[0].get('balance', 0)
-        else:
-            balance = 0
-        
-        report_cost = 1.0
-        
-        if balance < report_cost:
-            return jsonify({
-                'success': False,
-                'insufficient_balance': True,
-                'message': 'Недостаточно средств на балансе',
-                'required': report_cost,
-                'current': balance
-            })
-        
-        # Списываем средства
-        new_balance = balance - report_cost
-        supabase.table('users').update({'balance': new_balance}).eq('telegram_id', telegram_id).execute()
-        
-        # Генерируем полный отчет
-        full_report = generate_full_report(object_data, client_name, add_realtor_contacts, add_client_name)
-        
-        return jsonify({
-            'success': True,
-            'report': full_report,
-            'balance_after': new_balance
-        })
-        
+        existing = supabase.table('user_reports').select('*').eq('user_id', telegram_id).eq('address', address).eq('report_type', 'full').order('created_at', desc=True).limit(1).execute()
+        if existing.data and not force_update:
+            report = existing.data[0]
+            created = datetime.datetime.fromisoformat(report['created_at'])
+            now = datetime.datetime.now()
+            days_old = (now - created).days
+            if days_old <= 30:
+                return jsonify({'success': True, 'full_report': report['full_report'], 'created_at': report['created_at'], 'from_cache': True})
+            else:
+                return jsonify({'success': True, 'need_update': True, 'created_at': report['created_at']})
+        # --- MOCK/DEMO DATA ---
+        # В реальной реализации здесь будут запросы к таблицам Supabase (см. supabase_full_report_tables.sql)
+        # Пример: средняя цена за м2, yield, индексы, макроэкономика, альтернативы
+        avg_sqm = 15451.29
+        price_growth = 0.042
+        short_term_income = 1950
+        short_term_net = 1560
+        long_term_income = 43000
+        long_term_net = 34400
+        five_year_growth = 0.23
+        alt_deposit = 0.128
+        alt_bonds = 0.245
+        alt_stocks = 0.382
+        alt_reits = 0.427
+        inflation = 64.8
+        eur_try = 35.2
+        eur_try_growth = 0.14
+        refi_rate = 45
+        gdp_growth = 4.1
+        taxes = {
+            'transfer_tax': 0.04,
+            'stamp_duty': 0.015,
+            'notary': 1200,
+            'annual_property_tax': 0.001,
+            'annual_property_tax_max': 0.006,
+            'rental_income_tax': '15-35%',
+            'capital_gains_tax': '15-40%'
+        }
+        risks = [
+            'Валютный: TRY/EUR ▲23% за 3 года',
+            'Политический: Выборы 2028',
+            'Экологический: Карта наводнений (NASA Earth Data)'
+        ]
+        liquidity = 'Среднее время продажи: 68 дней'
+        district = 'Новый трамвай до пляжа (2026), Строительство школы (2027)'
+        # --- Формируем структуру полного отчёта ---
+        full_report_data = {
+            'object': {
+                'address': address,
+                'bedrooms': bedrooms,
+                'purchase_price': price,
+                'avg_price_per_sqm': avg_sqm
+            },
+            'roi': {
+                'short_term': {
+                    'monthly_income': short_term_income,
+                    'net_income': short_term_net,
+                    'five_year_income': 93600,
+                    'final_value': price * (1 + five_year_growth),
+                    'roi': 81.5
+                },
+                'long_term': {
+                    'annual_income': long_term_income,
+                    'net_income': long_term_net,
+                    'five_year_income': 172000,
+                    'final_value': price * (1 + five_year_growth),
+                    'roi': 130.5
+                },
+                'no_rent': {
+                    'final_value': price * (1 + five_year_growth),
+                    'roi': 23
+                },
+                'price_growth': price_growth
+            },
+            'alternatives': [
+                {'name': 'Банковский депозит', 'yield': alt_deposit, 'source': 'TCMB API'},
+                {'name': 'Облигации Турции', 'yield': alt_bonds, 'source': 'Investing.com API'},
+                {'name': 'Акции (BIST30)', 'yield': alt_stocks, 'source': 'Alpha Vantage API'},
+                {'name': 'REITs (фонды)', 'yield': alt_reits, 'source': 'Financial Modeling Prep'},
+                {'name': 'Недвижимость', 'yield': 0.815, 'source': 'Ваш объект'}
+            ],
+            'macro': {
+                'inflation': inflation,
+                'eur_try': eur_try,
+                'eur_try_growth': eur_try_growth,
+                'refi_rate': refi_rate,
+                'gdp_growth': gdp_growth
+            },
+            'taxes': taxes,
+            'risks': risks,
+            'liquidity': liquidity,
+            'district': district,
+            'yield': 0.081,
+            'price_index': 1.23,
+            'mortgage_rate': 0.32,
+            'global_house_price_index': 1.12,
+            'summary': 'Полный отчёт с реальными/мок-данными. Для реальных данных используйте таблицы Supabase.'
+        }
+        report_data = {
+            'user_id': telegram_id,
+            'report_type': 'full',
+            'title': f'Полный отчет: {address}',
+            'description': f'Полный отчет по адресу {address}, {bedrooms} спален, цена {price}',
+            'parameters': {
+                'address': address,
+                'bedrooms': bedrooms,
+                'price': price,
+                'lat': lat,
+                'lng': lng
+            },
+            'address': address,
+            'latitude': lat,
+            'longitude': lng,
+            'bedrooms': bedrooms,
+            'price': price,
+            'created_at': created_at,
+            'full_report': full_report_data
+        }
+        supabase.table('user_reports').insert(report_data).execute()
+        return jsonify({'success': True, 'full_report': full_report_data, 'created_at': created_at, 'from_cache': False})
     except Exception as e:
-        logger.error(f"Error generating full report: {e}")
+        logger.error(f"Error in full_report: {e}")
         return jsonify({'error': 'Internal error'}), 500
 
-def generate_full_report(object_data, client_name=None, add_realtor_contacts=False, add_client_name=False):
-    """Генерация полного отчета"""
-    
-    report = {
-        'object': object_data,
-        'macro': {
-            'inflation_rate': 2.5,
-            'interest_rate': 4.2,
-            'gdp_growth': 3.1,
-            'unemployment_rate': 5.2
-        },
-        'investments': [
-            {'type': 'Краткосрочная аренда', 'roi': '12-18%', 'risk': 'Средний'},
-            {'type': 'Долгосрочная аренда', 'roi': '6-10%', 'risk': 'Низкий'},
-            {'type': 'Перепродажа', 'roi': '15-25%', 'risk': 'Высокий'}
-        ],
-        'region': {
-            'population_growth': 2.1,
-            'infrastructure_development': 'Высокий',
-            'tourism_growth': 8.5
-        },
-        'taxes': {
-            'property_tax': 0.5,
-            'income_tax': 15.0,
-            'capital_gains_tax': 20.0
-        },
-        'risks': [
-            'Риск изменения законодательства',
-            'Риск изменения курса валют',
-            'Риск природных катаклизмов'
-        ]
-    }
-    
-    if add_client_name and client_name:
-        report['client_name'] = client_name
-    
-    if add_realtor_contacts:
-        report['realtor_contacts'] = {
-            'name': 'Иван Петров',
-            'phone': '+90 555 123 4567',
-            'email': 'ivan@aaadvisor.com',
-            'company': 'Aaadvisor Real Estate'
-        }
-    
-    return report
+@app.route('/api/user_reports', methods=['POST'])
+def api_user_reports():
+    """Получение списка всех отчетов пользователя по telegram_id"""
+    data = request.json or {}
+    telegram_id = data.get('telegram_id')
+    if not telegram_id:
+        return jsonify({'error': 'telegram_id required'}), 400
+    try:
+        result = supabase.table('user_reports').select('*').eq('user_id', telegram_id).order('created_at', desc=True).execute()
+        reports = result.data if hasattr(result, 'data') else result
+        return jsonify({'success': True, 'reports': reports})
+    except Exception as e:
+        logger.error(f"Error fetching user reports: {e}")
+        return jsonify({'error': 'Internal error'}), 500
 
 @app.route('/api/save_object', methods=['POST'])
 def api_save_object():
@@ -774,8 +830,8 @@ def api_generate_pdf_report():
             pdf.cell(0, 10, 'Макроэкономические показатели:', ln=True)
             pdf.set_font('Arial', '', 10)
             macro = report['macro']
-            pdf.cell(0, 8, f'Инфляция: {macro.get("inflation_rate", 0)}%', ln=True)
-            pdf.cell(0, 8, f'Ставка рефинансирования: {macro.get("interest_rate", 0)}%', ln=True)
+            pdf.cell(0, 8, f'Инфляция: {macro.get("inflation", 0)}%', ln=True)
+            pdf.cell(0, 8, f'Ставка рефинансирования: {macro.get("refi_rate", 0)}%', ln=True)
             pdf.cell(0, 8, f'Рост ВВП: {macro.get("gdp_growth", 0)}%', ln=True)
             pdf.ln(5)
         
@@ -842,38 +898,199 @@ def api_user_balance():
 
 @app.route('/api/send_pdf_to_client', methods=['POST'])
 def api_send_pdf_to_client():
-    """Отправка PDF клиенту"""
+    """Отправка PDF клиенту и запись в client_contacts (всегда новая запись)"""
     data = request.json or {}
     realtor_telegram_id = data.get('realtor_telegram_id')
     client_name = data.get('client_name')
     client_telegram = data.get('client_telegram')
     pdf_path = data.get('pdf_path')
-    
-    if not all([realtor_telegram_id, client_telegram, pdf_path]):
+    pdf_url = data.get('pdf_url')  # если уже загружено в облако
+    now = datetime.datetime.now().isoformat()
+    if not all([realtor_telegram_id, client_telegram, pdf_path or pdf_url]):
         return jsonify({'error': 'Missing required data'}), 400
-    
     try:
-        # Здесь должна быть логика отправки PDF через Telegram Bot API
-        # Пока возвращаем успех
-        
-        # Сохраняем информацию о клиенте
+        # Здесь должна быть логика отправки PDF через Telegram Bot API (или просто сохраняем ссылку)
+        # Сохраняем информацию о клиенте (всегда новая запись)
         client_data = {
             'realtor_telegram_id': realtor_telegram_id,
             'client_name': client_name,
             'client_telegram': client_telegram,
-            'pdf_sent_at': datetime.datetime.now().isoformat()
+            'created_at': now,
+            'last_report_pdf_url': pdf_url or pdf_path
         }
-        
-        supabase.table('client_communications').insert(client_data).execute()
-        
+        supabase.table('client_contacts').insert(client_data).execute()
         return jsonify({
             'success': True,
             'sent': True
         })
-        
     except Exception as e:
         logger.error(f"Error sending PDF to client: {e}")
         return jsonify({'error': 'Internal error'}), 500
+
+@app.route('/api/send_report_to_client', methods=['POST'])
+def api_send_report_to_client():
+    """Отправка отчета клиенту через Telegram"""
+    data = request.json or {}
+    telegram_id = data.get('telegram_id')
+    client_name = data.get('client_name')
+    client_username = data.get('client_username')
+    report_data = data.get('report_data')
+    
+    if not all([telegram_id, client_name, client_username, report_data]):
+        return jsonify({'error': 'Missing required data'}), 400
+    
+    try:
+        # Получаем данные пользователя (риелтора)
+        user_result = supabase.table('users').select('first_name, last_name').eq('telegram_id', telegram_id).execute()
+        if not user_result.data:
+            return jsonify({'error': 'User not found'}), 404
+        
+        realtor_name = f"{user_result.data[0].get('first_name', '')} {user_result.data[0].get('last_name', '')}".strip()
+        
+        # Генерируем PDF отчет
+        pdf_path = generate_client_report_pdf(report_data, realtor_name)
+        
+        # Отправляем через Telegram Bot API
+        success = send_pdf_via_telegram(client_username, pdf_path, client_name, realtor_name)
+        
+        if success:
+            # Сохраняем информацию о клиенте
+            try:
+                supabase.table('client_contacts').insert({
+                    'user_id': telegram_id,
+                    'client_name': client_name,
+                    'client_username': client_username,
+                    'report_address': report_data.get('address'),
+                    'sent_at': datetime.datetime.now().isoformat()
+                }).execute()
+            except Exception as e:
+                logger.error(f"Error saving client contact: {e}")
+                # Продолжаем выполнение даже если сохранение не удалось
+            
+            # Удаляем временный файл
+            try:
+                os.remove(pdf_path)
+            except:
+                pass
+            
+            return jsonify({'success': True, 'message': 'Report sent successfully'})
+        else:
+            return jsonify({'error': 'Failed to send report via Telegram'}), 500
+            
+    except Exception as e:
+        logger.error(f"Error sending report to client: {e}")
+        return jsonify({'error': 'Internal server error'}), 500
+
+def generate_client_report_pdf(report_data, realtor_name):
+    """Генерация PDF отчета для клиента"""
+    pdf = FPDF()
+    pdf.add_page()
+    pdf.set_font("Arial", size=12)
+    
+    # Заголовок
+    pdf.set_font("Arial", 'B', 16)
+    pdf.cell(200, 10, txt="Анализ недвижимости", ln=True, align='C')
+    pdf.ln(5)
+    
+    # Информация об объекте
+    pdf.set_font("Arial", 'B', 14)
+    pdf.cell(200, 10, txt="Информация об объекте:", ln=True)
+    pdf.set_font("Arial", size=12)
+    pdf.cell(200, 8, txt=f"Адрес: {report_data.get('address', 'N/A')}", ln=True)
+    pdf.cell(200, 8, txt=f"Спален: {report_data.get('bedrooms', 'N/A')}", ln=True)
+    pdf.cell(200, 8, txt=f"Цена: €{report_data.get('price', 0):,.0f}", ln=True)
+    pdf.ln(5)
+    
+    # Если есть полный отчет
+    if 'report' in report_data:
+        report = report_data['report']
+        
+        # ROI анализ
+        pdf.set_font("Arial", 'B', 14)
+        pdf.cell(200, 10, txt="Инвестиционный анализ (ROI):", ln=True)
+        pdf.set_font("Arial", size=12)
+        pdf.cell(200, 8, txt=f"Краткосрочная аренда: ROI {report['roi']['short_term']['roi']}%", ln=True)
+        pdf.cell(200, 8, txt=f"Долгосрочная аренда: ROI {report['roi']['long_term']['roi']}%", ln=True)
+        pdf.cell(200, 8, txt=f"Без аренды: ROI {report['roi']['no_rent']['roi']}%", ln=True)
+        pdf.ln(5)
+        
+        # Макроэкономика
+        pdf.set_font("Arial", 'B', 14)
+        pdf.cell(200, 10, txt="Макроэкономические показатели:", ln=True)
+        pdf.set_font("Arial", size=12)
+        pdf.cell(200, 8, txt=f"Инфляция: {report['macro']['inflation']}%", ln=True)
+        pdf.cell(200, 8, txt=f"Ключевая ставка: {report['macro']['refi_rate']}%", ln=True)
+        pdf.cell(200, 8, txt=f"Рост ВВП: {report['macro']['gdp_growth']}%", ln=True)
+        pdf.ln(5)
+        
+        # Налоги
+        pdf.set_font("Arial", 'B', 14)
+        pdf.cell(200, 10, txt="Налоги и сборы:", ln=True)
+        pdf.set_font("Arial", size=12)
+        pdf.cell(200, 8, txt=f"Налог на перевод: {report['taxes']['transfer_tax']*100}%", ln=True)
+        pdf.cell(200, 8, txt=f"Гербовый сбор: {report['taxes']['stamp_duty']*100}%", ln=True)
+        pdf.cell(200, 8, txt=f"Нотариус: €{report['taxes']['notary']}", ln=True)
+        pdf.ln(5)
+        
+        # Итог
+        pdf.set_font("Arial", 'B', 14)
+        pdf.cell(200, 10, txt="Заключение:", ln=True)
+        pdf.set_font("Arial", size=12)
+        pdf.multi_cell(200, 8, txt=report.get('summary', 'Анализ завершен'))
+    
+    # Контактная информация риелтора
+    pdf.ln(10)
+    pdf.set_font("Arial", 'B', 12)
+    pdf.cell(200, 8, txt=f"Риелтор: {realtor_name}", ln=True)
+    pdf.cell(200, 8, txt="Свяжитесь для получения дополнительной информации", ln=True)
+    
+    # Сохраняем во временный файл
+    temp_file = tempfile.NamedTemporaryFile(delete=False, suffix='.pdf')
+    pdf.output(temp_file.name)
+    return temp_file.name
+
+def send_pdf_via_telegram(client_username, pdf_path, client_name, realtor_name):
+    """Отправка PDF через Telegram Bot API"""
+    try:
+        # Убираем @ если есть
+        username = client_username.lstrip('@')
+        
+        # Формируем сообщение
+        message = f"Здравствуйте, {client_name}! 👋\n\n"
+        message += f"Риелтор {realtor_name} подготовил для вас анализ недвижимости.\n\n"
+        message += "В прикрепленном файле вы найдете:\n"
+        message += "• Детальный анализ объекта\n"
+        message += "• Инвестиционные расчеты (ROI)\n"
+        message += "• Макроэкономические показатели\n"
+        message += "• Информацию о налогах и сборах\n\n"
+        message += "Для получения дополнительной информации свяжитесь с риелтором."
+        
+        # Отправляем через Telegram Bot API
+        bot = Bot(token=TOKEN)
+        
+        # Сначала отправляем текстовое сообщение
+        try:
+            bot.send_message(chat_id=f"@{username}", text=message)
+        except Exception as e:
+            logger.error(f"Error sending text message: {e}")
+            return False
+        
+        # Затем отправляем PDF файл
+        try:
+            with open(pdf_path, 'rb') as pdf_file:
+                bot.send_document(
+                    chat_id=f"@{username}",
+                    document=pdf_file,
+                    caption="Анализ недвижимости"
+                )
+            return True
+        except Exception as e:
+            logger.error(f"Error sending PDF: {e}")
+            return False
+            
+    except Exception as e:
+        logger.error(f"Error in send_pdf_via_telegram: {e}")
+        return False
 
 def run_flask():
     """Запуск Flask приложения"""

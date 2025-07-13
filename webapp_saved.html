@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aaadviser - Мои отчеты</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            background: white;
+            min-height: 100vh;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 8px;
+        }
+        .title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 24px;
+            text-align: center;
+        }
+        .report-list {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+        .report-card {
+            background: #f8f9fa;
+            border-radius: 14px;
+            box-shadow: 0 2px 8px rgba(102,126,234,0.08);
+            padding: 18px 14px 14px 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .report-address {
+            font-size: 16px;
+            font-weight: 600;
+            color: #667eea;
+            margin-bottom: 2px;
+        }
+        .report-meta {
+            font-size: 13px;
+            color: #555;
+        }
+        .report-type {
+            font-size: 13px;
+            color: #764ba2;
+            font-weight: 500;
+        }
+        .btn {
+            margin-top: 10px;
+            padding: 10px 0;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            transition: background 0.2s;
+        }
+        .btn:hover {
+            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+        }
+        .back-btn {
+            margin-top: 30px;
+            background: #f1f1f1;
+            color: #333;
+            border: 1px solid #ddd;
+        }
+        .back-btn:hover {
+            background: #e2e2e2;
+        }
+        .loading {
+            text-align: center;
+            color: #667eea;
+            font-size: 16px;
+            margin-top: 30px;
+        }
+        .empty {
+            text-align: center;
+            color: #888;
+            font-size: 15px;
+            margin-top: 40px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">Aaadviser</div>
+        <div class="title" id="pageTitle">Мои отчеты</div>
+        <div id="loading" class="loading">Загрузка...</div>
+        <div id="reportList" class="report-list" style="display:none;"></div>
+        <div id="empty" class="empty" style="display:none;">Нет сохраненных отчетов</div>
+        <button class="btn back-btn" onclick="goToMainMenu()">В главное меню</button>
+    </div>
+    <script>
+        let tg = window.Telegram.WebApp;
+        tg.expand();
+        tg.ready();
+        let userData = tg.initDataUnsafe && tg.initDataUnsafe.user ? tg.initDataUnsafe.user : null;
+        // Локализация (можно расширить)
+        const locales = {
+            'ru': {
+                'pageTitle': 'Мои отчеты',
+                'loading': 'Загрузка...',
+                'empty': 'Нет сохраненных отчетов',
+                'mainMenu': 'В главное меню',
+                'view': 'Посмотреть',
+                'full': 'Полный',
+                'market_analysis': 'Базовый',
+            },
+            'en': {
+                'pageTitle': 'My Reports',
+                'loading': 'Loading...',
+                'empty': 'No saved reports',
+                'mainMenu': 'Main menu',
+                'view': 'View',
+                'full': 'Full',
+                'market_analysis': 'Basic',
+            }
+        };
+        let currentLanguage = 'ru';
+        if (userData && userData.language_code && locales[userData.language_code]) {
+            currentLanguage = userData.language_code;
+        }
+        function getText(key) {
+            return locales[currentLanguage][key] || key;
+        }
+        document.getElementById('pageTitle').textContent = getText('pageTitle');
+        document.getElementById('loading').textContent = getText('loading');
+        document.querySelector('.back-btn').textContent = getText('mainMenu');
+        // Загрузка отчетов
+        async function loadReports() {
+            if (!userData) return;
+            document.getElementById('loading').style.display = '';
+            document.getElementById('reportList').style.display = 'none';
+            document.getElementById('empty').style.display = 'none';
+            try {
+                const res = await fetch('/api/user_reports', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ telegram_id: userData.id })
+                });
+                const data = await res.json();
+                if (data.success && data.reports && data.reports.length > 0) {
+                    renderReports(data.reports);
+                } else {
+                    document.getElementById('empty').style.display = '';
+                }
+            } catch (e) {
+                document.getElementById('empty').style.display = '';
+            }
+            document.getElementById('loading').style.display = 'none';
+        }
+        function renderReports(reports) {
+            const list = document.getElementById('reportList');
+            list.innerHTML = '';
+            reports.forEach(r => {
+                const card = document.createElement('div');
+                card.className = 'report-card';
+                card.innerHTML = `
+                    <div class="report-address">${r.address || ''}</div>
+                    <div class="report-meta">${new Date(r.created_at).toLocaleString()} | <span class="report-type">${getText(r.report_type) || r.report_type}</span></div>
+                    <button class="btn" onclick="viewReport('${r.id || ''}')">${getText('view')}</button>
+                `;
+                list.appendChild(card);
+            });
+            list.style.display = '';
+        }
+        function goToMainMenu() {
+            window.location.href = '/webapp';
+        }
+        function viewReport(id) {
+            // Получаем отчёт по id из /api/user_reports (можно оптимизировать, если список уже есть)
+            fetch('/api/user_reports', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ telegram_id: userData.id })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success && data.reports) {
+                    const report = data.reports.find(r => r.id == id);
+                    if (report && report.report_type === 'full') {
+                        showFullReportModal(report.full_report);
+                    } else {
+                        alert('Детальный просмотр доступен только для полного отчёта.');
+                    }
+                }
+            });
+        }
+        // Модалка для полного отчёта
+        function showFullReportModal(report) {
+            let oldModal = document.getElementById('full-report-modal');
+            if (oldModal) oldModal.remove();
+            const modal = document.createElement('div');
+            modal.id = 'full-report-modal';
+            modal.style = 'position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.25);z-index:1000;display:flex;align-items:center;justify-content:center;overflow:auto;';
+            modal.innerHTML = `
+                <div style="background:#fff;border-radius:18px;box-shadow:0 4px 24px rgba(102,126,234,0.18);padding:32px 18px 24px 18px;max-width:420px;width:96vw;text-align:left;max-height:90vh;overflow-y:auto;">
+                    <div id="fullReportContent"></div>
+                    <div style='display:flex;gap:10px;margin-top:18px;'>
+                        <button class="btn" onclick="exportPdfFlow()">Экспорт в PDF</button>
+                        <button class="btn" onclick="sendPdfToClientFlow()">Отправить клиенту</button>
+                    </div>
+                    <button class="btn back-btn" style="margin-top:18px;" onclick="closeFullReportModal()">Закрыть</button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            showFullReport(report, 'fullReportContent');
+            window._currentFullReport = report; // для экспорта/отправки
+        }
+        function closeFullReportModal() {
+            let modal = document.getElementById('full-report-modal');
+            if (modal) modal.remove();
+        }
+        // Дублируем showFullReport с webapp_real_data.html (адаптировано для вставки в любой контейнер)
+        function showFullReport(report, containerId) {
+            let html = '';
+            html += `<div style='font-size:22px;font-weight:800;color:#667eea;margin-bottom:10px;text-align:center;'>Полный отчет по объекту</div>`;
+            html += `<div style='background:#f4f7ff;border-radius:12px;padding:16px 14px 10px 14px;margin-bottom:18px;box-shadow:0 2px 8px rgba(102,126,234,0.08);'>`;
+            html += `<div style='font-size:16px;margin-bottom:6px;'><b>Адрес:</b> <span style='color:#333;'>${report.object.address}</span></div>`;
+            html += `<div style='font-size:16px;margin-bottom:6px;'><b>Спален:</b> <span style='color:#333;'>${report.object.bedrooms}</span></div>`;
+            html += `<div style='font-size:16px;margin-bottom:6px;'><b>Цена объекта:</b> <span style='color:#333;'>€${Number(report.object.purchase_price).toLocaleString('ru-RU')}</span></div>`;
+            html += `<div style='font-size:16px;margin-bottom:0;'><b>Средняя цена за м²:</b> <span style='color:#333;'>€${Number(report.object.avg_price_per_sqm).toLocaleString('ru-RU')}</span></div>`;
+            html += `</div>`;
+            html += `<div style='background:#f8f9fa;border-radius:12px;padding:14px 12px 10px 12px;margin-bottom:14px;box-shadow:0 2px 8px rgba(102,126,234,0.06);'>`;
+            html += `<div style='font-size:17px;font-weight:700;color:#667eea;margin-bottom:8px;'>Инвестиционный анализ (ROI)</div>`;
+            html += `<div style='font-size:15px;color:#222;margin-bottom:7px;'>Краткосрочная аренда: ROI ${report.roi.short_term.roi}%<br>Месячный доход: €${report.roi.short_term.monthly_income}, Чистый доход: €${report.roi.short_term.net_income}, 5 лет: €${report.roi.short_term.five_year_income}, Рост стоимости: €${report.roi.short_term.final_value.toLocaleString('ru-RU')}</div>`;
+            html += `<div style='font-size:15px;color:#222;margin-bottom:7px;'>Долгосрочная аренда: ROI ${report.roi.long_term.roi}%<br>Годовой доход: €${report.roi.long_term.annual_income}, Чистый доход: €${report.roi.long_term.net_income}, 5 лет: €${report.roi.long_term.five_year_income}, Рост стоимости: €${report.roi.long_term.final_value.toLocaleString('ru-RU')}</div>`;
+            html += `<div style='font-size:15px;color:#222;margin-bottom:7px;'>Без аренды (только рост стоимости): ROI ${report.roi.no_rent.roi}%<br>Итоговая стоимость: €${report.roi.no_rent.final_value.toLocaleString('ru-RU')}</div>`;
+            html += `</div>`;
+            html += `<div style='background:#f8f9fa;border-radius:12px;padding:14px 12px 10px 12px;margin-bottom:14px;box-shadow:0 2px 8px rgba(102,126,234,0.06);'>`;
+            html += `<div style='font-size:17px;font-weight:700;color:#667eea;margin-bottom:8px;'>Сравнение с альтернативами (5 лет)</div>`;
+            html += `<table style='width:100%;font-size:14px;margin-bottom:7px;'><tr><th style='text-align:left;'>Инструмент</th><th style='text-align:right;'>Доходность</th></tr>`;
+            report.alternatives.forEach(alt => {
+                html += `<tr><td>${alt.name}</td><td style='text-align:right;'>${(alt.yield*100).toFixed(1)}%</td></tr>`;
+            });
+            html += `</table></div>`;
+            html += `<div style='background:#f8f9fa;border-radius:12px;padding:14px 12px 10px 12px;margin-bottom:14px;box-shadow:0 2px 8px rgba(102,126,234,0.06);'>`;
+            html += `<div style='font-size:17px;font-weight:700;color:#667eea;margin-bottom:8px;'>Макроэкономика</div>`;
+            html += `<div style='font-size:15px;color:#222;margin-bottom:7px;'>Инфляция: ${report.macro.inflation}%<br>Курс EUR/TRY: ${report.macro.eur_try} (${(report.macro.eur_try_growth*100).toFixed(1)}% за год)<br>Ключевая ставка: ${report.macro.refi_rate}%<br>Рост ВВП: ${report.macro.gdp_growth}%</div>`;
+            html += `</div>`;
+            html += `<div style='background:#f8f9fa;border-radius:12px;padding:14px 12px 10px 12px;margin-bottom:14px;box-shadow:0 2px 8px rgba(102,126,234,0.06);'>`;
+            html += `<div style='font-size:17px;font-weight:700;color:#667eea;margin-bottom:8px;'>Налоги и сборы</div>`;
+            html += `<div style='font-size:15px;color:#222;margin-bottom:7px;'>При покупке: налог на перевод ${report.taxes.transfer_tax*100}%<br>Гербовый сбор: ${report.taxes.stamp_duty*100}%<br>Нотариус: €${report.taxes.notary}</div>`;
+            html += `<div style='font-size:15px;color:#222;margin-bottom:7px;'>Ежегодно: налог на имущество ${report.taxes.annual_property_tax*100}% - ${report.taxes.annual_property_tax_max*100}%<br>Подоходный налог с аренды: ${report.taxes.rental_income_tax}</div>`;
+            html += `<div style='font-size:15px;color:#222;margin-bottom:7px;'>При продаже: налог на прирост: ${report.taxes.capital_gains_tax}</div>`;
+            html += `</div>`;
+            html += `<div style='background:#f8f9fa;border-radius:12px;padding:14px 12px 10px 12px;margin-bottom:14px;box-shadow:0 2px 8px rgba(102,126,234,0.06);'>`;
+            html += `<div style='font-size:17px;font-weight:700;color:#667eea;margin-bottom:8px;'>Профессиональные метрики</div>`;
+            html += `<div style='font-size:15px;color:#222;margin-bottom:7px;'>Yield: ${(report.yield*100).toFixed(1)}%<br>Индекс цен: ${report.price_index}<br>Ипотечная ставка: ${(report.mortgage_rate*100).toFixed(1)}%<br>Глобальный индекс цен: ${report.global_house_price_index}</div>`;
+            html += `</div>`;
+            html += `<div style='background:#f8f9fa;border-radius:12px;padding:14px 12px 10px 12px;margin-bottom:14px;box-shadow:0 2px 8px rgba(102,126,234,0.06);'>`;
+            html += `<div style='font-size:17px;font-weight:700;color:#667eea;margin-bottom:8px;'>Риски и развитие района</div>`;
+            html += `<div style='font-size:15px;color:#222;margin-bottom:7px;'>${report.risks.join('<br>')}</div>`;
+            html += `<div style='font-size:15px;color:#222;margin-bottom:7px;'>${report.liquidity}</div>`;
+            html += `<div style='font-size:15px;color:#222;margin-bottom:7px;'>${report.district}</div>`;
+            html += `</div>`;
+            html += `<div style='background:#f4f7ff;border-radius:12px;padding:14px 12px 10px 12px;margin-bottom:14px;box-shadow:0 2px 8px rgba(102,126,234,0.06);font-size:15px;color:#222;'>${report.summary}</div>`;
+            document.getElementById(containerId).innerHTML = html;
+        }
+        // Экспорт в PDF: выбор с контактами/без
+        function exportPdfFlow() {
+            showPdfOptionsModal((withContacts) => {
+                if (withContacts) {
+                    // Проверяем наличие данных пользователя (AJAX к /api/user_profile)
+                    fetch('/api/user_profile', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ telegram_id: userData.id })
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success) {
+                            const profile = data.profile;
+                            const missing = [];
+                            if (!profile.first_name) missing.push('Имя');
+                            if (!profile.last_name) missing.push('Фамилия');
+                            if (!profile.phone) missing.push('Телефон');
+                            if (!profile.email) missing.push('Email');
+                            if (!profile.company) missing.push('Компания');
+                            if (!profile.position) missing.push('Должность');
+                            if (!profile.about_me) missing.push('О себе');
+                            if (missing.length > 0) {
+                                alert('Заполните недостающие данные в профиле: ' + missing.join(', '));
+                                // Можно реализовать пошаговый сбор, если нужно
+                                return;
+                            }
+                            generatePdfRequest(profile);
+                        } else {
+                            alert('Ошибка загрузки профиля');
+                        }
+                    });
+                } else {
+                    generatePdfRequest(null);
+                }
+            });
+        }
+        // Модалка выбора PDF-опций
+        function showPdfOptionsModal(onSelect) {
+            let oldModal = document.getElementById('pdf-options-modal');
+            if (oldModal) oldModal.remove();
+            const modal = document.createElement('div');
+            modal.id = 'pdf-options-modal';
+            modal.style = 'position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.25);z-index:1100;display:flex;align-items:center;justify-content:center;';
+            modal.innerHTML = `
+                <div style="background:#fff;border-radius:18px;box-shadow:0 4px 24px rgba(102,126,234,0.18);padding:28px 18px 18px 18px;max-width:340px;width:90vw;text-align:center;">
+                    <div style="font-size:18px;font-weight:700;color:#667eea;margin-bottom:16px;">Экспорт в PDF</div>
+                    <div style="font-size:15px;color:#333;margin-bottom:18px;">Добавить ваши контактные данные в PDF?</div>
+                    <button class="btn" style="width:100%;font-size:16px;" onclick="closePdfOptionsModal();window._pdfOptionCb(true)">Да, добавить</button>
+                    <button class="btn btn-secondary" style="width:100%;margin-top:10px;font-size:16px;" onclick="closePdfOptionsModal();window._pdfOptionCb(false)">Нет, только отчет</button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            window._pdfOptionCb = onSelect;
+        }
+        function closePdfOptionsModal() {
+            let modal = document.getElementById('pdf-options-modal');
+            if (modal) modal.remove();
+        }
+        // Генерация PDF (AJAX)
+        function generatePdfRequest(profile) {
+            fetch('/api/generate_pdf_report', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ report: window._currentFullReport, profile })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success && data.pdf_path) {
+                    showPdfDownloadModal(data.pdf_path);
+                } else {
+                    alert('Ошибка генерации PDF');
+                }
+            });
+        }
+        // Модалка для скачивания PDF
+        function showPdfDownloadModal(pdfPath) {
+            let oldModal = document.getElementById('pdf-download-modal');
+            if (oldModal) oldModal.remove();
+            const modal = document.createElement('div');
+            modal.id = 'pdf-download-modal';
+            modal.style = 'position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.25);z-index:1200;display:flex;align-items:center;justify-content:center;';
+            modal.innerHTML = `
+                <div style="background:#fff;border-radius:18px;box-shadow:0 4px 24px rgba(102,126,234,0.18);padding:28px 18px 18px 18px;max-width:340px;width:90vw;text-align:center;">
+                    <div style="font-size:18px;font-weight:700;color:#667eea;margin-bottom:16px;">PDF готов</div>
+                    <a href="/api/download_pdf" onclick="event.preventDefault();window.open('${pdfPath}','_blank');" class="btn" style="width:100%;font-size:16px;">Скачать PDF</a>
+                    <button class="btn btn-secondary" style="width:100%;margin-top:10px;font-size:16px;" onclick="closePdfDownloadModal()">Закрыть</button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+        function closePdfDownloadModal() {
+            let modal = document.getElementById('pdf-download-modal');
+            if (modal) modal.remove();
+        }
+        // Отправка клиенту
+        function sendPdfToClientFlow() {
+            // Сначала генерируем PDF (без контактов)
+            generatePdfRequest(null);
+            // После генерации показываем форму для клиента (можно доработать для реального UX)
+            setTimeout(() => {
+                showSendClientModal();
+            }, 1000);
+        }
+        function showSendClientModal() {
+            let oldModal = document.getElementById('send-client-modal');
+            if (oldModal) oldModal.remove();
+            const modal = document.createElement('div');
+            modal.id = 'send-client-modal';
+            modal.style = 'position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.25);z-index:1300;display:flex;align-items:center;justify-content:center;';
+            modal.innerHTML = `
+                <div style="background:#fff;border-radius:18px;box-shadow:0 4px 24px rgba(102,126,234,0.18);padding:28px 18px 18px 18px;max-width:340px;width:90vw;text-align:center;">
+                    <div style="font-size:18px;font-weight:700;color:#667eea;margin-bottom:16px;">Отправить клиенту</div>
+                    <input id="clientNameInput" class="input-field" placeholder="Имя клиента" style="margin-bottom:10px;width:90%;">
+                    <input id="clientTelegramInput" class="input-field" placeholder="Telegram клиента (username)" style="margin-bottom:10px;width:90%;">
+                    <button class="btn" style="width:100%;font-size:16px;" onclick="sendPdfToClientConfirm()">Отправить</button>
+                    <button class="btn btn-secondary" style="width:100%;margin-top:10px;font-size:16px;" onclick="closeSendClientModal()">Отмена</button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+        function closeSendClientModal() {
+            let modal = document.getElementById('send-client-modal');
+            if (modal) modal.remove();
+        }
+        function sendPdfToClientConfirm() {
+            const clientName = document.getElementById('clientNameInput').value.trim();
+            const clientTelegram = document.getElementById('clientTelegramInput').value.trim();
+            if (!clientName || !clientTelegram) {
+                alert('Заполните все поля');
+                return;
+            }
+            // Здесь должен быть путь к PDF (можно хранить в window._lastPdfPath после генерации)
+            const pdfPath = window._lastPdfPath || '';
+            fetch('/api/send_pdf_to_client', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    realtor_telegram_id: userData.id,
+                    client_name: clientName,
+                    client_telegram: clientTelegram,
+                    pdf_path: pdfPath
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    alert('PDF отправлен клиенту и записан в историю!');
+                    closeSendClientModal();
+                } else {
+                    alert('Ошибка отправки PDF');
+                }
+            });
+        }
+        loadReports();
+    </script>
+</body>
+</html> 

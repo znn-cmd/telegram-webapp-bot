@@ -143,6 +143,146 @@
             margin-bottom: 18px;
             text-align: center;
         }
+
+        /* Progress Bar Styles */
+        .progress-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+
+        .progress-card {
+            background: white;
+            border-radius: 18px;
+            padding: 32px 24px;
+            text-align: center;
+            max-width: 320px;
+            width: 90%;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+
+        .progress-spinner {
+            width: 48px;
+            height: 48px;
+            border: 4px solid #f0f0f0;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        .progress-text {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 16px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: #f0f0f0;
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: 12px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 3px;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        /* Toast Notification Styles */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 3000;
+            max-width: 300px;
+        }
+
+        .toast {
+            background: white;
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-bottom: 12px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+            border-left: 4px solid #667eea;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .toast.show {
+            transform: translateX(0);
+        }
+
+        .toast.success {
+            border-left-color: #28a745;
+        }
+
+        .toast.error {
+            border-left-color: #dc3545;
+        }
+
+        .toast.warning {
+            border-left-color: #ffc107;
+        }
+
+        .toast.info {
+            border-left-color: #17a2b8;
+        }
+
+        /* Client Modal Styles */
+        .client-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.25);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .client-modal-content {
+            background: #fff;
+            border-radius: 18px;
+            box-shadow: 0 4px 24px rgba(102, 126, 234, 0.18);
+            padding: 32px 24px 24px 24px;
+            max-width: 340px;
+            width: 90vw;
+            text-align: center;
+        }
+
+        .client-input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            font-size: 16px;
+            margin-bottom: 18px;
+            background: #f8f9fa;
+            transition: border 0.2s;
+        }
+
+        .client-input:focus {
+            border: 1.5px solid #667eea;
+            outline: none;
+        }
     </style>
 </head>
 <body>
@@ -211,6 +351,33 @@
 
         <div id="loading" class="loading" style="display:none;">Загрузка...</div>
     </div>
+
+    <!-- Progress Bar Container -->
+    <div id="progress-container" class="progress-container" style="display: none;">
+        <div class="progress-card">
+            <div class="progress-spinner"></div>
+            <div class="progress-text" id="progress-text">Обрабатываем запрос...</div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notifications Container -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- Client Modal -->
+    <div id="client-modal" class="client-modal" style="display: none;">
+        <div class="client-modal-content">
+            <div style="font-size: 19px; font-weight: 700; color: #667eea; margin-bottom: 16px;" id="client-modal-title">Отправить отчет клиенту</div>
+            <input type="text" id="client-name" class="client-input" placeholder="Имя клиента">
+            <input type="text" id="client-username" class="client-input" placeholder="Telegram username (без @)">
+            <div class="btn-row">
+                <button class="btn btn-secondary" onclick="closeClientModal()" id="client-modal-cancel">Отмена</button>
+                <button class="btn btn-primary" onclick="sendReportToClient()" id="client-modal-send">Отправить</button>
+            </div>
+        </div>
+    </div>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBrDkDpNKNAIyY147MQ78hchBkeyCAxhEw"></script>
     <script>
         let geoData = null;
@@ -219,6 +386,156 @@
         let lastReportAddress = '';
         let lastReportBedrooms = '';
         let lastReportPrice = '';
+        let currentReportData = null; // Для хранения данных текущего отчета
+
+        // Progress Bar Functions
+        function showProgressBar(text, progress = 0) {
+            document.getElementById('progress-text').textContent = text;
+            document.getElementById('progress-fill').style.width = progress + '%';
+            document.getElementById('progress-container').style.display = 'flex';
+        }
+
+        function updateProgressBar(progress) {
+            document.getElementById('progress-fill').style.width = progress + '%';
+        }
+
+        function hideProgressBar() {
+            document.getElementById('progress-container').style.display = 'none';
+        }
+
+        // Toast Notification Functions
+        function showToast(message, type = 'info', duration = 4000) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            
+            container.appendChild(toast);
+            
+            // Trigger animation
+            setTimeout(() => toast.classList.add('show'), 100);
+            
+            // Auto remove
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => container.removeChild(toast), 300);
+            }, duration);
+        }
+
+        // Client Modal Functions
+        function showClientModal() {
+            updateClientModalText();
+            document.getElementById('client-modal').style.display = 'flex';
+        }
+
+        function closeClientModal() {
+            document.getElementById('client-modal').style.display = 'none';
+            document.getElementById('client-name').value = '';
+            document.getElementById('client-username').value = '';
+        }
+
+        function updateClientModalText() {
+            document.getElementById('client-modal-title').textContent = getLocalizedText('client_modal.title');
+            document.getElementById('client-name').placeholder = getLocalizedText('client_modal.client_name_placeholder');
+            document.getElementById('client-username').placeholder = getLocalizedText('client_modal.client_username_placeholder');
+            document.getElementById('client-modal-cancel').textContent = getLocalizedText('client_modal.cancel');
+            document.getElementById('client-modal-send').textContent = getLocalizedText('client_modal.send');
+        }
+
+        async function sendReportToClient() {
+            const clientName = document.getElementById('client-name').value.trim();
+            const clientUsername = document.getElementById('client-username').value.trim();
+            
+            if (!clientName || !clientUsername) {
+                showToast(getLocalizedText('notifications.fill_all_fields'), 'error');
+                return;
+            }
+
+            if (!currentReportData) {
+                showToast(getLocalizedText('notifications.report_data_error'), 'error');
+                return;
+            }
+
+            closeClientModal();
+            showProgressBar(getLocalizedText('progress.sending_to_client'), 0);
+
+            try {
+                const response = await fetch('/api/send_report_to_client', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        telegram_id: getTelegramId(),
+                        client_name: clientName,
+                        client_username: clientUsername,
+                        report_data: currentReportData
+                    })
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    showToast(getLocalizedText('notifications.report_sent_success'), 'success');
+                } else {
+                    showToast(result.error || getLocalizedText('notifications.report_sent_error'), 'error');
+                }
+            } catch (error) {
+                showToast(getLocalizedText('notifications.connection_send_error'), 'error');
+            } finally {
+                hideProgressBar();
+            }
+        }
+
+        // Helper function to get Telegram ID
+        function getTelegramId() {
+            if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe && window.Telegram.WebApp.initDataUnsafe.user) {
+                return window.Telegram.WebApp.initDataUnsafe.user.id;
+            }
+            return 1952374904; // Fallback
+        }
+
+        // Localization helper
+        function getLocalizedText(key) {
+            const currentLang = 'ru'; // Можно сделать динамическим
+            const texts = {
+                'ru': {
+                    'progress': {
+                        'checking_balance': 'Проверяем баланс...',
+                        'generating_report': 'Формируем полный отчет...',
+                        'sending_to_client': 'Отправляем отчет клиенту...',
+                        'processing_request': 'Обрабатываем запрос...'
+                    },
+                    'notifications': {
+                        'report_copied': 'Данные отчета скопированы в буфер обмена!',
+                        'copy_error': 'Ошибка копирования в буфер',
+                        'balance_check_error': 'Ошибка проверки баланса',
+                        'deduction_error': 'Ошибка списания баланса',
+                        'connection_error': 'Ошибка соединения при формировании отчета',
+                        'report_generated': 'Полный отчет сформирован!',
+                        'report_sent_success': 'Отчет успешно отправлен клиенту!',
+                        'report_sent_error': 'Ошибка отправки отчета',
+                        'connection_send_error': 'Ошибка соединения при отправке',
+                        'fill_all_fields': 'Пожалуйста, заполните все поля',
+                        'report_data_error': 'Ошибка: данные отчета не найдены'
+                    },
+                    'client_modal': {
+                        'title': 'Отправить отчет клиенту',
+                        'client_name_placeholder': 'Имя клиента',
+                        'client_username_placeholder': 'Telegram username (без @)',
+                        'cancel': 'Отмена',
+                        'send': 'Отправить'
+                    }
+                }
+            };
+            
+            const lang = texts[currentLang] || texts['ru'];
+            const parts = key.split('.');
+            let result = lang;
+            for (const part of parts) {
+                result = result[part];
+                if (!result) return key;
+            }
+            return result;
+        }
 
         function showStep(step) {
             document.getElementById('step-address').style.display = 'none';
@@ -355,6 +672,7 @@
             lastReportAddress = address;
             lastReportBedrooms = bedrooms;
             lastReportPrice = price;
+            currentReportData = { address, bedrooms, price }; // Сохраняем данные отчета
             // Оставляем только один крупный заголовок
             let headerHtml = '';
             headerHtml += `<div style='font-size:22px;font-weight:800;color:#667eea;margin-bottom:10px;text-align:center;'>Аналитика по объекту</div>`;
@@ -403,16 +721,18 @@
             const reportBlock = document.getElementById('reportResult');
             const text = reportBlock.innerText;
             navigator.clipboard.writeText(text).then(() => {
-                alert('Данные отчета скопированы в буфер обмена!');
+                showToast(getLocalizedText('notifications.report_copied'), 'success');
+            }).catch(() => {
+                showToast(getLocalizedText('notifications.copy_error'), 'error');
             });
         }
 
         function showFullReportStub() {
             // Получаем telegram_id (заглушка или из Telegram WebApp)
-            let telegram_id = 1952374904;
-            if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe && window.Telegram.WebApp.initDataUnsafe.user && window.Telegram.WebApp.initDataUnsafe.user.id) {
-                telegram_id = window.Telegram.WebApp.initDataUnsafe.user.id;
-            }
+            let telegram_id = getTelegramId();
+            
+            showProgressBar(getLocalizedText('progress.checking_balance'), 20);
+            
             fetch('/api/user_balance', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -420,6 +740,7 @@
             })
             .then(res => res.json())
             .then(data => {
+                hideProgressBar();
                 if (data.balance >= 1) {
                     // Передаем параметры напрямую
                     showFullReportConfirmModal(lastReportAddress, lastReportBedrooms, lastReportPrice, telegram_id);
@@ -428,7 +749,8 @@
                 }
             })
             .catch(() => {
-                alert('Ошибка проверки баланса');
+                hideProgressBar();
+                showToast(getLocalizedText('notifications.balance_check_error'), 'error');
             });
         }
 
@@ -456,6 +778,7 @@
         }
 
         function deductAndGenerateFullReport(telegram_id) {
+            showProgressBar(getLocalizedText('progress.generating_report'), 0);
             fetch('/api/user_balance', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -463,16 +786,16 @@
             })
             .then(res => res.json())
             .then(data => {
-                closeFullReportModal();
+                hideProgressBar();
                 if (data.success) {
-                    alert('Полный анализ недвижимости (заглушка)');
+                    afterFullReportPayment(lastReportAddress, lastReportBedrooms, lastReportPrice, geoData.lat, geoData.lng, telegram_id);
                 } else {
-                    alert('Ошибка списания баланса: ' + (data.error || 'Не удалось списать $1'));
+                    showToast(getLocalizedText('notifications.deduction_error'), 'error');
                 }
             })
             .catch(() => {
-                closeFullReportModal();
-                alert('Ошибка списания баланса');
+                hideProgressBar();
+                showToast(getLocalizedText('notifications.deduction_error'), 'error');
             });
         }
 
@@ -502,6 +825,151 @@
         function closeBalanceModal() {
             let modal = document.getElementById('balance-modal');
             if (modal) modal.remove();
+        }
+
+        // После успешного списания $1:
+        function afterFullReportPayment(address, bedrooms, price, lat, lng, telegram_id) {
+            showProgressBar(getLocalizedText('progress.generating_report'), 0);
+            fetch('/api/full_report', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ address, bedrooms, price, lat, lng, telegram_id })
+            })
+            .then(res => res.json())
+            .then(data => {
+                hideProgressBar();
+                if (data.need_update) {
+                    showUpdateReportModal(data.created_at, () => {
+                        // Пользователь согласился обновить
+                        fetch('/api/user_balance', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ telegram_id, deduct: true })
+                        })
+                        .then(res => res.json())
+                        .then(bal => {
+                            if (bal.success) {
+                                fetch('/api/full_report', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ address, bedrooms, price, lat, lng, telegram_id, force_update: true })
+                                })
+                                .then(res => res.json())
+                                .then(newData => showFullReport(newData.full_report));
+                            } else {
+                                showToast(getLocalizedText('notifications.deduction_error'), 'error');
+                            }
+                        });
+                    }, () => {
+                        // Пользователь отказался, показываем старый отчёт
+                        fetch('/api/full_report', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ address, bedrooms, price, lat, lng, telegram_id })
+                        })
+                        .then(res => res.json())
+                        .then(oldData => showFullReport(oldData.full_report));
+                    });
+                } else {
+                    showFullReport(data.full_report);
+                }
+            })
+            .catch(() => {
+                hideProgressBar();
+                showToast(getLocalizedText('notifications.connection_error'), 'error');
+            });
+        }
+        // Модалка для обновления отчёта
+        function showUpdateReportModal(date, onUpdate, onOld) {
+            let oldModal = document.getElementById('update-report-modal');
+            if (oldModal) oldModal.remove();
+            const modal = document.createElement('div');
+            modal.id = 'update-report-modal';
+            modal.style = 'position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.25);z-index:1000;display:flex;align-items:center;justify-content:center;';
+            modal.innerHTML = `
+                <div style="background:#fff;border-radius:18px;box-shadow:0 4px 24px rgba(102,126,234,0.18);padding:32px 24px 24px 24px;max-width:340px;width:90vw;text-align:center;">
+                    <div style="font-size:19px;font-weight:700;color:#667eea;margin-bottom:16px;">Наши данные обновились</div>
+                    <div style="font-size:16px;color:#333;margin-bottom:18px;">Ваш отчёт был создан ${new Date(date).toLocaleDateString()}. Для актуальности рекомендуем обновить его за $1. Обновить сейчас?</div>
+                    <button class="btn btn-primary" style="width:100%;font-size:17px;" onclick="closeUpdateReportModal();(${onUpdate.toString()})()">Обновить за $1</button>
+                    <button class="btn btn-secondary" style="width:100%;margin-top:10px;font-size:16px;" onclick="closeUpdateReportModal();(${onOld.toString()})()">Показать старый отчёт</button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+        function closeUpdateReportModal() {
+            let modal = document.getElementById('update-report-modal');
+            if (modal) modal.remove();
+        }
+        // showFullReport(report) — функция для красивого вывода полного отчёта (реализовать отдельно)
+        function showFullReport(report) {
+            let html = '';
+            // Блок: Информация об объекте
+            html += `<div style='font-size:22px;font-weight:800;color:#667eea;margin-bottom:10px;text-align:center;'>Полный отчет по объекту</div>`;
+            html += `<div style='background:#f4f7ff;border-radius:12px;padding:16px 14px 10px 14px;margin-bottom:18px;box-shadow:0 2px 8px rgba(102,126,234,0.08);'>`;
+            html += `<div style='font-size:16px;margin-bottom:6px;'><b>Адрес:</b> <span style='color:#333;'>${report.object.address}</span></div>`;
+            html += `<div style='font-size:16px;margin-bottom:6px;'><b>Спален:</b> <span style='color:#333;'>${report.object.bedrooms}</span></div>`;
+            html += `<div style='font-size:16px;margin-bottom:6px;'><b>Цена объекта:</b> <span style='color:#333;'>€${Number(report.object.purchase_price).toLocaleString('ru-RU')}</span></div>`;
+            html += `<div style='font-size:16px;margin-bottom:0;'><b>Средняя цена за м²:</b> <span style='color:#333;'>€${Number(report.object.avg_price_per_sqm).toLocaleString('ru-RU')}</span></div>`;
+            html += `</div>`;
+            // Блок: ROI
+            html += `<div style='background:#f8f9fa;border-radius:12px;padding:14px 12px 10px 12px;margin-bottom:14px;box-shadow:0 2px 8px rgba(102,126,234,0.06);'>`;
+            html += `<div style='font-size:17px;font-weight:700;color:#667eea;margin-bottom:8px;'>Инвестиционный анализ (ROI)</div>`;
+            html += `<div style='font-size:15px;color:#222;margin-bottom:7px;'>Краткосрочная аренда: ROI ${report.roi.short_term.roi}%<br>Месячный доход: €${report.roi.short_term.monthly_income}, Чистый доход: €${report.roi.short_term.net_income}, 5 лет: €${report.roi.short_term.five_year_income}, Рост стоимости: €${report.roi.short_term.final_value.toLocaleString('ru-RU')}</div>`;
+            html += `<div style='font-size:15px;color:#222;margin-bottom:7px;'>Долгосрочная аренда: ROI ${report.roi.long_term.roi}%<br>Годовой доход: €${report.roi.long_term.annual_income}, Чистый доход: €${report.roi.long_term.net_income}, 5 лет: €${report.roi.long_term.five_year_income}, Рост стоимости: €${report.roi.long_term.final_value.toLocaleString('ru-RU')}</div>`;
+            html += `<div style='font-size:15px;color:#222;margin-bottom:7px;'>Без аренды (только рост стоимости): ROI ${report.roi.no_rent.roi}%<br>Итоговая стоимость: €${report.roi.no_rent.final_value.toLocaleString('ru-RU')}</div>`;
+            html += `</div>`;
+            // Блок: Альтернативы
+            html += `<div style='background:#f8f9fa;border-radius:12px;padding:14px 12px 10px 12px;margin-bottom:14px;box-shadow:0 2px 8px rgba(102,126,234,0.06);'>`;
+            html += `<div style='font-size:17px;font-weight:700;color:#667eea;margin-bottom:8px;'>Сравнение с альтернативами (5 лет)</div>`;
+            html += `<table style='width:100%;font-size:14px;margin-bottom:7px;'><tr><th style='text-align:left;'>Инструмент</th><th style='text-align:right;'>Доходность</th></tr>`;
+            report.alternatives.forEach(alt => {
+                html += `<tr><td>${alt.name}</td><td style='text-align:right;'>${(alt.yield*100).toFixed(1)}%</td></tr>`;
+            });
+            html += `</table></div>`;
+            // Блок: Макроэкономика
+            html += `<div style='background:#f8f9fa;border-radius:12px;padding:14px 12px 10px 12px;margin-bottom:14px;box-shadow:0 2px 8px rgba(102,126,234,0.06);'>`;
+            html += `<div style='font-size:17px;font-weight:700;color:#667eea;margin-bottom:8px;'>Макроэкономика</div>`;
+            html += `<div style='font-size:15px;color:#222;margin-bottom:7px;'>Инфляция: ${report.macro.inflation}%<br>Курс EUR/TRY: ${report.macro.eur_try} (${(report.macro.eur_try_growth*100).toFixed(1)}% за год)<br>Ключевая ставка: ${report.macro.refi_rate}%<br>Рост ВВП: ${report.macro.gdp_growth}%</div>`;
+            html += `</div>`;
+            // Блок: Налоги и сборы
+            html += `<div style='background:#f8f9fa;border-radius:12px;padding:14px 12px 10px 12px;margin-bottom:14px;box-shadow:0 2px 8px rgba(102,126,234,0.06);'>`;
+            html += `<div style='font-size:17px;font-weight:700;color:#667eea;margin-bottom:8px;'>Налоги и сборы</div>`;
+            html += `<div style='font-size:15px;color:#222;margin-bottom:7px;'>При покупке: налог на перевод ${report.taxes.transfer_tax*100}%<br>Гербовый сбор: ${report.taxes.stamp_duty*100}%<br>Нотариус: €${report.taxes.notary}</div>`;
+            html += `<div style='font-size:15px;color:#222;margin-bottom:7px;'>Ежегодно: налог на имущество ${report.taxes.annual_property_tax*100}% - ${report.taxes.annual_property_tax_max*100}%<br>Подоходный налог с аренды: ${report.taxes.rental_income_tax}</div>`;
+            html += `<div style='font-size:15px;color:#222;margin-bottom:7px;'>При продаже: налог на прирост: ${report.taxes.capital_gains_tax}</div>`;
+            html += `</div>`;
+            // Блок: Yield, индексы, ипотека
+            html += `<div style='background:#f8f9fa;border-radius:12px;padding:14px 12px 10px 12px;margin-bottom:14px;box-shadow:0 2px 8px rgba(102,126,234,0.06);'>`;
+            html += `<div style='font-size:17px;font-weight:700;color:#667eea;margin-bottom:8px;'>Профессиональные метрики</div>`;
+            html += `<div style='font-size:15px;color:#222;margin-bottom:7px;'>Yield: ${(report.yield*100).toFixed(1)}%<br>Индекс цен: ${report.price_index}<br>Ипотечная ставка: ${(report.mortgage_rate*100).toFixed(1)}%<br>Глобальный индекс цен: ${report.global_house_price_index}</div>`;
+            html += `</div>`;
+            // Блок: Риски, ликвидность, развитие района
+            html += `<div style='background:#f8f9fa;border-radius:12px;padding:14px 12px 10px 12px;margin-bottom:14px;box-shadow:0 2px 8px rgba(102,126,234,0.06);'>`;
+            html += `<div style='font-size:17px;font-weight:700;color:#667eea;margin-bottom:8px;'>Риски и развитие района</div>`;
+            html += `<div style='font-size:15px;color:#222;margin-bottom:7px;'>${report.risks.join('<br>')}</div>`;
+            html += `<div style='font-size:15px;color:#222;margin-bottom:7px;'>${report.liquidity}</div>`;
+            html += `<div style='font-size:15px;color:#222;margin-bottom:7px;'>${report.district}</div>`;
+            html += `</div>`;
+            // Итог/summary
+            html += `<div style='background:#f4f7ff;border-radius:12px;padding:14px 12px 10px 12px;margin-bottom:14px;box-shadow:0 2px 8px rgba(102,126,234,0.06);font-size:15px;color:#222;'>${report.summary}</div>`;
+            
+            // Кнопки действий
+            html += `<div class="btn-row" style="margin-bottom:10px;">
+                <button class="btn btn-primary" onclick="copyReportToClipboard()">Скопировать отчет</button>
+                <button class="btn btn-primary" onclick="showClientModal()">Отправить клиенту</button>
+            </div>`;
+            
+            document.getElementById('reportResult').innerHTML = html;
+            
+            // Сохраняем данные отчета для отправки клиенту
+            currentReportData = {
+                address: report.object.address,
+                bedrooms: report.object.bedrooms,
+                price: report.object.purchase_price,
+                report: report
+            };
+            
+            showToast(getLocalizedText('notifications.report_generated'), 'success');
         }
 
         // Инициализация
