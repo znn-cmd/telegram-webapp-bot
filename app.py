@@ -1,7 +1,7 @@
 import os
 import logging
-from flask import Flask, request, jsonify
-from telegram import Update, WebAppInfo, KeyboardButton, ReplyKeyboardMarkup
+from flask import Flask, request, jsonify, send_file
+from telegram import Update, WebAppInfo, KeyboardButton, ReplyKeyboardMarkup, Bot
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
 from supabase import create_client, Client
 from dotenv import load_dotenv
@@ -9,6 +9,10 @@ import threading
 import asyncio
 from locales import locales
 import requests
+import datetime
+from fpdf import FPDF
+import tempfile
+import os
 
 # Загружаем переменные окружения
 load_dotenv()
@@ -983,6 +987,22 @@ def api_user():
             'languages': locales[lang]['language_names']
         })
 
+@app.route('/api/user_profile', methods=['POST'])
+def api_user_profile():
+    data = request.json or {}
+    telegram_id = data.get('telegram_id')
+    if not telegram_id:
+        return jsonify({'error': 'telegram_id required'}), 400
+    try:
+        result = supabase.table('users').select('first_name, last_name, photo_url, phone, email, website, company, position, about_me').eq('telegram_id', telegram_id).execute()
+        if result.data and len(result.data) > 0:
+            return jsonify({'success': True, 'profile': result.data[0]})
+        else:
+            return jsonify({'error': 'User not found'}), 404
+    except Exception as e:
+        logger.error(f"Error fetching user profile: {e}")
+        return jsonify({'error': 'Internal error'}), 500
+
 @app.route('/api/set_language', methods=['POST'])
 def api_set_language():
     data = request.json or {}
@@ -1472,10 +1492,255 @@ def api_similar_properties():
         logger.error(f"Error finding similar properties: {e}")
         return jsonify({'error': 'Similar properties search error'}), 500
 
+@app.route('/api/full_report', methods=['POST'])
+def api_full_report():
+    data = request.json or {}
+    telegram_id = data.get('telegram_id')
+    object_data = data.get('object_data', {})
+    client_name = data.get('client_name')
+    requested_pdf = data.get('requested_pdf', False)
+    add_realtor_contacts = data.get('add_realtor_contacts', False)
+    add_client_name = data.get('add_client_name', False)
+
+    if not telegram_id or not object_data:
+        return jsonify({'error': 'telegram_id and object_data required'}), 400
+
+    # Проверка баланса
+    try:
+        bal_result = supabase.table('user_balance').select('balance_usd').eq('telegram_id', telegram_id).execute()
+        balance = float(bal_result.data[0]['balance_usd']) if bal_result.data and len(bal_result.data) > 0 else 0.0
+        if balance < 1.0:
+            return jsonify({'success': False, 'insufficient_balance': True, 'message': 'Недостаточно средств на балансе'}), 200
+        # Списываем $1
+        new_balance = balance - 1.0
+        if bal_result.data and len(bal_result.data) > 0:
+            supabase.table('user_balance').update({'balance_usd': new_balance}).eq('telegram_id', telegram_id).execute()
+        else:
+            supabase.table('user_balance').insert({'telegram_id': telegram_id, 'balance_usd': new_balance}).execute()
+    except Exception as e:
+        logger.error(f"Error checking/updating balance: {e}")
+        return jsonify({'error': 'Internal error'}), 500
+
+    # 1. Получить профиль риэлтора
+    profile = None
+    try:
+        result = supabase.table('users').select('first_name, last_name, photo_url, phone, email, website, company, position, about_me').eq('telegram_id', telegram_id).execute()
+        if result.data and len(result.data) > 0:
+            profile = result.data[0]
+    except Exception as e:
+        logger.error(f"Error fetching user profile: {e}")
+
+    # 2. Получить макроэкономику, альтернативные инвестиции, региональные показатели, налоги, риски
+    # (Заглушки, реальные данные добавлю на следующем шаге)
+    macro = {
+        'inflation': '55% (2024, Турция)',
+        'currency_rate': '1 EUR = 35 TRY',
+        'cb_rate': '50%',
+        'gdp': '900 млрд USD',
+    }
+    investments = {
+        'bank_deposit': '36% годовых (TRY)',
+        'bonds': 'Гос. облигации 30% годовых',
+        'stocks': 'BIST100: +45% за год',
+        'reits': 'REIT Turkey: +28% за год',
+    }
+    region = {
+        'population': '1.3 млн (Анталья)',
+        'avg_income': '15 000 TRY',
+        'unemployment': '8%',
+        'price_trend': '+18% за год',
+    }
+    taxes = {
+        'purchase_tax': '4% от стоимости',
+        'ownership_tax': '0.1-0.3% в год',
+        'other_fees': 'Нотариус, регистрация ~500 EUR',
+    }
+    risks = [
+        'Валютные колебания',
+        'Изменения законодательства',
+        'Рыночные риски (падение цен)',
+        'Налоговые изменения',
+    ]
+
+    # 3. Собрать полный отчет
+    report = {
+        'realtor_profile': profile if add_realtor_contacts else None,
+        'client_name': client_name if add_client_name else None,
+        'object': object_data,
+        'market_analysis': {},  # TODO: заполнить реальными данными
+        'roi_analysis': {},     # TODO: заполнить реальными данными
+        'infrastructure': {},  # TODO: заполнить реальными данными
+        'legal_check': {},     # TODO: заполнить реальными данными
+        'investments': investments,
+        'macro': macro,
+        'region': region,
+        'taxes': taxes,
+        'risks': risks,
+        'created_at': str(datetime.datetime.utcnow()),
+    }
+
+    # 4. (Позже) Списание $1, сохранение PDF, объекта
+    # ...
+
+    return jsonify({'success': True, 'report': report, 'pdf_url': None})
+
+@app.route('/api/save_object', methods=['POST'])
+def api_save_object():
+    data = request.json or {}
+    telegram_id = data.get('telegram_id')
+    object_data = data.get('object_data', {})
+    if not telegram_id or not object_data:
+        return jsonify({'error': 'telegram_id and object_data required'}), 400
+    try:
+        # Сохраняем объект в таблицу user_objects (создать если нет)
+        result = supabase.table('user_objects').insert({
+            'telegram_id': telegram_id,
+            'object_data': object_data,
+            'created_at': datetime.datetime.utcnow().isoformat()
+        }).execute()
+        return jsonify({'success': True, 'object_id': result.data[0]['id'] if result.data else None})
+    except Exception as e:
+        logger.error(f"Error saving object: {e}")
+        return jsonify({'error': 'Internal error'}), 500
+
+@app.route('/api/generate_pdf_report', methods=['POST'])
+def api_generate_pdf_report():
+    data = request.json or {}
+    report = data.get('report')
+    add_realtor_contacts = data.get('add_realtor_contacts', False)
+    add_client_name = data.get('add_client_name', False)
+    if not report:
+        return jsonify({'error': 'report required'}), 400
+    try:
+        pdf = FPDF()
+        pdf.add_page()
+        pdf.set_font('Arial', 'B', 16)
+        # Фото риэлтора
+        if add_realtor_contacts and report.get('realtor_profile') and report['realtor_profile'].get('photo_url'):
+            try:
+                import requests
+                img_data = requests.get(report['realtor_profile']['photo_url']).content
+                with tempfile.NamedTemporaryFile(delete=False, suffix='.jpg') as tmp_img:
+                    tmp_img.write(img_data)
+                    tmp_img.flush()
+                    pdf.image(tmp_img.name, x=10, y=10, w=30)
+                    os.unlink(tmp_img.name)
+            except Exception as e:
+                pass
+        pdf.ln(35)
+        # Имя, телефон, email, сайт риэлтора
+        if add_realtor_contacts and report.get('realtor_profile'):
+            p = report['realtor_profile']
+            pdf.set_font('Arial', 'B', 12)
+            pdf.cell(0, 10, f"Риэлтор: {p.get('first_name','')} {p.get('last_name','')}", ln=1)
+            if p.get('phone'): pdf.cell(0, 10, f"Телефон: {p['phone']}", ln=1)
+            if p.get('email'): pdf.cell(0, 10, f"Email: {p['email']}", ln=1)
+            if p.get('website'): pdf.cell(0, 10, f"Сайт: {p['website']}", ln=1)
+            pdf.ln(5)
+        # ФИО клиента
+        if add_client_name and report.get('client_name'):
+            pdf.set_font('Arial', '', 12)
+            pdf.cell(0, 10, f"Клиент: {report['client_name']}", ln=1)
+            pdf.ln(5)
+        pdf.set_font('Arial', 'B', 14)
+        pdf.cell(0, 10, 'Информация об объекте', ln=1)
+        obj = report.get('object', {})
+        for k, v in obj.items():
+            pdf.set_font('Arial', '', 12)
+            pdf.cell(0, 8, f"{k}: {v}", ln=1)
+        pdf.ln(5)
+        # Макроэкономика, инвестиции, налоги, риски, регион
+        def section(title, d):
+            pdf.set_font('Arial', 'B', 13)
+            pdf.cell(0, 10, title, ln=1)
+            pdf.set_font('Arial', '', 12)
+            if isinstance(d, dict):
+                for k, v in d.items():
+                    pdf.cell(0, 8, f"{k}: {v}", ln=1)
+            elif isinstance(d, list):
+                for v in d:
+                    pdf.cell(0, 8, f"- {v}", ln=1)
+            pdf.ln(3)
+        section('Макроэкономика', report.get('macro', {}))
+        section('Инвестиционные альтернативы', report.get('investments', {}))
+        section('Региональные показатели', report.get('region', {}))
+        section('Налоги', report.get('taxes', {}))
+        section('Риски', report.get('risks', []))
+        # Сохраняем PDF
+        with tempfile.NamedTemporaryFile(delete=False, suffix='.pdf') as tmp_pdf:
+            pdf.output(tmp_pdf.name)
+            pdf_path = tmp_pdf.name
+        # Можно реализовать сохранение в облако, сейчас просто возвращаем путь
+        return jsonify({'success': True, 'pdf_path': pdf_path})
+    except Exception as e:
+        logger.error(f"Error generating PDF: {e}")
+        return jsonify({'error': 'Internal error'}), 500
+
+@app.route('/api/download_pdf', methods=['POST'])
+def api_download_pdf():
+    data = request.json or {}
+    pdf_path = data.get('pdf_path')
+    if not pdf_path or not os.path.exists(pdf_path):
+        return jsonify({'error': 'PDF not found'}), 404
+    return send_file(pdf_path, as_attachment=True, download_name='full_report.pdf')
+
 import threading
 
 def run_flask():
     app.run(host='0.0.0.0', port=8080, debug=False)
+
+@app.route('/api/user_balance', methods=['POST'])
+def api_user_balance():
+    data = request.json or {}
+    telegram_id = data.get('telegram_id')
+    if not telegram_id:
+        return jsonify({'error': 'telegram_id required'}), 400
+    try:
+        result = supabase.table('user_balance').select('balance_usd').eq('telegram_id', telegram_id).execute()
+        if result.data and len(result.data) > 0:
+            return jsonify({'success': True, 'balance': float(result.data[0]['balance_usd'])})
+        else:
+            return jsonify({'success': True, 'balance': 0.0})
+    except Exception as e:
+        logger.error(f"Error fetching user balance: {e}")
+        return jsonify({'error': 'Internal error'}), 500
+
+@app.route('/api/send_pdf_to_client', methods=['POST'])
+def api_send_pdf_to_client():
+    data = request.json or {}
+    realtor_telegram_id = data.get('realtor_telegram_id')
+    client_name = data.get('client_name')
+    client_telegram = data.get('client_telegram')
+    pdf_path = data.get('pdf_path')
+    if not realtor_telegram_id or not client_telegram or not pdf_path:
+        return jsonify({'error': 'realtor_telegram_id, client_telegram, pdf_path required'}), 400
+    try:
+        # 1. Сохраняем контакт
+        supabase.table('client_contacts').insert({
+            'realtor_telegram_id': realtor_telegram_id,
+            'client_name': client_name,
+            'client_telegram': client_telegram,
+            'last_report_pdf_url': pdf_path
+        }).execute()
+        # 2. Отправляем PDF через Telegram Bot
+        TOKEN = os.getenv('TELEGRAM_BOT_TOKEN')
+        bot = Bot(token=TOKEN)
+        # Получаем user_id по username (если возможно)
+        user_id = None
+        try:
+            user = bot.get_chat(client_telegram)
+            user_id = user.id
+        except Exception as e:
+            logger.error(f"Не удалось получить user_id по username: {e}")
+        if user_id:
+            with open(pdf_path, 'rb') as f:
+                bot.send_document(chat_id=user_id, document=f, filename='full_report.pdf', caption=f'Ваш персональный отчет от {client_name or "риэлтора"}')
+            return jsonify({'success': True, 'sent': True})
+        else:
+            return jsonify({'success': False, 'sent': False, 'error': 'Не удалось найти пользователя по username'})
+    except Exception as e:
+        logger.error(f"Error sending PDF to client: {e}")
+        return jsonify({'error': 'Internal error'}), 500
 
 if __name__ == '__main__':
     # Запускаем Flask-сервер в отдельном потоке-демоне

@@ -249,6 +249,13 @@
             <p id="error-text"></p>
         </div>
 
+        <!-- Новый блок с инфо по объекту -->
+        <div id="object-info" class="report hidden" style="margin-bottom: 10px;">
+            <div><b>Адрес:</b> <span id="object-address">-</span></div>
+            <div><b>Спален:</b> <span id="object-bedrooms">-</span></div>
+            <div><b>Цена покупки:</b> <span id="object-price">-</span></div>
+        </div>
+
         <div id="report" class="report hidden">
             <div class="report-title" id="report-title"></div>
             
@@ -279,9 +286,14 @@
                     • Анализом 20+ конкурентов<br>
                     • Кастомными рекомендациями
                 </div>
+                <!-- Кнопки на одном уровне -->
                 <div class="button-group">
-                    <button class="btn btn-primary" onclick="getFullReport()">Разблокировать за $15</button>
-                    <button class="btn btn-secondary" onclick="downloadPDF()">Скачать PDF</button>
+                    <button class="btn btn-secondary" onclick="goToMenu()">В главное меню</button>
+                    <button class="btn btn-primary" onclick="copyReport()">Скопировать в буфер</button>
+                </div>
+                <!-- Кнопка "Получить полный отчет" ниже -->
+                <div style="margin-top: 15px; text-align: center;">
+                    <button class="btn btn-primary" onclick="getFullReport()">Получить полный отчет</button>
                 </div>
             </div>
         </div>
@@ -295,6 +307,45 @@
             <p>На вашем балансе недостаточно средств</p>
             <button class="btn btn-primary" onclick="topUpBalance()">Пополнить счет</button>
         </div>
+    </div>
+
+    <!-- Модальное окно для ввода ФИО клиента -->
+    <div id="clientNameModal" class="modal hidden" style="position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;z-index:1000;">
+      <div style="background:white;padding:24px 18px;border-radius:12px;max-width:320px;width:100%;text-align:center;">
+        <h3>ФИО клиента для отчета</h3>
+        <input id="clientNameInput" type="text" placeholder="Введите ФИО клиента" style="width:100%;padding:10px;margin:12px 0;border-radius:8px;border:1px solid #ccc;">
+        <div style="display:flex;gap:10px;justify-content:center;">
+          <button class="btn btn-primary" onclick="submitClientName()">Продолжить</button>
+          <button class="btn btn-secondary" onclick="skipClientName()">Пропустить</button>
+        </div>
+      </div>
+    </div>
+    <!-- Модальное окно для PDF-опций -->
+    <div id="pdfOptionsModal" class="modal hidden" style="position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;z-index:1000;">
+      <div style="background:white;padding:24px 18px;border-radius:12px;max-width:340px;width:100%;text-align:center;">
+        <h3>Опции PDF-отчета</h3>
+        <div style="margin-bottom:10px;">
+          <label><input type="checkbox" id="addRealtorContacts"> Добавить контакты риэлтора</label>
+        </div>
+        <div style="margin-bottom:10px;">
+          <label><input type="checkbox" id="addClientName"> Указать ФИО клиента</label>
+        </div>
+        <div style="display:flex;gap:10px;justify-content:center;">
+          <button class="btn btn-primary" onclick="submitPdfOptions()">Сформировать PDF</button>
+          <button class="btn btn-secondary" onclick="closePdfOptions()">Отмена</button>
+        </div>
+      </div>
+    </div>
+    <!-- Модальное окно для отправки PDF клиенту -->
+    <div id="sendPdfModal" class="modal hidden" style="position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;z-index:1000;">
+      <div style="background:white;padding:24px 18px;border-radius:12px;max-width:320px;width:100%;text-align:center;">
+        <h3>Отправить PDF клиенту</h3>
+        <input id="clientTelegramInput" type="text" placeholder="@username клиента" style="width:100%;padding:10px;margin:12px 0;border-radius:8px;border:1px solid #ccc;">
+        <div style="display:flex;gap:10px;justify-content:center;">
+          <button class="btn btn-primary" onclick="submitSendPdf()">Отправить</button>
+          <button class="btn btn-secondary" onclick="closeSendPdfModal()">Отмена</button>
+        </div>
+      </div>
     </div>
 
     <script>
@@ -386,6 +437,24 @@
         function showReport(data) {
             document.getElementById('loading').classList.add('hidden');
             document.getElementById('report').classList.remove('hidden');
+            document.getElementById('object-info').classList.remove('hidden');
+
+            // Заполняем инфо по объекту
+            document.getElementById('object-bedrooms').textContent = data.bedrooms || '-';
+            document.getElementById('object-price').textContent = data.purchase_price ? `€${data.purchase_price}` : '-';
+            // Адрес: если есть в data.address, иначе делаем reverse geocoding
+            if (data.address) {
+                document.getElementById('object-address').textContent = data.address;
+            } else if (data.lat && data.lng) {
+                fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${data.lat},${data.lng}&key=AIzaSyBrDkDpNKNAIyY147MQ78hchBkeyCAxhEw`)
+                    .then(r => r.json())
+                    .then(res => {
+                        const addr = res.results && res.results[0] ? res.results[0].formatted_address : '-';
+                        document.getElementById('object-address').textContent = addr;
+                    });
+            } else {
+                document.getElementById('object-address').textContent = '-';
+            }
 
             // Заполняем данные отчета
             document.getElementById('report-title').textContent = 
@@ -444,60 +513,129 @@
             }
         }
 
+        let clientName = null;
+        let fullReportData = null;
+
         async function getFullReport() {
             if (!userData) {
                 showError('Необходимо авторизоваться в Telegram');
                 return;
             }
-
+            // Показываем модалку для ФИО клиента
+            document.getElementById('clientNameModal').classList.remove('hidden');
+        }
+        function submitClientName() {
+            clientName = document.getElementById('clientNameInput').value.trim();
+            document.getElementById('clientNameModal').classList.add('hidden');
+            requestFullReport();
+        }
+        function skipClientName() {
+            clientName = null;
+            document.getElementById('clientNameModal').classList.add('hidden');
+            requestFullReport();
+        }
+        async function requestFullReport() {
             try {
-                const response = await fetch('/api/full-report', {
+                const response = await fetch('/api/full_report', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         telegram_id: userData.id,
-                        report_data: reportData
+                        object_data: reportData,
+                        client_name: clientName,
+                        add_realtor_contacts: false,
+                        add_client_name: !!clientName
                     })
                 });
-
                 const result = await response.json();
-
                 if (result.success) {
-                    // Показываем полный отчет
+                    fullReportData = result.report;
                     showFullReport(result.report);
                 } else if (result.insufficient_balance) {
-                    // Показываем форму пополнения
                     document.getElementById('payment-section').classList.remove('hidden');
                 } else {
                     showError(result.message || 'Ошибка получения отчета');
                 }
             } catch (error) {
-                // Демо-режим
-                console.log('Демо: Получение полного отчета');
-                showFullReport(generateDemoFullReport());
+                showError('Ошибка получения полного отчета');
             }
         }
-
-        function generateDemoFullReport() {
-            return {
-                title: 'Полный анализ рынка недвижимости',
-                content: {
-                    price_forecast: 'Ожидается рост цен на 8-12% в 2025 году',
-                    competitor_analysis: 'Проанализировано 25 конкурентов',
-                    recommendations: [
-                        'Рассмотрите инвестиции в новые районы',
-                        'Фокус на объекты с паркингом',
-                        'Оптимальное время для покупки - Q2 2025'
-                    ]
-                }
-            };
-        }
-
         function showFullReport(report) {
-            // Здесь можно показать модальное окно с полным отчетом
-            alert(`Полный отчет: ${report.title}\n\n${report.content.price_forecast}`);
+            // Показываем подробный отчет (можно оформить красиво)
+            let html = `<h2>Полный отчет</h2>`;
+            if (report.object) {
+                html += `<div><b>Объект:</b> ${report.object.address || ''}, ${report.object.bedrooms || ''} спален, €${report.object.purchase_price || ''}</div>`;
+            }
+            if (report.macro) {
+                html += `<div><b>Макроэкономика:</b> <pre>${JSON.stringify(report.macro, null, 2)}</pre></div>`;
+            }
+            if (report.investments) {
+                html += `<div><b>Инвестиционные альтернативы:</b> <pre>${JSON.stringify(report.investments, null, 2)}</pre></div>`;
+            }
+            if (report.region) {
+                html += `<div><b>Региональные показатели:</b> <pre>${JSON.stringify(report.region, null, 2)}</pre></div>`;
+            }
+            if (report.taxes) {
+                html += `<div><b>Налоги:</b> <pre>${JSON.stringify(report.taxes, null, 2)}</pre></div>`;
+            }
+            if (report.risks) {
+                html += `<div><b>Риски:</b> <pre>${JSON.stringify(report.risks, null, 2)}</pre></div>`;
+            }
+            document.getElementById('report').innerHTML = html + `
+                <div class="button-group" style="margin-top:20px;">
+                    <button class="btn btn-primary" onclick="saveObject()">Сохранить объект</button>
+                    <button class="btn btn-primary" onclick="openPdfOptions()">Сохранить в PDF</button>
+                    <button class="btn btn-secondary" onclick="goToMenu()">Вернуться в главное меню</button>
+                </div>
+            `;
+        }
+        async function saveObject() {
+            if (!userData || !fullReportData) return;
+            await fetch('/api/save_object', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ telegram_id: userData.id, object_data: fullReportData.object })
+            });
+            alert('Объект сохранен!');
+        }
+        function openPdfOptions() {
+            document.getElementById('pdfOptionsModal').classList.remove('hidden');
+        }
+        function closePdfOptions() {
+            document.getElementById('pdfOptionsModal').classList.add('hidden');
+        }
+        async function submitPdfOptions() {
+            closePdfOptions();
+            const addRealtor = document.getElementById('addRealtorContacts').checked;
+            const addClient = document.getElementById('addClientName').checked;
+            // Генерируем PDF
+            const resp = await fetch('/api/generate_pdf_report', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ report: fullReportData, add_realtor_contacts: addRealtor, add_client_name: addClient })
+            });
+            const data = await resp.json();
+            if (data.success && data.pdf_path) {
+                // Скачиваем PDF
+                const pdfResp = await fetch('/api/download_pdf', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ pdf_path: data.pdf_path })
+                });
+                const blob = await pdfResp.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'full_report.pdf';
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                window.URL.revokeObjectURL(url);
+                alert('PDF-отчет сохранен и скачан!');
+                showSendPdfModal(data.pdf_path);
+            } else {
+                alert('Ошибка генерации PDF');
+            }
         }
 
         function downloadPDF() {
@@ -509,6 +647,53 @@
             // Демо-функция пополнения баланса
             alert('Переход к платежной системе...');
             // В реальности здесь будет редирект на платежную систему
+        }
+
+        function goToMenu() {
+            // Здесь логика возврата в главное меню (например, tg.close() или переход на главную страницу)
+            window.location.href = '/webapp';
+        }
+
+        function copyReport() {
+            let text = '';
+            text += `Адрес: ${document.getElementById('object-address').textContent}\n`;
+            text += `Спален: ${document.getElementById('object-bedrooms').textContent}\n`;
+            text += `Цена покупки: ${document.getElementById('object-price').textContent}\n`;
+            text += document.getElementById('report').innerText;
+            navigator.clipboard.writeText(text).then(() => {
+                alert('Отчет скопирован в буфер обмена!');
+            });
+        }
+
+        let lastPdfPath = null;
+        function showSendPdfModal(pdfPath) {
+          lastPdfPath = pdfPath;
+          document.getElementById('sendPdfModal').classList.remove('hidden');
+        }
+        function closeSendPdfModal() {
+          document.getElementById('sendPdfModal').classList.add('hidden');
+        }
+        async function submitSendPdf() {
+          const clientTelegram = document.getElementById('clientTelegramInput').value.trim();
+          if (!clientTelegram || !lastPdfPath) return alert('Укажите Telegram username клиента!');
+          const clientName = clientName || '';
+          const resp = await fetch('/api/send_pdf_to_client', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              realtor_telegram_id: userData.id,
+              client_name: clientName,
+              client_telegram: clientTelegram,
+              pdf_path: lastPdfPath
+            })
+          });
+          const data = await resp.json();
+          if (data.success && data.sent) {
+            alert('PDF успешно отправлен клиенту!');
+            closeSendPdfModal();
+          } else {
+            alert('Ошибка отправки PDF: ' + (data.error || '')); 
+          }
         }
 
         // Обработка кнопок Telegram

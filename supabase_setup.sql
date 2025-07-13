@@ -40,3 +40,32 @@ CREATE POLICY "Allow insert access" ON users FOR INSERT WITH CHECK (true);
 CREATE POLICY "Allow update access" ON users FOR UPDATE USING (true); 
 
 ALTER TABLE users ADD COLUMN IF NOT EXISTS language VARCHAR(10); 
+ALTER TABLE users ADD COLUMN IF NOT EXISTS photo_url VARCHAR(512);
+ALTER TABLE users ADD COLUMN IF NOT EXISTS phone VARCHAR(64);
+ALTER TABLE users ADD COLUMN IF NOT EXISTS email VARCHAR(255);
+ALTER TABLE users ADD COLUMN IF NOT EXISTS website VARCHAR(255);
+ALTER TABLE users ADD COLUMN IF NOT EXISTS company VARCHAR(255);
+ALTER TABLE users ADD COLUMN IF NOT EXISTS position VARCHAR(255);
+ALTER TABLE users ADD COLUMN IF NOT EXISTS about_me TEXT; 
+
+CREATE TABLE IF NOT EXISTS user_objects (
+    id BIGSERIAL PRIMARY KEY,
+    telegram_id BIGINT NOT NULL,
+    object_data JSONB NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+); 
+
+CREATE TABLE IF NOT EXISTS user_balance (
+    id BIGSERIAL PRIMARY KEY,
+    telegram_id BIGINT UNIQUE NOT NULL,
+    balance_usd NUMERIC(10,2) DEFAULT 0
+); 
+
+CREATE TABLE IF NOT EXISTS client_contacts (
+    id BIGSERIAL PRIMARY KEY,
+    realtor_telegram_id BIGINT NOT NULL,
+    client_name VARCHAR(255),
+    client_telegram VARCHAR(64),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    last_report_pdf_url VARCHAR(512)
+); 
