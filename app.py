@@ -452,10 +452,6 @@ def webapp():
                 if (i === 0) {
                     html += `<button class="menu-btn" onclick="startNewReport()">${item}</button>`;
                 } else if (i === 1) {
-                    html += `<button class="menu-btn" onclick="showSearchProperties()">Поиск недвижимости</button>`;
-                } else if (i === 2) {
-                    html += `<button class="menu-btn" onclick="showROICalculator()">Калькулятор ROI</button>`;
-                } else if (i === 3) {
                     html += `<button class="menu-btn" onclick="showMarketStats()">Статистика рынка</button>`;
                 } else {
                     html += `<button class="menu-btn">${item}</button>`;
@@ -793,7 +789,7 @@ def webapp():
                     document.getElementById('roiResult').innerHTML = `
                         <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin: 15px 0;">
                             <h4>Результат расчета ROI:</h4>
-                            <p><strong>ROI:</strong> ${data.roi_percentage}</p>
+                            <p><strong>ROI:</strong> ${data.roi}</p>
                             <p><strong>Тип недвижимости:</strong> ${propertyType === 'short_term' ? 'Краткосрочная аренда' : 'Долгосрочная аренда'}</p>
                         </div>
                     `;
@@ -1237,12 +1233,51 @@ def api_search_properties():
 def find_properties_in_radius(lat, lng, radius_km, property_type):
     """Поиск недвижимости в радиусе"""
     try:
-        # Используем функцию из базы данных
-        query = f"""
-        SELECT * FROM find_properties_in_radius({lat}, {lng}, {radius_km}, '{property_type}')
-        """
-        result = supabase.rpc('execute_sql', {'query': query}).execute()
-        return result.data if result.data else []
+        # Прямой SQL запрос вместо RPC
+        table_name = {
+            'short_term': 'short_term_rentals',
+            'long_term': 'long_term_rentals',
+            'sale': 'property_sales'
+        }.get(property_type, 'short_term_rentals')
+        
+        price_column = {
+            'short_term': 'price_per_night',
+            'long_term': 'monthly_rent',
+            'sale': 'asking_price'
+        }.get(property_type, 'price_per_night')
+        
+        # Получаем все активные записи с координатами
+        result = supabase.table(table_name).select('*').eq('is_active', True).execute()
+        
+        # Фильтруем результаты по расстоянию на стороне Python
+        filtered_results = []
+        for item in result.data:
+            if item.get('latitude') and item.get('longitude'):
+                # Рассчитываем расстояние
+                import math
+                lat1, lon1 = float(lat), float(lng)
+                lat2, lon2 = float(item['latitude']), float(item['longitude'])
+                
+                # Формула гаверсинуса
+                R = 6371  # Радиус Земли в км
+                dlat = math.radians(lat2 - lat1)
+                dlon = math.radians(lon2 - lon1)
+                a = (math.sin(dlat/2) * math.sin(dlat/2) + 
+                     math.cos(math.radians(lat1)) * math.cos(math.radians(lat2)) * 
+                     math.sin(dlon/2) * math.sin(dlon/2))
+                c = 2 * math.atan2(math.sqrt(a), math.sqrt(1-a))
+                distance = R * c
+                
+                if distance <= radius_km:
+                    item['distance_km'] = round(distance, 2)
+                    item['property_type'] = property_type
+                    item['price'] = item.get(price_column, 0)
+                    filtered_results.append(item)
+        
+        # Сортируем по расстоянию
+        filtered_results.sort(key=lambda x: x['distance_km'])
+        return filtered_results[:50]  # Ограничиваем 50 результатами
+        
     except Exception as e:
         logger.error(f"Error in radius search: {e}")
         return []

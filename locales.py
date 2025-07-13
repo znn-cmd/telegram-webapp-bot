@@ -5,8 +5,6 @@ locales = {
         'choose_language': 'Пожалуйста, выберите язык для дальнейшего общения:',
         'menu': [
             'Получить новый отчет',
-            'Поиск недвижимости',
-            'Калькулятор ROI',
             'Статистика рынка',
             'Мои сохраненные обзоры',
             'Личный кабинет'
@@ -38,8 +36,6 @@ locales = {
         'choose_language': 'Please select your preferred language:',
         'menu': [
             'Get new report',
-            'Search properties',
-            'ROI Calculator',
             'Market statistics',
             'My saved reports',
             'Profile'
@@ -71,8 +67,6 @@ locales = {
         'choose_language': 'Bitte wählen Sie Ihre bevorzugte Sprache:',
         'menu': [
             'Neuen Bericht erstellen',
-            'Immobilien suchen',
-            'ROI-Rechner',
             'Marktstatistiken',
             'Meine gespeicherten Berichte',
             'Profil'
@@ -104,8 +98,6 @@ locales = {
         'choose_language': 'Veuillez choisir votre langue préférée :',
         'menu': [
             'Obtenir un nouveau rapport',
-            'Rechercher des biens',
-            'Calculateur ROI',
             'Statistiques du marché',
             'Mes rapports enregistrés',
             'Profil'
@@ -137,8 +129,6 @@ locales = {
         'choose_language': 'Lütfen tercih ettiğiniz dili seçin:',
         'menu': [
             'Yeni rapor al',
-            'Emlak ara',
-            'ROI Hesaplayıcı',
             'Piyasa istatistikleri',
             'Kayıtlı raporlarım',
             'Profil'
