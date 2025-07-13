@@ -345,13 +345,15 @@
         function renderReport(reportText, address, bedrooms, price) {
             // Формируем блок с адресом, спальнями и ценой
             let headerHtml = '';
-            headerHtml += `<div style='font-size:18px;font-weight:700;color:#667eea;margin-bottom:8px;'>Аналитика по объекту</div>`;
-            headerHtml += `<div style='font-size:15px;margin-bottom:4px;'><b>Адрес:</b> ${address}</div>`;
-            headerHtml += `<div style='font-size:15px;margin-bottom:4px;'><b>Спален:</b> ${bedrooms}</div>`;
-            headerHtml += `<div style='font-size:15px;margin-bottom:12px;'><b>Цена объекта:</b> €${Number(price).toLocaleString('ru-RU')}</div>`;
+            headerHtml += `<div style='font-size:22px;font-weight:800;color:#667eea;margin-bottom:10px;text-align:center;'>Аналитика по объекту</div>`;
+            headerHtml += `<div style='background:#f4f7ff;border-radius:12px;padding:16px 14px 10px 14px;margin-bottom:18px;box-shadow:0 2px 8px rgba(102,126,234,0.08);'>`;
+            headerHtml += `<div style='font-size:16px;margin-bottom:6px;'><b>Адрес:</b> <span style='color:#333;'>${address}</span></div>`;
+            headerHtml += `<div style='font-size:16px;margin-bottom:6px;'><b>Спален:</b> <span style='color:#333;'>${bedrooms}</span></div>`;
+            headerHtml += `<div style='font-size:16px;margin-bottom:0;'><b>Цена объекта:</b> <span style='color:#333;'>€${Number(price).toLocaleString('ru-RU')}</span></div>`;
+            headerHtml += `</div>`;
             // Основной текст отчета
-            const mainHtml = reportText.split('\n').map(line => 
-                line ? `<div style="margin-bottom: 8px; font-size: 15px;">${line}</div>` : '<div style="margin-bottom: 12px;"></div>'
+            const mainHtml = reportText.split('\n').map(line =>
+                line ? `<div style="margin-bottom: 10px; font-size: 16px; color:#222;">${line}</div>` : '<div style="margin-bottom: 18px;"></div>'
             ).join('');
             // Кнопки
             const buttonsHtml = `

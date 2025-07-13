@@ -400,9 +400,9 @@ def analyze_market_around_location(lat, lng, bedrooms, target_price):
             long_term_query = long_term_query.eq('bedrooms', bedrooms)
         long_term_rentals = long_term_query.execute().data or []
 
-        # Продажи (используем asking_price вместо sale_price)
+        # Продажи (используем asking_price, price_per_sqm, avg_price_per_sqm)
         sales_query = supabase.table('property_sales') \
-            .select('property_id, asking_price, bedrooms, latitude, longitude, price_per_sqm, area, avg_price_per_sqm') \
+            .select('property_id, asking_price, bedrooms, latitude, longitude, price_per_sqm, avg_price_per_sqm') \
             .gte('latitude', lat - radius).lte('latitude', lat + radius) \
             .gte('longitude', lng - radius).lte('longitude', lng + radius)
         if bedrooms:
@@ -423,20 +423,13 @@ def analyze_market_around_location(lat, lng, bedrooms, target_price):
         long_term_stats = summarize(long_term_rentals, 'monthly_rent')
         sales_stats = summarize(sales, 'asking_price')
 
-        # Средняя цена за кв.м.
+        # Средняя цена за кв.м. (только по price_per_sqm и avg_price_per_sqm)
         sqm_prices = []
         for s in sales:
             if s.get('price_per_sqm') and s['price_per_sqm'] > 0:
                 sqm_prices.append(s['price_per_sqm'])
             elif s.get('avg_price_per_sqm') and s['avg_price_per_sqm'] > 0:
                 sqm_prices.append(s['avg_price_per_sqm'])
-            elif s.get('asking_price') and s.get('area') and s['area']:
-                try:
-                    sqm = float(s['asking_price']) / float(s['area'])
-                    if sqm > 0:
-                        sqm_prices.append(sqm)
-                except Exception:
-                    pass
         avg_price_per_sqm = sum(sqm_prices) / len(sqm_prices) if sqm_prices else 0
 
         report = {
