@@ -65,7 +65,7 @@ def full_report():
         
         # Проверяем баланс пользователя
         balance = get_user_balance(telegram_id)
-        report_cost = 15.0
+        report_cost = 1.0
         
         if balance < report_cost:
             return jsonify({

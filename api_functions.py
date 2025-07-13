@@ -291,6 +291,6 @@ def update_user_balance(telegram_id: int, amount: float) -> bool:
     
     return False
 
-def charge_user_for_report(telegram_id: int, report_cost: float = 15.0) -> bool:
+def charge_user_for_report(telegram_id: int, report_cost: float = 1.0) -> bool:
     """Списание средств за полный отчет"""
     return update_user_balance(telegram_id, -report_cost) 

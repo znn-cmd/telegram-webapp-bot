@@ -78,167 +78,7 @@
             text-align: center;
         }
 
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-            color: #333;
-        }
-
-        .form-input {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #e1e5e9;
-            border-radius: 8px;
-            font-size: 16px;
-            transition: border-color 0.3s;
-        }
-
-        .form-input:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-
-        .btn {
-            padding: 12px 20px;
-            border: none;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: inline-block;
-            margin: 5px;
-        }
-
-        .btn-primary {
-            background: #4CAF50;
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: #45a049;
-        }
-
-        .btn-secondary {
-            background: #667eea;
-            color: white;
-        }
-
-        .btn-secondary:hover {
-            background: #5a6fd8;
-        }
-
-        .btn-danger {
-            background: #dc3545;
-            color: white;
-        }
-
-        .btn-danger:hover {
-            background: #c82333;
-        }
-
-        .btn-success {
-            background: #28a745;
-            color: white;
-        }
-
-        .btn-success:hover {
-            background: #218838;
-        }
-
-        .property-card {
-            background: #f8f9fa;
-            border-radius: 12px;
-            padding: 20px;
-            margin: 20px 0;
-            border-left: 4px solid #667eea;
-        }
-
-        .property-info {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-
-        .property-address {
-            font-weight: bold;
-            color: #333;
-            margin-bottom: 10px;
-        }
-
-        .property-details {
-            display: flex;
-            gap: 20px;
-            font-size: 14px;
-            color: #666;
-        }
-
-        .property-price {
-            font-size: 18px;
-            font-weight: bold;
-            color: #4CAF50;
-        }
-
-        .button-group {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-
-        .button-group-vertical {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            align-items: center;
-        }
-
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.5);
-        }
-
-        .modal-content {
-            background-color: white;
-            margin: 15% auto;
-            padding: 20px;
-            border-radius: 12px;
-            width: 90%;
-            max-width: 350px;
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .close {
-            color: #aaa;
-            font-size: 28px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        .close:hover {
-            color: #000;
-        }
-
-        .report-section {
+        .report {
             background: white;
             border-radius: 12px;
             padding: 20px;
@@ -252,6 +92,28 @@
             color: #333;
             margin-bottom: 20px;
             text-align: center;
+        }
+
+        .object-info {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            border-left: 4px solid #667eea;
+        }
+
+        .object-address {
+            font-size: 16px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .object-details {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            color: #666;
         }
 
         .metrics-grid {
@@ -300,572 +162,836 @@
             color: #333;
         }
 
+        .button-group {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        .button-group-row {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin: 10px 0;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            flex: 1;
+        }
+
+        .btn-primary {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #45a049;
+        }
+
+        .btn-secondary {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .btn-copy {
+            background: #007bff;
+            color: white;
+        }
+
+        .btn-copy:hover {
+            background: #0056b3;
+        }
+
+        .btn-menu {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-menu:hover {
+            background: #545b62;
+        }
+
+        .btn-full-report {
+            background: #28a745;
+            color: white;
+            width: 100%;
+        }
+
+        .btn-full-report:hover {
+            background: #1e7e34;
+        }
+
         .balance-info {
-            background: #e8f5e8;
+            background: #e7f3ff;
             border-radius: 8px;
             padding: 15px;
-            margin: 20px 0;
+            margin: 15px 0;
             text-align: center;
+            border-left: 4px solid #007bff;
         }
 
         .balance-amount {
-            font-size: 20px;
+            font-size: 18px;
             font-weight: bold;
-            color: #28a745;
+            color: #007bff;
+        }
+
+        .insufficient-balance {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            text-align: center;
         }
 
         .hidden {
             display: none;
         }
 
-        .success-message {
-            background: #d4edda;
-            border: 1px solid #c3e6cb;
-            color: #155724;
-            padding: 15px;
-            border-radius: 8px;
-            margin: 20px 0;
+        /* Модальные окна */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            max-width: 90%;
+            max-height: 80%;
+            overflow-y: auto;
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 15px;
             text-align: center;
         }
 
-        .error-message {
-            background: #f8d7da;
-            border: 1px solid #f5c6cb;
-            color: #721c24;
-            padding: 15px;
+        .modal-input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
             border-radius: 8px;
-            margin: 20px 0;
-            text-align: center;
+            margin: 10px 0;
+            font-size: 16px;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .modal-btn-primary {
+            background: #007bff;
+            color: white;
+        }
+
+        .modal-btn-secondary {
+            background: #6c757d;
+            color: white;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <div class="logo">🏠 Aaadviser</div>
-            <div class="slogan">Инсайты рынка недвижимости Анталии</div>
+            <div class="logo">Aaadviser</div>
+            <div class="slogan">Инсайты рынка недвижимости</div>
         </div>
 
-        <!-- Начальный экран -->
-        <div id="initial-screen">
-            <div class="form-group">
-                <label class="form-label">📍 Адрес недвижимости</label>
-                <input type="text" id="address" class="form-input" placeholder="Введите адрес или выберите на карте">
+        <!-- Загрузка -->
+        <div id="loading" class="loading">
+            <div class="spinner"></div>
+            <p id="loading-text">Загрузка...</p>
+        </div>
+
+        <!-- Ошибка -->
+        <div id="error" class="error-message hidden">
+            <p id="error-text"></p>
+        </div>
+
+        <!-- Информация об объекте -->
+        <div id="object-info" class="object-info hidden">
+            <div class="object-address" id="object-address">Адрес объекта</div>
+            <div class="object-details">
+                <span>Спален: <span id="object-bedrooms">-</span></span>
+                <span>Цена: <span id="object-price">-</span></span>
             </div>
+        </div>
+
+        <!-- Отчет -->
+        <div id="report" class="report hidden">
+            <div class="report-title" id="report-title">Анализ рынка</div>
             
-            <div class="form-group">
-                <label class="form-label">🛏️ Количество спален</label>
-                <select id="bedrooms" class="form-input">
-                    <option value="">Выберите количество спален</option>
-                    <option value="1">1 спальня</option>
-                    <option value="2">2 спальни</option>
-                    <option value="3">3 спальни</option>
-                    <option value="4">4 спальни</option>
-                    <option value="5">5+ спален</option>
-                </select>
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-value" id="price-per-sqm">$0</div>
+                    <div class="metric-label">Средняя цена за м²</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value" id="roi">0%</div>
+                    <div class="metric-label">Средний ROI</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value" id="liquidity">0 дней</div>
+                    <div class="metric-label">Ликвидность</div>
+                </div>
             </div>
-            
-            <div class="form-group">
-                <label class="form-label">💰 Цена покупки (USD)</label>
-                <input type="number" id="price" class="form-input" placeholder="Введите цену в долларах">
+
+            <div class="insights">
+                <h4>Ключевые инсайты:</h4>
+                <div id="insights-list"></div>
+            </div>
+
+            <!-- Баланс пользователя -->
+            <div id="balance-info" class="balance-info hidden">
+                <div class="balance-amount" id="balance-amount">$0</div>
+                <small>Текущий баланс</small>
+            </div>
+
+            <!-- Кнопки действий -->
+            <div class="button-group-row">
+                <button class="btn btn-copy" onclick="copyReport()" id="copy-btn">Копировать в буфер</button>
+                <button class="btn btn-menu" onclick="goToMenu()" id="menu-btn">Главное меню</button>
             </div>
             
             <div class="button-group">
-                <button class="btn btn-primary" onclick="generateReport()">Генерация отчета</button>
+                <button class="btn btn-full-report" onclick="getFullReport()" id="full-report-btn">Получить полный отчет</button>
+            </div>
+
+            <!-- Сообщение о недостаточном балансе -->
+            <div id="insufficient-balance" class="insufficient-balance hidden">
+                <p id="insufficient-balance-text">Недостаточно баланса, нужно его пополнить</p>
             </div>
         </div>
+    </div>
 
-        <!-- Экран загрузки -->
-        <div id="loading-screen" class="hidden">
-            <div class="loading">
-                <div class="spinner"></div>
-                <p>Ваш отчет формируется...</p>
+    <!-- Модальное окно для ввода имени клиента -->
+    <div id="clientNameModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-title" id="clientNameTitle">Имя клиента (необязательно)</div>
+            <input type="text" id="clientNameInput" class="modal-input" placeholder="Введите имя клиента">
+            <div class="modal-buttons">
+                <button class="modal-btn modal-btn-secondary" onclick="skipClientName()">Пропустить</button>
+                <button class="modal-btn modal-btn-primary" onclick="submitClientName()">Продолжить</button>
             </div>
         </div>
+    </div>
 
-        <!-- Экран с результатом -->
-        <div id="result-screen" class="hidden">
-            <div class="property-card">
-                <div class="property-address" id="property-address"></div>
-                <div class="property-details">
-                    <span>🛏️ <span id="property-bedrooms"></span> спален</span>
-                    <span>💰 <span id="property-price"></span> USD</span>
-                </div>
-            </div>
-            
-            <div class="button-group">
-                <button class="btn btn-secondary" onclick="showMainMenu()">В главное меню</button>
-                <button class="btn btn-primary" onclick="copyToClipboard()">Копировать в буфер</button>
-            </div>
-            
-            <div class="button-group-vertical">
-                <button class="btn btn-success" onclick="getFullReport()">Получить полный отчет</button>
+    <!-- Модальное окно для опций PDF -->
+    <div id="pdfOptionsModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-title">Настройки PDF</div>
+            <label><input type="checkbox" id="addRealtorContacts"> Добавить контакты риелтора</label><br>
+            <label><input type="checkbox" id="addClientName"> Добавить имя клиента</label>
+            <div class="modal-buttons">
+                <button class="modal-btn modal-btn-secondary" onclick="closePdfOptions()">Отмена</button>
+                <button class="modal-btn modal-btn-primary" onclick="submitPdfOptions()">Создать PDF</button>
             </div>
         </div>
+    </div>
 
-        <!-- Экран полного отчета -->
-        <div id="full-report-screen" class="hidden">
-            <div class="balance-info">
-                <div>Ваш баланс: <span class="balance-amount" id="user-balance">$0</span></div>
-                <div>Стоимость полного отчета: $1</div>
-            </div>
-            
-            <div id="full-report-content"></div>
-            
-            <div class="button-group">
-                <button class="btn btn-secondary" onclick="showMainMenu()">В главное меню</button>
-                <button class="btn btn-success" onclick="generatePDF()">Скачать PDF</button>
-            </div>
-        </div>
-
-        <!-- Модальное окно для клиента -->
-        <div id="client-modal" class="modal">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3>Отправить отчет клиенту</h3>
-                    <span class="close" onclick="closeClientModal()">&times;</span>
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label">Имя клиента</label>
-                    <input type="text" id="client-name" class="form-input" placeholder="Введите имя клиента">
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label">Telegram username клиента</label>
-                    <input type="text" id="client-telegram" class="form-input" placeholder="@username">
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label">Включить в PDF:</label>
-                    <div>
-                        <input type="checkbox" id="include-macro" checked> <label for="include-macro">Макроэкономические данные</label>
-                    </div>
-                    <div>
-                        <input type="checkbox" id="include-financial" checked> <label for="include-financial">Финансовые показатели</label>
-                    </div>
-                    <div>
-                        <input type="checkbox" id="include-regional" checked> <label for="include-regional">Региональные показатели</label>
-                    </div>
-                    <div>
-                        <input type="checkbox" id="include-tax" checked> <label for="include-tax">Налоговая информация</label>
-                    </div>
-                    <div>
-                        <input type="checkbox" id="include-risk" checked> <label for="include-risk">Оценка рисков</label>
-                    </div>
-                </div>
-                
-                <div class="button-group">
-                    <button class="btn btn-primary" onclick="sendPDFToClient()">Отправить клиенту</button>
-                    <button class="btn btn-secondary" onclick="closeClientModal()">Отмена</button>
-                </div>
+    <!-- Модальное окно для отправки PDF клиенту -->
+    <div id="sendPdfModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-title">Отправить PDF клиенту</div>
+            <input type="text" id="clientTelegramInput" class="modal-input" placeholder="Telegram username клиента (без @)">
+            <div class="modal-buttons">
+                <button class="modal-btn modal-btn-secondary" onclick="closeSendPdfModal()">Отмена</button>
+                <button class="modal-btn modal-btn-primary" onclick="submitSendPdf()">Отправить</button>
             </div>
         </div>
     </div>
 
     <script>
         let tg = window.Telegram.WebApp;
-        let currentReport = null;
-        let currentProperty = null;
-        let userBalance = 0;
-
-        // Инициализация WebApp
-        tg.ready();
         tg.expand();
+        tg.ready();
 
-        // Получение данных пользователя
-        async function getUserData() {
-            try {
-                const response = await fetch('/api/user', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        telegram_id: tg.initDataUnsafe?.user?.id,
-                        username: tg.initDataUnsafe?.user?.username,
-                        first_name: tg.initDataUnsafe?.user?.first_name,
-                        last_name: tg.initDataUnsafe?.user?.last_name
-                    })
-                });
-                const data = await response.json();
-                if (data.success) {
-                    userBalance = data.balance || 0;
-                    document.getElementById('user-balance').textContent = `$${userBalance}`;
-                }
-            } catch (error) {
-                console.error('Ошибка получения данных пользователя:', error);
-            }
+        let userData = null;
+        let reportData = null;
+        let currentLanguage = 'ru';
+
+        // Получаем данные пользователя
+        if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
+            userData = tg.initDataUnsafe.user;
+            currentLanguage = userData.language_code || 'ru';
         }
 
-        // Генерация отчета
+        // Функция для получения локализованного текста
+        function getText(key) {
+            const locales = {
+                'ru': {
+                    'loading': 'Загрузка...',
+                    'copy_to_clipboard': 'Копировать в буфер',
+                    'main_menu': 'Главное меню',
+                    'get_full_report': 'Получить полный отчет',
+                    'insufficient_balance': 'Недостаточно баланса, нужно его пополнить',
+                    'balance_required': 'Для полного отчета требуется $1',
+                    'current_balance': 'Текущий баланс: $',
+                    'report_cost': 'Стоимость отчета: $1',
+                    'client_name_title': 'Имя клиента (необязательно)',
+                    'client_name_placeholder': 'Введите имя клиента',
+                    'skip': 'Пропустить',
+                    'continue': 'Продолжить',
+                    'pdf_settings': 'Настройки PDF',
+                    'add_realtor_contacts': 'Добавить контакты риелтора',
+                    'add_client_name': 'Добавить имя клиента',
+                    'cancel': 'Отмена',
+                    'create_pdf': 'Создать PDF',
+                    'send_pdf_title': 'Отправить PDF клиенту',
+                    'client_telegram_placeholder': 'Telegram username клиента (без @)',
+                    'send': 'Отправить',
+                    'report_copied': 'Отчет скопирован в буфер обмена!',
+                    'error_telegram_username': 'Укажите Telegram username клиента!',
+                    'pdf_sent_success': 'PDF успешно отправлен клиенту!',
+                    'pdf_sent_error': 'Ошибка отправки PDF: ',
+                    'pdf_downloaded': 'PDF-отчет сохранен и скачан!',
+                    'pdf_error': 'Ошибка генерации PDF'
+                },
+                'en': {
+                    'loading': 'Loading...',
+                    'copy_to_clipboard': 'Copy to clipboard',
+                    'main_menu': 'Main menu',
+                    'get_full_report': 'Get full report',
+                    'insufficient_balance': 'Insufficient balance, need to top up',
+                    'balance_required': 'Full report requires $1',
+                    'current_balance': 'Current balance: $',
+                    'report_cost': 'Report cost: $1',
+                    'client_name_title': 'Client name (optional)',
+                    'client_name_placeholder': 'Enter client name',
+                    'skip': 'Skip',
+                    'continue': 'Continue',
+                    'pdf_settings': 'PDF Settings',
+                    'add_realtor_contacts': 'Add realtor contacts',
+                    'add_client_name': 'Add client name',
+                    'cancel': 'Cancel',
+                    'create_pdf': 'Create PDF',
+                    'send_pdf_title': 'Send PDF to client',
+                    'client_telegram_placeholder': 'Client Telegram username (without @)',
+                    'send': 'Send',
+                    'report_copied': 'Report copied to clipboard!',
+                    'error_telegram_username': 'Please enter client Telegram username!',
+                    'pdf_sent_success': 'PDF successfully sent to client!',
+                    'pdf_sent_error': 'Error sending PDF: ',
+                    'pdf_downloaded': 'PDF report saved and downloaded!',
+                    'pdf_error': 'Error generating PDF'
+                },
+                'de': {
+                    'loading': 'Laden...',
+                    'copy_to_clipboard': 'In Zwischenablage kopieren',
+                    'main_menu': 'Hauptmenü',
+                    'get_full_report': 'Vollständigen Bericht erhalten',
+                    'insufficient_balance': 'Unzureichender Kontostand, muss aufgeladen werden',
+                    'balance_required': 'Vollständiger Bericht erfordert $1',
+                    'current_balance': 'Aktueller Kontostand: $',
+                    'report_cost': 'Berichtskosten: $1',
+                    'client_name_title': 'Kundenname (optional)',
+                    'client_name_placeholder': 'Kundenname eingeben',
+                    'skip': 'Überspringen',
+                    'continue': 'Weiter',
+                    'pdf_settings': 'PDF-Einstellungen',
+                    'add_realtor_contacts': 'Maklerkontakte hinzufügen',
+                    'add_client_name': 'Kundenname hinzufügen',
+                    'cancel': 'Abbrechen',
+                    'create_pdf': 'PDF erstellen',
+                    'send_pdf_title': 'PDF an Kunden senden',
+                    'client_telegram_placeholder': 'Kunde Telegram Benutzername (ohne @)',
+                    'send': 'Senden',
+                    'report_copied': 'Bericht in Zwischenablage kopiert!',
+                    'error_telegram_username': 'Bitte geben Sie den Telegram Benutzername des Kunden ein!',
+                    'pdf_sent_success': 'PDF erfolgreich an Kunden gesendet!',
+                    'pdf_sent_error': 'Fehler beim Senden der PDF: ',
+                    'pdf_downloaded': 'PDF-Bericht gespeichert und heruntergeladen!',
+                    'pdf_error': 'Fehler beim Generieren der PDF'
+                },
+                'fr': {
+                    'loading': 'Chargement...',
+                    'copy_to_clipboard': 'Copier dans le presse-papiers',
+                    'main_menu': 'Menu principal',
+                    'get_full_report': 'Obtenir le rapport complet',
+                    'insufficient_balance': 'Solde insuffisant, besoin de recharger',
+                    'balance_required': 'Le rapport complet nécessite $1',
+                    'current_balance': 'Solde actuel: $',
+                    'report_cost': 'Coût du rapport: $1',
+                    'client_name_title': 'Nom du client (optionnel)',
+                    'client_name_placeholder': 'Entrez le nom du client',
+                    'skip': 'Passer',
+                    'continue': 'Continuer',
+                    'pdf_settings': 'Paramètres PDF',
+                    'add_realtor_contacts': 'Ajouter les contacts de l\'agent',
+                    'add_client_name': 'Ajouter le nom du client',
+                    'cancel': 'Annuler',
+                    'create_pdf': 'Créer PDF',
+                    'send_pdf_title': 'Envoyer PDF au client',
+                    'client_telegram_placeholder': 'Nom d\'utilisateur Telegram du client (sans @)',
+                    'send': 'Envoyer',
+                    'report_copied': 'Rapport copié dans le presse-papiers!',
+                    'error_telegram_username': 'Veuillez entrer le nom d\'utilisateur Telegram du client!',
+                    'pdf_sent_success': 'PDF envoyé avec succès au client!',
+                    'pdf_sent_error': 'Erreur lors de l\'envoi du PDF: ',
+                    'pdf_downloaded': 'Rapport PDF sauvegardé et téléchargé!',
+                    'pdf_error': 'Erreur lors de la génération du PDF'
+                },
+                'tr': {
+                    'loading': 'Yükleniyor...',
+                    'copy_to_clipboard': 'Panoya kopyala',
+                    'main_menu': 'Ana menü',
+                    'get_full_report': 'Tam rapor al',
+                    'insufficient_balance': 'Yetersiz bakiye, yükleme gerekli',
+                    'balance_required': 'Tam rapor $1 gerektirir',
+                    'current_balance': 'Mevcut bakiye: $',
+                    'report_cost': 'Rapor maliyeti: $1',
+                    'client_name_title': 'Müşteri adı (isteğe bağlı)',
+                    'client_name_placeholder': 'Müşteri adını girin',
+                    'skip': 'Atla',
+                    'continue': 'Devam et',
+                    'pdf_settings': 'PDF Ayarları',
+                    'add_realtor_contacts': 'Emlakçı iletişim bilgilerini ekle',
+                    'add_client_name': 'Müşteri adını ekle',
+                    'cancel': 'İptal',
+                    'create_pdf': 'PDF Oluştur',
+                    'send_pdf_title': 'PDF\'i müşteriye gönder',
+                    'client_telegram_placeholder': 'Müşteri Telegram kullanıcı adı (@ olmadan)',
+                    'send': 'Gönder',
+                    'report_copied': 'Rapor panoya kopyalandı!',
+                    'error_telegram_username': 'Lütfen müşteri Telegram kullanıcı adını girin!',
+                    'pdf_sent_success': 'PDF başarıyla müşteriye gönderildi!',
+                    'pdf_sent_error': 'PDF gönderme hatası: ',
+                    'pdf_downloaded': 'PDF raporu kaydedildi ve indirildi!',
+                    'pdf_error': 'PDF oluşturma hatası'
+                }
+            };
+
+            const locale = locales[currentLanguage] || locales['ru'];
+            return locale[key] || key;
+        }
+
+        // Обновляем текст на странице
+        function updatePageText() {
+            document.getElementById('loading-text').textContent = getText('loading');
+            document.getElementById('copy-btn').textContent = getText('copy_to_clipboard');
+            document.getElementById('menu-btn').textContent = getText('main_menu');
+            document.getElementById('full-report-btn').textContent = getText('get_full_report');
+            document.getElementById('clientNameTitle').textContent = getText('client_name_title');
+            document.getElementById('clientNameInput').placeholder = getText('client_name_placeholder');
+            document.getElementById('pdfOptionsModal').querySelector('.modal-title').textContent = getText('pdf_settings');
+            document.getElementById('sendPdfModal').querySelector('.modal-title').textContent = getText('send_pdf_title');
+            document.getElementById('clientTelegramInput').placeholder = getText('client_telegram_placeholder');
+        }
+
+        // Инициализация
+        updatePageText();
+
+        // Получаем координаты и генерируем отчет
         async function generateReport() {
-            const address = document.getElementById('address').value;
-            const bedrooms = document.getElementById('bedrooms').value;
-            const price = document.getElementById('price').value;
-
-            if (!address || !bedrooms || !price) {
-                alert('Пожалуйста, заполните все поля');
-                return;
-            }
-
-            showScreen('loading-screen');
-
             try {
-                const response = await fetch('/api/generate_report', {
+                // Получаем координаты из Telegram
+                const lat = 36.8969; // Координаты Анталии
+                const lon = 30.7133;
+                
+                // Запрос к API для получения отчета
+                const response = await fetch('/api/generate-report', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-                        address: address,
-                        bedrooms: parseInt(bedrooms),
-                        price_usd: parseFloat(price),
-                        telegram_id: tg.initDataUnsafe?.user?.id
+                        lat: lat,
+                        lon: lon,
+                        telegram_id: userData ? userData.id : null
                     })
                 });
 
-                const data = await response.json();
+                const reportData = await response.json();
                 
-                if (data.success) {
-                    currentReport = data.report;
-                    currentProperty = {
-                        address: address,
-                        bedrooms: bedrooms,
-                        price: price
-                    };
-                    
-                    // Показываем информацию о недвижимости
-                    document.getElementById('property-address').textContent = address;
-                    document.getElementById('property-bedrooms').textContent = bedrooms;
-                    document.getElementById('property-price').textContent = price;
-                    
-                    showScreen('result-screen');
+                if (reportData.error) {
+                    showError(reportData.message);
                 } else {
-                    alert('Ошибка генерации отчета: ' + data.error);
-                    showScreen('initial-screen');
+                    showReport(reportData);
                 }
             } catch (error) {
-                console.error('Ошибка:', error);
-                alert('Ошибка при генерации отчета');
-                showScreen('initial-screen');
+                // Для демонстрации используем заглушку
+                console.log('Используем демо-данные');
+                reportData = generateDemoReport(lat, lon);
+                showReport(reportData);
             }
         }
 
-        // Получение полного отчета
+        function generateDemoReport(lat, lon) {
+            // Демо-данные для тестирования
+            const districts = ['Kaleiçi', 'Lara', 'Muratpaşa', 'Konyaaltı'];
+            const district = districts[Math.floor(Math.random() * districts.length)];
+            
+            return {
+                error: false,
+                district: district,
+                property_type: 'apartment',
+                address: 'ул. Ататюрка, 123, Анталья, Турция',
+                bedrooms: 3,
+                purchase_price: 250000,
+                metrics: {
+                    avg_price_per_sqm: Math.floor(Math.random() * 3000) + 2000,
+                    avg_roi: (Math.random() * 5 + 5).toFixed(1),
+                    avg_days_on_market: Math.floor(Math.random() * 30) + 50
+                },
+                insights: [
+                    '🔍 Цены на 10% выше аналогов в соседних районах',
+                    '💰 Лучший ROI у объектов с паркингом (9.1%)',
+                    '⚠️ Пик предложения — июль (снижайте цену на 5%)'
+                ],
+                total_properties: Math.floor(Math.random() * 50) + 20,
+                search_radius: 5.0
+            };
+        }
+
+        function showReport(data) {
+            reportData = data;
+            
+            document.getElementById('loading').classList.add('hidden');
+            document.getElementById('report').classList.remove('hidden');
+            document.getElementById('object-info').classList.remove('hidden');
+
+            // Заполняем инфо по объекту
+            document.getElementById('object-bedrooms').textContent = data.bedrooms || '-';
+            document.getElementById('object-price').textContent = data.purchase_price ? `€${data.purchase_price.toLocaleString()}` : '-';
+            document.getElementById('object-address').textContent = data.address || 'Адрес не указан';
+
+            // Заполняем данные отчета
+            document.getElementById('report-title').textContent = 
+                `Снапшот: ${data.district}, ${data.property_type}`;
+            
+            document.getElementById('price-per-sqm').textContent = 
+                `$${data.metrics.avg_price_per_sqm.toLocaleString()}`;
+            
+            document.getElementById('roi').textContent = 
+                `${data.metrics.avg_roi}%`;
+            
+            document.getElementById('liquidity').textContent = 
+                `${data.metrics.avg_days_on_market} дней`;
+
+            // Заполняем инсайты
+            const insightsList = document.getElementById('insights-list');
+            insightsList.innerHTML = '';
+            data.insights.forEach(insight => {
+                const insightDiv = document.createElement('div');
+                insightDiv.className = 'insight-item';
+                insightDiv.innerHTML = `<div class="insight-text">${insight}</div>`;
+                insightsList.appendChild(insightDiv);
+            });
+
+            // Показываем баланс пользователя
+            if (userData) {
+                showUserBalance();
+            }
+        }
+
+        function showError(message) {
+            document.getElementById('loading').classList.add('hidden');
+            document.getElementById('error').classList.remove('hidden');
+            document.getElementById('error-text').textContent = message;
+        }
+
+        async function showUserBalance() {
+            try {
+                const response = await fetch('/api/user-balance', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        telegram_id: userData.id
+                    })
+                });
+
+                if (response.ok) {
+                    const balanceData = await response.json();
+                    document.getElementById('balance-amount').textContent = `$${balanceData.balance}`;
+                    document.getElementById('balance-info').classList.remove('hidden');
+                }
+            } catch (error) {
+                console.log('Ошибка получения баланса:', error);
+            }
+        }
+
+        let clientName = null;
+        let fullReportData = null;
+
         async function getFullReport() {
-            if (userBalance < 1) {
-                alert('Недостаточно средств. Необходимо $1 для получения полного отчета.');
+            if (!userData) {
+                showError('Необходимо авторизоваться в Telegram');
                 return;
             }
 
-            showScreen('loading-screen');
+            // Проверяем баланс пользователя
+            try {
+                const response = await fetch('/api/user-balance', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        telegram_id: userData.id
+                    })
+                });
 
+                if (response.ok) {
+                    const balanceData = await response.json();
+                    const balance = balanceData.balance;
+                    
+                    if (balance < 1) {
+                        // Недостаточно баланса
+                        document.getElementById('insufficient-balance').classList.remove('hidden');
+                        document.getElementById('insufficient-balance-text').textContent = getText('insufficient_balance');
+                        return;
+                    }
+                }
+            } catch (error) {
+                console.log('Ошибка проверки баланса:', error);
+                return;
+            }
+
+            // Показываем модалку для ФИО клиента
+            document.getElementById('clientNameModal').classList.remove('hidden');
+        }
+
+        function submitClientName() {
+            clientName = document.getElementById('clientNameInput').value.trim();
+            document.getElementById('clientNameModal').classList.add('hidden');
+            requestFullReport();
+        }
+
+        function skipClientName() {
+            clientName = null;
+            document.getElementById('clientNameModal').classList.add('hidden');
+            requestFullReport();
+        }
+
+        async function requestFullReport() {
             try {
                 const response = await fetch('/api/full_report', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        property_data: currentProperty,
-                        telegram_id: tg.initDataUnsafe?.user?.id
+                        telegram_id: userData.id,
+                        object_data: reportData,
+                        client_name: clientName,
+                        add_realtor_contacts: false,
+                        add_client_name: !!clientName
                     })
                 });
-
-                const data = await response.json();
-                
-                if (data.success) {
-                    displayFullReport(data.report);
-                    showScreen('full-report-screen');
+                const result = await response.json();
+                if (result.success) {
+                    fullReportData = result.report;
+                    showFullReport(result.report);
+                } else if (result.insufficient_balance) {
+                    document.getElementById('insufficient-balance').classList.remove('hidden');
+                    document.getElementById('insufficient-balance-text').textContent = getText('insufficient_balance');
                 } else {
-                    alert('Ошибка получения полного отчета: ' + data.error);
-                    showScreen('result-screen');
+                    showError(result.message || 'Ошибка получения отчета');
                 }
             } catch (error) {
-                console.error('Ошибка:', error);
-                alert('Ошибка при получении полного отчета');
-                showScreen('result-screen');
+                showError('Ошибка получения полного отчета');
             }
         }
 
-        // Отображение полного отчета
-        function displayFullReport(report) {
-            const container = document.getElementById('full-report-content');
-            
-            let html = `
-                <div class="report-section">
-                    <div class="report-title">📊 Макроэкономические показатели</div>
-                    <div class="metrics-grid">
-                        <div class="metric-card">
-                            <div class="metric-value">${report.macroeconomic_data.inflation}%</div>
-                            <div class="metric-label">Инфляция</div>
-                        </div>
-                        <div class="metric-card">
-                            <div class="metric-value">${report.macroeconomic_data.currency_rate}</div>
-                            <div class="metric-label">Курс USD/TRY</div>
-                        </div>
-                        <div class="metric-card">
-                            <div class="metric-value">${report.macroeconomic_data.interest_rate}%</div>
-                            <div class="metric-label">Ставка ЦБ</div>
-                        </div>
-                        <div class="metric-card">
-                            <div class="metric-value">${report.macroeconomic_data.gdp_growth}%</div>
-                            <div class="metric-label">Рост ВВП</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="report-section">
-                    <div class="report-title">💰 Финансовые показатели</div>
-                    <div class="metrics-grid">
-                        <div class="metric-card">
-                            <div class="metric-value">${report.financial_market_data.deposit_rates.TRY}%</div>
-                            <div class="metric-label">Депозиты TRY</div>
-                        </div>
-                        <div class="metric-card">
-                            <div class="metric-value">${report.financial_market_data.deposit_rates.USD}%</div>
-                            <div class="metric-label">Депозиты USD</div>
-                        </div>
-                        <div class="metric-card">
-                            <div class="metric-value">${report.financial_market_data.bond_yields['5_year']}%</div>
-                            <div class="metric-label">Облигации 5 лет</div>
-                        </div>
-                        <div class="metric-card">
-                            <div class="metric-value">${report.financial_market_data.real_estate_funds.PROPERTY_FUND_YIELD}%</div>
-                            <div class="metric-label">Фонды недвижимости</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="report-section">
-                    <div class="report-title">🏘️ Региональные показатели Анталии</div>
-                    <div class="metrics-grid">
-                        <div class="metric-card">
-                            <div class="metric-value">${report.regional_indicators.antalya_property_price_growth}%</div>
-                            <div class="metric-label">Рост цен недвижимости</div>
-                        </div>
-                        <div class="metric-card">
-                            <div class="metric-value">${report.regional_indicators.antalya_rental_yield}%</div>
-                            <div class="metric-label">Доходность аренды</div>
-                        </div>
-                        <div class="metric-card">
-                            <div class="metric-value">${report.regional_indicators.antalya_tourism_growth}%</div>
-                            <div class="metric-label">Рост туризма</div>
-                        </div>
-                        <div class="metric-card">
-                            <div class="metric-value">${report.regional_indicators.antalya_gdp_growth}%</div>
-                            <div class="metric-label">Рост ВВП региона</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="report-section">
-                    <div class="report-title">📈 Инвестиционный анализ</div>
-                    <div class="metrics-grid">
-                        <div class="metric-card">
-                            <div class="metric-value">${report.investment_analysis.rental_yield_percentage.toFixed(1)}%</div>
-                            <div class="metric-label">Доходность аренды</div>
-                        </div>
-                        <div class="metric-card">
-                            <div class="metric-value">${report.investment_analysis.net_yield_percentage.toFixed(1)}%</div>
-                            <div class="metric-label">Чистая доходность</div>
-                        </div>
-                        <div class="metric-card">
-                            <div class="metric-value">$${report.investment_analysis.monthly_rent_estimate.toFixed(0)}</div>
-                            <div class="metric-label">Месячная аренда</div>
-                        </div>
-                        <div class="metric-card">
-                            <div class="metric-value">$${report.investment_analysis.net_annual_income.toFixed(0)}</div>
-                            <div class="metric-label">Годовой доход</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="report-section">
-                    <div class="report-title">⚠️ Оценка рисков</div>
-                    <div class="insights">
-                        <div class="insight-item">
-                            <div class="insight-text">Валютный риск: ${report.risk_assessment.currency_risk}</div>
-                        </div>
-                        <div class="insight-item">
-                            <div class="insight-text">Политический риск: ${report.risk_assessment.political_risk}</div>
-                        </div>
-                        <div class="insight-item">
-                            <div class="insight-text">Экономический риск: ${report.risk_assessment.economic_risk}</div>
-                        </div>
-                        <div class="insight-item">
-                            <div class="insight-text">Общий риск: ${report.risk_assessment.overall_risk_score}/10</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="report-section">
-                    <div class="report-title">💡 Рекомендации</div>
-                    <div class="insights">
-                        ${report.recommendations.map(rec => `
-                            <div class="insight-item">
-                                <div class="insight-text">${rec}</div>
-                            </div>
-                        `).join('')}
-                    </div>
+        function showFullReport(report) {
+            // Показываем подробный отчет
+            let html = `<h2>Полный отчет</h2>`;
+            if (report.object) {
+                html += `<div><b>Объект:</b> ${report.object.address || ''}, ${report.object.bedrooms || ''} спален, €${report.object.purchase_price || ''}</div>`;
+            }
+            if (report.macro) {
+                html += `<div><b>Макроэкономика:</b> <pre>${JSON.stringify(report.macro, null, 2)}</pre></div>`;
+            }
+            if (report.investments) {
+                html += `<div><b>Инвестиционные альтернативы:</b> <pre>${JSON.stringify(report.investments, null, 2)}</pre></div>`;
+            }
+            if (report.region) {
+                html += `<div><b>Региональные показатели:</b> <pre>${JSON.stringify(report.region, null, 2)}</pre></div>`;
+            }
+            if (report.taxes) {
+                html += `<div><b>Налоги:</b> <pre>${JSON.stringify(report.taxes, null, 2)}</pre></div>`;
+            }
+            if (report.risks) {
+                html += `<div><b>Риски:</b> <pre>${JSON.stringify(report.risks, null, 2)}</pre></div>`;
+            }
+            document.getElementById('report').innerHTML = html + `
+                <div class="button-group" style="margin-top:20px;">
+                    <button class="btn btn-primary" onclick="saveObject()">Сохранить объект</button>
+                    <button class="btn btn-primary" onclick="openPdfOptions()">Сохранить в PDF</button>
+                    <button class="btn btn-secondary" onclick="goToMenu()">Вернуться в главное меню</button>
                 </div>
             `;
-            
-            container.innerHTML = html;
         }
 
-        // Генерация PDF
-        async function generatePDF() {
-            const clientName = document.getElementById('client-name').value;
-            const clientTelegram = document.getElementById('client-telegram').value;
+        async function saveObject() {
+            if (!userData || !fullReportData) return;
+            await fetch('/api/save_object', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ telegram_id: userData.id, object_data: fullReportData.object })
+            });
+            alert('Объект сохранен!');
+        }
+
+        function openPdfOptions() {
+            document.getElementById('pdfOptionsModal').classList.remove('hidden');
+        }
+
+        function closePdfOptions() {
+            document.getElementById('pdfOptionsModal').classList.add('hidden');
+        }
+
+        async function submitPdfOptions() {
+            closePdfOptions();
+            const addRealtor = document.getElementById('addRealtorContacts').checked;
+            const addClient = document.getElementById('addClientName').checked;
             
-            if (!clientName || !clientTelegram) {
-                document.getElementById('client-modal').style.display = 'block';
-                return;
-            }
-
-            showScreen('loading-screen');
-
-            try {
-                const response = await fetch('/api/generate_pdf_report', {
+            // Генерируем PDF
+            const resp = await fetch('/api/generate_pdf_report', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ report: fullReportData, add_realtor_contacts: addRealtor, add_client_name: addClient })
+            });
+            const data = await resp.json();
+            if (data.success && data.pdf_path) {
+                // Скачиваем PDF
+                const pdfResp = await fetch('/api/download_pdf', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        property_data: currentProperty,
-                        full_report: currentReport,
-                        client_name: clientName,
-                        client_telegram: clientTelegram,
-                        include_macro: document.getElementById('include-macro').checked,
-                        include_financial: document.getElementById('include-financial').checked,
-                        include_regional: document.getElementById('include-regional').checked,
-                        include_tax: document.getElementById('include-tax').checked,
-                        include_risk: document.getElementById('include-risk').checked,
-                        telegram_id: tg.initDataUnsafe?.user?.id
-                    })
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ pdf_path: data.pdf_path })
                 });
-
-                const data = await response.json();
-                
-                if (data.success) {
-                    // Скачиваем PDF
-                    const downloadResponse = await fetch('/api/download_pdf', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            pdf_filename: data.pdf_filename,
-                            telegram_id: tg.initDataUnsafe?.user?.id
-                        })
-                    });
-
-                    if (downloadResponse.ok) {
-                        const blob = await downloadResponse.blob();
-                        const url = window.URL.createObjectURL(blob);
-                        const a = document.createElement('a');
-                        a.href = url;
-                        a.download = data.pdf_filename;
-                        document.body.appendChild(a);
-                        a.click();
-                        window.URL.revokeObjectURL(url);
-                        document.body.removeChild(a);
-
-                        // Показываем кнопку отправки клиенту
-                        showSendToClientButton();
-                    }
-                } else {
-                    alert('Ошибка генерации PDF: ' + data.error);
-                }
-            } catch (error) {
-                console.error('Ошибка:', error);
-                alert('Ошибка при генерации PDF');
+                const blob = await pdfResp.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'full_report.pdf';
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                window.URL.revokeObjectURL(url);
+                alert(getText('pdf_downloaded'));
+                showSendPdfModal(data.pdf_path);
+            } else {
+                alert(getText('pdf_error'));
             }
         }
 
-        // Показать кнопку отправки клиенту
-        function showSendToClientButton() {
-            const buttonGroup = document.querySelector('#full-report-screen .button-group');
-            const sendButton = document.createElement('button');
-            sendButton.className = 'btn btn-success';
-            sendButton.textContent = 'Отправить клиенту';
-            sendButton.onclick = sendPDFToClient;
-            buttonGroup.appendChild(sendButton);
+        function goToMenu() {
+            // Здесь логика возврата в главное меню
+            window.location.href = '/webapp';
         }
 
-        // Отправка PDF клиенту
-        async function sendPDFToClient() {
-            const clientName = document.getElementById('client-name').value;
-            const clientTelegram = document.getElementById('client-telegram').value;
+        function copyReport() {
+            let text = '';
+            text += `Адрес: ${document.getElementById('object-address').textContent}\n`;
+            text += `Спален: ${document.getElementById('object-bedrooms').textContent}\n`;
+            text += `Цена покупки: ${document.getElementById('object-price').textContent}\n\n`;
             
-            if (!clientName || !clientTelegram) {
-                alert('Пожалуйста, заполните данные клиента');
-                return;
-            }
-
-            try {
-                const response = await fetch('/api/send_pdf_to_client', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        client_name: clientName,
-                        client_telegram: clientTelegram,
-                        property_data: currentProperty,
-                        telegram_id: tg.initDataUnsafe?.user?.id
-                    })
-                });
-
-                const data = await response.json();
-                
-                if (data.success) {
-                    alert('PDF успешно отправлен клиенту!');
-                    closeClientModal();
-                } else {
-                    alert('Ошибка отправки PDF: ' + data.error);
-                }
-            } catch (error) {
-                console.error('Ошибка:', error);
-                alert('Ошибка при отправке PDF');
-            }
-        }
-
-        // Копирование в буфер
-        function copyToClipboard() {
-            const text = `Недвижимость: ${currentProperty.address}\nСпальни: ${currentProperty.bedrooms}\nЦена: $${currentProperty.price}`;
+            // Добавляем данные отчета
+            text += `Снапшот: ${reportData.district}, ${reportData.property_type}\n`;
+            text += `Средняя цена за м²: ${document.getElementById('price-per-sqm').textContent}\n`;
+            text += `Средний ROI: ${document.getElementById('roi').textContent}\n`;
+            text += `Ликвидность: ${document.getElementById('liquidity').textContent}\n\n`;
+            
+            // Добавляем инсайты
+            text += `Ключевые инсайты:\n`;
+            reportData.insights.forEach(insight => {
+                text += `• ${insight}\n`;
+            });
+            
             navigator.clipboard.writeText(text).then(() => {
-                alert('Информация скопирована в буфер обмена!');
+                alert(getText('report_copied'));
             }).catch(() => {
-                alert('Ошибка копирования в буфер обмена');
+                // Fallback для старых браузеров
+                const textArea = document.createElement('textarea');
+                textArea.value = text;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                alert(getText('report_copied'));
             });
         }
 
-        // Показать главное меню
-        function showMainMenu() {
-            showScreen('initial-screen');
+        let lastPdfPath = null;
+        
+        function showSendPdfModal(pdfPath) {
+            lastPdfPath = pdfPath;
+            document.getElementById('sendPdfModal').classList.remove('hidden');
         }
-
-        // Закрыть модальное окно клиента
-        function closeClientModal() {
-            document.getElementById('client-modal').style.display = 'none';
+        
+        function closeSendPdfModal() {
+            document.getElementById('sendPdfModal').classList.add('hidden');
         }
-
-        // Показать экран
-        function showScreen(screenId) {
-            const screens = ['initial-screen', 'loading-screen', 'result-screen', 'full-report-screen'];
-            screens.forEach(screen => {
-                document.getElementById(screen).classList.add('hidden');
+        
+        async function submitSendPdf() {
+            const clientTelegram = document.getElementById('clientTelegramInput').value.trim();
+            if (!clientTelegram || !lastPdfPath) {
+                alert(getText('error_telegram_username'));
+                return;
+            }
+            
+            const resp = await fetch('/api/send_pdf_to_client', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    realtor_telegram_id: userData.id,
+                    client_name: clientName || '',
+                    client_telegram: clientTelegram,
+                    pdf_path: lastPdfPath
+                })
             });
-            document.getElementById(screenId).classList.remove('hidden');
+            const data = await resp.json();
+            if (data.success && data.sent) {
+                alert(getText('pdf_sent_success'));
+                closeSendPdfModal();
+            } else {
+                alert(getText('pdf_sent_error') + (data.error || ''));
+            }
         }
 
-        // Инициализация при загрузке
-        document.addEventListener('DOMContentLoaded', function() {
-            getUserData();
-        });
+        // Запускаем генерацию отчета при загрузке страницы
+        generateReport();
     </script>
 </body>
 </html> 

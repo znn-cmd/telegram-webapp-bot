@@ -28,6 +28,15 @@ locales = {
             'generating_report': 'Ваш отчет формируется...',
             'back': 'Назад',
             'main_menu': 'В главное меню'
+        },
+        'report': {
+            'copy_to_clipboard': 'Копировать в буфер',
+            'main_menu': 'Главное меню',
+            'get_full_report': 'Получить полный отчет',
+            'insufficient_balance': 'Недостаточно баланса, нужно его пополнить',
+            'balance_required': 'Для полного отчета требуется $1',
+            'current_balance': 'Текущий баланс: $',
+            'report_cost': 'Стоимость отчета: $1'
         }
     },
     'en': {
@@ -59,6 +68,15 @@ locales = {
             'generating_report': 'Your report is being generated...',
             'back': 'Back',
             'main_menu': 'Main menu'
+        },
+        'report': {
+            'copy_to_clipboard': 'Copy to clipboard',
+            'main_menu': 'Main menu',
+            'get_full_report': 'Get full report',
+            'insufficient_balance': 'Insufficient balance, need to top up',
+            'balance_required': 'Full report requires $1',
+            'current_balance': 'Current balance: $',
+            'report_cost': 'Report cost: $1'
         }
     },
     'de': {
@@ -90,6 +108,15 @@ locales = {
             'generating_report': 'Ihr Bericht wird erstellt...',
             'back': 'Zurück',
             'main_menu': 'Hauptmenü'
+        },
+        'report': {
+            'copy_to_clipboard': 'In Zwischenablage kopieren',
+            'main_menu': 'Hauptmenü',
+            'get_full_report': 'Vollständigen Bericht erhalten',
+            'insufficient_balance': 'Unzureichender Kontostand, muss aufgeladen werden',
+            'balance_required': 'Vollständiger Bericht erfordert $1',
+            'current_balance': 'Aktueller Kontostand: $',
+            'report_cost': 'Berichtskosten: $1'
         }
     },
     'fr': {
@@ -121,6 +148,15 @@ locales = {
             'generating_report': 'Votre rapport est en cours de génération...',
             'back': 'Retour',
             'main_menu': 'Menu principal'
+        },
+        'report': {
+            'copy_to_clipboard': 'Copier dans le presse-papiers',
+            'main_menu': 'Menu principal',
+            'get_full_report': 'Obtenir le rapport complet',
+            'insufficient_balance': 'Solde insuffisant, besoin de recharger',
+            'balance_required': 'Le rapport complet nécessite $1',
+            'current_balance': 'Solde actuel: $',
+            'report_cost': 'Coût du rapport: $1'
         }
     },
     'tr': {
@@ -133,12 +169,6 @@ locales = {
             'Kayıtlı raporlarım',
             'Profil'
         ],
-        'language_names': {
-            'en': 'İngilizce',
-            'de': 'Almanca',
-            'fr': 'Fransızca',
-            'tr': 'Türkçe'
-        },
         'new_report': {
             'enter_address': 'Mülk adresini girin:',
             'address_not_found': 'Adres tanınmadı, lütfen tekrar girmeyi deneyin.',
@@ -152,6 +182,15 @@ locales = {
             'generating_report': 'Raporunuz oluşturuluyor...',
             'back': 'Geri',
             'main_menu': 'Ana menü'
+        },
+        'report': {
+            'copy_to_clipboard': 'Panoya kopyala',
+            'main_menu': 'Ana menü',
+            'get_full_report': 'Tam rapor al',
+            'insufficient_balance': 'Yetersiz bakiye, yükleme gerekli',
+            'balance_required': 'Tam rapor $1 gerektirir',
+            'current_balance': 'Mevcut bakiye: $',
+            'report_cost': 'Rapor maliyeti: $1'
         }
     }
 } 
