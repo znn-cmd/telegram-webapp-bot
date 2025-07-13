@@ -28,7 +28,7 @@ supabase: Client = create_client(supabase_url, supabase_key)
 TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 
 # URL вашего WebApp (замените на ваш домен после деплоя)
-WEBAPP_URL = "https://your-domain.amvera.io/webapp"
+WEBAPP_URL = https://aaadvisor-zaicevn.amvera.io/webapp
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Обработчик команды /start"""
