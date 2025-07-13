@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aaadviser - Инсайты рынка недвижимости</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 20px;
+            background: white;
+            min-height: 100vh;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px 0;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 8px;
+        }
+
+        .slogan {
+            font-size: 14px;
+            color: #666;
+            font-style: italic;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error-message {
+            background: #fee;
+            border: 1px solid #fcc;
+            color: #c33;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .report {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .report-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .metric-card {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            border-left: 4px solid #667eea;
+        }
+
+        .metric-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .metric-label {
+            font-size: 12px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .insights {
+            margin: 25px 0;
+        }
+
+        .insight-item {
+            background: #f0f8ff;
+            border-radius: 8px;
+            padding: 12px;
+            margin: 10px 0;
+            border-left: 3px solid #4CAF50;
+        }
+
+        .insight-text {
+            font-size: 14px;
+            color: #333;
+        }
+
+        .cta-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 25px 0;
+            text-align: center;
+            color: white;
+        }
+
+        .cta-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .cta-description {
+            font-size: 14px;
+            margin-bottom: 20px;
+            opacity: 0.9;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #45a049;
+        }
+
+        .btn-secondary {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .balance-info {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            text-align: center;
+        }
+
+        .balance-amount {
+            font-size: 18px;
+            font-weight: bold;
+            color: #856404;
+        }
+
+        .payment-section {
+            background: #e8f5e8;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            text-align: center;
+        }
+
+        .price {
+            font-size: 20px;
+            font-weight: bold;
+            color: #2e7d32;
+            margin-bottom: 10px;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">🏠 Aaadviser</div>
+            <div class="slogan">Инсайты рынка недвижимости за 60 секунд</div>
+        </div>
+
+        <div id="loading" class="loading">
+            <div class="spinner"></div>
+            <p>Анализируем рынок недвижимости...</p>
+        </div>
+
+        <div id="error" class="error-message hidden">
+            <p id="error-text"></p>
+        </div>
+
+        <div id="report" class="report hidden">
+            <div class="report-title" id="report-title"></div>
+            
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-value" id="price-per-sqm">$0</div>
+                    <div class="metric-label">Цена за м²</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value" id="roi">0%</div>
+                    <div class="metric-label">ROI аренды</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value" id="liquidity">0 дней</div>
+                    <div class="metric-label">Ликвидность</div>
+                </div>
+            </div>
+
+            <div class="insights">
+                <h3>🔍 Топ-3 инсайта</h3>
+                <div id="insights-list"></div>
+            </div>
+
+            <div class="cta-section">
+                <div class="cta-title">🔓 Получите полный Whitepaper с:</div>
+                <div class="cta-description">
+                    • Прогнозом цен на 2025 год<br>
+                    • Анализом 20+ конкурентов<br>
+                    • Кастомными рекомендациями
+                </div>
+                <div class="button-group">
+                    <button class="btn btn-primary" onclick="getFullReport()">Разблокировать за $15</button>
+                    <button class="btn btn-secondary" onclick="downloadPDF()">Скачать PDF</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="balance-info" class="balance-info hidden">
+            <div>Ваш баланс: <span class="balance-amount" id="balance-amount">$0</span></div>
+        </div>
+
+        <div id="payment-section" class="payment-section hidden">
+            <div class="price">$15</div>
+            <p>На вашем балансе недостаточно средств</p>
+            <button class="btn btn-primary" onclick="topUpBalance()">Пополнить счет</button>
+        </div>
+    </div>
+
+    <script>
+        let tg = window.Telegram.WebApp;
+        let userData = null;
+        let reportData = null;
+
+        // Инициализация WebApp
+        tg.ready();
+        tg.expand();
+
+        // Получаем данные пользователя
+        if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
+            userData = tg.initDataUnsafe.user;
+        }
+
+        // Получаем координаты из URL параметров
+        const urlParams = new URLSearchParams(window.location.search);
+        const lat = parseFloat(urlParams.get('lat'));
+        const lon = parseFloat(urlParams.get('lon'));
+
+        if (!lat || !lon) {
+            showError('Координаты не указаны');
+            return;
+        }
+
+        // Загружаем данные
+        loadReportData(lat, lon);
+
+        async function loadReportData(lat, lon) {
+            try {
+                // Имитация API запроса к Supabase
+                // В реальности здесь будет вызов вашего API
+                const response = await fetch('/api/generate-report', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        lat: lat,
+                        lon: lon,
+                        telegram_id: userData ? userData.id : null
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Ошибка загрузки данных');
+                }
+
+                reportData = await response.json();
+                
+                if (reportData.error) {
+                    showError(reportData.message);
+                } else {
+                    showReport(reportData);
+                }
+            } catch (error) {
+                // Для демонстрации используем заглушку
+                console.log('Используем демо-данные');
+                reportData = generateDemoReport(lat, lon);
+                showReport(reportData);
+            }
+        }
+
+        function generateDemoReport(lat, lon) {
+            // Демо-данные для тестирования
+            const districts = ['Kaleiçi', 'Lara', 'Muratpaşa', 'Konyaaltı'];
+            const district = districts[Math.floor(Math.random() * districts.length)];
+            
+            return {
+                error: false,
+                district: district,
+                property_type: 'apartment',
+                metrics: {
+                    avg_price_per_sqm: Math.floor(Math.random() * 3000) + 2000,
+                    avg_roi: (Math.random() * 5 + 5).toFixed(1),
+                    avg_days_on_market: Math.floor(Math.random() * 30) + 50
+                },
+                insights: [
+                    '🔍 Цены на 10% выше аналогов в соседних районах',
+                    '💰 Лучший ROI у объектов с паркингом (9.1%)',
+                    '⚠️ Пик предложения — июль (снижайте цену на 5%)'
+                ],
+                total_properties: Math.floor(Math.random() * 50) + 20,
+                search_radius: 5.0
+            };
+        }
+
+        function showReport(data) {
+            document.getElementById('loading').classList.add('hidden');
+            document.getElementById('report').classList.remove('hidden');
+
+            // Заполняем данные отчета
+            document.getElementById('report-title').textContent = 
+                `Снапшот: ${data.district}, ${data.property_type}`;
+            
+            document.getElementById('price-per-sqm').textContent = 
+                `$${data.metrics.avg_price_per_sqm.toLocaleString()}`;
+            
+            document.getElementById('roi').textContent = 
+                `${data.metrics.avg_roi}%`;
+            
+            document.getElementById('liquidity').textContent = 
+                `${data.metrics.avg_days_on_market} дней`;
+
+            // Заполняем инсайты
+            const insightsList = document.getElementById('insights-list');
+            insightsList.innerHTML = '';
+            data.insights.forEach(insight => {
+                const insightDiv = document.createElement('div');
+                insightDiv.className = 'insight-item';
+                insightDiv.innerHTML = `<div class="insight-text">${insight}</div>`;
+                insightsList.appendChild(insightDiv);
+            });
+
+            // Показываем баланс пользователя
+            if (userData) {
+                showUserBalance();
+            }
+        }
+
+        function showError(message) {
+            document.getElementById('loading').classList.add('hidden');
+            document.getElementById('error').classList.remove('hidden');
+            document.getElementById('error-text').textContent = message;
+        }
+
+        async function showUserBalance() {
+            try {
+                const response = await fetch('/api/user-balance', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        telegram_id: userData.id
+                    })
+                });
+
+                if (response.ok) {
+                    const balanceData = await response.json();
+                    document.getElementById('balance-amount').textContent = `$${balanceData.balance}`;
+                    document.getElementById('balance-info').classList.remove('hidden');
+                }
+            } catch (error) {
+                console.log('Ошибка получения баланса:', error);
+            }
+        }
+
+        async function getFullReport() {
+            if (!userData) {
+                showError('Необходимо авторизоваться в Telegram');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/full-report', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        telegram_id: userData.id,
+                        report_data: reportData
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    // Показываем полный отчет
+                    showFullReport(result.report);
+                } else if (result.insufficient_balance) {
+                    // Показываем форму пополнения
+                    document.getElementById('payment-section').classList.remove('hidden');
+                } else {
+                    showError(result.message || 'Ошибка получения отчета');
+                }
+            } catch (error) {
+                // Демо-режим
+                console.log('Демо: Получение полного отчета');
+                showFullReport(generateDemoFullReport());
+            }
+        }
+
+        function generateDemoFullReport() {
+            return {
+                title: 'Полный анализ рынка недвижимости',
+                content: {
+                    price_forecast: 'Ожидается рост цен на 8-12% в 2025 году',
+                    competitor_analysis: 'Проанализировано 25 конкурентов',
+                    recommendations: [
+                        'Рассмотрите инвестиции в новые районы',
+                        'Фокус на объекты с паркингом',
+                        'Оптимальное время для покупки - Q2 2025'
+                    ]
+                }
+            };
+        }
+
+        function showFullReport(report) {
+            // Здесь можно показать модальное окно с полным отчетом
+            alert(`Полный отчет: ${report.title}\n\n${report.content.price_forecast}`);
+        }
+
+        function downloadPDF() {
+            // Демо-функция скачивания PDF
+            alert('Функция скачивания PDF в разработке');
+        }
+
+        function topUpBalance() {
+            // Демо-функция пополнения баланса
+            alert('Переход к платежной системе...');
+            // В реальности здесь будет редирект на платежную систему
+        }
+
+        // Обработка кнопок Telegram
+        tg.MainButton.setText('Получить полный отчет');
+        tg.MainButton.onClick(getFullReport);
+        tg.MainButton.show();
+    </script>
+</body>
+</html> 

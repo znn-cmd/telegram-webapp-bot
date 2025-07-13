@@ -120,6 +120,7 @@ def webapp():
         <title>Telegram WebApp Test</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <script src="https://telegram.org/js/telegram-web-app.js"></script>
+        <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBrDkDpNKNAIyY147MQ78hchBkeyCAxhEw&libraries=places"></script>
         <style>
             body {
                 font-family: Arial, sans-serif;
@@ -291,9 +292,74 @@ def webapp():
                 <div class="step" id="stepReport">
                     <h3>Генерация отчета</h3>
                     <p id="reportMessage">Ваш отчет формируется...</p>
+                    <div id="marketAnalysis" style="display:none;">
+                        <h4>Анализ рынка в радиусе 5 км:</h4>
+                        <div id="analysisResults"></div>
+                    </div>
                     <div class="navigation-buttons">
                         <button class="btn" onclick="goToMainMenu()">В главное меню</button>
                     </div>
+                </div>
+            </div>
+            
+            <!-- Поиск недвижимости -->
+            <div id="searchProperties" style="display:none;">
+                <h3>Поиск недвижимости</h3>
+                <div class="search-filters">
+                    <select id="propertyType" class="input-field">
+                        <option value="short_term">Краткосрочная аренда</option>
+                        <option value="long_term">Долгосрочная аренда</option>
+                        <option value="sale">Продажа</option>
+                    </select>
+                    <input type="number" id="searchBedrooms" class="input-field" placeholder="Количество спален">
+                    <input type="number" id="searchPriceMin" class="input-field" placeholder="Минимальная цена">
+                    <input type="number" id="searchPriceMax" class="input-field" placeholder="Максимальная цена">
+                    <input type="text" id="searchCity" class="input-field" placeholder="Город">
+                    <input type="text" id="searchDistrict" class="input-field" placeholder="Район">
+                    <button class="btn" onclick="searchProperties()">Найти недвижимость</button>
+                </div>
+                <div id="searchResults"></div>
+                <div class="navigation-buttons">
+                    <button class="btn btn-danger" onclick="goToMainMenu()">В главное меню</button>
+                </div>
+            </div>
+            
+            <!-- Анализ ROI -->
+            <div id="roiCalculator" style="display:none;">
+                <h3>Калькулятор ROI</h3>
+                <div class="roi-inputs">
+                    <select id="roiPropertyType" class="input-field">
+                        <option value="short_term">Краткосрочная аренда</option>
+                        <option value="long_term">Долгосрочная аренда</option>
+                    </select>
+                    <input type="number" id="purchasePrice" class="input-field" placeholder="Цена покупки">
+                    <input type="number" id="monthlyExpenses" class="input-field" placeholder="Месячные расходы">
+                    <div id="shortTermInputs" style="display:none;">
+                        <input type="number" id="avgNightlyRate" class="input-field" placeholder="Средняя цена за ночь">
+                        <input type="number" id="occupancyRate" class="input-field" placeholder="Процент занятости (%)" value="75">
+                    </div>
+                    <div id="longTermInputs" style="display:none;">
+                        <input type="number" id="monthlyRent" class="input-field" placeholder="Месячная аренда">
+                    </div>
+                    <button class="btn" onclick="calculateROI()">Рассчитать ROI</button>
+                </div>
+                <div id="roiResult"></div>
+                <div class="navigation-buttons">
+                    <button class="btn btn-danger" onclick="goToMainMenu()">В главное меню</button>
+                </div>
+            </div>
+            
+            <!-- Статистика рынка -->
+            <div id="marketStats" style="display:none;">
+                <h3>Статистика рынка</h3>
+                <div class="stats-inputs">
+                    <input type="text" id="statsCity" class="input-field" placeholder="Город">
+                    <input type="text" id="statsDistrict" class="input-field" placeholder="Район">
+                    <button class="btn" onclick="getMarketStatistics()">Получить статистику</button>
+                </div>
+                <div id="statsResults"></div>
+                <div class="navigation-buttons">
+                    <button class="btn btn-danger" onclick="goToMainMenu()">В главное меню</button>
                 </div>
             </div>
         </div>
@@ -376,11 +442,21 @@ def webapp():
         function showMenu(menu) {
             menuBlock.style.display = '';
             reportSteps.style.display = 'none';
+            document.getElementById('searchProperties').style.display = 'none';
+            document.getElementById('roiCalculator').style.display = 'none';
+            document.getElementById('marketStats').style.display = 'none';
+            
             let html = '';
             for (let i = 0; i < menu.length; i++) {
                 const item = menu[i];
                 if (i === 0) {
                     html += `<button class="menu-btn" onclick="startNewReport()">${item}</button>`;
+                } else if (i === 1) {
+                    html += `<button class="menu-btn" onclick="showSearchProperties()">Поиск недвижимости</button>`;
+                } else if (i === 2) {
+                    html += `<button class="menu-btn" onclick="showROICalculator()">Калькулятор ROI</button>`;
+                } else if (i === 3) {
+                    html += `<button class="menu-btn" onclick="showMarketStats()">Статистика рынка</button>`;
                 } else {
                     html += `<button class="menu-btn">${item}</button>`;
                 }
@@ -461,10 +537,31 @@ def webapp():
                 document.getElementById('formattedAddress').textContent = data.formatted_address;
                 showStep('confirm');
                 currentStep = 'confirm';
+                // Загружаем карту
+                loadMap(data.lat, data.lng, data.formatted_address);
             } else {
                 const texts = getLocalizedTexts();
                 alert(texts.address_not_found);
             }
+        }
+
+        function loadMap(lat, lng, address) {
+            const mapContainer = document.getElementById('mapContainer');
+            mapContainer.innerHTML = '<div id="map" style="width:100%;height:100%;border-radius:8px;"></div>';
+            
+            const map = new google.maps.Map(document.getElementById('map'), {
+                center: { lat: parseFloat(lat), lng: parseFloat(lng) },
+                zoom: 15,
+                mapTypeControl: false,
+                streetViewControl: false,
+                fullscreenControl: false
+            });
+
+            new google.maps.Marker({
+                position: { lat: parseFloat(lat), lng: parseFloat(lng) },
+                map: map,
+                title: address
+            });
         }
 
         function confirmAddress() {
@@ -551,6 +648,9 @@ def webapp():
 
         function goToMainMenu() {
             reportSteps.style.display = 'none';
+            document.getElementById('searchProperties').style.display = 'none';
+            document.getElementById('roiCalculator').style.display = 'none';
+            document.getElementById('marketStats').style.display = 'none';
             reportData = {};
             currentStep = 'address';
             document.getElementById('addressInput').value = '';
@@ -558,6 +658,280 @@ def webapp():
             document.getElementById('priceInput').value = '';
             showMenu([]);
             fetchUser();
+        }
+
+        // Новые функции для работы с недвижимостью
+        function showSearchProperties() {
+            menuBlock.style.display = 'none';
+            document.getElementById('searchProperties').style.display = '';
+        }
+
+        function showROICalculator() {
+            menuBlock.style.display = 'none';
+            document.getElementById('roiCalculator').style.display = '';
+            setupROICalculator();
+        }
+
+        function showMarketStats() {
+            menuBlock.style.display = 'none';
+            document.getElementById('marketStats').style.display = '';
+        }
+
+        function setupROICalculator() {
+            const propertyType = document.getElementById('roiPropertyType');
+            const shortTermInputs = document.getElementById('shortTermInputs');
+            const longTermInputs = document.getElementById('longTermInputs');
+            
+            propertyType.addEventListener('change', function() {
+                if (this.value === 'short_term') {
+                    shortTermInputs.style.display = '';
+                    longTermInputs.style.display = 'none';
+                } else {
+                    shortTermInputs.style.display = 'none';
+                    longTermInputs.style.display = '';
+                }
+            });
+        }
+
+        async function searchProperties() {
+            const propertyType = document.getElementById('propertyType').value;
+            const bedrooms = document.getElementById('searchBedrooms').value;
+            const priceMin = document.getElementById('searchPriceMin').value;
+            const priceMax = document.getElementById('searchPriceMax').value;
+            const city = document.getElementById('searchCity').value;
+            const district = document.getElementById('searchDistrict').value;
+            
+            const searchData = {
+                property_type: propertyType
+            };
+            
+            if (bedrooms) searchData.bedrooms = parseInt(bedrooms);
+            if (priceMin) searchData.price_min = parseFloat(priceMin);
+            if (priceMax) searchData.price_max = parseFloat(priceMax);
+            if (city) searchData.city = city;
+            if (district) searchData.district = district;
+            
+            try {
+                const res = await fetch('/api/search_properties', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(searchData)
+                });
+                const data = await res.json();
+                
+                if (data.success) {
+                    displaySearchResults(data.properties, propertyType);
+                } else {
+                    document.getElementById('searchResults').innerHTML = '<p>Ошибка поиска</p>';
+                }
+            } catch (error) {
+                document.getElementById('searchResults').innerHTML = '<p>Ошибка соединения</p>';
+            }
+        }
+
+        function displaySearchResults(properties, propertyType) {
+            const resultsDiv = document.getElementById('searchResults');
+            
+            if (properties.length === 0) {
+                resultsDiv.innerHTML = '<p>Недвижимость не найдена</p>';
+                return;
+            }
+            
+            let html = `<h4>Найдено ${properties.length} объектов:</h4>`;
+            
+            properties.forEach(property => {
+                const priceLabel = propertyType === 'short_term' ? 'Цена за ночь' : 
+                                 propertyType === 'long_term' ? 'Месячная аренда' : 'Цена продажи';
+                
+                html += `
+                    <div style="border: 1px solid #ddd; padding: 10px; margin: 10px 0; border-radius: 8px;">
+                        <h5>${property.address}</h5>
+                        <p><strong>${priceLabel}:</strong> €${property.price}</p>
+                        <p><strong>Спальни:</strong> ${property.bedrooms}</p>
+                        <p><strong>Ванные:</strong> ${property.bathrooms}</p>
+                        <p><strong>Источник:</strong> ${property.source}</p>
+                        <a href="${property.source_url}" target="_blank" class="btn">Открыть</a>
+                    </div>
+                `;
+            });
+            
+            resultsDiv.innerHTML = html;
+        }
+
+        async function calculateROI() {
+            const propertyType = document.getElementById('roiPropertyType').value;
+            const purchasePrice = document.getElementById('purchasePrice').value;
+            const monthlyExpenses = document.getElementById('monthlyExpenses').value;
+            
+            if (!purchasePrice) {
+                alert('Введите цену покупки');
+                return;
+            }
+            
+            const roiData = {
+                property_type: propertyType,
+                purchase_price: parseFloat(purchasePrice),
+                monthly_expenses: parseFloat(monthlyExpenses) || 0
+            };
+            
+            if (propertyType === 'short_term') {
+                roiData.avg_nightly_rate = parseFloat(document.getElementById('avgNightlyRate').value) || 0;
+                roiData.occupancy_rate = parseFloat(document.getElementById('occupancyRate').value) || 75;
+            } else {
+                roiData.monthly_rent = parseFloat(document.getElementById('monthlyRent').value) || 0;
+            }
+            
+            try {
+                const res = await fetch('/api/calculate_roi', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(roiData)
+                });
+                const data = await res.json();
+                
+                if (data.success) {
+                    document.getElementById('roiResult').innerHTML = `
+                        <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin: 15px 0;">
+                            <h4>Результат расчета ROI:</h4>
+                            <p><strong>ROI:</strong> ${data.roi_percentage}</p>
+                            <p><strong>Тип недвижимости:</strong> ${propertyType === 'short_term' ? 'Краткосрочная аренда' : 'Долгосрочная аренда'}</p>
+                        </div>
+                    `;
+                } else {
+                    document.getElementById('roiResult').innerHTML = '<p>Ошибка расчета ROI</p>';
+                }
+            } catch (error) {
+                document.getElementById('roiResult').innerHTML = '<p>Ошибка соединения</p>';
+            }
+        }
+
+        async function getMarketStatistics() {
+            const city = document.getElementById('statsCity').value;
+            const district = document.getElementById('statsDistrict').value;
+            
+            if (!city || !district) {
+                alert('Введите город и район');
+                return;
+            }
+            
+            try {
+                const res = await fetch('/api/market_statistics', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ city: city, district: district })
+                });
+                const data = await res.json();
+                
+                if (data.success) {
+                    displayMarketStatistics(data.statistics);
+                } else {
+                    document.getElementById('statsResults').innerHTML = '<p>Ошибка получения статистики</p>';
+                }
+            } catch (error) {
+                document.getElementById('statsResults').innerHTML = '<p>Ошибка соединения</p>';
+            }
+        }
+
+        function displayMarketStatistics(statistics) {
+            const resultsDiv = document.getElementById('statsResults');
+            
+            if (statistics.length === 0) {
+                resultsDiv.innerHTML = '<p>Статистика не найдена</p>';
+                return;
+            }
+            
+            let html = '<h4>Статистика рынка:</h4>';
+            
+            statistics.forEach(stat => {
+                const typeLabel = stat.property_type === 'short_term' ? 'Краткосрочная аренда' :
+                                stat.property_type === 'long_term' ? 'Долгосрочная аренда' : 'Продажи';
+                
+                html += `
+                    <div style="border: 1px solid #ddd; padding: 15px; margin: 10px 0; border-radius: 8px;">
+                        <h5>${typeLabel}</h5>
+                        <p><strong>Средняя цена:</strong> €${stat.avg_price || 0}</p>
+                        <p><strong>Медианная цена:</strong> €${stat.median_price || 0}</p>
+                        <p><strong>Минимальная цена:</strong> €${stat.min_price || 0}</p>
+                        <p><strong>Максимальная цена:</strong> €${stat.max_price || 0}</p>
+                        <p><strong>Количество объявлений:</strong> ${stat.listings_count || 0}</p>
+                        ${stat.avg_rating ? `<p><strong>Средний рейтинг:</strong> ${stat.avg_rating}</p>` : ''}
+                        <p><strong>Среднее количество спален:</strong> ${stat.avg_bedrooms || 0}</p>
+                    </div>
+                `;
+            });
+            
+            resultsDiv.innerHTML = html;
+        }
+
+        // Обновляем функцию generateReport для отображения анализа рынка
+        async function generateReport() {
+            const res = await fetch('/api/generate_report', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    address: reportData.address,
+                    bedrooms: reportData.bedrooms,
+                    price: reportData.price,
+                    lat: reportData.lat,
+                    lng: reportData.lng,
+                    language: currentLanguage,
+                    telegram_id: telegramId
+                })
+            });
+            const data = await res.json();
+            document.getElementById('reportMessage').textContent = data.message;
+            
+            // Отображаем анализ рынка если есть данные
+            if (data.analysis) {
+                displayMarketAnalysis(data.analysis);
+            }
+        }
+
+        function displayMarketAnalysis(analysis) {
+            const analysisDiv = document.getElementById('marketAnalysis');
+            const resultsDiv = document.getElementById('analysisResults');
+            
+            analysisDiv.style.display = '';
+            
+            let html = '';
+            
+            if (analysis.short_term_rental && analysis.short_term_rental.count > 0) {
+                html += `
+                    <div style="border: 1px solid #ddd; padding: 10px; margin: 10px 0; border-radius: 8px;">
+                        <h5>Краткосрочная аренда (${analysis.short_term_rental.count} объектов)</h5>
+                        <p>Средняя цена за ночь: €${analysis.short_term_rental.avg_price || 0}</p>
+                        <p>Диапазон цен: €${analysis.short_term_rental.min_price || 0} - €${analysis.short_term_rental.max_price || 0}</p>
+                        ${analysis.short_term_rental.avg_rating ? `<p>Средний рейтинг: ${analysis.short_term_rental.avg_rating}</p>` : ''}
+                    </div>
+                `;
+            }
+            
+            if (analysis.long_term_rental && analysis.long_term_rental.count > 0) {
+                html += `
+                    <div style="border: 1px solid #ddd; padding: 10px; margin: 10px 0; border-radius: 8px;">
+                        <h5>Долгосрочная аренда (${analysis.long_term_rental.count} объектов)</h5>
+                        <p>Средняя месячная аренда: €${analysis.long_term_rental.avg_price || 0}</p>
+                        <p>Диапазон цен: €${analysis.long_term_rental.min_price || 0} - €${analysis.long_term_rental.max_price || 0}</p>
+                    </div>
+                `;
+            }
+            
+            if (analysis.property_sales && analysis.property_sales.count > 0) {
+                html += `
+                    <div style="border: 1px solid #ddd; padding: 10px; margin: 10px 0; border-radius: 8px;">
+                        <h5>Продажи недвижимости (${analysis.property_sales.count} объектов)</h5>
+                        <p>Средняя цена продажи: €${analysis.property_sales.avg_price || 0}</p>
+                        <p>Диапазон цен: €${analysis.property_sales.min_price || 0} - €${analysis.property_sales.max_price || 0}</p>
+                        <p>Средняя цена за кв.м: €${analysis.property_sales.avg_price_per_sqm || 0}</p>
+                    </div>
+                `;
+            }
+            
+            if (html === '') {
+                html = '<p>В радиусе 5 км не найдено объектов недвижимости для сравнения</p>';
+            }
+            
+            resultsDiv.innerHTML = html;
         }
 
         fetchUser();
@@ -700,21 +1074,322 @@ def api_validate_price():
 
 @app.route('/api/generate_report', methods=['POST'])
 def api_generate_report():
-    """Генерация отчета (заглушка)"""
+    """Генерация отчета с анализом недвижимости"""
     data = request.json or {}
     address = data.get('address')
     bedrooms = data.get('bedrooms')
     price = data.get('price')
     language = data.get('language', 'en')
+    lat = data.get('lat')
+    lng = data.get('lng')
     
     if not all([address, bedrooms, price]):
         return jsonify({'error': 'Missing required data'}), 400
     
-    # Заглушка - в будущем здесь будет реальная генерация отчета
-    return jsonify({
-        'success': True,
-        'message': locales[language]['new_report']['generating_report']
-    })
+    try:
+        # Сохраняем отчет в базу данных
+        report_data = {
+            'user_id': data.get('telegram_id'),
+            'report_type': 'market_analysis',
+            'title': f'Анализ недвижимости: {address}',
+            'description': f'Отчет по адресу {address}, {bedrooms} спален, цена {price}',
+            'parameters': {
+                'address': address,
+                'bedrooms': bedrooms,
+                'price': price,
+                'lat': lat,
+                'lng': lng
+            },
+            'address': address,
+            'latitude': lat,
+            'longitude': lng,
+            'bedrooms': bedrooms,
+            'price_range_min': float(price) * 0.8,
+            'price_range_max': float(price) * 1.2
+        }
+        
+        # Получаем user_id из telegram_id
+        user_result = supabase.table('users').select('id').eq('telegram_id', data.get('telegram_id')).execute()
+        if user_result.data:
+            report_data['user_id'] = user_result.data[0]['id']
+            
+            # Сохраняем отчет
+            supabase.table('user_reports').insert(report_data).execute()
+        
+        # Анализируем рынок в радиусе 5 км
+        market_analysis = analyze_market_around_location(lat, lng, bedrooms, float(price))
+        
+        return jsonify({
+            'success': True,
+            'message': locales[language]['new_report']['generating_report'],
+            'analysis': market_analysis
+        })
+        
+    except Exception as e:
+        logger.error(f"Error generating report: {e}")
+        return jsonify({
+            'success': True,
+            'message': locales[language]['new_report']['generating_report']
+        })
+
+def analyze_market_around_location(lat, lng, bedrooms, target_price):
+    """Анализ рынка недвижимости вокруг указанной локации"""
+    try:
+        # Используем функцию поиска в радиусе (5 км)
+        radius_km = 5.0
+        
+        # Поиск краткосрочной аренды
+        short_term_query = f"""
+        SELECT 
+            COUNT(*) as count,
+            AVG(price_per_night) as avg_price,
+            MIN(price_per_night) as min_price,
+            MAX(price_per_night) as max_price,
+            AVG(avg_rating) as avg_rating
+        FROM short_term_rentals 
+        WHERE is_active = true 
+        AND bedrooms = {bedrooms}
+        AND (6371 * acos(cos(radians({lat})) * cos(radians(latitude)) * 
+             cos(radians(longitude) - radians({lng})) + 
+             sin(radians({lat})) * sin(radians(latitude)))) <= {radius_km}
+        """
+        
+        # Поиск долгосрочной аренды
+        long_term_query = f"""
+        SELECT 
+            COUNT(*) as count,
+            AVG(monthly_rent) as avg_price,
+            MIN(monthly_rent) as min_price,
+            MAX(monthly_rent) as max_price
+        FROM long_term_rentals 
+        WHERE is_active = true 
+        AND bedrooms = {bedrooms}
+        AND (6371 * acos(cos(radians({lat})) * cos(radians(latitude)) * 
+             cos(radians(longitude) - radians({lng})) + 
+             sin(radians({lat})) * sin(radians(latitude)))) <= {radius_km}
+        """
+        
+        # Поиск продаж
+        sales_query = f"""
+        SELECT 
+            COUNT(*) as count,
+            AVG(asking_price) as avg_price,
+            MIN(asking_price) as min_price,
+            MAX(asking_price) as max_price,
+            AVG(price_per_sqm) as avg_price_per_sqm
+        FROM property_sales 
+        WHERE is_active = true 
+        AND bedrooms = {bedrooms}
+        AND (6371 * acos(cos(radians({lat})) * cos(radians(latitude)) * 
+             cos(radians(longitude) - radians({lng})) + 
+             sin(radians({lat})) * sin(radians(latitude)))) <= {radius_km}
+        """
+        
+        # Выполняем запросы
+        short_term_result = supabase.rpc('execute_sql', {'query': short_term_query}).execute()
+        long_term_result = supabase.rpc('execute_sql', {'query': long_term_query}).execute()
+        sales_result = supabase.rpc('execute_sql', {'query': sales_query}).execute()
+        
+        return {
+            'short_term_rental': short_term_result.data[0] if short_term_result.data else {},
+            'long_term_rental': long_term_result.data[0] if long_term_result.data else {},
+            'property_sales': sales_result.data[0] if sales_result.data else {},
+            'target_price': target_price,
+            'radius_km': radius_km
+        }
+        
+    except Exception as e:
+        logger.error(f"Error analyzing market: {e}")
+        return {}
+
+@app.route('/api/search_properties', methods=['POST'])
+def api_search_properties():
+    """Поиск недвижимости по параметрам"""
+    data = request.json or {}
+    property_type = data.get('property_type', 'short_term')  # short_term, long_term, sale
+    bedrooms = data.get('bedrooms')
+    price_min = data.get('price_min')
+    price_max = data.get('price_max')
+    city = data.get('city')
+    district = data.get('district')
+    lat = data.get('lat')
+    lng = data.get('lng')
+    radius_km = data.get('radius_km', 5.0)
+    
+    try:
+        if lat and lng:
+            # Поиск по радиусу
+            properties = find_properties_in_radius(lat, lng, radius_km, property_type)
+        else:
+            # Поиск по параметрам
+            properties = find_properties_by_params(property_type, bedrooms, price_min, price_max, city, district)
+        
+        return jsonify({
+            'success': True,
+            'properties': properties,
+            'count': len(properties)
+        })
+        
+    except Exception as e:
+        logger.error(f"Error searching properties: {e}")
+        return jsonify({'error': 'Search error'}), 500
+
+def find_properties_in_radius(lat, lng, radius_km, property_type):
+    """Поиск недвижимости в радиусе"""
+    try:
+        # Используем функцию из базы данных
+        query = f"""
+        SELECT * FROM find_properties_in_radius({lat}, {lng}, {radius_km}, '{property_type}')
+        """
+        result = supabase.rpc('execute_sql', {'query': query}).execute()
+        return result.data if result.data else []
+    except Exception as e:
+        logger.error(f"Error in radius search: {e}")
+        return []
+
+def find_properties_by_params(property_type, bedrooms, price_min, price_max, city, district):
+    """Поиск недвижимости по параметрам"""
+    try:
+        table_name = {
+            'short_term': 'short_term_rentals',
+            'long_term': 'long_term_rentals',
+            'sale': 'property_sales'
+        }.get(property_type, 'short_term_rentals')
+        
+        price_column = {
+            'short_term': 'price_per_night',
+            'long_term': 'monthly_rent',
+            'sale': 'asking_price'
+        }.get(property_type, 'price_per_night')
+        
+        conditions = ['is_active = true']
+        
+        if bedrooms:
+            conditions.append(f'bedrooms = {bedrooms}')
+        if price_min:
+            conditions.append(f'{price_column} >= {price_min}')
+        if price_max:
+            conditions.append(f'{price_column} <= {price_max}')
+        if city:
+            conditions.append(f"city ILIKE '%{city}%'")
+        if district:
+            conditions.append(f"district ILIKE '%{district}%'")
+        
+        query = f"""
+        SELECT 
+            property_id, address, latitude, longitude, 
+            {price_column} as price, bedrooms, bathrooms,
+            source, source_url, updated_at
+        FROM {table_name}
+        WHERE {' AND '.join(conditions)}
+        ORDER BY {price_column}
+        LIMIT 50
+        """
+        
+        result = supabase.rpc('execute_sql', {'query': query}).execute()
+        return result.data if result.data else []
+        
+    except Exception as e:
+        logger.error(f"Error in params search: {e}")
+        return []
+
+@app.route('/api/market_statistics', methods=['POST'])
+def api_market_statistics():
+    """Получение статистики рынка"""
+    data = request.json or {}
+    district = data.get('district')
+    city = data.get('city')
+    
+    if not district or not city:
+        return jsonify({'error': 'District and city required'}), 400
+    
+    try:
+        # Используем функцию статистики из базы данных
+        query = f"""
+        SELECT * FROM get_district_statistics('{district}', '{city}')
+        """
+        result = supabase.rpc('execute_sql', {'query': query}).execute()
+        
+        return jsonify({
+            'success': True,
+            'statistics': result.data if result.data else []
+        })
+        
+    except Exception as e:
+        logger.error(f"Error getting statistics: {e}")
+        return jsonify({'error': 'Statistics error'}), 500
+
+@app.route('/api/calculate_roi', methods=['POST'])
+def api_calculate_roi():
+    """Расчет ROI для инвестиций"""
+    data = request.json or {}
+    property_type = data.get('property_type', 'short_term')
+    purchase_price = data.get('purchase_price')
+    monthly_expenses = data.get('monthly_expenses', 0)
+    
+    if not purchase_price:
+        return jsonify({'error': 'Purchase price required'}), 400
+    
+    try:
+        if property_type == 'short_term':
+            avg_nightly_rate = data.get('avg_nightly_rate', 0)
+            occupancy_rate = data.get('occupancy_rate', 75)
+            
+            # Используем функцию ROI из базы данных
+            query = f"""
+            SELECT calculate_short_term_roi({purchase_price}, {monthly_expenses}, {avg_nightly_rate}, {occupancy_rate}) as roi
+            """
+        else:
+            monthly_rent = data.get('monthly_rent', 0)
+            
+            query = f"""
+            SELECT calculate_long_term_roi({purchase_price}, {monthly_expenses}, {monthly_rent}) as roi
+            """
+        
+        result = supabase.rpc('execute_sql', {'query': query}).execute()
+        roi = result.data[0]['roi'] if result.data else 0
+        
+        return jsonify({
+            'success': True,
+            'roi': roi,
+            'roi_percentage': f"{roi:.2f}%"
+        })
+        
+    except Exception as e:
+        logger.error(f"Error calculating ROI: {e}")
+        return jsonify({'error': 'ROI calculation error'}), 500
+
+@app.route('/api/similar_properties', methods=['POST'])
+def api_similar_properties():
+    """Поиск похожих объектов"""
+    data = request.json or {}
+    bedrooms = data.get('bedrooms')
+    price_min = data.get('price_min')
+    price_max = data.get('price_max')
+    city = data.get('city')
+    district = data.get('district')
+    property_type = data.get('property_type', 'short_term')
+    
+    if not all([bedrooms, price_min, price_max, city]):
+        return jsonify({'error': 'Missing required parameters'}), 400
+    
+    try:
+        # Используем функцию поиска похожих объектов
+        query = f"""
+        SELECT * FROM find_similar_properties({bedrooms}, {price_min}, {price_max}, '{city}', '{district}', '{property_type}')
+        LIMIT 20
+        """
+        
+        result = supabase.rpc('execute_sql', {'query': query}).execute()
+        
+        return jsonify({
+            'success': True,
+            'properties': result.data if result.data else []
+        })
+        
+    except Exception as e:
+        logger.error(f"Error finding similar properties: {e}")
+        return jsonify({'error': 'Similar properties search error'}), 500
 
 import threading
 
