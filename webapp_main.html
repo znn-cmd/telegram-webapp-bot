@@ -216,15 +216,16 @@
         </div>
 
         <!-- Выбор языка -->
-        <div class="language-selector">
+        <div class="language-selector" id="languageSelector">
             <div class="language-title" id="languageTitle">Выберите язык</div>
             <div class="language-buttons">
-                <button class="lang-btn selected" data-lang="ru" onclick="setLanguage('ru')">🇷🇺 Русский</button>
-                <button class="lang-btn" data-lang="en" onclick="setLanguage('en')">🇺🇸 English</button>
-                <button class="lang-btn" data-lang="de" onclick="setLanguage('de')">🇩🇪 Deutsch</button>
-                <button class="lang-btn" data-lang="fr" onclick="setLanguage('fr')">🇫🇷 Français</button>
-                <button class="lang-btn" data-lang="tr" onclick="setLanguage('tr')">🇹🇷 Türkçe</button>
+                <button class="lang-btn selected" data-lang="ru" onclick="selectLanguage('ru')">🇷🇺 Русский</button>
+                <button class="lang-btn" data-lang="en" onclick="selectLanguage('en')">🇺🇸 English</button>
+                <button class="lang-btn" data-lang="de" onclick="selectLanguage('de')">🇩🇪 Deutsch</button>
+                <button class="lang-btn" data-lang="fr" onclick="selectLanguage('fr')">🇫🇷 Français</button>
+                <button class="lang-btn" data-lang="tr" onclick="selectLanguage('tr')">🇹🇷 Türkçe</button>
             </div>
+            <button class="btn" id="confirmLangBtn" style="margin-top:15px;width:100%;" onclick="confirmLanguage()">Подтвердить</button>
         </div>
 
         <!-- Главное меню -->
@@ -270,6 +271,7 @@
 
         let userData = null;
         let currentLanguage = 'ru';
+        let selectedLanguage = currentLanguage;
 
         // Получаем данные пользователя
         if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
@@ -389,29 +391,29 @@
         }
 
         // Установка языка
-        function setLanguage(lang) {
-            currentLanguage = lang;
-            
-            // Обновляем кнопки языка
-            document.querySelectorAll('.lang-btn').forEach(btn => {
-                btn.classList.remove('selected');
-            });
+        function selectLanguage(lang) {
+            selectedLanguage = lang;
+            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('selected'));
             document.querySelector(`[data-lang="${lang}"]`).classList.add('selected');
-            
-            // Обновляем текст на странице
+        }
+
+        // Подтверждение выбора языка
+        async function confirmLanguage() {
+            currentLanguage = selectedLanguage;
             updatePageText();
-            
-            // Сохраняем выбор языка
+            // Сохраняем выбор языка в базу
             if (userData) {
-                fetch('/api/set_language', {
+                await fetch('/api/set_language', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         telegram_id: userData.id,
-                        language: lang
+                        language: currentLanguage
                     })
                 });
             }
+            // Скрываем блок выбора языка
+            document.getElementById('languageSelector').style.display = 'none';
         }
 
         // Загрузка данных пользователя
@@ -436,11 +438,18 @@
                 if (response.ok) {
                     const userInfo = await response.json();
                     const isNewUser = userInfo.is_new_user;
-                    
+                    // Если язык уже выбран — скрываем выбор языка и используем его
+                    if (userInfo.language) {
+                        currentLanguage = userInfo.language;
+                        selectedLanguage = userInfo.language;
+                        document.getElementById('languageSelector').style.display = 'none';
+                        updatePageText();
+                    } else {
+                        document.getElementById('languageSelector').style.display = 'block';
+                    }
                     // Приветственное сообщение
                     const welcomeText = isNewUser ? getText('welcome_new') : getText('welcome_back');
                     document.getElementById('userName').textContent = welcomeText;
-                    
                     // Загружаем баланс
                     await loadUserBalance();
                 }
@@ -453,7 +462,7 @@
         // Загрузка баланса пользователя
         async function loadUserBalance() {
             try {
-                const response = await fetch('/api/user-balance', {
+                const response = await fetch('/api/user_balance', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({

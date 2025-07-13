@@ -337,6 +337,49 @@
             <div class="slogan">Инсайты рынка недвижимости</div>
         </div>
 
+        <!-- Шаг 1: Ввод адреса -->
+        <div id="stepAddress" class="step active">
+            <h3>Введите адрес объекта</h3>
+            <input type="text" id="addressInput" class="input-field" placeholder="Введите адрес...">
+            <button class="btn" onclick="verifyAddress()">Далее</button>
+        </div>
+
+        <!-- Шаг 2: Карта и подтверждение адреса -->
+        <div id="stepConfirm" class="step" style="display:none;">
+            <h3>Проверьте адрес</h3>
+            <div id="map" style="width:100%;height:200px;margin-bottom:10px;"></div>
+            <div id="confirmedAddress" style="margin-bottom:10px;"></div>
+            <button class="btn btn-success" onclick="confirmAddress()">Адрес правильный</button>
+            <button class="btn btn-danger" onclick="retryAddress()">Адрес неправильный</button>
+        </div>
+
+        <!-- Шаг 3: Количество спален -->
+        <div id="stepBedrooms" class="step" style="display:none;">
+            <h3>Количество спален</h3>
+            <select id="bedroomsSelect" class="input-field">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5+</option>
+            </select>
+            <button class="btn" onclick="goToPriceStep()">Далее</button>
+        </div>
+
+        <!-- Шаг 4: Стоимость квартиры -->
+        <div id="stepPrice" class="step" style="display:none;">
+            <h3>Стоимость квартиры (€)</h3>
+            <input type="number" id="priceInput" class="input-field" placeholder="Введите стоимость в евро">
+            <button class="btn" onclick="generateReport()">Получить отчет</button>
+        </div>
+
+        <!-- Шаг 5: Отчет -->
+        <div id="stepReport" class="step" style="display:none;">
+            <h3>Ваш отчет</h3>
+            <div id="reportResult"></div>
+            <button class="btn" onclick="goToMainMenu()">В главное меню</button>
+        </div>
+
         <!-- Загрузка -->
         <div id="loading" class="loading">
             <div class="spinner"></div>
@@ -621,135 +664,103 @@
         // Инициализация
         updatePageText();
 
-        // Получаем координаты и генерируем отчет
-        async function generateReport() {
-            try {
-                // Получаем координаты из Telegram
-                const lat = 36.8969; // Координаты Анталии
-                const lon = 30.7133;
-                
-                // Запрос к API для получения отчета
-                const response = await fetch('/api/generate-report', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        lat: lat,
-                        lon: lon,
-                        telegram_id: userData ? userData.id : null
-                    })
-                });
+        let currentStep = 0;
+        let addressData = {};
+        let geoData = {};
 
-                const reportData = await response.json();
-                
-                if (reportData.error) {
-                    showError(reportData.message);
-                } else {
-                    showReport(reportData);
-                }
-            } catch (error) {
-                // Для демонстрации используем заглушку
-                console.log('Используем демо-данные');
-                reportData = generateDemoReport(lat, lon);
-                showReport(reportData);
+        function showStep(stepId) {
+            document.querySelectorAll('.step').forEach(s => s.style.display = 'none');
+            document.getElementById(stepId).style.display = 'block';
+        }
+
+        // Шаг 1: Верификация адреса
+        async function verifyAddress() {
+            const address = document.getElementById('addressInput').value;
+            if (!address) {
+                alert('Введите адрес');
+                return;
             }
-        }
-
-        function generateDemoReport(lat, lon) {
-            // Демо-данные для тестирования
-            const districts = ['Kaleiçi', 'Lara', 'Muratpaşa', 'Konyaaltı'];
-            const district = districts[Math.floor(Math.random() * districts.length)];
-            
-            return {
-                error: false,
-                district: district,
-                property_type: 'apartment',
-                address: 'ул. Ататюрка, 123, Анталья, Турция',
-                bedrooms: 3,
-                purchase_price: 250000,
-                metrics: {
-                    avg_price_per_sqm: Math.floor(Math.random() * 3000) + 2000,
-                    avg_roi: (Math.random() * 5 + 5).toFixed(1),
-                    avg_days_on_market: Math.floor(Math.random() * 30) + 50
-                },
-                insights: [
-                    '🔍 Цены на 10% выше аналогов в соседних районах',
-                    '💰 Лучший ROI у объектов с паркингом (9.1%)',
-                    '⚠️ Пик предложения — июль (снижайте цену на 5%)'
-                ],
-                total_properties: Math.floor(Math.random() * 50) + 20,
-                search_radius: 5.0
-            };
-        }
-
-        function showReport(data) {
-            reportData = data;
-            
-            document.getElementById('loading').classList.add('hidden');
-            document.getElementById('report').classList.remove('hidden');
-            document.getElementById('object-info').classList.remove('hidden');
-
-            // Заполняем инфо по объекту
-            document.getElementById('object-bedrooms').textContent = data.bedrooms || '-';
-            document.getElementById('object-price').textContent = data.purchase_price ? `€${data.purchase_price.toLocaleString()}` : '-';
-            document.getElementById('object-address').textContent = data.address || 'Адрес не указан';
-
-            // Заполняем данные отчета
-            document.getElementById('report-title').textContent = 
-                `Снапшот: ${data.district}, ${data.property_type}`;
-            
-            document.getElementById('price-per-sqm').textContent = 
-                `$${data.metrics.avg_price_per_sqm.toLocaleString()}`;
-            
-            document.getElementById('roi').textContent = 
-                `${data.metrics.avg_roi}%`;
-            
-            document.getElementById('liquidity').textContent = 
-                `${data.metrics.avg_days_on_market} дней`;
-
-            // Заполняем инсайты
-            const insightsList = document.getElementById('insights-list');
-            insightsList.innerHTML = '';
-            data.insights.forEach(insight => {
-                const insightDiv = document.createElement('div');
-                insightDiv.className = 'insight-item';
-                insightDiv.innerHTML = `<div class="insight-text">${insight}</div>`;
-                insightsList.appendChild(insightDiv);
+            // Google Geocoding API через backend
+            const res = await fetch('/api/geocode', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ address })
             });
-
-            // Показываем баланс пользователя
-            if (userData) {
-                showUserBalance();
+            const data = await res.json();
+            if (data.success) {
+                geoData = data;
+                document.getElementById('confirmedAddress').innerText = data.formatted_address;
+                showMap(data.lat, data.lng);
+                showStep('stepConfirm');
+            } else {
+                alert('Адрес не найден, попробуйте еще раз');
             }
         }
 
-        function showError(message) {
-            document.getElementById('loading').classList.add('hidden');
-            document.getElementById('error').classList.remove('hidden');
-            document.getElementById('error-text').textContent = message;
+        // Шаг 2: Карта и подтверждение
+        function showMap(lat, lng) {
+            const mapDiv = document.getElementById('map');
+            mapDiv.innerHTML = '';
+            const map = new google.maps.Map(mapDiv, {
+                center: { lat, lng },
+                zoom: 16
+            });
+            new google.maps.Marker({ position: { lat, lng }, map });
+        }
+        function confirmAddress() {
+            showStep('stepBedrooms');
+        }
+        function retryAddress() {
+            document.getElementById('addressInput').value = '';
+            showStep('stepAddress');
         }
 
-        async function showUserBalance() {
-            try {
-                const response = await fetch('/api/user-balance', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        telegram_id: userData.id
-                    })
-                });
+        // Шаг 3: Количество спален
+        function goToPriceStep() {
+            showStep('stepPrice');
+        }
 
-                if (response.ok) {
-                    const balanceData = await response.json();
-                    document.getElementById('balance-amount').textContent = `$${balanceData.balance}`;
-                    document.getElementById('balance-info').classList.remove('hidden');
-                }
-            } catch (error) {
-                console.log('Ошибка получения баланса:', error);
+        // Шаг 4: Генерация отчета
+        async function generateReport() {
+            const bedrooms = document.getElementById('bedroomsSelect').value;
+            const price = document.getElementById('priceInput').value;
+            if (!price || price <= 0) {
+                alert('Введите корректную стоимость');
+                return;
             }
+            // Получаем отчет из Supabase по координатам
+            const res = await fetch('/api/generate_report', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    address: geoData.formatted_address,
+                    lat: geoData.lat,
+                    lng: geoData.lng,
+                    bedrooms,
+                    price
+                })
+            });
+            const data = await res.json();
+            if (data.success) {
+                renderReport(data.report);
+                showStep('stepReport');
+            } else {
+                alert('Ошибка генерации отчета');
+            }
+        }
+
+        function renderReport(report) {
+            let html = `<div style='background:#f8f9fa;padding:15px;border-radius:8px;'>`;
+            html += `<b>Краткосрочная аренда:</b> ${report.short_term_rentals.avg_price} €/ночь<br>`;
+            html += `<b>Долгосрочная аренда:</b> ${report.long_term_rentals.avg_price} €/мес<br>`;
+            html += `<b>Стоимость квартир:</b> ${report.sales.avg_price} €/м²<br>`;
+            html += `<b>Найдено объектов:</b> ${report.total_properties}`;
+            html += `</div>`;
+            document.getElementById('reportResult').innerHTML = html;
+        }
+
+        function goToMainMenu() {
+            window.location.href = '/webapp';
         }
 
         let clientName = null;
@@ -991,7 +1002,8 @@
         }
 
         // Запускаем генерацию отчета при загрузке страницы
-        generateReport();
+        // generateReport(); // This line is now handled by the new step-based flow
     </script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBrDkDpNKNAIyY147MQ78hchBkeyCAxhEw"></script>
 </body>
 </html> 
