@@ -711,9 +711,9 @@
                 window.lastApiReport = {};
             }
             const report = window.lastApiReport;
-            const shortCount = report?.market_analysis?.radius_5km?.short_term_rentals?.count || 0;
-            const longCount = report?.market_analysis?.radius_5km?.long_term_rentals?.count || 0;
-            const salesCount = report?.market_analysis?.radius_5km?.sales?.count || 0;
+            const shortCount = report?.market_analysis?.radius_5km?.short_term_rentals?.total_count ?? 0;
+            const longCount = report?.market_analysis?.radius_5km?.long_term_rentals?.total_count ?? 0;
+            const salesCount = report?.market_analysis?.radius_5km?.sales?.total_count ?? 0;
 
             // Парсим отчет по блокам
             const lines = reportText.split('\n');

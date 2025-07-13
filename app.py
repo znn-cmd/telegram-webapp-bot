@@ -110,8 +110,8 @@ def main() -> None:
     application.add_handler(MessageHandler(filters.StatusUpdate.WEB_APP_DATA, webapp_data))
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
 
-    # Запускаем бота
-    application.run_polling(allowed_updates=Update.ALL_TYPES)
+    # Запускаем бота (закомментировано для WebApp)
+    # application.run_polling(allowed_updates=Update.ALL_TYPES)
 
 # Flask маршруты для WebApp
 @app.route('/webapp')
@@ -410,13 +410,15 @@ def analyze_market_around_location(lat, lng, bedrooms, target_price):
         sales = sales_query.execute().data or []
 
         def summarize(props, price_key):
-            prices = [p[price_key] for p in props if p.get(price_key)]
-            count = len(props)
+            prices = [p[price_key] for p in props if p.get(price_key) is not None and p[price_key] != 0]
+            total_count = len(props)
+            count = len(prices)
             if not prices:
-                return {'avg_price': 0, 'count': count, 'price_range': [0, 0]}
+                return {'avg_price': 0, 'count': count, 'total_count': total_count, 'price_range': [0, 0]}
             return {
                 'avg_price': sum(prices) / len(prices),
                 'count': count,
+                'total_count': total_count,
                 'price_range': [min(prices), max(prices)]
             }
 
@@ -433,16 +435,19 @@ def analyze_market_around_location(lat, lng, bedrooms, target_price):
                 'radius_5km': {
                     'short_term_rentals': {
                         'count': short_term_stats['count'],
+                        'total_count': short_term_stats['total_count'],
                         'avg_price_per_night': short_term_stats['avg_price'],
                         'price_range': short_term_stats['price_range']
                     },
                     'long_term_rentals': {
                         'count': long_term_stats['count'],
+                        'total_count': long_term_stats['total_count'],
                         'avg_monthly_rent': long_term_stats['avg_price'],
                         'price_range': long_term_stats['price_range']
                     },
                     'sales': {
                         'count': sales_stats['count'],
+                        'total_count': sales_stats['total_count'],
                         'avg_sale_price': sales_stats['avg_price'],
                         'price_range': sales_stats['price_range']
                     },
@@ -456,7 +461,7 @@ def analyze_market_around_location(lat, lng, bedrooms, target_price):
                 'coordinates': {'lat': lat, 'lng': lng}
             },
             'summary': {
-                'total_properties_analyzed': short_term_stats['count'] + long_term_stats['count'] + sales_stats['count'],
+                'total_properties_analyzed': short_term_stats['total_count'] + long_term_stats['total_count'] + sales_stats['total_count'],
                 'market_activity': 'high' if sales_stats['count'] > 5 else 'medium',
                 'price_trend': 'up' if sales_stats['avg_price'] > 1100000 else 'stable'
             }
@@ -716,6 +721,12 @@ def api_full_report():
             'global_house_price_index': 1.12,
             'summary': 'Полный отчёт с реальными/мок-данными. Для реальных данных используйте таблицы Supabase.'
         }
+        # Получаем user_id из базы данных по telegram_id
+        user_result = supabase.table('users').select('id').eq('telegram_id', telegram_id).execute()
+        user_id = user_result.data[0]['id'] if user_result.data else telegram_id
+        
+        created_at = datetime.datetime.now().isoformat()
+        
         report_data = {
             'user_id': user_id,
             'report_type': 'full',
@@ -750,7 +761,11 @@ def api_user_reports():
     if not telegram_id:
         return jsonify({'error': 'telegram_id required'}), 400
     try:
-        result = supabase.table('user_reports').select('*').eq('user_id', telegram_id).order('created_at', desc=True).execute()
+        # Получаем user_id из базы данных по telegram_id
+        user_result = supabase.table('users').select('id').eq('telegram_id', telegram_id).execute()
+        user_id = user_result.data[0]['id'] if user_result.data else telegram_id
+        
+        result = supabase.table('user_reports').select('*').eq('user_id', user_id).order('created_at', desc=True).execute()
         reports = result.data if hasattr(result, 'data') else result
         return jsonify({'success': True, 'reports': reports})
     except Exception as e:
@@ -768,9 +783,13 @@ def api_save_object():
         return jsonify({'error': 'Missing required data'}), 400
     
     try:
+        # Получаем user_id из базы данных по telegram_id
+        user_result = supabase.table('users').select('id').eq('telegram_id', telegram_id).execute()
+        user_id = user_result.data[0]['id'] if user_result.data else telegram_id
+        
         # Сохраняем объект в базу данных
         saved_object = {
-            'user_id': telegram_id,
+            'user_id': user_id,
             'object_data': object_data,
             'saved_at': datetime.datetime.now().isoformat()
         }
