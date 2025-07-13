@@ -5,6 +5,7 @@ from telegram import Update, WebAppInfo, KeyboardButton, ReplyKeyboardMarkup
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
 from supabase import create_client, Client
 from dotenv import load_dotenv
+import threading
 
 # Загружаем переменные окружения
 load_dotenv()
@@ -28,7 +29,7 @@ supabase: Client = create_client(supabase_url, supabase_key)
 TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 
 # URL вашего WebApp (замените на ваш домен после деплоя)
-WEBAPP_URL = https://aaadvisor-zaicevn.amvera.io/webapp
+WEBAPP_URL = "https://aaadvisor-zaicevn.amvera.io/webapp"
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Обработчик команды /start"""
@@ -218,6 +219,13 @@ def health():
     """Эндпоинт для проверки здоровья приложения"""
     return jsonify({"status": "ok", "message": "Telegram WebApp Bot is running"})
 
+def run_telegram_bot():
+    main()  # функция main() должна запускать вашего Telegram-бота
+
 if __name__ == '__main__':
-    # Запускаем Flask сервер
+    # Запускаем Telegram-бота в отдельном потоке
+    bot_thread = threading.Thread(target=run_telegram_bot)
+    bot_thread.start()
+
+    # Запускаем Flask-сервер
     app.run(host='0.0.0.0', port=8080, debug=False) 
