@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aaadviser - Инсайты рынка недвижимости</title>
+    <title>Aaadviser - Новый отчет</title>
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -35,11 +35,113 @@
             font-style: italic;
             margin-bottom: 40px;
         }
-        .stub {
-            font-size: 18px;
-            color: #888;
+        .step-card {
+            background: #fff;
+            border-radius: 18px;
+            box-shadow: 0 4px 16px rgba(102,126,234,0.08);
+            padding: 32px 24px 28px 24px;
+            width: 100%;
+            max-width: 360px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+        .step-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 18px;
             text-align: center;
-            margin-top: 60px;
+        }
+        .input-field {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            font-size: 16px;
+            margin-bottom: 18px;
+            background: #f8f9fa;
+            transition: border 0.2s;
+        }
+        .input-field:focus {
+            border: 1.5px solid #667eea;
+            outline: none;
+        }
+        .btn-row {
+            display: flex;
+            gap: 12px;
+            width: 100%;
+            margin-top: 10px;
+        }
+        .btn {
+            flex: 1;
+            padding: 14px 0;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+        }
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+        }
+        .btn-secondary {
+            background: #f1f1f1;
+            color: #333;
+            border: 1px solid #ddd;
+        }
+        .btn-secondary:hover {
+            background: #e2e2e2;
+        }
+        .map-block {
+            width: 100%;
+            height: 220px;
+            border-radius: 14px;
+            overflow: hidden;
+            margin-bottom: 18px;
+            box-shadow: 0 2px 8px rgba(102,126,234,0.08);
+        }
+        .report-block {
+            background: #f8f9fa;
+            border-radius: 14px;
+            padding: 22px 16px;
+            width: 100%;
+            margin-top: 10px;
+            box-shadow: 0 2px 8px rgba(102,126,234,0.06);
+        }
+        .report-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+        .report-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 15px;
+            margin-bottom: 8px;
+        }
+        .loading {
+            text-align: center;
+            color: #667eea;
+            font-size: 16px;
+            margin-top: 30px;
+        }
+        .error {
+            color: #c33;
+            background: #fee;
+            border: 1px solid #fcc;
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 18px;
+            text-align: center;
         }
     </style>
 </head>
@@ -47,10 +149,151 @@
     <div class="container">
         <div class="logo">Aaadviser</div>
         <div class="slogan">Инсайты рынка недвижимости</div>
-        <div class="stub">
-            Здесь скоро появится новый функционал отчёта.<br>
-            (Механика получения отчёта временно отключена)
+
+        <!-- Шаг 1: Ввод адреса -->
+        <div id="step-address" class="step-card">
+            <div class="step-title">Введите адрес недвижимости</div>
+            <input type="text" id="addressInput" class="input-field" placeholder="Например: ул. Ленина, 10, Москва">
+            <div class="btn-row">
+                <button class="btn btn-secondary" onclick="goToMainMenu()">В главное меню</button>
+                <button class="btn btn-primary" onclick="verifyAddress()">Далее</button>
+            </div>
+            <div id="address-error" class="error" style="display:none;"></div>
         </div>
+
+        <!-- Шаг 2: Карта и подтверждение -->
+        <div id="step-map" class="step-card" style="display:none;">
+            <div class="step-title">Это правильная локация?</div>
+            <div class="map-block" id="map"></div>
+            <div style="font-size:15px;color:#555;margin-bottom:10px;" id="confirmedAddress"></div>
+            <div class="btn-row">
+                <button class="btn btn-secondary" onclick="backToAddress()">Нет</button>
+                <button class="btn btn-primary" onclick="confirmLocation()">Да</button>
+            </div>
+        </div>
+
+        <!-- Шаг 3: Отчет -->
+        <div id="step-report" class="step-card" style="display:none;">
+            <div class="report-title">Аналитика по району</div>
+            <div id="reportResult" class="report-block"></div>
+            <div class="btn-row">
+                <button class="btn btn-secondary" onclick="goToMainMenu()">В главное меню</button>
+            </div>
+        </div>
+
+        <div id="loading" class="loading" style="display:none;">Загрузка...</div>
     </div>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBrDkDpNKNAIyY147MQ78hchBkeyCAxhEw"></script>
+    <script>
+        let geoData = null;
+        let lastAddress = '';
+
+        function showStep(step) {
+            document.getElementById('step-address').style.display = 'none';
+            document.getElementById('step-map').style.display = 'none';
+            document.getElementById('step-report').style.display = 'none';
+            document.getElementById('loading').style.display = 'none';
+            if (step === 'address') document.getElementById('step-address').style.display = 'flex';
+            if (step === 'map') document.getElementById('step-map').style.display = 'flex';
+            if (step === 'report') document.getElementById('step-report').style.display = 'flex';
+            if (step === 'loading') document.getElementById('loading').style.display = 'block';
+        }
+
+        function goToMainMenu() {
+            window.location.href = '/webapp';
+        }
+
+        function backToAddress() {
+            showStep('address');
+            document.getElementById('addressInput').value = lastAddress;
+        }
+
+        async function verifyAddress() {
+            const address = document.getElementById('addressInput').value.trim();
+            document.getElementById('address-error').style.display = 'none';
+            if (!address) {
+                showError('address-error', 'Пожалуйста, введите адрес.');
+                return;
+            }
+            showStep('loading');
+            try {
+                const res = await fetch('/api/geocode', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ address })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    geoData = data;
+                    lastAddress = data.formatted_address;
+                    showMap(data.lat, data.lng);
+                    document.getElementById('confirmedAddress').innerText = data.formatted_address;
+                    showStep('map');
+                } else {
+                    showStep('address');
+                    showError('address-error', 'Адрес не найден, попробуйте еще раз.');
+                }
+            } catch (e) {
+                showStep('address');
+                showError('address-error', 'Ошибка соединения. Попробуйте позже.');
+            }
+        }
+
+        function showError(id, msg) {
+            const el = document.getElementById(id);
+            el.textContent = msg;
+            el.style.display = 'block';
+        }
+
+        function showMap(lat, lng) {
+            const mapDiv = document.getElementById('map');
+            mapDiv.innerHTML = '';
+            const map = new google.maps.Map(mapDiv, {
+                center: { lat, lng },
+                zoom: 16,
+                disableDefaultUI: true
+            });
+            new google.maps.Marker({ position: { lat, lng }, map });
+        }
+
+        async function confirmLocation() {
+            showStep('loading');
+            // Получаем отчет из Supabase по координатам
+            try {
+                const res = await fetch('/api/generate_report', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        address: geoData.formatted_address,
+                        lat: geoData.lat,
+                        lng: geoData.lng
+                    })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    renderReport(data.report);
+                    showStep('report');
+                } else {
+                    showStep('address');
+                    showError('address-error', 'Ошибка генерации отчета.');
+                }
+            } catch (e) {
+                showStep('address');
+                showError('address-error', 'Ошибка соединения.');
+            }
+        }
+
+        function renderReport(report) {
+            let html = '';
+            html += `<div class='report-row'><span>Краткосрочная аренда:</span><b>${report.short_term_rentals.avg_price} €/ночь</b></div>`;
+            html += `<div class='report-row'><span>Долгосрочная аренда:</span><b>${report.long_term_rentals.avg_price} €/мес</b></div>`;
+            html += `<div class='report-row'><span>Стоимость квартир:</span><b>${report.sales.avg_price} €/м²</b></div>`;
+            html += `<div class='report-row'><span>Найдено объектов:</span><b>${report.total_properties}</b></div>`;
+            document.getElementById('reportResult').innerHTML = html;
+        }
+
+        // Инициализация
+        showStep('address');
+    </script>
 </body>
 </html> 
