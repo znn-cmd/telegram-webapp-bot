@@ -221,18 +221,15 @@ def health():
     """Эндпоинт для проверки здоровья приложения"""
     return jsonify({"status": "ok", "message": "Telegram WebApp Bot is running"})
 
-def run_telegram_bot():
-    try:
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-        main()
-    except Exception as e:
-        logger.exception("Ошибка при запуске Telegram-бота:")
+import threading
+
+def run_flask():
+    app.run(host='0.0.0.0', port=8080, debug=False)
 
 if __name__ == '__main__':
-    # Запускаем Telegram-бота в отдельном потоке-демоне
-    bot_thread = threading.Thread(target=run_telegram_bot, daemon=True)
-    bot_thread.start()
+    # Запускаем Flask-сервер в отдельном потоке-демоне
+    flask_thread = threading.Thread(target=run_flask, daemon=True)
+    flask_thread.start()
 
-    # Запускаем Flask-сервер
-    app.run(host='0.0.0.0', port=8080, debug=False) 
+    # Запускаем Telegram-бота в главном потоке
+    main() 
