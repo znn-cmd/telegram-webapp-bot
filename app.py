@@ -411,11 +411,12 @@ def analyze_market_around_location(lat, lng, bedrooms, target_price):
 
         def summarize(props, price_key):
             prices = [p[price_key] for p in props if p.get(price_key)]
+            count = len(props)
             if not prices:
-                return {'avg_price': 0, 'count': 0, 'price_range': [0, 0]}
+                return {'avg_price': 0, 'count': count, 'price_range': [0, 0]}
             return {
                 'avg_price': sum(prices) / len(prices),
-                'count': len(prices),
+                'count': count,
                 'price_range': [min(prices), max(prices)]
             }
 
@@ -627,30 +628,8 @@ def api_full_report():
     lng = data.get('lng')
     bedrooms = data.get('bedrooms')
     price = data.get('price')
-    force_update = data.get('force_update', False)
-    created_at = datetime.datetime.now().isoformat()
     try:
-        # Получаем user_id по telegram_id
-        user_id = None
-        if telegram_id:
-            user_result = supabase.table('users').select('id').eq('telegram_id', telegram_id).execute()
-            if user_result.data:
-                user_id = user_result.data[0]['id']
-            else:
-                return jsonify({'error': 'User not found'}), 404
-        else:
-            return jsonify({'error': 'telegram_id required'}), 400
-        # Проверяем существующий отчет
-        existing = supabase.table('user_reports').select('*').eq('user_id', user_id).eq('address', address).eq('report_type', 'full').order('created_at', desc=True).limit(1).execute()
-        if existing.data and not force_update:
-            report = existing.data[0]
-            created = datetime.datetime.fromisoformat(report['created_at'])
-            now = datetime.datetime.now()
-            days_old = (now - created).days
-            if days_old <= 30:
-                return jsonify({'success': True, 'full_report': report['full_report'], 'created_at': report['created_at'], 'from_cache': True})
-            else:
-                return jsonify({'success': True, 'need_update': True, 'created_at': report['created_at']})
+        price = float(price) if price is not None else 0
         # --- MOCK/DEMO DATA ---
         avg_sqm = 15451.29
         price_growth = 0.042
