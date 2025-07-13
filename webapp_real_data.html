@@ -341,43 +341,55 @@
         <div id="stepAddress" class="step active">
             <h3>Введите адрес объекта</h3>
             <input type="text" id="addressInput" class="input-field" placeholder="Введите адрес...">
-            <button class="btn" onclick="verifyAddress()">Далее</button>
+            <div style="display:flex;gap:10px;margin-top:15px;">
+                <button class="btn menu-btn" style="flex:1;background:#f1f1f1;color:#333;border:1px solid #ddd;" onclick="goToMainMenu()">В главное меню</button>
+                <button class="btn menu-btn" style="flex:1;" onclick="verifyAddress()">Далее</button>
+            </div>
         </div>
 
         <!-- Шаг 2: Карта и подтверждение адреса -->
         <div id="stepConfirm" class="step" style="display:none;">
             <h3>Проверьте адрес</h3>
-            <div id="map" style="width:100%;height:200px;margin-bottom:10px;"></div>
-            <div id="confirmedAddress" style="margin-bottom:10px;"></div>
-            <button class="btn btn-success" onclick="confirmAddress()">Адрес правильный</button>
-            <button class="btn btn-danger" onclick="retryAddress()">Адрес неправильный</button>
+            <div id="map" style="width:100%;height:200px;margin-bottom:10px;border-radius:12px;overflow:hidden;"></div>
+            <div id="confirmedAddress" style="margin-bottom:10px;font-size:15px;color:#555;"></div>
+            <div style="display:flex;gap:10px;margin-bottom:15px;">
+                <button class="btn menu-btn" style="flex:1;background:#f1f1f1;color:#333;border:1px solid #ddd;" onclick="goToMainMenu()">В главное меню</button>
+                <button class="btn menu-btn btn-danger" style="flex:1;" onclick="retryAddress()">Адрес неправильный</button>
+                <button class="btn menu-btn btn-success" style="flex:1;" onclick="confirmAddress()">Адрес правильный</button>
+            </div>
         </div>
 
         <!-- Шаг 3: Количество спален -->
         <div id="stepBedrooms" class="step" style="display:none;">
             <h3>Количество спален</h3>
-            <select id="bedroomsSelect" class="input-field">
+            <select id="bedroomsSelect" class="input-field" style="margin-bottom:15px;">
                 <option value="1">1</option>
                 <option value="2">2</option>
                 <option value="3">3</option>
                 <option value="4">4</option>
                 <option value="5">5+</option>
             </select>
-            <button class="btn" onclick="goToPriceStep()">Далее</button>
+            <div style="display:flex;gap:10px;">
+                <button class="btn menu-btn" style="flex:1;background:#f1f1f1;color:#333;border:1px solid #ddd;" onclick="goToMainMenu()">В главное меню</button>
+                <button class="btn menu-btn" style="flex:1;" onclick="goToPriceStep()">Далее</button>
+            </div>
         </div>
 
         <!-- Шаг 4: Стоимость квартиры -->
         <div id="stepPrice" class="step" style="display:none;">
             <h3>Стоимость квартиры (€)</h3>
-            <input type="number" id="priceInput" class="input-field" placeholder="Введите стоимость в евро">
-            <button class="btn" onclick="generateReport()">Получить отчет</button>
+            <input type="number" id="priceInput" class="input-field" placeholder="Введите стоимость в евро" style="margin-bottom:15px;">
+            <div style="display:flex;gap:10px;">
+                <button class="btn menu-btn" style="flex:1;background:#f1f1f1;color:#333;border:1px solid #ddd;" onclick="goToMainMenu()">В главное меню</button>
+                <button class="btn menu-btn" style="flex:1;" onclick="generateReport()">Получить отчет</button>
+            </div>
         </div>
 
         <!-- Шаг 5: Отчет -->
         <div id="stepReport" class="step" style="display:none;">
             <h3>Ваш отчет</h3>
-            <div id="reportResult"></div>
-            <button class="btn" onclick="goToMainMenu()">В главное меню</button>
+            <div id="reportResult" style="margin-bottom:15px;"></div>
+            <button class="btn menu-btn" style="width:100%;background:#f1f1f1;color:#333;border:1px solid #ddd;" onclick="goToMainMenu()">В главное меню</button>
         </div>
 
         <!-- Загрузка -->
