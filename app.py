@@ -6,6 +6,7 @@ from telegram.ext import Application, CommandHandler, MessageHandler, filters, C
 from supabase import create_client, Client
 from dotenv import load_dotenv
 import threading
+import asyncio
 
 # Загружаем переменные окружения
 load_dotenv()
@@ -222,6 +223,8 @@ def health():
 
 def run_telegram_bot():
     try:
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
         main()
     except Exception as e:
         logger.exception("Ошибка при запуске Telegram-бота:")
