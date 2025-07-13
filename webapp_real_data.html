@@ -667,6 +667,29 @@
             }
         }
 
+        // Helper for declension and localization
+        function getObjectLabel(count) {
+            // Determine language
+            let lang = (typeof currentLanguage !== 'undefined') ? currentLanguage : 'ru';
+            let words = ['объект', 'объекта', 'объектов'];
+            if (lang === 'en') words = ['object', 'objects'];
+            if (lang === 'de') words = ['Objekt', 'Objekte'];
+            if (lang === 'fr') words = ['objet', 'objets'];
+            if (lang === 'tr') words = ['nesne', 'nesne'];
+            // Russian declension
+            if (lang === 'ru') {
+                if (typeof count !== 'number') return '';
+                let word = words[2];
+                if (count % 10 === 1 && count % 100 !== 11) word = words[0];
+                else if ([2,3,4].includes(count % 10) && ![12,13,14].includes(count % 100)) word = words[1];
+                return `${count} ${word}`;
+            } else {
+                // For other languages: singular/plural
+                let word = (count === 1) ? words[0] : words[1];
+                return `${count} ${word}`;
+            }
+        }
+
         function renderReport(reportText, address, bedrooms, price) {
             // Сохраняем параметры для дальнейшего использования в модалке
             lastReportAddress = address;
@@ -682,11 +705,22 @@
             headerHtml += `<div style='font-size:16px;margin-bottom:0;'><b>Цена объекта:</b> <span style='color:#333;'>€${Number(price).toLocaleString('ru-RU')}</span></div>`;
             headerHtml += `</div>`;
 
+            // Получаем данные из последнего ответа API (глобальная переменная)
+            if (!window.lastApiReport) {
+                showToast('Нет данных для отображения количества объектов', 'warning');
+                window.lastApiReport = {};
+            }
+            const report = window.lastApiReport;
+            const shortCount = report?.market_analysis?.radius_5km?.short_term_rentals?.count || 0;
+            const longCount = report?.market_analysis?.radius_5km?.long_term_rentals?.count || 0;
+            const salesCount = report?.market_analysis?.radius_5km?.sales?.count || 0;
+
             // Парсим отчет по блокам
             const lines = reportText.split('\n');
-            function block(title, contentArr) {
+            function block(title, contentArr, count) {
+                let countLabel = (typeof count === 'number') ? ` (${getObjectLabel(count)})` : '';
                 return `<div style='background:#f8f9fa;border-radius:12px;padding:14px 12px 10px 12px;margin-bottom:14px;box-shadow:0 2px 8px rgba(102,126,234,0.06);'>
-                    <div style='font-size:17px;font-weight:700;color:#667eea;margin-bottom:8px;'>${title}</div>
+                    <div style='font-size:17px;font-weight:700;color:#667eea;margin-bottom:8px;'>${title}${countLabel}</div>
                     ${contentArr.map(line => `<div style='font-size:15px;color:#222;margin-bottom:7px;'>${line}</div>`).join('')}
                 </div>`;
             }
@@ -701,9 +735,9 @@
                 if (current) current.push(line);
             }
             let blocksHtml = '';
-            if (shortTerm.length) blocksHtml += block('Краткосрочная аренда', shortTerm);
-            if (longTerm.length) blocksHtml += block('Долгосрочная аренда', longTerm);
-            if (sales.length) blocksHtml += block('Продажи недвижимости', sales);
+            if (shortTerm.length) blocksHtml += block('Краткосрочная аренда', shortTerm, shortCount);
+            if (longTerm.length) blocksHtml += block('Долгосрочная аренда', longTerm, longCount);
+            if (sales.length) blocksHtml += block('Продажи недвижимости', sales, salesCount);
             if (other.length) blocksHtml += block('Прочее', other);
 
             // Кнопки

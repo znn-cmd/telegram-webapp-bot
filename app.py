@@ -630,7 +630,18 @@ def api_full_report():
     force_update = data.get('force_update', False)
     created_at = datetime.datetime.now().isoformat()
     try:
-        existing = supabase.table('user_reports').select('*').eq('user_id', telegram_id).eq('address', address).eq('report_type', 'full').order('created_at', desc=True).limit(1).execute()
+        # Получаем user_id по telegram_id
+        user_id = None
+        if telegram_id:
+            user_result = supabase.table('users').select('id').eq('telegram_id', telegram_id).execute()
+            if user_result.data:
+                user_id = user_result.data[0]['id']
+            else:
+                return jsonify({'error': 'User not found'}), 404
+        else:
+            return jsonify({'error': 'telegram_id required'}), 400
+        # Проверяем существующий отчет
+        existing = supabase.table('user_reports').select('*').eq('user_id', user_id).eq('address', address).eq('report_type', 'full').order('created_at', desc=True).limit(1).execute()
         if existing.data and not force_update:
             report = existing.data[0]
             created = datetime.datetime.fromisoformat(report['created_at'])
@@ -641,8 +652,6 @@ def api_full_report():
             else:
                 return jsonify({'success': True, 'need_update': True, 'created_at': report['created_at']})
         # --- MOCK/DEMO DATA ---
-        # В реальной реализации здесь будут запросы к таблицам Supabase (см. supabase_full_report_tables.sql)
-        # Пример: средняя цена за м2, yield, индексы, макроэкономика, альтернативы
         avg_sqm = 15451.29
         price_growth = 0.042
         short_term_income = 1950
@@ -729,7 +738,7 @@ def api_full_report():
             'summary': 'Полный отчёт с реальными/мок-данными. Для реальных данных используйте таблицы Supabase.'
         }
         report_data = {
-            'user_id': telegram_id,
+            'user_id': user_id,
             'report_type': 'full',
             'title': f'Полный отчет: {address}',
             'description': f'Полный отчет по адресу {address}, {bedrooms} спален, цена {price}',

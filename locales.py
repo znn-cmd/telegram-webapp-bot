@@ -36,7 +36,12 @@ locales = {
             'insufficient_balance': 'Недостаточно баланса, нужно его пополнить',
             'balance_required': 'Для полного отчета требуется $1',
             'current_balance': 'Текущий баланс: $',
-            'report_cost': 'Стоимость отчета: $1'
+            'report_cost': 'Стоимость отчета: $1',
+            'object_count': ['объект', 'объекта', 'объектов'],
+            'object_count_en': ['object', 'objects'],
+            'object_count_de': ['Objekt', 'Objekte'],
+            'object_count_fr': ['objet', 'objets'],
+            'object_count_tr': ['nesne', 'nesne']
         },
         'progress': {
             'checking_balance': 'Проверяем баланс...',
@@ -102,7 +107,12 @@ locales = {
             'insufficient_balance': 'Insufficient balance, need to top up',
             'balance_required': 'Full report requires $1',
             'current_balance': 'Current balance: $',
-            'report_cost': 'Report cost: $1'
+            'report_cost': 'Report cost: $1',
+            'object_count': ['object', 'objects'],
+            'object_count_en': ['object', 'objects'],
+            'object_count_de': ['Objekt', 'Objekte'],
+            'object_count_fr': ['objet', 'objets'],
+            'object_count_tr': ['nesne', 'nesne']
         },
         'progress': {
             'checking_balance': 'Checking balance...',
@@ -168,7 +178,12 @@ locales = {
             'insufficient_balance': 'Unzureichender Kontostand, muss aufgeladen werden',
             'balance_required': 'Vollständiger Bericht erfordert $1',
             'current_balance': 'Aktueller Kontostand: $',
-            'report_cost': 'Berichtskosten: $1'
+            'report_cost': 'Berichtskosten: $1',
+            'object_count': ['Objekt', 'Objekte'],
+            'object_count_en': ['object', 'objects'],
+            'object_count_de': ['Objekt', 'Objekte'],
+            'object_count_fr': ['objet', 'objets'],
+            'object_count_tr': ['nesne', 'nesne']
         },
         'progress': {
             'checking_balance': 'Kontostand wird überprüft...',
@@ -234,7 +249,12 @@ locales = {
             'insufficient_balance': 'Solde insuffisant, besoin de recharger',
             'balance_required': 'Le rapport complet nécessite $1',
             'current_balance': 'Solde actuel: $',
-            'report_cost': 'Coût du rapport: $1'
+            'report_cost': 'Coût du rapport: $1',
+            'object_count': ['objet', 'objets'],
+            'object_count_en': ['object', 'objects'],
+            'object_count_de': ['Objekt', 'Objekte'],
+            'object_count_fr': ['objet', 'objets'],
+            'object_count_tr': ['nesne', 'nesne']
         },
         'progress': {
             'checking_balance': 'Vérification du solde...',
@@ -294,7 +314,12 @@ locales = {
             'insufficient_balance': 'Yetersiz bakiye, yükleme gerekli',
             'balance_required': 'Tam rapor $1 gerektirir',
             'current_balance': 'Mevcut bakiye: $',
-            'report_cost': 'Rapor maliyeti: $1'
+            'report_cost': 'Rapor maliyeti: $1',
+            'object_count': ['nesne', 'nesne'],
+            'object_count_en': ['object', 'objects'],
+            'object_count_de': ['Objekt', 'Objekte'],
+            'object_count_fr': ['objet', 'objets'],
+            'object_count_tr': ['nesne', 'nesne']
         },
         'progress': {
             'checking_balance': 'Bakiye kontrol ediliyor...',
