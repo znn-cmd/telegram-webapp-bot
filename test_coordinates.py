@@ -13,7 +13,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # URL API сервера
-API_URL = "http://localhost:8080"
+API_URL = "http://127.0.0.1:8080"
 
 def test_coordinate_search():
     """Тестируем поиск по координатам"""
