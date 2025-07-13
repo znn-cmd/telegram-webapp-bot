@@ -1130,72 +1130,50 @@ def api_generate_report():
 
 def analyze_market_around_location(lat, lng, bedrooms, target_price):
     """Анализ рынка недвижимости вокруг указанной локации"""
+    import logging
     try:
-        # Используем функцию поиска в радиусе (5 км)
         radius_km = 5.0
-        
         # Поиск краткосрочной аренды
-        short_term_query = f"""
-        SELECT 
-            COUNT(*) as count,
-            AVG(price_per_night) as avg_price,
-            MIN(price_per_night) as min_price,
-            MAX(price_per_night) as max_price,
-            AVG(avg_rating) as avg_rating
-        FROM short_term_rentals 
-        WHERE is_active = true 
-        AND bedrooms = {bedrooms}
-        AND (6371 * acos(cos(radians({lat})) * cos(radians(latitude)) * 
-             cos(radians(longitude) - radians({lng})) + 
-             sin(radians({lat})) * sin(radians(latitude)))) <= {radius_km}
-        """
+        short_term_props = find_properties_in_radius(lat, lng, radius_km, 'short_term')
+        short_term_props = [p for p in short_term_props if str(p.get('bedrooms')) == str(bedrooms)]
+        logging.info(f"Short-term found: {len(short_term_props)}")
+        for p in short_term_props:
+            logging.info(f"Short-term: {p.get('address')} ({p.get('latitude')}, {p.get('longitude')}) dist={p.get('distance_km')}")
         
         # Поиск долгосрочной аренды
-        long_term_query = f"""
-        SELECT 
-            COUNT(*) as count,
-            AVG(monthly_rent) as avg_price,
-            MIN(monthly_rent) as min_price,
-            MAX(monthly_rent) as max_price
-        FROM long_term_rentals 
-        WHERE is_active = true 
-        AND bedrooms = {bedrooms}
-        AND (6371 * acos(cos(radians({lat})) * cos(radians(latitude)) * 
-             cos(radians(longitude) - radians({lng})) + 
-             sin(radians({lat})) * sin(radians(latitude)))) <= {radius_km}
-        """
+        long_term_props = find_properties_in_radius(lat, lng, radius_km, 'long_term')
+        long_term_props = [p for p in long_term_props if str(p.get('bedrooms')) == str(bedrooms)]
+        logging.info(f"Long-term found: {len(long_term_props)}")
+        for p in long_term_props:
+            logging.info(f"Long-term: {p.get('address')} ({p.get('latitude')}, {p.get('longitude')}) dist={p.get('distance_km')}")
         
         # Поиск продаж
-        sales_query = f"""
-        SELECT 
-            COUNT(*) as count,
-            AVG(asking_price) as avg_price,
-            MIN(asking_price) as min_price,
-            MAX(asking_price) as max_price,
-            AVG(price_per_sqm) as avg_price_per_sqm
-        FROM property_sales 
-        WHERE is_active = true 
-        AND bedrooms = {bedrooms}
-        AND (6371 * acos(cos(radians({lat})) * cos(radians(latitude)) * 
-             cos(radians(longitude) - radians({lng})) + 
-             sin(radians({lat})) * sin(radians(latitude)))) <= {radius_km}
-        """
+        sales_props = find_properties_in_radius(lat, lng, radius_km, 'sale')
+        sales_props = [p for p in sales_props if str(p.get('bedrooms')) == str(bedrooms)]
+        logging.info(f"Sales found: {len(sales_props)}")
+        for p in sales_props:
+            logging.info(f"Sale: {p.get('address')} ({p.get('latitude')}, {p.get('longitude')}) dist={p.get('distance_km')}")
         
-        # Выполняем запросы
-        short_term_result = supabase.rpc('execute_sql', {'query': short_term_query}).execute()
-        long_term_result = supabase.rpc('execute_sql', {'query': long_term_query}).execute()
-        sales_result = supabase.rpc('execute_sql', {'query': sales_query}).execute()
+        def summarize(props, price_key):
+            if not props:
+                return {}
+            prices = [float(p.get(price_key, 0)) for p in props if p.get(price_key) is not None]
+            return {
+                'count': len(props),
+                'avg_price': sum(prices)/len(prices) if prices else 0,
+                'min_price': min(prices) if prices else 0,
+                'max_price': max(prices) if prices else 0,
+            }
         
         return {
-            'short_term_rental': short_term_result.data[0] if short_term_result.data else {},
-            'long_term_rental': long_term_result.data[0] if long_term_result.data else {},
-            'property_sales': sales_result.data[0] if sales_result.data else {},
+            'short_term_rental': summarize(short_term_props, 'price'),
+            'long_term_rental': summarize(long_term_props, 'price'),
+            'property_sales': summarize(sales_props, 'price'),
             'target_price': target_price,
             'radius_km': radius_km
         }
-        
     except Exception as e:
-        logger.error(f"Error analyzing market: {e}")
+        logging.error(f"Error analyzing market: {e}")
         return {}
 
 @app.route('/api/search_properties', methods=['POST'])
@@ -1297,32 +1275,43 @@ def find_properties_by_params(property_type, bedrooms, price_min, price_max, cit
             'sale': 'asking_price'
         }.get(property_type, 'price_per_night')
         
-        conditions = ['is_active = true']
+        # Начинаем с базового запроса
+        query = supabase.table(table_name).select('*').eq('is_active', True)
         
+        # Добавляем фильтры
         if bedrooms:
-            conditions.append(f'bedrooms = {bedrooms}')
+            query = query.eq('bedrooms', bedrooms)
         if price_min:
-            conditions.append(f'{price_column} >= {price_min}')
+            query = query.gte(price_column, price_min)
         if price_max:
-            conditions.append(f'{price_column} <= {price_max}')
+            query = query.lte(price_column, price_max)
         if city:
-            conditions.append(f"city ILIKE '%{city}%'")
+            query = query.ilike('city', f'%{city}%')
         if district:
-            conditions.append(f"district ILIKE '%{district}%'")
+            query = query.ilike('district', f'%{district}%')
         
-        query = f"""
-        SELECT 
-            property_id, address, latitude, longitude, 
-            {price_column} as price, bedrooms, bathrooms,
-            source, source_url, updated_at
-        FROM {table_name}
-        WHERE {' AND '.join(conditions)}
-        ORDER BY {price_column}
-        LIMIT 50
-        """
+        # Выполняем запрос
+        result = query.execute()
         
-        result = supabase.rpc('execute_sql', {'query': query}).execute()
-        return result.data if result.data else []
+        # Преобразуем результаты
+        properties = []
+        for item in result.data:
+            properties.append({
+                'property_id': item.get('property_id'),
+                'address': item.get('address'),
+                'latitude': item.get('latitude'),
+                'longitude': item.get('longitude'),
+                'price': item.get(price_column, 0),
+                'bedrooms': item.get('bedrooms'),
+                'bathrooms': item.get('bathrooms'),
+                'source': item.get('source'),
+                'source_url': item.get('source_url'),
+                'updated_at': item.get('updated_at')
+            })
+        
+        # Сортируем по цене
+        properties.sort(key=lambda x: x['price'])
+        return properties[:50]  # Ограничиваем 50 результатами
         
     except Exception as e:
         logger.error(f"Error in params search: {e}")
@@ -1339,15 +1328,66 @@ def api_market_statistics():
         return jsonify({'error': 'District and city required'}), 400
     
     try:
-        # Используем функцию статистики из базы данных
-        query = f"""
-        SELECT * FROM get_district_statistics('{district}', '{city}')
-        """
-        result = supabase.rpc('execute_sql', {'query': query}).execute()
+        statistics = []
+        
+        # Статистика по краткосрочной аренде
+        short_term_result = supabase.table('short_term_rentals').select('price_per_night, bedrooms, avg_rating').eq('is_active', True).eq('district', district).eq('city', city).execute()
+        if short_term_result.data:
+            prices = [float(item['price_per_night']) for item in short_term_result.data if item.get('price_per_night')]
+            bedrooms_list = [item['bedrooms'] for item in short_term_result.data if item.get('bedrooms')]
+            ratings = [float(item['avg_rating']) for item in short_term_result.data if item.get('avg_rating')]
+            
+            if prices:
+                statistics.append({
+                    'property_type': 'short_term',
+                    'avg_price': sum(prices) / len(prices),
+                    'median_price': sorted(prices)[len(prices)//2] if prices else 0,
+                    'min_price': min(prices),
+                    'max_price': max(prices),
+                    'listings_count': len(short_term_result.data),
+                    'avg_rating': sum(ratings) / len(ratings) if ratings else None,
+                    'avg_bedrooms': sum(bedrooms_list) / len(bedrooms_list) if bedrooms_list else 0
+                })
+        
+        # Статистика по долгосрочной аренде
+        long_term_result = supabase.table('long_term_rentals').select('monthly_rent, bedrooms').eq('is_active', True).eq('district', district).eq('city', city).execute()
+        if long_term_result.data:
+            prices = [float(item['monthly_rent']) for item in long_term_result.data if item.get('monthly_rent')]
+            bedrooms_list = [item['bedrooms'] for item in long_term_result.data if item.get('bedrooms')]
+            
+            if prices:
+                statistics.append({
+                    'property_type': 'long_term',
+                    'avg_price': sum(prices) / len(prices),
+                    'median_price': sorted(prices)[len(prices)//2] if prices else 0,
+                    'min_price': min(prices),
+                    'max_price': max(prices),
+                    'listings_count': len(long_term_result.data),
+                    'avg_rating': None,
+                    'avg_bedrooms': sum(bedrooms_list) / len(bedrooms_list) if bedrooms_list else 0
+                })
+        
+        # Статистика по продажам
+        sales_result = supabase.table('property_sales').select('asking_price, bedrooms, price_per_sqm').eq('is_active', True).eq('district', district).eq('city', city).execute()
+        if sales_result.data:
+            prices = [float(item['asking_price']) for item in sales_result.data if item.get('asking_price')]
+            bedrooms_list = [item['bedrooms'] for item in sales_result.data if item.get('bedrooms')]
+            
+            if prices:
+                statistics.append({
+                    'property_type': 'sale',
+                    'avg_price': sum(prices) / len(prices),
+                    'median_price': sorted(prices)[len(prices)//2] if prices else 0,
+                    'min_price': min(prices),
+                    'max_price': max(prices),
+                    'listings_count': len(sales_result.data),
+                    'avg_rating': None,
+                    'avg_bedrooms': sum(bedrooms_list) / len(bedrooms_list) if bedrooms_list else 0
+                })
         
         return jsonify({
             'success': True,
-            'statistics': result.data if result.data else []
+            'statistics': statistics
         })
         
     except Exception as e:
@@ -1371,17 +1411,21 @@ def api_calculate_roi():
             occupancy_rate = data.get('occupancy_rate', 75)
             
             # Используем функцию ROI из базы данных
-            query = f"""
-            SELECT calculate_short_term_roi({purchase_price}, {monthly_expenses}, {avg_nightly_rate}, {occupancy_rate}) as roi
-            """
+            result = supabase.rpc('calculate_short_term_roi', {
+                'purchase_price': purchase_price,
+                'monthly_expenses': monthly_expenses,
+                'avg_nightly_rate': avg_nightly_rate,
+                'occupancy_rate': occupancy_rate
+            }).execute()
         else:
             monthly_rent = data.get('monthly_rent', 0)
             
-            query = f"""
-            SELECT calculate_long_term_roi({purchase_price}, {monthly_expenses}, {monthly_rent}) as roi
-            """
+            result = supabase.rpc('calculate_long_term_roi', {
+                'purchase_price': purchase_price,
+                'monthly_expenses': monthly_expenses,
+                'monthly_rent': monthly_rent
+            }).execute()
         
-        result = supabase.rpc('execute_sql', {'query': query}).execute()
         roi = result.data[0]['roi'] if result.data else 0
         
         return jsonify({
@@ -1410,12 +1454,14 @@ def api_similar_properties():
     
     try:
         # Используем функцию поиска похожих объектов
-        query = f"""
-        SELECT * FROM find_similar_properties({bedrooms}, {price_min}, {price_max}, '{city}', '{district}', '{property_type}')
-        LIMIT 20
-        """
-        
-        result = supabase.rpc('execute_sql', {'query': query}).execute()
+        result = supabase.rpc('find_similar_properties', {
+            'p_bedrooms': bedrooms,
+            'p_price_min': price_min,
+            'p_price_max': price_max,
+            'p_city': city,
+            'p_district': district,
+            'p_property_type': property_type
+        }).execute()
         
         return jsonify({
             'success': True,
