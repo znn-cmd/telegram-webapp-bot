@@ -380,95 +380,96 @@ def format_market_report(market_analysis, address, language='en'):
     return "\n".join(report_lines)
 
 def analyze_market_around_location(lat, lng, bedrooms, target_price):
-    """Анализ рынка вокруг локации"""
-    
-    # Генерируем реалистичные данные на основе вашего примера
-    import random
-    
-    # Краткосрочная аренда (6 объектов)
-    short_term_rentals = []
-    for i in range(6):
-        price_per_night = random.uniform(95, 130)
-        short_term_rentals.append({
-            'price_per_night': price_per_night,
-            'bedrooms': bedrooms,
-            'address': f'Краткосрочная аренда #{i+1}'
-        })
-    
-    # Долгосрочная аренда (6 объектов)
-    long_term_rentals = []
-    for i in range(6):
-        monthly_rent = random.uniform(3200, 4200)
-        long_term_rentals.append({
-            'monthly_rent': monthly_rent,
-            'bedrooms': bedrooms,
-            'address': f'Долгосрочная аренда #{i+1}'
-        })
-    
-    # Продажи недвижимости (7 объектов)
-    sales = []
-    for i in range(7):
-        sale_price = random.uniform(1000000, 1300000)
-        sales.append({
-            'sale_price': sale_price,
-            'bedrooms': bedrooms,
-            'address': f'Продажа #{i+1}'
-        })
-    
-    def summarize(props, price_key):
-        if not props:
-            return {'avg_price': 0, 'count': 0, 'price_range': [0, 0]}
-        
-        prices = [p[price_key] for p in props if p.get(price_key)]
-        if not prices:
-            return {'avg_price': 0, 'count': 0, 'price_range': [0, 0]}
-        
-        return {
-            'avg_price': sum(prices) / len(prices),
-            'count': len(props),
-            'price_range': [min(prices), max(prices)]
-        }
-    
-    # Рассчитываем статистику
-    short_term_stats = summarize(short_term_rentals, 'price_per_night')
-    long_term_stats = summarize(long_term_rentals, 'monthly_rent')
-    sales_stats = summarize(sales, 'sale_price')
-    
-    # Формируем отчёт в нужном формате
-    report = {
-        'market_analysis': {
-            'radius_5km': {
-                'short_term_rentals': {
-                    'count': short_term_stats['count'],
-                    'avg_price_per_night': short_term_stats['avg_price'],
-                    'price_range': short_term_stats['price_range']
-                },
-                'long_term_rentals': {
-                    'count': long_term_stats['count'],
-                    'avg_monthly_rent': long_term_stats['avg_price'],
-                    'price_range': long_term_stats['price_range']
-                },
-                'sales': {
-                    'count': sales_stats['count'],
-                    'avg_sale_price': sales_stats['avg_price'],
-                    'price_range': sales_stats['price_range']
-                }
+    try:
+        radius = 0.05  # ~5.5 км
+        # Краткосрочная аренда
+        short_term_query = supabase.table('short_term_rentals') \
+            .select('property_id, price_per_night, bedrooms, latitude, longitude') \
+            .gte('latitude', lat - radius).lte('latitude', lat + radius) \
+            .gte('longitude', lng - radius).lte('longitude', lng + radius)
+        if bedrooms:
+            short_term_query = short_term_query.eq('bedrooms', bedrooms)
+        short_term_rentals = short_term_query.execute().data or []
+
+        # Долгосрочная аренда
+        long_term_query = supabase.table('long_term_rentals') \
+            .select('property_id, monthly_rent, bedrooms, latitude, longitude') \
+            .gte('latitude', lat - radius).lte('latitude', lat + radius) \
+            .gte('longitude', lng - radius).lte('longitude', lng + radius)
+        if bedrooms:
+            long_term_query = long_term_query.eq('bedrooms', bedrooms)
+        long_term_rentals = long_term_query.execute().data or []
+
+        # Продажи
+        sales_query = supabase.table('property_sales') \
+            .select('property_id, sale_price, bedrooms, latitude, longitude') \
+            .gte('latitude', lat - radius).lte('latitude', lat + radius) \
+            .gte('longitude', lng - radius).lte('longitude', lng + radius)
+        if bedrooms:
+            sales_query = sales_query.eq('bedrooms', bedrooms)
+        sales = sales_query.execute().data or []
+
+        def summarize(props, price_key):
+            prices = [p[price_key] for p in props if p.get(price_key)]
+            if not prices:
+                return {'avg_price': 0, 'count': 0, 'price_range': [0, 0]}
+            return {
+                'avg_price': sum(prices) / len(prices),
+                'count': len(prices),
+                'price_range': [min(prices), max(prices)]
             }
-        },
-        'property_details': {
-            'address': f'Адрес объекта',
-            'bedrooms': bedrooms,
-            'target_price': target_price,
-            'coordinates': {'lat': lat, 'lng': lng}
-        },
-        'summary': {
-            'total_properties_analyzed': short_term_stats['count'] + long_term_stats['count'] + sales_stats['count'],
-            'market_activity': 'high' if sales_stats['count'] > 5 else 'medium',
-            'price_trend': 'up' if sales_stats['avg_price'] > 1100000 else 'stable'
+
+        short_term_stats = summarize(short_term_rentals, 'price_per_night')
+        long_term_stats = summarize(long_term_rentals, 'monthly_rent')
+        sales_stats = summarize(sales, 'sale_price')
+
+        report = {
+            'market_analysis': {
+                'radius_5km': {
+                    'short_term_rentals': {
+                        'count': short_term_stats['count'],
+                        'avg_price_per_night': short_term_stats['avg_price'],
+                        'price_range': short_term_stats['price_range']
+                    },
+                    'long_term_rentals': {
+                        'count': long_term_stats['count'],
+                        'avg_monthly_rent': long_term_stats['avg_price'],
+                        'price_range': long_term_stats['price_range']
+                    },
+                    'sales': {
+                        'count': sales_stats['count'],
+                        'avg_sale_price': sales_stats['avg_price'],
+                        'price_range': sales_stats['price_range']
+                    }
+                }
+            },
+            'property_details': {
+                'address': f'Адрес объекта',
+                'bedrooms': bedrooms,
+                'target_price': target_price,
+                'coordinates': {'lat': lat, 'lng': lng}
+            },
+            'summary': {
+                'total_properties_analyzed': short_term_stats['count'] + long_term_stats['count'] + sales_stats['count'],
+                'market_activity': 'high' if sales_stats['count'] > 5 else 'medium',
+                'price_trend': 'up' if sales_stats['avg_price'] > 1100000 else 'stable'
+            }
         }
-    }
-    
-    return report
+        return report
+    except Exception as e:
+        logger.error(f"Error analyzing market data: {e}")
+        # Возвращаем пустой отчёт в случае ошибки
+        return {
+            'market_analysis': {
+                'radius_5km': {
+                    'short_term_rentals': {'count': 0, 'avg_price_per_night': 0, 'price_range': [0, 0]},
+                    'long_term_rentals': {'count': 0, 'avg_monthly_rent': 0, 'price_range': [0, 0]},
+                    'sales': {'count': 0, 'avg_sale_price': 0, 'price_range': [0, 0]}
+                }
+            },
+            'property_details': {'address': 'Адрес объекта', 'bedrooms': bedrooms, 'target_price': target_price, 'coordinates': {'lat': lat, 'lng': lng}},
+            'summary': {'total_properties_analyzed': 0, 'market_activity': 'none', 'price_trend': 'stable'}
+        }
 
 @app.route('/api/search_properties', methods=['POST'])
 def api_search_properties():

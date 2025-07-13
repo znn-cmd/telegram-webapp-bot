@@ -172,7 +172,35 @@
             </div>
         </div>
 
-        <!-- Шаг 3: Отчет -->
+        <!-- Шаг 3: Выбор количества спален -->
+        <div id="step-bedrooms" class="step-card" style="display:none;">
+            <div class="step-title">Выберите количество спален</div>
+            <select id="bedroomsSelect" class="input-field">
+                <option value="1">1 спальня</option>
+                <option value="2">2 спальни</option>
+                <option value="3" selected>3 спальни</option>
+                <option value="4">4 спальни</option>
+                <option value="5">5+ спален</option>
+            </select>
+            <div class="btn-row">
+                <button class="btn btn-secondary" onclick="backToMap()">Назад</button>
+                <button class="btn btn-primary" onclick="confirmBedrooms()">Далее</button>
+            </div>
+        </div>
+
+        <!-- Шаг 4: Ввод цены -->
+        <div id="step-price" class="step-card" style="display:none;">
+            <div class="step-title">Введите цену недвижимости</div>
+            <input type="number" id="priceInput" class="input-field" placeholder="Цена в евро (например: 500000)" min="10000" step="1000">
+            <div style="font-size:14px;color:#666;margin-bottom:15px;">Введите стоимость объекта в евро</div>
+            <div class="btn-row">
+                <button class="btn btn-secondary" onclick="backToBedrooms()">Назад</button>
+                <button class="btn btn-primary" onclick="confirmPrice()">Сформировать отчет</button>
+            </div>
+            <div id="price-error" class="error" style="display:none;"></div>
+        </div>
+
+        <!-- Шаг 5: Отчет -->
         <div id="step-report" class="step-card" style="display:none;">
             <div class="report-title">Аналитика по району</div>
             <div id="reportResult" class="report-block"></div>
@@ -191,10 +219,14 @@
         function showStep(step) {
             document.getElementById('step-address').style.display = 'none';
             document.getElementById('step-map').style.display = 'none';
+            document.getElementById('step-bedrooms').style.display = 'none';
+            document.getElementById('step-price').style.display = 'none';
             document.getElementById('step-report').style.display = 'none';
             document.getElementById('loading').style.display = 'none';
             if (step === 'address') document.getElementById('step-address').style.display = 'flex';
             if (step === 'map') document.getElementById('step-map').style.display = 'flex';
+            if (step === 'bedrooms') document.getElementById('step-bedrooms').style.display = 'flex';
+            if (step === 'price') document.getElementById('step-price').style.display = 'flex';
             if (step === 'report') document.getElementById('step-report').style.display = 'flex';
             if (step === 'loading') document.getElementById('loading').style.display = 'block';
         }
@@ -206,6 +238,14 @@
         function backToAddress() {
             showStep('address');
             document.getElementById('addressInput').value = lastAddress;
+        }
+
+        function backToMap() {
+            showStep('map');
+        }
+
+        function backToBedrooms() {
+            showStep('bedrooms');
         }
 
         async function verifyAddress() {
@@ -256,9 +296,25 @@
             new google.maps.Marker({ position: { lat, lng }, map });
         }
 
-        async function confirmLocation() {
+        function confirmLocation() {
+            showStep('bedrooms');
+        }
+
+        function confirmBedrooms() {
+            showStep('price');
+        }
+
+        async function confirmPrice() {
+            const price = document.getElementById('priceInput').value.trim();
+            const bedrooms = document.getElementById('bedroomsSelect').value;
+            document.getElementById('price-error').style.display = 'none';
+            
+            if (!price || price < 10000) {
+                showError('price-error', 'Пожалуйста, введите корректную цену (минимум 10,000 евро).');
+                return;
+            }
+            
             showStep('loading');
-            // Получаем отчет из Supabase по координатам
             try {
                 const res = await fetch('/api/generate_report', {
                     method: 'POST',
@@ -267,8 +323,8 @@
                         address: geoData.formatted_address,
                         lat: geoData.lat,
                         lng: geoData.lng,
-                        bedrooms: 3, // По умолчанию 3 спальни
-                        price: 500000, // По умолчанию 500,000 евро
+                        bedrooms: parseInt(bedrooms),
+                        price: parseFloat(price),
                         language: 'ru'
                     })
                 });
@@ -277,12 +333,12 @@
                     renderReport(data.report_text);
                     showStep('report');
                 } else {
-                    showStep('address');
-                    showError('address-error', 'Ошибка генерации отчета.');
+                    showStep('price');
+                    showError('price-error', 'Ошибка генерации отчета.');
                 }
             } catch (e) {
-                showStep('address');
-                showError('address-error', 'Ошибка соединения.');
+                showStep('price');
+                showError('price-error', 'Ошибка соединения.');
             }
         }
 
