@@ -266,12 +266,15 @@
                     body: JSON.stringify({
                         address: geoData.formatted_address,
                         lat: geoData.lat,
-                        lng: geoData.lng
+                        lng: geoData.lng,
+                        bedrooms: 3, // По умолчанию 3 спальни
+                        price: 500000, // По умолчанию 500,000 евро
+                        language: 'ru'
                     })
                 });
                 const data = await res.json();
                 if (data.success) {
-                    renderReport(data.report);
+                    renderReport(data.report_text);
                     showStep('report');
                 } else {
                     showStep('address');
@@ -283,12 +286,11 @@
             }
         }
 
-        function renderReport(report) {
-            let html = '';
-            html += `<div class='report-row'><span>Краткосрочная аренда:</span><b>${report.short_term_rentals.avg_price} €/ночь</b></div>`;
-            html += `<div class='report-row'><span>Долгосрочная аренда:</span><b>${report.long_term_rentals.avg_price} €/мес</b></div>`;
-            html += `<div class='report-row'><span>Стоимость квартир:</span><b>${report.sales.avg_price} €/м²</b></div>`;
-            html += `<div class='report-row'><span>Найдено объектов:</span><b>${report.total_properties}</b></div>`;
+        function renderReport(reportText) {
+            // Отображаем отчёт как текст с переносами строк
+            const html = reportText.split('\n').map(line => 
+                line ? `<div style="margin-bottom: 8px; font-size: 15px;">${line}</div>` : '<div style="margin-bottom: 12px;"></div>'
+            ).join('');
             document.getElementById('reportResult').innerHTML = html;
         }
 
