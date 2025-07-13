@@ -374,7 +374,7 @@ def format_market_report(market_analysis, address, language='en'):
         "",
         f"Диапазон цен: {format_price_range(sales['price_range'][0], sales['price_range'][1])}",
         "",
-        f"Средняя цена за кв.м: €0"
+        f"Средняя цена за кв.м: €{market_analysis['market_analysis']['radius_5km']['avg_price_per_sqm']:.2f}"
     ]
     
     return "\n".join(report_lines)
@@ -402,7 +402,7 @@ def analyze_market_around_location(lat, lng, bedrooms, target_price):
 
         # Продажи (используем asking_price вместо sale_price)
         sales_query = supabase.table('property_sales') \
-            .select('property_id, asking_price, bedrooms, latitude, longitude') \
+            .select('property_id, asking_price, bedrooms, latitude, longitude, price_per_sqm, area, avg_price_per_sqm') \
             .gte('latitude', lat - radius).lte('latitude', lat + radius) \
             .gte('longitude', lng - radius).lte('longitude', lng + radius)
         if bedrooms:
@@ -423,6 +423,22 @@ def analyze_market_around_location(lat, lng, bedrooms, target_price):
         long_term_stats = summarize(long_term_rentals, 'monthly_rent')
         sales_stats = summarize(sales, 'asking_price')
 
+        # Средняя цена за кв.м.
+        sqm_prices = []
+        for s in sales:
+            if s.get('price_per_sqm') and s['price_per_sqm'] > 0:
+                sqm_prices.append(s['price_per_sqm'])
+            elif s.get('avg_price_per_sqm') and s['avg_price_per_sqm'] > 0:
+                sqm_prices.append(s['avg_price_per_sqm'])
+            elif s.get('asking_price') and s.get('area') and s['area']:
+                try:
+                    sqm = float(s['asking_price']) / float(s['area'])
+                    if sqm > 0:
+                        sqm_prices.append(sqm)
+                except Exception:
+                    pass
+        avg_price_per_sqm = sum(sqm_prices) / len(sqm_prices) if sqm_prices else 0
+
         report = {
             'market_analysis': {
                 'radius_5km': {
@@ -440,7 +456,8 @@ def analyze_market_around_location(lat, lng, bedrooms, target_price):
                         'count': sales_stats['count'],
                         'avg_sale_price': sales_stats['avg_price'],
                         'price_range': sales_stats['price_range']
-                    }
+                    },
+                    'avg_price_per_sqm': avg_price_per_sqm
                 }
             },
             'property_details': {
@@ -464,7 +481,8 @@ def analyze_market_around_location(lat, lng, bedrooms, target_price):
                 'radius_5km': {
                     'short_term_rentals': {'count': 0, 'avg_price_per_night': 0, 'price_range': [0, 0]},
                     'long_term_rentals': {'count': 0, 'avg_monthly_rent': 0, 'price_range': [0, 0]},
-                    'sales': {'count': 0, 'avg_sale_price': 0, 'price_range': [0, 0]}
+                    'sales': {'count': 0, 'avg_sale_price': 0, 'price_range': [0, 0]},
+                    'avg_price_per_sqm': 0
                 }
             },
             'property_details': {'address': 'Адрес объекта', 'bedrooms': bedrooms, 'target_price': target_price, 'coordinates': {'lat': lat, 'lng': lng}},

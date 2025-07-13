@@ -202,7 +202,7 @@
 
         <!-- Шаг 5: Отчет -->
         <div id="step-report" class="step-card" style="display:none;">
-            <div class="report-title">Аналитика по району</div>
+            <div class="report-title">Аналитика по объекту</div>
             <div id="reportResult" class="report-block"></div>
             <div class="btn-row">
                 <button class="btn btn-secondary" onclick="goToMainMenu()">В главное меню</button>
@@ -330,7 +330,7 @@
                 });
                 const data = await res.json();
                 if (data.success) {
-                    renderReport(data.report_text);
+                    renderReport(data.report_text, geoData.formatted_address, bedrooms, price);
                     showStep('report');
                 } else {
                     showStep('price');
@@ -342,12 +342,38 @@
             }
         }
 
-        function renderReport(reportText) {
-            // Отображаем отчёт как текст с переносами строк
-            const html = reportText.split('\n').map(line => 
+        function renderReport(reportText, address, bedrooms, price) {
+            // Формируем блок с адресом, спальнями и ценой
+            let headerHtml = '';
+            headerHtml += `<div style='font-size:18px;font-weight:700;color:#667eea;margin-bottom:8px;'>Аналитика по объекту</div>`;
+            headerHtml += `<div style='font-size:15px;margin-bottom:4px;'><b>Адрес:</b> ${address}</div>`;
+            headerHtml += `<div style='font-size:15px;margin-bottom:4px;'><b>Спален:</b> ${bedrooms}</div>`;
+            headerHtml += `<div style='font-size:15px;margin-bottom:12px;'><b>Цена объекта:</b> €${Number(price).toLocaleString('ru-RU')}</div>`;
+            // Основной текст отчета
+            const mainHtml = reportText.split('\n').map(line => 
                 line ? `<div style="margin-bottom: 8px; font-size: 15px;">${line}</div>` : '<div style="margin-bottom: 12px;"></div>'
             ).join('');
-            document.getElementById('reportResult').innerHTML = html;
+            // Кнопки
+            const buttonsHtml = `
+                <div class="btn-row" style="margin-bottom:10px;">
+                    <button class="btn btn-primary" onclick="copyReportToClipboard()">Скопировать данные в буфер</button>
+                    <button class="btn btn-primary" onclick="showFullReportStub()">Получить полный отчет</button>
+                </div>
+            `;
+            document.getElementById('reportResult').innerHTML = headerHtml + mainHtml + buttonsHtml;
+        }
+
+        function copyReportToClipboard() {
+            // Копируем весь текст отчета (включая адрес, спальни, цену)
+            const reportBlock = document.getElementById('reportResult');
+            const text = reportBlock.innerText;
+            navigator.clipboard.writeText(text).then(() => {
+                alert('Данные отчета скопированы в буфер обмена!');
+            });
+        }
+
+        function showFullReportStub() {
+            alert('Механика в разработке');
         }
 
         // Инициализация
