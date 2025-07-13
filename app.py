@@ -400,9 +400,9 @@ def analyze_market_around_location(lat, lng, bedrooms, target_price):
             long_term_query = long_term_query.eq('bedrooms', bedrooms)
         long_term_rentals = long_term_query.execute().data or []
 
-        # Продажи
+        # Продажи (используем asking_price вместо sale_price)
         sales_query = supabase.table('property_sales') \
-            .select('property_id, sale_price, bedrooms, latitude, longitude') \
+            .select('property_id, asking_price, bedrooms, latitude, longitude') \
             .gte('latitude', lat - radius).lte('latitude', lat + radius) \
             .gte('longitude', lng - radius).lte('longitude', lng + radius)
         if bedrooms:
@@ -421,7 +421,7 @@ def analyze_market_around_location(lat, lng, bedrooms, target_price):
 
         short_term_stats = summarize(short_term_rentals, 'price_per_night')
         long_term_stats = summarize(long_term_rentals, 'monthly_rent')
-        sales_stats = summarize(sales, 'sale_price')
+        sales_stats = summarize(sales, 'asking_price')
 
         report = {
             'market_analysis': {
