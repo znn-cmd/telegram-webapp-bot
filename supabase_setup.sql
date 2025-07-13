@@ -38,3 +38,5 @@ CREATE POLICY "Allow insert access" ON users FOR INSERT WITH CHECK (true);
 
 -- Создание политики для обновления (в данном случае разрешаем всем)
 CREATE POLICY "Allow update access" ON users FOR UPDATE USING (true); 
+
+ALTER TABLE users ADD COLUMN IF NOT EXISTS language VARCHAR(10); 
