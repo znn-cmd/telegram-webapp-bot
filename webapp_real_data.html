@@ -343,7 +343,7 @@
         }
 
         function renderReport(reportText, address, bedrooms, price) {
-            // Формируем блок с адресом, спальнями и ценой
+            // Оставляем только один крупный заголовок
             let headerHtml = '';
             headerHtml += `<div style='font-size:22px;font-weight:800;color:#667eea;margin-bottom:10px;text-align:center;'>Аналитика по объекту</div>`;
             headerHtml += `<div style='background:#f4f7ff;border-radius:12px;padding:16px 14px 10px 14px;margin-bottom:18px;box-shadow:0 2px 8px rgba(102,126,234,0.08);'>`;
@@ -351,10 +351,31 @@
             headerHtml += `<div style='font-size:16px;margin-bottom:6px;'><b>Спален:</b> <span style='color:#333;'>${bedrooms}</span></div>`;
             headerHtml += `<div style='font-size:16px;margin-bottom:0;'><b>Цена объекта:</b> <span style='color:#333;'>€${Number(price).toLocaleString('ru-RU')}</span></div>`;
             headerHtml += `</div>`;
-            // Основной текст отчета
-            const mainHtml = reportText.split('\n').map(line =>
-                line ? `<div style="margin-bottom: 10px; font-size: 16px; color:#222;">${line}</div>` : '<div style="margin-bottom: 18px;"></div>'
-            ).join('');
+
+            // Парсим отчет по блокам
+            const lines = reportText.split('\n');
+            function block(title, contentArr) {
+                return `<div style='background:#f8f9fa;border-radius:12px;padding:14px 12px 10px 12px;margin-bottom:14px;box-shadow:0 2px 8px rgba(102,126,234,0.06);'>
+                    <div style='font-size:17px;font-weight:700;color:#667eea;margin-bottom:8px;'>${title}</div>
+                    ${contentArr.map(line => `<div style='font-size:15px;color:#222;margin-bottom:7px;'>${line}</div>`).join('')}
+                </div>`;
+            }
+            // Блоки
+            let shortTerm = [], longTerm = [], sales = [], other = [];
+            let current = null;
+            for (let line of lines) {
+                if (line.includes('Краткосрочная аренда')) { current = shortTerm; continue; }
+                if (line.includes('Долгосрочная аренда')) { current = longTerm; continue; }
+                if (line.includes('Продажи недвижимости')) { current = sales; continue; }
+                if (line.includes('Средняя цена за кв.м')) { other.push(line); continue; }
+                if (current) current.push(line);
+            }
+            let blocksHtml = '';
+            if (shortTerm.length) blocksHtml += block('Краткосрочная аренда', shortTerm);
+            if (longTerm.length) blocksHtml += block('Долгосрочная аренда', longTerm);
+            if (sales.length) blocksHtml += block('Продажи недвижимости', sales);
+            if (other.length) blocksHtml += block('Прочее', other);
+
             // Кнопки
             const buttonsHtml = `
                 <div class="btn-row" style="margin-bottom:10px;">
@@ -362,7 +383,7 @@
                     <button class="btn btn-primary" onclick="showFullReportStub()">Получить полный отчет</button>
                 </div>
             `;
-            document.getElementById('reportResult').innerHTML = headerHtml + mainHtml + buttonsHtml;
+            document.getElementById('reportResult').innerHTML = headerHtml + blocksHtml + buttonsHtml;
         }
 
         function copyReportToClipboard() {
