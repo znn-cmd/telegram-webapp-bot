@@ -88,6 +88,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
 
 def main() -> None:
     """Запуск бота"""
+    logger.info("Запуск Telegram-бота...")
     # Создаем приложение
     application = Application.builder().token(TOKEN).build()
 
@@ -220,11 +221,14 @@ def health():
     return jsonify({"status": "ok", "message": "Telegram WebApp Bot is running"})
 
 def run_telegram_bot():
-    main()  # функция main() должна запускать вашего Telegram-бота
+    try:
+        main()
+    except Exception as e:
+        logger.exception("Ошибка при запуске Telegram-бота:")
 
 if __name__ == '__main__':
-    # Запускаем Telegram-бота в отдельном потоке
-    bot_thread = threading.Thread(target=run_telegram_bot)
+    # Запускаем Telegram-бота в отдельном потоке-демоне
+    bot_thread = threading.Thread(target=run_telegram_bot, daemon=True)
     bot_thread.start()
 
     # Запускаем Flask-сервер
