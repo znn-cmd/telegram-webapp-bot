@@ -899,12 +899,49 @@ def api_generate_pdf_report():
             pdf.cell(200, 8, txt=f"Гербовый сбор: {report['taxes']['stamp_duty']*100}%", ln=True)
             pdf.cell(200, 8, txt=f"Нотариус: €{report['taxes']['notary']}", ln=True)
             pdf.ln(5)
-        # Итог
-        if 'summary' in report:
-            pdf.set_font("DejaVu", 'B', 14)
-            pdf.cell(200, 10, txt="Заключение:", ln=True)
-            pdf.set_font("DejaVu", size=12)
-            pdf.multi_cell(200, 8, txt=report.get('summary', 'Анализ завершен'))
+        # Блок: Альтернативы
+        if 'alternatives' in report and isinstance(report['alternatives'], list):
+            pdf.set_font('DejaVu', 'B', 14)
+            pdf.cell(0, 10, 'Сравнение с альтернативами (5 лет):', ln=True)
+            pdf.set_font('DejaVu', '', 12)
+            for alt in report['alternatives']:
+                name = alt.get('name', '-')
+                yld = alt.get('yield', 0)
+                pdf.cell(0, 8, f'{name}: {round(yld*100, 1)}%', ln=True)
+            pdf.ln(5)
+        # Блок: Профессиональные метрики
+        if 'yield' in report or 'price_index' in report or 'mortgage_rate' in report or 'global_house_price_index' in report:
+            pdf.set_font('DejaVu', 'B', 14)
+            pdf.cell(0, 10, 'Профессиональные метрики:', ln=True)
+            pdf.set_font('DejaVu', '', 12)
+            if 'yield' in report:
+                pdf.cell(0, 8, f'Yield: {round(report["yield"]*100, 1)}%', ln=True)
+            if 'price_index' in report:
+                pdf.cell(0, 8, f'Индекс цен: {report["price_index"]}', ln=True)
+            if 'mortgage_rate' in report:
+                pdf.cell(0, 8, f'Ипотечная ставка: {round(report["mortgage_rate"]*100, 1)}%', ln=True)
+            if 'global_house_price_index' in report:
+                pdf.cell(0, 8, f'Глобальный индекс цен: {report["global_house_price_index"]}', ln=True)
+            pdf.ln(5)
+        # Блок: Риски и развитие района
+        if 'risks' in report or 'liquidity' in report or 'district' in report:
+            pdf.set_font('DejaVu', 'B', 14)
+            pdf.cell(0, 10, 'Риски и развитие района:', ln=True)
+            pdf.set_font('DejaVu', '', 12)
+            if 'risks' in report and isinstance(report['risks'], list):
+                for idx, risk in enumerate(report['risks']):
+                    pdf.cell(0, 8, f'Риск {idx+1}: {risk}', ln=True)
+            if 'liquidity' in report:
+                pdf.cell(0, 8, f'Ликвидность: {report["liquidity"]}', ln=True)
+            if 'district' in report:
+                pdf.cell(0, 8, f'Развитие района: {report["district"]}', ln=True)
+            pdf.ln(5)
+        # Удаляем блок summary/заключение
+        # if 'summary' in report:
+        #     pdf.set_font("DejaVu", 'B', 14)
+        #     pdf.cell(200, 10, txt="Заключение:", ln=True)
+        #     pdf.set_font("DejaVu", size=12)
+        #     pdf.multi_cell(200, 8, txt=report.get('summary', 'Анализ завершен'))
         # Подвал: контактные данные пользователя
         if profile:
             pdf.set_y(-60)
