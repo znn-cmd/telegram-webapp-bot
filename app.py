@@ -835,10 +835,14 @@ def api_save_object():
 def api_generate_pdf_report():
     """Генерация PDF отчета с поддержкой Unicode (DejaVu)"""
     data = request.json or {}
+    logger.info(f"PDF request data: {data}")
     report = data.get('report')
     profile = data.get('profile') or {}
     client_name = data.get('client_name')
     report_id = data.get('report_id')
+    if not report_id:
+        logger.error(f"PDF generation error: report_id not provided. Incoming data: {data}")
+        return jsonify({'error': 'report_id required for PDF generation', 'details': data}), 400
     try:
         pdf = FPDF()
         pdf.add_page()

@@ -433,6 +433,7 @@
         }
         // Генерация PDF (AJAX)
         function generatePdfRequest(profile, clientName) {
+            console.log('PDF GENERATE: reportId:', window._currentReportId, 'profile:', profile, 'clientName:', clientName, 'fullReport:', window._currentFullReport);
             fetch('/api/generate_pdf_report', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -443,7 +444,8 @@
                 if (data.success && data.pdf_path) {
                     showPdfDownloadModal(data.pdf_path, data.message);
                 } else {
-                    alert('Ошибка генерации PDF');
+                    alert('Ошибка генерации PDF: ' + (data.error || ''));
+                    if (data.details) console.log('PDF ERROR DETAILS:', data.details);
                 }
             });
         }
