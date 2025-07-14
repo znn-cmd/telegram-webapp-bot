@@ -115,10 +115,12 @@
         <button class="btn back-btn" onclick="goToMainMenu()">В главное меню</button>
     </div>
     <script>
-        let tg = window.Telegram.WebApp;
-        tg.expand();
-        tg.ready();
-        let userData = tg.initDataUnsafe && tg.initDataUnsafe.user ? tg.initDataUnsafe.user : null;
+        let tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
+        if (tg) {
+            tg.ready();
+            tg.expand();
+        }
+        let userData = tg && tg.initDataUnsafe && tg.initDataUnsafe.user ? tg.initDataUnsafe.user : null;
         // Локализация (можно расширить)
         const locales = {
             'ru': {
@@ -134,7 +136,8 @@
                 'delete': 'Удалить',
                 'update': 'Обновить',
                 'confirm_delete': 'Вы уверены, что хотите удалить этот отчет?',
-                'confirm_update': 'Вы уверены, что хотите обновить этот отчет? Это потребует 1$ из вашего баланса.'
+                'confirm_update': 'Вы уверены, что хотите обновить этот отчет? Это потребует 1$ из вашего баланса.',
+                'error': 'Ошибка инициализации Telegram WebApp. Пожалуйста, перезапустите приложение.'
             },
             'en': {
                 'pageTitle': 'My Reports',
@@ -149,7 +152,8 @@
                 'delete': 'Delete',
                 'update': 'Update',
                 'confirm_delete': 'Are you sure you want to delete this report?',
-                'confirm_update': 'Are you sure you want to update this report? This will require 1$ from your balance.'
+                'confirm_update': 'Are you sure you want to update this report? This will require 1$ from your balance.',
+                'error': 'Telegram WebApp initialization error. Please restart the app.'
             }
         };
         let currentLanguage = 'ru';
@@ -167,9 +171,13 @@
             document.getElementById('empty').style.display = '';
             document.getElementById('reportList').style.display = 'none';
         }
-        // Загрузка отчетов
         async function loadReports() {
-            if (!userData) return;
+            if (!userData) {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('emptyText').textContent = getText('error');
+                document.getElementById('empty').style.display = '';
+                return;
+            }
             document.getElementById('loading').style.display = '';
             document.getElementById('reportList').style.display = 'none';
             document.getElementById('empty').style.display = 'none';
@@ -681,6 +689,7 @@
             window.location.href = '/webapp';
         }
         loadReports();
+        window.addEventListener('DOMContentLoaded', loadReports);
     </script>
 </body>
 </html> 
