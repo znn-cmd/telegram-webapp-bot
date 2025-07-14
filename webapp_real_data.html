@@ -757,8 +757,7 @@
             // Кнопки
             const buttonsHtml = `
                 <div class="btn-row" style="margin-bottom:10px;">
-                    <button class="btn btn-primary" onclick="copyReportToClipboard()">Скопировать данные в буфер</button>
-                    <button class="btn btn-primary" onclick="showFullReportStub()">Получить полный отчет</button>
+                    <button class="btn btn-primary" style="width:100%;" onclick="copyReportToClipboard()">Скопировать данные в буфер</button>
                 </div>
             `;
             document.getElementById('reportResult').innerHTML = headerHtml + blocksHtml + buttonsHtml;

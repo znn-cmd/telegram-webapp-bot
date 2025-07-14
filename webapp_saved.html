@@ -385,7 +385,7 @@
             <button class="btn" onclick="goToMainMenu()">Создать первый отчет</button>
         </div>
         
-        <button class="btn back-btn" onclick="goToMainMenu()">В главное меню</button>
+        <button class="btn back-btn" style="width:100%;" onclick="goToMainMenu()">В главное меню</button>
     </div>
 
     <!-- Toast container -->
@@ -1166,7 +1166,7 @@
         }
 
                         // Инициализация
-        loadReports();
+        window.addEventListener('DOMContentLoaded', loadReports);
         // Добавляем функцию saveAndExitFullReport
         async function saveAndExitFullReport() {
             if (!userData || !window._currentFullReport) return;
@@ -1179,8 +1179,6 @@
             // После сохранения возвращаем в главное меню
             window.location.href = '/webapp';
         }
-        loadReports();
-        window.addEventListener('DOMContentLoaded', loadReports);
     </script>
 </body>
 </html> 
