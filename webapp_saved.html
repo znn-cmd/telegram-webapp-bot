@@ -109,7 +109,9 @@
         <div class="title" id="pageTitle">Мои отчеты</div>
         <div id="loading" class="loading">Загрузка...</div>
         <div id="reportList" class="report-list" style="display:none;"></div>
-        <div id="empty" class="empty" style="display:none;">Нет сохраненных отчетов</div>
+        <div id="empty" style="display:none;text-align:center;color:#888;font-size:18px;margin-top:40px;">
+    У вас пока нет сохранённых отчётов.<br>Создайте новый отчёт, чтобы он появился здесь.
+</div>
         <button class="btn back-btn" onclick="goToMainMenu()">В главное меню</button>
     </div>
     <script>
@@ -188,6 +190,12 @@
         function renderReports(reports) {
             const list = document.getElementById('reportList');
             list.innerHTML = '';
+            if (!reports || reports.length === 0) {
+                document.getElementById('empty').style.display = '';
+                list.style.display = 'none';
+                return;
+            }
+            document.getElementById('empty').style.display = 'none';
             reports.forEach(r => {
                 const card = document.createElement('div');
                 card.className = 'report-card';
