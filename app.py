@@ -144,7 +144,10 @@ def serve_logo():
 @app.route('/api/user', methods=['POST'])
 def api_user():
     data = request.json or {}
-    telegram_id = str(data.get('telegram_id'))  # Приводим к строке
+    try:
+        telegram_id = int(data.get('telegram_id'))
+    except (TypeError, ValueError):
+        return jsonify({'error': 'Invalid telegram_id'}), 400
     username = data.get('username')
     first_name = data.get('first_name')
     last_name = data.get('last_name')
@@ -188,7 +191,10 @@ def api_user():
 @app.route('/api/user_profile', methods=['POST'])
 def api_user_profile():
     data = request.json or {}
-    telegram_id = data.get('telegram_id')
+    try:
+        telegram_id = int(data.get('telegram_id'))
+    except (TypeError, ValueError):
+        return jsonify({'error': 'Invalid telegram_id'}), 400
     if not telegram_id:
         return jsonify({'error': 'telegram_id required'}), 400
     try:
@@ -204,7 +210,10 @@ def api_user_profile():
 @app.route('/api/set_language', methods=['POST'])
 def api_set_language():
     data = request.json or {}
-    telegram_id = data.get('telegram_id')
+    try:
+        telegram_id = int(data.get('telegram_id'))
+    except (TypeError, ValueError):
+        return jsonify({'error': 'Invalid telegram_id'}), 400
     language = data.get('language')
     if not telegram_id or not language:
         return jsonify({'error': 'telegram_id and language required'}), 400
@@ -639,7 +648,10 @@ def api_similar_properties():
 @app.route('/api/full_report', methods=['POST'])
 def api_full_report():
     data = request.json or {}
-    telegram_id = data.get('telegram_id')
+    try:
+        telegram_id = int(data.get('telegram_id'))
+    except (TypeError, ValueError):
+        return jsonify({'error': 'Invalid telegram_id'}), 400
     address = data.get('address')
     lat = data.get('lat')
     lng = data.get('lng')
@@ -776,7 +788,10 @@ def api_full_report():
 def api_user_reports():
     """Получение списка всех отчетов пользователя по telegram_id"""
     data = request.json or {}
-    telegram_id = str(data.get('telegram_id'))  # Приводим к строке
+    try:
+        telegram_id = int(data.get('telegram_id'))
+    except (TypeError, ValueError):
+        return jsonify({'error': 'Invalid telegram_id'}), 400
     if not telegram_id:
         return jsonify({'error': 'telegram_id required'}), 400
     try:
@@ -797,7 +812,10 @@ def api_user_reports():
 def api_delete_user_report():
     """Soft delete отчета: выставляет deleted_at"""
     data = request.json or {}
-    telegram_id = data.get('telegram_id')
+    try:
+        telegram_id = int(data.get('telegram_id'))
+    except (TypeError, ValueError):
+        return jsonify({'error': 'Invalid telegram_id'}), 400
     report_id = data.get('report_id')
     if not telegram_id or not report_id:
         return jsonify({'error': 'Missing required data'}), 400
@@ -825,7 +843,10 @@ def api_delete_user_report():
 def api_save_object():
     """Сохранение объекта в избранное"""
     data = request.json or {}
-    telegram_id = data.get('telegram_id')
+    try:
+        telegram_id = int(data.get('telegram_id'))
+    except (TypeError, ValueError):
+        return jsonify({'error': 'Invalid telegram_id'}), 400
     object_data = data.get('object_data')
     
     if not telegram_id or not object_data:
@@ -1011,7 +1032,10 @@ def api_download_pdf():
 def api_user_balance():
     """Получение или списание баланса пользователя"""
     data = request.json or {}
-    telegram_id = str(data.get('telegram_id'))  # Приводим к строке
+    try:
+        telegram_id = int(data.get('telegram_id'))
+    except (TypeError, ValueError):
+        return jsonify({'error': 'Invalid telegram_id'}), 400
     deduct = data.get('deduct', False)
     if not telegram_id:
         return jsonify({'error': 'telegram_id required'}), 400
@@ -1043,9 +1067,15 @@ def api_user_balance():
 def api_send_pdf_to_client():
     """Отправка PDF клиенту и запись в client_contacts (всегда новая запись)"""
     data = request.json or {}
-    realtor_telegram_id = data.get('realtor_telegram_id')
+    try:
+        realtor_telegram_id = int(data.get('realtor_telegram_id'))
+    except (TypeError, ValueError):
+        return jsonify({'error': 'Invalid realtor_telegram_id'}), 400
     client_name = data.get('client_name')
-    client_telegram = data.get('client_telegram')
+    try:
+        client_telegram = int(data.get('client_telegram'))
+    except (TypeError, ValueError):
+        return jsonify({'error': 'Invalid client_telegram'}), 400
     pdf_path = data.get('pdf_path')
     pdf_url = data.get('pdf_url')  # если уже загружено в облако
     now = datetime.datetime.now().isoformat()
@@ -1074,7 +1104,10 @@ def api_send_pdf_to_client():
 def api_send_report_to_client():
     """Отправка отчета клиенту через Telegram"""
     data = request.json or {}
-    telegram_id = data.get('telegram_id')
+    try:
+        telegram_id = int(data.get('telegram_id'))
+    except (TypeError, ValueError):
+        return jsonify({'error': 'Invalid telegram_id'}), 400
     client_name = data.get('client_name')
     client_username = data.get('client_username')
     report_data = data.get('report_data')
@@ -1247,7 +1280,10 @@ if __name__ == '__main__':
 def api_update_user_report():
     """Обновление отчета пользователя (списание $1, перегенерация)"""
     data = request.json or {}
-    telegram_id = data.get('telegram_id')
+    try:
+        telegram_id = int(data.get('telegram_id'))
+    except (TypeError, ValueError):
+        return jsonify({'error': 'Invalid telegram_id'}), 400
     report_id = data.get('report_id')
     if not telegram_id or not report_id:
         return jsonify({'error': 'Missing required data'}), 400
@@ -1283,7 +1319,10 @@ def api_update_user_report():
 def api_save_user_report():
     """Сохраняет новый отчет пользователя и возвращает report_id"""
     data = request.json or {}
-    telegram_id = data.get('telegram_id')
+    try:
+        telegram_id = int(data.get('telegram_id'))
+    except (TypeError, ValueError):
+        return jsonify({'error': 'Invalid telegram_id'}), 400
     full_report = data.get('full_report')
     address = data.get('address')
     report_type = data.get('report_type', 'full')
