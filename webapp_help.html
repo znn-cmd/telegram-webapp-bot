@@ -8,8 +8,9 @@
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f8f9fa; margin: 0; }
         .container { max-width: 400px; margin: 40px auto; background: #fff; border-radius: 16px; box-shadow: 0 2px 12px rgba(102,126,234,0.10); padding: 32px 20px 24px 20px; text-align: center; }
         .title { font-size: 1.3em; font-weight: bold; margin-bottom: 18px; color: #333; }
-        .help-btn { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; border: none; border-radius: 12px; padding: 18px 20px; font-size: 16px; font-weight: 500; cursor: pointer; margin: 10px 0; width: 100%; text-align: left; transition: all 0.2s; box-shadow: 0 2px 8px rgba(102,126,234,0.15); }
+        .help-btn { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; border: none; border-radius: 12px; padding: 18px 20px; font-size: 16px; font-weight: 500; cursor: pointer; margin: 12px 0; width: 100%; text-align: left; transition: all 0.2s; box-shadow: 0 2px 8px rgba(102,126,234,0.15); display: flex; align-items: center; gap: 12px; }
         .help-btn:hover { background: linear-gradient(135deg, #764ba2 0%, #667eea 100%); }
+        .help-btn-icon { font-size: 20px; margin-right: 10px; }
         .back-btn { margin-top: 30px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; border: none; border-radius: 10px; padding: 14px 28px; font-size: 1em; font-weight: 500; cursor: pointer; transition: background 0.2s; width: 100%; }
         .back-btn:hover { background: linear-gradient(135deg, #764ba2 0%, #667eea 100%); }
     </style>
@@ -17,10 +18,10 @@
 <body>
     <div class="container">
         <div class="title">Помощь</div>
-        <button class="help-btn" onclick="aboutApp()">О приложении</button>
-        <button class="help-btn" onclick="showInstruction()">Инструкция</button>
-        <button class="help-btn" onclick="showGeo()">Наша география</button>
-        <button class="help-btn" onclick="showSupport()">Техническая поддержка</button>
+        <button class="help-btn" onclick="aboutApp()"><span class="help-btn-icon">ℹ️</span>О приложении</button>
+        <button class="help-btn" onclick="showInstruction()"><span class="help-btn-icon">📖</span>Инструкция</button>
+        <button class="help-btn" onclick="showGeo()"><span class="help-btn-icon">🌍</span>Наша география</button>
+        <button class="help-btn" onclick="showSupport()"><span class="help-btn-icon">🛠️</span>Техническая поддержка</button>
         <button class="back-btn" onclick="goToMainMenu()">Вернуться в главное меню</button>
     </div>
     <script>
