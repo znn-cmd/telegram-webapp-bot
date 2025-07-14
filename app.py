@@ -151,6 +151,8 @@ def webapp_stats():
     with open('webapp_stats.html', 'r', encoding='utf-8') as f:
         return f.read()
 
+
+
 @app.route('/health')
 def health():
     """Эндпоинт для проверки здоровья приложения"""
