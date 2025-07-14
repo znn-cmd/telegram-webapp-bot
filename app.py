@@ -1,6 +1,6 @@
 import os
 import logging
-from flask import Flask, request, jsonify, send_file
+from flask import Flask, request, jsonify, send_file, send_from_directory
 from telegram import Update, WebAppInfo, KeyboardButton, ReplyKeyboardMarkup, Bot
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
 from supabase import create_client, Client
@@ -137,10 +137,14 @@ def health():
     """Эндпоинт для проверки здоровья приложения"""
     return jsonify({"status": "ok", "message": "Telegram WebApp Bot is running"})
 
+@app.route('/logo-sqv.png')
+def serve_logo():
+    return send_from_directory('.', 'logo-sqv.png')
+
 @app.route('/api/user', methods=['POST'])
 def api_user():
     data = request.json or {}
-    telegram_id = data.get('telegram_id')
+    telegram_id = str(data.get('telegram_id'))  # Приводим к строке
     username = data.get('username')
     first_name = data.get('first_name')
     last_name = data.get('last_name')
@@ -772,7 +776,7 @@ def api_full_report():
 def api_user_reports():
     """Получение списка всех отчетов пользователя по telegram_id"""
     data = request.json or {}
-    telegram_id = data.get('telegram_id')
+    telegram_id = str(data.get('telegram_id'))  # Приводим к строке
     if not telegram_id:
         return jsonify({'error': 'telegram_id required'}), 400
     try:
@@ -1007,7 +1011,7 @@ def api_download_pdf():
 def api_user_balance():
     """Получение или списание баланса пользователя"""
     data = request.json or {}
-    telegram_id = data.get('telegram_id')
+    telegram_id = str(data.get('telegram_id'))  # Приводим к строке
     deduct = data.get('deduct', False)
     if not telegram_id:
         return jsonify({'error': 'telegram_id required'}), 400
