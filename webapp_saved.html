@@ -177,9 +177,11 @@
                     renderReports(data.reports);
                 } else {
                     document.getElementById('empty').style.display = '';
+                    document.getElementById('loading').style.display = 'none';
                 }
             } catch (e) {
                 document.getElementById('empty').style.display = '';
+                document.getElementById('loading').style.display = 'none';
             }
             document.getElementById('loading').style.display = 'none';
         }
