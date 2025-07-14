@@ -796,17 +796,21 @@ def api_delete_user_report():
     try:
         # Получаем user_id по telegram_id
         user_result = supabase.table('users').select('id').eq('telegram_id', telegram_id).execute()
-        user_id = user_result.data[0]['id'] if user_result.data else telegram_id
+        if not user_result.data:
+            logger.error(f"User with telegram_id {telegram_id} not found for report deletion")
+            return jsonify({'error': 'User not found'}), 404
+        user_id = user_result.data[0]['id']
         # Проверяем, что отчет принадлежит пользователю
         report_result = supabase.table('user_reports').select('id').eq('id', report_id).eq('user_id', user_id).execute()
         if not report_result.data:
+            logger.error(f"Report {report_id} not found or not owned by user_id {user_id}")
             return jsonify({'error': 'Report not found or not owned by user'}), 404
         # Отвязываем отчет (user_id ставим null)
         supabase.table('user_reports').update({'user_id': None}).eq('id', report_id).execute()
         return jsonify({'success': True})
     except Exception as e:
         logger.error(f"Error deleting user report: {e}")
-        return jsonify({'error': 'Internal error'}), 500
+        return jsonify({'error': f'Internal error: {str(e)}'}), 500
 
 @app.route('/api/save_object', methods=['POST'])
 def api_save_object():
