@@ -477,6 +477,13 @@
                 <span class="menu-btn-text" id="profileBtn">Личный кабинет</span>
                 <span class="menu-btn-description" id="profileDesc">Настройки и баланс</span>
             </button>
+
+            <!-- Кнопка Помощь -->
+            <button class="menu-btn fade-in" onclick="showHelp()">
+                <span class="menu-btn-icon">❓</span>
+                <span class="menu-btn-text">Помощь</span>
+                <span class="menu-btn-description">Ответы на вопросы и поддержка</span>
+            </button>
         </div>
 
         <!-- Загрузка -->
@@ -811,9 +818,6 @@
         }
 
         function showMarketStats() {
-            showLoading();
-            showToast('Загрузка статистики рынка...', 'info');
-            // Переходим к странице статистики рынка
             window.location.href = '/webapp_stats';
         }
 
@@ -827,10 +831,11 @@
         }
 
         function showProfile() {
-            showLoading();
-            showToast('Переход в личный кабинет...', 'info');
-            // Переходим к странице профиля
             window.location.href = '/webapp_profile';
+        }
+
+        function showHelp() {
+            window.location.href = '/webapp_help';
         }
 
         function goToMainMenu() {

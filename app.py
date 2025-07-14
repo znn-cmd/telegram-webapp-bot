@@ -136,6 +136,21 @@ def webapp_saved():
     with open('webapp_saved.html', 'r', encoding='utf-8') as f:
         return f.read()
 
+@app.route('/webapp_help')
+def webapp_help():
+    with open('webapp_help.html', 'r', encoding='utf-8') as f:
+        return f.read()
+
+@app.route('/webapp_profile')
+def webapp_profile():
+    with open('webapp_profile.html', 'r', encoding='utf-8') as f:
+        return f.read()
+
+@app.route('/webapp_stats')
+def webapp_stats():
+    with open('webapp_stats.html', 'r', encoding='utf-8') as f:
+        return f.read()
+
 @app.route('/health')
 def health():
     """Эндпоинт для проверки здоровья приложения"""
