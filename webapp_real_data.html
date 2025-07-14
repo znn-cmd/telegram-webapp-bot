@@ -889,7 +889,7 @@
                                     body: JSON.stringify({ address, bedrooms, price, lat, lng, telegram_id, force_update: true })
                                 })
                                 .then(res => res.json())
-                                .then(newData => showFullReport(newData.full_report));
+                                .then(newData => showFullReport(newData.full_report, newData.report_id));
                             } else {
                                 showToast(getLocalizedText('notifications.deduction_error'), 'error');
                             }
@@ -902,10 +902,10 @@
                             body: JSON.stringify({ address, bedrooms, price, lat, lng, telegram_id })
                         })
                         .then(res => res.json())
-                        .then(oldData => showFullReport(oldData.full_report));
+                        .then(oldData => showFullReport(oldData.full_report, oldData.report_id));
                     });
                 } else {
-                    showFullReport(data.full_report);
+                    showFullReport(data.full_report, data.report_id);
                 }
             })
             .catch(() => {
@@ -934,8 +934,8 @@
             let modal = document.getElementById('update-report-modal');
             if (modal) modal.remove();
         }
-        // showFullReport(report) — функция для красивого вывода полного отчёта (реализовать отдельно)
-        function showFullReport(report) {
+        // showFullReport(report, report_id) — функция для красивого вывода полного отчёта
+        function showFullReport(report, report_id) {
             // Закрываем модальное окно подтверждения
             closeFullReportModal();
             
@@ -1033,7 +1033,7 @@
                 bedrooms: report.object.bedrooms,
                 price: report.object.purchase_price,
                 report: report,
-                id: data.report_id // Сохраняем ID отчета если он есть
+                id: report_id // Сохраняем ID отчета если он есть
             };
             
             showToast(getLocalizedText('notifications.report_generated'), 'success');
