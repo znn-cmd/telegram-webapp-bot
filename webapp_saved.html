@@ -110,7 +110,7 @@
         <div id="loading" class="loading">Загрузка...</div>
         <div id="reportList" class="report-list" style="display:none;"></div>
         <div id="empty" style="display:none;text-align:center;color:#888;font-size:18px;margin-top:40px;">
-    У вас пока нет сохранённых отчётов.<br>Создайте новый отчёт, чтобы он появился здесь.
+    <span id="emptyText"></span>
 </div>
         <button class="btn back-btn" onclick="goToMainMenu()">В главное меню</button>
     </div>
@@ -162,6 +162,11 @@
         document.getElementById('pageTitle').textContent = getText('pageTitle');
         document.getElementById('loading').textContent = getText('loading');
         document.querySelector('.back-btn').textContent = getText('mainMenu');
+        function showEmptyMessage() {
+            document.getElementById('emptyText').textContent = getText('empty');
+            document.getElementById('empty').style.display = '';
+            document.getElementById('reportList').style.display = 'none';
+        }
         // Загрузка отчетов
         async function loadReports() {
             if (!userData) return;
@@ -178,11 +183,11 @@
                 if (data.success && data.reports && data.reports.length > 0) {
                     renderReports(data.reports);
                 } else {
-                    document.getElementById('empty').style.display = '';
+                    showEmptyMessage();
                     document.getElementById('loading').style.display = 'none';
                 }
             } catch (e) {
-                document.getElementById('empty').style.display = '';
+                showEmptyMessage();
                 document.getElementById('loading').style.display = 'none';
             }
             document.getElementById('loading').style.display = 'none';
@@ -191,8 +196,7 @@
             const list = document.getElementById('reportList');
             list.innerHTML = '';
             if (!reports || reports.length === 0) {
-                document.getElementById('empty').style.display = '';
-                list.style.display = 'none';
+                showEmptyMessage();
                 return;
             }
             document.getElementById('empty').style.display = 'none';
