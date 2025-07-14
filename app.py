@@ -833,22 +833,22 @@ def api_save_object():
 
 @app.route('/api/generate_pdf_report', methods=['POST'])
 def api_generate_pdf_report():
-    """Генерация PDF отчета"""
+    """Генерация PDF отчета с опциональными контактными данными пользователя и клиента, сохранение pdf_path в user_reports"""
     data = request.json or {}
     report = data.get('report')
-    add_realtor_contacts = data.get('add_realtor_contacts', False)
-    add_client_name = data.get('add_client_name', False)
-    
+    profile = data.get('profile') or {}
+    client_name = data.get('client_name')
+    report_id = data.get('report_id')
     try:
-        # Создаем PDF
         pdf = FPDF()
         pdf.add_page()
         pdf.set_font('Arial', 'B', 16)
-        
-        # Заголовок
+        # Шапка: имя клиента
+        if client_name:
+            pdf.cell(0, 10, f'Клиент: {client_name}', ln=True, align='C')
+            pdf.ln(2)
         pdf.cell(0, 10, 'Полный отчет по недвижимости', ln=True, align='C')
         pdf.ln(10)
-        
         # Информация об объекте
         if report.get('object'):
             pdf.set_font('Arial', 'B', 12)
@@ -859,28 +859,76 @@ def api_generate_pdf_report():
             pdf.cell(0, 8, f'Спален: {obj.get("bedrooms", "Не указано")}', ln=True)
             pdf.cell(0, 8, f'Цена: €{obj.get("purchase_price", "Не указана")}', ln=True)
             pdf.ln(5)
-        
-        # Макроэкономика
-        if report.get('macro'):
-            pdf.set_font('Arial', 'B', 12)
-            pdf.cell(0, 10, 'Макроэкономические показатели:', ln=True)
-            pdf.set_font('Arial', '', 10)
-            macro = report['macro']
-            pdf.cell(0, 8, f'Инфляция: {macro.get("inflation", 0)}%', ln=True)
-            pdf.cell(0, 8, f'Ставка рефинансирования: {macro.get("refi_rate", 0)}%', ln=True)
-            pdf.cell(0, 8, f'Рост ВВП: {macro.get("gdp_growth", 0)}%', ln=True)
+        # Если есть полный отчет
+        if 'report' in report:
+            report = report['report']
+            
+            # ROI анализ
+            pdf.set_font("Arial", 'B', 14)
+            pdf.cell(200, 10, txt="Инвестиционный анализ (ROI):", ln=True)
+            pdf.set_font("Arial", size=12)
+            pdf.cell(200, 8, txt=f"Краткосрочная аренда: ROI {report['roi']['short_term']['roi']}%", ln=True)
+            pdf.cell(200, 8, txt=f"Долгосрочная аренда: ROI {report['roi']['long_term']['roi']}%", ln=True)
+            pdf.cell(200, 8, txt=f"Без аренды: ROI {report['roi']['no_rent']['roi']}%", ln=True)
             pdf.ln(5)
+            
+            # Макроэкономика
+            pdf.set_font("Arial", 'B', 14)
+            pdf.cell(200, 10, txt="Макроэкономические показатели:", ln=True)
+            pdf.set_font("Arial", size=12)
+            pdf.cell(200, 8, txt=f"Инфляция: {report['macro']['inflation']}%", ln=True)
+            pdf.cell(200, 8, txt=f"Ключевая ставка: {report['macro']['refi_rate']}%", ln=True)
+            pdf.cell(200, 8, txt=f"Рост ВВП: {report['macro']['gdp_growth']}%", ln=True)
+            pdf.ln(5)
+            
+            # Налоги
+            pdf.set_font("Arial", 'B', 14)
+            pdf.cell(200, 10, txt="Налоги и сборы:", ln=True)
+            pdf.set_font("Arial", size=12)
+            pdf.cell(200, 8, txt=f"Налог на перевод: {report['taxes']['transfer_tax']*100}%", ln=True)
+            pdf.cell(200, 8, txt=f"Гербовый сбор: {report['taxes']['stamp_duty']*100}%", ln=True)
+            pdf.cell(200, 8, txt=f"Нотариус: €{report['taxes']['notary']}", ln=True)
+            pdf.ln(5)
+            
+            # Итог
+            pdf.set_font("Arial", 'B', 14)
+            pdf.cell(200, 10, txt="Заключение:", ln=True)
+            pdf.set_font("Arial", size=12)
+            pdf.multi_cell(200, 8, txt=report.get('summary', 'Анализ завершен'))
         
+        # Подвал: контактные данные пользователя
+        if profile:
+            pdf.set_y(-60)
+            pdf.set_font('Arial', 'B', 11)
+            pdf.cell(0, 8, 'Контактные данные риелтора:', ln=True)
+            pdf.set_font('Arial', '', 10)
+            if profile.get('first_name') or profile.get('last_name'):
+                pdf.cell(0, 8, f"Имя: {profile.get('first_name','')} {profile.get('last_name','')}", ln=True)
+            if profile.get('company'):
+                pdf.cell(0, 8, f"Компания: {profile.get('company')}", ln=True)
+            if profile.get('position'):
+                pdf.cell(0, 8, f"Должность: {profile.get('position')}", ln=True)
+            if profile.get('phone'):
+                pdf.cell(0, 8, f"Телефон: {profile.get('phone')}", ln=True)
+            if profile.get('email'):
+                pdf.cell(0, 8, f"Email: {profile.get('email')}", ln=True)
+            if profile.get('website'):
+                pdf.cell(0, 8, f"Сайт: {profile.get('website')}", ln=True)
+            if profile.get('about_me'):
+                pdf.multi_cell(0, 8, f"О себе: {profile.get('about_me')}")
         # Сохраняем PDF во временный файл
         temp_file = tempfile.NamedTemporaryFile(delete=False, suffix='.pdf')
         pdf.output(temp_file.name)
         temp_file.close()
-        
+        # Сохраняем путь к PDF в user_reports
+        if not report_id:
+            return jsonify({'error': 'report_id required'}), 400
+        supabase.table('user_reports').update({'pdf_path': temp_file.name}).eq('id', report_id).execute()
         return jsonify({
             'success': True,
-            'pdf_path': temp_file.name
+            'pdf_path': temp_file.name,
+            'message': 'PDF успешно сгенерирован и сохранен!'
         })
-        
     except Exception as e:
         logger.error(f"Error generating PDF: {e}")
         return jsonify({'error': 'Internal error'}), 500

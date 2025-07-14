@@ -122,7 +122,7 @@
             'ru': {
                 'pageTitle': 'Мои отчеты',
                 'loading': 'Загрузка...',
-                'empty': 'Нет сохраненных отчетов',
+                'empty': 'У вас еще нет сохраненных отчетов, начните с формирования первого и сохраните его для дальнейшей работы.',
                 'mainMenu': 'В главное меню',
                 'view': 'Посмотреть',
                 'full': 'Полный',
@@ -137,7 +137,7 @@
             'en': {
                 'pageTitle': 'My Reports',
                 'loading': 'Loading...',
-                'empty': 'No saved reports',
+                'empty': 'You have no saved reports yet. Start by generating your first report and save it for future use.',
                 'mainMenu': 'Main menu',
                 'view': 'View',
                 'full': 'Full',
@@ -239,8 +239,9 @@
                 <div style="background:#fff;border-radius:18px;box-shadow:0 4px 24px rgba(102,126,234,0.18);padding:32px 18px 24px 18px;max-width:420px;width:96vw;text-align:left;max-height:90vh;overflow-y:auto;">
                     <div id="fullReportContent"></div>
                     <div style='display:flex;gap:10px;margin-top:18px;'>
-                        <button class="btn" onclick="exportPdfFlow()">Экспорт в PDF</button>
+                        <button class="btn" onclick="exportPdfFlow()">Скачать PDF</button>
                         <button class="btn" onclick="sendPdfToClientFlow()">Отправить клиенту</button>
+                        <button class="btn back-btn" style="background:#f1f1f1;color:#333;" onclick="saveAndExitFullReport()">Сохранить и выйти</button>
                     </div>
                     <button class="btn back-btn" style="margin-top:18px;" onclick="closeFullReportModal()">Закрыть</button>
                 </div>
@@ -299,83 +300,153 @@
             html += `<div style='background:#f4f7ff;border-radius:12px;padding:14px 12px 10px 12px;margin-bottom:14px;box-shadow:0 2px 8px rgba(102,126,234,0.06);font-size:15px;color:#222;'>${report.summary}</div>`;
             document.getElementById(containerId).innerHTML = html;
         }
-        // Экспорт в PDF: выбор с контактами/без
-        function exportPdfFlow() {
-            showPdfOptionsModal((withContacts) => {
-                if (withContacts) {
-                    // Проверяем наличие данных пользователя (AJAX к /api/user_profile)
-                    fetch('/api/user_profile', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ telegram_id: userData.id })
-                    })
-                    .then(res => res.json())
-                    .then(data => {
-                        if (data.success) {
-                            const profile = data.profile;
-                            const missing = [];
-                            if (!profile.first_name) missing.push('Имя');
-                            if (!profile.last_name) missing.push('Фамилия');
-                            if (!profile.phone) missing.push('Телефон');
-                            if (!profile.email) missing.push('Email');
-                            if (!profile.company) missing.push('Компания');
-                            if (!profile.position) missing.push('Должность');
-                            if (!profile.about_me) missing.push('О себе');
-                            if (missing.length > 0) {
-                                alert('Заполните недостающие данные в профиле: ' + missing.join(', '));
-                                // Можно реализовать пошаговый сбор, если нужно
-                                return;
-                            }
-                            generatePdfRequest(profile);
-                        } else {
-                            alert('Ошибка загрузки профиля');
-                        }
+        // Экспорт в PDF: пошаговая логика
+        function exportPdfFlow(reportId) {
+            window._currentReportId = reportId;
+            askAddUserContacts();
+        }
+
+        function askAddUserContacts() {
+            showModalQuestion(
+                'Добавить ваши контактные данные в PDF?',
+                () => checkAndCollectUserContacts(),
+                () => askAddClientData()
+            );
+        }
+
+        function askAddClientData(userProfile) {
+            showModalQuestion(
+                'Хотите добавить данные получателя (клиента)?',
+                () => askClientName(userProfile),
+                () => generatePdfRequest(userProfile, null)
+            );
+        }
+
+        function askClientName(userProfile) {
+            showModalInput('Имя получателя (клиента)', (clientName) => {
+                generatePdfRequest(userProfile, clientName);
+            });
+        }
+
+        function checkAndCollectUserContacts() {
+            // Получаем профиль пользователя
+            fetch('/api/user_profile', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ telegram_id: userData.id })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    const profile = data.profile;
+                    const fields = [
+                        { key: 'first_name', label: 'Имя' },
+                        { key: 'last_name', label: 'Фамилия' },
+                        { key: 'photo_url', label: 'Фото (ссылка)' },
+                        { key: 'phone', label: 'Телефон' },
+                        { key: 'email', label: 'Email' },
+                        { key: 'website', label: 'Сайт' },
+                        { key: 'company', label: 'Компания' },
+                        { key: 'about_me', label: 'О себе' }
+                    ];
+                    collectMissingFields(profile, fields, 0, (filledProfile) => {
+                        // После сбора всех данных спрашиваем про клиента
+                        askAddClientData(filledProfile);
                     });
                 } else {
-                    generatePdfRequest(null);
+                    alert('Ошибка загрузки профиля');
                 }
             });
         }
-        // Модалка выбора PDF-опций
-        function showPdfOptionsModal(onSelect) {
-            let oldModal = document.getElementById('pdf-options-modal');
+
+        function collectMissingFields(profile, fields, idx, cb) {
+            if (idx >= fields.length) {
+                cb(profile);
+                return;
+            }
+            const field = fields[idx];
+            if (profile[field.key]) {
+                collectMissingFields(profile, fields, idx + 1, cb);
+            } else {
+                showModalInput(field.label + ' (можно пропустить)', (val) => {
+                    if (val) profile[field.key] = val;
+                    // Сохраняем в базу
+                    const update = {};
+                    update[field.key] = val;
+                    fetch('/api/user_profile', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ telegram_id: userData.id, ...update })
+                    });
+                    collectMissingFields(profile, fields, idx + 1, cb);
+                }, true);
+            }
+        }
+
+        // Универсальное модальное окно с вопросом (да/нет)
+        function showModalQuestion(question, onYes, onNo) {
+            let oldModal = document.getElementById('modal-question');
             if (oldModal) oldModal.remove();
             const modal = document.createElement('div');
-            modal.id = 'pdf-options-modal';
-            modal.style = 'position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.25);z-index:1100;display:flex;align-items:center;justify-content:center;';
+            modal.id = 'modal-question';
+            modal.style = 'position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.25);z-index:2000;display:flex;align-items:center;justify-content:center;';
             modal.innerHTML = `
                 <div style="background:#fff;border-radius:18px;box-shadow:0 4px 24px rgba(102,126,234,0.18);padding:28px 18px 18px 18px;max-width:340px;width:90vw;text-align:center;">
-                    <div style="font-size:18px;font-weight:700;color:#667eea;margin-bottom:16px;">Экспорт в PDF</div>
-                    <div style="font-size:15px;color:#333;margin-bottom:18px;">Добавить ваши контактные данные в PDF?</div>
-                    <button class="btn" style="width:100%;font-size:16px;" onclick="closePdfOptionsModal();window._pdfOptionCb(true)">Да, добавить</button>
-                    <button class="btn btn-secondary" style="width:100%;margin-top:10px;font-size:16px;" onclick="closePdfOptionsModal();window._pdfOptionCb(false)">Нет, только отчет</button>
+                    <div style="font-size:18px;font-weight:700;color:#667eea;margin-bottom:16px;">${question}</div>
+                    <button class="btn" style="width:100%;font-size:16px;" onclick="closeModalQuestion();window._modalYes()">Да</button>
+                    <button class="btn btn-secondary" style="width:100%;margin-top:10px;font-size:16px;" onclick="closeModalQuestion();window._modalNo()">Нет, пропустить</button>
                 </div>
             `;
             document.body.appendChild(modal);
-            window._pdfOptionCb = onSelect;
+            window._modalYes = onYes;
+            window._modalNo = onNo;
         }
-        function closePdfOptionsModal() {
-            let modal = document.getElementById('pdf-options-modal');
+        function closeModalQuestion() {
+            let modal = document.getElementById('modal-question');
+            if (modal) modal.remove();
+        }
+        // Универсальное модальное окно для ввода
+        function showModalInput(label, onSubmit, allowSkip) {
+            let oldModal = document.getElementById('modal-input');
+            if (oldModal) oldModal.remove();
+            const modal = document.createElement('div');
+            modal.id = 'modal-input';
+            modal.style = 'position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.25);z-index:2100;display:flex;align-items:center;justify-content:center;';
+            modal.innerHTML = `
+                <div style="background:#fff;border-radius:18px;box-shadow:0 4px 24px rgba(102,126,234,0.18);padding:28px 18px 18px 18px;max-width:340px;width:90vw;text-align:center;">
+                    <div style="font-size:18px;font-weight:700;color:#667eea;margin-bottom:16px;">${label}</div>
+                    <input id="modalInputField" class="input-field" style="margin-bottom:10px;width:90%;font-size:16px;padding:8px;" autofocus>
+                    <button class="btn" style="width:100%;font-size:16px;" onclick="closeModalInput();window._modalInputSubmit()">${allowSkip ? 'Сохранить/Пропустить' : 'Сохранить'}</button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            window._modalInputSubmit = function() {
+                const val = document.getElementById('modalInputField').value.trim();
+                onSubmit(val);
+            };
+        }
+        function closeModalInput() {
+            let modal = document.getElementById('modal-input');
             if (modal) modal.remove();
         }
         // Генерация PDF (AJAX)
-        function generatePdfRequest(profile) {
+        function generatePdfRequest(profile, clientName) {
             fetch('/api/generate_pdf_report', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ report: window._currentFullReport, profile })
+                body: JSON.stringify({ report: window._currentFullReport, profile, client_name: clientName, report_id: window._currentReportId })
             })
             .then(res => res.json())
             .then(data => {
                 if (data.success && data.pdf_path) {
-                    showPdfDownloadModal(data.pdf_path);
+                    showPdfDownloadModal(data.pdf_path, data.message);
                 } else {
                     alert('Ошибка генерации PDF');
                 }
             });
         }
         // Модалка для скачивания PDF
-        function showPdfDownloadModal(pdfPath) {
+        function showPdfDownloadModal(pdfPath, message) {
             let oldModal = document.getElementById('pdf-download-modal');
             if (oldModal) oldModal.remove();
             const modal = document.createElement('div');
@@ -383,8 +454,8 @@
             modal.style = 'position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.25);z-index:1200;display:flex;align-items:center;justify-content:center;';
             modal.innerHTML = `
                 <div style="background:#fff;border-radius:18px;box-shadow:0 4px 24px rgba(102,126,234,0.18);padding:28px 18px 18px 18px;max-width:340px;width:90vw;text-align:center;">
-                    <div style="font-size:18px;font-weight:700;color:#667eea;margin-bottom:16px;">PDF готов</div>
-                    <a href="/api/download_pdf" onclick="event.preventDefault();window.open('${pdfPath}','_blank');" class="btn" style="width:100%;font-size:16px;">Скачать PDF</a>
+                    <div style="font-size:18px;font-weight:700;color:#667eea;margin-bottom:16px;">${message || 'PDF готов'}</div>
+                    <a href="/api/download_pdf" onclick="event.preventDefault();window.open('${pdfPath}','_blank');window.location.href='/webapp_saved';" class="btn" style="width:100%;font-size:16px;">Скачать PDF</a>
                     <button class="btn btn-secondary" style="width:100%;margin-top:10px;font-size:16px;" onclick="closePdfDownloadModal()">Закрыть</button>
                 </div>
             `;
@@ -505,7 +576,7 @@
                 const report = data.reports.find(r => r.id == reportId);
                 if (report && report.full_report) {
                     window._currentFullReport = report.full_report;
-                    exportPdfFlow();
+                    exportPdfFlow(reportId);
                 } else {
                     alert('Полный отчет недоступен');
                 }
@@ -529,6 +600,18 @@
                     alert('Полный отчет недоступен');
                 }
             }
+        }
+        // Добавляем функцию saveAndExitFullReport
+        async function saveAndExitFullReport() {
+            if (!userData || !window._currentFullReport) return;
+            // Сохраняем отчет в базу (если еще не сохранен)
+            const res = await fetch('/api/user_reports', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ telegram_id: userData.id, full_report: window._currentFullReport })
+            });
+            // После сохранения возвращаем в главное меню
+            window.location.href = '/webapp';
         }
         loadReports();
     </script>
