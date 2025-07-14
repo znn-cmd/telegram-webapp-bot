@@ -419,7 +419,11 @@
         <!-- Информация о пользователе -->
         <div class="user-info hidden" id="userInfo">
             <div class="user-name" id="userName">Загрузка...</div>
-            <div class="user-balance">
+            <div id="welcomeBlock">
+                <div style="font-size: 1.35em; font-weight: bold;">С возвращением!</div>
+                <div style="font-size: 1em; font-weight: normal; margin-top: 6px; color: #444;">Наши последние данные обновлены — проверьте свежие тренды и персональные рекомендации</div>
+            </div>
+            <div class="user-balance" style="margin-top: 10px;">
                 <span>Баланс:</span>
                 <span class="balance-amount" id="userBalance">$0</span>
             </div>
@@ -465,7 +469,7 @@
             <button class="menu-btn fade-in" onclick="showSavedReports()">
                 <span class="menu-btn-icon">💾</span>
                 <span class="menu-btn-text" id="savedReportsBtn">Мои сохраненные отчеты</span>
-                <span class="menu-btn-description" id="savedReportsDesc">История ваших анализов</span>
+                <span class="menu-btn-description" id="savedReportsDesc">История ваших запросов</span>
             </button>
 
             <button class="menu-btn fade-in" onclick="showProfile()">
@@ -484,11 +488,6 @@
 
     <!-- Toast container -->
     <div class="toast-container" id="toastContainer"></div>
-
-    <!-- Floating action button -->
-    <button class="fab" onclick="startNewReport()" title="Создать новый отчет">
-        📊
-    </button>
 
     <script>
         let tg = window.Telegram.WebApp;
