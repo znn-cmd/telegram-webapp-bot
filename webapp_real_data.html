@@ -547,7 +547,11 @@
             if (step === 'address') document.getElementById('step-address').style.display = 'flex';
             if (step === 'map') document.getElementById('step-map').style.display = 'flex';
             if (step === 'bedrooms') document.getElementById('step-bedrooms').style.display = 'flex';
-            if (step === 'price') document.getElementById('step-price').style.display = 'flex';
+            if (step === 'price') {
+                document.getElementById('step-price').style.display = 'flex';
+                var priceInput = document.getElementById('priceInput');
+                if (priceInput) { priceInput.disabled = false; priceInput.readOnly = false; }
+            }
             if (step === 'report') document.getElementById('step-report').style.display = 'flex';
             if (step === 'loading') document.getElementById('loading').style.display = 'block';
         }
