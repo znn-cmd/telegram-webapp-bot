@@ -871,11 +871,9 @@ def api_generate_pdf_report():
             pdf.cell(0, 8, f'Спален: {obj.get("bedrooms", "Не указано")}', ln=True)
             pdf.cell(0, 8, f'Цена: €{obj.get("purchase_price", "Не указана")}', ln=True)
             pdf.ln(5)
-        # Если есть полный отчет
-        if 'report' in report:
-            report = report['report']
-            
-            # ROI анализ
+        # Печатаем остальные блоки отчёта (без вложенности)
+        # ROI анализ
+        if 'roi' in report:
             pdf.set_font("DejaVu", 'B', 14)
             pdf.cell(200, 10, txt="Инвестиционный анализ (ROI):", ln=True)
             pdf.set_font("DejaVu", size=12)
@@ -883,8 +881,8 @@ def api_generate_pdf_report():
             pdf.cell(200, 8, txt=f"Долгосрочная аренда: ROI {report['roi']['long_term']['roi']}%", ln=True)
             pdf.cell(200, 8, txt=f"Без аренды: ROI {report['roi']['no_rent']['roi']}%", ln=True)
             pdf.ln(5)
-            
-            # Макроэкономика
+        # Макроэкономика
+        if 'macro' in report:
             pdf.set_font("DejaVu", 'B', 14)
             pdf.cell(200, 10, txt="Макроэкономические показатели:", ln=True)
             pdf.set_font("DejaVu", size=12)
@@ -892,8 +890,8 @@ def api_generate_pdf_report():
             pdf.cell(200, 8, txt=f"Ключевая ставка: {report['macro']['refi_rate']}%", ln=True)
             pdf.cell(200, 8, txt=f"Рост ВВП: {report['macro']['gdp_growth']}%", ln=True)
             pdf.ln(5)
-            
-            # Налоги
+        # Налоги
+        if 'taxes' in report:
             pdf.set_font("DejaVu", 'B', 14)
             pdf.cell(200, 10, txt="Налоги и сборы:", ln=True)
             pdf.set_font("DejaVu", size=12)
@@ -901,13 +899,12 @@ def api_generate_pdf_report():
             pdf.cell(200, 8, txt=f"Гербовый сбор: {report['taxes']['stamp_duty']*100}%", ln=True)
             pdf.cell(200, 8, txt=f"Нотариус: €{report['taxes']['notary']}", ln=True)
             pdf.ln(5)
-            
-            # Итог
+        # Итог
+        if 'summary' in report:
             pdf.set_font("DejaVu", 'B', 14)
             pdf.cell(200, 10, txt="Заключение:", ln=True)
             pdf.set_font("DejaVu", size=12)
             pdf.multi_cell(200, 8, txt=report.get('summary', 'Анализ завершен'))
-        
         # Подвал: контактные данные пользователя
         if profile:
             pdf.set_y(-60)

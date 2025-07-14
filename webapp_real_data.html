@@ -1100,6 +1100,7 @@
                 .then(res => res.json())
                 .then(data => {
                     if (data.success) {
+                        window._lastPdfPath = data.pdf_path;
                         // Отправляем PDF клиенту
                         fetch('/api/send_pdf_to_client', {
                             method: 'POST',
@@ -1108,7 +1109,7 @@
                                 realtor_telegram_id: userData.id,
                                 client_name: clientName,
                                 client_telegram: clientUsername,
-                                pdf_path: data.pdf_path
+                                pdf_path: window._lastPdfPath
                             })
                         })
                         .then(res => res.json())
@@ -1196,6 +1197,7 @@
                 .then(res => res.json())
                 .then(data => {
                     if (data.success) {
+                        window._lastPdfPath = data.pdf_path;
                         // Скачиваем PDF
                         fetch('/api/download_pdf', {
                             method: 'POST',
