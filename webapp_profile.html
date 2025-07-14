@@ -24,33 +24,55 @@
         }
         // Баланс и приветствие
         document.addEventListener('DOMContentLoaded', function() {
-            let tgUser = null;
-            if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe && window.Telegram.WebApp.initDataUnsafe.user) {
-                tgUser = window.Telegram.WebApp.initDataUnsafe.user;
-            } else if (localStorage.getItem('telegram_id')) {
-                tgUser = { id: localStorage.getItem('telegram_id') };
+            let tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
+            if (tg) {
+                tg.ready();
+                tg.expand && tg.expand();
             }
-            if (!tgUser || !tgUser.id) return;
+            let userData = tg && tg.initDataUnsafe && tg.initDataUnsafe.user ? tg.initDataUnsafe.user : null;
+            if (!userData) {
+                try {
+                    userData = JSON.parse(localStorage.getItem('aaadviser_user'));
+                } catch (e) {
+                    userData = null;
+                }
+            }
+            console.log('userData:', userData);
+            if (!userData || !userData.id) {
+                document.getElementById('balance-block').innerHTML = `<div style='color:#c33;background:#fee;border-radius:10px;padding:18px 10px;font-size:1.1em;'>Пользователь не определён.<br>Пожалуйста, откройте WebApp из Telegram.</div>`;
+                document.getElementById('balance-block').style.display = '';
+                return;
+            }
             fetch('/api/user', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ telegram_id: tgUser.id, username: tgUser.username, first_name: tgUser.first_name, last_name: tgUser.last_name })
+                body: JSON.stringify({ telegram_id: userData.id, username: userData.username, first_name: userData.first_name, last_name: userData.last_name })
             })
             .then(res => res.json())
             .then(data => {
-                if (data && (data.first_name || data.username)) {
-                    let name = data.first_name ? data.first_name : (data.username ? '@' + data.username : 'Пользователь');
+                if (data) {
+                    let name = data.first_name && data.first_name.trim() ? data.first_name : (data.username ? '@' + data.username : 'Пользователь');
                     let balance = typeof data.balance === 'number' ? data.balance : 0;
                     document.getElementById('balance-block').innerHTML = `
                         <div style="background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:#fff;border-radius:12px;padding:20px 16px 16px 16px;box-shadow:0 2px 8px rgba(102,126,234,0.10);font-size:1.1em;">
                             <div style='font-size:1.1em;margin-bottom:8px;'>Здравствуйте, <b>${name}</b>!</div>
                             <div style='font-size:1.2em;font-weight:600;'>Ваш баланс: <span style='color:#ffd700;'>$${balance}</span></div>
                         </div>
+                        <div style='display:flex;flex-direction:column;gap:12px;margin-top:18px;'>
+                            <button class='btn btn-secondary' style='width:100%;' onclick='showProfileData()'>Личные данные</button>
+                            <button class='btn btn-secondary' style='width:100%;' onclick='showBalance()'>Баланс</button>
+                            <button class='btn btn-secondary' style='width:100%;' onclick='showCooperation()'>Сотрудничество</button>
+                            <button class='btn btn-secondary' style='width:100%;' onclick='showLanguage()'>Язык</button>
+                        </div>
                     `;
                     document.getElementById('balance-block').style.display = '';
                 }
             });
         });
+        function showProfileData() { alert('Личные данные (в разработке)'); }
+        function showBalance() { alert('Баланс (в разработке)'); }
+        function showCooperation() { alert('Сотрудничество (в разработке)'); }
+        function showLanguage() { alert('Язык (в разработке)'); }
     </script>
 </body>
 </html> 

@@ -188,6 +188,7 @@ def api_user():
             'language_code': lang,
             'welcome': locales[lang]['welcome_back'],
             'menu': locales[lang]['menu'],
+            'name': user.get('name'),
             'first_name': user.get('first_name'),
             'last_name': user.get('last_name'),
             'username': user.get('username'),
