@@ -493,8 +493,10 @@
         }
 
         function showSavedReports() {
+            if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe && window.Telegram.WebApp.initDataUnsafe.user) {
+                localStorage.setItem('aaadviser_user', JSON.stringify(window.Telegram.WebApp.initDataUnsafe.user));
+            }
             showLoading();
-            // Переходим к странице сохраненных отчетов
             window.location.href = '/webapp_saved';
         }
 

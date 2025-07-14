@@ -121,6 +121,13 @@
             tg.expand();
         }
         let userData = tg && tg.initDataUnsafe && tg.initDataUnsafe.user ? tg.initDataUnsafe.user : null;
+        if (!userData) {
+            try {
+                userData = JSON.parse(localStorage.getItem('aaadviser_user'));
+            } catch (e) {
+                userData = null;
+            }
+        }
         // Локализация (можно расширить)
         const locales = {
             'ru': {
