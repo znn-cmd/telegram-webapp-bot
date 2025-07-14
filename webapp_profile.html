@@ -10,6 +10,62 @@
         .title { font-size: 1.3em; font-weight: bold; margin-bottom: 18px; color: #333; }
         .back-btn { margin-top: 30px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; border: none; border-radius: 10px; padding: 14px 28px; font-size: 1em; font-weight: 500; cursor: pointer; transition: background 0.2s; }
         .back-btn:hover { background: linear-gradient(135deg, #764ba2 0%, #667eea 100%); }
+        .profile-balance-block {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 18px;
+            margin: 20px 0 18px 0;
+            text-align: center;
+            border-left: 4px solid #667eea;
+            box-shadow: 0 2px 8px rgba(102,126,234,0.10);
+        }
+        .profile-balance-name {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 8px;
+        }
+        .profile-balance-sum {
+            font-size: 16px;
+            color: #666;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .profile-balance-amount {
+            font-weight: bold;
+            color: #ffffff;
+            padding: 4px 8px;
+            background: rgba(255,215,0,0.08);
+            border-radius: 6px;
+            font-size: 1.2em;
+        }
+        .profile-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            padding: 18px 20px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            margin: 12px 0 0 0;
+            width: 100%;
+            text-align: left;
+            transition: all 0.2s;
+            box-shadow: 0 2px 8px rgba(102,126,234,0.15);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .profile-btn:hover {
+            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+        }
+        .profile-btn-icon {
+            font-size: 20px;
+            margin-right: 10px;
+        }
     </style>
 </head>
 <body>
@@ -54,16 +110,14 @@
                     let name = data.first_name && data.first_name.trim() ? data.first_name : (data.username ? '@' + data.username : 'Пользователь');
                     let balance = typeof data.balance === 'number' ? data.balance : 0;
                     document.getElementById('balance-block').innerHTML = `
-                        <div style="background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:#fff;border-radius:12px;padding:20px 16px 16px 16px;box-shadow:0 2px 8px rgba(102,126,234,0.10);font-size:1.1em;">
-                            <div style='font-size:1.1em;margin-bottom:8px;'>Здравствуйте, <b>${name}</b>!</div>
-                            <div style='font-size:1.2em;font-weight:600;'>Ваш баланс: <span style='color:#ffd700;'>$${balance}</span></div>
+                        <div class='profile-balance-block'>
+                            <div class='profile-balance-name'>Здравствуйте, <b>${name}</b>!</div>
+                            <div class='profile-balance-sum'>Ваш баланс: <span class='profile-balance-amount'>$${balance}</span></div>
                         </div>
-                        <div style='display:flex;flex-direction:column;gap:12px;margin-top:18px;'>
-                            <button class='btn btn-secondary' style='width:100%;' onclick='showProfileData()'>Личные данные</button>
-                            <button class='btn btn-secondary' style='width:100%;' onclick='showBalance()'>Баланс</button>
-                            <button class='btn btn-secondary' style='width:100%;' onclick='showCooperation()'>Сотрудничество</button>
-                            <button class='btn btn-secondary' style='width:100%;' onclick='showLanguage()'>Язык</button>
-                        </div>
+                        <button class='profile-btn' onclick='showProfileData()'><span class='profile-btn-icon'>👤</span>Личные данные</button>
+                        <button class='profile-btn' onclick='showBalance()'><span class='profile-btn-icon'>💰</span>Баланс</button>
+                        <button class='profile-btn' onclick='showCooperation()'><span class='profile-btn-icon'>🤝</span>Сотрудничество</button>
+                        <button class='profile-btn' onclick='showLanguage()'><span class='profile-btn-icon'>🌐</span>Язык</button>
                     `;
                     document.getElementById('balance-block').style.display = '';
                 }
