@@ -1220,3 +1220,33 @@ def api_update_user_report():
     except Exception as e:
         logger.error(f"Error updating user report: {e}")
         return jsonify({'error': 'Internal error'}), 500 
+
+@app.route('/api/user_reports/save', methods=['POST'])
+def api_save_user_report():
+    """Сохраняет новый отчет пользователя и возвращает report_id"""
+    data = request.json or {}
+    telegram_id = data.get('telegram_id')
+    full_report = data.get('full_report')
+    address = data.get('address')
+    report_type = data.get('report_type', 'full')
+    if not telegram_id or not full_report:
+        return jsonify({'error': 'Missing required data'}), 400
+    try:
+        # Получаем user_id по telegram_id
+        user_result = supabase.table('users').select('id').eq('telegram_id', telegram_id).execute()
+        user_id = user_result.data[0]['id'] if user_result.data else telegram_id
+        # Сохраняем отчет
+        report_data = {
+            'user_id': user_id,
+            'report_type': report_type,
+            'address': address,
+            'full_report': full_report,
+            'created_at': datetime.datetime.now().isoformat(),
+            'updated_at': datetime.datetime.now().isoformat()
+        }
+        result = supabase.table('user_reports').insert(report_data).execute()
+        new_id = result.data[0]['id'] if hasattr(result, 'data') and result.data else None
+        return jsonify({'success': True, 'report_id': new_id})
+    except Exception as e:
+        logger.error(f"Error saving user report: {e}")
+        return jsonify({'error': 'Internal error'}), 500 

@@ -468,9 +468,10 @@
             if (modal) modal.remove();
         }
         // Отправка клиенту
-        function sendPdfToClientFlow() {
+        function sendPdfToClientFlow(reportId) {
             // Сначала генерируем PDF (без контактов)
-            generatePdfRequest(null);
+            window._currentReportId = reportId;
+            generatePdfRequest(null, null);
             // После генерации показываем форму для клиента (можно доработать для реального UX)
             setTimeout(() => {
                 showSendClientModal();
@@ -565,6 +566,25 @@
                 }
             }
         }
+        // Сохраняет отчет если нет id, затем вызывает cb(reportId) — для отправки клиенту
+        async function saveReportIfNeededAndSendToClient(report, cb) {
+            if (report.id) {
+                cb(report.id);
+                return;
+            }
+            // Сохраняем отчет в базу
+            const res = await fetch('/api/user_reports/save', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ telegram_id: userData.id, full_report: report.full_report, address: report.address, report_type: report.report_type })
+            });
+            const data = await res.json();
+            if (data.success && data.report_id) {
+                cb(data.report_id);
+            } else {
+                alert('Ошибка сохранения отчета');
+            }
+        }
         // Скачивание PDF
         async function downloadPdf(reportId) {
             // Получаем отчет по ID
@@ -578,7 +598,9 @@
                 const report = data.reports.find(r => r.id == reportId);
                 if (report && report.full_report) {
                     window._currentFullReport = report.full_report;
-                    exportPdfFlow(reportId);
+                    saveReportIfNeededAndExportPdf(report, function(newReportId) {
+                        exportPdfFlow(newReportId);
+                    });
                 } else {
                     alert('Полный отчет недоступен');
                 }
@@ -597,7 +619,9 @@
                 const report = data.reports.find(r => r.id == reportId);
                 if (report && report.full_report) {
                     window._currentFullReport = report.full_report;
-                    sendPdfToClientFlow();
+                    saveReportIfNeededAndSendToClient(report, function(newReportId) {
+                        sendPdfToClientFlow(newReportId);
+                    });
                 } else {
                     alert('Полный отчет недоступен');
                 }
