@@ -778,7 +778,7 @@ def api_user_reports():
         user_result = supabase.table('users').select('id').eq('telegram_id', telegram_id).execute()
         user_id = user_result.data[0]['id'] if user_result.data else telegram_id
         # Возвращаем только неотвязанные отчеты
-        result = supabase.table('user_reports').select('*').eq('user_id', user_id).order('created_at', desc=True).execute()
+        result = supabase.table('user_reports').select('*').eq('user_id', user_id).eq('deleted_at', None).order('created_at', desc=True).execute()
         reports = result.data if hasattr(result, 'data') else result
         return jsonify({'success': True, 'reports': reports})
     except Exception as e:
@@ -787,7 +787,7 @@ def api_user_reports():
 
 @app.route('/api/delete_user_report', methods=['POST'])
 def api_delete_user_report():
-    """Отвязка отчета от пользователя (soft delete)"""
+    """Soft delete отчета: выставляет deleted_at"""
     data = request.json or {}
     telegram_id = data.get('telegram_id')
     report_id = data.get('report_id')
@@ -800,13 +800,14 @@ def api_delete_user_report():
             logger.error(f"User with telegram_id {telegram_id} not found for report deletion")
             return jsonify({'error': 'User not found'}), 404
         user_id = user_result.data[0]['id']
-        # Проверяем, что отчет принадлежит пользователю
-        report_result = supabase.table('user_reports').select('id').eq('id', report_id).eq('user_id', user_id).execute()
+        # Проверяем, что отчет принадлежит пользователю и не удалён
+        report_result = supabase.table('user_reports').select('id').eq('id', report_id).eq('user_id', user_id).eq('deleted_at', None).execute()
         if not report_result.data:
-            logger.error(f"Report {report_id} not found or not owned by user_id {user_id}")
+            logger.error(f"Report {report_id} not found or not owned by user_id {user_id} or already deleted")
             return jsonify({'error': 'Report not found or not owned by user'}), 404
-        # Отвязываем отчет (user_id ставим null)
-        supabase.table('user_reports').update({'user_id': None}).eq('id', report_id).execute()
+        # Soft delete: выставляем deleted_at
+        now = datetime.datetime.utcnow().isoformat()
+        supabase.table('user_reports').update({'deleted_at': now}).eq('id', report_id).execute()
         return jsonify({'success': True})
     except Exception as e:
         logger.error(f"Error deleting user report: {e}")
