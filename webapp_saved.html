@@ -101,6 +101,59 @@
             font-size: 15px;
             margin-top: 40px;
         }
+        .icon-btn-row {
+            display: flex;
+            flex-direction: row;
+            gap: 12px;
+            margin-top: 12px;
+            justify-content: flex-start;
+        }
+        .icon-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            cursor: pointer;
+            transition: background 0.2s, box-shadow 0.2s;
+            box-shadow: 0 2px 8px rgba(102,126,234,0.08);
+            position: relative;
+        }
+        .icon-btn:hover {
+            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+            box-shadow: 0 4px 16px rgba(102,126,234,0.18);
+        }
+        .icon-btn[disabled] {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .icon-btn .tooltip {
+            visibility: hidden;
+            width: max-content;
+            background: #222;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px 10px;
+            position: absolute;
+            z-index: 1;
+            bottom: 120%;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.2s;
+            font-size: 13px;
+            pointer-events: none;
+        }
+        .icon-btn:hover .tooltip {
+            visibility: visible;
+            opacity: 1;
+        }
     </style>
 </head>
 <body>
@@ -225,11 +278,13 @@
                 card.innerHTML = `
                     <div class="report-address">${r.address || ''}</div>
                     <div class="report-meta">${createdAt.toLocaleString()} | <span class="report-type">${getText(r.report_type) || r.report_type}</span></div>
-                    <button class="btn" onclick="viewReport('${r.id || ''}')">${getText('view')}</button>
-                    <button class="btn" onclick="downloadPdf('${r.id || ''}')">${getText('download_pdf')}</button>
-                    <button class="btn" onclick="sendToClient('${r.id || ''}')">${getText('send_to_client')}</button>
-                    <button class="btn" onclick="confirmDeleteReport('${r.id || ''}')">${getText('delete')}</button>
-                    <button class="btn" onclick="confirmUpdateReport('${r.id || ''}')" ${canUpdate ? '' : 'disabled'}>${getText('update')} (1$)</button>
+                    <div class="icon-btn-row">
+                        <button class="icon-btn" onclick="viewReport('${r.id || ''}')" title="Посмотреть"><span>👁️<span class='tooltip'>Посмотреть</span></span></button>
+                        <button class="icon-btn" onclick="downloadPdf('${r.id || ''}')" title="Скачать PDF"><span>⬇️<span class='tooltip'>Скачать PDF</span></span></button>
+                        <button class="icon-btn" onclick="sendToClient('${r.id || ''}')" title="Отправить клиенту"><span>✉️<span class='tooltip'>Отправить клиенту</span></span></button>
+                        <button class="icon-btn" onclick="confirmDeleteReport('${r.id || ''}')" title="Удалить"><span>🗑️<span class='tooltip'>Удалить</span></span></button>
+                        <button class="icon-btn" onclick="confirmUpdateReport('${r.id || ''}')" ${canUpdate ? '' : 'disabled'} title="Обновить (1$)"><span>♻️<span class='tooltip'>Обновить (1$)</span></span></button>
+                    </div>
                 `;
                 list.appendChild(card);
             });
