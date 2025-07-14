@@ -700,130 +700,131 @@ def api_full_report():
         price = float(price) if price is not None else 0
     except (ValueError, TypeError):
         price = 0
-    # --- MOCK/DEMO DATA ---
-    avg_sqm = 15451.29
-    price_growth = 0.042
-    short_term_income = 1950
-    short_term_net = 1560
-    long_term_income = 43000
-    long_term_net = 34400
-    five_year_growth = 0.23
-    alt_deposit = 0.128
-    alt_bonds = 0.245
-    alt_stocks = 0.382
-    alt_reits = 0.427
-    inflation = 64.8
-    eur_try = 35.2
-    eur_try_growth = 0.14
-    refi_rate = 45
-    gdp_growth = 4.1
-    taxes = {
-        'transfer_tax': 0.04,
-        'stamp_duty': 0.015,
-        'notary': 1200,
-        'annual_property_tax': 0.001,
-        'annual_property_tax_max': 0.006,
-        'rental_income_tax': '15-35%',
-        'capital_gains_tax': '15-40%'
-    }
-    risks = [
-        'Валютный: TRY/EUR ▲23% за 3 года',
-        'Политический: Выборы 2028',
-        'Экологический: Карта наводнений (NASA Earth Data)'
-    ]
-    liquidity = 'Среднее время продажи: 68 дней'
-    district = 'Новый трамвай до пляжа (2026), Строительство школы (2027)'
-    # --- Формируем структуру полного отчёта ---
-    full_report_data = {
-        'object': {
+    try:
+        # --- MOCK/DEMO DATA ---
+        avg_sqm = 15451.29
+        price_growth = 0.042
+        short_term_income = 1950
+        short_term_net = 1560
+        long_term_income = 43000
+        long_term_net = 34400
+        five_year_growth = 0.23
+        alt_deposit = 0.128
+        alt_bonds = 0.245
+        alt_stocks = 0.382
+        alt_reits = 0.427
+        inflation = 64.8
+        eur_try = 35.2
+        eur_try_growth = 0.14
+        refi_rate = 45
+        gdp_growth = 4.1
+        taxes = {
+            'transfer_tax': 0.04,
+            'stamp_duty': 0.015,
+            'notary': 1200,
+            'annual_property_tax': 0.001,
+            'annual_property_tax_max': 0.006,
+            'rental_income_tax': '15-35%',
+            'capital_gains_tax': '15-40%'
+        }
+        risks = [
+            'Валютный: TRY/EUR ▲23% за 3 года',
+            'Политический: Выборы 2028',
+            'Экологический: Карта наводнений (NASA Earth Data)'
+        ]
+        liquidity = 'Среднее время продажи: 68 дней'
+        district = 'Новый трамвай до пляжа (2026), Строительство школы (2027)'
+        # --- Формируем структуру полного отчёта ---
+        full_report_data = {
+            'object': {
+                'address': address,
+                'bedrooms': bedrooms,
+                'purchase_price': price,
+                'avg_price_per_sqm': avg_sqm
+            },
+            'roi': {
+                'short_term': {
+                    'monthly_income': short_term_income,
+                    'net_income': short_term_net,
+                    'five_year_income': 93600,
+                    'final_value': price * (1 + five_year_growth),
+                    'roi': 81.5
+                },
+                'long_term': {
+                    'annual_income': long_term_income,
+                    'net_income': long_term_net,
+                    'five_year_income': 172000,
+                    'final_value': price * (1 + five_year_growth),
+                    'roi': 130.5
+                },
+                'no_rent': {
+                    'final_value': price * (1 + five_year_growth),
+                    'roi': 23
+                },
+                'price_growth': price_growth
+            },
+            'alternatives': [
+                {'name': 'Банковский депозит', 'yield': alt_deposit, 'source': 'TCMB API'},
+                {'name': 'Облигации Турции', 'yield': alt_bonds, 'source': 'Investing.com API'},
+                {'name': 'Акции (BIST30)', 'yield': alt_stocks, 'source': 'Alpha Vantage API'},
+                {'name': 'REITs (фонды)', 'yield': alt_reits, 'source': 'Financial Modeling Prep'},
+                {'name': 'Недвижимость', 'yield': 0.815, 'source': 'Ваш объект'}
+            ],
+            'macro': {
+                'inflation': inflation,
+                'eur_try': eur_try,
+                'eur_try_growth': eur_try_growth,
+                'refi_rate': refi_rate,
+                'gdp_growth': gdp_growth
+            },
+            'taxes': taxes,
+            'risks': risks,
+            'liquidity': liquidity,
+            'district': district,
+            'yield': 0.081,
+            'price_index': 1.23,
+            'mortgage_rate': 0.32,
+            'global_house_price_index': 1.12,
+            'summary': 'Полный отчёт с реальными/мок-данными. Для реальных данных используйте таблицы Supabase.'
+        }
+        # Получаем user_id из базы данных по telegram_id
+        user_result = supabase.table('users').select('id').eq('telegram_id', telegram_id).execute()
+        user_id = user_result.data[0]['id'] if user_result.data else telegram_id
+        
+        created_at = datetime.datetime.now().isoformat()
+        
+        report_data = {
+            'user_id': user_id,
+            'report_type': 'full',
+            'title': f'Полный отчет: {address}',
+            'description': f'Полный отчет по адресу {address}, {bedrooms} спален, цена {price}',
+            'parameters': {
+                'address': address,
+                'bedrooms': bedrooms,
+                'price': price,
+                'lat': lat,
+                'lng': lng
+            },
             'address': address,
-            'bedrooms': bedrooms,
-            'purchase_price': price,
-            'avg_price_per_sqm': avg_sqm
-        },
-        'roi': {
-            'short_term': {
-                'monthly_income': short_term_income,
-                'net_income': short_term_net,
-                'five_year_income': 93600,
-                'final_value': price * (1 + five_year_growth),
-                'roi': 81.5
-            },
-            'long_term': {
-                'annual_income': long_term_income,
-                'net_income': long_term_net,
-                'five_year_income': 172000,
-                'final_value': price * (1 + five_year_growth),
-                'roi': 130.5
-            },
-            'no_rent': {
-                'final_value': price * (1 + five_year_growth),
-                'roi': 23
-            },
-            'price_growth': price_growth
-        },
-        'alternatives': [
-            {'name': 'Банковский депозит', 'yield': alt_deposit, 'source': 'TCMB API'},
-            {'name': 'Облигации Турции', 'yield': alt_bonds, 'source': 'Investing.com API'},
-            {'name': 'Акции (BIST30)', 'yield': alt_stocks, 'source': 'Alpha Vantage API'},
-            {'name': 'REITs (фонды)', 'yield': alt_reits, 'source': 'Financial Modeling Prep'},
-            {'name': 'Недвижимость', 'yield': 0.815, 'source': 'Ваш объект'}
-        ],
-        'macro': {
-            'inflation': inflation,
-            'eur_try': eur_try,
-            'eur_try_growth': eur_try_growth,
-            'refi_rate': refi_rate,
-            'gdp_growth': gdp_growth
-        },
-        'taxes': taxes,
-        'risks': risks,
-        'liquidity': liquidity,
-        'district': district,
-        'yield': 0.081,
-        'price_index': 1.23,
-        'mortgage_rate': 0.32,
-        'global_house_price_index': 1.12,
-        'summary': 'Полный отчёт с реальными/мок-данными. Для реальных данных используйте таблицы Supabase.'
-    }
-    # Получаем user_id из базы данных по telegram_id
-    user_result = supabase.table('users').select('id').eq('telegram_id', telegram_id).execute()
-    user_id = user_result.data[0]['id'] if user_result.data else telegram_id
-    
-    created_at = datetime.datetime.now().isoformat()
-    
-    report_data = {
-        'user_id': user_id,
-        'report_type': 'full',
-        'title': f'Полный отчет: {address}',
-        'description': f'Полный отчет по адресу {address}, {bedrooms} спален, цена {price}',
-        'parameters': {
-            'address': address,
+            'latitude': lat,
+            'longitude': lng,
             'bedrooms': bedrooms,
             'price': price,
-            'lat': lat,
-            'lng': lng
-        },
-        'address': address,
-        'latitude': lat,
-        'longitude': lng,
-        'bedrooms': bedrooms,
-        'price': price,
-        'created_at': created_at,
-        'full_report': full_report_data
-    }
-    result = supabase.table('user_reports').insert(report_data).execute()
-    report_id = result.data[0]['id'] if result.data else None
-    return jsonify({
-        'success': True, 
-        'full_report': full_report_data, 
-        'created_at': created_at, 
-        'from_cache': False,
-        'report_id': report_id
-    })
-except Exception as e:
-    logger.error(f"Error in full_report: {e}")
-    return jsonify({'error': 'Internal error'}), 500
+            'created_at': created_at,
+            'full_report': full_report_data
+        }
+        result = supabase.table('user_reports').insert(report_data).execute()
+        report_id = result.data[0]['id'] if result.data else None
+        return jsonify({
+            'success': True, 
+            'full_report': full_report_data, 
+            'created_at': created_at, 
+            'from_cache': False,
+            'report_id': report_id
+        })
+    except Exception as e:
+        logger.error(f"Error in full_report: {e}")
+        return jsonify({'error': 'Internal error'}), 500
 
 @app.route('/api/user_reports', methods=['POST'])
 def api_user_reports():
