@@ -31,6 +31,31 @@
         .toast.info { border-left-color: #17a2b8; }
         .back-btn { margin-top: 30px; background: #f1f1f1; color: #333; border: 1px solid #ddd; border-radius: 10px; padding: 14px 28px; font-size: 1em; font-weight: 500; cursor: pointer; transition: background 0.2s; width: 100%; }
         .back-btn:hover { background: #e2e2e2; }
+        .market-stats-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 8px;
+            margin-bottom: 4px;
+            background: #fff;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 1px 4px rgba(102,126,234,0.06);
+        }
+        .market-stats-table th, .market-stats-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .market-stats-table th {
+            background: #f5f7ff;
+            font-weight: 600;
+            text-align: left;
+        }
+        .market-stats-table tr:last-child td {
+            border-bottom: none;
+        }
+        .market-stats-table td {
+            font-size: 1em;
+        }
     </style>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBrDkDpNKNAIyY147MQ78hchBkeyCAxhEw"></script>
 </head>
@@ -262,15 +287,19 @@
 
         function renderReport(stats, city, district) {
             let html = '';
-            html += `<div style='font-size:16px;margin-bottom:6px;'><b>Город:</b> <span style='color:#333;'>${city}</span></div>`;
-            html += `<div style='font-size:16px;margin-bottom:6px;'><b>Район:</b> <span style='color:#333;'>${district}</span></div>`;
-            html += `<div style='font-size:16px;margin-bottom:0;'><b>Средняя цена за м²:</b> <span style='color:#333;'>€${Number(stats.avg_price_per_sqm).toLocaleString('ru-RU')}</span></div>`;
-            html += `<div style='font-size:16px;margin-bottom:0;'><b>Объектов на рынке:</b> <span style='color:#333;'>${stats.total_properties}</span></div>`;
-            html += `<div style='font-size:16px;margin-bottom:0;'><b>Среднее время продажи:</b> <span style='color:#333;'>${stats.avg_days_on_market} дней</span></div>`;
-            html += `<div style='font-size:16px;margin-bottom:0;'><b>Годовой рост цен:</b> <span style='color:#333;'>${stats.price_growth_yoy}%</span></div>`;
-            html += `<div style='font-size:16px;margin-bottom:0;'><b>Доходность аренды:</b> <span style='color:#333;'>${stats.rental_yield}%</span></div>`;
-            html += `<div style='font-size:16px;margin-bottom:0;'><b>Активность рынка:</b> <span style='color:#333;'>${stats.market_activity}</span></div>`;
-            html += `<div style='font-size:16px;margin-bottom:0;'><b>Тренд цен:</b> <span style='color:#333;'>${stats.price_trend}</span></div>`;
+            html += `<div style='font-size:16px;margin-bottom:10px;'><b>Город:</b> <span style='color:#333;'>${city}</span></div>`;
+            html += `<div style='font-size:16px;margin-bottom:16px;'><b>Район:</b> <span style='color:#333;'>${district}</span></div>`;
+            html += `
+            <table class="market-stats-table">
+                <tr><th>Показатель</th><th>Значение</th></tr>
+                <tr><td>Средняя цена за м²</td><td align="right">€${Number(stats.avg_price_per_sqm).toLocaleString('ru-RU')}</td></tr>
+                <tr><td>Объектов на рынке</td><td align="right">${stats.total_properties}</td></tr>
+                <tr><td>Среднее время продажи</td><td align="right">${stats.avg_days_on_market} дней</td></tr>
+                <tr><td>Годовой рост цен</td><td align="right">${stats.price_growth_yoy}%</td></tr>
+                <tr><td>Доходность аренды</td><td align="right">${stats.rental_yield}%</td></tr>
+                <tr><td>Активность рынка</td><td align="right">${stats.market_activity}</td></tr>
+                <tr><td>Тренд цен</td><td align="right">${stats.price_trend}</td></tr>
+            </table>`;
             document.getElementById('reportResult').innerHTML = html;
         }
 

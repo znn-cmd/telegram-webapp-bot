@@ -15,12 +15,42 @@
 <body>
     <div class="container">
         <div class="title">Личный кабинет</div>
+        <div id="balance-block" style="margin-bottom:22px;display:none;"></div>
         <button class="back-btn" onclick="goToMainMenu()">Вернуться в главное меню</button>
     </div>
     <script>
         function goToMainMenu() {
             window.location.href = '/webapp';
         }
+        // Баланс и приветствие
+        document.addEventListener('DOMContentLoaded', function() {
+            let tgUser = null;
+            if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe && window.Telegram.WebApp.initDataUnsafe.user) {
+                tgUser = window.Telegram.WebApp.initDataUnsafe.user;
+            } else if (localStorage.getItem('telegram_id')) {
+                tgUser = { id: localStorage.getItem('telegram_id') };
+            }
+            if (!tgUser || !tgUser.id) return;
+            fetch('/api/user', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ telegram_id: tgUser.id, username: tgUser.username, first_name: tgUser.first_name, last_name: tgUser.last_name })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data && (data.first_name || data.username)) {
+                    let name = data.first_name ? data.first_name : (data.username ? '@' + data.username : 'Пользователь');
+                    let balance = typeof data.balance === 'number' ? data.balance : 0;
+                    document.getElementById('balance-block').innerHTML = `
+                        <div style="background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:#fff;border-radius:12px;padding:20px 16px 16px 16px;box-shadow:0 2px 8px rgba(102,126,234,0.10);font-size:1.1em;">
+                            <div style='font-size:1.1em;margin-bottom:8px;'>Здравствуйте, <b>${name}</b>!</div>
+                            <div style='font-size:1.2em;font-weight:600;'>Ваш баланс: <span style='color:#ffd700;'>$${balance}</span></div>
+                        </div>
+                    `;
+                    document.getElementById('balance-block').style.display = '';
+                }
+            });
+        });
     </script>
 </body>
 </html> 
