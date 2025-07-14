@@ -749,7 +749,7 @@
             blocksHtml += `
                 <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 14px; padding: 18px 14px 16px 14px; margin-bottom: 18px; box-shadow: 0 2px 8px rgba(102,126,234,0.10); color: #fff; text-align: center;">
                     <div style="font-size: 18px; font-weight: 800; margin-bottom: 8px;">Хотите узнать больше?</div>
-                    <div style="font-size: 15px; font-weight: 400; margin-bottom: 14px;">Получите <b>полный отчет по объекту</b> — подробный анализ доходности, рисков, налогов, сравнение с альтернативами и профессиональные рекомендации. Всё в одном PDF-документе!</div>
+                    <div style="font-size: 15px; font-weight: 400; margin-bottom: 14px;">Получите <b>полный отчет по объекту</b> — подробный анализ доходности, рисков, налогов, сравнение с альтернативами и профессиональные рекомендации. Всё в одном PDF-документе!<br><br><a href="https://t.me/Aaadviser_bot" target="_blank" style="color:#fff;text-decoration:underline;font-weight:700;">Получить полный отчет</a></div>
                     <button class="btn btn-primary" style="width: 100%; font-size: 16px; margin-top: 4px; background: #fff; color: #667eea; border: none; font-weight: 700;" onclick="showFullReportStub()">Получить полный отчет</button>
                 </div>
             `;
@@ -764,9 +764,11 @@
         }
 
         function copyReportToClipboard() {
-            // Копируем весь текст отчета (включая адрес, спальни, цену)
+            // Копируем текст отчета, исключая строку кнопки "Скопировать данные в буфер"
             const reportBlock = document.getElementById('reportResult');
-            const text = reportBlock.innerText;
+            let text = reportBlock.innerText;
+            // Удаляем последнюю строку, если это "Скопировать данные в буфер"
+            text = text.replace(/\n?Скопировать данные в буфер\s*$/,'');
             navigator.clipboard.writeText(text).then(() => {
                 showToast(getLocalizedText('notifications.report_copied'), 'success');
             }).catch(() => {
