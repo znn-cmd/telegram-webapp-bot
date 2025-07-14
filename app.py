@@ -833,7 +833,7 @@ def api_save_object():
 
 @app.route('/api/generate_pdf_report', methods=['POST'])
 def api_generate_pdf_report():
-    """Генерация PDF отчета с опциональными контактными данными пользователя и клиента, сохранение pdf_path в user_reports"""
+    """Генерация PDF отчета с поддержкой Unicode (DejaVu)"""
     data = request.json or {}
     report = data.get('report')
     profile = data.get('profile') or {}
@@ -842,18 +842,19 @@ def api_generate_pdf_report():
     try:
         pdf = FPDF()
         pdf.add_page()
-        pdf.set_font('Arial', 'B', 16)
-        # Шапка: имя клиента
+        # Добавляем шрифты DejaVu
+        pdf.add_font('DejaVu', '', 'fonts/DejaVuSans.ttf', uni=True)
+        pdf.add_font('DejaVu', 'B', 'fonts/DejaVuSans-Bold.ttf', uni=True)
+        pdf.set_font('DejaVu', 'B', 16)
         if client_name:
             pdf.cell(0, 10, f'Клиент: {client_name}', ln=True, align='C')
             pdf.ln(2)
         pdf.cell(0, 10, 'Полный отчет по недвижимости', ln=True, align='C')
         pdf.ln(10)
-        # Информация об объекте
         if report.get('object'):
-            pdf.set_font('Arial', 'B', 12)
+            pdf.set_font('DejaVu', 'B', 12)
             pdf.cell(0, 10, 'Информация об объекте:', ln=True)
-            pdf.set_font('Arial', '', 10)
+            pdf.set_font('DejaVu', '', 10)
             obj = report['object']
             pdf.cell(0, 8, f'Адрес: {obj.get("address", "Не указан")}', ln=True)
             pdf.cell(0, 8, f'Спален: {obj.get("bedrooms", "Не указано")}', ln=True)
@@ -864,44 +865,44 @@ def api_generate_pdf_report():
             report = report['report']
             
             # ROI анализ
-            pdf.set_font("Arial", 'B', 14)
+            pdf.set_font("DejaVu", 'B', 14)
             pdf.cell(200, 10, txt="Инвестиционный анализ (ROI):", ln=True)
-            pdf.set_font("Arial", size=12)
+            pdf.set_font("DejaVu", size=12)
             pdf.cell(200, 8, txt=f"Краткосрочная аренда: ROI {report['roi']['short_term']['roi']}%", ln=True)
             pdf.cell(200, 8, txt=f"Долгосрочная аренда: ROI {report['roi']['long_term']['roi']}%", ln=True)
             pdf.cell(200, 8, txt=f"Без аренды: ROI {report['roi']['no_rent']['roi']}%", ln=True)
             pdf.ln(5)
             
             # Макроэкономика
-            pdf.set_font("Arial", 'B', 14)
+            pdf.set_font("DejaVu", 'B', 14)
             pdf.cell(200, 10, txt="Макроэкономические показатели:", ln=True)
-            pdf.set_font("Arial", size=12)
+            pdf.set_font("DejaVu", size=12)
             pdf.cell(200, 8, txt=f"Инфляция: {report['macro']['inflation']}%", ln=True)
             pdf.cell(200, 8, txt=f"Ключевая ставка: {report['macro']['refi_rate']}%", ln=True)
             pdf.cell(200, 8, txt=f"Рост ВВП: {report['macro']['gdp_growth']}%", ln=True)
             pdf.ln(5)
             
             # Налоги
-            pdf.set_font("Arial", 'B', 14)
+            pdf.set_font("DejaVu", 'B', 14)
             pdf.cell(200, 10, txt="Налоги и сборы:", ln=True)
-            pdf.set_font("Arial", size=12)
+            pdf.set_font("DejaVu", size=12)
             pdf.cell(200, 8, txt=f"Налог на перевод: {report['taxes']['transfer_tax']*100}%", ln=True)
             pdf.cell(200, 8, txt=f"Гербовый сбор: {report['taxes']['stamp_duty']*100}%", ln=True)
             pdf.cell(200, 8, txt=f"Нотариус: €{report['taxes']['notary']}", ln=True)
             pdf.ln(5)
             
             # Итог
-            pdf.set_font("Arial", 'B', 14)
+            pdf.set_font("DejaVu", 'B', 14)
             pdf.cell(200, 10, txt="Заключение:", ln=True)
-            pdf.set_font("Arial", size=12)
+            pdf.set_font("DejaVu", size=12)
             pdf.multi_cell(200, 8, txt=report.get('summary', 'Анализ завершен'))
         
         # Подвал: контактные данные пользователя
         if profile:
             pdf.set_y(-60)
-            pdf.set_font('Arial', 'B', 11)
+            pdf.set_font('DejaVu', 'B', 11)
             pdf.cell(0, 8, 'Контактные данные риелтора:', ln=True)
-            pdf.set_font('Arial', '', 10)
+            pdf.set_font('DejaVu', '', 10)
             if profile.get('first_name') or profile.get('last_name'):
                 pdf.cell(0, 8, f"Имя: {profile.get('first_name','')} {profile.get('last_name','')}", ln=True)
             if profile.get('company'):
@@ -1069,17 +1070,17 @@ def generate_client_report_pdf(report_data, realtor_name):
     """Генерация PDF отчета для клиента"""
     pdf = FPDF()
     pdf.add_page()
-    pdf.set_font("Arial", size=12)
+    pdf.set_font("DejaVu", size=12)
     
     # Заголовок
-    pdf.set_font("Arial", 'B', 16)
+    pdf.set_font("DejaVu", 'B', 16)
     pdf.cell(200, 10, txt="Анализ недвижимости", ln=True, align='C')
     pdf.ln(5)
     
     # Информация об объекте
-    pdf.set_font("Arial", 'B', 14)
+    pdf.set_font("DejaVu", 'B', 14)
     pdf.cell(200, 10, txt="Информация об объекте:", ln=True)
-    pdf.set_font("Arial", size=12)
+    pdf.set_font("DejaVu", size=12)
     pdf.cell(200, 8, txt=f"Адрес: {report_data.get('address', 'N/A')}", ln=True)
     pdf.cell(200, 8, txt=f"Спален: {report_data.get('bedrooms', 'N/A')}", ln=True)
     pdf.cell(200, 8, txt=f"Цена: €{report_data.get('price', 0):,.0f}", ln=True)
@@ -1090,41 +1091,41 @@ def generate_client_report_pdf(report_data, realtor_name):
         report = report_data['report']
         
         # ROI анализ
-        pdf.set_font("Arial", 'B', 14)
+        pdf.set_font("DejaVu", 'B', 14)
         pdf.cell(200, 10, txt="Инвестиционный анализ (ROI):", ln=True)
-        pdf.set_font("Arial", size=12)
+        pdf.set_font("DejaVu", size=12)
         pdf.cell(200, 8, txt=f"Краткосрочная аренда: ROI {report['roi']['short_term']['roi']}%", ln=True)
         pdf.cell(200, 8, txt=f"Долгосрочная аренда: ROI {report['roi']['long_term']['roi']}%", ln=True)
         pdf.cell(200, 8, txt=f"Без аренды: ROI {report['roi']['no_rent']['roi']}%", ln=True)
         pdf.ln(5)
         
         # Макроэкономика
-        pdf.set_font("Arial", 'B', 14)
+        pdf.set_font("DejaVu", 'B', 14)
         pdf.cell(200, 10, txt="Макроэкономические показатели:", ln=True)
-        pdf.set_font("Arial", size=12)
+        pdf.set_font("DejaVu", size=12)
         pdf.cell(200, 8, txt=f"Инфляция: {report['macro']['inflation']}%", ln=True)
         pdf.cell(200, 8, txt=f"Ключевая ставка: {report['macro']['refi_rate']}%", ln=True)
         pdf.cell(200, 8, txt=f"Рост ВВП: {report['macro']['gdp_growth']}%", ln=True)
         pdf.ln(5)
         
         # Налоги
-        pdf.set_font("Arial", 'B', 14)
+        pdf.set_font("DejaVu", 'B', 14)
         pdf.cell(200, 10, txt="Налоги и сборы:", ln=True)
-        pdf.set_font("Arial", size=12)
+        pdf.set_font("DejaVu", size=12)
         pdf.cell(200, 8, txt=f"Налог на перевод: {report['taxes']['transfer_tax']*100}%", ln=True)
         pdf.cell(200, 8, txt=f"Гербовый сбор: {report['taxes']['stamp_duty']*100}%", ln=True)
         pdf.cell(200, 8, txt=f"Нотариус: €{report['taxes']['notary']}", ln=True)
         pdf.ln(5)
         
         # Итог
-        pdf.set_font("Arial", 'B', 14)
+        pdf.set_font("DejaVu", 'B', 14)
         pdf.cell(200, 10, txt="Заключение:", ln=True)
-        pdf.set_font("Arial", size=12)
+        pdf.set_font("DejaVu", size=12)
         pdf.multi_cell(200, 8, txt=report.get('summary', 'Анализ завершен'))
     
     # Контактная информация риелтора
     pdf.ln(10)
-    pdf.set_font("Arial", 'B', 12)
+    pdf.set_font("DejaVu", 'B', 12)
     pdf.cell(200, 8, txt=f"Риелтор: {realtor_name}", ln=True)
     pdf.cell(200, 8, txt="Свяжитесь для получения дополнительной информации", ln=True)
     
