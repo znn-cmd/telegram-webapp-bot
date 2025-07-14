@@ -35,9 +35,9 @@
         }
         .profile-balance-amount {
             font-weight: bold;
-            color: #ffffff;
+            color: #000000;
             padding: 4px 8px;
-            background: rgba(255,215,0,0.08);
+            background: rgba(255, 255, 255, 0);
             border-radius: 6px;
             font-size: 1.2em;
         }
@@ -123,7 +123,9 @@
                 }
             });
         });
-        function showProfileData() { alert('Личные данные (в разработке)'); }
+        function showProfileData() {
+            window.location.href = '/webapp_profile_data';
+        }
         function showBalance() { alert('Баланс (в разработке)'); }
         function showCooperation() { alert('Сотрудничество (в разработке)'); }
         function showLanguage() { alert('Язык (в разработке)'); }
