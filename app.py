@@ -154,19 +154,21 @@ def api_user():
     language_code = data.get('language_code', 'en')
     if not telegram_id:
         return jsonify({'error': 'telegram_id required'}), 400
-
     # Проверяем пользователя в базе
     user_result = supabase.table('users').select('*').eq('telegram_id', telegram_id).execute()
-    user = user_result.data if hasattr(user_result, 'data') else user_result
+    user = user_result.data[0] if user_result.data else None
     if user:
-        user = user[0]
         lang = user.get('language') or (language_code[:2] if language_code[:2] in locales else 'en')
         return jsonify({
             'exists': True,
             'is_new_user': False,
             'language': user.get('language'),
             'welcome': locales[lang]['welcome_back'],
-            'menu': locales[lang]['menu']
+            'menu': locales[lang]['menu'],
+            'first_name': user.get('first_name'),
+            'last_name': user.get('last_name'),
+            'username': user.get('username'),
+            'balance': user.get('balance', 0)
         })
     else:
         # Новый пользователь
@@ -175,9 +177,9 @@ def api_user():
             'username': username,
             'first_name': first_name,
             'last_name': last_name,
-            'language': None
+            'language': None,
+            'balance': 0
         }).execute()
-        # Приветствие на языке Telegram
         lang = language_code[:2] if language_code[:2] in locales else 'en'
         return jsonify({
             'exists': False,
@@ -185,7 +187,8 @@ def api_user():
             'language': None,
             'welcome': locales[lang]['welcome_new'],
             'choose_language': locales[lang]['choose_language'],
-            'languages': locales[lang]['language_names']
+            'languages': locales[lang]['language_names'],
+            'balance': 0
         })
 
 @app.route('/api/user_profile', methods=['POST'])
