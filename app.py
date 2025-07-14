@@ -126,6 +126,12 @@ def webapp_report():
     with open('webapp_real_data.html', 'r', encoding='utf-8') as f:
         return f.read()
 
+@app.route('/webapp_saved')
+def webapp_saved():
+    """Страница сохраненных отчетов"""
+    with open('webapp_saved.html', 'r', encoding='utf-8') as f:
+        return f.read()
+
 @app.route('/health')
 def health():
     """Эндпоинт для проверки здоровья приложения"""
