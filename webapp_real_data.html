@@ -1082,6 +1082,11 @@
                 return;
             }
             
+            if (!window._lastPdfPath) {
+                showToast('PDF ещё не сгенерирован. Сначала скачайте PDF!', 'error');
+                return;
+            }
+            
             showProgressBar('Отправляем отчет клиенту...', 0);
             
             // Сначала сохраняем отчет, затем отправляем клиенту
@@ -1189,41 +1194,19 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         report: currentReportData.report,
+                        report_id: reportId,
                         add_realtor_contacts: false,
-                        add_client_name: false,
-                        report_id: reportId
+                        add_client_name: false
                     })
                 })
                 .then(res => res.json())
                 .then(data => {
-                    if (data.success) {
+                    hideProgressBar();
+                    if (data.success && data.pdf_path) {
                         window._lastPdfPath = data.pdf_path;
-                        // Скачиваем PDF
-                        fetch('/api/download_pdf', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ pdf_path: data.pdf_path })
-                        })
-                        .then(res => res.blob())
-                        .then(blob => {
-                            const url = window.URL.createObjectURL(blob);
-                            const a = document.createElement('a');
-                            a.href = url;
-                            a.download = 'full_report.pdf';
-                            document.body.appendChild(a);
-                            a.click();
-                            window.URL.revokeObjectURL(url);
-                            document.body.removeChild(a);
-                            
-                            hideProgressBar();
-                            showPDFSavedModal();
-                        })
-                        .catch(() => {
-                            hideProgressBar();
-                            showToast('Ошибка скачивания PDF', 'error');
-                        });
+                        window.open(data.pdf_path, '_blank');
+                        showToast('PDF успешно сгенерирован!', 'success');
                     } else {
-                        hideProgressBar();
                         showToast('Ошибка генерации PDF: ' + (data.error || ''), 'error');
                     }
                 })
