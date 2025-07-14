@@ -156,7 +156,8 @@ def api_user():
         lang = user.get('language') or (language_code[:2] if language_code[:2] in locales else 'en')
         return jsonify({
             'exists': True,
-            'language': lang,
+            'is_new_user': False,
+            'language': user.get('language'),
             'welcome': locales[lang]['welcome_back'],
             'menu': locales[lang]['menu']
         })
@@ -173,7 +174,8 @@ def api_user():
         lang = language_code[:2] if language_code[:2] in locales else 'en'
         return jsonify({
             'exists': False,
-            'language': lang,
+            'is_new_user': True,
+            'language': None,
             'welcome': locales[lang]['welcome_new'],
             'choose_language': locales[lang]['choose_language'],
             'languages': locales[lang]['language_names']
