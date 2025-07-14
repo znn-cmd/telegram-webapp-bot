@@ -1188,7 +1188,6 @@
             
             // Сначала сохраняем отчет, затем генерируем PDF
             saveReportIfNeededAndGeneratePdf(currentReportData.report, function(reportId) {
-                // Отправляем запрос на генерацию PDF с report_id
                 fetch('/api/generate_pdf_report', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -1204,15 +1203,34 @@
                     hideProgressBar();
                     if (data.success && data.pdf_path) {
                         window._lastPdfPath = data.pdf_path;
-                        window.open(data.pdf_path, '_blank');
-                        showToast('PDF успешно сгенерирован!', 'success');
+                        // Скачиваем PDF через API
+                        fetch('/api/download_pdf', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ pdf_path: data.pdf_path })
+                        })
+                        .then(res => res.blob())
+                        .then(blob => {
+                            const url = window.URL.createObjectURL(blob);
+                            const a = document.createElement('a');
+                            a.href = url;
+                            a.download = 'full_report.pdf';
+                            document.body.appendChild(a);
+                            a.click();
+                            window.URL.revokeObjectURL(url);
+                            document.body.removeChild(a);
+                            showToast('PDF успешно сгенерирован!', 'success');
+                        })
+                        .catch(() => {
+                            showToast('Ошибка скачивания PDF', 'error');
+                        });
                     } else {
-                        showToast('Ошибка генерации PDF: ' + (data.error || ''), 'error');
+                        showToast('Ошибка генерации PDF', 'error');
                     }
                 })
                 .catch(() => {
                     hideProgressBar();
-                    showToast('Ошибка соединения', 'error');
+                    showToast('Ошибка соединения при генерации PDF', 'error');
                 });
             });
         }
