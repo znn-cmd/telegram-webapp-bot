@@ -15,6 +15,7 @@ BEGIN
             latitude NUMERIC,
             longitude NUMERIC,
             bedrooms INTEGER,
+            price NUMERIC,
             price_range_min NUMERIC,
             price_range_max NUMERIC,
             full_report JSONB,
@@ -56,6 +57,9 @@ BEGIN
         END IF;
         IF NOT EXISTS (SELECT FROM information_schema.columns WHERE table_name = 'user_reports' AND column_name = 'price_range_max') THEN
             ALTER TABLE user_reports ADD COLUMN price_range_max NUMERIC;
+        END IF;
+        IF NOT EXISTS (SELECT FROM information_schema.columns WHERE table_name = 'user_reports' AND column_name = 'price') THEN
+            ALTER TABLE user_reports ADD COLUMN price NUMERIC;
         END IF;
         IF NOT EXISTS (SELECT FROM information_schema.columns WHERE table_name = 'user_reports' AND column_name = 'full_report') THEN
             ALTER TABLE user_reports ADD COLUMN full_report JSONB;

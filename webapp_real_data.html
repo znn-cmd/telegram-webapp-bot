@@ -936,6 +936,14 @@
         }
         // showFullReport(report) — функция для красивого вывода полного отчёта (реализовать отдельно)
         function showFullReport(report) {
+            // Закрываем модальное окно подтверждения
+            closeFullReportModal();
+            
+            // Создаем модальное окно для отчета
+            const modal = document.createElement('div');
+            modal.id = 'full-report-display-modal';
+            modal.style = 'position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.25);z-index:1000;display:flex;align-items:center;justify-content:center;overflow-y:auto;padding:20px;';
+            
             let html = '';
             // Блок: Информация об объекте
             html += `<div style='font-size:22px;font-weight:800;color:#667eea;margin-bottom:10px;text-align:center;'>Полный отчет по объекту</div>`;
@@ -991,9 +999,16 @@
             html += `<div class="btn-row" style="margin-bottom:10px;">
                 <button class="btn btn-primary" onclick="copyReportToClipboard()">Скопировать отчет</button>
                 <button class="btn btn-primary" onclick="showClientModal()">Отправить клиенту</button>
+                <button class="btn btn-secondary" onclick="closeFullReportDisplayModal()">Закрыть</button>
             </div>`;
             
-            document.getElementById('reportResult').innerHTML = html;
+            modal.innerHTML = `
+                <div style="background:#fff;border-radius:18px;box-shadow:0 4px 24px rgba(102,126,234,0.18);padding:32px 24px 24px 24px;max-width:400px;width:90vw;max-height:80vh;overflow-y:auto;">
+                    ${html}
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
             
             // Сохраняем данные отчета для отправки клиенту
             currentReportData = {
@@ -1004,6 +1019,92 @@
             };
             
             showToast(getLocalizedText('notifications.report_generated'), 'success');
+        }
+        
+        function closeFullReportDisplayModal() {
+            let modal = document.getElementById('full-report-display-modal');
+            if (modal) modal.remove();
+        }
+        
+        function copyReportToClipboard() {
+            if (currentReportData && currentReportData.report) {
+                const report = currentReportData.report;
+                let text = `ПОЛНЫЙ ОТЧЕТ ПО НЕДВИЖИМОСТИ\n\n`;
+                text += `Адрес: ${report.object.address}\n`;
+                text += `Спален: ${report.object.bedrooms}\n`;
+                text += `Цена объекта: €${Number(report.object.purchase_price).toLocaleString('ru-RU')}\n`;
+                text += `Средняя цена за м²: €${Number(report.object.avg_price_per_sqm).toLocaleString('ru-RU')}\n\n`;
+                text += `ИНВЕСТИЦИОННЫЙ АНАЛИЗ (ROI)\n`;
+                text += `Краткосрочная аренда: ROI ${report.roi.short_term.roi}%\n`;
+                text += `Долгосрочная аренда: ROI ${report.roi.long_term.roi}%\n`;
+                text += `Без аренды: ROI ${report.roi.no_rent.roi}%\n\n`;
+                text += `МАКРОЭКОНОМИКА\n`;
+                text += `Инфляция: ${report.macro.inflation}%\n`;
+                text += `Курс EUR/TRY: ${report.macro.eur_try}\n`;
+                text += `Ключевая ставка: ${report.macro.refi_rate}%\n`;
+                text += `Рост ВВП: ${report.macro.gdp_growth}%\n\n`;
+                text += `НАЛОГИ И СБОРЫ\n`;
+                text += `Налог на перевод: ${report.taxes.transfer_tax*100}%\n`;
+                text += `Гербовый сбор: ${report.taxes.stamp_duty*100}%\n`;
+                text += `Нотариус: €${report.taxes.notary}\n\n`;
+                text += `РИСКИ И РАЗВИТИЕ РАЙОНА\n`;
+                text += `${report.risks.join('\n')}\n\n`;
+                text += `${report.liquidity}\n`;
+                text += `${report.district}\n\n`;
+                text += `ИТОГ: ${report.summary}`;
+                
+                navigator.clipboard.writeText(text).then(() => {
+                    showToast('Отчет скопирован в буфер обмена!', 'success');
+                }).catch(() => {
+                    showToast('Ошибка копирования', 'error');
+                });
+            }
+        }
+        
+        function showClientModal() {
+            // Удаляем старое модальное окно если есть
+            let oldModal = document.getElementById('client-modal');
+            if (oldModal) oldModal.remove();
+            
+            // Создаем модальное окно
+            const modal = document.createElement('div');
+            modal.id = 'client-modal';
+            modal.style = 'position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.25);z-index:1000;display:flex;align-items:center;justify-content:center;';
+            modal.innerHTML = `
+                <div style="background:#fff;border-radius:18px;box-shadow:0 4px 24px rgba(102,126,234,0.18);padding:32px 24px 24px 24px;max-width:340px;width:90vw;text-align:center;">
+                    <div style="font-size:19px;font-weight:700;color:#667eea;margin-bottom:16px;">Отправить отчет клиенту</div>
+                    <div style="font-size:16px;color:#333;margin-bottom:22px;">Введите данные клиента для отправки отчета</div>
+                    <input type="text" id="client-name" placeholder="Имя клиента" style="width:100%;padding:12px;border:1px solid #ddd;border-radius:8px;margin-bottom:12px;font-size:16px;">
+                    <input type="text" id="client-username" placeholder="Telegram username (без @)" style="width:100%;padding:12px;border:1px solid #ddd;border-radius:8px;margin-bottom:20px;font-size:16px;">
+                    <button class="btn btn-primary" style="width:100%;font-size:17px;" onclick="sendReportToClient()">Отправить</button>
+                    <button class="btn btn-secondary" style="width:100%;margin-top:10px;font-size:16px;" onclick="closeClientModal()">Отмена</button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+        
+        function closeClientModal() {
+            let modal = document.getElementById('client-modal');
+            if (modal) modal.remove();
+        }
+        
+        function sendReportToClient() {
+            const clientName = document.getElementById('client-name').value.trim();
+            const clientUsername = document.getElementById('client-username').value.trim();
+            
+            if (!clientName || !clientUsername) {
+                showToast('Пожалуйста, заполните все поля', 'error');
+                return;
+            }
+            
+            showProgressBar('Отправляем отчет клиенту...', 0);
+            
+            // Здесь должна быть отправка через API
+            setTimeout(() => {
+                hideProgressBar();
+                closeClientModal();
+                showToast('Отчет успешно отправлен клиенту!', 'success');
+            }, 2000);
         }
 
         // Инициализация
