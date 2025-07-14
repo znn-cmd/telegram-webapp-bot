@@ -30,10 +30,14 @@ app = Flask(__name__)
 # Инициализация Supabase
 supabase_url = os.getenv("SUPABASE_URL")
 supabase_key = os.getenv("SUPABASE_ANON_KEY")
+if not supabase_url or not supabase_key:
+    raise RuntimeError("SUPABASE_URL и SUPABASE_ANON_KEY должны быть заданы в переменных окружения!")
 supabase: Client = create_client(supabase_url, supabase_key)
 
 # Токен бота
 TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+if not TOKEN:
+    raise RuntimeError("TELEGRAM_BOT_TOKEN должен быть задан в переменных окружения!")
 
 # URL вашего WebApp (замените на ваш домен после деплоя)
 WEBAPP_URL = "https://aaadvisor-zaicevn.amvera.io/webapp"
@@ -144,8 +148,11 @@ def serve_logo():
 @app.route('/api/user', methods=['POST'])
 def api_user():
     data = request.json or {}
+    telegram_id_raw = data.get('telegram_id')
+    if telegram_id_raw is None:
+        return jsonify({'error': 'telegram_id required'}), 400
     try:
-        telegram_id = int(data.get('telegram_id'))
+        telegram_id = int(telegram_id_raw)
     except (TypeError, ValueError):
         return jsonify({'error': 'Invalid telegram_id'}), 400
     username = data.get('username')
@@ -162,40 +169,47 @@ def api_user():
         return jsonify({
             'exists': True,
             'is_new_user': False,
-            'language': user.get('language'),
+            'language': user.get('language') or lang,
+            'language_code': lang,
             'welcome': locales[lang]['welcome_back'],
             'menu': locales[lang]['menu'],
             'first_name': user.get('first_name'),
             'last_name': user.get('last_name'),
             'username': user.get('username'),
-            'balance': user.get('balance', 0)
+            'balance': user.get('balance', 0),
+            'telegram_id': user.get('telegram_id'),
         })
     else:
         # Новый пользователь
+        lang = language_code[:2] if language_code[:2] in locales else 'en'
         supabase.table('users').insert({
             'telegram_id': telegram_id,
             'username': username,
             'first_name': first_name,
             'last_name': last_name,
-            'language': None,
+            'language': lang,
             'balance': 0
         }).execute()
-        lang = language_code[:2] if language_code[:2] in locales else 'en'
         return jsonify({
             'exists': False,
             'is_new_user': True,
-            'language': None,
+            'language': lang,
+            'language_code': lang,
             'welcome': locales[lang]['welcome_new'],
             'choose_language': locales[lang]['choose_language'],
             'languages': locales[lang]['language_names'],
-            'balance': 0
+            'balance': 0,
+            'telegram_id': telegram_id,
         })
 
 @app.route('/api/user_profile', methods=['POST'])
 def api_user_profile():
     data = request.json or {}
+    telegram_id_raw = data.get('telegram_id')
+    if telegram_id_raw is None:
+        return jsonify({'error': 'telegram_id required'}), 400
     try:
-        telegram_id = int(data.get('telegram_id'))
+        telegram_id = int(telegram_id_raw)
     except (TypeError, ValueError):
         return jsonify({'error': 'Invalid telegram_id'}), 400
     if not telegram_id:
@@ -213,11 +227,16 @@ def api_user_profile():
 @app.route('/api/set_language', methods=['POST'])
 def api_set_language():
     data = request.json or {}
+    telegram_id_raw = data.get('telegram_id')
+    if telegram_id_raw is None:
+        return jsonify({'error': 'telegram_id required'}), 400
     try:
-        telegram_id = int(data.get('telegram_id'))
+        telegram_id = int(telegram_id_raw)
     except (TypeError, ValueError):
         return jsonify({'error': 'Invalid telegram_id'}), 400
     language = data.get('language')
+    if not language:
+        return jsonify({'error': 'language required'}), 400
     if not telegram_id or not language:
         return jsonify({'error': 'telegram_id and language required'}), 400
     # Обновляем язык пользователя
@@ -273,7 +292,8 @@ def api_validate_bedrooms():
     """Валидация количества спален"""
     data = request.json or {}
     bedrooms = data.get('bedrooms')
-    
+    if bedrooms is None:
+        return jsonify({'valid': False, 'error': 'Bedrooms must be a number'})
     try:
         bedrooms_int = int(bedrooms)
         if 1 <= bedrooms_int <= 10:
@@ -288,7 +308,8 @@ def api_validate_price():
     """Валидация цены"""
     data = request.json or {}
     price = data.get('price')
-    
+    if price is None:
+        return jsonify({'valid': False, 'error': 'Price must be a number'})
     try:
         price_float = float(price)
         if price_float > 0:
@@ -339,8 +360,8 @@ def api_generate_report():
                     'latitude': lat,
                     'longitude': lng,
                     'bedrooms': bedrooms,
-                    'price_range_min': float(price) * 0.8,
-                    'price_range_max': float(price) * 1.2
+                    'price_range_min': float(price) * 0.8 if price is not None else None,
+                    'price_range_max': float(price) * 1.2 if price is not None else None
                 }
                 
                 # Получаем user_id из telegram_id
@@ -576,30 +597,39 @@ def api_market_statistics():
 
 @app.route('/api/calculate_roi', methods=['POST'])
 def api_calculate_roi():
-    """Калькулятор ROI"""
     data = request.json or {}
     property_type = data.get('property_type')
     purchase_price = data.get('purchase_price')
     purchase_costs = data.get('purchase_costs', 0)
-    
+    try:
+        purchase_price = float(purchase_price) if purchase_price is not None else 0
+        purchase_costs = float(purchase_costs) if purchase_costs is not None else 0
+    except (ValueError, TypeError):
+        return jsonify({'error': 'Invalid purchase_price or purchase_costs'}), 400
+
     if property_type == 'short_term':
         avg_nightly_rate = data.get('avg_nightly_rate')
         occupancy_rate = data.get('occupancy_rate', 75)
-        
+        try:
+            avg_nightly_rate = float(avg_nightly_rate) if avg_nightly_rate is not None else 0
+            occupancy_rate = float(occupancy_rate) if occupancy_rate is not None else 75
+        except (ValueError, TypeError):
+            return jsonify({'error': 'Invalid avg_nightly_rate or occupancy_rate'}), 400
         # Расчет ROI для краткосрочной аренды
         monthly_income = avg_nightly_rate * (occupancy_rate / 100) * 30
         annual_income = monthly_income * 12
         total_investment = purchase_price + purchase_costs
-        roi = (annual_income / total_investment) * 100
-        
+        roi = (annual_income / total_investment) * 100 if total_investment else 0
     elif property_type == 'long_term':
         monthly_rent = data.get('monthly_rent')
-        
+        try:
+            monthly_rent = float(monthly_rent) if monthly_rent is not None else 0
+        except (ValueError, TypeError):
+            return jsonify({'error': 'Invalid monthly_rent'}), 400
         # Расчет ROI для долгосрочной аренды
         annual_income = monthly_rent * 12
         total_investment = purchase_price + purchase_costs
-        roi = (annual_income / total_investment) * 100
-        
+        roi = (annual_income / total_investment) * 100 if total_investment else 0
     else:
         return jsonify({'error': 'Invalid property type'}), 400
     
@@ -617,7 +647,10 @@ def api_similar_properties():
     address = data.get('address')
     bedrooms = data.get('bedrooms')
     price = data.get('price')
-    
+    try:
+        price = float(price) if price is not None else 0
+    except (ValueError, TypeError):
+        price = 0
     try:
         # Здесь должна быть логика поиска похожих объектов
         # Пока возвращаем демо-данные
@@ -651,8 +684,11 @@ def api_similar_properties():
 @app.route('/api/full_report', methods=['POST'])
 def api_full_report():
     data = request.json or {}
+    telegram_id_raw = data.get('telegram_id')
+    if telegram_id_raw is None:
+        return jsonify({'error': 'Invalid telegram_id'}), 400
     try:
-        telegram_id = int(data.get('telegram_id'))
+        telegram_id = int(telegram_id_raw)
     except (TypeError, ValueError):
         return jsonify({'error': 'Invalid telegram_id'}), 400
     address = data.get('address')
@@ -662,137 +698,142 @@ def api_full_report():
     price = data.get('price')
     try:
         price = float(price) if price is not None else 0
-        # --- MOCK/DEMO DATA ---
-        avg_sqm = 15451.29
-        price_growth = 0.042
-        short_term_income = 1950
-        short_term_net = 1560
-        long_term_income = 43000
-        long_term_net = 34400
-        five_year_growth = 0.23
-        alt_deposit = 0.128
-        alt_bonds = 0.245
-        alt_stocks = 0.382
-        alt_reits = 0.427
-        inflation = 64.8
-        eur_try = 35.2
-        eur_try_growth = 0.14
-        refi_rate = 45
-        gdp_growth = 4.1
-        taxes = {
-            'transfer_tax': 0.04,
-            'stamp_duty': 0.015,
-            'notary': 1200,
-            'annual_property_tax': 0.001,
-            'annual_property_tax_max': 0.006,
-            'rental_income_tax': '15-35%',
-            'capital_gains_tax': '15-40%'
-        }
-        risks = [
-            'Валютный: TRY/EUR ▲23% за 3 года',
-            'Политический: Выборы 2028',
-            'Экологический: Карта наводнений (NASA Earth Data)'
-        ]
-        liquidity = 'Среднее время продажи: 68 дней'
-        district = 'Новый трамвай до пляжа (2026), Строительство школы (2027)'
-        # --- Формируем структуру полного отчёта ---
-        full_report_data = {
-            'object': {
-                'address': address,
-                'bedrooms': bedrooms,
-                'purchase_price': price,
-                'avg_price_per_sqm': avg_sqm
-            },
-            'roi': {
-                'short_term': {
-                    'monthly_income': short_term_income,
-                    'net_income': short_term_net,
-                    'five_year_income': 93600,
-                    'final_value': price * (1 + five_year_growth),
-                    'roi': 81.5
-                },
-                'long_term': {
-                    'annual_income': long_term_income,
-                    'net_income': long_term_net,
-                    'five_year_income': 172000,
-                    'final_value': price * (1 + five_year_growth),
-                    'roi': 130.5
-                },
-                'no_rent': {
-                    'final_value': price * (1 + five_year_growth),
-                    'roi': 23
-                },
-                'price_growth': price_growth
-            },
-            'alternatives': [
-                {'name': 'Банковский депозит', 'yield': alt_deposit, 'source': 'TCMB API'},
-                {'name': 'Облигации Турции', 'yield': alt_bonds, 'source': 'Investing.com API'},
-                {'name': 'Акции (BIST30)', 'yield': alt_stocks, 'source': 'Alpha Vantage API'},
-                {'name': 'REITs (фонды)', 'yield': alt_reits, 'source': 'Financial Modeling Prep'},
-                {'name': 'Недвижимость', 'yield': 0.815, 'source': 'Ваш объект'}
-            ],
-            'macro': {
-                'inflation': inflation,
-                'eur_try': eur_try,
-                'eur_try_growth': eur_try_growth,
-                'refi_rate': refi_rate,
-                'gdp_growth': gdp_growth
-            },
-            'taxes': taxes,
-            'risks': risks,
-            'liquidity': liquidity,
-            'district': district,
-            'yield': 0.081,
-            'price_index': 1.23,
-            'mortgage_rate': 0.32,
-            'global_house_price_index': 1.12,
-            'summary': 'Полный отчёт с реальными/мок-данными. Для реальных данных используйте таблицы Supabase.'
-        }
-        # Получаем user_id из базы данных по telegram_id
-        user_result = supabase.table('users').select('id').eq('telegram_id', telegram_id).execute()
-        user_id = user_result.data[0]['id'] if user_result.data else telegram_id
-        
-        created_at = datetime.datetime.now().isoformat()
-        
-        report_data = {
-            'user_id': user_id,
-            'report_type': 'full',
-            'title': f'Полный отчет: {address}',
-            'description': f'Полный отчет по адресу {address}, {bedrooms} спален, цена {price}',
-            'parameters': {
-                'address': address,
-                'bedrooms': bedrooms,
-                'price': price,
-                'lat': lat,
-                'lng': lng
-            },
+    except (ValueError, TypeError):
+        price = 0
+    # --- MOCK/DEMO DATA ---
+    avg_sqm = 15451.29
+    price_growth = 0.042
+    short_term_income = 1950
+    short_term_net = 1560
+    long_term_income = 43000
+    long_term_net = 34400
+    five_year_growth = 0.23
+    alt_deposit = 0.128
+    alt_bonds = 0.245
+    alt_stocks = 0.382
+    alt_reits = 0.427
+    inflation = 64.8
+    eur_try = 35.2
+    eur_try_growth = 0.14
+    refi_rate = 45
+    gdp_growth = 4.1
+    taxes = {
+        'transfer_tax': 0.04,
+        'stamp_duty': 0.015,
+        'notary': 1200,
+        'annual_property_tax': 0.001,
+        'annual_property_tax_max': 0.006,
+        'rental_income_tax': '15-35%',
+        'capital_gains_tax': '15-40%'
+    }
+    risks = [
+        'Валютный: TRY/EUR ▲23% за 3 года',
+        'Политический: Выборы 2028',
+        'Экологический: Карта наводнений (NASA Earth Data)'
+    ]
+    liquidity = 'Среднее время продажи: 68 дней'
+    district = 'Новый трамвай до пляжа (2026), Строительство школы (2027)'
+    # --- Формируем структуру полного отчёта ---
+    full_report_data = {
+        'object': {
             'address': address,
-            'latitude': lat,
-            'longitude': lng,
+            'bedrooms': bedrooms,
+            'purchase_price': price,
+            'avg_price_per_sqm': avg_sqm
+        },
+        'roi': {
+            'short_term': {
+                'monthly_income': short_term_income,
+                'net_income': short_term_net,
+                'five_year_income': 93600,
+                'final_value': price * (1 + five_year_growth),
+                'roi': 81.5
+            },
+            'long_term': {
+                'annual_income': long_term_income,
+                'net_income': long_term_net,
+                'five_year_income': 172000,
+                'final_value': price * (1 + five_year_growth),
+                'roi': 130.5
+            },
+            'no_rent': {
+                'final_value': price * (1 + five_year_growth),
+                'roi': 23
+            },
+            'price_growth': price_growth
+        },
+        'alternatives': [
+            {'name': 'Банковский депозит', 'yield': alt_deposit, 'source': 'TCMB API'},
+            {'name': 'Облигации Турции', 'yield': alt_bonds, 'source': 'Investing.com API'},
+            {'name': 'Акции (BIST30)', 'yield': alt_stocks, 'source': 'Alpha Vantage API'},
+            {'name': 'REITs (фонды)', 'yield': alt_reits, 'source': 'Financial Modeling Prep'},
+            {'name': 'Недвижимость', 'yield': 0.815, 'source': 'Ваш объект'}
+        ],
+        'macro': {
+            'inflation': inflation,
+            'eur_try': eur_try,
+            'eur_try_growth': eur_try_growth,
+            'refi_rate': refi_rate,
+            'gdp_growth': gdp_growth
+        },
+        'taxes': taxes,
+        'risks': risks,
+        'liquidity': liquidity,
+        'district': district,
+        'yield': 0.081,
+        'price_index': 1.23,
+        'mortgage_rate': 0.32,
+        'global_house_price_index': 1.12,
+        'summary': 'Полный отчёт с реальными/мок-данными. Для реальных данных используйте таблицы Supabase.'
+    }
+    # Получаем user_id из базы данных по telegram_id
+    user_result = supabase.table('users').select('id').eq('telegram_id', telegram_id).execute()
+    user_id = user_result.data[0]['id'] if user_result.data else telegram_id
+    
+    created_at = datetime.datetime.now().isoformat()
+    
+    report_data = {
+        'user_id': user_id,
+        'report_type': 'full',
+        'title': f'Полный отчет: {address}',
+        'description': f'Полный отчет по адресу {address}, {bedrooms} спален, цена {price}',
+        'parameters': {
+            'address': address,
             'bedrooms': bedrooms,
             'price': price,
-            'created_at': created_at,
-            'full_report': full_report_data
-        }
-        result = supabase.table('user_reports').insert(report_data).execute()
-        report_id = result.data[0]['id'] if result.data else None
-        return jsonify({
-            'success': True, 
-            'full_report': full_report_data, 
-            'created_at': created_at, 
-            'from_cache': False,
-            'report_id': report_id
-        })
-    except Exception as e:
-        logger.error(f"Error in full_report: {e}")
-        return jsonify({'error': 'Internal error'}), 500
+            'lat': lat,
+            'lng': lng
+        },
+        'address': address,
+        'latitude': lat,
+        'longitude': lng,
+        'bedrooms': bedrooms,
+        'price': price,
+        'created_at': created_at,
+        'full_report': full_report_data
+    }
+    result = supabase.table('user_reports').insert(report_data).execute()
+    report_id = result.data[0]['id'] if result.data else None
+    return jsonify({
+        'success': True, 
+        'full_report': full_report_data, 
+        'created_at': created_at, 
+        'from_cache': False,
+        'report_id': report_id
+    })
+except Exception as e:
+    logger.error(f"Error in full_report: {e}")
+    return jsonify({'error': 'Internal error'}), 500
 
 @app.route('/api/user_reports', methods=['POST'])
 def api_user_reports():
     """Получение списка всех отчетов пользователя по telegram_id"""
     data = request.json or {}
+    telegram_id_raw = data.get('telegram_id')
+    if telegram_id_raw is None:
+        return jsonify({'error': 'Invalid telegram_id'}), 400
     try:
-        telegram_id = int(data.get('telegram_id'))
+        telegram_id = int(telegram_id_raw)
     except (TypeError, ValueError):
         return jsonify({'error': 'Invalid telegram_id'}), 400
     if not telegram_id:
@@ -815,8 +856,11 @@ def api_user_reports():
 def api_delete_user_report():
     """Soft delete отчета: выставляет deleted_at"""
     data = request.json or {}
+    telegram_id_raw = data.get('telegram_id')
+    if telegram_id_raw is None:
+        return jsonify({'error': 'Invalid telegram_id'}), 400
     try:
-        telegram_id = int(data.get('telegram_id'))
+        telegram_id = int(telegram_id_raw)
     except (TypeError, ValueError):
         return jsonify({'error': 'Invalid telegram_id'}), 400
     report_id = data.get('report_id')
@@ -846,8 +890,11 @@ def api_delete_user_report():
 def api_save_object():
     """Сохранение объекта в избранное"""
     data = request.json or {}
+    telegram_id_raw = data.get('telegram_id')
+    if telegram_id_raw is None:
+        return jsonify({'error': 'Invalid telegram_id'}), 400
     try:
-        telegram_id = int(data.get('telegram_id'))
+        telegram_id = int(telegram_id_raw)
     except (TypeError, ValueError):
         return jsonify({'error': 'Invalid telegram_id'}), 400
     object_data = data.get('object_data')
@@ -1035,8 +1082,11 @@ def api_download_pdf():
 def api_user_balance():
     """Получение или списание баланса пользователя"""
     data = request.json or {}
+    telegram_id_raw = data.get('telegram_id')
+    if telegram_id_raw is None:
+        return jsonify({'error': 'Invalid telegram_id'}), 400
     try:
-        telegram_id = int(data.get('telegram_id'))
+        telegram_id = int(telegram_id_raw)
     except (TypeError, ValueError):
         return jsonify({'error': 'Invalid telegram_id'}), 400
     deduct = data.get('deduct', False)
@@ -1070,13 +1120,19 @@ def api_user_balance():
 def api_send_pdf_to_client():
     """Отправка PDF клиенту и запись в client_contacts (всегда новая запись)"""
     data = request.json or {}
+    realtor_telegram_id_raw = data.get('realtor_telegram_id')
+    if realtor_telegram_id_raw is None:
+        return jsonify({'error': 'Invalid realtor_telegram_id'}), 400
     try:
-        realtor_telegram_id = int(data.get('realtor_telegram_id'))
+        realtor_telegram_id = int(realtor_telegram_id_raw)
     except (TypeError, ValueError):
         return jsonify({'error': 'Invalid realtor_telegram_id'}), 400
     client_name = data.get('client_name')
+    client_telegram_raw = data.get('client_telegram')
+    if client_telegram_raw is None:
+        return jsonify({'error': 'Invalid client_telegram'}), 400
     try:
-        client_telegram = int(data.get('client_telegram'))
+        client_telegram = int(client_telegram_raw)
     except (TypeError, ValueError):
         return jsonify({'error': 'Invalid client_telegram'}), 400
     pdf_path = data.get('pdf_path')
@@ -1107,8 +1163,11 @@ def api_send_pdf_to_client():
 def api_send_report_to_client():
     """Отправка отчета клиенту через Telegram"""
     data = request.json or {}
+    telegram_id_raw = data.get('telegram_id')
+    if telegram_id_raw is None:
+        return jsonify({'error': 'Invalid telegram_id'}), 400
     try:
-        telegram_id = int(data.get('telegram_id'))
+        telegram_id = int(telegram_id_raw)
     except (TypeError, ValueError):
         return jsonify({'error': 'Invalid telegram_id'}), 400
     client_name = data.get('client_name')
@@ -1283,8 +1342,11 @@ if __name__ == '__main__':
 def api_update_user_report():
     """Обновление отчета пользователя (списание $1, перегенерация)"""
     data = request.json or {}
+    telegram_id_raw = data.get('telegram_id')
+    if telegram_id_raw is None:
+        return jsonify({'error': 'Invalid telegram_id'}), 400
     try:
-        telegram_id = int(data.get('telegram_id'))
+        telegram_id = int(telegram_id_raw)
     except (TypeError, ValueError):
         return jsonify({'error': 'Invalid telegram_id'}), 400
     report_id = data.get('report_id')
@@ -1322,8 +1384,11 @@ def api_update_user_report():
 def api_save_user_report():
     """Сохраняет новый отчет пользователя и возвращает report_id"""
     data = request.json or {}
+    telegram_id_raw = data.get('telegram_id')
+    if telegram_id_raw is None:
+        return jsonify({'error': 'Invalid telegram_id'}), 400
     try:
-        telegram_id = int(data.get('telegram_id'))
+        telegram_id = int(telegram_id_raw)
     except (TypeError, ValueError):
         return jsonify({'error': 'Invalid telegram_id'}), 400
     full_report = data.get('full_report')

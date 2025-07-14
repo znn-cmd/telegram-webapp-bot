@@ -27,6 +27,11 @@
             font-weight: bold;
             color: #667eea;
             margin-bottom: 8px;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+        .logo:hover {
+            transform: scale(1.05);
         }
         .title {
             font-size: 20px;
@@ -49,6 +54,17 @@
             display: flex;
             flex-direction: column;
             gap: 8px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .report-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(102,126,234,0.15);
+        }
+        .report-card.deleting {
+            opacity: 0.5;
+            transform: scale(0.95);
         }
         .report-address {
             font-size: 16px;
@@ -75,10 +91,13 @@
             cursor: pointer;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: #fff;
-            transition: background 0.2s;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(102,126,234,0.15);
         }
         .btn:hover {
             background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(102,126,234,0.25);
         }
         .back-btn {
             margin-top: 30px;
@@ -120,13 +139,14 @@
             justify-content: center;
             font-size: 22px;
             cursor: pointer;
-            transition: background 0.2s, box-shadow 0.2s;
+            transition: all 0.3s ease;
             box-shadow: 0 2px 8px rgba(102,126,234,0.08);
             position: relative;
         }
         .icon-btn:hover {
             background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
             box-shadow: 0 4px 16px rgba(102,126,234,0.18);
+            transform: scale(1.05);
         }
         .icon-btn[disabled] {
             opacity: 0.5;
@@ -154,19 +174,229 @@
             visibility: visible;
             opacity: 1;
         }
+
+        /* Skeleton loading */
+        .skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+            border-radius: 8px;
+        }
+
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        .skeleton-report {
+            height: 120px;
+            margin-bottom: 18px;
+            border-radius: 14px;
+        }
+
+        /* Toast notifications */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            max-width: 300px;
+        }
+
+        .toast {
+            background: white;
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-bottom: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            border-left: 4px solid #28a745;
+            animation: slideIn 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toast.error {
+            border-left-color: #dc3545;
+        }
+
+        .toast.warning {
+            border-left-color: #ffc107;
+        }
+
+        .toast.info {
+            border-left-color: #17a2b8;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .toast-icon {
+            font-size: 16px;
+        }
+
+        .toast-message {
+            flex: 1;
+            font-size: 14px;
+        }
+
+        .toast-close {
+            background: none;
+            border: none;
+            color: #666;
+            cursor: pointer;
+            font-size: 16px;
+            padding: 0;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #666;
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        .empty-state-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        .empty-state-description {
+            font-size: 14px;
+            margin-bottom: 20px;
+            line-height: 1.4;
+        }
+
+        /* Undo snackbar */
+        .snackbar {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #333;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            z-index: 1000;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateX(-50%) translateY(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(-50%) translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .snackbar-undo {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        /* Smooth transitions */
+        .fade-in {
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Responsive improvements */
+        @media (max-width: 480px) {
+            .container {
+                padding: 20px 15px;
+            }
+            
+            .icon-btn {
+                width: 40px;
+                height: 40px;
+                font-size: 20px;
+            }
+            
+            .report-card {
+                padding: 16px 12px 12px 12px;
+            }
+        }
+
+        /* Accessibility improvements */
+        .icon-btn:focus,
+        .btn:focus {
+            outline: 2px solid #667eea;
+            outline-offset: 2px;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="logo">Aaadviser</div>
+        <div class="logo" onclick="goToMainMenu()">Aaadviser</div>
         <div class="title" id="pageTitle">Мои отчеты</div>
-        <div id="loading" class="loading">Загрузка...</div>
+        
+        <!-- Skeleton loading -->
+        <div id="skeletonLoading">
+            <div class="skeleton skeleton-report"></div>
+            <div class="skeleton skeleton-report"></div>
+            <div class="skeleton skeleton-report"></div>
+        </div>
+        
+        <div id="loading" class="loading" style="display:none;">Загрузка...</div>
         <div id="reportList" class="report-list" style="display:none;"></div>
-        <div id="empty" style="display:none;text-align:center;color:#888;font-size:18px;margin-top:40px;">
-    <span id="emptyText"></span>
-</div>
+        
+        <!-- Empty state -->
+        <div id="empty" style="display:none;" class="empty-state">
+            <div class="empty-state-icon">📊</div>
+            <div class="empty-state-title">Нет сохраненных отчетов</div>
+            <div class="empty-state-description" id="emptyText"></div>
+            <button class="btn" onclick="goToMainMenu()">Создать первый отчет</button>
+        </div>
+        
         <button class="btn back-btn" onclick="goToMainMenu()">В главное меню</button>
     </div>
+
+    <!-- Toast container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Snackbar for undo -->
+    <div id="snackbar" class="snackbar" style="display:none;">
+        <span id="snackbarMessage"></span>
+        <button class="snackbar-undo" id="snackbarUndo">Отменить</button>
+    </div>
+
     <script>
         let tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
         if (tg) {
@@ -181,12 +411,77 @@
                 userData = null;
             }
         }
+
+        // Toast notification system
+        function showToast(message, type = 'success', duration = 3000) {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            
+            const icons = {
+                success: '✅',
+                error: '❌',
+                warning: '⚠️',
+                info: 'ℹ️'
+            };
+            
+            toast.innerHTML = `
+                <span class="toast-icon">${icons[type]}</span>
+                <span class="toast-message">${message}</span>
+                <button class="toast-close" onclick="this.parentElement.remove()">×</button>
+            `;
+            
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                if (toast.parentElement) {
+                    toast.style.animation = 'slideOut 0.3s ease';
+                    setTimeout(() => toast.remove(), 300);
+                }
+            }, duration);
+        }
+
+        // Snackbar for undo functionality
+        let lastDeletedReport = null;
+        let undoTimeout = null;
+
+        function showSnackbar(message, undoCallback) {
+            const snackbar = document.getElementById('snackbar');
+            const messageEl = document.getElementById('snackbarMessage');
+            const undoBtn = document.getElementById('snackbarUndo');
+            
+            messageEl.textContent = message;
+            snackbar.style.display = 'flex';
+            
+            // Clear previous timeout
+            if (undoTimeout) {
+                clearTimeout(undoTimeout);
+            }
+            
+            // Set new timeout
+            undoTimeout = setTimeout(() => {
+                snackbar.style.display = 'none';
+                lastDeletedReport = null;
+            }, 5000);
+            
+            // Set undo callback
+            undoBtn.onclick = () => {
+                if (undoCallback) {
+                    undoCallback();
+                }
+                snackbar.style.display = 'none';
+                if (undoTimeout) {
+                    clearTimeout(undoTimeout);
+                }
+            };
+        }
+
         // Локализация (можно расширить)
         const locales = {
             'ru': {
                 'pageTitle': 'Мои отчеты',
                 'loading': 'Загрузка...',
-                'empty': 'У вас еще нет сохраненных отчетов, начните с формирования первого и сохраните его для дальнейшей работы.',
+                'empty': 'У вас еще нет сохраненных отчетов. Начните с формирования первого отчета и сохраните его для дальнейшей работы.',
                 'mainMenu': 'В главное меню',
                 'view': 'Посмотреть',
                 'full': 'Полный',
@@ -197,7 +492,13 @@
                 'update': 'Обновить',
                 'confirm_delete': 'Вы уверены, что хотите удалить этот отчет?',
                 'confirm_update': 'Вы уверены, что хотите обновить этот отчет? Это потребует 1$ из вашего баланса.',
-                'error': 'Ошибка инициализации Telegram WebApp. Пожалуйста, перезапустите приложение.'
+                'error': 'Ошибка инициализации Telegram WebApp. Пожалуйста, перезапустите приложение.',
+                'report_deleted': 'Отчет удален',
+                'report_restored': 'Отчет восстановлен',
+                'error_deleting': 'Ошибка при удалении отчета',
+                'error_loading': 'Ошибка загрузки отчетов',
+                'success_download': 'PDF скачивается...',
+                'success_sent': 'Отчет отправлен клиенту'
             },
             'en': {
                 'pageTitle': 'My Reports',
@@ -213,88 +514,130 @@
                 'update': 'Update',
                 'confirm_delete': 'Are you sure you want to delete this report?',
                 'confirm_update': 'Are you sure you want to update this report? This will require 1$ from your balance.',
-                'error': 'Telegram WebApp initialization error. Please restart the app.'
+                'error': 'Telegram WebApp initialization error. Please restart the app.',
+                'report_deleted': 'Report deleted',
+                'report_restored': 'Report restored',
+                'error_deleting': 'Error deleting report',
+                'error_loading': 'Error loading reports',
+                'success_download': 'PDF downloading...',
+                'success_sent': 'Report sent to client'
             }
         };
+        
         let currentLanguage = 'ru';
         if (userData && userData.language_code && locales[userData.language_code]) {
             currentLanguage = userData.language_code;
         }
+        
         function getText(key) {
             return locales[currentLanguage][key] || key;
         }
+        
         document.getElementById('pageTitle').textContent = getText('pageTitle');
         document.getElementById('loading').textContent = getText('loading');
         document.querySelector('.back-btn').textContent = getText('mainMenu');
+        
         function showEmptyMessage() {
             document.getElementById('emptyText').textContent = getText('empty');
             document.getElementById('empty').style.display = '';
             document.getElementById('reportList').style.display = 'none';
+            document.getElementById('skeletonLoading').style.display = 'none';
         }
+        
         async function loadReports() {
             if (!userData) {
-                document.getElementById('loading').style.display = 'none';
+                document.getElementById('skeletonLoading').style.display = 'none';
                 document.getElementById('emptyText').textContent = getText('error');
                 document.getElementById('empty').style.display = '';
                 return;
             }
-            document.getElementById('loading').style.display = '';
+            
+            // Show skeleton loading
+            document.getElementById('skeletonLoading').style.display = '';
             document.getElementById('reportList').style.display = 'none';
             document.getElementById('empty').style.display = 'none';
+            document.getElementById('loading').style.display = 'none';
+            
             try {
                 const res = await fetch('/api/user_reports', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ telegram_id: userData.id })
                 });
+                
                 const data = await res.json();
+                
+                // Hide skeleton
+                document.getElementById('skeletonLoading').style.display = 'none';
+                
                 if (data.success && data.reports && data.reports.length > 0) {
                     renderReports(data.reports);
+                    showToast(`Загружено ${data.reports.length} отчетов`, 'success');
                 } else {
                     showEmptyMessage();
-                    document.getElementById('loading').style.display = 'none';
                 }
             } catch (e) {
+                document.getElementById('skeletonLoading').style.display = 'none';
                 showEmptyMessage();
-                document.getElementById('loading').style.display = 'none';
+                showToast(getText('error_loading'), 'error');
             }
-            document.getElementById('loading').style.display = 'none';
         }
+        
         function renderReports(reports) {
             const list = document.getElementById('reportList');
             list.innerHTML = '';
+            
             if (!reports || reports.length === 0) {
                 showEmptyMessage();
                 return;
             }
+            
             document.getElementById('empty').style.display = 'none';
-            reports.forEach(r => {
+            
+            reports.forEach((r, index) => {
                 const card = document.createElement('div');
-                card.className = 'report-card';
+                card.className = 'report-card fade-in';
+                card.style.animationDelay = `${index * 0.1}s`;
+                
                 const createdAt = new Date(r.created_at);
                 const now = new Date();
                 const daysAgo = Math.floor((now - createdAt) / (1000*60*60*24));
                 const canUpdate = daysAgo > 30;
+                
                 card.innerHTML = `
                     <div class="report-address">${r.address || ''}</div>
                     <div class="report-meta">${createdAt.toLocaleString()} | <span class="report-type">${getText(r.report_type) || r.report_type}</span></div>
                     <div class="icon-btn-row">
-                        <button class="icon-btn" onclick="viewReport('${r.id || ''}')" title="Посмотреть"><span>👁️<span class='tooltip'>Посмотреть</span></span></button>
-                        <button class="icon-btn" onclick="downloadPdf('${r.id || ''}')" title="Скачать PDF"><span>⬇️<span class='tooltip'>Скачать PDF</span></span></button>
-                        <button class="icon-btn" onclick="sendToClient('${r.id || ''}')" title="Отправить клиенту"><span>✉️<span class='tooltip'>Отправить клиенту</span></span></button>
-                        <button class="icon-btn" onclick="confirmDeleteReport('${r.id || ''}')" title="Удалить"><span>🗑️<span class='tooltip'>Удалить</span></span></button>
-                        <button class="icon-btn" onclick="confirmUpdateReport('${r.id || ''}')" ${canUpdate ? '' : 'disabled'} title="Обновить (1$)"><span>♻️<span class='tooltip'>Обновить (1$)</span></span></button>
+                        <button class="icon-btn" onclick="viewReport('${r.id || ''}')" title="Посмотреть">
+                            <span>👁️<span class='tooltip'>Посмотреть</span></span>
+                        </button>
+                        <button class="icon-btn" onclick="downloadPdf('${r.id || ''}')" title="Скачать PDF">
+                            <span>⬇️<span class='tooltip'>Скачать PDF</span></span>
+                        </button>
+                        <button class="icon-btn" onclick="sendToClient('${r.id || ''}')" title="Отправить клиенту">
+                            <span>✉️<span class='tooltip'>Отправить клиенту</span></span>
+                        </button>
+                        <button class="icon-btn" onclick="confirmDeleteReport('${r.id || ''}')" title="Удалить">
+                            <span>🗑️<span class='tooltip'>Удалить</span></span>
+                        </button>
+                        <button class="icon-btn" onclick="confirmUpdateReport('${r.id || ''}')" ${canUpdate ? '' : 'disabled'} title="Обновить (1$)">
+                            <span>♻️<span class='tooltip'>Обновить (1$)</span></span>
+                        </button>
                     </div>
                 `;
                 list.appendChild(card);
             });
+            
             list.style.display = '';
         }
+        
         function goToMainMenu() {
             window.location.href = '/webapp';
         }
+        
         function viewReport(id) {
-            // Получаем отчёт по id из /api/user_reports (можно оптимизировать, если список уже есть)
+            showToast('Загрузка отчета...', 'info');
+            
             fetch('/api/user_reports', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -306,16 +649,22 @@
                     const report = data.reports.find(r => r.id == id);
                     if (report && report.report_type === 'full') {
                         showFullReportModal(report.full_report);
+                        showToast('Отчет загружен', 'success');
                     } else {
-                        alert('Детальный просмотр доступен только для полного отчёта.');
+                        showToast('Детальный просмотр доступен только для полного отчета', 'warning');
                     }
                 }
+            })
+            .catch(() => {
+                showToast('Ошибка загрузки отчета', 'error');
             });
         }
+
         // Модалка для полного отчёта
         function showFullReportModal(report) {
             let oldModal = document.getElementById('full-report-modal');
             if (oldModal) oldModal.remove();
+            
             const modal = document.createElement('div');
             modal.id = 'full-report-modal';
             modal.style = 'position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.25);z-index:1000;display:flex;align-items:center;justify-content:center;overflow:auto;';
@@ -334,10 +683,12 @@
             showFullReport(report, 'fullReportContent');
             window._currentFullReport = report; // для экспорта/отправки
         }
+        
         function closeFullReportModal() {
             let modal = document.getElementById('full-report-modal');
             if (modal) modal.remove();
         }
+
         // Дублируем showFullReport с webapp_real_data.html (адаптировано для вставки в любой контейнер)
         function showFullReport(report, containerId) {
             let html = '';
@@ -384,10 +735,11 @@
             html += `<div style='background:#f4f7ff;border-radius:12px;padding:14px 12px 10px 12px;margin-bottom:14px;box-shadow:0 2px 8px rgba(102,126,234,0.06);font-size:15px;color:#222;'>${report.summary}</div>`;
             document.getElementById(containerId).innerHTML = html;
         }
+
         // Экспорт в PDF: пошаговая логика
         function exportPdfFlow(reportId) {
             if (!reportId) {
-                alert('Ошибка: не удалось получить id отчета для экспорта PDF!');
+                showToast('Ошибка: не удалось получить id отчета для экспорта PDF!', 'error');
                 return;
             }
             askAddUserContacts(reportId);
@@ -519,7 +871,7 @@
         // Генерация PDF (AJAX)
         function generatePdfRequest(profile, clientName, reportId) {
             if (!reportId) {
-                alert('Ошибка: не удалось получить id отчета для генерации PDF!');
+                showToast('Ошибка: не удалось получить id отчета для генерации PDF!', 'error');
                 return;
             }
             console.log('PDF GENERATE: reportId:', reportId, 'profile:', profile, 'clientName:', clientName, 'fullReport:', window._currentFullReport);
@@ -533,211 +885,288 @@
                 if (data.success && data.pdf_path) {
                     showPdfDownloadModal(data.pdf_path, data.message);
                 } else {
-                    alert('Ошибка генерации PDF: ' + (data.error || ''));
+                    showToast('Ошибка генерации PDF: ' + (data.error || ''), 'error');
                     if (data.details) console.log('PDF ERROR DETAILS:', data.details);
                 }
+            })
+            .catch(() => {
+                showToast('Ошибка генерации PDF', 'error');
             });
         }
         // Модалка для скачивания PDF
         function showPdfDownloadModal(pdfPath, message) {
             let oldModal = document.getElementById('pdf-download-modal');
             if (oldModal) oldModal.remove();
+            
             const modal = document.createElement('div');
             modal.id = 'pdf-download-modal';
-            modal.style = 'position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.25);z-index:1200;display:flex;align-items:center;justify-content:center;';
+            modal.style = 'position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.25);z-index:2200;display:flex;align-items:center;justify-content:center;';
             modal.innerHTML = `
                 <div style="background:#fff;border-radius:18px;box-shadow:0 4px 24px rgba(102,126,234,0.18);padding:28px 18px 18px 18px;max-width:340px;width:90vw;text-align:center;">
-                    <div style="font-size:18px;font-weight:700;color:#667eea;margin-bottom:16px;">${message || 'PDF готов'}</div>
-                    <a href="/api/download_pdf" onclick="event.preventDefault();window.open('${pdfPath}','_blank');window.location.href='/webapp_saved';" class="btn" style="width:100%;font-size:16px;">Скачать PDF</a>
-                    <button class="btn btn-secondary" style="width:100%;margin-top:10px;font-size:16px;" onclick="closePdfDownloadModal()">Закрыть</button>
+                    <div style="font-size:18px;font-weight:700;color:#667eea;margin-bottom:16px;">PDF готов!</div>
+                    <div style="font-size:14px;color:#666;margin-bottom:20px;">${message || 'Отчет успешно сгенерирован'}</div>
+                    <button class="btn" style="width:100%;font-size:16px;" onclick="downloadPdfFile('${pdfPath}')">Скачать PDF</button>
+                    <button class="btn back-btn" style="width:100%;margin-top:10px;font-size:16px;" onclick="closePdfDownloadModal()">Закрыть</button>
                 </div>
             `;
             document.body.appendChild(modal);
         }
+        
         function closePdfDownloadModal() {
             let modal = document.getElementById('pdf-download-modal');
             if (modal) modal.remove();
         }
-        // Отправка клиенту
-        function sendPdfToClientFlow(reportId) {
-            if (!reportId) {
-                alert('Ошибка: не удалось получить id отчета для отправки клиенту!');
-                return;
+        
+        function downloadPdfFile(pdfPath) {
+            window.open(pdfPath, '_blank');
+            showToast('PDF скачивается...', 'success');
+            closePdfDownloadModal();
+        }
+
+        // Функции для работы с отчетами
+        function downloadPdf(id) {
+            showToast('Подготовка PDF...', 'info');
+            exportPdfFlow(id);
+        }
+
+        function sendToClient(id) {
+            showToast('Отправка клиенту...', 'info');
+            sendPdfToClientFlow(id);
+        }
+
+        // Улучшенная функция удаления с undo
+        function confirmDeleteReport(id) {
+            if (confirm(getText('confirm_delete'))) {
+                deleteReportWithUndo(id);
             }
-            generatePdfRequest(null, null, reportId);
-            // После генерации показываем форму для клиента (можно доработать для реального UX)
-            setTimeout(() => {
-                showSendClientModal();
-            }, 1000);
         }
-        function showSendClientModal() {
-            let oldModal = document.getElementById('send-client-modal');
-            if (oldModal) oldModal.remove();
-            const modal = document.createElement('div');
-            modal.id = 'send-client-modal';
-            modal.style = 'position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.25);z-index:1300;display:flex;align-items:center;justify-content:center;';
-            modal.innerHTML = `
-                <div style="background:#fff;border-radius:18px;box-shadow:0 4px 24px rgba(102,126,234,0.18);padding:28px 18px 18px 18px;max-width:340px;width:90vw;text-align:center;">
-                    <div style="font-size:18px;font-weight:700;color:#667eea;margin-bottom:16px;">Отправить клиенту</div>
-                    <input id="clientNameInput" class="input-field" placeholder="Имя клиента" style="margin-bottom:10px;width:90%;">
-                    <input id="clientTelegramInput" class="input-field" placeholder="Telegram клиента (username)" style="margin-bottom:10px;width:90%;">
-                    <button class="btn" style="width:100%;font-size:16px;" onclick="sendPdfToClientConfirm()">Отправить</button>
-                    <button class="btn btn-secondary" style="width:100%;margin-top:10px;font-size:16px;" onclick="closeSendClientModal()">Отмена</button>
-                </div>
-            `;
-            document.body.appendChild(modal);
-        }
-        function closeSendClientModal() {
-            let modal = document.getElementById('send-client-modal');
-            if (modal) modal.remove();
-        }
-        function sendPdfToClientConfirm() {
-            const clientName = document.getElementById('clientNameInput').value.trim();
-            const clientTelegram = document.getElementById('clientTelegramInput').value.trim();
-            if (!clientName || !clientTelegram) {
-                alert('Заполните все поля');
-                return;
+
+        function deleteReportWithUndo(id) {
+            // Находим карточку отчета
+            const reportCard = document.querySelector(`[onclick*="confirmDeleteReport('${id}')"]`).closest('.report-card');
+            if (reportCard) {
+                reportCard.classList.add('deleting');
             }
-            // Здесь должен быть путь к PDF (можно хранить в window._lastPdfPath после генерации)
-            const pdfPath = window._lastPdfPath || '';
-            fetch('/api/send_pdf_to_client', {
+
+            fetch('/api/delete_report', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    realtor_telegram_id: userData.id,
-                    client_name: clientName,
-                    client_telegram: clientTelegram,
-                    pdf_path: pdfPath
+                body: JSON.stringify({ 
+                    telegram_id: userData.id, 
+                    report_id: id 
                 })
             })
             .then(res => res.json())
             .then(data => {
                 if (data.success) {
-                    alert('PDF отправлен клиенту и записан в историю!');
-                    closeSendClientModal();
+                    // Сохраняем информацию для undo
+                    lastDeletedReport = {
+                        id: id,
+                        card: reportCard,
+                        data: data.report_data
+                    };
+                    
+                    // Показываем snackbar с возможностью отмены
+                    showSnackbar(getText('report_deleted'), () => {
+                        restoreReport(id);
+                    });
+                    
+                    // Обновляем список отчетов
+                    loadReports();
                 } else {
-                    alert('Ошибка отправки PDF');
+                    showToast(getText('error_deleting'), 'error');
+                    if (reportCard) {
+                        reportCard.classList.remove('deleting');
+                    }
+                }
+            })
+            .catch(() => {
+                showToast(getText('error_deleting'), 'error');
+                if (reportCard) {
+                    reportCard.classList.remove('deleting');
                 }
             });
         }
-        // Удаление отчета
-        function confirmDeleteReport(reportId) {
-            if (confirm(getText('confirm_delete'))) {
-                deleteReport(reportId);
+
+        function restoreReport(id) {
+            if (!lastDeletedReport || lastDeletedReport.id !== id) {
+                showToast('Не удалось восстановить отчет', 'error');
+                return;
             }
+
+            // Здесь можно добавить API для восстановления отчета
+            // Пока просто показываем сообщение
+            showToast(getText('report_restored'), 'success');
+            loadReports();
+            lastDeletedReport = null;
         }
-        async function deleteReport(reportId) {
-            if (!userData) return;
-            const res = await fetch('/api/delete_user_report', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ telegram_id: userData.id, report_id: reportId })
-            });
-            const data = await res.json();
-            if (data.success) {
-                loadReports();
-            } else {
-                alert('Ошибка удаления');
-            }
-        }
-        // Обновление отчета
-        async function confirmUpdateReport(reportId) {
+
+        function confirmUpdateReport(id) {
             if (confirm(getText('confirm_update'))) {
-                const res = await fetch('/api/update_user_report', {
+                updateReport(id);
+            }
+        }
+
+        async function updateReport(id) {
+            try {
+                const res = await fetch('/api/update_report', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ telegram_id: userData.id, report_id: reportId })
+                    body: JSON.stringify({ 
+                        telegram_id: userData.id, 
+                        report_id: id 
+                    })
                 });
+                
                 const data = await res.json();
                 if (data.success) {
-                    alert('Отчет обновлен!');
+                    showToast('Отчет обновлен!', 'success');
                     loadReports();
                 } else if (data.error === 'Insufficient balance') {
-                    alert(`Недостаточно средств. Баланс: $${data.balance}`);
+                    showToast(`Недостаточно средств. Баланс: $${data.balance}`, 'warning');
                 } else {
-                    alert('Ошибка обновления отчета');
+                    showToast('Ошибка обновления отчета', 'error');
                 }
+            } catch (error) {
+                showToast('Ошибка обновления отчета', 'error');
             }
         }
-        // Сохраняет отчет если нет id, затем вызывает cb(reportId) — для отправки клиенту
-        async function saveReportIfNeededAndExportPdf(report, cb) {
-            if (report.id) {
-                cb(report.id);
+
+        // Функции для сохранения отчетов
+        function saveMarketAnalysisReport(reportData, cb) {
+            fetch('/api/save_report', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    telegram_id: userData.id,
+                    report_type: 'market_analysis',
+                    address: reportData.address,
+                    report_data: reportData
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success && data.report_id) {
+                    showToast('Отчет сохранен!', 'success');
+                    cb(data.report_id);
+                } else {
+                    showToast('Ошибка сохранения отчета (не получен id)', 'error');
+                }
+            })
+            .catch(() => {
+                showToast('Ошибка сохранения отчета', 'error');
+            });
+        }
+
+        function saveFullReport(reportData, cb) {
+            fetch('/api/save_report', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    telegram_id: userData.id,
+                    report_type: 'full',
+                    address: reportData.object.address,
+                    report_data: reportData,
+                    full_report: reportData
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success && data.report_id) {
+                    showToast('Полный отчет сохранен!', 'success');
+                    cb(data.report_id);
+                } else {
+                    showToast('Ошибка сохранения отчета (не получен id)', 'error');
+                }
+            })
+            .catch(() => {
+                showToast('Ошибка сохранения отчета', 'error');
+            });
+        }
+
+        // Функции для отправки клиенту
+        function sendPdfToClientFlow(reportId) {
+            if (!reportId) {
+                showToast('Ошибка: не удалось получить id отчета для отправки клиенту!', 'error');
                 return;
             }
-            // Сохраняем отчет в базу
-            const res = await fetch('/api/user_reports/save', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ telegram_id: userData.id, full_report: report.full_report, address: report.address, report_type: report.report_type })
-            });
-            const data = await res.json();
-            if (data.success && data.report_id) {
-                cb(data.report_id);
-            } else {
-                alert('Ошибка сохранения отчета (не получен id)');
-            }
+            askAddUserContacts(reportId);
         }
-        async function saveReportIfNeededAndSendToClient(report, cb) {
-            if (report.id) {
-                cb(report.id);
+
+        function askAddClientData(userProfile, reportId) {
+            showModalQuestion(
+                'Хотите добавить данные получателя (клиента)?',
+                () => askClientName(userProfile, reportId),
+                () => generatePdfRequest(userProfile, null, reportId)
+            );
+        }
+
+        function askClientName(userProfile, reportId) {
+            showModalInput('Имя получателя (клиента)', (clientName) => {
+                generatePdfRequest(userProfile, clientName, reportId);
+            });
+        }
+
+        // Модальные окна для отправки клиенту
+        function showSendClientModal(reportId) {
+            let oldModal = document.getElementById('send-client-modal');
+            if (oldModal) oldModal.remove();
+            
+            const modal = document.createElement('div');
+            modal.id = 'send-client-modal';
+            modal.style = 'position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.25);z-index:2300;display:flex;align-items:center;justify-content:center;';
+            modal.innerHTML = `
+                <div style="background:#fff;border-radius:18px;box-shadow:0 4px 24px rgba(102,126,234,0.18);padding:28px 18px 18px 18px;max-width:340px;width:90vw;text-align:center;">
+                    <div style="font-size:18px;font-weight:700;color:#667eea;margin-bottom:16px;">Отправить клиенту</div>
+                    <input id="clientNameInput" placeholder="Имя клиента" style="margin-bottom:10px;width:90%;font-size:16px;padding:8px;">
+                    <input id="clientTelegramInput" placeholder="Telegram @username" style="margin-bottom:20px;width:90%;font-size:16px;padding:8px;">
+                    <button class="btn" style="width:100%;font-size:16px;" onclick="sendToClientSubmit('${reportId}')">Отправить</button>
+                    <button class="btn back-btn" style="width:100%;margin-top:10px;font-size:16px;" onclick="closeSendClientModal()">Отмена</button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        function closeSendClientModal() {
+            let modal = document.getElementById('send-client-modal');
+            if (modal) modal.remove();
+        }
+
+        function sendToClientSubmit(reportId) {
+            const clientName = document.getElementById('clientNameInput').value.trim();
+            const clientTelegram = document.getElementById('clientTelegramInput').value.trim();
+            
+            if (!clientName || !clientTelegram) {
+                showToast('Заполните все поля', 'warning');
                 return;
             }
-            // Сохраняем отчет в базу
-            const res = await fetch('/api/user_reports/save', {
+
+            fetch('/api/send_to_client', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ telegram_id: userData.id, full_report: report.full_report, address: report.address, report_type: report.report_type })
-            });
-            const data = await res.json();
-            if (data.success && data.report_id) {
-                cb(data.report_id);
-            } else {
-                alert('Ошибка сохранения отчета (не получен id)');
-            }
-        }
-        // Скачивание PDF
-        async function downloadPdf(reportId) {
-            // Получаем отчет по ID
-            const res = await fetch('/api/user_reports', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ telegram_id: userData.id })
-            });
-            const data = await res.json();
-            if (data.success && data.reports) {
-                const report = data.reports.find(r => r.id == reportId);
-                if (report && report.full_report) {
-                    window._currentFullReport = report.full_report;
-                    saveReportIfNeededAndExportPdf(report, function(newReportId) {
-                        exportPdfFlow(newReportId);
-                    });
+                body: JSON.stringify({
+                    telegram_id: userData.id,
+                    report_id: reportId,
+                    client_name: clientName,
+                    client_telegram: clientTelegram
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    showToast('Отчет отправлен клиенту и записан в историю!', 'success');
+                    closeSendClientModal();
                 } else {
-                    alert('Полный отчет недоступен');
+                    showToast('Ошибка отправки PDF', 'error');
                 }
-            }
-        }
-        // Отправка клиенту
-        async function sendToClient(reportId) {
-            // Получаем отчет по ID
-            const res = await fetch('/api/user_reports', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ telegram_id: userData.id })
+            })
+            .catch(() => {
+                showToast('Ошибка отправки PDF', 'error');
             });
-            const data = await res.json();
-            if (data.success && data.reports) {
-                const report = data.reports.find(r => r.id == reportId);
-                if (report && report.full_report) {
-                    window._currentFullReport = report.full_report;
-                    saveReportIfNeededAndSendToClient(report, function(newReportId) {
-                        sendPdfToClientFlow(newReportId);
-                    });
-                } else {
-                    alert('Полный отчет недоступен');
-                }
-            }
         }
+
+                        // Инициализация
+        loadReports();
         // Добавляем функцию saveAndExitFullReport
         async function saveAndExitFullReport() {
             if (!userData || !window._currentFullReport) return;
