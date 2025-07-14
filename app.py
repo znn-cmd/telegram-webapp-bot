@@ -1412,7 +1412,7 @@ def run_flask():
 
 if __name__ == '__main__':
     # Для WebApp запускаем только Flask
-    run_flask() 
+    run_flask()
 
 @app.route('/api/update_user_report', methods=['POST'])
 def api_update_user_report():
