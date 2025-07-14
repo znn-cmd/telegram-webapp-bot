@@ -1491,3 +1491,8 @@ def api_save_user_report():
     except Exception as e:
         logger.error(f"Error saving user report: {e}")
         return jsonify({'error': 'Internal error'}), 500 
+
+@app.route('/webapp_profile_data')
+def webapp_profile_data():
+    with open('webapp_profile_data.html', 'r', encoding='utf-8') as f:
+        return f.read()
