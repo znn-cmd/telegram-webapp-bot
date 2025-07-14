@@ -417,13 +417,12 @@
             document.getElementById('languageSelector').style.display = 'none';
         }
 
-        // Загрузка данных пользователя
+        // Загрузка данных пользователя и баланса
         async function loadUserData() {
             if (!userData) {
                 document.getElementById('userName').textContent = 'Гость';
                 return;
             }
-
             try {
                 const response = await fetch('/api/user', {
                     method: 'POST',
@@ -435,48 +434,21 @@
                         last_name: userData.last_name
                     })
                 });
-
                 if (response.ok) {
                     const userInfo = await response.json();
-                    const isNewUser = userInfo.is_new_user;
-                    // Если язык уже выбран — скрываем выбор языка и используем его
+                    // Скрыть выбор языка, если уже выбран
                     if (userInfo.language) {
-                        currentLanguage = userInfo.language;
-                        selectedLanguage = userInfo.language;
                         document.getElementById('languageSelector').style.display = 'none';
-                        updatePageText();
                     } else {
                         document.getElementById('languageSelector').style.display = 'block';
                     }
-                    // Приветственное сообщение
-                    const welcomeText = isNewUser ? getText('welcome_new') : getText('welcome_back');
-                    document.getElementById('userName').textContent = welcomeText;
-                    // Загружаем баланс
-                    await loadUserBalance();
+                    // Приветствие
+                    document.getElementById('userName').textContent = userInfo.welcome || userInfo.first_name || 'Пользователь';
+                    // Баланс
+                    document.getElementById('userBalance').textContent = `$${userInfo.balance}`;
                 }
             } catch (error) {
-                console.log('Ошибка загрузки данных пользователя:', error);
                 document.getElementById('userName').textContent = userData.first_name || 'Пользователь';
-            }
-        }
-
-        // Загрузка баланса пользователя
-        async function loadUserBalance() {
-            try {
-                const response = await fetch('/api/user_balance', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        telegram_id: userData.id
-                    })
-                });
-
-                if (response.ok) {
-                    const balanceData = await response.json();
-                    document.getElementById('userBalance').textContent = `$${balanceData.balance}`;
-                }
-            } catch (error) {
-                console.log('Ошибка загрузки баланса:', error);
             }
         }
 
