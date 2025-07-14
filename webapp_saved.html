@@ -304,6 +304,10 @@
         }
         // Экспорт в PDF: пошаговая логика
         function exportPdfFlow(reportId) {
+            if (!reportId) {
+                alert('Ошибка: не удалось получить id отчета для экспорта PDF!');
+                return;
+            }
             window._currentReportId = reportId;
             askAddUserContacts();
         }
@@ -471,7 +475,10 @@
         }
         // Отправка клиенту
         function sendPdfToClientFlow(reportId) {
-            // Сначала генерируем PDF (без контактов)
+            if (!reportId) {
+                alert('Ошибка: не удалось получить id отчета для отправки клиенту!');
+                return;
+            }
             window._currentReportId = reportId;
             generatePdfRequest(null, null);
             // После генерации показываем форму для клиента (можно доработать для реального UX)
@@ -569,6 +576,24 @@
             }
         }
         // Сохраняет отчет если нет id, затем вызывает cb(reportId) — для отправки клиенту
+        async function saveReportIfNeededAndExportPdf(report, cb) {
+            if (report.id) {
+                cb(report.id);
+                return;
+            }
+            // Сохраняем отчет в базу
+            const res = await fetch('/api/user_reports/save', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ telegram_id: userData.id, full_report: report.full_report, address: report.address, report_type: report.report_type })
+            });
+            const data = await res.json();
+            if (data.success && data.report_id) {
+                cb(data.report_id);
+            } else {
+                alert('Ошибка сохранения отчета (не получен id)');
+            }
+        }
         async function saveReportIfNeededAndSendToClient(report, cb) {
             if (report.id) {
                 cb(report.id);
@@ -584,7 +609,7 @@
             if (data.success && data.report_id) {
                 cb(data.report_id);
             } else {
-                alert('Ошибка сохранения отчета');
+                alert('Ошибка сохранения отчета (не получен id)');
             }
         }
         // Скачивание PDF
