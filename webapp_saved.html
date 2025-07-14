@@ -127,6 +127,12 @@
                 'view': 'Посмотреть',
                 'full': 'Полный',
                 'market_analysis': 'Базовый',
+                'download_pdf': 'Скачать PDF',
+                'send_to_client': 'Отправить клиенту',
+                'delete': 'Удалить',
+                'update': 'Обновить',
+                'confirm_delete': 'Вы уверены, что хотите удалить этот отчет?',
+                'confirm_update': 'Вы уверены, что хотите обновить этот отчет? Это потребует 1$ из вашего баланса.'
             },
             'en': {
                 'pageTitle': 'My Reports',
@@ -136,6 +142,12 @@
                 'view': 'View',
                 'full': 'Full',
                 'market_analysis': 'Basic',
+                'download_pdf': 'Download PDF',
+                'send_to_client': 'Send to client',
+                'delete': 'Delete',
+                'update': 'Update',
+                'confirm_delete': 'Are you sure you want to delete this report?',
+                'confirm_update': 'Are you sure you want to update this report? This will require 1$ from your balance.'
             }
         };
         let currentLanguage = 'ru';
@@ -177,10 +189,18 @@
             reports.forEach(r => {
                 const card = document.createElement('div');
                 card.className = 'report-card';
+                const createdAt = new Date(r.created_at);
+                const now = new Date();
+                const daysAgo = Math.floor((now - createdAt) / (1000*60*60*24));
+                const canUpdate = daysAgo > 30;
                 card.innerHTML = `
                     <div class="report-address">${r.address || ''}</div>
-                    <div class="report-meta">${new Date(r.created_at).toLocaleString()} | <span class="report-type">${getText(r.report_type) || r.report_type}</span></div>
+                    <div class="report-meta">${createdAt.toLocaleString()} | <span class="report-type">${getText(r.report_type) || r.report_type}</span></div>
                     <button class="btn" onclick="viewReport('${r.id || ''}')">${getText('view')}</button>
+                    <button class="btn" onclick="downloadPdf('${r.id || ''}')">${getText('download_pdf')}</button>
+                    <button class="btn" onclick="sendToClient('${r.id || ''}')">${getText('send_to_client')}</button>
+                    <button class="btn" onclick="confirmDeleteReport('${r.id || ''}')">${getText('delete')}</button>
+                    <button class="btn" onclick="confirmUpdateReport('${r.id || ''}')" ${canUpdate ? '' : 'disabled'}>${getText('update')} (1$)</button>
                 `;
                 list.appendChild(card);
             });
@@ -432,6 +452,83 @@
                     alert('Ошибка отправки PDF');
                 }
             });
+        }
+        // Удаление отчета
+        function confirmDeleteReport(reportId) {
+            if (confirm(getText('confirm_delete'))) {
+                deleteReport(reportId);
+            }
+        }
+        async function deleteReport(reportId) {
+            if (!userData) return;
+            const res = await fetch('/api/delete_user_report', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ telegram_id: userData.id, report_id: reportId })
+            });
+            const data = await res.json();
+            if (data.success) {
+                loadReports();
+            } else {
+                alert('Ошибка удаления');
+            }
+        }
+        // Обновление отчета
+        async function confirmUpdateReport(reportId) {
+            if (confirm(getText('confirm_update'))) {
+                const res = await fetch('/api/update_user_report', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ telegram_id: userData.id, report_id: reportId })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    alert('Отчет обновлен!');
+                    loadReports();
+                } else if (data.error === 'Insufficient balance') {
+                    alert(`Недостаточно средств. Баланс: $${data.balance}`);
+                } else {
+                    alert('Ошибка обновления отчета');
+                }
+            }
+        }
+        // Скачивание PDF
+        async function downloadPdf(reportId) {
+            // Получаем отчет по ID
+            const res = await fetch('/api/user_reports', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ telegram_id: userData.id })
+            });
+            const data = await res.json();
+            if (data.success && data.reports) {
+                const report = data.reports.find(r => r.id == reportId);
+                if (report && report.full_report) {
+                    window._currentFullReport = report.full_report;
+                    exportPdfFlow();
+                } else {
+                    alert('Полный отчет недоступен');
+                }
+            }
+        }
+        // Отправка клиенту
+        async function sendToClient(reportId) {
+            // Получаем отчет по ID
+            const res = await fetch('/api/user_reports', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ telegram_id: userData.id })
+            });
+            const data = await res.json();
+            if (data.success && data.reports) {
+                const report = data.reports.find(r => r.id == reportId);
+                if (report && report.full_report) {
+                    window._currentFullReport = report.full_report;
+                    sendPdfToClientFlow();
+                } else {
+                    alert('Полный отчет недоступен');
+                }
+            }
         }
         loadReports();
     </script>

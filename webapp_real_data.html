@@ -939,76 +939,93 @@
             // Закрываем модальное окно подтверждения
             closeFullReportModal();
             
-            // Создаем модальное окно для отчета
-            const modal = document.createElement('div');
-            modal.id = 'full-report-display-modal';
-            modal.style = 'position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.25);z-index:1000;display:flex;align-items:center;justify-content:center;overflow-y:auto;padding:20px;';
-            
+            // Показываем отчет в основном контейнере
             let html = '';
+            
+            // Заголовок
+            html += `<div style='font-size:22px;font-weight:800;color:#667eea;margin-bottom:20px;text-align:center;'>Полный отчет по объекту</div>`;
+            
             // Блок: Информация об объекте
-            html += `<div style='font-size:22px;font-weight:800;color:#667eea;margin-bottom:10px;text-align:center;'>Полный отчет по объекту</div>`;
             html += `<div style='background:#f4f7ff;border-radius:12px;padding:16px 14px 10px 14px;margin-bottom:18px;box-shadow:0 2px 8px rgba(102,126,234,0.08);'>`;
-            html += `<div style='font-size:16px;margin-bottom:6px;'><b>Адрес:</b> <span style='color:#333;'>${report.object.address}</span></div>`;
-            html += `<div style='font-size:16px;margin-bottom:6px;'><b>Спален:</b> <span style='color:#333;'>${report.object.bedrooms}</span></div>`;
-            html += `<div style='font-size:16px;margin-bottom:6px;'><b>Цена объекта:</b> <span style='color:#333;'>€${Number(report.object.purchase_price).toLocaleString('ru-RU')}</span></div>`;
-            html += `<div style='font-size:16px;margin-bottom:0;'><b>Средняя цена за м²:</b> <span style='color:#333;'>€${Number(report.object.avg_price_per_sqm).toLocaleString('ru-RU')}</span></div>`;
+            html += `<div style='font-size:17px;font-weight:700;color:#667eea;margin-bottom:12px;'>Информация об объекте</div>`;
+            html += `<table style='width:100%;font-size:15px;'><tr><td style='padding:4px 0;'><b>Адрес:</b></td><td style='padding:4px 0;'>${report.object.address}</td></tr>`;
+            html += `<tr><td style='padding:4px 0;'><b>Спален:</b></td><td style='padding:4px 0;'>${report.object.bedrooms}</td></tr>`;
+            html += `<tr><td style='padding:4px 0;'><b>Цена объекта:</b></td><td style='padding:4px 0;'>€${Number(report.object.purchase_price).toLocaleString('ru-RU')}</td></tr>`;
+            html += `<tr><td style='padding:4px 0;'><b>Средняя цена за м²:</b></td><td style='padding:4px 0;'>€${Number(report.object.avg_price_per_sqm).toLocaleString('ru-RU')}</td></tr></table>`;
             html += `</div>`;
+            
             // Блок: ROI
             html += `<div style='background:#f8f9fa;border-radius:12px;padding:14px 12px 10px 12px;margin-bottom:14px;box-shadow:0 2px 8px rgba(102,126,234,0.06);'>`;
-            html += `<div style='font-size:17px;font-weight:700;color:#667eea;margin-bottom:8px;'>Инвестиционный анализ (ROI)</div>`;
-            html += `<div style='font-size:15px;color:#222;margin-bottom:7px;'>Краткосрочная аренда: ROI ${report.roi.short_term.roi}%<br>Месячный доход: €${report.roi.short_term.monthly_income}, Чистый доход: €${report.roi.short_term.net_income}, 5 лет: €${report.roi.short_term.five_year_income}, Рост стоимости: €${report.roi.short_term.final_value.toLocaleString('ru-RU')}</div>`;
-            html += `<div style='font-size:15px;color:#222;margin-bottom:7px;'>Долгосрочная аренда: ROI ${report.roi.long_term.roi}%<br>Годовой доход: €${report.roi.long_term.annual_income}, Чистый доход: €${report.roi.long_term.net_income}, 5 лет: €${report.roi.long_term.five_year_income}, Рост стоимости: €${report.roi.long_term.final_value.toLocaleString('ru-RU')}</div>`;
-            html += `<div style='font-size:15px;color:#222;margin-bottom:7px;'>Без аренды (только рост стоимости): ROI ${report.roi.no_rent.roi}%<br>Итоговая стоимость: €${report.roi.no_rent.final_value.toLocaleString('ru-RU')}</div>`;
+            html += `<div style='font-size:17px;font-weight:700;color:#667eea;margin-bottom:12px;'>Инвестиционный анализ (ROI)</div>`;
+            html += `<table style='width:100%;font-size:14px;margin-bottom:8px;'><tr><th style='text-align:left;padding:4px 0;'>Тип инвестиции</th><th style='text-align:right;padding:4px 0;'>ROI</th><th style='text-align:right;padding:4px 0;'>Доход</th><th style='text-align:right;padding:4px 0;'>Итоговая стоимость</th></tr>`;
+            html += `<tr><td style='padding:4px 0;'>Краткосрочная аренда</td><td style='text-align:right;padding:4px 0;'>${report.roi.short_term.roi}%</td><td style='text-align:right;padding:4px 0;'>€${report.roi.short_term.five_year_income.toLocaleString('ru-RU')}</td><td style='text-align:right;padding:4px 0;'>€${report.roi.short_term.final_value.toLocaleString('ru-RU')}</td></tr>`;
+            html += `<tr><td style='padding:4px 0;'>Долгосрочная аренда</td><td style='text-align:right;padding:4px 0;'>${report.roi.long_term.roi}%</td><td style='text-align:right;padding:4px 0;'>€${report.roi.long_term.five_year_income.toLocaleString('ru-RU')}</td><td style='text-align:right;padding:4px 0;'>€${report.roi.long_term.final_value.toLocaleString('ru-RU')}</td></tr>`;
+            html += `<tr><td style='padding:4px 0;'>Без аренды</td><td style='text-align:right;padding:4px 0;'>${report.roi.no_rent.roi}%</td><td style='text-align:right;padding:4px 0;'>-</td><td style='text-align:right;padding:4px 0;'>€${report.roi.no_rent.final_value.toLocaleString('ru-RU')}</td></tr></table>`;
             html += `</div>`;
+            
             // Блок: Альтернативы
             html += `<div style='background:#f8f9fa;border-radius:12px;padding:14px 12px 10px 12px;margin-bottom:14px;box-shadow:0 2px 8px rgba(102,126,234,0.06);'>`;
-            html += `<div style='font-size:17px;font-weight:700;color:#667eea;margin-bottom:8px;'>Сравнение с альтернативами (5 лет)</div>`;
-            html += `<table style='width:100%;font-size:14px;margin-bottom:7px;'><tr><th style='text-align:left;'>Инструмент</th><th style='text-align:right;'>Доходность</th></tr>`;
+            html += `<div style='font-size:17px;font-weight:700;color:#667eea;margin-bottom:12px;'>Сравнение с альтернативами (5 лет)</div>`;
+            html += `<table style='width:100%;font-size:14px;margin-bottom:8px;'><tr><th style='text-align:left;padding:4px 0;'>Инструмент</th><th style='text-align:right;padding:4px 0;'>Доходность</th></tr>`;
             report.alternatives.forEach(alt => {
-                html += `<tr><td>${alt.name}</td><td style='text-align:right;'>${(alt.yield*100).toFixed(1)}%</td></tr>`;
+                html += `<tr><td style='padding:4px 0;'>${alt.name}</td><td style='text-align:right;padding:4px 0;'>${(alt.yield*100).toFixed(1)}%</td></tr>`;
             });
             html += `</table></div>`;
+            
             // Блок: Макроэкономика
             html += `<div style='background:#f8f9fa;border-radius:12px;padding:14px 12px 10px 12px;margin-bottom:14px;box-shadow:0 2px 8px rgba(102,126,234,0.06);'>`;
-            html += `<div style='font-size:17px;font-weight:700;color:#667eea;margin-bottom:8px;'>Макроэкономика</div>`;
-            html += `<div style='font-size:15px;color:#222;margin-bottom:7px;'>Инфляция: ${report.macro.inflation}%<br>Курс EUR/TRY: ${report.macro.eur_try} (${(report.macro.eur_try_growth*100).toFixed(1)}% за год)<br>Ключевая ставка: ${report.macro.refi_rate}%<br>Рост ВВП: ${report.macro.gdp_growth}%</div>`;
+            html += `<div style='font-size:17px;font-weight:700;color:#667eea;margin-bottom:12px;'>Макроэкономические показатели</div>`;
+            html += `<table style='width:100%;font-size:14px;margin-bottom:8px;'><tr><th style='text-align:left;padding:4px 0;'>Показатель</th><th style='text-align:right;padding:4px 0;'>Значение</th></tr>`;
+            html += `<tr><td style='padding:4px 0;'>Инфляция</td><td style='text-align:right;padding:4px 0;'>${report.macro.inflation}%</td></tr>`;
+            html += `<tr><td style='padding:4px 0;'>Курс EUR/TRY</td><td style='text-align:right;padding:4px 0;'>${report.macro.eur_try}</td></tr>`;
+            html += `<tr><td style='padding:4px 0;'>Ключевая ставка</td><td style='text-align:right;padding:4px 0;'>${report.macro.refi_rate}%</td></tr>`;
+            html += `<tr><td style='padding:4px 0;'>Рост ВВП</td><td style='text-align:right;padding:4px 0;'>${report.macro.gdp_growth}%</td></tr></table>`;
             html += `</div>`;
+            
             // Блок: Налоги и сборы
             html += `<div style='background:#f8f9fa;border-radius:12px;padding:14px 12px 10px 12px;margin-bottom:14px;box-shadow:0 2px 8px rgba(102,126,234,0.06);'>`;
-            html += `<div style='font-size:17px;font-weight:700;color:#667eea;margin-bottom:8px;'>Налоги и сборы</div>`;
-            html += `<div style='font-size:15px;color:#222;margin-bottom:7px;'>При покупке: налог на перевод ${report.taxes.transfer_tax*100}%<br>Гербовый сбор: ${report.taxes.stamp_duty*100}%<br>Нотариус: €${report.taxes.notary}</div>`;
-            html += `<div style='font-size:15px;color:#222;margin-bottom:7px;'>Ежегодно: налог на имущество ${report.taxes.annual_property_tax*100}% - ${report.taxes.annual_property_tax_max*100}%<br>Подоходный налог с аренды: ${report.taxes.rental_income_tax}</div>`;
-            html += `<div style='font-size:15px;color:#222;margin-bottom:7px;'>При продаже: налог на прирост: ${report.taxes.capital_gains_tax}</div>`;
+            html += `<div style='font-size:17px;font-weight:700;color:#667eea;margin-bottom:12px;'>Налоги и сборы</div>`;
+            html += `<table style='width:100%;font-size:14px;margin-bottom:8px;'><tr><th style='text-align:left;padding:4px 0;'>Тип налога</th><th style='text-align:right;padding:4px 0;'>Ставка</th></tr>`;
+            html += `<tr><td style='padding:4px 0;'>Налог на перевод</td><td style='text-align:right;padding:4px 0;'>${report.taxes.transfer_tax*100}%</td></tr>`;
+            html += `<tr><td style='padding:4px 0;'>Гербовый сбор</td><td style='text-align:right;padding:4px 0;'>${report.taxes.stamp_duty*100}%</td></tr>`;
+            html += `<tr><td style='padding:4px 0;'>Нотариус</td><td style='text-align:right;padding:4px 0;'>€${report.taxes.notary}</td></tr>`;
+            html += `<tr><td style='padding:4px 0;'>Налог на имущество</td><td style='text-align:right;padding:4px 0;'>${report.taxes.annual_property_tax*100}% - ${report.taxes.annual_property_tax_max*100}%</td></tr>`;
+            html += `<tr><td style='padding:4px 0;'>Подоходный налог с аренды</td><td style='text-align:right;padding:4px 0;'>${report.taxes.rental_income_tax}</td></tr>`;
+            html += `<tr><td style='padding:4px 0;'>Налог на прирост капитала</td><td style='text-align:right;padding:4px 0;'>${report.taxes.capital_gains_tax}</td></tr></table>`;
             html += `</div>`;
-            // Блок: Yield, индексы, ипотека
+            
+            // Блок: Профессиональные метрики
             html += `<div style='background:#f8f9fa;border-radius:12px;padding:14px 12px 10px 12px;margin-bottom:14px;box-shadow:0 2px 8px rgba(102,126,234,0.06);'>`;
-            html += `<div style='font-size:17px;font-weight:700;color:#667eea;margin-bottom:8px;'>Профессиональные метрики</div>`;
-            html += `<div style='font-size:15px;color:#222;margin-bottom:7px;'>Yield: ${(report.yield*100).toFixed(1)}%<br>Индекс цен: ${report.price_index}<br>Ипотечная ставка: ${(report.mortgage_rate*100).toFixed(1)}%<br>Глобальный индекс цен: ${report.global_house_price_index}</div>`;
+            html += `<div style='font-size:17px;font-weight:700;color:#667eea;margin-bottom:12px;'>Профессиональные метрики</div>`;
+            html += `<table style='width:100%;font-size:14px;margin-bottom:8px;'><tr><th style='text-align:left;padding:4px 0;'>Метрика</th><th style='text-align:right;padding:4px 0;'>Значение</th></tr>`;
+            html += `<tr><td style='padding:4px 0;'>Yield</td><td style='text-align:right;padding:4px 0;'>${(report.yield*100).toFixed(1)}%</td></tr>`;
+            html += `<tr><td style='padding:4px 0;'>Индекс цен</td><td style='text-align:right;padding:4px 0;'>${report.price_index}</td></tr>`;
+            html += `<tr><td style='padding:4px 0;'>Ипотечная ставка</td><td style='text-align:right;padding:4px 0;'>${(report.mortgage_rate*100).toFixed(1)}%</td></tr>`;
+            html += `<tr><td style='padding:4px 0;'>Глобальный индекс цен</td><td style='text-align:right;padding:4px 0;'>${report.global_house_price_index}</td></tr></table>`;
             html += `</div>`;
-            // Блок: Риски, ликвидность, развитие района
+            
+            // Блок: Риски и развитие района
             html += `<div style='background:#f8f9fa;border-radius:12px;padding:14px 12px 10px 12px;margin-bottom:14px;box-shadow:0 2px 8px rgba(102,126,234,0.06);'>`;
-            html += `<div style='font-size:17px;font-weight:700;color:#667eea;margin-bottom:8px;'>Риски и развитие района</div>`;
-            html += `<div style='font-size:15px;color:#222;margin-bottom:7px;'>${report.risks.join('<br>')}</div>`;
-            html += `<div style='font-size:15px;color:#222;margin-bottom:7px;'>${report.liquidity}</div>`;
-            html += `<div style='font-size:15px;color:#222;margin-bottom:7px;'>${report.district}</div>`;
+            html += `<div style='font-size:17px;font-weight:700;color:#667eea;margin-bottom:12px;'>Риски и развитие района</div>`;
+            html += `<table style='width:100%;font-size:14px;margin-bottom:8px;'><tr><th style='text-align:left;padding:4px 0;'>Категория</th><th style='text-align:left;padding:4px 0;'>Описание</th></tr>`;
+            report.risks.forEach((risk, index) => {
+                html += `<tr><td style='padding:4px 0;'>Риск ${index + 1}</td><td style='padding:4px 0;'>${risk}</td></tr>`;
+            });
+            html += `<tr><td style='padding:4px 0;'>Ликвидность</td><td style='padding:4px 0;'>${report.liquidity}</td></tr>`;
+            html += `<tr><td style='padding:4px 0;'>Развитие района</td><td style='padding:4px 0;'>${report.district}</td></tr></table>`;
             html += `</div>`;
+            
             // Итог/summary
             html += `<div style='background:#f4f7ff;border-radius:12px;padding:14px 12px 10px 12px;margin-bottom:14px;box-shadow:0 2px 8px rgba(102,126,234,0.06);font-size:15px;color:#222;'>${report.summary}</div>`;
             
             // Кнопки действий
             html += `<div class="btn-row" style="margin-bottom:10px;">
-                <button class="btn btn-primary" onclick="copyReportToClipboard()">Скопировать отчет</button>
+                <button class="btn btn-primary" onclick="downloadPDF()">Скачать PDF</button>
                 <button class="btn btn-primary" onclick="showClientModal()">Отправить клиенту</button>
-                <button class="btn btn-secondary" onclick="closeFullReportDisplayModal()">Закрыть</button>
+                <button class="btn btn-secondary" onclick="goToMainMenu()">Главное меню</button>
             </div>`;
             
-            modal.innerHTML = `
-                <div style="background:#fff;border-radius:18px;box-shadow:0 4px 24px rgba(102,126,234,0.18);padding:32px 24px 24px 24px;max-width:400px;width:90vw;max-height:80vh;overflow-y:auto;">
-                    ${html}
-                </div>
-            `;
-            
-            document.body.appendChild(modal);
+            document.getElementById('reportResult').innerHTML = html;
             
             // Сохраняем данные отчета для отправки клиенту
             currentReportData = {
@@ -1021,45 +1038,7 @@
             showToast(getLocalizedText('notifications.report_generated'), 'success');
         }
         
-        function closeFullReportDisplayModal() {
-            let modal = document.getElementById('full-report-display-modal');
-            if (modal) modal.remove();
-        }
-        
-        function copyReportToClipboard() {
-            if (currentReportData && currentReportData.report) {
-                const report = currentReportData.report;
-                let text = `ПОЛНЫЙ ОТЧЕТ ПО НЕДВИЖИМОСТИ\n\n`;
-                text += `Адрес: ${report.object.address}\n`;
-                text += `Спален: ${report.object.bedrooms}\n`;
-                text += `Цена объекта: €${Number(report.object.purchase_price).toLocaleString('ru-RU')}\n`;
-                text += `Средняя цена за м²: €${Number(report.object.avg_price_per_sqm).toLocaleString('ru-RU')}\n\n`;
-                text += `ИНВЕСТИЦИОННЫЙ АНАЛИЗ (ROI)\n`;
-                text += `Краткосрочная аренда: ROI ${report.roi.short_term.roi}%\n`;
-                text += `Долгосрочная аренда: ROI ${report.roi.long_term.roi}%\n`;
-                text += `Без аренды: ROI ${report.roi.no_rent.roi}%\n\n`;
-                text += `МАКРОЭКОНОМИКА\n`;
-                text += `Инфляция: ${report.macro.inflation}%\n`;
-                text += `Курс EUR/TRY: ${report.macro.eur_try}\n`;
-                text += `Ключевая ставка: ${report.macro.refi_rate}%\n`;
-                text += `Рост ВВП: ${report.macro.gdp_growth}%\n\n`;
-                text += `НАЛОГИ И СБОРЫ\n`;
-                text += `Налог на перевод: ${report.taxes.transfer_tax*100}%\n`;
-                text += `Гербовый сбор: ${report.taxes.stamp_duty*100}%\n`;
-                text += `Нотариус: €${report.taxes.notary}\n\n`;
-                text += `РИСКИ И РАЗВИТИЕ РАЙОНА\n`;
-                text += `${report.risks.join('\n')}\n\n`;
-                text += `${report.liquidity}\n`;
-                text += `${report.district}\n\n`;
-                text += `ИТОГ: ${report.summary}`;
-                
-                navigator.clipboard.writeText(text).then(() => {
-                    showToast('Отчет скопирован в буфер обмена!', 'success');
-                }).catch(() => {
-                    showToast('Ошибка копирования', 'error');
-                });
-            }
-        }
+
         
         function showClientModal() {
             // Удаляем старое модальное окно если есть
@@ -1105,6 +1084,85 @@
                 closeClientModal();
                 showToast('Отчет успешно отправлен клиенту!', 'success');
             }, 2000);
+        }
+        
+        function downloadPDF() {
+            if (!currentReportData || !currentReportData.report) {
+                showToast('Данные отчета не найдены', 'error');
+                return;
+            }
+            
+            showProgressBar('Генерируем PDF...', 0);
+            
+            // Отправляем запрос на генерацию PDF
+            fetch('/api/generate_pdf_report', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    report: currentReportData.report,
+                    add_realtor_contacts: false,
+                    add_client_name: false
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    // Скачиваем PDF
+                    fetch('/api/download_pdf', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ pdf_path: data.pdf_path })
+                    })
+                    .then(res => res.blob())
+                    .then(blob => {
+                        const url = window.URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = 'full_report.pdf';
+                        document.body.appendChild(a);
+                        a.click();
+                        window.URL.revokeObjectURL(url);
+                        document.body.removeChild(a);
+                        
+                        hideProgressBar();
+                        showPDFSavedModal();
+                    })
+                    .catch(() => {
+                        hideProgressBar();
+                        showToast('Ошибка скачивания PDF', 'error');
+                    });
+                } else {
+                    hideProgressBar();
+                    showToast('Ошибка генерации PDF', 'error');
+                }
+            })
+            .catch(() => {
+                hideProgressBar();
+                showToast('Ошибка соединения', 'error');
+            });
+        }
+        
+        function showPDFSavedModal() {
+            const modal = document.createElement('div');
+            modal.id = 'pdf-saved-modal';
+            modal.style = 'position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.25);z-index:1000;display:flex;align-items:center;justify-content:center;';
+            modal.innerHTML = `
+                <div style="background:#fff;border-radius:18px;box-shadow:0 4px 24px rgba(102,126,234,0.18);padding:32px 24px 24px 24px;max-width:340px;width:90vw;text-align:center;">
+                    <div style="font-size:19px;font-weight:700;color:#667eea;margin-bottom:16px;">PDF сохранен</div>
+                    <div style="font-size:16px;color:#333;margin-bottom:22px;">Отчет успешно сохранен в базу данных и скачан на ваше устройство.</div>
+                    <button class="btn btn-primary" style="width:100%;font-size:17px;" onclick="closePDFSavedModal()">Понятно</button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+        
+        function closePDFSavedModal() {
+            let modal = document.getElementById('pdf-saved-modal');
+            if (modal) modal.remove();
+        }
+        
+        function goToMainMenu() {
+            window.location.href = '/webapp';
         }
 
         // Инициализация

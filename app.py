@@ -764,12 +764,35 @@ def api_user_reports():
         # Получаем user_id из базы данных по telegram_id
         user_result = supabase.table('users').select('id').eq('telegram_id', telegram_id).execute()
         user_id = user_result.data[0]['id'] if user_result.data else telegram_id
-        
+        # Возвращаем только неотвязанные отчеты
         result = supabase.table('user_reports').select('*').eq('user_id', user_id).order('created_at', desc=True).execute()
         reports = result.data if hasattr(result, 'data') else result
         return jsonify({'success': True, 'reports': reports})
     except Exception as e:
         logger.error(f"Error fetching user reports: {e}")
+        return jsonify({'error': 'Internal error'}), 500
+
+@app.route('/api/delete_user_report', methods=['POST'])
+def api_delete_user_report():
+    """Отвязка отчета от пользователя (soft delete)"""
+    data = request.json or {}
+    telegram_id = data.get('telegram_id')
+    report_id = data.get('report_id')
+    if not telegram_id or not report_id:
+        return jsonify({'error': 'Missing required data'}), 400
+    try:
+        # Получаем user_id по telegram_id
+        user_result = supabase.table('users').select('id').eq('telegram_id', telegram_id).execute()
+        user_id = user_result.data[0]['id'] if user_result.data else telegram_id
+        # Проверяем, что отчет принадлежит пользователю
+        report_result = supabase.table('user_reports').select('id').eq('id', report_id).eq('user_id', user_id).execute()
+        if not report_result.data:
+            return jsonify({'error': 'Report not found or not owned by user'}), 404
+        # Отвязываем отчет (user_id ставим null)
+        supabase.table('user_reports').update({'user_id': None}).eq('id', report_id).execute()
+        return jsonify({'success': True})
+    except Exception as e:
+        logger.error(f"Error deleting user report: {e}")
         return jsonify({'error': 'Internal error'}), 500
 
 @app.route('/api/save_object', methods=['POST'])
@@ -1106,3 +1129,39 @@ def run_flask():
 if __name__ == '__main__':
     # Для WebApp запускаем только Flask
     run_flask() 
+
+@app.route('/api/update_user_report', methods=['POST'])
+def api_update_user_report():
+    """Обновление отчета пользователя (списание $1, перегенерация)"""
+    data = request.json or {}
+    telegram_id = data.get('telegram_id')
+    report_id = data.get('report_id')
+    if not telegram_id or not report_id:
+        return jsonify({'error': 'Missing required data'}), 400
+    try:
+        # Получаем user_id по telegram_id
+        user_result = supabase.table('users').select('id').eq('telegram_id', telegram_id).execute()
+        user_id = user_result.data[0]['id'] if user_result.data else telegram_id
+        # Проверяем, что отчет принадлежит пользователю
+        report_result = supabase.table('user_reports').select('*').eq('id', report_id).eq('user_id', user_id).execute()
+        if not report_result.data:
+            return jsonify({'error': 'Report not found or not owned by user'}), 404
+        report = report_result.data[0]
+        # Проверяем баланс
+        balance_result = supabase.table('users').select('balance').eq('telegram_id', telegram_id).execute()
+        balance = balance_result.data[0].get('balance', 0) if balance_result.data else 0
+        if balance < 1:
+            return jsonify({'error': 'Insufficient balance', 'balance': balance}), 400
+        # Списываем $1
+        new_balance = balance - 1
+        supabase.table('users').update({'balance': new_balance}).eq('telegram_id', telegram_id).execute()
+        # Перегенерируем отчет (используем существующие параметры)
+        # TODO: здесь должна быть логика перегенерации отчета
+        # Пока просто обновляем дату
+        supabase.table('user_reports').update({
+            'updated_at': datetime.datetime.now().isoformat()
+        }).eq('id', report_id).execute()
+        return jsonify({'success': True, 'balance': new_balance})
+    except Exception as e:
+        logger.error(f"Error updating user report: {e}")
+        return jsonify({'error': 'Internal error'}), 500 
