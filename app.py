@@ -487,7 +487,7 @@ def analyze_market_around_location(lat, lng, bedrooms, target_price):
         sales_stats = summarize(sales, 'asking_price')
 
         # Средняя цена за кв.м. (только по price_per_sqm)
-        sqm_prices = [s['price_per_sqm'] for s in sales if s.get('price_per_sqm') and s['price_per_sqm'] > 0]
+        sqm_prices = [x for x in (s['price_per_sqm'] for s in sales) if isinstance(x, (int, float))]
         avg_price_per_sqm = sum(sqm_prices) / len(sqm_prices) if sqm_prices else 0
 
         report = {
@@ -582,30 +582,89 @@ def api_search_properties():
 
 @app.route('/api/market_statistics', methods=['POST'])
 def api_market_statistics():
-    """Получение статистики рынка"""
+    """Получение статистики рынка по городу и району из Supabase"""
     data = request.json or {}
     city = data.get('city')
     district = data.get('district')
-    
     try:
-        # Здесь должна быть логика получения статистики
-        # Пока возвращаем демо-данные
-        
+        # Фильтрация по городу и району (case-insensitive)
+        filters = []
+        if city:
+            filters.append(('city', city.lower()))
+        if district:
+            filters.append(('district', district.lower()))
+        # Property sales
+        sales_query = supabase.table('property_sales').select('*')
+        if city:
+            sales_query = sales_query.ilike('city', f'%{city}%')
+        if district:
+            sales_query = sales_query.ilike('district', f'%{district}%')
+        sales = sales_query.execute().data or []
+        # Long term rentals
+        long_term_query = supabase.table('long_term_rentals').select('*')
+        if city:
+            long_term_query = long_term_query.ilike('city', f'%{city}%')
+        if district:
+            long_term_query = long_term_query.ilike('district', f'%{district}%')
+        long_term = long_term_query.execute().data or []
+        # Short term rentals
+        short_term_query = supabase.table('short_term_rentals').select('*')
+        if city:
+            short_term_query = short_term_query.ilike('city', f'%{city}%')
+        if district:
+            short_term_query = short_term_query.ilike('district', f'%{district}%')
+        short_term = short_term_query.execute().data or []
+        # Средняя цена за м²
+        sqm_prices = [x for x in (s.get('price_per_sqm') for s in sales) if isinstance(x, (int, float))]
+        avg_price_per_sqm = sum(sqm_prices) / len(sqm_prices) if sqm_prices else 0
+        # Количество объектов
+        total_properties = len(sales)
+        # Среднее время продажи
+        days_on_market = [x for x in (s.get('days_on_market') for s in sales) if isinstance(x, (int, float))]
+        avg_days_on_market = sum(days_on_market) / len(days_on_market) if days_on_market else 0
+        # Годовой рост цен (по последним 2 годам, если есть даты)
+        price_growth_yoy = 0
+        try:
+            sales_with_dates = [s for s in sales if s.get('sale_date') and isinstance(s.get('asking_price'), (int, float))]
+            if len(sales_with_dates) > 5:
+                sales_with_dates.sort(key=lambda x: x['sale_date'])
+                first_year = sales_with_dates[0]['sale_date'][:4]
+                last_year = sales_with_dates[-1]['sale_date'][:4]
+                first_prices = [s['asking_price'] for s in sales_with_dates if s['sale_date'][:4] == first_year and isinstance(s.get('asking_price'), (int, float))]
+                last_prices = [s['asking_price'] for s in sales_with_dates if s['sale_date'][:4] == last_year and isinstance(s.get('asking_price'), (int, float))]
+                if first_prices and last_prices:
+                    price_growth_yoy = (sum(last_prices)/len(last_prices) - sum(first_prices)/len(first_prices)) / (sum(first_prices)/len(first_prices)) * 100
+        except Exception:
+            price_growth_yoy = 0
+        # Доходность аренды (long_term)
+        rental_yield = 0
+        try:
+            if avg_price_per_sqm > 0 and long_term:
+                rents = [x for x in (r.get('monthly_rent') for r in long_term) if isinstance(x, (int, float))]
+                avg_rent = sum(rents) / len(rents) if rents else 0
+                prices = [x for x in (s.get('asking_price') for s in sales) if isinstance(x, (int, float))]
+                avg_price = sum(prices) / len(prices) if prices else 0
+                if avg_price > 0:
+                    rental_yield = (avg_rent * 12) / avg_price * 100
+        except Exception:
+            rental_yield = 0
+        # Активность рынка (по количеству продаж)
+        market_activity = 'high' if total_properties > 100 else 'medium' if total_properties > 20 else 'low'
+        # Тренд цен (по price_growth_yoy)
+        price_trend = 'up' if price_growth_yoy > 5 else 'stable' if price_growth_yoy > -2 else 'down'
         stats = {
-            'avg_price_per_sqm': 3500,
-            'price_growth_yoy': 12.5,
-            'total_properties': 1250,
-            'avg_days_on_market': 68,
-            'rental_yield': 8.5,
-            'price_trend': 'up',
-            'market_activity': 'high'
+            'avg_price_per_sqm': round(avg_price_per_sqm, 2),
+            'price_growth_yoy': round(price_growth_yoy, 2),
+            'total_properties': total_properties,
+            'avg_days_on_market': round(avg_days_on_market, 1),
+            'rental_yield': round(rental_yield, 2),
+            'price_trend': price_trend,
+            'market_activity': market_activity
         }
-        
         return jsonify({
             'success': True,
             'statistics': stats
         })
-        
     except Exception as e:
         logger.error(f"Error getting market statistics: {e}")
         return jsonify({'error': 'Internal error'}), 500
