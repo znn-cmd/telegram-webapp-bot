@@ -1032,7 +1032,8 @@
                 address: report.object.address,
                 bedrooms: report.object.bedrooms,
                 price: report.object.purchase_price,
-                report: report
+                report: report,
+                id: data.report_id // Сохраняем ID отчета если он есть
             };
             
             showToast(getLocalizedText('notifications.report_generated'), 'success');
@@ -1076,16 +1077,101 @@
                 return;
             }
             
+            if (!currentReportData || !currentReportData.report) {
+                showToast('Данные отчета не найдены', 'error');
+                return;
+            }
+            
             showProgressBar('Отправляем отчет клиенту...', 0);
             
-            // Здесь должна быть отправка через API
-            setTimeout(() => {
-                hideProgressBar();
-                closeClientModal();
-                showToast('Отчет успешно отправлен клиенту!', 'success');
-            }, 2000);
+            // Сначала сохраняем отчет, затем отправляем клиенту
+            saveReportIfNeededAndGeneratePdf(currentReportData.report, function(reportId) {
+                // Генерируем PDF с report_id
+                fetch('/api/generate_pdf_report', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        report: currentReportData.report,
+                        add_realtor_contacts: false,
+                        add_client_name: false,
+                        report_id: reportId
+                    })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        // Отправляем PDF клиенту
+                        fetch('/api/send_pdf_to_client', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                realtor_telegram_id: userData.id,
+                                client_name: clientName,
+                                client_telegram: clientUsername,
+                                pdf_path: data.pdf_path
+                            })
+                        })
+                        .then(res => res.json())
+                        .then(sendData => {
+                            hideProgressBar();
+                            closeClientModal();
+                            if (sendData.success) {
+                                showToast('Отчет успешно отправлен клиенту!', 'success');
+                            } else {
+                                showToast('Ошибка отправки отчета клиенту', 'error');
+                            }
+                        })
+                        .catch(() => {
+                            hideProgressBar();
+                            showToast('Ошибка отправки отчета клиенту', 'error');
+                        });
+                    } else {
+                        hideProgressBar();
+                        showToast('Ошибка генерации PDF: ' + (data.error || ''), 'error');
+                    }
+                })
+                .catch(() => {
+                    hideProgressBar();
+                    showToast('Ошибка соединения', 'error');
+                });
+            });
         }
         
+        // Сохраняет отчет если нет id, затем вызывает cb(reportId) — для генерации PDF
+        async function saveReportIfNeededAndGeneratePdf(report, cb) {
+            // Проверяем наличие ID в currentReportData
+            if (currentReportData && currentReportData.id) {
+                cb(currentReportData.id);
+                return;
+            }
+            // Проверяем наличие ID в самом отчете
+            if (report.id) {
+                cb(report.id);
+                return;
+            }
+            // Сохраняем отчет в базу
+            const res = await fetch('/api/user_reports/save', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    telegram_id: userData.id, 
+                    full_report: report, 
+                    address: report.object.address, 
+                    report_type: 'full_report' 
+                })
+            });
+            const data = await res.json();
+            if (data.success && data.report_id) {
+                // Обновляем ID в currentReportData
+                if (currentReportData) {
+                    currentReportData.id = data.report_id;
+                }
+                cb(data.report_id);
+            } else {
+                showToast('Ошибка сохранения отчета (не получен id)', 'error');
+            }
+        }
+
         function downloadPDF() {
             if (!currentReportData || !currentReportData.report) {
                 showToast('Данные отчета не найдены', 'error');
@@ -1094,51 +1180,55 @@
             
             showProgressBar('Генерируем PDF...', 0);
             
-            // Отправляем запрос на генерацию PDF
-            fetch('/api/generate_pdf_report', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    report: currentReportData.report,
-                    add_realtor_contacts: false,
-                    add_client_name: false
+            // Сначала сохраняем отчет, затем генерируем PDF
+            saveReportIfNeededAndGeneratePdf(currentReportData.report, function(reportId) {
+                // Отправляем запрос на генерацию PDF с report_id
+                fetch('/api/generate_pdf_report', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        report: currentReportData.report,
+                        add_realtor_contacts: false,
+                        add_client_name: false,
+                        report_id: reportId
+                    })
                 })
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    // Скачиваем PDF
-                    fetch('/api/download_pdf', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ pdf_path: data.pdf_path })
-                    })
-                    .then(res => res.blob())
-                    .then(blob => {
-                        const url = window.URL.createObjectURL(blob);
-                        const a = document.createElement('a');
-                        a.href = url;
-                        a.download = 'full_report.pdf';
-                        document.body.appendChild(a);
-                        a.click();
-                        window.URL.revokeObjectURL(url);
-                        document.body.removeChild(a);
-                        
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        // Скачиваем PDF
+                        fetch('/api/download_pdf', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ pdf_path: data.pdf_path })
+                        })
+                        .then(res => res.blob())
+                        .then(blob => {
+                            const url = window.URL.createObjectURL(blob);
+                            const a = document.createElement('a');
+                            a.href = url;
+                            a.download = 'full_report.pdf';
+                            document.body.appendChild(a);
+                            a.click();
+                            window.URL.revokeObjectURL(url);
+                            document.body.removeChild(a);
+                            
+                            hideProgressBar();
+                            showPDFSavedModal();
+                        })
+                        .catch(() => {
+                            hideProgressBar();
+                            showToast('Ошибка скачивания PDF', 'error');
+                        });
+                    } else {
                         hideProgressBar();
-                        showPDFSavedModal();
-                    })
-                    .catch(() => {
-                        hideProgressBar();
-                        showToast('Ошибка скачивания PDF', 'error');
-                    });
-                } else {
+                        showToast('Ошибка генерации PDF: ' + (data.error || ''), 'error');
+                    }
+                })
+                .catch(() => {
                     hideProgressBar();
-                    showToast('Ошибка генерации PDF', 'error');
-                }
-            })
-            .catch(() => {
-                hideProgressBar();
-                showToast('Ошибка соединения', 'error');
+                    showToast('Ошибка соединения', 'error');
+                });
             });
         }
         

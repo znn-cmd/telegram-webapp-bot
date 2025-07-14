@@ -753,8 +753,15 @@ def api_full_report():
             'created_at': created_at,
             'full_report': full_report_data
         }
-        supabase.table('user_reports').insert(report_data).execute()
-        return jsonify({'success': True, 'full_report': full_report_data, 'created_at': created_at, 'from_cache': False})
+        result = supabase.table('user_reports').insert(report_data).execute()
+        report_id = result.data[0]['id'] if result.data else None
+        return jsonify({
+            'success': True, 
+            'full_report': full_report_data, 
+            'created_at': created_at, 
+            'from_cache': False,
+            'report_id': report_id
+        })
     except Exception as e:
         logger.error(f"Error in full_report: {e}")
         return jsonify({'error': 'Internal error'}), 500
