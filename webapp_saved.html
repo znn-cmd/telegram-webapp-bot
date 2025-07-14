@@ -308,33 +308,32 @@
                 alert('Ошибка: не удалось получить id отчета для экспорта PDF!');
                 return;
             }
-            window._currentReportId = reportId;
-            askAddUserContacts();
+            askAddUserContacts(reportId);
         }
 
-        function askAddUserContacts() {
+        function askAddUserContacts(reportId) {
             showModalQuestion(
                 'Добавить ваши контактные данные в PDF?',
-                () => checkAndCollectUserContacts(),
-                () => askAddClientData()
+                () => checkAndCollectUserContacts(reportId),
+                () => askAddClientData(undefined, reportId)
             );
         }
 
-        function askAddClientData(userProfile) {
+        function askAddClientData(userProfile, reportId) {
             showModalQuestion(
                 'Хотите добавить данные получателя (клиента)?',
-                () => askClientName(userProfile),
-                () => generatePdfRequest(userProfile, null)
+                () => askClientName(userProfile, reportId),
+                () => generatePdfRequest(userProfile, null, reportId)
             );
         }
 
-        function askClientName(userProfile) {
+        function askClientName(userProfile, reportId) {
             showModalInput('Имя получателя (клиента)', (clientName) => {
-                generatePdfRequest(userProfile, clientName);
+                generatePdfRequest(userProfile, clientName, reportId);
             });
         }
 
-        function checkAndCollectUserContacts() {
+        function checkAndCollectUserContacts(reportId) {
             // Получаем профиль пользователя
             fetch('/api/user_profile', {
                 method: 'POST',
@@ -357,7 +356,7 @@
                     ];
                     collectMissingFields(profile, fields, 0, (filledProfile) => {
                         // После сбора всех данных спрашиваем про клиента
-                        askAddClientData(filledProfile);
+                        askAddClientData(filledProfile, reportId);
                     });
                 } else {
                     alert('Ошибка загрузки профиля');
@@ -436,12 +435,16 @@
             if (modal) modal.remove();
         }
         // Генерация PDF (AJAX)
-        function generatePdfRequest(profile, clientName) {
-            console.log('PDF GENERATE: reportId:', window._currentReportId, 'profile:', profile, 'clientName:', clientName, 'fullReport:', window._currentFullReport);
+        function generatePdfRequest(profile, clientName, reportId) {
+            if (!reportId) {
+                alert('Ошибка: не удалось получить id отчета для генерации PDF!');
+                return;
+            }
+            console.log('PDF GENERATE: reportId:', reportId, 'profile:', profile, 'clientName:', clientName, 'fullReport:', window._currentFullReport);
             fetch('/api/generate_pdf_report', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ report: window._currentFullReport, profile, client_name: clientName, report_id: window._currentReportId })
+                body: JSON.stringify({ report: window._currentFullReport, profile, client_name: clientName, report_id: reportId })
             })
             .then(res => res.json())
             .then(data => {
@@ -479,8 +482,7 @@
                 alert('Ошибка: не удалось получить id отчета для отправки клиенту!');
                 return;
             }
-            window._currentReportId = reportId;
-            generatePdfRequest(null, null);
+            generatePdfRequest(null, null, reportId);
             // После генерации показываем форму для клиента (можно доработать для реального UX)
             setTimeout(() => {
                 showSendClientModal();
