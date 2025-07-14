@@ -776,7 +776,9 @@ def api_user_reports():
     try:
         # Получаем user_id из базы данных по telegram_id
         user_result = supabase.table('users').select('id').eq('telegram_id', telegram_id).execute()
-        user_id = user_result.data[0]['id'] if user_result.data else telegram_id
+        if not user_result.data:
+            return jsonify({'error': 'User not found'}), 404
+        user_id = user_result.data[0]['id']
         # Возвращаем только неотвязанные отчеты
         result = supabase.table('user_reports').select('*').eq('user_id', user_id).eq('deleted_at', None).order('created_at', desc=True).execute()
         reports = result.data if hasattr(result, 'data') else result
