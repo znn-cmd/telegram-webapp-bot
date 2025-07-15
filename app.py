@@ -19,7 +19,11 @@ from api_functions import (
     check_admin_status,
     set_user_balance_to_100,
     get_user_statistics,
-    send_publication_to_all_users
+    send_publication_to_all_users,
+    save_promotional_text_to_db,
+    translate_with_chatgpt,
+    get_promotional_text_by_language,
+    update_text_send_count
 )
 
 # Загружаем переменные окружения
@@ -1602,6 +1606,8 @@ def api_admin_send_publication():
     data = request.json or {}
     telegram_id = data.get('telegram_id')
     text = data.get('text')
+    save_to_db = data.get('save_to_db', False)
+    make_translation = data.get('make_translation', False)
     
     if not telegram_id:
         return jsonify({'error': 'telegram_id required'}), 400
@@ -1614,8 +1620,8 @@ def api_admin_send_publication():
         if not check_admin_status(telegram_id):
             return jsonify({'error': 'Access denied. Admin privileges required.'}), 403
         
-        # Отправляем публикацию
-        result = send_publication_to_all_users(text)
+        # Отправляем публикацию с учетом настроек
+        result = send_publication_to_all_users(text, save_to_db, make_translation)
         return jsonify(result)
             
     except Exception as e:

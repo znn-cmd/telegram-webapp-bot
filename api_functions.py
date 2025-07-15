@@ -476,8 +476,8 @@ def get_user_statistics() -> Dict[str, Any]:
         print(f"Ошибка при получении статистики: {e}")
         return {}
 
-def send_publication_to_all_users(text: str) -> Dict[str, int]:
-    """Отправка публикации всем пользователям"""
+def save_promotional_text_to_db(base_text: str, ru_text: str, us_text: str = None, ft_text: str = None, de_text: str = None, tr_text: str = None) -> int:
+    """Сохранение промо-текста в базу данных"""
     
     headers = {
         'apikey': SUPABASE_ANON_KEY,
@@ -486,34 +486,231 @@ def send_publication_to_all_users(text: str) -> Dict[str, int]:
     }
     
     try:
+        from datetime import datetime
+        
+        text_data = {
+            'created_at': datetime.now().isoformat(),
+            'base': base_text,
+            'ru': ru_text,
+            'us': us_text or base_text,
+            'ft': ft_text or base_text,
+            'de': de_text or base_text,
+            'tr': tr_text or base_text,
+            'qttty_ru': 0,
+            'qttty_us': 0,
+            'qttty_ft': 0,
+            'qttty_de': 0,
+            'qttty_tr': 0
+        }
+        
+        url = f"{SUPABASE_URL}/rest/v1/texts_promo"
+        response = requests.post(url, headers=headers, json=text_data)
+        
+        if response.status_code == 201:
+            result = response.json()
+            return result[0]['text_id'] if result else None
+        else:
+            print(f"Ошибка сохранения текста: {response.status_code}")
+            return None
+            
+    except Exception as e:
+        print(f"Ошибка при сохранении промо-текста: {e}")
+        return None
+
+def translate_with_chatgpt(text: str, target_language: str) -> str:
+    """Перевод текста через ChatGPT API"""
+    
+    try:
+        # Здесь нужно будет добавить ваш ChatGPT API ключ
+        # Пока используем заглушку для демонстрации
+        chatgpt_api_key = os.getenv('CHATGPT_API_KEY')
+        
+        if not chatgpt_api_key:
+            # Заглушка для демонстрации
+            translations = {
+                'us': f"[EN] {text}",
+                'ft': f"[FR] {text}",
+                'de': f"[DE] {text}",
+                'tr': f"[TR] {text}"
+            }
+            return translations.get(target_language, text)
+        
+        # Реальный API вызов к ChatGPT
+        headers = {
+            'Authorization': f'Bearer {chatgpt_api_key}',
+            'Content-Type': 'application/json'
+        }
+        
+        prompt = f"Переведи следующий текст на {target_language}. Сохрани все форматирование, эмодзи и оформление. Дословный перевод: {text}"
+        
+        data = {
+            'model': 'gpt-3.5-turbo',
+            'messages': [
+                {'role': 'system', 'content': 'Ты профессиональный переводчик. Сохраняй все форматирование, эмодзи и оформление текста.'},
+                {'role': 'user', 'content': prompt}
+            ],
+            'max_tokens': 1000,
+            'temperature': 0.3
+        }
+        
+        response = requests.post('https://api.openai.com/v1/chat/completions', headers=headers, json=data)
+        
+        if response.status_code == 200:
+            result = response.json()
+            return result['choices'][0]['message']['content'].strip()
+        else:
+            print(f"Ошибка ChatGPT API: {response.status_code}")
+            return text
+            
+    except Exception as e:
+        print(f"Ошибка при переводе: {e}")
+        return text
+
+def get_promotional_text_by_language(text_id: int, language: str) -> str:
+    """Получение промо-текста на нужном языке"""
+    
+    headers = {
+        'apikey': SUPABASE_ANON_KEY,
+        'Authorization': f'Bearer {SUPABASE_ANON_KEY}',
+        'Content-Type': 'application/json',
+    }
+    
+    try:
+        # Маппинг языков к полям в базе
+        language_mapping = {
+            'ru': 'ru',
+            'en': 'us',
+            'fr': 'ft',
+            'de': 'de',
+            'tr': 'tr'
+        }
+        
+        field = language_mapping.get(language, 'ru')
+        url = f"{SUPABASE_URL}/rest/v1/texts_promo?text_id=eq.{text_id}&select={field}"
+        
+        response = requests.get(url, headers=headers)
+        
+        if response.status_code == 200:
+            result = response.json()
+            if result:
+                return result[0].get(field, '')
+        return ''
+        
+    except Exception as e:
+        print(f"Ошибка при получении текста: {e}")
+        return ''
+
+def update_text_send_count(text_id: int, language: str) -> bool:
+    """Обновление счетчика отправок для языка"""
+    
+    headers = {
+        'apikey': SUPABASE_ANON_KEY,
+        'Authorization': f'Bearer {SUPABASE_ANON_KEY}',
+        'Content-Type': 'application/json',
+    }
+    
+    try:
+        # Маппинг языков к полям счетчиков
+        counter_mapping = {
+            'ru': 'qttty_ru',
+            'en': 'qttty_us',
+            'fr': 'qttty_ft',
+            'de': 'qttty_de',
+            'tr': 'qttty_tr'
+        }
+        
+        counter_field = counter_mapping.get(language, 'qttty_ru')
+        
+        # Сначала получаем текущее значение
+        url = f"{SUPABASE_URL}/rest/v1/texts_promo?text_id=eq.{text_id}&select={counter_field}"
+        response = requests.get(url, headers=headers)
+        
+        if response.status_code == 200:
+            result = response.json()
+            if result:
+                current_count = result[0].get(counter_field, 0) or 0
+                new_count = current_count + 1
+                
+                # Обновляем счетчик
+                update_url = f"{SUPABASE_URL}/rest/v1/texts_promo?text_id=eq.{text_id}"
+                update_data = {counter_field: new_count}
+                
+                update_response = requests.patch(update_url, headers=headers, json=update_data)
+                return update_response.status_code == 204
+                
+        return False
+        
+    except Exception as e:
+        print(f"Ошибка при обновлении счетчика: {e}")
+        return False
+
+def send_publication_to_all_users(text: str, save_to_db: bool = False, make_translation: bool = False) -> Dict[str, Any]:
+    """Отправка публикации всем пользователям с поддержкой переводов"""
+    
+    headers = {
+        'apikey': SUPABASE_ANON_KEY,
+        'Authorization': f'Bearer {SUPABASE_ANON_KEY}',
+        'Content-Type': 'application/json',
+    }
+    
+    try:
+        text_id = None
+        
+        # Если нужно сохранить в базу
+        if save_to_db:
+            if make_translation:
+                # Делаем переводы
+                us_text = translate_with_chatgpt(text, 'us')
+                ft_text = translate_with_chatgpt(text, 'ft')
+                de_text = translate_with_chatgpt(text, 'de')
+                tr_text = translate_with_chatgpt(text, 'tr')
+                
+                # Сохраняем в базу с переводами
+                text_id = save_promotional_text_to_db(text, text, us_text, ft_text, de_text, tr_text)
+            else:
+                # Сохраняем только оригинальный текст
+                text_id = save_promotional_text_to_db(text, text)
+        
         # Получаем всех пользователей
-        users_url = f"{SUPABASE_URL}/rest/v1/users?select=telegram_id,user_status"
+        users_url = f"{SUPABASE_URL}/rest/v1/users?select=telegram_id,user_status,language"
         users_response = requests.get(users_url, headers=headers)
         
         if users_response.status_code != 200:
-            return {'admin_count': 0, 'user_count': 0}
+            return {'admin_count': 0, 'user_count': 0, 'text_id': text_id}
         
         users = users_response.json()
         
         # Отправляем сообщения через Telegram Bot API
         bot_token = os.getenv('TELEGRAM_BOT_TOKEN')
         if not bot_token:
-            return {'admin_count': 0, 'user_count': 0}
+            return {'admin_count': 0, 'user_count': 0, 'text_id': text_id}
         
         admin_count = 0
         user_count = 0
+        language_stats = {'ru': 0, 'en': 0, 'fr': 0, 'de': 0, 'tr': 0}
         
         for user in users:
             telegram_id = user.get('telegram_id')
             is_admin = user.get('user_status') == 'admin'
+            user_language = user.get('language', 'ru')
             
             if telegram_id:
                 try:
+                    # Определяем текст для отправки
+                    if text_id and save_to_db:
+                        # Используем текст из базы на нужном языке
+                        send_text = get_promotional_text_by_language(text_id, user_language)
+                        if not send_text:
+                            send_text = text  # Fallback на оригинальный текст
+                    else:
+                        # Отправляем оригинальный текст
+                        send_text = text
+                    
                     # Отправляем сообщение через Telegram Bot API
                     send_url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
                     send_data = {
                         'chat_id': telegram_id,
-                        'text': text,
+                        'text': send_text,
                         'parse_mode': 'HTML'  # Поддержка HTML форматирования
                     }
                     
@@ -524,15 +721,22 @@ def send_publication_to_all_users(text: str) -> Dict[str, int]:
                             admin_count += 1
                         else:
                             user_count += 1
+                            language_stats[user_language] = language_stats.get(user_language, 0) + 1
+                        
+                        # Обновляем счетчик отправок если текст сохранен в базу
+                        if text_id and save_to_db:
+                            update_text_send_count(text_id, user_language)
                     
                 except Exception as e:
                     print(f"Ошибка отправки сообщения пользователю {telegram_id}: {e}")
         
         return {
             'admin_count': admin_count,
-            'user_count': user_count
+            'user_count': user_count,
+            'text_id': text_id,
+            'language_stats': language_stats
         }
         
     except Exception as e:
         print(f"Ошибка при отправке публикации: {e}")
-        return {'admin_count': 0, 'user_count': 0} 
+        return {'admin_count': 0, 'user_count': 0, 'text_id': None, 'language_stats': {}} 
