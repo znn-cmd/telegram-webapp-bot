@@ -1392,3 +1392,132 @@ def api_save_user_report():
     except Exception as e:
         logger.error(f"Error saving user report: {e}")
         return jsonify({'error': 'Internal error'}), 500
+
+@app.route('/api/send_saved_report_pdf', methods=['POST'])
+def api_send_saved_report_pdf():
+    """Генерирует PDF для сохранённого отчёта и отправляет его пользователю в Telegram (без контактов)"""
+    data = request.json or {}
+    report_id = data.get('report_id')
+    telegram_id = data.get('telegram_id')
+    if not report_id or not telegram_id:
+        return jsonify({'error': 'report_id and telegram_id required'}), 400
+    try:
+        # Получаем отчёт из базы
+        report_result = supabase.table('user_reports').select('full_report').eq('id', report_id).execute()
+        if not report_result.data or not report_result.data[0].get('full_report'):
+            return jsonify({'error': 'Report not found'}), 404
+        report = report_result.data[0]['full_report']
+        # Генерируем PDF (без контактов)
+        from fpdf import FPDF
+        import tempfile, shutil
+        pdf = FPDF()
+        pdf.add_page()
+        pdf.add_font('DejaVu', '', 'fonts/DejaVuSans.ttf', uni=True)
+        pdf.add_font('DejaVu', 'B', 'fonts/DejaVuSans-Bold.ttf', uni=True)
+        pdf.set_font('DejaVu', 'B', 16)
+        pdf.cell(0, 10, 'Полный отчет по недвижимости', ln=True, align='C')
+        pdf.ln(10)
+        if report.get('object'):
+            pdf.set_font('DejaVu', 'B', 12)
+            pdf.cell(0, 10, 'Информация об объекте:', ln=True)
+            pdf.set_font('DejaVu', '', 10)
+            obj = report['object']
+            pdf.cell(0, 8, f'Адрес: {obj.get("address", "Не указан")}', ln=True)
+            pdf.cell(0, 8, f'Спален: {obj.get("bedrooms", "Не указано")}', ln=True)
+            pdf.cell(0, 8, f'Цена: €{obj.get("purchase_price", "Не указана")}', ln=True)
+            pdf.ln(5)
+        if 'roi' in report:
+            pdf.set_font("DejaVu", 'B', 14)
+            pdf.cell(200, 10, txt="Инвестиционный анализ (ROI):", ln=True)
+            pdf.set_font("DejaVu", size=12)
+            pdf.cell(200, 8, txt=f"Краткосрочная аренда: ROI {report['roi']['short_term']['roi']}%", ln=True)
+            pdf.cell(200, 8, txt=f"Долгосрочная аренда: ROI {report['roi']['long_term']['roi']}%", ln=True)
+            pdf.cell(200, 8, txt=f"Без аренды: ROI {report['roi']['no_rent']['roi']}%", ln=True)
+            pdf.ln(5)
+        if 'macro' in report:
+            pdf.set_font("DejaVu", 'B', 14)
+            pdf.cell(200, 10, txt="Макроэкономические показатели:", ln=True)
+            pdf.set_font("DejaVu", size=12)
+            pdf.cell(200, 8, txt=f"Инфляция: {report['macro']['inflation']}%", ln=True)
+            pdf.cell(200, 8, txt=f"Ключевая ставка: {report['macro']['refi_rate']}%", ln=True)
+            pdf.cell(200, 8, txt=f"Рост ВВП: {report['macro']['gdp_growth']}%", ln=True)
+            pdf.ln(5)
+        if 'taxes' in report:
+            pdf.set_font("DejaVu", 'B', 14)
+            pdf.cell(200, 10, txt="Налоги и сборы:", ln=True)
+            pdf.set_font("DejaVu", size=12)
+            pdf.cell(200, 8, txt=f"Налог на перевод: {report['taxes']['transfer_tax']*100}%", ln=True)
+            pdf.cell(200, 8, txt=f"Гербовый сбор: {report['taxes']['stamp_duty']*100}%", ln=True)
+            pdf.cell(200, 8, txt=f"Нотариус: €{report['taxes']['notary']}", ln=True)
+            pdf.ln(5)
+        if 'alternatives' in report and isinstance(report['alternatives'], list):
+            pdf.set_font('DejaVu', 'B', 14)
+            pdf.cell(0, 10, 'Сравнение с альтернативами (5 лет):', ln=True)
+            pdf.set_font('DejaVu', '', 12)
+            for alt in report['alternatives']:
+                name = alt.get('name', '-')
+                yld = alt.get('yield', 0)
+                pdf.cell(0, 8, f'{name}: {round(yld*100, 1)}%', ln=True)
+            pdf.ln(5)
+        if 'yield' in report or 'price_index' in report or 'mortgage_rate' in report or 'global_house_price_index' in report:
+            pdf.set_font('DejaVu', 'B', 14)
+            pdf.cell(0, 10, 'Профессиональные метрики:', ln=True)
+            pdf.set_font('DejaVu', '', 12)
+            if 'yield' in report:
+                pdf.cell(0, 8, f'Yield: {round(report["yield"]*100, 1)}%', ln=True)
+            if 'price_index' in report:
+                pdf.cell(0, 8, f'Индекс цен: {report["price_index"]}', ln=True)
+            if 'mortgage_rate' in report:
+                pdf.cell(0, 8, f'Ипотечная ставка: {round(report["mortgage_rate"]*100, 1)}%', ln=True)
+            if 'global_house_price_index' in report:
+                pdf.cell(0, 8, f'Глобальный индекс цен: {report["global_house_price_index"]}', ln=True)
+            pdf.ln(5)
+        if 'risks' in report or 'liquidity' in report or 'district' in report:
+            pdf.set_font('DejaVu', 'B', 14)
+            pdf.cell(0, 10, 'Риски и развитие района:', ln=True)
+            pdf.set_font('DejaVu', '', 12)
+            if 'risks' in report and isinstance(report['risks'], list):
+                for idx, risk in enumerate(report['risks']):
+                    pdf.cell(0, 8, f'Риск {idx+1}: {risk}', ln=True)
+            if 'liquidity' in report:
+                pdf.cell(0, 8, f'Ликвидность: {report["liquidity"]}', ln=True)
+            if 'district' in report:
+                pdf.cell(0, 8, f'Развитие района: {report["district"]}', ln=True)
+            pdf.ln(5)
+        # Сохраняем PDF во временный файл
+        temp_file = tempfile.NamedTemporaryFile(delete=False, suffix='.pdf')
+        pdf.output(temp_file.name)
+        temp_file.close()
+        # Перемещаем PDF в static/reports/
+        reports_dir = os.path.join(app.root_path, 'static', 'reports')
+        os.makedirs(reports_dir, exist_ok=True)
+        final_pdf_name = f'report_{report_id}.pdf'
+        final_pdf_path = os.path.join(reports_dir, final_pdf_name)
+        shutil.move(temp_file.name, final_pdf_path)
+        pdf_url = f'/static/reports/{final_pdf_name}'
+        supabase.table('user_reports').update({'pdf_path': pdf_url}).eq('id', report_id).execute()
+        # Отправка PDF через Telegram-бота
+        send_status = None
+        try:
+            bot_token = os.getenv("TELEGRAM_BOT_TOKEN") or '7215676549:AAFS86JbRCqwzTKQG-dF96JX-C1aWNvBoLo'
+            send_url = f'https://api.telegram.org/bot{bot_token}/sendDocument'
+            with open(final_pdf_path, 'rb') as pdf_file:
+                files = {'document': pdf_file}
+                data_send = {'chat_id': telegram_id}
+                resp = requests.post(send_url, data=data_send, files=files)
+                if resp.status_code == 200 and resp.json().get('ok'):
+                    send_status = 'sent'
+                else:
+                    send_status = f'error: {resp.text}'
+        except Exception as e:
+            logger.error(f"Error sending PDF via Telegram bot: {e}")
+            send_status = f'error: {e}'
+        return jsonify({
+            'success': True,
+            'pdf_path': pdf_url,
+            'telegram_send_status': send_status,
+            'message': 'PDF успешно сгенерирован и отправлен!'
+        })
+    except Exception as e:
+        logger.error(f"Error generating/sending PDF: {e}")
+        return jsonify({'error': 'Internal error'}), 500

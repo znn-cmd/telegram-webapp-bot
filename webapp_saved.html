@@ -729,182 +729,23 @@
         }
 
         // Экспорт в PDF: пошаговая логика
-        function exportPdfFlow(reportId) {
-            if (!reportId) {
-                showToast('Ошибка: не удалось получить id отчета для экспорта PDF!', 'error');
-                return;
-            }
-            askAddUserContacts(reportId);
-        }
-
-        function askAddUserContacts(reportId) {
-            showModalQuestion(
-                'Добавить ваши контактные данные в PDF?',
-                () => checkAndCollectUserContacts(reportId),
-                () => generatePdfRequest(reportId)
-            );
-        }
-
-        function checkAndCollectUserContacts(reportId) {
-            // Получаем профиль пользователя
-            fetch('/api/user_profile', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ telegram_id: userData.id })
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    const profile = data.profile;
-                    const fields = [
-                        { key: 'tg_name', label: 'Имя' },
-                        { key: 'last_name', label: 'Фамилия' },
-                        { key: 'photo_url', label: 'Фото (ссылка)' },
-                        { key: 'phone', label: 'Телефон' },
-                        { key: 'email', label: 'Email' },
-                        { key: 'website', label: 'Сайт' },
-                        { key: 'company', label: 'Компания' },
-                        { key: 'about_me', label: 'О себе' }
-                    ];
-                    collectMissingFields(profile, fields, 0, (filledProfile) => {
-                        // После сбора всех данных спрашиваем про клиента
-                        generatePdfRequest(reportId);
-                    });
+        async function downloadPdf(id) {
+            showToast('Отправляем PDF в Telegram...', 'info');
+            try {
+                const res = await fetch('/api/send_saved_report_pdf', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ report_id: id, telegram_id: userData.id })
+                });
+                const data = await res.json();
+                if (data.success && data.telegram_send_status === 'sent') {
+                    showToast('Отчет отправлен в Telegram!', 'success');
                 } else {
-                    alert('Ошибка загрузки профиля');
+                    showToast('Ошибка при отправке отчета: ' + (data.message || data.error), 'error');
                 }
-            });
-        }
-
-        function collectMissingFields(profile, fields, idx, cb) {
-            if (idx >= fields.length) {
-                cb(profile);
-                return;
+            } catch (e) {
+                showToast('Ошибка соединения с сервером', 'error');
             }
-            const field = fields[idx];
-            if (profile[field.key]) {
-                collectMissingFields(profile, fields, idx + 1, cb);
-            } else {
-                showModalInput(field.label + ' (можно пропустить)', (val) => {
-                    if (val) profile[field.key] = val;
-                    // Сохраняем в базу
-                    const update = {};
-                    update[field.key] = val;
-                    fetch('/api/user_profile', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ telegram_id: userData.id, ...update })
-                    });
-                    collectMissingFields(profile, fields, idx + 1, cb);
-                }, true);
-            }
-        }
-
-        // Универсальное модальное окно с вопросом (да/нет)
-        function showModalQuestion(question, onYes, onNo) {
-            let oldModal = document.getElementById('modal-question');
-            if (oldModal) oldModal.remove();
-            const modal = document.createElement('div');
-            modal.id = 'modal-question';
-            modal.style = 'position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.25);z-index:2000;display:flex;align-items:center;justify-content:center;';
-            modal.innerHTML = `
-                <div style="background:#fff;border-radius:18px;box-shadow:0 4px 24px rgba(102,126,234,0.18);padding:28px 18px 18px 18px;max-width:340px;width:90vw;text-align:center;">
-                    <div style="font-size:18px;font-weight:700;color:#667eea;margin-bottom:16px;">${question}</div>
-                    <button class="btn" style="width:100%;font-size:16px;" onclick="closeModalQuestion();window._modalYes()">Да</button>
-                    <button class="btn btn-secondary" style="width:100%;margin-top:10px;font-size:16px;" onclick="closeModalQuestion();window._modalNo()">Нет, пропустить</button>
-                </div>
-            `;
-            document.body.appendChild(modal);
-            window._modalYes = onYes;
-            window._modalNo = onNo;
-        }
-        function closeModalQuestion() {
-            let modal = document.getElementById('modal-question');
-            if (modal) modal.remove();
-        }
-        // Универсальное модальное окно для ввода
-        function showModalInput(label, onSubmit, allowSkip) {
-            let oldModal = document.getElementById('modal-input');
-            if (oldModal) oldModal.remove();
-            const modal = document.createElement('div');
-            modal.id = 'modal-input';
-            modal.style = 'position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.25);z-index:2100;display:flex;align-items:center;justify-content:center;';
-            modal.innerHTML = `
-                <div style="background:#fff;border-radius:18px;box-shadow:0 4px 24px rgba(102,126,234,0.18);padding:28px 18px 18px 18px;max-width:340px;width:90vw;text-align:center;">
-                    <div style="font-size:18px;font-weight:700;color:#667eea;margin-bottom:16px;">${label}</div>
-                    <input id="modalInputField" class="input-field" style="margin-bottom:10px;width:90%;font-size:16px;padding:8px;" autofocus>
-                    <button class="btn" style="width:100%;font-size:16px;" onclick="closeModalInput();window._modalInputSubmit()">${allowSkip ? 'Сохранить/Пропустить' : 'Сохранить'}</button>
-                </div>
-            `;
-            document.body.appendChild(modal);
-            window._modalInputSubmit = function() {
-                const val = document.getElementById('modalInputField').value.trim();
-                onSubmit(val);
-            };
-        }
-        function closeModalInput() {
-            let modal = document.getElementById('modal-input');
-            if (modal) modal.remove();
-        }
-        // Генерация PDF (AJAX)
-        function generatePdfRequest(reportId) {
-            if (!reportId) {
-                showToast('Ошибка: не удалось получить id отчета для генерации PDF!', 'error');
-                return;
-            }
-            console.log('PDF GENERATE: reportId:', reportId, 'profile:', userData, 'fullReport:', window._currentFullReport);
-            fetch('/api/generate_pdf_report', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ report: window._currentFullReport, profile: userData, report_id: reportId })
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success && data.pdf_path) {
-                    showPdfDownloadModal(data.pdf_path, data.message);
-                } else {
-                    showToast('Ошибка генерации PDF: ' + (data.error || ''), 'error');
-                    if (data.details) console.log('PDF ERROR DETAILS:', data.details);
-                }
-            })
-            .catch(() => {
-                showToast('Ошибка генерации PDF', 'error');
-            });
-        }
-        // Модалка для скачивания PDF
-        function showPdfDownloadModal(pdfPath, message) {
-            let oldModal = document.getElementById('pdf-download-modal');
-            if (oldModal) oldModal.remove();
-            
-            const modal = document.createElement('div');
-            modal.id = 'pdf-download-modal';
-            modal.style = 'position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.25);z-index:2200;display:flex;align-items:center;justify-content:center;';
-            modal.innerHTML = `
-                <div style="background:#fff;border-radius:18px;box-shadow:0 4px 24px rgba(102,126,234,0.18);padding:28px 18px 18px 18px;max-width:340px;width:90vw;text-align:center;">
-                    <div style="font-size:18px;font-weight:700;color:#667eea;margin-bottom:16px;">PDF готов!</div>
-                    <div style="font-size:14px;color:#666;margin-bottom:20px;">${message || 'Отчет успешно сгенерирован'}</div>
-                    <button class="btn" style="width:100%;font-size:16px;" onclick="downloadPdfFile('${pdfPath}')">Скачать PDF</button>
-                    <button class="btn back-btn" style="width:100%;margin-top:10px;font-size:16px;" onclick="closePdfDownloadModal()">Закрыть</button>
-                </div>
-            `;
-            document.body.appendChild(modal);
-        }
-        
-        function closePdfDownloadModal() {
-            let modal = document.getElementById('pdf-download-modal');
-            if (modal) modal.remove();
-        }
-        
-        function downloadPdfFile(pdfPath) {
-            window.open(pdfPath, '_blank');
-            showToast('PDF скачивается...', 'success');
-            closePdfDownloadModal();
-        }
-
-        // Функции для работы с отчетами
-        function downloadPdf(id) {
-            showToast('Подготовка PDF...', 'info');
-            exportPdfFlow(id);
         }
 
         // Улучшенная функция удаления с undo
