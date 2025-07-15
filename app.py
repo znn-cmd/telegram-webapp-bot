@@ -1530,16 +1530,23 @@ def api_send_saved_report_pdf():
         send_status = None
         if telegram_id:
             try:
-                bot_token = os.getenv("TELEGRAM_BOT_TOKEN") or '7215676549:AAFS86JbRCqwzTKQG-dF96JX-C1aWNvBoLo'
+                bot_token = '7215676549:AAFS86JbRCqwzTKQG-dF96JX-C1aWNvBoLo'
                 send_url = f'https://api.telegram.org/bot{bot_token}/sendDocument'
+                logger.info(f"Sending PDF to Telegram: chat_id={telegram_id}, file={final_pdf_path}")
+                
                 with open(final_pdf_path, 'rb') as pdf_file:
                     files = {'document': pdf_file}
                     data_send = {'chat_id': telegram_id}
                     resp = requests.post(send_url, data=data_send, files=files)
+                    
+                    logger.info(f"Telegram API response: status={resp.status_code}, body={resp.text}")
+                    
                     if resp.status_code == 200 and resp.json().get('ok'):
                         send_status = 'sent'
+                        logger.info("PDF successfully sent to Telegram")
                     else:
                         send_status = f'error: {resp.text}'
+                        logger.error(f"Telegram API error: {resp.text}")
             except Exception as e:
                 logger.error(f"Error sending PDF via Telegram bot: {e}")
                 send_status = f'error: {e}'
@@ -1547,7 +1554,7 @@ def api_send_saved_report_pdf():
             'success': True,
             'pdf_path': pdf_url,
             'telegram_send_status': send_status,
-            'message': 'PDF успешно сгенерирован и отправлен!'
+            'message': 'PDF успешно сгенерирован и отправлен!' if send_status == 'sent' else f'PDF сгенерирован, но ошибка отправки: {send_status}'
         })
     except Exception as e:
         logger.error(f"Error generating/sending PDF: {e}")
