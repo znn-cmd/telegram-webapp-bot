@@ -66,6 +66,17 @@
             font-size: 20px;
             margin-right: 10px;
         }
+        .profile-btn-coop { display: none !important; }
+        .modal-bg { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.25); z-index: 1000; display: flex; align-items: center; justify-content: center; }
+        .modal { background: #fff; border-radius: 14px; box-shadow: 0 4px 24px rgba(102,126,234,0.18); padding: 28px 22px 22px 22px; min-width: 280px; max-width: 90vw; text-align: left; }
+        .modal-title { font-size: 1.1em; font-weight: bold; color: #333; margin-bottom: 14px; }
+        .modal-btn-row { display: flex; gap: 12px; }
+        .modal-btn { flex: 1; padding: 12px 0; border: none; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; }
+        .modal-btn-primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; }
+        .modal-btn-primary:hover { background: linear-gradient(135deg, #764ba2 0%, #667eea 100%); }
+        .modal-btn-secondary { background: #f1f1f1; color: #333; border: 1px solid #ddd; }
+        .modal-btn-secondary:hover { background: #e2e2e2; }
+        .lang-select { width: 100%; padding: 12px 14px; border: 1px solid #ddd; border-radius: 8px; font-size: 15px; margin-bottom: 18px; background: #f8f9fa; }
     </style>
 </head>
 <body>
@@ -73,6 +84,16 @@
         <div class="title">Личный кабинет</div>
         <div id="balance-block" style="margin-bottom:22px;display:none;"></div>
         <button class="back-btn" onclick="goToMainMenu()">Вернуться в главное меню</button>
+    </div>
+    <div id="modal-bg" class="modal-bg" style="display:none;">
+        <div class="modal">
+            <div class="modal-title">Выберите язык</div>
+            <select id="lang-select" class="lang-select"></select>
+            <div class="modal-btn-row">
+                <button class="modal-btn modal-btn-secondary" onclick="closeLangModal()">Отмена</button>
+                <button class="modal-btn modal-btn-primary" onclick="saveLangModal()">Сохранить</button>
+            </div>
+        </div>
     </div>
     <script>
         function goToMainMenu() {
@@ -128,7 +149,57 @@
         }
         function showBalance() { window.location.href = '/webapp_balance'; }
         function showCooperation() { alert('Сотрудничество (в разработке)'); }
-        function showLanguage() { alert('Язык (в разработке)'); }
+        function showLanguage() {
+            // Получить список языков с главной страницы (или захардкодить как на главной)
+            const languages = [
+                { code: 'ru', name: 'Русский' },
+                { code: 'en', name: 'English' }
+            ];
+            const select = document.getElementById('lang-select');
+            select.innerHTML = '';
+            languages.forEach(lang => {
+                const option = document.createElement('option');
+                option.value = lang.code;
+                option.textContent = lang.name;
+                select.appendChild(option);
+            });
+            // Установить текущий язык
+            let currentLang = localStorage.getItem('aaadviser_lang') || 'ru';
+            select.value = currentLang;
+            document.getElementById('modal-bg').style.display = 'flex';
+        }
+        function closeLangModal() {
+            document.getElementById('modal-bg').style.display = 'none';
+        }
+        function saveLangModal() {
+            const select = document.getElementById('lang-select');
+            const lang = select.value;
+            let tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
+            let userData = tg && tg.initDataUnsafe && tg.initDataUnsafe.user ? tg.initDataUnsafe.user : null;
+            if (!userData) {
+                try { userData = JSON.parse(localStorage.getItem('aaadviser_user')); } catch (e) { userData = null; }
+            }
+            if (!userData || !userData.id) {
+                alert('Пользователь не определён');
+                return;
+            }
+            fetch('/api/set_language', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ telegram_id: userData.id, language: lang })
+            })
+            .then(res => res.json())
+            .then(resp => {
+                if (resp.ok) {
+                    localStorage.setItem('aaadviser_lang', lang);
+                    closeLangModal();
+                    alert('Язык успешно изменён! Перезагрузите страницу для применения.');
+                } else {
+                    alert('Ошибка сохранения языка');
+                }
+            })
+            .catch(() => alert('Ошибка соединения'));
+        }
     </script>
 </body>
 </html> 
