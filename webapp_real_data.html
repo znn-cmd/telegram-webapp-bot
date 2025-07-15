@@ -745,53 +745,63 @@
                 const today = new Date();
                 let periodStart = data.period_start ? new Date(data.period_start) : null;
                 let periodEnd = data.period_end ? new Date(data.period_end) : null;
+                let isFree = false;
                 if (periodStart && periodEnd && today >= periodStart && today <= periodEnd) {
-                    // Бесплатно по подписке — сразу формируем отчет
-                    showToast(`У вас оплачен период пользования до ${periodEnd.toLocaleDateString()}. Для вас отчет бесплатный!`, 'success');
-                    showFullReportConfirmModal(lastReportAddress, lastReportBedrooms, lastReportPrice, telegram_id, true, data.full_report_price);
-                } else {
-                    // Платно — сразу списываем средства и формируем отчет
-                    if (parseFloat(data.balance) >= parseFloat(data.full_report_price)) {
-                        showProgressBar('Списываем средства...', 30);
-                        try {
-                            const deductRes = await fetch('/api/deduct_balance', {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({ telegram_id, amount: data.full_report_price })
-                            });
-                            if (!deductRes.ok) throw new Error('Ошибка соединения с сервером');
-                            const deductData = await deductRes.json();
-                            hideProgressBar();
-                            if (deductData.success) {
-                                showToast('Средства успешно списаны. Формируем отчет...', 'success');
-                                showFullReportConfirmModal(lastReportAddress, lastReportBedrooms, lastReportPrice, telegram_id, false, data.full_report_price);
-                            } else if (deductData.error === 'Insufficient balance') {
-                                showModalTopup(`Недостаточно средств для получения полного отчета.<br>Стоимость: <b>${data.full_report_price} EUR</b>`, () => {
-                                    closeModalTopup();
-                                    showTopupModal();
-                                }, () => {
-                                    closeModalTopup();
-                                }, data.balance);
-                            } else {
-                                showToast('Ошибка списания средств', 'error');
-                            }
-                        } catch (e) {
-                            hideProgressBar();
-                            showToast(e.message || 'Ошибка списания', 'error');
-                        }
-                    } else {
-                        // Недостаточно средств
-                        showModalTopup(`Недостаточно средств для получения полного отчета.<br>Стоимость: <b>${data.full_report_price} EUR</b>`, () => {
+                    isFree = true;
+                }
+                // Только открываем модалку, ничего не списываем!
+                showFullReportConfirmModal(lastReportAddress, lastReportBedrooms, lastReportPrice, telegram_id, isFree, data.full_report_price, data.balance);
+            } catch (e) {
+                hideProgressBar();
+                showToast(e.message || 'Ошибка соединения', 'error');
+            }
+        }
+
+        // Новая функция: вызывается по клику на 'Да, продолжить' в модалке
+        async function onConfirmFullReport(address, bedrooms, price, telegram_id, isFree, fullReportPrice, balance) {
+            if (isFree) {
+                showToast('Для вас отчет бесплатный! Формируем отчет...', 'success');
+                showProgressBar('Формируем отчет...', 30);
+                afterFullReportPayment(address, bedrooms, price, geoData.lat, geoData.lng, telegram_id);
+                return;
+            }
+            if (parseFloat(balance) >= parseFloat(fullReportPrice)) {
+                showProgressBar('Списываем средства...', 30);
+                try {
+                    const deductRes = await fetch('/api/deduct_balance', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ telegram_id, amount: fullReportPrice })
+                    });
+                    if (!deductRes.ok) throw new Error('Ошибка соединения с сервером');
+                    const deductData = await deductRes.json();
+                    hideProgressBar();
+                    if (deductData.success) {
+                        showToast('Средства успешно списаны. Формируем отчет...', 'success');
+                        showProgressBar('Формируем отчет...', 30);
+                        afterFullReportPayment(address, bedrooms, price, geoData.lat, geoData.lng, telegram_id);
+                    } else if (deductData.error === 'Insufficient balance') {
+                        showModalTopup(`Недостаточно средств для получения полного отчета.<br>Стоимость: <b>${fullReportPrice} EUR</b>`, () => {
                             closeModalTopup();
                             showTopupModal();
                         }, () => {
                             closeModalTopup();
-                        }, data.balance);
+                        }, balance);
+                    } else {
+                        showToast('Ошибка списания средств', 'error');
                     }
+                } catch (e) {
+                    hideProgressBar();
+                    showToast(e.message || 'Ошибка списания', 'error');
                 }
-            } catch (e) {
-                hideProgressBar();
-                showToast(e.message || 'Ошибка соединения', 'error');
+            } else {
+                // Недостаточно средств
+                showModalTopup(`Недостаточно средств для получения полного отчета.<br>Стоимость: <b>${fullReportPrice} EUR</b>`, () => {
+                    closeModalTopup();
+                    showTopupModal();
+                }, () => {
+                    closeModalTopup();
+                }, balance);
             }
         }
 
@@ -891,7 +901,7 @@
         }
 
         // Обновленная функция: принимает параметры напрямую
-        function showFullReportConfirmModal(address, bedrooms, price, telegram_id, isFree = false, fullReportPrice = null) {
+        function showFullReportConfirmModal(address, bedrooms, price, telegram_id, isFree = false, fullReportPrice = null, balance = null) {
             let oldModal = document.getElementById('full-report-modal');
             if (oldModal) oldModal.remove();
             // Используем цену из параметра, если не бесплатный
@@ -906,7 +916,7 @@
                     <div style="font-size:16px;color:#333;margin-bottom:10px;"><b>Спален:</b> ${bedrooms}</div>
                     <div style="font-size:16px;color:#333;margin-bottom:18px;"><b>Цена объекта:</b> €${Number(price).toLocaleString('ru-RU')}</div>
                     <div style="font-size:15px;color:#555;margin-bottom:18px;">Стоимость полного отчета: <b>${priceText} EUR</b></div>
-                    <button class="btn btn-primary" style="width:100%;font-size:17px;" onclick="deductAndGenerateFullReport(${telegram_id})">Да, продолжить (${priceText} EUR)</button>
+                    <button class="btn btn-primary" style="width:100%;font-size:17px;" onclick="onConfirmFullReport('${address}', '${bedrooms}', '${price}', '${telegram_id}', ${isFree}, '${fullReportPrice}', '${balance}')">Да, продолжить (${priceText} EUR)</button>
                     <button class="btn btn-secondary" style="width:100%;margin-top:10px;font-size:16px;" onclick="closeFullReportModal();goToSimpleReportForm();">Нет, адрес нужно изменить</button>
                 </div>
             `;
