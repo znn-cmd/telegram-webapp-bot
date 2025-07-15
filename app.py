@@ -1186,7 +1186,13 @@ def api_generate_pdf_report():
         send_status = None
         if telegram_id:
             try:
-                bot_token = '7215676549:AAFS86JbRCqwzTKQG-dF96JX-C1aWNvBoLo'
+                # Получаем токен бота из базы данных
+                from api_functions import get_api_key_from_db
+                bot_token = get_api_key_from_db('telegram_bot_token')
+                if not bot_token:
+                    # Fallback на старый токен
+                    bot_token = '7215676549:AAFS86JbRCqwzTKQG-dF96JX-C1aWNvBoLo'
+                
                 send_url = f'https://api.telegram.org/bot{bot_token}/sendDocument'
                 with open(final_pdf_path, 'rb') as pdf_file:
                     files = {'document': pdf_file}
@@ -1530,7 +1536,13 @@ def api_send_saved_report_pdf():
         send_status = None
         if telegram_id:
             try:
-                bot_token = '7215676549:AAFS86JbRCqwzTKQG-dF96JX-C1aWNvBoLo'
+                # Получаем токен бота из базы данных
+                from api_functions import get_api_key_from_db
+                bot_token = get_api_key_from_db('telegram_bot_token')
+                if not bot_token:
+                    # Fallback на старый токен
+                    bot_token = '7215676549:AAFS86JbRCqwzTKQG-dF96JX-C1aWNvBoLo'
+                
                 send_url = f'https://api.telegram.org/bot{bot_token}/sendDocument'
                 logger.info(f"Sending PDF to Telegram: chat_id={telegram_id}, file={final_pdf_path}")
                 
@@ -1605,6 +1617,45 @@ def api_admin_user_stats():
             
     except Exception as e:
         logger.error(f"Error getting user statistics: {e}")
+        return jsonify({'error': 'Internal server error'}), 500
+
+@app.route('/api/admin/api_keys', methods=['GET', 'POST'])
+def api_admin_api_keys():
+    """Управление API ключами (только для админов)"""
+    data = request.json or {}
+    telegram_id = data.get('telegram_id')
+    
+    if not telegram_id:
+        return jsonify({'error': 'telegram_id required'}), 400
+    
+    try:
+        # Проверяем статус админа
+        if not check_admin_status(telegram_id):
+            return jsonify({'error': 'Access denied. Admin privileges required.'}), 403
+        
+        if request.method == 'GET':
+            # Получаем все ключи
+            from api_functions import get_all_api_keys
+            keys = get_all_api_keys()
+            return jsonify({'success': True, 'keys': keys})
+        
+        elif request.method == 'POST':
+            # Сохраняем/обновляем ключ
+            key_name = data.get('key_name')
+            key_value = data.get('key_value')
+            description = data.get('description', '')
+            
+            if not key_name or not key_value:
+                return jsonify({'error': 'key_name and key_value required'}), 400
+            
+            from api_functions import save_api_key_to_db
+            if save_api_key_to_db(key_name, key_value, description):
+                return jsonify({'success': True, 'message': f'API ключ {key_name} сохранен'})
+            else:
+                return jsonify({'error': 'Failed to save API key'}), 500
+                
+    except Exception as e:
+        logger.error(f"Error managing API keys: {e}")
         return jsonify({'error': 'Internal server error'}), 500
 
 @app.route('/api/admin/send_publication', methods=['POST'])

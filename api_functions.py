@@ -517,16 +517,100 @@ def save_promotional_text_to_db(base_text: str, ru_text: str, us_text: str = Non
         print(f"Ошибка при сохранении промо-текста: {e}")
         return None
 
+def get_api_key_from_db(key_name: str) -> str:
+    """Получение API ключа из базы данных"""
+    
+    headers = {
+        'apikey': SUPABASE_ANON_KEY,
+        'Authorization': f'Bearer {SUPABASE_ANON_KEY}',
+        'Content-Type': 'application/json',
+    }
+    
+    try:
+        url = f"{SUPABASE_URL}/rest/v1/api_keys?key_name=eq.{key_name}&is_active=eq.true&select=key_value"
+        response = requests.get(url, headers=headers)
+        
+        if response.status_code == 200:
+            result = response.json()
+            if result:
+                return result[0].get('key_value', '')
+        return ''
+        
+    except Exception as e:
+        print(f"Ошибка при получении API ключа {key_name}: {e}")
+        return ''
+
+def save_api_key_to_db(key_name: str, key_value: str, description: str = '') -> bool:
+    """Сохранение API ключа в базу данных"""
+    
+    headers = {
+        'apikey': SUPABASE_ANON_KEY,
+        'Authorization': f'Bearer {SUPABASE_ANON_KEY}',
+        'Content-Type': 'application/json',
+    }
+    
+    try:
+        from datetime import datetime
+        
+        key_data = {
+            'key_name': key_name,
+            'key_value': key_value,
+            'description': description,
+            'is_active': True,
+            'updated_at': datetime.now().isoformat()
+        }
+        
+        # Проверяем, существует ли уже ключ
+        check_url = f"{SUPABASE_URL}/rest/v1/api_keys?key_name=eq.{key_name}"
+        check_response = requests.get(check_url, headers=headers)
+        
+        if check_response.status_code == 200 and check_response.json():
+            # Обновляем существующий ключ
+            update_url = f"{SUPABASE_URL}/rest/v1/api_keys?key_name=eq.{key_name}"
+            response = requests.patch(update_url, headers=headers, json=key_data)
+        else:
+            # Создаем новый ключ
+            key_data['created_at'] = datetime.now().isoformat()
+            url = f"{SUPABASE_URL}/rest/v1/api_keys"
+            response = requests.post(url, headers=headers, json=key_data)
+        
+        return response.status_code in [200, 201, 204]
+        
+    except Exception as e:
+        print(f"Ошибка при сохранении API ключа {key_name}: {e}")
+        return False
+
+def get_all_api_keys() -> List[Dict[str, Any]]:
+    """Получение всех API ключей из базы данных"""
+    
+    headers = {
+        'apikey': SUPABASE_ANON_KEY,
+        'Authorization': f'Bearer {SUPABASE_ANON_KEY}',
+        'Content-Type': 'application/json',
+    }
+    
+    try:
+        url = f"{SUPABASE_URL}/rest/v1/api_keys?select=*&order=created_at.desc"
+        response = requests.get(url, headers=headers)
+        
+        if response.status_code == 200:
+            return response.json()
+        return []
+        
+    except Exception as e:
+        print(f"Ошибка при получении API ключей: {e}")
+        return []
+
 def translate_with_chatgpt(text: str, target_language: str) -> str:
     """Перевод текста через ChatGPT API"""
     
     try:
-        # Получаем API ключ из переменных окружения или используем заглушку
-        chatgpt_api_key = os.getenv('CHATGPT_API_KEY')
+        # Получаем API ключ из базы данных
+        chatgpt_api_key = get_api_key_from_db('chatgpt_api_key')
         
         if not chatgpt_api_key:
             # Если ключ не найден, используем заглушку с базовыми переводами
-            print("ChatGPT API ключ не найден. Используется заглушка.")
+            print("ChatGPT API ключ не найден в базе данных. Используется заглушка.")
             translations = {
                 'us': f"[EN] {text}",
                 'ft': f"[FR] {text}",

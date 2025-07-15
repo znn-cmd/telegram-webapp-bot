@@ -249,6 +249,26 @@
             font-size: 14px;
         }
 
+        .modal .form-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+        }
+
+        .modal .form-input:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
+            outline: none;
+        }
+
+        .modal .form-input[type="password"] {
+            font-family: monospace;
+        }
+
         .form-textarea:focus {
             outline: none;
             border-color: #667eea;
@@ -610,6 +630,10 @@
             📢 Публикация
         </button>
 
+        <button class="admin-btn red" onclick="openApiKeysModal()">
+            🔑 API Ключи
+        </button>
+
         <!-- Модальные окна -->
         
         <!-- Модальное окно для установки баланса -->
@@ -686,6 +710,40 @@
                     <div class="modal-actions">
                         <button class="modal-btn cancel" onclick="closeModal('publicationModal')">Отмена</button>
                         <button class="modal-btn confirm" onclick="sendPublication()">📤 Отправить</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Модальное окно для управления API ключами -->
+        <div id="apiKeysModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>🔑 Управление API ключами</h3>
+                    <button class="modal-close" onclick="closeModal('apiKeysModal')">×</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="keyName">Название ключа:</label>
+                        <select id="keyName" class="form-input">
+                            <option value="chatgpt_api_key">ChatGPT API Key</option>
+                            <option value="telegram_bot_token">Telegram Bot Token</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="keyValue">Значение ключа:</label>
+                        <input type="password" id="keyValue" class="form-input" placeholder="Введите значение ключа">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="keyDescription">Описание:</label>
+                        <textarea id="keyDescription" class="form-textarea" placeholder="Описание назначения ключа"></textarea>
+                    </div>
+                    
+                    <div class="modal-actions">
+                        <button class="modal-btn cancel" onclick="closeModal('apiKeysModal')">Отмена</button>
+                        <button class="modal-btn confirm" onclick="saveApiKey()">💾 Сохранить</button>
                     </div>
                 </div>
             </div>
@@ -801,6 +859,11 @@
         function openPublicationModal() {
             console.log('Publication modal button clicked');
             openModal('publicationModal');
+        }
+
+        function openApiKeysModal() {
+            console.log('API Keys modal button clicked');
+            openModal('apiKeysModal');
         }
 
         async function setBalance100() {
@@ -953,6 +1016,51 @@
                 } else {
                     const error = await response.json();
                     showToast(error.message || 'Ошибка отправки публикации', 'error');
+                }
+            } catch (error) {
+                showToast('Ошибка сети', 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        async function saveApiKey() {
+            const keyName = document.getElementById('keyName').value;
+            const keyValue = document.getElementById('keyValue').value.trim();
+            const description = document.getElementById('keyDescription').value.trim();
+
+            if (!keyValue) {
+                showToast('Введите значение ключа', 'warning');
+                return;
+            }
+
+            if (!userData) {
+                showToast('Ошибка: пользователь не определен', 'error');
+                return;
+            }
+
+            showLoading();
+            try {
+                const response = await fetch('/api/admin/api_keys', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        telegram_id: userData.id,
+                        key_name: keyName,
+                        key_value: keyValue,
+                        description: description
+                    })
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    showToast(result.message || 'API ключ успешно сохранен', 'success');
+                    document.getElementById('keyValue').value = '';
+                    document.getElementById('keyDescription').value = '';
+                    closeModal('apiKeysModal');
+                } else {
+                    const error = await response.json();
+                    showToast(error.message || 'Ошибка сохранения API ключа', 'error');
                 }
             } catch (error) {
                 showToast('Ошибка сети', 'error');
