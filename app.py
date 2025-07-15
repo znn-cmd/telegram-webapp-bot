@@ -240,7 +240,7 @@ def api_user_profile():
     
     # Проверяем, есть ли данные для обновления
     update_data = {}
-    for field in ['tg_name', 'last_name', 'phone', 'email', 'website', 'company', 'position', 'about_me']:
+    for field in ['first_name', 'last_name', 'phone', 'email', 'website', 'company', 'position', 'about_me']:
         if field in data:
             update_data[field] = data[field]
     
@@ -250,7 +250,7 @@ def api_user_profile():
             supabase.table('users').update(update_data).eq('telegram_id', telegram_id).execute()
         
         # Получаем обновленные данные
-        result = supabase.table('users').select('tg_name, last_name, photo_url, phone, email, website, company, position, about_me').eq('telegram_id', telegram_id).execute()
+        result = supabase.table('users').select('first_name, last_name, photo_url, phone, email, website, company, position, about_me').eq('telegram_id', telegram_id).execute()
         if result.data and len(result.data) > 0:
             return jsonify({'success': True, 'profile': result.data[0]})
         else:
