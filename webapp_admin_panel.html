@@ -119,7 +119,8 @@
                 });
                 const data = await resp.json();
                 if (resp.ok && data.success) {
-                    document.getElementById('pubSuccess').textContent = 'Публикация отправлена!';
+                    const message = `Публикация отправлена! Успешно: ${data.sent}, Ошибок: ${data.errors}, Всего получателей: ${data.total} (Админов: ${data.admins}, Обычных пользователей: ${data.regular_users})`;
+                    document.getElementById('pubSuccess').textContent = message;
                     document.getElementById('pubSuccess').style.display = 'block';
                     document.getElementById('pubText').value = '';
                 } else {

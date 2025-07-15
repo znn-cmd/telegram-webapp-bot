@@ -1568,20 +1568,38 @@ def api_admin_publish():
     user = supabase.table('users').select('user_status').eq('telegram_id', telegram_id).execute().data
     if not user or user[0].get('user_status') != 'admin':
         return jsonify({'success': False, 'error': 'Нет прав администратора'}), 403
-    # Получаем всех подписанных пользователей
-    users = supabase.table('users').select('telegram_id').eq('user_status', 'subscribed').execute().data
+    # Получаем всех пользователей для рассылки
+    users = supabase.table('users').select('telegram_id, user_status').execute().data
+    logger.info(f"Found {len(users)} users for publication")
     if not users:
-        return jsonify({'success': False, 'error': 'Нет подписчиков'}), 400
+        return jsonify({'success': False, 'error': 'Нет пользователей для рассылки'}), 400
+    
+    # Подсчитываем количество админов и обычных пользователей
+    admins_count = sum(1 for u in users if u.get('user_status') == 'admin')
+    regular_users_count = len(users) - admins_count
+    
     # Рассылка через Telegram-бота
     from telegram import Bot
     bot = Bot(TOKEN)
     errors = 0
+    sent = 0
     for u in users:
         try:
             bot.send_message(chat_id=u['telegram_id'], text=text)
-        except Exception:
+            sent += 1
+        except Exception as e:
+            logger.error(f"Failed to send message to {u['telegram_id']}: {e}")
             errors += 1
-    return jsonify({'success': True, 'sent': len(users)-errors, 'errors': errors})
+    
+    logger.info(f"Publication sent: {sent} successful, {errors} errors. Admins: {admins_count}, Regular users: {regular_users_count}")
+    return jsonify({
+        'success': True, 
+        'sent': sent, 
+        'errors': errors, 
+        'total': len(users),
+        'admins': admins_count,
+        'regular_users': regular_users_count
+    })
 
 @app.route('/api/admin_topup_balance', methods=['POST'])
 def api_admin_topup_balance():
