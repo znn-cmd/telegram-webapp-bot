@@ -73,4 +73,5 @@ tmp/
 
 # Test files
 test_*.py
+security_check.py
 test_*.html 
