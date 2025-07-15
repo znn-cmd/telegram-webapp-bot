@@ -1148,13 +1148,19 @@ def api_generate_pdf_report():
         temp_file = tempfile.NamedTemporaryFile(delete=False, suffix='.pdf')
         pdf.output(temp_file.name)
         temp_file.close()
+        # Перемещаем PDF в static/reports/
+        reports_dir = os.path.join(app.root_path, 'static', 'reports')
+        os.makedirs(reports_dir, exist_ok=True)
+        final_pdf_name = f'report_{report_id}.pdf'
+        final_pdf_path = os.path.join(reports_dir, final_pdf_name)
+        import shutil
+        shutil.move(temp_file.name, final_pdf_path)
         # Сохраняем путь к PDF в user_reports
-        if not report_id:
-            return jsonify({'error': 'report_id required'}), 400
-        supabase.table('user_reports').update({'pdf_path': temp_file.name}).eq('id', report_id).execute()
+        pdf_url = f'/static/reports/{final_pdf_name}'
+        supabase.table('user_reports').update({'pdf_path': pdf_url}).eq('id', report_id).execute()
         return jsonify({
             'success': True,
-            'pdf_path': temp_file.name,
+            'pdf_path': pdf_url,
             'message': 'PDF успешно сгенерирован и сохранен!'
         })
     except Exception as e:
