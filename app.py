@@ -1254,24 +1254,35 @@ def api_deduct_balance():
     data = request.json or {}
     telegram_id = data.get('telegram_id')
     amount = data.get('amount')
-    if not telegram_id or amount is None:
+    logger.info(f"/api/deduct_balance incoming data: {data}")
+    if telegram_id is None or str(telegram_id).strip() == '' or amount is None:
+        logger.warning("/api/deduct_balance: telegram_id or amount missing in request")
         return jsonify({'error': 'telegram_id and amount required'}), 400
     try:
-        # Получаем текущий баланс
+        telegram_id = int(telegram_id)
+        amount = float(amount)
+    except (TypeError, ValueError):
+        logger.warning(f"/api/deduct_balance: telegram_id or amount not convertible: {telegram_id}, {amount}")
+        return jsonify({'error': 'Invalid telegram_id or amount'}), 400
+    try:
         user_result = supabase.table('users').select('balance').eq('telegram_id', telegram_id).execute()
         user = user_result.data[0] if user_result.data else None
         if not user:
+            logger.warning(f"/api/deduct_balance: user not found for telegram_id {telegram_id}")
             return jsonify({'error': 'User not found'}), 404
-        balance = float(user.get('balance', 0))
-        amount = float(amount)
-        if balance < amount:
-            return jsonify({'error': 'Insufficient balance'}), 400
-        new_balance = balance - amount
-        supabase.table('users').update({'balance': new_balance}).eq('telegram_id', telegram_id).execute()
-        return jsonify({'success': True, 'new_balance': new_balance})
+        old_balance = user['balance']
+        new_balance = old_balance - amount
+        # Приводим к int для smallint
+        new_balance_int = int(new_balance)
+        logger.info(f"/api/deduct_balance: old_balance={old_balance}, amount={amount}, new_balance_int={new_balance_int}")
+        update_result = supabase.table('users').update({'balance': new_balance_int}).eq('telegram_id', telegram_id).execute()
+        if update_result.error:
+            logger.error(f"Error in deduct_balance: {update_result.error}")
+            return jsonify({'error': 'Failed to update balance', 'details': str(update_result.error)}), 500
+        return jsonify({'success': True, 'new_balance': new_balance_int})
     except Exception as e:
         logger.error(f"Error in deduct_balance: {e}")
-        return jsonify({'error': 'Internal error'}), 500
+        return jsonify({'error': 'Internal server error', 'details': str(e)}), 500
 # === Запуск Flask приложения ===
 def run_flask():
     """Запуск Flask приложения"""

@@ -746,57 +746,48 @@
                 let periodStart = data.period_start ? new Date(data.period_start) : null;
                 let periodEnd = data.period_end ? new Date(data.period_end) : null;
                 if (periodStart && periodEnd && today >= periodStart && today <= periodEnd) {
-                    // Бесплатно по подписке
-                    showModalInfo(`У вас оплачен период пользования до ${periodEnd.toLocaleDateString()}<br>Для вас отчет бесплатный!`, () => {
-                        closeModalInfo();
-                        showFullReportConfirmModal(lastReportAddress, lastReportBedrooms, lastReportPrice, telegram_id, true);
-                    });
+                    // Бесплатно по подписке — сразу формируем отчет
+                    showToast(`У вас оплачен период пользования до ${periodEnd.toLocaleDateString()}. Для вас отчет бесплатный!`, 'success');
+                    showFullReportConfirmModal(lastReportAddress, lastReportBedrooms, lastReportPrice, telegram_id, true);
                 } else {
-                    // Платно
-                    showModalConfirm(`Сформировать полный отчет за <b>${data.full_report_price} EUR</b>?`, async (agree) => {
-                        closeModalConfirm();
-                        if (!agree) return; // отказ — ничего не делаем
-                        // Проверяем баланс
-                        if (parseFloat(data.balance) >= parseFloat(data.full_report_price)) {
-                            // Списываем баланс
-                            showProgressBar('Списываем средства...', 30);
-                            try {
-                                const deductRes = await fetch('/api/deduct_balance', {
-                                    method: 'POST',
-                                    headers: { 'Content-Type': 'application/json' },
-                                    body: JSON.stringify({ telegram_id, amount: data.full_report_price })
-                                });
-                                if (!deductRes.ok) throw new Error('Ошибка соединения с сервером');
-                                const deductData = await deductRes.json();
-                                hideProgressBar();
-                                if (deductData.success) {
-                                    showToast('Средства успешно списаны. Формируем отчет...', 'success');
-                                    showFullReportConfirmModal(lastReportAddress, lastReportBedrooms, lastReportPrice, telegram_id, false);
-                                } else if (deductData.error === 'Insufficient balance') {
-                                    // Баланс изменился — повторно предложить пополнить
-                                    showModalTopup(`Недостаточно средств для получения полного отчета.<br>Стоимость: <b>${data.full_report_price} EUR</b>`, () => {
-                                        closeModalTopup();
-                                        showTopupModal();
-                                    }, () => {
-                                        closeModalTopup();
-                                    }, data.balance);
-                                } else {
-                                    showToast('Ошибка списания средств', 'error');
-                                }
-                            } catch (e) {
-                                hideProgressBar();
-                                showToast(e.message || 'Ошибка списания', 'error');
+                    // Платно — сразу списываем средства и формируем отчет
+                    if (parseFloat(data.balance) >= parseFloat(data.full_report_price)) {
+                        showProgressBar('Списываем средства...', 30);
+                        try {
+                            const deductRes = await fetch('/api/deduct_balance', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ telegram_id, amount: data.full_report_price })
+                            });
+                            if (!deductRes.ok) throw new Error('Ошибка соединения с сервером');
+                            const deductData = await deductRes.json();
+                            hideProgressBar();
+                            if (deductData.success) {
+                                showToast('Средства успешно списаны. Формируем отчет...', 'success');
+                                showFullReportConfirmModal(lastReportAddress, lastReportBedrooms, lastReportPrice, telegram_id, false);
+                            } else if (deductData.error === 'Insufficient balance') {
+                                showModalTopup(`Недостаточно средств для получения полного отчета.<br>Стоимость: <b>${data.full_report_price} EUR</b>`, () => {
+                                    closeModalTopup();
+                                    showTopupModal();
+                                }, () => {
+                                    closeModalTopup();
+                                }, data.balance);
+                            } else {
+                                showToast('Ошибка списания средств', 'error');
                             }
-                        } else {
-                            // Недостаточно средств
-                            showModalTopup(`Недостаточно средств для получения полного отчета.<br>Стоимость: <b>${data.full_report_price} EUR</b>`, () => {
-                                closeModalTopup();
-                                showTopupModal();
-                            }, () => {
-                                closeModalTopup();
-                            }, data.balance);
+                        } catch (e) {
+                            hideProgressBar();
+                            showToast(e.message || 'Ошибка списания', 'error');
                         }
-                    });
+                    } else {
+                        // Недостаточно средств
+                        showModalTopup(`Недостаточно средств для получения полного отчета.<br>Стоимость: <b>${data.full_report_price} EUR</b>`, () => {
+                            closeModalTopup();
+                            showTopupModal();
+                        }, () => {
+                            closeModalTopup();
+                        }, data.balance);
+                    }
                 }
             } catch (e) {
                 hideProgressBar();
