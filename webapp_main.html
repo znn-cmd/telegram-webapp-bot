@@ -420,7 +420,7 @@
             <div class="user-name" id="userName">Загрузка...</div>
             <div class="user-balance" style="margin-top: 10px;">
                 <span>Баланс:</span>
-                <span class="balance-amount" id="userBalance">$0</span>
+                <span class="balance-amount" id="userBalance">€0</span>
             </div>
         </div>
 
@@ -782,7 +782,7 @@
 
                     // Баланс с цветовой индикацией
                     const balanceElement = document.getElementById('userBalance');
-                    balanceElement.textContent = `$${userInfo.balance}`;
+                    balanceElement.textContent = `€${userInfo.balance}`;
                     if (userInfo.balance < 5) {
                         balanceElement.classList.add('balance-low');
                     } else {
