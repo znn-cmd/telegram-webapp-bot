@@ -1193,16 +1193,18 @@
             window.location.href = '/webapp';
         }
 
-        function getTelegramId() {
-            // Telegram WebApp
+        (function saveTelegramIdToLocalStorage() {
             if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe && window.Telegram.WebApp.initDataUnsafe.user) {
-                return window.Telegram.WebApp.initDataUnsafe.user.id;
+                const telegramId = window.Telegram.WebApp.initDataUnsafe.user.id;
+                if (telegramId) {
+                    localStorage.setItem('telegram_id', telegramId);
+                }
             }
-            // fallback: localStorage
-            const id = localStorage.getItem('telegram_id');
-            if (id) return id;
-            // fallback: prompt (для отладки)
-            return prompt('Введите ваш telegram_id (только для отладки):');
+        })();
+
+        function getTelegramId() {
+            // Теперь всегда берём из localStorage (он гарантированно будет сохранён при запуске через Telegram)
+            return localStorage.getItem('telegram_id');
         }
 
         // Инициализация
