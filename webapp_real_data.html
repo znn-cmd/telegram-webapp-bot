@@ -365,19 +365,6 @@
 
     <!-- Toast Notifications Container -->
     <div id="toast-container" class="toast-container"></div>
-
-    <!-- Client Modal -->
-    <div id="client-modal" class="client-modal" style="display: none;">
-        <div class="client-modal-content">
-            <div style="font-size: 19px; font-weight: 700; color: #667eea; margin-bottom: 16px;" id="client-modal-title">Отправить отчет клиенту</div>
-            <input type="text" id="client-name" class="client-input" placeholder="Имя клиента">
-            <input type="text" id="client-username" class="client-input" placeholder="Telegram username (без @)">
-            <div class="btn-row">
-                <button class="btn btn-secondary" onclick="closeClientModal()" id="client-modal-cancel">Отмена</button>
-                <button class="btn btn-primary" onclick="sendReportToClient()" id="client-modal-send">Отправить</button>
-            </div>
-        </div>
-    </div>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBrDkDpNKNAIyY147MQ78hchBkeyCAxhEw"></script>
     <script>
         let geoData = null;
@@ -420,77 +407,6 @@
                 toast.classList.remove('show');
                 setTimeout(() => container.removeChild(toast), 300);
             }, duration);
-        }
-
-        // Client Modal Functions
-        function showClientModal() {
-            updateClientModalText();
-            document.getElementById('client-modal').style.display = 'flex';
-        }
-
-        function closeClientModal() {
-            document.getElementById('client-modal').style.display = 'none';
-            document.getElementById('client-name').value = '';
-            document.getElementById('client-username').value = '';
-        }
-
-        function updateClientModalText() {
-            document.getElementById('client-modal-title').textContent = getLocalizedText('client_modal.title');
-            document.getElementById('client-name').placeholder = getLocalizedText('client_modal.client_name_placeholder');
-            document.getElementById('client-username').placeholder = getLocalizedText('client_modal.client_username_placeholder');
-            document.getElementById('client-modal-cancel').textContent = getLocalizedText('client_modal.cancel');
-            document.getElementById('client-modal-send').textContent = getLocalizedText('client_modal.send');
-        }
-
-        async function sendReportToClient() {
-            const clientName = document.getElementById('client-name').value.trim();
-            const clientUsername = document.getElementById('client-username').value.trim();
-            
-            if (!clientName || !clientUsername) {
-                showToast(getLocalizedText('notifications.fill_all_fields'), 'error');
-                return;
-            }
-
-            if (!currentReportData) {
-                showToast(getLocalizedText('notifications.report_data_error'), 'error');
-                return;
-            }
-
-            closeClientModal();
-            showProgressBar(getLocalizedText('progress.sending_to_client'), 0);
-
-            try {
-                const response = await fetch('/api/send_report_to_client', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        telegram_id: getTelegramId(),
-                        client_name: clientName,
-                        client_username: clientUsername,
-                        report_data: currentReportData
-                    })
-                });
-
-                const result = await response.json();
-                
-                if (result.success) {
-                    showToast(getLocalizedText('notifications.report_sent_success'), 'success');
-                } else {
-                    showToast(result.error || getLocalizedText('notifications.report_sent_error'), 'error');
-                }
-            } catch (error) {
-                showToast(getLocalizedText('notifications.connection_send_error'), 'error');
-            } finally {
-                hideProgressBar();
-            }
-        }
-
-        // Helper function to get Telegram ID
-        function getTelegramId() {
-            if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe && window.Telegram.WebApp.initDataUnsafe.user) {
-                return window.Telegram.WebApp.initDataUnsafe.user.id;
-            }
-            return 1952374904; // Fallback
         }
 
         // Localization helper
@@ -756,8 +672,9 @@
 
             // Кнопки
             const buttonsHtml = `
-                <div class="btn-row" style="margin-bottom:10px;">
-                    <button class="btn btn-primary" style="width:100%;" onclick="copyReportToClipboard()">Скопировать данные в буфер</button>
+                <div class="btn-row" style="margin-bottom:10px; justify-content: center; gap: 16px;">
+                    <button class="btn btn-primary" style="width:48%;min-width:140px;" onclick="copyReportToClipboard()">Скопировать данные</button>
+                    <button class="btn btn-secondary" style="width:48%;min-width:140px;" onclick="downloadPdfReport()">Скачать PDF</button>
                 </div>
             `;
             document.getElementById('reportResult').innerHTML = headerHtml + blocksHtml + buttonsHtml;

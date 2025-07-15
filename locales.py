@@ -46,7 +46,6 @@ locales = {
         'progress': {
             'checking_balance': 'Проверяем баланс...',
             'generating_report': 'Формируем полный отчет...',
-            'sending_to_client': 'Отправляем отчет клиенту...',
             'processing_request': 'Обрабатываем запрос...'
         },
         'notifications': {
@@ -55,19 +54,7 @@ locales = {
             'balance_check_error': 'Ошибка проверки баланса',
             'deduction_error': 'Ошибка списания баланса',
             'connection_error': 'Ошибка соединения при формировании отчета',
-            'report_generated': 'Полный отчет сформирован!',
-            'report_sent_success': 'Отчет успешно отправлен клиенту!',
-            'report_sent_error': 'Ошибка отправки отчета',
-            'connection_send_error': 'Ошибка соединения при отправке',
-            'fill_all_fields': 'Пожалуйста, заполните все поля',
-            'report_data_error': 'Ошибка: данные отчета не найдены'
-        },
-        'client_modal': {
-            'title': 'Отправить отчет клиенту',
-            'client_name_placeholder': 'Имя клиента',
-            'client_username_placeholder': 'Telegram username (без @)',
-            'cancel': 'Отмена',
-            'send': 'Отправить'
+            'report_generated': 'Полный отчет сформирован!'
         }
     },
     'en': {
@@ -117,7 +104,6 @@ locales = {
         'progress': {
             'checking_balance': 'Checking balance...',
             'generating_report': 'Generating full report...',
-            'sending_to_client': 'Sending report to client...',
             'processing_request': 'Processing request...'
         },
         'notifications': {
@@ -126,19 +112,7 @@ locales = {
             'balance_check_error': 'Balance check error',
             'deduction_error': 'Balance deduction error',
             'connection_error': 'Connection error during report generation',
-            'report_generated': 'Full report generated!',
-            'report_sent_success': 'Report successfully sent to client!',
-            'report_sent_error': 'Report sending error',
-            'connection_send_error': 'Connection send error',
-            'fill_all_fields': 'Please fill in all fields',
-            'report_data_error': 'Error: report data not found'
-        },
-        'client_modal': {
-            'title': 'Send report to client',
-            'client_name_placeholder': 'Client name',
-            'client_username_placeholder': 'Telegram username (without @)',
-            'cancel': 'Cancel',
-            'send': 'Send'
+            'report_generated': 'Full report generated!'
         }
     },
     'de': {
@@ -188,7 +162,6 @@ locales = {
         'progress': {
             'checking_balance': 'Kontostand wird überprüft...',
             'generating_report': 'Vollständiger Bericht wird erstellt...',
-            'sending_to_client': 'Bericht an den Kunden gesendet...',
             'processing_request': 'Anfrage wird verarbeitet...'
         },
         'notifications': {
@@ -197,19 +170,7 @@ locales = {
             'balance_check_error': 'Kontostand-Fehler',
             'deduction_error': 'Kontostand-Abzug-Fehler',
             'connection_error': 'Verbindungsfehler beim Berichtsgenerieren',
-            'report_generated': 'Vollständiger Bericht erstellt!',
-            'report_sent_success': 'Bericht erfolgreich an den Kunden gesendet!',
-            'report_sent_error': 'Berichtsendefehler',
-            'connection_send_error': 'Verbindungsfehler beim Senden',
-            'fill_all_fields': 'Bitte füllen Sie alle Felder aus',
-            'report_data_error': 'Fehler: Berichtsdaten nicht gefunden'
-        },
-        'client_modal': {
-            'title': 'Bericht an Kunden senden',
-            'client_name_placeholder': 'Kundenname',
-            'client_username_placeholder': 'Telegram Benutzername (ohne @)',
-            'cancel': 'Abbrechen',
-            'send': 'Senden'
+            'report_generated': 'Vollständiger Bericht erstellt!'
         }
     },
     'fr': {
@@ -259,7 +220,6 @@ locales = {
         'progress': {
             'checking_balance': 'Vérification du solde...',
             'generating_report': 'Génération du rapport complet...',
-            'sending_to_client': 'Envoi du rapport au client...',
             'processing_request': 'Traitement de la demande...'
         },
         'notifications': {
@@ -268,19 +228,7 @@ locales = {
             'balance_check_error': 'Erreur de vérification du solde',
             'deduction_error': 'Erreur de déduction du solde',
             'connection_error': 'Erreur de connexion lors de la génération du rapport',
-            'report_generated': 'Rapport complet généré !',
-            'report_sent_success': 'Rapport envoyé avec succès au client !',
-            'report_sent_error': 'Erreur d\'envoi de rapport',
-            'connection_send_error': 'Erreur de connexion lors de l\'envoi',
-            'fill_all_fields': 'Veuillez remplir tous les champs',
-            'report_data_error': 'Erreur : données de rapport non trouvées'
-        },
-        'client_modal': {
-            'title': 'Envoyer le rapport au client',
-            'client_name_placeholder': 'Nom du client',
-            'client_username_placeholder': 'Nom d\'utilisateur Telegram (sans @)',
-            'cancel': 'Annuler',
-            'send': 'Envoyer'
+            'report_generated': 'Rapport complet généré !'
         }
     },
     'tr': {
@@ -324,7 +272,6 @@ locales = {
         'progress': {
             'checking_balance': 'Bakiye kontrol ediliyor...',
             'generating_report': 'Tam rapor oluşturuluyor...',
-            'sending_to_client': 'Rapor müşteriye gönderiliyor...',
             'processing_request': 'İsteğin işleniyor...'
         },
         'notifications': {
@@ -333,19 +280,7 @@ locales = {
             'balance_check_error': 'Bakiye kontrol hatası',
             'deduction_error': 'Bakiye indirme hatası',
             'connection_error': 'Rapor oluşturma sırasında bağlantı hatası',
-            'report_generated': 'Tam rapor oluşturuldu!',
-            'report_sent_success': 'Rapor müşteriye başarıyla gönderildi!',
-            'report_sent_error': 'Rapor gönderme hatası',
-            'connection_send_error': 'Gönderme sırasında bağlantı hatası',
-            'fill_all_fields': 'Lütfen tüm alanları doldurun',
-            'report_data_error': 'Hata: rapor verileri bulunamadı'
-        },
-        'client_modal': {
-            'title': 'Raporu müşteriye gönder',
-            'client_name_placeholder': 'Müşteri adı',
-            'client_username_placeholder': 'Telegram kullanıcı adı (örn: @username)',
-            'cancel': 'İptal',
-            'send': 'Gönder'
+            'report_generated': 'Tam rapor oluşturuldu!'
         }
     }
 } 
