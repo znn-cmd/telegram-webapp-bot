@@ -911,7 +911,7 @@ def api_full_report():
             'full_report': full_report_data
         }
         result = supabase.table('user_reports').insert(report_data).execute()
-        report_id = result.data[0]['id'] if result.data else None
+        report_id = result.data[0]['id'] if hasattr(result, 'data') and result.data else None
         return jsonify({
             'success': True, 
             'full_report': full_report_data, 
@@ -1407,82 +1407,97 @@ def api_send_saved_report_pdf():
         if not report_result.data or not report_result.data[0].get('full_report'):
             return jsonify({'error': 'Report not found'}), 404
         report = report_result.data[0]['full_report']
+        if not isinstance(report, dict):
+            return jsonify({'error': 'Invalid report data'}), 500
         # Генерируем PDF (без контактов)
         from fpdf import FPDF
         import tempfile, shutil
         pdf = FPDF()
         pdf.add_page()
-        pdf.add_font('DejaVu', '', 'fonts/DejaVuSans.ttf', uni=True)
-        pdf.add_font('DejaVu', 'B', 'fonts/DejaVuSans-Bold.ttf', uni=True)
+        pdf.add_font('DejaVu', '', 'fonts/DejaVuSans.ttf')
+        pdf.add_font('DejaVu', 'B', 'fonts/DejaVuSans-Bold.ttf')
         pdf.set_font('DejaVu', 'B', 16)
-        pdf.cell(0, 10, 'Полный отчет по недвижимости', ln=True, align='C')
+        pdf.cell(0, 10, 'Полный отчет по недвижимости', ln=1, align='C')
         pdf.ln(10)
-        if report.get('object'):
-            pdf.set_font('DejaVu', 'B', 12)
-            pdf.cell(0, 10, 'Информация об объекте:', ln=True)
-            pdf.set_font('DejaVu', '', 10)
-            obj = report['object']
-            pdf.cell(0, 8, f'Адрес: {obj.get("address", "Не указан")}', ln=True)
-            pdf.cell(0, 8, f'Спален: {obj.get("bedrooms", "Не указано")}', ln=True)
-            pdf.cell(0, 8, f'Цена: €{obj.get("purchase_price", "Не указана")}', ln=True)
-            pdf.ln(5)
-        if 'roi' in report:
+        obj = report.get('object') or {}
+        pdf.set_font('DejaVu', 'B', 12)
+        pdf.cell(0, 10, 'Информация об объекте:', ln=1)
+        pdf.set_font('DejaVu', '', 10)
+        pdf.cell(0, 8, f'Адрес: {obj.get("address", "Не указан")}', ln=1)
+        pdf.cell(0, 8, f'Спален: {obj.get("bedrooms", "Не указано")}', ln=1)
+        pdf.cell(0, 8, f'Цена: €{obj.get("purchase_price", "Не указана")}', ln=1)
+        pdf.ln(5)
+        # ROI анализ
+        roi = report.get('roi')
+        if roi:
             pdf.set_font("DejaVu", 'B', 14)
-            pdf.cell(200, 10, txt="Инвестиционный анализ (ROI):", ln=True)
+            pdf.cell(0, 10, "Инвестиционный анализ (ROI):", ln=1)
             pdf.set_font("DejaVu", size=12)
-            pdf.cell(200, 8, txt=f"Краткосрочная аренда: ROI {report['roi']['short_term']['roi']}%", ln=True)
-            pdf.cell(200, 8, txt=f"Долгосрочная аренда: ROI {report['roi']['long_term']['roi']}%", ln=True)
-            pdf.cell(200, 8, txt=f"Без аренды: ROI {report['roi']['no_rent']['roi']}%", ln=True)
+            st = roi.get('short_term', {})
+            lt = roi.get('long_term', {})
+            nr = roi.get('no_rent', {})
+            pdf.cell(0, 8, f"Краткосрочная аренда: ROI {st.get('roi', '-')}", ln=1)
+            pdf.cell(0, 8, f"Долгосрочная аренда: ROI {lt.get('roi', '-')}", ln=1)
+            pdf.cell(0, 8, f"Без аренды: ROI {nr.get('roi', '-')}", ln=1)
             pdf.ln(5)
-        if 'macro' in report:
+        # Макроэкономика
+        macro = report.get('macro')
+        if macro:
             pdf.set_font("DejaVu", 'B', 14)
-            pdf.cell(200, 10, txt="Макроэкономические показатели:", ln=True)
+            pdf.cell(0, 10, "Макроэкономические показатели:", ln=1)
             pdf.set_font("DejaVu", size=12)
-            pdf.cell(200, 8, txt=f"Инфляция: {report['macro']['inflation']}%", ln=True)
-            pdf.cell(200, 8, txt=f"Ключевая ставка: {report['macro']['refi_rate']}%", ln=True)
-            pdf.cell(200, 8, txt=f"Рост ВВП: {report['macro']['gdp_growth']}%", ln=True)
+            pdf.cell(0, 8, f"Инфляция: {macro.get('inflation', '-')}%", ln=1)
+            pdf.cell(0, 8, f"Ключевая ставка: {macro.get('refi_rate', '-')}%", ln=1)
+            pdf.cell(0, 8, f"Рост ВВП: {macro.get('gdp_growth', '-')}%", ln=1)
             pdf.ln(5)
-        if 'taxes' in report:
+        # Налоги
+        taxes = report.get('taxes')
+        if taxes:
             pdf.set_font("DejaVu", 'B', 14)
-            pdf.cell(200, 10, txt="Налоги и сборы:", ln=True)
+            pdf.cell(0, 10, "Налоги и сборы:", ln=1)
             pdf.set_font("DejaVu", size=12)
-            pdf.cell(200, 8, txt=f"Налог на перевод: {report['taxes']['transfer_tax']*100}%", ln=True)
-            pdf.cell(200, 8, txt=f"Гербовый сбор: {report['taxes']['stamp_duty']*100}%", ln=True)
-            pdf.cell(200, 8, txt=f"Нотариус: €{report['taxes']['notary']}", ln=True)
+            pdf.cell(0, 8, f"Налог на перевод: {taxes.get('transfer_tax', 0)*100}%", ln=1)
+            pdf.cell(0, 8, f"Гербовый сбор: {taxes.get('stamp_duty', 0)*100}%", ln=1)
+            pdf.cell(0, 8, f"Нотариус: €{taxes.get('notary', '-')}" , ln=1)
             pdf.ln(5)
-        if 'alternatives' in report and isinstance(report['alternatives'], list):
+        # Альтернативы
+        alternatives = report.get('alternatives')
+        if isinstance(alternatives, list):
             pdf.set_font('DejaVu', 'B', 14)
-            pdf.cell(0, 10, 'Сравнение с альтернативами (5 лет):', ln=True)
+            pdf.cell(0, 10, 'Сравнение с альтернативами (5 лет):', ln=1)
             pdf.set_font('DejaVu', '', 12)
-            for alt in report['alternatives']:
+            for alt in alternatives:
                 name = alt.get('name', '-')
                 yld = alt.get('yield', 0)
-                pdf.cell(0, 8, f'{name}: {round(yld*100, 1)}%', ln=True)
+                pdf.cell(0, 8, f'{name}: {round(yld*100, 1)}%', ln=1)
             pdf.ln(5)
-        if 'yield' in report or 'price_index' in report or 'mortgage_rate' in report or 'global_house_price_index' in report:
+        # Профессиональные метрики
+        if any(k in report for k in ['yield', 'price_index', 'mortgage_rate', 'global_house_price_index']):
             pdf.set_font('DejaVu', 'B', 14)
-            pdf.cell(0, 10, 'Профессиональные метрики:', ln=True)
+            pdf.cell(0, 10, 'Профессиональные метрики:', ln=1)
             pdf.set_font('DejaVu', '', 12)
             if 'yield' in report:
-                pdf.cell(0, 8, f'Yield: {round(report["yield"]*100, 1)}%', ln=True)
+                pdf.cell(0, 8, f'Yield: {round(report.get("yield", 0)*100, 1)}%', ln=1)
             if 'price_index' in report:
-                pdf.cell(0, 8, f'Индекс цен: {report["price_index"]}', ln=True)
+                pdf.cell(0, 8, f'Индекс цен: {report.get("price_index", "-")}', ln=1)
             if 'mortgage_rate' in report:
-                pdf.cell(0, 8, f'Ипотечная ставка: {round(report["mortgage_rate"]*100, 1)}%', ln=True)
+                pdf.cell(0, 8, f'Ипотечная ставка: {round(report.get("mortgage_rate", 0)*100, 1)}%', ln=1)
             if 'global_house_price_index' in report:
-                pdf.cell(0, 8, f'Глобальный индекс цен: {report["global_house_price_index"]}', ln=True)
+                pdf.cell(0, 8, f'Глобальный индекс цен: {report.get("global_house_price_index", "-")}', ln=1)
             pdf.ln(5)
-        if 'risks' in report or 'liquidity' in report or 'district' in report:
+        # Риски и развитие района
+        if any(k in report for k in ['risks', 'liquidity', 'district']):
             pdf.set_font('DejaVu', 'B', 14)
-            pdf.cell(0, 10, 'Риски и развитие района:', ln=True)
+            pdf.cell(0, 10, 'Риски и развитие района:', ln=1)
             pdf.set_font('DejaVu', '', 12)
-            if 'risks' in report and isinstance(report['risks'], list):
-                for idx, risk in enumerate(report['risks']):
-                    pdf.cell(0, 8, f'Риск {idx+1}: {risk}', ln=True)
+            risks = report.get('risks')
+            if isinstance(risks, list):
+                for idx, risk in enumerate(risks):
+                    pdf.cell(0, 8, f'Риск {idx+1}: {risk}', ln=1)
             if 'liquidity' in report:
-                pdf.cell(0, 8, f'Ликвидность: {report["liquidity"]}', ln=True)
+                pdf.cell(0, 8, f'Ликвидность: {report.get("liquidity", "-")}', ln=1)
             if 'district' in report:
-                pdf.cell(0, 8, f'Развитие района: {report["district"]}', ln=True)
+                pdf.cell(0, 8, f'Развитие района: {report.get("district", "-")}', ln=1)
             pdf.ln(5)
         # Сохраняем PDF во временный файл
         temp_file = tempfile.NamedTemporaryFile(delete=False, suffix='.pdf')
