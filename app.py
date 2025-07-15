@@ -1219,7 +1219,6 @@ def run_flask():
     app.run(host='0.0.0.0', port=8080, debug=False)
 
 if __name__ == '__main__':
-    # Для WebApp запускаем только Flask
     run_flask()
 
 @app.route('/api/update_user_report', methods=['POST'])
