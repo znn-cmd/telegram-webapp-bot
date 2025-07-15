@@ -573,6 +573,8 @@
                 'savedReportsDesc': 'История ваших запросов',
                 'profileBtn': 'Личный кабинет',
                 'profileDesc': 'Настройки и баланс',
+                'adminPanelBtn': 'Админ-панель',
+                'adminPanelDesc': 'Управление пользователями и публикациями',
                 'welcome_new': 'Добро пожаловать в Aaadvisor',
                 'welcome_back': 'С возвращением!',
                 'error_loading': 'Ошибка загрузки данных',
@@ -594,6 +596,8 @@
                 'savedReportsDesc': 'Your analysis history',
                 'profileBtn': 'Profile',
                 'profileDesc': 'Settings and balance',
+                'adminPanelBtn': 'Admin Panel',
+                'adminPanelDesc': 'User and publication management',
                 'welcome_new': 'Welcome to Aaadvisor',
                 'welcome_back': 'Welcome back!',
                 'error_loading': 'Error loading data',
@@ -686,6 +690,15 @@
             document.getElementById('profileBtn').textContent = getText('profileBtn');
             document.getElementById('profileDesc').textContent = getText('profileDesc');
             document.getElementById('loadingText').textContent = getText('loading');
+            
+            // Обновляем текст кнопки админ-панели
+            const adminBtn = document.getElementById('adminPanelBtn');
+            if (adminBtn) {
+                const adminBtnText = adminBtn.querySelector('.menu-btn-text');
+                const adminBtnDesc = adminBtn.querySelector('.menu-btn-description');
+                if (adminBtnText) adminBtnText.textContent = getText('adminPanelBtn');
+                if (adminBtnDesc) adminBtnDesc.textContent = getText('adminPanelDesc');
+            }
         }
 
         // Установка языка
@@ -782,10 +795,13 @@
                     }
 
                     // Показываем кнопку админ-панели только для admin
+                    console.log('User status:', userInfo.user_status);
                     if (userInfo.user_status === 'admin') {
                         document.getElementById('adminPanelBtn').classList.remove('hidden');
+                        console.log('Admin button shown');
                     } else {
                         document.getElementById('adminPanelBtn').classList.add('hidden');
+                        console.log('Admin button hidden');
                     }
                 } else {
                     const err = await response.json();
