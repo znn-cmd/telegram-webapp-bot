@@ -724,6 +724,10 @@
         // Основная логика для кнопки 'Получить полный отчет'
         async function showFullReportStub() {
             let telegram_id = getTelegramId();
+            if (!telegram_id) {
+                showToast('Ошибка: не удалось определить telegram_id пользователя. Откройте WebApp из Telegram.', 'error', 6000);
+                return;
+            }
             showProgressBar('Проверяем доступ...', 20);
             try {
                 const res = await fetch('/api/full_report_access', {
@@ -1375,8 +1379,16 @@
         })();
 
         function getTelegramId() {
-            // Теперь всегда берём из localStorage (он гарантированно будет сохранён при запуске через Telegram)
-            return localStorage.getItem('telegram_id');
+            // Всегда берём из Telegram WebApp API, если есть, иначе из localStorage
+            if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe && window.Telegram.WebApp.initDataUnsafe.user && window.Telegram.WebApp.initDataUnsafe.user.id) {
+                const telegramId = window.Telegram.WebApp.initDataUnsafe.user.id;
+                localStorage.setItem('telegram_id', telegramId);
+                return telegramId;
+            }
+            // Fallback: localStorage
+            const stored = localStorage.getItem('telegram_id');
+            if (stored) return stored;
+            return null;
         }
 
         // Инициализация
