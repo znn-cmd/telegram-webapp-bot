@@ -13,7 +13,6 @@ import datetime
 from fpdf import FPDF
 import tempfile
 import os
-from datetime import datetime, timedelta
 
 # Загружаем переменные окружения
 load_dotenv()
@@ -171,10 +170,6 @@ def health():
 def serve_logo():
     return send_from_directory('.', 'logo-sqv.png')
 
-@app.route('/logo-flt.png')
-def serve_logo_flt():
-    return send_from_directory('.', 'logo-flt.png')
-
 @app.route('/api/user', methods=['POST'])
 def api_user():
     data = request.json or {}
@@ -209,7 +204,6 @@ def api_user():
             'username': user.get('username'),
             'balance': user.get('balance', 0),
             'telegram_id': user.get('telegram_id'),
-            'user_status': user.get('user_status'),
         })
     else:
         # Новый пользователь
@@ -232,7 +226,6 @@ def api_user():
             'languages': locales[lang]['language_names'],
             'balance': 0,
             'telegram_id': telegram_id,
-            'user_status': 'user',
         })
 
 @app.route('/api/user_profile', methods=['POST'])
@@ -1546,280 +1539,6 @@ def run_flask():
         print(f"{rule.methods} {rule}")
     print("====================\n")
     app.run(host='0.0.0.0', port=8080, debug=False)
-
-@app.route('/webapp_admin_panel')
-def webapp_admin_panel():
-    with open('webapp_admin_panel.html', 'r', encoding='utf-8') as f:
-        return f.read()
-
-@app.route('/api/admin_publish', methods=['POST'])
-def api_admin_publish():
-    data = request.json or {}
-    text = data.get('text', '').strip()
-    telegram_id = request.headers.get('X-Telegram-Id') or (request.json.get('telegram_id') if request.json else None)
-    if not text:
-        return jsonify({'success': False, 'error': 'Текст публикации обязателен'}), 400
-    if not telegram_id:
-        return jsonify({'success': False, 'error': 'Нет telegram_id администратора'}), 403
-    try:
-        telegram_id = int(telegram_id)
-    except Exception:
-        return jsonify({'success': False, 'error': 'Некорректный telegram_id'}), 403
-    # Проверка, что это админ
-    user = supabase.table('users').select('user_status').eq('telegram_id', telegram_id).execute().data
-    if not user or user[0].get('user_status') != 'admin':
-        return jsonify({'success': False, 'error': 'Нет прав администратора'}), 403
-    # Получаем всех пользователей для рассылки
-    users = supabase.table('users').select('telegram_id, user_status').execute().data
-    logger.info(f"Found {len(users)} users for publication")
-    if not users:
-        return jsonify({'success': False, 'error': 'Нет пользователей для рассылки'}), 400
-    
-    # Подсчитываем количество админов и обычных пользователей
-    admins_count = sum(1 for u in users if u.get('user_status') == 'admin')
-    regular_users_count = len(users) - admins_count
-    
-    # Рассылка через Telegram-бота (используем HTTP API как в PDF отправке)
-    bot_token = os.getenv("TELEGRAM_BOT_TOKEN") or '7215676549:AAFS86JbRCqwzTKQG-dF96JX-C1aWNvBoLo'
-    send_url = f'https://api.telegram.org/bot{bot_token}/sendMessage'
-    errors = 0
-    sent = 0
-    for u in users:
-        try:
-            data_send = {
-                'chat_id': u['telegram_id'],
-                'text': text,
-                'parse_mode': 'HTML'
-            }
-            resp = requests.post(send_url, data=data_send)
-            if resp.status_code == 200 and resp.json().get('ok'):
-                sent += 1
-                logger.info(f"Message sent successfully to {u['telegram_id']}")
-            else:
-                errors += 1
-                logger.error(f"Failed to send message to {u['telegram_id']}: {resp.text}")
-        except Exception as e:
-            logger.error(f"Failed to send message to {u['telegram_id']}: {e}")
-            errors += 1
-    
-    logger.info(f"Publication sent: {sent} successful, {errors} errors. Admins: {admins_count}, Regular users: {regular_users_count}")
-    return jsonify({
-        'success': True, 
-        'sent': sent, 
-        'errors': errors, 
-        'total': len(users),
-        'admins': admins_count,
-        'regular_users': regular_users_count
-    })
-
-@app.route('/api/admin_topup_balance', methods=['POST'])
-def api_admin_topup_balance():
-    data = request.json or {}
-    telegram_id = data.get('telegram_id')
-    if not telegram_id:
-        return jsonify({'success': False, 'error': 'Нет telegram_id'}), 400
-    try:
-        telegram_id = int(telegram_id)
-    except Exception:
-        return jsonify({'success': False, 'error': 'Некорректный telegram_id'}), 400
-    
-    # Проверка, что это админ
-    user = supabase.table('users').select('user_status').eq('telegram_id', telegram_id).execute().data
-    if not user or user[0].get('user_status') != 'admin':
-        return jsonify({'success': False, 'error': 'Нет прав администратора'}), 403
-    
-    # Пополняем баланс до 100
-    try:
-        supabase.table('users').update({'balance': 100}).eq('telegram_id', telegram_id).execute()
-        return jsonify({'success': True, 'message': 'Баланс пополнен до 100€'})
-    except Exception as e:
-        logger.error(f"Error updating balance: {e}")
-        return jsonify({'success': False, 'error': 'Ошибка обновления баланса'}), 500
-
-@app.route('/api/admin/users', methods=['GET'])
-def api_admin_users():
-    # Проверка прав администратора (можно доработать по токену)
-    # Фильтры: status, search, offset, limit
-    status = request.args.get('status')  # 'admin', 'user', None
-    search = request.args.get('search')  # username, name, telegram_id
-    offset = int(request.args.get('offset', 0))
-    limit = int(request.args.get('limit', 20))
-    query = supabase.table('users').select('*')
-    if status in ('admin', 'user'):
-        query = query.eq('user_status', status)
-    if search:
-        # Поиск по username, tg_name, last_name, telegram_id
-        query = query.or_(
-            f"username.ilike.%{search}%", f"tg_name.ilike.%{search}%", f"last_name.ilike.%{search}%", f"telegram_id.eq.{search}"
-        )
-    query = query.range(offset, offset + limit - 1)
-    result = query.execute()
-    users = result.data if hasattr(result, 'data') else result.get('data', [])
-    # Считаем всего пользователей для пагинации
-    total = supabase.table('users').select('id', count='exact').execute().count
-    return jsonify({'users': users, 'total': total})
-
-@app.route('/api/admin/users/<int:telegram_id>', methods=['GET'])
-def api_admin_user_detail(telegram_id):
-    # Проверка прав администратора (можно доработать по токену)
-    user_result = supabase.table('users').select('*').eq('telegram_id', telegram_id).execute()
-    user = user_result.data[0] if user_result.data else None
-    if not user:
-        return jsonify({'error': 'User not found'}), 404
-    # Статистика по отчетам
-    reports_result = supabase.table('user_reports').select('id, created_at, report_type, title, cost').eq('user_id', telegram_id).order('created_at', desc=True).limit(10).execute()
-    reports = reports_result.data if hasattr(reports_result, 'data') else reports_result.get('data', [])
-    total_reports = len(reports)
-    total_spent = sum(float(r.get('cost', 0)) for r in reports)
-    # Можно добавить агрегацию по неделе/месяцу/кварталу/году
-    return jsonify({'user': user, 'reports': reports, 'total_reports': total_reports, 'total_spent': total_spent})
-
-@app.route('/api/admin/users/<int:telegram_id>/status', methods=['PUT'])
-def api_admin_user_status(telegram_id):
-    data = request.json or {}
-    new_status = data.get('user_status')
-    if new_status not in ('admin', 'user'):
-        return jsonify({'error': 'Invalid status'}), 400
-    supabase.table('users').update({'user_status': new_status}).eq('telegram_id', telegram_id).execute()
-    return jsonify({'success': True, 'user_status': new_status})
-
-@app.route('/api/admin/users/<int:telegram_id>/balance', methods=['PUT'])
-def api_admin_user_balance(telegram_id):
-    data = request.json or {}
-    try:
-        new_balance = float(data.get('balance'))
-    except Exception:
-        return jsonify({'error': 'Invalid balance'}), 400
-    supabase.table('users').update({'balance': new_balance}).eq('telegram_id', telegram_id).execute()
-    return jsonify({'success': True, 'balance': new_balance})
-
-@app.route('/api/admin/users/stats', methods=['GET'])
-def api_admin_users_stats():
-    now = datetime.utcnow()
-    week_ago = now - timedelta(days=7)
-    month_ago = now - timedelta(days=30)
-    quarter_ago = now - timedelta(days=90)
-    year_ago = now - timedelta(days=365)
-    # Всего пользователей
-    total = supabase.table('users').select('id', count='exact').execute().count
-    # Новые пользователи
-    new_week = supabase.table('users').select('id', count='exact').gte('registration_date', week_ago.isoformat()).execute().count
-    new_month = supabase.table('users').select('id', count='exact').gte('registration_date', month_ago.isoformat()).execute().count
-    # Активные пользователи (last_activity)
-    active_week = supabase.table('users').select('id', count='exact').gte('last_activity', week_ago.isoformat()).execute().count
-    active_month = supabase.table('users').select('id', count='exact').gte('last_activity', month_ago.isoformat()).execute().count
-    # По языкам
-    langs = supabase.table('users').select('language').execute().data
-    lang_stats = {}
-    for u in langs:
-        lang = u.get('language') or 'unknown'
-        lang_stats[lang] = lang_stats.get(lang, 0) + 1
-    # По балансам
-    balance_50 = supabase.table('users').select('id', count='exact').gte('balance', 50).execute().count
-    balance_100 = supabase.table('users').select('id', count='exact').gte('balance', 100).execute().count
-    # По отчетам
-    reports_week = supabase.table('user_reports').select('id', count='exact').gte('created_at', week_ago.isoformat()).execute().count
-    reports_month = supabase.table('user_reports').select('id', count='exact').gte('created_at', month_ago.isoformat()).execute().count
-    reports_quarter = supabase.table('user_reports').select('id', count='exact').gte('created_at', quarter_ago.isoformat()).execute().count
-    reports_year = supabase.table('user_reports').select('id', count='exact').gte('created_at', year_ago.isoformat()).execute().count
-    # Тарифы (по балансу)
-    tariffs = {
-        'free': supabase.table('users').select('id', count='exact').lt('balance', 1).execute().count,
-        'basic': balance_50 - balance_100,
-        'premium': balance_100
-    }
-    return jsonify({
-        'total': total,
-        'new_week': new_week,
-        'new_month': new_month,
-        'active_week': active_week,
-        'active_month': active_month,
-        'lang_stats': lang_stats,
-        'balance_50': balance_50,
-        'balance_100': balance_100,
-        'tariffs': tariffs,
-        'reports_week': reports_week,
-        'reports_month': reports_month,
-        'reports_quarter': reports_quarter,
-        'reports_year': reports_year
-    })
-
-@app.route('/api/admin/users/activity', methods=['GET'])
-def api_admin_users_activity():
-    # Топ-10 пользователей по количеству отчетов
-    top_users = supabase.table('user_reports').select('user_id, count').execute().data
-    user_counts = {}
-    for r in top_users:
-        user_id = r.get('user_id')
-        if user_id:
-            user_counts[user_id] = user_counts.get(user_id, 0) + 1
-    # Сортируем по количеству отчетов
-    sorted_users = sorted(user_counts.items(), key=lambda x: x[1], reverse=True)[:10]
-    # Получаем информацию о топ пользователях
-    top_user_ids = [u[0] for u in sorted_users]
-    top_users_info = []
-    for user_id in top_user_ids:
-        user_info = supabase.table('users').select('telegram_id, username, tg_name, total_reports').eq('telegram_id', user_id).execute().data
-        if user_info:
-            user_info[0]['reports_count'] = user_counts[user_id]
-            top_users_info.append(user_info[0])
-    # Среднее количество отчетов на пользователя
-    total_reports = supabase.table('user_reports').select('id', count='exact').execute().count
-    total_users = supabase.table('users').select('id', count='exact').execute().count
-    avg_reports = total_reports / total_users if total_users > 0 else 0
-    # Активность по дням недели (если есть данные о времени создания отчетов)
-    # Можно добавить более детальную аналитику
-    return jsonify({
-        'top_users': top_users_info,
-        'avg_reports_per_user': round(avg_reports, 2),
-        'total_reports': total_reports,
-        'total_users': total_users
-    })
-
-@app.route('/api/admin/users/<int:telegram_id>/reports', methods=['GET'])
-def api_admin_user_reports(telegram_id):
-    """Пагинированная история отчетов пользователя + аналитика"""
-    try:
-        offset = int(request.args.get('offset', 0))
-        limit = int(request.args.get('limit', 20))
-        # Получаем user_id по telegram_id
-        user_result = supabase.table('users').select('id').eq('telegram_id', telegram_id).execute()
-        if not user_result.data:
-            return jsonify({'error': 'User not found'}), 404
-        user_id = user_result.data[0]['id']
-        # Пагинированные отчеты
-        reports_result = supabase.table('user_reports')\
-            .select('id, created_at, report_type, title, cost')\
-            .eq('user_id', user_id)\
-            .is_('deleted_at', None)\
-            .order('created_at', desc=True)\
-            .range(offset, offset + limit - 1)\
-            .execute()
-        reports = reports_result.data if hasattr(reports_result, 'data') else reports_result.get('data', [])
-        # Всего отчетов
-        total_count = supabase.table('user_reports').select('id', count='exact').eq('user_id', user_id).is_('deleted_at', None).execute().count
-        # Аналитика: отчеты за неделю/месяц
-        now = datetime.utcnow()
-        week_ago = now - timedelta(days=7)
-        month_ago = now - timedelta(days=30)
-        reports_week = supabase.table('user_reports').select('id', count='exact').eq('user_id', user_id).is_('deleted_at', None).gte('created_at', week_ago.isoformat()).execute().count
-        reports_month = supabase.table('user_reports').select('id', count='exact').eq('user_id', user_id).is_('deleted_at', None).gte('created_at', month_ago.isoformat()).execute().count
-        # Activity timeline (отчеты по дням за месяц)
-        timeline_result = supabase.table('user_reports').select('created_at').eq('user_id', user_id).is_('deleted_at', None).gte('created_at', month_ago.isoformat()).order('created_at', desc=True).execute()
-        timeline = {}
-        for r in (timeline_result.data if hasattr(timeline_result, 'data') else timeline_result.get('data', [])):
-            day = r['created_at'][:10]
-            timeline[day] = timeline.get(day, 0) + 1
-        return jsonify({
-            'reports': reports,
-            'total': total_count,
-            'reports_week': reports_week,
-            'reports_month': reports_month,
-            'timeline': timeline
-        })
-    except Exception as e:
-        logger.error(f"Error in admin user reports: {e}")
-        return jsonify({'error': 'Internal error'}), 500
 
 if __name__ == '__main__':
     run_flask()
