@@ -120,6 +120,12 @@
             margin: 15px 0;
         }
 
+        .modal .stats-container {
+            background: transparent;
+            padding: 0;
+            margin: 0;
+        }
+
         .stats-title {
             font-size: 18px;
             font-weight: bold;
@@ -179,6 +185,10 @@
             font-family: inherit;
             resize: vertical;
             margin-bottom: 15px;
+        }
+
+        .modal .form-textarea {
+            margin-bottom: 0;
         }
 
         .form-textarea:focus {
@@ -295,6 +305,133 @@
             align-items: center;
             justify-content: center;
         }
+
+        /* Модальные окна */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            max-width: 90%;
+            max-height: 90%;
+            overflow-y: auto;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            animation: slideIn 0.3s ease;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .modal-header h3 {
+            margin: 0;
+            color: #333;
+            font-size: 18px;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: #666;
+            cursor: pointer;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .modal-close:hover {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+
+        .modal-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .modal-btn.cancel {
+            background: #6c757d;
+            color: white;
+        }
+
+        .modal-btn.cancel:hover {
+            background: #5a6268;
+        }
+
+        .modal-btn.confirm {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+        }
+
+        .modal-btn.confirm:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(40,167,69,0.3);
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
     </style>
 </head>
 <body>
@@ -310,35 +447,76 @@
         <button class="back-btn" onclick="goToMainMenu()">← Назад в главное меню</button>
 
         <!-- Кнопки админ панели -->
-        <button class="admin-btn yellow" onclick="setBalance100()">
+        <button class="admin-btn yellow" onclick="openBalanceModal()">
             💰 Сделать баланс 100
         </button>
 
-        <button class="admin-btn" onclick="showUserStats()">
+        <button class="admin-btn" onclick="openUserStatsModal()">
             👥 Пользователи
         </button>
 
-        <button class="admin-btn" onclick="showPublicationForm()">
+        <button class="admin-btn" onclick="openPublicationModal()">
             📢 Публикация
         </button>
 
-        <!-- Статистика пользователей -->
-        <div id="userStats" class="stats-container hidden">
-            <div class="stats-title">Статистика пользователей</div>
-            <div class="stats-grid" id="statsGrid">
-                <!-- Статистика будет загружена динамически -->
+        <!-- Модальные окна -->
+        
+        <!-- Модальное окно для установки баланса -->
+        <div id="balanceModal" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>💰 Установить баланс 100</h3>
+                    <button class="modal-close" onclick="closeModal('balanceModal')">×</button>
+                </div>
+                <div class="modal-body">
+                    <p>Установить баланс в 100 для текущего пользователя?</p>
+                    <div class="modal-actions">
+                        <button class="modal-btn cancel" onclick="closeModal('balanceModal')">Отмена</button>
+                        <button class="modal-btn confirm" onclick="setBalance100()">Подтвердить</button>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <!-- Форма публикации -->
-        <div id="publicationForm" class="publication-form hidden">
-            <div class="form-title">Отправить публикацию</div>
-            <textarea 
-                class="form-textarea" 
-                id="publicationText" 
-                placeholder="Введите текст публикации... Поддерживается форматирование и эмодзи"
-            ></textarea>
-            <button class="send-btn" onclick="sendPublication()">📤 Отправить всем пользователям</button>
+        <!-- Модальное окно для статистики пользователей -->
+        <div id="userStatsModal" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>👥 Статистика пользователей</h3>
+                    <button class="modal-close" onclick="closeModal('userStatsModal')">×</button>
+                </div>
+                <div class="modal-body">
+                    <div class="stats-container">
+                        <div class="stats-grid" id="statsGrid">
+                            <!-- Статистика будет загружена динамически -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Модальное окно для публикации -->
+        <div id="publicationModal" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>📢 Отправить публикацию</h3>
+                    <button class="modal-close" onclick="closeModal('publicationModal')">×</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="publicationText">Текст публикации:</label>
+                        <textarea 
+                            class="form-textarea" 
+                            id="publicationText" 
+                            placeholder="Введите текст публикации... Поддерживается форматирование и эмодзи"
+                        ></textarea>
+                    </div>
+                    <div class="modal-actions">
+                        <button class="modal-btn cancel" onclick="closeModal('publicationModal')">Отмена</button>
+                        <button class="modal-btn confirm" onclick="sendPublication()">📤 Отправить</button>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- Загрузка -->
@@ -414,6 +592,30 @@
             window.location.href = '/webapp';
         }
 
+        // Функции для работы с модальными окнами
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        function openBalanceModal() {
+            openModal('balanceModal');
+        }
+
+        function openUserStatsModal() {
+            openModal('userStatsModal');
+            loadUserStats();
+        }
+
+        function openPublicationModal() {
+            openModal('publicationModal');
+        }
+
         async function setBalance100() {
             if (!userData) {
                 showToast('Ошибка: пользователь не определен', 'error');
@@ -432,6 +634,7 @@
 
                 if (response.ok) {
                     showToast('Баланс успешно установлен в 100', 'success');
+                    closeModal('balanceModal');
                 } else {
                     const error = await response.json();
                     showToast(error.message || 'Ошибка установки баланса', 'error');
@@ -443,7 +646,7 @@
             }
         }
 
-        async function showUserStats() {
+        async function loadUserStats() {
             showLoading();
             try {
                 const response = await fetch('/api/admin/user_stats', {
@@ -457,7 +660,6 @@
                 if (response.ok) {
                     const stats = await response.json();
                     displayUserStats(stats);
-                    document.getElementById('userStats').classList.remove('hidden');
                 } else {
                     const error = await response.json();
                     showToast(error.message || 'Ошибка загрузки статистики', 'error');
@@ -504,10 +706,6 @@
             });
         }
 
-        function showPublicationForm() {
-            document.getElementById('publicationForm').classList.remove('hidden');
-        }
-
         async function sendPublication() {
             const text = document.getElementById('publicationText').value.trim();
             if (!text) {
@@ -535,6 +733,7 @@
                     const result = await response.json();
                     showToast(`Публикация отправлена! Админов: ${result.admin_count}, пользователей: ${result.user_count}`, 'success');
                     document.getElementById('publicationText').value = '';
+                    closeModal('publicationModal');
                 } else {
                     const error = await response.json();
                     showToast(error.message || 'Ошибка отправки публикации', 'error');
@@ -545,6 +744,24 @@
                 hideLoading();
             }
         }
+
+        // Обработчик клика вне модального окна
+        document.addEventListener('click', function(event) {
+            if (event.target.classList.contains('modal')) {
+                const modalId = event.target.id;
+                closeModal(modalId);
+            }
+        });
+
+        // Обработчик клавиши Escape для закрытия модальных окон
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                const openModals = document.querySelectorAll('.modal:not(.hidden)');
+                openModals.forEach(modal => {
+                    closeModal(modal.id);
+                });
+            }
+        });
 
         // Инициализация
         if (!userData) {
