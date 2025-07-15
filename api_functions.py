@@ -293,4 +293,246 @@ def update_user_balance(telegram_id: int, amount: float) -> bool:
 
 def charge_user_for_report(telegram_id: int, report_cost: float = 1.0) -> bool:
     """Списание средств за полный отчет"""
-    return update_user_balance(telegram_id, -report_cost) 
+    return update_user_balance(telegram_id, -report_cost)
+
+def check_admin_status(telegram_id: int) -> bool:
+    """Проверка статуса админа пользователя"""
+    
+    headers = {
+        'apikey': SUPABASE_ANON_KEY,
+        'Authorization': f'Bearer {SUPABASE_ANON_KEY}',
+        'Content-Type': 'application/json',
+    }
+    
+    url = f"{SUPABASE_URL}/rest/v1/users?telegram_id=eq.{telegram_id}&select=user_status"
+    
+    try:
+        response = requests.get(url, headers=headers)
+        if response.status_code == 200:
+            users = response.json()
+            if users and users[0].get('user_status') == 'admin':
+                return True
+        return False
+    except Exception as e:
+        print(f"Ошибка при проверке статуса админа: {e}")
+        return False
+
+def set_user_balance_to_100(telegram_id: int) -> bool:
+    """Установка баланса пользователя в 100"""
+    
+    headers = {
+        'apikey': SUPABASE_ANON_KEY,
+        'Authorization': f'Bearer {SUPABASE_ANON_KEY}',
+        'Content-Type': 'application/json',
+    }
+    
+    # Сначала проверяем, существует ли пользователь
+    check_url = f"{SUPABASE_URL}/rest/v1/users?telegram_id=eq.{telegram_id}"
+    try:
+        response = requests.get(check_url, headers=headers)
+        if response.status_code == 200:
+            users = response.json()
+            if users:
+                # Обновляем существующего пользователя
+                update_url = f"{SUPABASE_URL}/rest/v1/users?id=eq.{users[0]['id']}"
+                update_data = {'balance': 100}
+                
+                response = requests.patch(update_url, headers=headers, json=update_data)
+                return response.status_code == 204
+            else:
+                # Создаем нового пользователя
+                user_data = {
+                    'telegram_id': telegram_id,
+                    'balance': 100
+                }
+                response = requests.post(f"{SUPABASE_URL}/rest/v1/users", headers=headers, json=user_data)
+                return response.status_code == 201
+    except Exception as e:
+        print(f"Ошибка при установке баланса: {e}")
+        return False
+    
+    return False
+
+def get_user_statistics() -> Dict[str, Any]:
+    """Получение статистики пользователей"""
+    
+    headers = {
+        'apikey': SUPABASE_ANON_KEY,
+        'Authorization': f'Bearer {SUPABASE_ANON_KEY}',
+        'Content-Type': 'application/json',
+    }
+    
+    try:
+        from datetime import datetime, timedelta
+        
+        # Получаем всех пользователей
+        users_url = f"{SUPABASE_URL}/rest/v1/users?select=*"
+        users_response = requests.get(users_url, headers=headers)
+        
+        if users_response.status_code != 200:
+            return {}
+        
+        users = users_response.json()
+        
+        # Получаем все отчеты
+        reports_url = f"{SUPABASE_URL}/rest/v1/user_reports?select=*"
+        reports_response = requests.get(reports_url, headers=headers)
+        
+        if reports_response.status_code != 200:
+            return {}
+        
+        reports = reports_response.json()
+        
+        # Получаем тарифы
+        tariffs_url = f"{SUPABASE_URL}/rest/v1/tariffs?select=*"
+        tariffs_response = requests.get(tariffs_url, headers=headers)
+        
+        if tariffs_response.status_code != 200:
+            return {}
+        
+        tariffs = tariffs_response.json()
+        
+        # Вычисляем статистику
+        now = datetime.now()
+        week_ago = now - timedelta(days=7)
+        month_ago = now - timedelta(days=30)
+        quarter_ago = now - timedelta(days=90)
+        year_ago = now - timedelta(days=365)
+        
+        # Фильтруем пользователей
+        admin_users = [u for u in users if u.get('user_status') == 'admin']
+        regular_users = [u for u in users if u.get('user_status') != 'admin']
+        
+        # Пользователи с истекшим периодом
+        expired_users = [u for u in regular_users if not u.get('period_end') or 
+                       (u.get('period_end') and datetime.fromisoformat(u['period_end'].replace('Z', '+00:00')) < now)]
+        
+        # Активные пользователи
+        active_users = [u for u in regular_users if u.get('period_end') and 
+                       datetime.fromisoformat(u['period_end'].replace('Z', '+00:00')) >= now]
+        
+        # Новые пользователи
+        new_week = len([u for u in users if u.get('created_at') and 
+                       datetime.fromisoformat(u['created_at'].replace('Z', '+00:00')) >= week_ago])
+        new_month = len([u for u in users if u.get('created_at') and 
+                        datetime.fromisoformat(u['created_at'].replace('Z', '+00:00')) >= month_ago])
+        new_quarter = len([u for u in users if u.get('created_at') and 
+                          datetime.fromisoformat(u['created_at'].replace('Z', '+00:00')) >= quarter_ago])
+        new_year = len([u for u in users if u.get('created_at') and 
+                       datetime.fromisoformat(u['created_at'].replace('Z', '+00:00')) >= year_ago])
+        
+        # Балансы
+        total_balance = sum(u.get('balance', 0) for u in regular_users)
+        expired_balance = sum(u.get('balance', 0) for u in expired_users)
+        active_balance = sum(u.get('balance', 0) for u in active_users)
+        
+        # Отчеты
+        reports_week = len([r for r in reports if r.get('created_at') and 
+                           datetime.fromisoformat(r['created_at'].replace('Z', '+00:00')) >= week_ago])
+        reports_month = len([r for r in reports if r.get('created_at') and 
+                           datetime.fromisoformat(r['created_at'].replace('Z', '+00:00')) >= month_ago])
+        reports_quarter = len([r for r in reports if r.get('created_at') and 
+                             datetime.fromisoformat(r['created_at'].replace('Z', '+00:00')) >= quarter_ago])
+        reports_year = len([r for r in reports if r.get('created_at') and 
+                          datetime.fromisoformat(r['created_at'].replace('Z', '+00:00')) >= year_ago])
+        
+        # Удаленные отчеты
+        deleted_reports = len([r for r in reports if r.get('deleted_at')])
+        
+        # Отчеты истекших пользователей
+        expired_user_ids = [u['id'] for u in expired_users]
+        expired_reports = len([r for r in reports if r.get('user_id') in expired_user_ids])
+        avg_expired_reports = expired_reports / len(expired_users) if expired_users else 0
+        
+        # Отчеты активных пользователей
+        active_user_ids = [u['id'] for u in active_users]
+        active_reports = len([r for r in reports if r.get('user_id') in active_user_ids])
+        
+        # Затраты активных пользователей
+        tariff_cost = next((t.get('full', 1.0) for t in tariffs if t.get('name') == 'full'), 1.0)
+        active_costs = active_reports * tariff_cost
+        
+        return {
+            'total_users': len(users),
+            'new_week': new_week,
+            'new_month': new_month,
+            'new_quarter': new_quarter,
+            'new_year': new_year,
+            'total_balance': round(total_balance, 2),
+            'expired_balance': round(expired_balance, 2),
+            'active_balance': round(active_balance, 2),
+            'reports_week': reports_week,
+            'reports_month': reports_month,
+            'reports_quarter': reports_quarter,
+            'reports_year': reports_year,
+            'deleted_reports': deleted_reports,
+            'expired_reports': expired_reports,
+            'avg_expired_reports': round(avg_expired_reports, 1),
+            'active_reports': active_reports,
+            'active_costs': round(active_costs, 2)
+        }
+        
+    except Exception as e:
+        print(f"Ошибка при получении статистики: {e}")
+        return {}
+
+def send_publication_to_all_users(text: str) -> Dict[str, int]:
+    """Отправка публикации всем пользователям"""
+    
+    headers = {
+        'apikey': SUPABASE_ANON_KEY,
+        'Authorization': f'Bearer {SUPABASE_ANON_KEY}',
+        'Content-Type': 'application/json',
+    }
+    
+    try:
+        # Получаем всех пользователей
+        users_url = f"{SUPABASE_URL}/rest/v1/users?select=telegram_id,user_status"
+        users_response = requests.get(users_url, headers=headers)
+        
+        if users_response.status_code != 200:
+            return {'admin_count': 0, 'user_count': 0}
+        
+        users = users_response.json()
+        
+        # Отправляем сообщения через Telegram Bot API
+        bot_token = os.getenv('TELEGRAM_BOT_TOKEN')
+        if not bot_token:
+            return {'admin_count': 0, 'user_count': 0}
+        
+        admin_count = 0
+        user_count = 0
+        
+        for user in users:
+            telegram_id = user.get('telegram_id')
+            is_admin = user.get('user_status') == 'admin'
+            
+            if telegram_id:
+                try:
+                    # Отправляем сообщение через Telegram Bot API
+                    send_url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
+                    send_data = {
+                        'chat_id': telegram_id,
+                        'text': text,
+                        'parse_mode': 'HTML'  # Поддержка HTML форматирования
+                    }
+                    
+                    response = requests.post(send_url, json=send_data)
+                    
+                    if response.status_code == 200:
+                        if is_admin:
+                            admin_count += 1
+                        else:
+                            user_count += 1
+                    
+                except Exception as e:
+                    print(f"Ошибка отправки сообщения пользователю {telegram_id}: {e}")
+        
+        return {
+            'admin_count': admin_count,
+            'user_count': user_count
+        }
+        
+    except Exception as e:
+        print(f"Ошибка при отправке публикации: {e}")
+        return {'admin_count': 0, 'user_count': 0} 

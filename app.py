@@ -14,6 +14,14 @@ from fpdf import FPDF
 import tempfile
 import os
 
+# Импорты для админ функций
+from api_functions import (
+    check_admin_status,
+    set_user_balance_to_100,
+    get_user_statistics,
+    send_publication_to_all_users
+)
+
 # Загружаем переменные окружения
 load_dotenv()
 
@@ -161,6 +169,12 @@ def webapp_balance():
     with open('webapp_balance.html', 'r', encoding='utf-8') as f:
         return f.read()
 
+@app.route('/webapp_admin')
+def webapp_admin():
+    """Страница админ панели"""
+    with open('webapp_admin.html', 'r', encoding='utf-8') as f:
+        return f.read()
+
 @app.route('/health')
 def health():
     """Эндпоинт для проверки здоровья приложения"""
@@ -169,6 +183,10 @@ def health():
 @app.route('/logo-sqv.png')
 def serve_logo():
     return send_from_directory('.', 'logo-sqv.png')
+
+@app.route('/logo-flt.png')
+def serve_logo_flt():
+    return send_from_directory('.', 'logo-flt.png')
 
 @app.route('/api/user', methods=['POST'])
 def api_user():
@@ -204,6 +222,7 @@ def api_user():
             'username': user.get('username'),
             'balance': user.get('balance', 0),
             'telegram_id': user.get('telegram_id'),
+            'is_admin': user.get('user_status') == 'admin',
         })
     else:
         # Новый пользователь
@@ -1529,6 +1548,79 @@ def api_send_saved_report_pdf():
     except Exception as e:
         logger.error(f"Error generating/sending PDF: {e}")
         return jsonify({'error': 'Internal error'}), 500
+
+# Админ API маршруты
+@app.route('/api/admin/set_balance_100', methods=['POST'])
+def api_admin_set_balance_100():
+    """Установка баланса пользователя в 100 (только для админов)"""
+    data = request.json or {}
+    telegram_id = data.get('telegram_id')
+    
+    if not telegram_id:
+        return jsonify({'error': 'telegram_id required'}), 400
+    
+    try:
+        # Проверяем статус админа
+        if not check_admin_status(telegram_id):
+            return jsonify({'error': 'Access denied. Admin privileges required.'}), 403
+        
+        # Устанавливаем баланс
+        if set_user_balance_to_100(telegram_id):
+            return jsonify({'success': True, 'message': 'Balance set to 100 successfully'})
+        else:
+            return jsonify({'error': 'Failed to set balance'}), 500
+            
+    except Exception as e:
+        logger.error(f"Error setting balance to 100: {e}")
+        return jsonify({'error': 'Internal server error'}), 500
+
+@app.route('/api/admin/user_stats', methods=['POST'])
+def api_admin_user_stats():
+    """Получение статистики пользователей (только для админов)"""
+    data = request.json or {}
+    telegram_id = data.get('telegram_id')
+    
+    if not telegram_id:
+        return jsonify({'error': 'telegram_id required'}), 400
+    
+    try:
+        # Проверяем статус админа
+        if not check_admin_status(telegram_id):
+            return jsonify({'error': 'Access denied. Admin privileges required.'}), 403
+        
+        # Получаем статистику
+        stats = get_user_statistics()
+        return jsonify(stats)
+            
+    except Exception as e:
+        logger.error(f"Error getting user statistics: {e}")
+        return jsonify({'error': 'Internal server error'}), 500
+
+@app.route('/api/admin/send_publication', methods=['POST'])
+def api_admin_send_publication():
+    """Отправка публикации всем пользователям (только для админов)"""
+    data = request.json or {}
+    telegram_id = data.get('telegram_id')
+    text = data.get('text')
+    
+    if not telegram_id:
+        return jsonify({'error': 'telegram_id required'}), 400
+    
+    if not text:
+        return jsonify({'error': 'text required'}), 400
+    
+    try:
+        # Проверяем статус админа
+        if not check_admin_status(telegram_id):
+            return jsonify({'error': 'Access denied. Admin privileges required.'}), 403
+        
+        # Отправляем публикацию
+        result = send_publication_to_all_users(text)
+        return jsonify(result)
+            
+    except Exception as e:
+        logger.error(f"Error sending publication: {e}")
+        return jsonify({'error': 'Internal server error'}), 500
 
 # === Запуск Flask приложения ===
 def run_flask():
