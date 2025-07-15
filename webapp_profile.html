@@ -81,6 +81,10 @@
         .lang-btn.selected { background: #007bff; color: white; border-color: #007bff; box-shadow: 0 2px 8px rgba(0,123,255,0.3); }
         .lang-btn:hover { background: #f0f0f0; transform: translateY(-1px); }
         .lang-btn.selected:hover { background: #0056b3; }
+        .reload-modal-bg { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.25); z-index: 2000; display: flex; align-items: center; justify-content: center; }
+        .reload-modal { background: #fff; border-radius: 14px; box-shadow: 0 4px 24px rgba(102,126,234,0.18); padding: 32px 32px 28px 32px; min-width: 220px; text-align: center; }
+        .reload-spinner { width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid #667eea; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 18px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
@@ -97,6 +101,13 @@
                 <button class="modal-btn modal-btn-secondary" onclick="closeLangModal()">Отмена</button>
                 <button class="modal-btn modal-btn-primary" onclick="saveLangModal()">Сохранить</button>
             </div>
+        </div>
+    </div>
+    <div id="reload-modal-bg" class="reload-modal-bg" style="display:none;">
+        <div class="reload-modal">
+            <div class="reload-spinner"></div>
+            <div style="font-size:1.1em; font-weight:500; margin-bottom:4px;">Язык изменён!</div>
+            <div style="font-size:0.98em; color:#666;">Перезагрузка...</div>
         </div>
     </div>
     <script>
@@ -205,7 +216,8 @@
                 if (resp.ok) {
                     localStorage.setItem('aaadviser_lang', selectedLang);
                     closeLangModal();
-                    alert('Язык успешно изменён! Перезагрузите страницу для применения.');
+                    document.getElementById('reload-modal-bg').style.display = 'flex';
+                    setTimeout(() => location.reload(), 1500);
                 } else {
                     alert('Ошибка сохранения языка');
                 }
