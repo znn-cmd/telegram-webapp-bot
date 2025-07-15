@@ -1329,9 +1329,9 @@
             modal.innerHTML = `
                 <div style="background:#fff;border-radius:18px;box-shadow:0 4px 24px rgba(102,126,234,0.18);padding:32px 24px 24px 24px;max-width:340px;width:90vw;text-align:center;">
                     <div style="font-size:19px;font-weight:700;color:#667eea;margin-bottom:16px;">PDF сформирован</div>
-                    <div style="font-size:16px;color:#333;margin-bottom:22px;">Нажмите кнопку ниже, чтобы скачать файл.</div>
-                    <a href="${pdfUrl}" target="_blank" download style="display:block;width:100%;margin-bottom:14px;">
-                        <button class="btn btn-primary" style="width:100%;font-size:17px;">Скачать PDF</button>
+                    <div style="font-size:16px;color:#333;margin-bottom:18px;">Нажмите кнопку ниже, чтобы открыть PDF.\nЕсли файл не открывается, используйте Telegram Desktop или откройте WebApp в браузере.</div>
+                    <a href="${pdfUrl}" target="_blank" style="display:block;width:100%;margin-bottom:14px;">
+                        <button class="btn btn-primary" style="width:100%;font-size:17px;">Открыть PDF</button>
                     </a>
                     <button class="btn btn-secondary" style="width:100%;font-size:16px;" onclick="closePdfModal();goToMainMenu();">В главное меню</button>
                 </div>
