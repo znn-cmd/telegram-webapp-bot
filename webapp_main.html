@@ -515,6 +515,9 @@
         }
 
         userData = getUserData();
+        if (userData && userData.id) {
+            localStorage.setItem('telegram_id', userData.id);
+        }
         currentLanguage = (userData && userData.language_code) ? userData.language_code : 'ru';
         selectedLanguage = currentLanguage;
 

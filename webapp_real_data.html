@@ -1369,26 +1369,21 @@
             window.location.href = '/webapp';
         }
 
-        (function saveTelegramIdToLocalStorage() {
-            if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe && window.Telegram.WebApp.initDataUnsafe.user) {
-                const telegramId = window.Telegram.WebApp.initDataUnsafe.user.id;
-                if (telegramId) {
-                    localStorage.setItem('telegram_id', telegramId);
-                }
-            }
-        })();
+        let telegram_id = null;
+        if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe && window.Telegram.WebApp.initDataUnsafe.user && window.Telegram.WebApp.initDataUnsafe.user.id) {
+            telegram_id = window.Telegram.WebApp.initDataUnsafe.user.id;
+            localStorage.setItem('telegram_id', telegram_id);
+        } else {
+            telegram_id = localStorage.getItem('telegram_id');
+        }
 
         function getTelegramId() {
-            // Всегда берём из Telegram WebApp API, если есть, иначе из localStorage
             if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe && window.Telegram.WebApp.initDataUnsafe.user && window.Telegram.WebApp.initDataUnsafe.user.id) {
                 const telegramId = window.Telegram.WebApp.initDataUnsafe.user.id;
                 localStorage.setItem('telegram_id', telegramId);
                 return telegramId;
             }
-            // Fallback: localStorage
-            const stored = localStorage.getItem('telegram_id');
-            if (stored) return stored;
-            return null;
+            return localStorage.getItem('telegram_id');
         }
 
         // Инициализация
