@@ -951,6 +951,7 @@ def api_user_reports():
         return jsonify({'error': 'Internal error'}), 500
 
 @app.route('/api/delete_user_report', methods=['POST'])
+@app.route('/api/delete_report', methods=['POST'])
 def api_delete_user_report():
     """Soft delete отчета: выставляет deleted_at"""
     data = request.json or {}
