@@ -1516,22 +1516,23 @@ def api_send_saved_report_pdf():
         shutil.move(temp_file.name, final_pdf_path)
         pdf_url = f'/static/reports/{final_pdf_name}'
         supabase.table('user_reports').update({'pdf_path': pdf_url}).eq('id', report_id).execute()
-        # Отправка PDF через Telegram-бота
+        # Отправка PDF через Telegram-бота (точно как в /api/generate_pdf_report)
         send_status = None
-        try:
-            bot_token = os.getenv("TELEGRAM_BOT_TOKEN") or '7215676549:AAFS86JbRCqwzTKQG-dF96JX-C1aWNvBoLo'
-            send_url = f'https://api.telegram.org/bot{bot_token}/sendDocument'
-            with open(final_pdf_path, 'rb') as pdf_file:
-                files = {'document': pdf_file}
-                data_send = {'chat_id': telegram_id}
-                resp = requests.post(send_url, data=data_send, files=files)
-                if resp.status_code == 200 and resp.json().get('ok'):
-                    send_status = 'sent'
-                else:
-                    send_status = f'error: {resp.text}'
-        except Exception as e:
-            logger.error(f"Error sending PDF via Telegram bot: {e}")
-            send_status = f'error: {e}'
+        if telegram_id:
+            try:
+                bot_token = os.getenv("TELEGRAM_BOT_TOKEN") or '7215676549:AAFS86JbRCqwzTKQG-dF96JX-C1aWNvBoLo'
+                send_url = f'https://api.telegram.org/bot{bot_token}/sendDocument'
+                with open(final_pdf_path, 'rb') as pdf_file:
+                    files = {'document': pdf_file}
+                    data_send = {'chat_id': telegram_id}
+                    resp = requests.post(send_url, data=data_send, files=files)
+                    if resp.status_code == 200 and resp.json().get('ok'):
+                        send_status = 'sent'
+                    else:
+                        send_status = f'error: {resp.text}'
+            except Exception as e:
+                logger.error(f"Error sending PDF via Telegram bot: {e}")
+                send_status = f'error: {e}'
         return jsonify({
             'success': True,
             'pdf_path': pdf_url,
