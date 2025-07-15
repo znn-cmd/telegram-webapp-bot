@@ -1299,3 +1299,52 @@ def api_save_user_report():
     except Exception as e:
         logger.error(f"Error saving user report: {e}")
         return jsonify({'error': 'Internal error'}), 500
+
+@app.route('/api/full_report_access', methods=['POST'])
+def api_full_report_access():
+    data = request.json or {}
+    telegram_id = data.get('telegram_id')
+    if not telegram_id:
+        return jsonify({'error': 'telegram_id required'}), 400
+    try:
+        user_result = supabase.table('users').select('period_start, period_end, balance').eq('telegram_id', telegram_id).execute()
+        user = user_result.data[0] if user_result.data else None
+        if not user:
+            return jsonify({'error': 'User not found'}), 404
+        # Получаем стоимость полного отчета
+        tariff_result = supabase.table('tariffs').select('price').eq('name', 'full report').execute()
+        tariff = tariff_result.data[0] if tariff_result.data else None
+        full_report_price = float(tariff['price']) if tariff and 'price' in tariff else 3.0
+        return jsonify({
+            'period_start': user.get('period_start'),
+            'period_end': user.get('period_end'),
+            'balance': user.get('balance', 0),
+            'full_report_price': full_report_price
+        })
+    except Exception as e:
+        logger.error(f"Error in full_report_access: {e}")
+        return jsonify({'error': 'Internal error'}), 500
+
+@app.route('/api/deduct_balance', methods=['POST'])
+def api_deduct_balance():
+    data = request.json or {}
+    telegram_id = data.get('telegram_id')
+    amount = data.get('amount')
+    if not telegram_id or amount is None:
+        return jsonify({'error': 'telegram_id and amount required'}), 400
+    try:
+        # Получаем текущий баланс
+        user_result = supabase.table('users').select('balance').eq('telegram_id', telegram_id).execute()
+        user = user_result.data[0] if user_result.data else None
+        if not user:
+            return jsonify({'error': 'User not found'}), 404
+        balance = float(user.get('balance', 0))
+        amount = float(amount)
+        if balance < amount:
+            return jsonify({'error': 'Insufficient balance'}), 400
+        new_balance = balance - amount
+        supabase.table('users').update({'balance': new_balance}).eq('telegram_id', telegram_id).execute()
+        return jsonify({'success': True, 'new_balance': new_balance})
+    except Exception as e:
+        logger.error(f"Error in deduct_balance: {e}")
+        return jsonify({'error': 'Internal error'}), 500

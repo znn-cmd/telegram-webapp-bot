@@ -283,6 +283,10 @@
             border: 1.5px solid #667eea;
             outline: none;
         }
+
+        /* Toast с автоисчезновением и анимацией */
+        .toast.fade-out { opacity: 0; transition: opacity 0.4s; }
+        #modal-info.fade-out, #modal-confirm.fade-out, #modal-topup.fade-out, #topup-modal.fade-out { opacity: 0; transition: opacity 0.35s; }
     </style>
 </head>
 <body>
@@ -396,16 +400,12 @@
             const toast = document.createElement('div');
             toast.className = `toast ${type}`;
             toast.textContent = message;
-            
             container.appendChild(toast);
-            
-            // Trigger animation
             setTimeout(() => toast.classList.add('show'), 100);
-            
-            // Auto remove
             setTimeout(() => {
                 toast.classList.remove('show');
-                setTimeout(() => container.removeChild(toast), 300);
+                toast.classList.add('fade-out');
+                setTimeout(() => container.removeChild(toast), 400);
             }, duration);
         }
 
@@ -696,35 +696,207 @@
             });
         }
 
-        function showFullReportStub() {
-            // Получаем telegram_id (заглушка или из Telegram WebApp)
+        // Модальное окно для пополнения баланса
+        function showTopupModal() {
+            let oldModal = document.getElementById('topup-modal');
+            if (oldModal) animateModalClose(oldModal);
+            const modal = document.createElement('div');
+            modal.id = 'topup-modal';
+            modal.style = 'position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.25);z-index:1000;display:flex;align-items:center;justify-content:center;';
+            modal.innerHTML = `
+                <div style="background:#fff;border-radius:18px;box-shadow:0 4px 24px rgba(102,126,234,0.18);padding:32px 24px 24px 24px;max-width:340px;width:90vw;text-align:center;">
+                    <iframe id="topup-iframe" src='/webapp_topup' style='width:100%;height:180px;border:none;'></iframe>
+                    <div id="topup-iframe-error" style="display:none;color:#c33;margin-top:10px;">Ошибка загрузки страницы пополнения</div>
+                    <button class="btn btn-secondary" style="width:100%;margin-top:10px;font-size:16px;" onclick="closeTopupModal()">Закрыть</button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            const iframe = document.getElementById('topup-iframe');
+            iframe.onerror = function() {
+                document.getElementById('topup-iframe-error').style.display = 'block';
+            };
+        }
+        function closeTopupModal() {
+            let modal = document.getElementById('topup-modal');
+            if (modal) animateModalClose(modal);
+        }
+
+        // Основная логика для кнопки 'Получить полный отчет'
+        async function showFullReportStub() {
             let telegram_id = getTelegramId();
-            
-            showProgressBar(getLocalizedText('progress.checking_balance'), 20);
-            
-            fetch('/api/user_balance', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ telegram_id })
-            })
-            .then(res => res.json())
-            .then(data => {
+            showProgressBar('Проверяем доступ...', 20);
+            try {
+                const res = await fetch('/api/full_report_access', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ telegram_id })
+                });
+                if (!res.ok) throw new Error('Ошибка соединения с сервером');
+                const data = await res.json();
                 hideProgressBar();
-                if (data.balance >= 1) {
-                    // Передаем параметры напрямую
-                    showFullReportConfirmModal(lastReportAddress, lastReportBedrooms, lastReportPrice, telegram_id);
-                } else {
-                    showBalanceModal();
+                if (data.error) {
+                    showToast(data.error, 'error');
+                    return;
                 }
-            })
-            .catch(() => {
+                const today = new Date();
+                let periodStart = data.period_start ? new Date(data.period_start) : null;
+                let periodEnd = data.period_end ? new Date(data.period_end) : null;
+                if (periodStart && periodEnd && today >= periodStart && today <= periodEnd) {
+                    // Бесплатно по подписке
+                    showModalInfo(`У вас оплачен период пользования до ${periodEnd.toLocaleDateString()}<br>Для вас отчет бесплатный!`, () => {
+                        closeModalInfo();
+                        showFullReportConfirmModal(lastReportAddress, lastReportBedrooms, lastReportPrice, telegram_id, true);
+                    });
+                } else {
+                    // Платно
+                    showModalConfirm(`Сформировать полный отчет за <b>${data.full_report_price} EUR</b>?`, async (agree) => {
+                        closeModalConfirm();
+                        if (!agree) return; // отказ — ничего не делаем
+                        // Проверяем баланс
+                        if (parseFloat(data.balance) >= parseFloat(data.full_report_price)) {
+                            // Списываем баланс
+                            showProgressBar('Списываем средства...', 30);
+                            try {
+                                const deductRes = await fetch('/api/deduct_balance', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ telegram_id, amount: data.full_report_price })
+                                });
+                                if (!deductRes.ok) throw new Error('Ошибка соединения с сервером');
+                                const deductData = await deductRes.json();
+                                hideProgressBar();
+                                if (deductData.success) {
+                                    showToast('Средства успешно списаны. Формируем отчет...', 'success');
+                                    showFullReportConfirmModal(lastReportAddress, lastReportBedrooms, lastReportPrice, telegram_id, false);
+                                } else if (deductData.error === 'Insufficient balance') {
+                                    // Баланс изменился — повторно предложить пополнить
+                                    showModalTopup(`Недостаточно средств для получения полного отчета.<br>Стоимость: <b>${data.full_report_price} EUR</b>`, () => {
+                                        closeModalTopup();
+                                        showTopupModal();
+                                    }, () => {
+                                        closeModalTopup();
+                                    }, data.balance);
+                                } else {
+                                    showToast('Ошибка списания средств', 'error');
+                                }
+                            } catch (e) {
+                                hideProgressBar();
+                                showToast(e.message || 'Ошибка списания', 'error');
+                            }
+                        } else {
+                            // Недостаточно средств
+                            showModalTopup(`Недостаточно средств для получения полного отчета.<br>Стоимость: <b>${data.full_report_price} EUR</b>`, () => {
+                                closeModalTopup();
+                                showTopupModal();
+                            }, () => {
+                                closeModalTopup();
+                            }, data.balance);
+                        }
+                    });
+                }
+            } catch (e) {
                 hideProgressBar();
-                showToast(getLocalizedText('notifications.balance_check_error'), 'error');
-            });
+                showToast(e.message || 'Ошибка соединения', 'error');
+            }
+        }
+
+        // Универсальные модалки
+        function animateModalClose(modal) {
+            modal.classList.add('fade-out');
+            setTimeout(() => { if (modal.parentNode) modal.parentNode.removeChild(modal); }, 350);
+        }
+
+        function showModalInfo(message, onOk) {
+            let oldModal = document.getElementById('modal-info');
+            if (oldModal) animateModalClose(oldModal);
+            const modal = document.createElement('div');
+            modal.id = 'modal-info';
+            modal.style = 'position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.25);z-index:1000;display:flex;align-items:center;justify-content:center;';
+            modal.innerHTML = `
+                <div style="background:#fff;border-radius:18px;box-shadow:0 4px 24px rgba(102,126,234,0.18);padding:32px 24px 24px 24px;max-width:340px;width:90vw;text-align:center;">
+                    <div style='font-size:17px;font-weight:600;margin-bottom:18px;'>${message}</div>
+                    <button class="btn btn-primary" id="modal-info-ok" style="width:100%;font-size:17px;">ОК</button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            document.getElementById('modal-info-ok').focus();
+            document.getElementById('modal-info-ok').onclick = function() {
+                animateModalClose(modal);
+                if (onOk) onOk();
+            };
+        }
+        function closeModalInfo() {
+            let modal = document.getElementById('modal-info');
+            if (modal) animateModalClose(modal);
+        }
+        function showModalConfirm(message, onResult) {
+            let oldModal = document.getElementById('modal-confirm');
+            if (oldModal) animateModalClose(oldModal);
+            const modal = document.createElement('div');
+            modal.id = 'modal-confirm';
+            modal.style = 'position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.25);z-index:1000;display:flex;align-items:center;justify-content:center;';
+            modal.innerHTML = `
+                <div style="background:#fff;border-radius:18px;box-shadow:0 4px 24px rgba(102,126,234,0.18);padding:32px 24px 24px 24px;max-width:340px;width:90vw;text-align:center;">
+                    <div style='font-size:17px;font-weight:600;margin-bottom:18px;'>${message}</div>
+                    <button class="btn btn-primary" id="modal-confirm-yes" style="width:100%;font-size:17px;">Согласен</button>
+                    <button class="btn btn-secondary" id="modal-confirm-no" style="width:100%;margin-top:10px;font-size:16px;">Отказаться</button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            document.getElementById('modal-confirm-yes').focus();
+            let yesBtn = document.getElementById('modal-confirm-yes');
+            let noBtn = document.getElementById('modal-confirm-no');
+            yesBtn.onclick = function() {
+                yesBtn.disabled = true; noBtn.disabled = true;
+                onResult && onResult(true);
+            };
+            noBtn.onclick = function() {
+                yesBtn.disabled = true; noBtn.disabled = true;
+                onResult && onResult(false);
+                animateModalClose(modal);
+            };
+        }
+        function closeModalConfirm() {
+            let modal = document.getElementById('modal-confirm');
+            if (modal) animateModalClose(modal);
+            window.onResult = null;
+        }
+        function showModalTopup(message, onTopup, onCancel, balance) {
+            let oldModal = document.getElementById('modal-topup');
+            if (oldModal) animateModalClose(oldModal);
+            const modal = document.createElement('div');
+            modal.id = 'modal-topup';
+            modal.style = 'position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.25);z-index:1000;display:flex;align-items:center;justify-content:center;';
+            modal.innerHTML = `
+                <div style="background:#fff;border-radius:18px;box-shadow:0 4px 24px rgba(102,126,234,0.18);padding:32px 24px 24px 24px;max-width:340px;width:90vw;text-align:center;">
+                    <div style='font-size:17px;font-weight:600;margin-bottom:18px;'>${message}<br>Ваш баланс: <b>${balance} EUR</b></div>
+                    <button class="btn btn-primary" id="modal-topup-pay" style="width:100%;font-size:17px;">Пополнить</button>
+                    <button class="btn btn-secondary" id="modal-topup-cancel" style="width:100%;margin-top:10px;font-size:16px;">Отказаться</button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            document.getElementById('modal-topup-pay').focus();
+            let payBtn = document.getElementById('modal-topup-pay');
+            let cancelBtn = document.getElementById('modal-topup-cancel');
+            payBtn.onclick = function() {
+                payBtn.disabled = true; cancelBtn.disabled = true;
+                onTopup && onTopup();
+            };
+            cancelBtn.onclick = function() {
+                payBtn.disabled = true; cancelBtn.disabled = true;
+                onCancel && onCancel();
+                animateModalClose(modal);
+            };
+        }
+        function closeModalTopup() {
+            let modal = document.getElementById('modal-topup');
+            if (modal) animateModalClose(modal);
+            window.onTopup = null;
+            window.onCancel = null;
         }
 
         // Обновленная функция: принимает параметры напрямую
-        function showFullReportConfirmModal(address, bedrooms, price, telegram_id) {
+        function showFullReportConfirmModal(address, bedrooms, price, telegram_id, isFree = false) {
             // Удаляем старое модальное окно если есть
             let oldModal = document.getElementById('full-report-modal');
             if (oldModal) oldModal.remove();
@@ -738,8 +910,8 @@
                     <div style=\"font-size:16px;color:#333;margin-bottom:10px;word-break:break-word;\"><b>Адрес:</b> ${address}</div>
                     <div style=\"font-size:16px;color:#333;margin-bottom:10px;\"><b>Спален:</b> ${bedrooms}</div>
                     <div style=\"font-size:16px;color:#333;margin-bottom:18px;\"><b>Цена объекта:</b> €${Number(price).toLocaleString('ru-RU')}</div>
-                    <div style=\"font-size:15px;color:#555;margin-bottom:18px;\">Стоимость полного отчета: <b>$1</b></div>
-                    <button class=\"btn btn-primary\" style=\"width:100%;font-size:17px;\" onclick=\"deductAndGenerateFullReport(${telegram_id})\">Да, продолжить (1$)</button>
+                    <div style=\"font-size:15px;color:#555;margin-bottom:18px;\">Стоимость полного отчета: <b>${isFree ? '0' : '1'} EUR</b></div>
+                    <button class=\"btn btn-primary\" style=\"width:100%;font-size:17px;\" onclick=\"deductAndGenerateFullReport(${telegram_id})\">Да, продолжить (${isFree ? '0' : '1'} EUR)</button>
                     <button class=\"btn btn-secondary\" style=\"width:100%;margin-top:10px;font-size:16px;\" onclick=\"closeFullReportModal();goToMainMenu();\">Нет, полный отчет не нужен</button>
                 </div>
             `;
