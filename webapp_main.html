@@ -479,6 +479,13 @@
                 <span class="menu-btn-text">Помощь</span>
                 <span class="menu-btn-description">Ответы на вопросы и поддержка</span>
             </button>
+
+            <!-- Кнопка Админ-панель (только для admin) -->
+            <button class="menu-btn fade-in hidden" id="adminPanelBtn" onclick="showAdminPanel()">
+                <span class="menu-btn-icon">🛡️</span>
+                <span class="menu-btn-text">Админ-панель</span>
+                <span class="menu-btn-description">Управление пользователями и публикациями</span>
+            </button>
         </div>
 
         <!-- Загрузка -->
@@ -773,6 +780,13 @@
                     if (userInfo.is_new_user) {
                         showToast(getText('success_welcome'), 'success');
                     }
+
+                    // Показываем кнопку админ-панели только для admin
+                    if (userInfo.user_status === 'admin') {
+                        document.getElementById('adminPanelBtn').classList.remove('hidden');
+                    } else {
+                        document.getElementById('adminPanelBtn').classList.add('hidden');
+                    }
                 } else {
                     const err = await response.json();
                     throw new Error(err.error || 'Failed to load user data');
@@ -834,6 +848,10 @@
 
         function showHelp() {
             window.location.href = '/webapp_help';
+        }
+
+        function showAdminPanel() {
+            window.location.href = '/webapp_admin_panel';
         }
 
         function goToMainMenu() {

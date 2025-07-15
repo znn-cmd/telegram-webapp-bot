@@ -1540,5 +1540,42 @@ def run_flask():
     print("====================\n")
     app.run(host='0.0.0.0', port=8080, debug=False)
 
+@app.route('/webapp_admin_panel')
+def webapp_admin_panel():
+    with open('webapp_admin_panel.html', 'r', encoding='utf-8') as f:
+        return f.read()
+
+@app.route('/api/admin_publish', methods=['POST'])
+def api_admin_publish():
+    data = request.json or {}
+    text = data.get('text', '').strip()
+    telegram_id = request.headers.get('X-Telegram-Id') or (request.json.get('telegram_id') if request.json else None)
+    if not text:
+        return jsonify({'success': False, 'error': 'Текст публикации обязателен'}), 400
+    if not telegram_id:
+        return jsonify({'success': False, 'error': 'Нет telegram_id администратора'}), 403
+    try:
+        telegram_id = int(telegram_id)
+    except Exception:
+        return jsonify({'success': False, 'error': 'Некорректный telegram_id'}), 403
+    # Проверка, что это админ
+    user = supabase.table('users').select('user_status').eq('telegram_id', telegram_id).execute().data
+    if not user or user[0].get('user_status') != 'admin':
+        return jsonify({'success': False, 'error': 'Нет прав администратора'}), 403
+    # Получаем всех подписанных пользователей
+    users = supabase.table('users').select('telegram_id').eq('user_status', 'subscribed').execute().data
+    if not users:
+        return jsonify({'success': False, 'error': 'Нет подписчиков'}), 400
+    # Рассылка через Telegram-бота
+    from telegram import Bot
+    bot = Bot(TOKEN)
+    errors = 0
+    for u in users:
+        try:
+            bot.send_message(chat_id=u['telegram_id'], text=text)
+        except Exception:
+            errors += 1
+    return jsonify({'success': True, 'sent': len(users)-errors, 'errors': errors})
+
 if __name__ == '__main__':
     run_flask()

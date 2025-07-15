@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Админ-панель</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; }
+        .admin-container { max-width: 420px; margin: 40px auto; background: #fff; border-radius: 16px; box-shadow: 0 0 20px rgba(0,0,0,0.08); padding: 32px 24px; }
+        .admin-title { font-size: 24px; font-weight: bold; color: #667eea; text-align: center; margin-bottom: 24px; }
+        .admin-btn { width: 100%; margin: 10px 0; padding: 16px; font-size: 16px; border-radius: 10px; border: none; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; font-weight: 500; cursor: pointer; transition: 0.2s; }
+        .admin-btn:hover { background: linear-gradient(135deg, #764ba2 0%, #667eea 100%); }
+        .section { margin-top: 30px; }
+        .section-title { font-size: 18px; font-weight: bold; color: #333; margin-bottom: 12px; }
+        .pub-form textarea { width: 100%; min-height: 80px; border-radius: 8px; border: 1px solid #ddd; padding: 10px; font-size: 15px; margin-bottom: 10px; }
+        .pub-form button { width: 100%; padding: 12px; border-radius: 8px; background: #667eea; color: #fff; font-size: 16px; border: none; font-weight: 500; cursor: pointer; }
+        .pub-form button:hover { background: #764ba2; }
+        .back-btn { margin-top: 20px; background: #eee; color: #333; }
+        .success-msg { color: #28a745; text-align: center; margin-top: 10px; }
+        .error-msg { color: #dc3545; text-align: center; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <div class="admin-title">Админ-панель</div>
+        <button class="admin-btn" onclick="showSection('users')">Пользователи</button>
+        <button class="admin-btn" onclick="showSection('reports')">Отчеты</button>
+        <button class="admin-btn" onclick="showSection('publications')">Публикации</button>
+
+        <div class="section" id="section-users" style="display:none;">
+            <div class="section-title">Пользователи</div>
+            <div>Здесь будет список пользователей (реализуйте по необходимости).</div>
+        </div>
+        <div class="section" id="section-reports" style="display:none;">
+            <div class="section-title">Отчеты</div>
+            <div>Здесь будет список отчетов (реализуйте по необходимости).</div>
+        </div>
+        <div class="section" id="section-publications" style="display:none;">
+            <div class="section-title">Публикации</div>
+            <form class="pub-form" onsubmit="return sendPublication(event)">
+                <textarea id="pubText" placeholder="Введите текст публикации..."></textarea>
+                <button type="submit">Отправить всем</button>
+            </form>
+            <div class="success-msg" id="pubSuccess" style="display:none;"></div>
+            <div class="error-msg" id="pubError" style="display:none;"></div>
+        </div>
+        <button class="admin-btn back-btn" onclick="goBack()">Назад в меню</button>
+    </div>
+    <script>
+        function showSection(section) {
+            document.getElementById('section-users').style.display = 'none';
+            document.getElementById('section-reports').style.display = 'none';
+            document.getElementById('section-publications').style.display = 'none';
+            document.getElementById('pubSuccess').style.display = 'none';
+            document.getElementById('pubError').style.display = 'none';
+            document.getElementById('section-' + section).style.display = 'block';
+        }
+        function goBack() {
+            window.location.href = '/webapp';
+        }
+        async function sendPublication(e) {
+            e.preventDefault();
+            const text = document.getElementById('pubText').value.trim();
+            if (!text) return false;
+            document.getElementById('pubSuccess').style.display = 'none';
+            document.getElementById('pubError').style.display = 'none';
+            let telegram_id = null;
+            if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe && window.Telegram.WebApp.initDataUnsafe.user) {
+                telegram_id = window.Telegram.WebApp.initDataUnsafe.user.id;
+            } else {
+                telegram_id = localStorage.getItem('telegram_id');
+            }
+            try {
+                const resp = await fetch('/api/admin_publish', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text, telegram_id })
+                });
+                const data = await resp.json();
+                if (resp.ok && data.success) {
+                    document.getElementById('pubSuccess').textContent = 'Публикация отправлена!';
+                    document.getElementById('pubSuccess').style.display = 'block';
+                    document.getElementById('pubText').value = '';
+                } else {
+                    document.getElementById('pubError').textContent = data.error || 'Ошибка отправки';
+                    document.getElementById('pubError').style.display = 'block';
+                }
+            } catch (err) {
+                document.getElementById('pubError').textContent = 'Ошибка сети';
+                document.getElementById('pubError').style.display = 'block';
+            }
+            return false;
+        }
+    </script>
+</body>
+</html> 
