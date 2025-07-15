@@ -1218,13 +1218,22 @@ def api_user_balance():
 @app.route('/api/full_report_access', methods=['POST'])
 def api_full_report_access():
     data = request.json or {}
+    logger.info(f"/api/full_report_access incoming data: {data}")
     telegram_id = data.get('telegram_id')
-    if not telegram_id:
+    if telegram_id is None:
+        logger.warning("/api/full_report_access: telegram_id missing in request")
         return jsonify({'error': 'telegram_id required'}), 400
     try:
+        telegram_id = int(telegram_id)
+    except (TypeError, ValueError):
+        logger.warning(f"/api/full_report_access: telegram_id not convertible to int: {telegram_id}")
+        return jsonify({'error': 'Invalid telegram_id'}), 400
+    try:
         user_result = supabase.table('users').select('period_start, period_end, balance').eq('telegram_id', telegram_id).execute()
+        logger.info(f"/api/full_report_access user_result: {user_result.data}")
         user = user_result.data[0] if user_result.data else None
         if not user:
+            logger.warning(f"/api/full_report_access: User not found for telegram_id {telegram_id}")
             return jsonify({'error': 'User not found'}), 404
         # Получаем стоимость полного отчета
         tariff_result = supabase.table('tariffs').select('price').eq('name', 'full report').execute()
