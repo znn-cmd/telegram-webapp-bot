@@ -1310,6 +1310,11 @@ def api_deduct_balance():
 # === Запуск Flask приложения ===
 def run_flask():
     """Запуск Flask приложения"""
+    # Вывод всех роутов для отладки
+    print("\n=== Flask ROUTES ===")
+    for rule in app.url_map.iter_rules():
+        print(f"{rule.methods} {rule}")
+    print("====================\n")
     app.run(host='0.0.0.0', port=8080, debug=False)
 
 if __name__ == '__main__':
