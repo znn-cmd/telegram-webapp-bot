@@ -521,8 +521,19 @@ def translate_with_chatgpt(text: str, target_language: str) -> str:
     """Перевод текста через ChatGPT API"""
     
     try:
-        # Жестко прописанный ChatGPT API ключ
-        chatgpt_api_key = "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"
+        # Получаем API ключ из переменных окружения или используем заглушку
+        chatgpt_api_key = os.getenv('CHATGPT_API_KEY')
+        
+        if not chatgpt_api_key:
+            # Если ключ не найден, используем заглушку с базовыми переводами
+            print("ChatGPT API ключ не найден. Используется заглушка.")
+            translations = {
+                'us': f"[EN] {text}",
+                'ft': f"[FR] {text}",
+                'de': f"[DE] {text}",
+                'tr': f"[TR] {text}"
+            }
+            return translations.get(target_language, text)
         
         # Реальный API вызов к ChatGPT
         headers = {
