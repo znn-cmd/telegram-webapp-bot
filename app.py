@@ -1307,19 +1307,6 @@ def api_deduct_balance():
     except Exception as e:
         logger.error(f"Error in deduct_balance: {e}")
         return jsonify({'error': 'Internal server error', 'details': str(e)}), 500
-# === Запуск Flask приложения ===
-def run_flask():
-    """Запуск Flask приложения"""
-    # Вывод всех роутов для отладки
-    print("\n=== Flask ROUTES ===")
-    for rule in app.url_map.iter_rules():
-        print(f"{rule.methods} {rule}")
-    print("====================\n")
-    app.run(host='0.0.0.0', port=8080, debug=False)
-
-if __name__ == '__main__':
-    run_flask()
-
 @app.route('/api/update_user_report', methods=['POST'])
 def api_update_user_report():
     """Обновление отчета пользователя (списание $1, перегенерация)"""
@@ -1542,3 +1529,16 @@ def api_send_saved_report_pdf():
     except Exception as e:
         logger.error(f"Error generating/sending PDF: {e}")
         return jsonify({'error': 'Internal error'}), 500
+
+# === Запуск Flask приложения ===
+def run_flask():
+    """Запуск Flask приложения"""
+    # Вывод всех роутов для отладки
+    print("\n=== Flask ROUTES ===")
+    for rule in app.url_map.iter_rules():
+        print(f"{rule.methods} {rule}")
+    print("====================\n")
+    app.run(host='0.0.0.0', port=8080, debug=False)
+
+if __name__ == '__main__':
+    run_flask()
