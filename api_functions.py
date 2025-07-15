@@ -521,19 +521,8 @@ def translate_with_chatgpt(text: str, target_language: str) -> str:
     """Перевод текста через ChatGPT API"""
     
     try:
-        # Здесь нужно будет добавить ваш ChatGPT API ключ
-        # Пока используем заглушку для демонстрации
-        chatgpt_api_key = os.getenv('CHATGPT_API_KEY')
-        
-        if not chatgpt_api_key:
-            # Заглушка для демонстрации
-            translations = {
-                'us': f"[EN] {text}",
-                'ft': f"[FR] {text}",
-                'de': f"[DE] {text}",
-                'tr': f"[TR] {text}"
-            }
-            return translations.get(target_language, text)
+        # Жестко прописанный ChatGPT API ключ
+        chatgpt_api_key = "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"
         
         # Реальный API вызов к ChatGPT
         headers = {
@@ -541,7 +530,16 @@ def translate_with_chatgpt(text: str, target_language: str) -> str:
             'Content-Type': 'application/json'
         }
         
-        prompt = f"Переведи следующий текст на {target_language}. Сохрани все форматирование, эмодзи и оформление. Дословный перевод: {text}"
+        # Маппинг языков для промпта
+        language_names = {
+            'us': 'английский',
+            'ft': 'французский', 
+            'de': 'немецкий',
+            'tr': 'турецкий'
+        }
+        
+        lang_name = language_names.get(target_language, target_language)
+        prompt = f"Переведи следующий текст на {lang_name}. Сохрани все форматирование, эмодзи и оформление. Дословный перевод: {text}"
         
         data = {
             'model': 'gpt-3.5-turbo',
@@ -559,7 +557,7 @@ def translate_with_chatgpt(text: str, target_language: str) -> str:
             result = response.json()
             return result['choices'][0]['message']['content'].strip()
         else:
-            print(f"Ошибка ChatGPT API: {response.status_code}")
+            print(f"Ошибка ChatGPT API: {response.status_code} - {response.text}")
             return text
             
     except Exception as e:
