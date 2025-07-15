@@ -1220,8 +1220,8 @@ def api_full_report_access():
     data = request.json or {}
     logger.info(f"/api/full_report_access incoming data: {data}")
     telegram_id = data.get('telegram_id')
-    if telegram_id is None:
-        logger.warning("/api/full_report_access: telegram_id missing in request")
+    if telegram_id is None or str(telegram_id).strip() == '':
+        logger.warning("/api/full_report_access: telegram_id missing or empty in request")
         return jsonify({'error': 'telegram_id required'}), 400
     try:
         telegram_id = int(telegram_id)
