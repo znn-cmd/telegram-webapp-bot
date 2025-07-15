@@ -1276,9 +1276,8 @@ def api_deduct_balance():
         new_balance_int = int(new_balance)
         logger.info(f"/api/deduct_balance: old_balance={old_balance}, amount={amount}, new_balance_int={new_balance_int}")
         update_result = supabase.table('users').update({'balance': new_balance_int}).eq('telegram_id', telegram_id).execute()
-        if update_result.error:
-            logger.error(f"Error in deduct_balance: {update_result.error}")
-            return jsonify({'error': 'Failed to update balance', 'details': str(update_result.error)}), 500
+        logger.info(f"/api/deduct_balance: update_result={update_result}")
+        # Если не было исключения — считаем успехом
         return jsonify({'success': True, 'new_balance': new_balance_int})
     except Exception as e:
         logger.error(f"Error in deduct_balance: {e}")
