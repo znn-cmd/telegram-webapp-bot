@@ -1578,15 +1578,25 @@ def api_admin_publish():
     admins_count = sum(1 for u in users if u.get('user_status') == 'admin')
     regular_users_count = len(users) - admins_count
     
-    # Рассылка через Telegram-бота
-    from telegram import Bot
-    bot = Bot(TOKEN)
+    # Рассылка через Telegram-бота (используем HTTP API как в PDF отправке)
+    bot_token = os.getenv("TELEGRAM_BOT_TOKEN") or '7215676549:AAFS86JbRCqwzTKQG-dF96JX-C1aWNvBoLo'
+    send_url = f'https://api.telegram.org/bot{bot_token}/sendMessage'
     errors = 0
     sent = 0
     for u in users:
         try:
-            bot.send_message(chat_id=u['telegram_id'], text=text)
-            sent += 1
+            data_send = {
+                'chat_id': u['telegram_id'],
+                'text': text,
+                'parse_mode': 'HTML'
+            }
+            resp = requests.post(send_url, data=data_send)
+            if resp.status_code == 200 and resp.json().get('ok'):
+                sent += 1
+                logger.info(f"Message sent successfully to {u['telegram_id']}")
+            else:
+                errors += 1
+                logger.error(f"Failed to send message to {u['telegram_id']}: {resp.text}")
         except Exception as e:
             logger.error(f"Failed to send message to {u['telegram_id']}: {e}")
             errors += 1
