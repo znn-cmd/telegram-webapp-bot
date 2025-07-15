@@ -1127,8 +1127,8 @@ def api_generate_pdf_report():
             pdf.set_font('DejaVu', 'B', 11)
             pdf.cell(0, 8, 'Контактные данные риелтора:', ln=True)
             pdf.set_font('DejaVu', '', 10)
-                    if profile.get('tg_name') or profile.get('last_name'):
-            pdf.cell(0, 8, f"Имя: {profile.get('tg_name','')} {profile.get('last_name','')}", ln=True)
+            if profile.get('tg_name') or profile.get('last_name'):
+                pdf.cell(0, 8, f"Имя: {profile.get('tg_name','')} {profile.get('last_name','')}", ln=True)
             if profile.get('company'):
                 pdf.cell(0, 8, f"Компания: {profile.get('company')}", ln=True)
             if profile.get('position'):
