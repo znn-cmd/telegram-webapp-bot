@@ -487,7 +487,6 @@
                 'full': 'Полный',
                 'market_analysis': 'Базовый',
                 'download_pdf': 'Скачать PDF',
-                'send_to_client': 'Отправить клиенту',
                 'delete': 'Удалить',
                 'update': 'Обновить',
                 'confirm_delete': 'Вы уверены, что хотите удалить этот отчет?',
@@ -498,7 +497,6 @@
                 'error_deleting': 'Ошибка при удалении отчета',
                 'error_loading': 'Ошибка загрузки отчетов',
                 'success_download': 'PDF скачивается...',
-                'success_sent': 'Отчет отправлен клиенту'
             },
             'en': {
                 'pageTitle': 'My Reports',
@@ -509,7 +507,6 @@
                 'full': 'Full',
                 'market_analysis': 'Basic',
                 'download_pdf': 'Download PDF',
-                'send_to_client': 'Send to client',
                 'delete': 'Delete',
                 'update': 'Update',
                 'confirm_delete': 'Are you sure you want to delete this report?',
@@ -520,7 +517,6 @@
                 'error_deleting': 'Error deleting report',
                 'error_loading': 'Error loading reports',
                 'success_download': 'PDF downloading...',
-                'success_sent': 'Report sent to client'
             }
         };
         
@@ -614,9 +610,6 @@
                         <button class="icon-btn" onclick="downloadPdf('${r.id || ''}')" title="Скачать PDF">
                             <span>⬇️<span class='tooltip'>Скачать PDF</span></span>
                         </button>
-                        <button class="icon-btn" onclick="sendToClient('${r.id || ''}')" title="Отправить клиенту">
-                            <span>✉️<span class='tooltip'>Отправить клиенту</span></span>
-                        </button>
                         <button class="icon-btn" onclick="confirmDeleteReport('${r.id || ''}')" title="Удалить">
                             <span>🗑️<span class='tooltip'>Удалить</span></span>
                         </button>
@@ -673,7 +666,6 @@
                     <div id="fullReportContent"></div>
                     <div style='display:flex;gap:10px;margin-top:18px;'>
                         <button class="btn" onclick="exportPdfFlow()">Скачать PDF</button>
-                        <button class="btn" onclick="sendPdfToClientFlow()">Отправить клиенту</button>
                         <button class="btn back-btn" style="background:#f1f1f1;color:#333;" onclick="saveAndExitFullReport()">Сохранить и выйти</button>
                     </div>
                     <button class="btn back-btn" style="margin-top:18px;" onclick="closeFullReportModal()">Закрыть</button>
@@ -749,22 +741,8 @@
             showModalQuestion(
                 'Добавить ваши контактные данные в PDF?',
                 () => checkAndCollectUserContacts(reportId),
-                () => askAddClientData(undefined, reportId)
+                () => generatePdfRequest(reportId)
             );
-        }
-
-        function askAddClientData(userProfile, reportId) {
-            showModalQuestion(
-                'Хотите добавить данные получателя (клиента)?',
-                () => askClientName(userProfile, reportId),
-                () => generatePdfRequest(userProfile, null, reportId)
-            );
-        }
-
-        function askClientName(userProfile, reportId) {
-            showModalInput('Имя получателя (клиента)', (clientName) => {
-                generatePdfRequest(userProfile, clientName, reportId);
-            });
         }
 
         function checkAndCollectUserContacts(reportId) {
@@ -790,7 +768,7 @@
                     ];
                     collectMissingFields(profile, fields, 0, (filledProfile) => {
                         // После сбора всех данных спрашиваем про клиента
-                        askAddClientData(filledProfile, reportId);
+                        generatePdfRequest(reportId);
                     });
                 } else {
                     alert('Ошибка загрузки профиля');
@@ -869,16 +847,16 @@
             if (modal) modal.remove();
         }
         // Генерация PDF (AJAX)
-        function generatePdfRequest(profile, clientName, reportId) {
+        function generatePdfRequest(reportId) {
             if (!reportId) {
                 showToast('Ошибка: не удалось получить id отчета для генерации PDF!', 'error');
                 return;
             }
-            console.log('PDF GENERATE: reportId:', reportId, 'profile:', profile, 'clientName:', clientName, 'fullReport:', window._currentFullReport);
+            console.log('PDF GENERATE: reportId:', reportId, 'profile:', userData, 'fullReport:', window._currentFullReport);
             fetch('/api/generate_pdf_report', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ report: window._currentFullReport, profile, client_name: clientName, report_id: reportId })
+                body: JSON.stringify({ report: window._currentFullReport, profile: userData, report_id: reportId })
             })
             .then(res => res.json())
             .then(data => {
@@ -927,11 +905,6 @@
         function downloadPdf(id) {
             showToast('Подготовка PDF...', 'info');
             exportPdfFlow(id);
-        }
-
-        function sendToClient(id) {
-            showToast('Отправка клиенту...', 'info');
-            sendPdfToClientFlow(id);
         }
 
         // Улучшенная функция удаления с undo
@@ -1081,87 +1054,6 @@
             })
             .catch(() => {
                 showToast('Ошибка сохранения отчета', 'error');
-            });
-        }
-
-        // Функции для отправки клиенту
-        function sendPdfToClientFlow(reportId) {
-            if (!reportId) {
-                showToast('Ошибка: не удалось получить id отчета для отправки клиенту!', 'error');
-                return;
-            }
-            askAddUserContacts(reportId);
-        }
-
-        function askAddClientData(userProfile, reportId) {
-            showModalQuestion(
-                'Хотите добавить данные получателя (клиента)?',
-                () => askClientName(userProfile, reportId),
-                () => generatePdfRequest(userProfile, null, reportId)
-            );
-        }
-
-        function askClientName(userProfile, reportId) {
-            showModalInput('Имя получателя (клиента)', (clientName) => {
-                generatePdfRequest(userProfile, clientName, reportId);
-            });
-        }
-
-        // Модальные окна для отправки клиенту
-        function showSendClientModal(reportId) {
-            let oldModal = document.getElementById('send-client-modal');
-            if (oldModal) oldModal.remove();
-            
-            const modal = document.createElement('div');
-            modal.id = 'send-client-modal';
-            modal.style = 'position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.25);z-index:2300;display:flex;align-items:center;justify-content:center;';
-            modal.innerHTML = `
-                <div style="background:#fff;border-radius:18px;box-shadow:0 4px 24px rgba(102,126,234,0.18);padding:28px 18px 18px 18px;max-width:340px;width:90vw;text-align:center;">
-                    <div style="font-size:18px;font-weight:700;color:#667eea;margin-bottom:16px;">Отправить клиенту</div>
-                    <input id="clientNameInput" placeholder="Имя клиента" style="margin-bottom:10px;width:90%;font-size:16px;padding:8px;">
-                    <input id="clientTelegramInput" placeholder="Telegram @username" style="margin-bottom:20px;width:90%;font-size:16px;padding:8px;">
-                    <button class="btn" style="width:100%;font-size:16px;" onclick="sendToClientSubmit('${reportId}')">Отправить</button>
-                    <button class="btn back-btn" style="width:100%;margin-top:10px;font-size:16px;" onclick="closeSendClientModal()">Отмена</button>
-                </div>
-            `;
-            document.body.appendChild(modal);
-        }
-
-        function closeSendClientModal() {
-            let modal = document.getElementById('send-client-modal');
-            if (modal) modal.remove();
-        }
-
-        function sendToClientSubmit(reportId) {
-            const clientName = document.getElementById('clientNameInput').value.trim();
-            const clientTelegram = document.getElementById('clientTelegramInput').value.trim();
-            
-            if (!clientName || !clientTelegram) {
-                showToast('Заполните все поля', 'warning');
-                return;
-            }
-
-            fetch('/api/send_to_client', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    telegram_id: userData.id,
-                    report_id: reportId,
-                    client_name: clientName,
-                    client_telegram: clientTelegram
-                })
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    showToast('Отчет отправлен клиенту и записан в историю!', 'success');
-                    closeSendClientModal();
-                } else {
-                    showToast('Ошибка отправки PDF', 'error');
-                }
-            })
-            .catch(() => {
-                showToast('Ошибка отправки PDF', 'error');
             });
         }
 
