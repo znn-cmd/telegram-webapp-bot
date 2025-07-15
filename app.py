@@ -1391,3 +1391,16 @@ def api_save_user_report():
     except Exception as e:
         logger.error(f"Error saving user report: {e}")
         return jsonify({'error': 'Internal error'}), 500
+
+@app.route('/api/delete_report', methods=['POST'])
+def api_delete_report():
+    data = request.json or {}
+    report_id = data.get('report_id')
+    if not report_id:
+        return jsonify({'error': 'report_id required'}), 400
+    try:
+        from datetime import datetime
+        result = supabase.table('user_reports').update({'deleted_at': datetime.utcnow().isoformat()}).eq('id', report_id).execute()
+        return jsonify({'success': True})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
