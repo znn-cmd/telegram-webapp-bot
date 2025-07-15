@@ -1131,10 +1131,8 @@
             html += `<div style='background:#f4f7ff;border-radius:12px;padding:14px 12px 10px 12px;margin-bottom:14px;box-shadow:0 2px 8px rgba(102,126,234,0.06);font-size:15px;color:#222;'>${report.summary}</div>`;
             
             // Кнопки действий
-            html += `<div class="btn-row" style="margin-bottom:10px;">
-                <button class="btn btn-primary" onclick="downloadPDF()">Скачать PDF</button>
-                <button class="btn btn-primary" onclick="showClientModal()">Отправить клиенту</button>
-                <button class="btn btn-secondary" onclick="goToMainMenu()">Главное меню</button>
+            html += `<div style="margin-bottom:10px;">
+                <button class="btn btn-primary" style="width:100%;font-size:17px;" onclick="downloadPDF()">Скачать PDF</button>
             </div>`;
             
             document.getElementById('reportResult').innerHTML = html;
@@ -1295,56 +1293,54 @@
                 showToast('Данные отчета не найдены', 'error');
                 return;
             }
-            
             showProgressBar('Генерируем PDF...', 0);
-            
-            // Сначала сохраняем отчет, затем генерируем PDF
-            saveReportIfNeededAndGeneratePdf(currentReportData.report, function(reportId) {
-                fetch('/api/generate_pdf_report', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        report: currentReportData.report,
-                        report_id: reportId,
-                        add_realtor_contacts: false,
-                        add_client_name: false
-                    })
+            fetch('/api/generate_pdf_report', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    report: currentReportData.report,
+                    add_realtor_contacts: false,
+                    add_client_name: false,
+                    report_id: currentReportData.id
                 })
-                .then(res => res.json())
-                .then(data => {
-                    hideProgressBar();
-                    if (data.success && data.pdf_path) {
-                        window._lastPdfPath = data.pdf_path;
-                        // Скачиваем PDF через API
-                        fetch('/api/download_pdf', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ pdf_path: data.pdf_path })
-                        })
-                        .then(res => res.blob())
-                        .then(blob => {
-                            const url = window.URL.createObjectURL(blob);
-                            const a = document.createElement('a');
-                            a.href = url;
-                            a.download = 'full_report.pdf';
-                            document.body.appendChild(a);
-                            a.click();
-                            window.URL.revokeObjectURL(url);
-                            document.body.removeChild(a);
-                            showToast('PDF успешно сгенерирован!', 'success');
-                        })
-                        .catch(() => {
-                            showToast('Ошибка скачивания PDF', 'error');
-                        });
-                    } else {
-                        showToast('Ошибка генерации PDF', 'error');
-                    }
-                })
-                .catch(() => {
-                    hideProgressBar();
-                    showToast('Ошибка соединения при генерации PDF', 'error');
-                });
+            })
+            .then(res => res.json())
+            .then(data => {
+                hideProgressBar();
+                if (data.success && data.pdf_path) {
+                    window._lastPdfPath = data.pdf_path;
+                    showPdfDownloadModal(data.pdf_path);
+                } else {
+                    showToast('Ошибка генерации PDF: ' + (data.error || ''), 'error');
+                }
+            })
+            .catch(() => {
+                hideProgressBar();
+                showToast('Ошибка соединения', 'error');
             });
+        }
+
+        function showPdfDownloadModal(pdfUrl) {
+            let oldModal = document.getElementById('pdf-modal');
+            if (oldModal) oldModal.remove();
+            const modal = document.createElement('div');
+            modal.id = 'pdf-modal';
+            modal.style = 'position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.25);z-index:1000;display:flex;align-items:center;justify-content:center;';
+            modal.innerHTML = `
+                <div style="background:#fff;border-radius:18px;box-shadow:0 4px 24px rgba(102,126,234,0.18);padding:32px 24px 24px 24px;max-width:340px;width:90vw;text-align:center;">
+                    <div style="font-size:19px;font-weight:700;color:#667eea;margin-bottom:16px;">PDF сформирован</div>
+                    <div style="font-size:16px;color:#333;margin-bottom:22px;">Нажмите кнопку ниже, чтобы скачать файл.</div>
+                    <a href="${pdfUrl}" target="_blank" download style="display:block;width:100%;margin-bottom:14px;">
+                        <button class="btn btn-primary" style="width:100%;font-size:17px;">Скачать PDF</button>
+                    </a>
+                    <button class="btn btn-secondary" style="width:100%;font-size:16px;" onclick="closePdfModal();goToMainMenu();">В главное меню</button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+        function closePdfModal() {
+            let modal = document.getElementById('pdf-modal');
+            if (modal) modal.remove();
         }
         
         function showPDFSavedModal() {
