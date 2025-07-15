@@ -748,7 +748,7 @@
                 if (periodStart && periodEnd && today >= periodStart && today <= periodEnd) {
                     // Бесплатно по подписке — сразу формируем отчет
                     showToast(`У вас оплачен период пользования до ${periodEnd.toLocaleDateString()}. Для вас отчет бесплатный!`, 'success');
-                    showFullReportConfirmModal(lastReportAddress, lastReportBedrooms, lastReportPrice, telegram_id, true);
+                    showFullReportConfirmModal(lastReportAddress, lastReportBedrooms, lastReportPrice, telegram_id, true, data.full_report_price);
                 } else {
                     // Платно — сразу списываем средства и формируем отчет
                     if (parseFloat(data.balance) >= parseFloat(data.full_report_price)) {
@@ -764,7 +764,7 @@
                             hideProgressBar();
                             if (deductData.success) {
                                 showToast('Средства успешно списаны. Формируем отчет...', 'success');
-                                showFullReportConfirmModal(lastReportAddress, lastReportBedrooms, lastReportPrice, telegram_id, false);
+                                showFullReportConfirmModal(lastReportAddress, lastReportBedrooms, lastReportPrice, telegram_id, false, data.full_report_price);
                             } else if (deductData.error === 'Insufficient balance') {
                                 showModalTopup(`Недостаточно средств для получения полного отчета.<br>Стоимость: <b>${data.full_report_price} EUR</b>`, () => {
                                     closeModalTopup();
