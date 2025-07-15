@@ -1022,13 +1022,14 @@ def api_save_object():
 
 @app.route('/api/generate_pdf_report', methods=['POST'])
 def api_generate_pdf_report():
-    """Генерация PDF отчета с поддержкой Unicode (DejaVu)"""
+    """Генерация PDF отчета с поддержкой Unicode (DejaVu) и отправка через Telegram-бота"""
     data = request.json or {}
     logger.info(f"PDF request data: {data}")
     report = data.get('report')
     profile = data.get('profile') or {}
     client_name = data.get('client_name')
     report_id = data.get('report_id')
+    telegram_id = data.get('telegram_id')
     if not report_id:
         logger.error(f"PDF generation error: report_id not provided. Incoming data: {data}")
         return jsonify({'error': 'report_id required for PDF generation', 'details': data}), 400
@@ -1155,12 +1156,29 @@ def api_generate_pdf_report():
         final_pdf_path = os.path.join(reports_dir, final_pdf_name)
         import shutil
         shutil.move(temp_file.name, final_pdf_path)
-        # Сохраняем путь к PDF в user_reports
         pdf_url = f'/static/reports/{final_pdf_name}'
         supabase.table('user_reports').update({'pdf_path': pdf_url}).eq('id', report_id).execute()
+        # Отправка PDF через Telegram-бота
+        send_status = None
+        if telegram_id:
+            try:
+                bot_token = '7215676549:AAFS86JbRCqwzTKQG-dF96JX-C1aWNvBoLo'
+                send_url = f'https://api.telegram.org/bot{bot_token}/sendDocument'
+                with open(final_pdf_path, 'rb') as pdf_file:
+                    files = {'document': pdf_file}
+                    data_send = {'chat_id': telegram_id}
+                    resp = requests.post(send_url, data=data_send, files=files)
+                    if resp.status_code == 200 and resp.json().get('ok'):
+                        send_status = 'sent'
+                    else:
+                        send_status = f'error: {resp.text}'
+            except Exception as e:
+                logger.error(f"Error sending PDF via Telegram bot: {e}")
+                send_status = f'error: {e}'
         return jsonify({
             'success': True,
             'pdf_path': pdf_url,
+            'telegram_send_status': send_status,
             'message': 'PDF успешно сгенерирован и сохранен!'
         })
     except Exception as e:

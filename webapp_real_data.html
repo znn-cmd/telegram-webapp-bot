@@ -1301,15 +1301,23 @@
                     report: currentReportData.report,
                     add_realtor_contacts: false,
                     add_client_name: false,
-                    report_id: currentReportData.id
+                    report_id: currentReportData.id,
+                    telegram_id: getTelegramId()
                 })
             })
             .then(res => res.json())
             .then(data => {
                 hideProgressBar();
-                if (data.success && data.pdf_path) {
-                    window._lastPdfPath = data.pdf_path;
-                    showPdfDownloadModal(data.pdf_path);
+                if (data.success) {
+                    if (data.telegram_send_status === 'sent') {
+                        closePdfModal && closePdfModal();
+                        showToast('PDF-отчёт отправлен вам в Telegram!', 'success', 6000);
+                        setTimeout(() => { goToMainMenu(); }, 2000);
+                    } else if (data.telegram_send_status && data.telegram_send_status.startsWith('error')) {
+                        showToast('Ошибка отправки PDF через Telegram: ' + data.telegram_send_status, 'error', 8000);
+                    } else {
+                        showToast('PDF сгенерирован, но не удалось отправить через Telegram.', 'error', 8000);
+                    }
                 } else {
                     showToast('Ошибка генерации PDF: ' + (data.error || ''), 'error');
                 }
@@ -1329,10 +1337,8 @@
             modal.innerHTML = `
                 <div style="background:#fff;border-radius:18px;box-shadow:0 4px 24px rgba(102,126,234,0.18);padding:32px 24px 24px 24px;max-width:340px;width:90vw;text-align:center;">
                     <div style="font-size:19px;font-weight:700;color:#667eea;margin-bottom:16px;">PDF сформирован</div>
-                    <div style="font-size:16px;color:#333;margin-bottom:18px;">Нажмите кнопку ниже, чтобы открыть PDF.\nЕсли файл не открывается, используйте Telegram Desktop или откройте WebApp в браузере.</div>
-                    <a href="${pdfUrl}" target="_blank" style="display:block;width:100%;margin-bottom:14px;">
-                        <button class="btn btn-primary" style="width:100%;font-size:17px;">Открыть PDF</button>
-                    </a>
+                    <div style="font-size:16px;color:#333;margin-bottom:18px;">Скопируйте ссылку ниже и откройте её в браузере.<br>Если файл не открывается, используйте Telegram Desktop или откройте WebApp в браузере.</div>
+                    <div style='word-break:break-all;background:#f4f7ff;padding:10px 8px;border-radius:8px;margin-bottom:16px;font-size:14px;color:#222;'>${location.origin}${pdfUrl}</div>
                     <button class="btn btn-secondary" style="width:100%;font-size:16px;" onclick="closePdfModal();goToMainMenu();">В главное меню</button>
                 </div>
             `;
