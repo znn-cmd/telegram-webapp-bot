@@ -23,6 +23,60 @@
         .back-btn { margin-top: 20px; background: #eee; color: #333; }
         .success-msg { color: #28a745; text-align: center; margin-top: 10px; }
         .error-msg { color: #dc3545; text-align: center; margin-top: 10px; }
+        
+        /* Стили для раздела пользователей */
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+        .stat-card { background: #f8f9fa; border-radius: 8px; padding: 12px; text-align: center; }
+        .stat-number { font-size: 20px; font-weight: bold; color: #667eea; }
+        .stat-label { font-size: 12px; color: #666; margin-top: 4px; }
+        .filters { margin-bottom: 15px; }
+        .filter-row { display: flex; gap: 8px; margin-bottom: 8px; }
+        .filter-input { flex: 1; padding: 8px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; }
+        .filter-select { padding: 8px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; }
+        .users-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        .users-table th, .users-table td { padding: 8px; text-align: left; border-bottom: 1px solid #eee; font-size: 14px; }
+        .users-table th { background: #f8f9fa; font-weight: bold; }
+        .user-status { padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; }
+        .status-admin { background: #dc3545; color: white; }
+        .status-user { background: #28a745; color: white; }
+        .user-actions { display: flex; gap: 4px; }
+        .action-btn { padding: 4px 8px; border: none; border-radius: 4px; font-size: 12px; cursor: pointer; }
+        .btn-view { background: #17a2b8; color: white; }
+        .btn-edit { background: #ffc107; color: #333; }
+        .pagination { display: flex; justify-content: center; gap: 8px; margin-top: 15px; }
+        .page-btn { padding: 8px 12px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; }
+        .page-btn.active { background: #667eea; color: white; border-color: #667eea; }
+        .loading { text-align: center; padding: 20px; }
+        .spinner { width: 30px; height: 30px; border: 3px solid #f3f3f3; border-top: 3px solid #667eea; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        /* Стили для детального просмотра пользователя */
+        .user-detail { margin-top: 20px; }
+        .user-header { background: #f8f9fa; border-radius: 8px; padding: 16px; margin-bottom: 16px; }
+        .user-name { font-size: 18px; font-weight: bold; color: #333; margin-bottom: 8px; }
+        .user-info { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+        .info-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee; }
+        .info-label { font-weight: 500; color: #666; }
+        .info-value { color: #333; }
+        .user-actions-panel { display: flex; gap: 8px; margin-bottom: 16px; }
+        .action-panel-btn { padding: 8px 16px; border: none; border-radius: 6px; font-size: 14px; cursor: pointer; font-weight: 500; }
+        .btn-status { background: #28a745; color: white; }
+        .btn-status.admin { background: #dc3545; }
+        .btn-balance { background: #ffc107; color: #333; }
+        .btn-back { background: #6c757d; color: white; }
+        .reports-section { margin-top: 20px; }
+        .reports-title { font-size: 16px; font-weight: bold; color: #333; margin-bottom: 12px; }
+        .reports-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        .reports-table th, .reports-table td { padding: 8px; text-align: left; border-bottom: 1px solid #eee; font-size: 13px; }
+        .reports-table th { background: #f8f9fa; font-weight: bold; }
+        .edit-form { background: #f8f9fa; border-radius: 8px; padding: 16px; margin-top: 12px; }
+        .form-row { display: flex; gap: 8px; margin-bottom: 12px; align-items: center; }
+        .form-input { flex: 1; padding: 8px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; }
+        .form-btn { padding: 8px 16px; border: none; border-radius: 6px; font-size: 14px; cursor: pointer; background: #667eea; color: white; }
+        .form-btn:hover { background: #764ba2; }
+        .success-msg, .error-msg { padding: 8px; border-radius: 6px; margin-top: 8px; font-size: 14px; }
+        .success-msg { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error-msg { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
     </style>
 </head>
 <body>
@@ -41,10 +95,124 @@
         <button class="admin-btn" onclick="showSection('reports')">Отчеты</button>
         <button class="admin-btn" onclick="showSection('publications')">Публикации</button>
 
+        <!-- Раздел Пользователи -->
         <div class="section" id="section-users" style="display:none;">
             <div class="section-title">Пользователи</div>
-            <div>Здесь будет список пользователей (реализуйте по необходимости).</div>
+            
+            <!-- Статистика -->
+            <div class="stats-grid" id="usersStats">
+                <div class="stat-card">
+                    <div class="stat-number" id="totalUsers">-</div>
+                    <div class="stat-label">Всего пользователей</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="newWeek">-</div>
+                    <div class="stat-label">Новых за неделю</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="activeWeek">-</div>
+                    <div class="stat-label">Активных за неделю</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="reportsWeek">-</div>
+                    <div class="stat-label">Отчетов за неделю</div>
+                </div>
+            </div>
+            
+            <!-- Фильтры -->
+            <div class="filters">
+                <div class="filter-row">
+                    <input type="text" class="filter-input" id="searchInput" placeholder="Поиск по имени, username, ID..." onkeyup="filterUsers()">
+                    <select class="filter-select" id="statusFilter" onchange="filterUsers()">
+                        <option value="">Все статусы</option>
+                        <option value="admin">Админы</option>
+                        <option value="user">Пользователи</option>
+                    </select>
+                </div>
+            </div>
+            
+            <!-- Таблица пользователей -->
+            <div class="loading" id="usersLoading" style="display:none;">
+                <div class="spinner"></div>
+                <p>Загрузка пользователей...</p>
+            </div>
+            
+            <table class="users-table" id="usersTable" style="display:none;">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Имя</th>
+                        <th>Статус</th>
+                        <th>Баланс</th>
+                        <th>Отчеты</th>
+                        <th>Действия</th>
+                    </tr>
+                </thead>
+                <tbody id="usersTableBody">
+                </tbody>
+            </table>
+            
+            <!-- Пагинация -->
+            <div class="pagination" id="pagination" style="display:none;">
+            </div>
+            
+            <!-- Детальный просмотр пользователя -->
+            <div class="user-detail" id="userDetail" style="display:none;">
+                <div class="user-header">
+                    <div class="user-name" id="detailUserName">Имя пользователя</div>
+                    <div class="user-info" id="detailUserInfo">
+                        <!-- Информация о пользователе будет загружена динамически -->
+                    </div>
+                    <div class="user-actions-panel">
+                        <button class="action-panel-btn btn-status" id="statusBtn" onclick="toggleUserStatus()">Изменить статус</button>
+                        <button class="action-panel-btn btn-balance" onclick="editUserBalance()">Изменить баланс</button>
+                        <button class="action-panel-btn btn-back" onclick="backToUsersList()">← Назад к списку</button>
+                    </div>
+                </div>
+                
+                <!-- Форма редактирования баланса -->
+                <div class="edit-form" id="balanceEditForm" style="display:none;">
+                    <div class="form-row">
+                        <label>Новый баланс (€):</label>
+                        <input type="number" class="form-input" id="newBalanceInput" step="0.01" min="0">
+                        <button class="form-btn" onclick="saveUserBalance()">Сохранить</button>
+                        <button class="form-btn" onclick="cancelBalanceEdit()" style="background: #6c757d;">Отмена</button>
+                    </div>
+                </div>
+                
+                <!-- Сообщения об успехе/ошибке -->
+                <div class="success-msg" id="detailSuccessMsg" style="display:none;"></div>
+                <div class="error-msg" id="detailErrorMsg" style="display:none;"></div>
+                
+                <!-- Аналитика по отчетам пользователя -->
+                <div id="userReportsAnalytics" class="stats-grid" style="margin-bottom:10px;"></div>
+                <!-- Раздел отчетов -->
+                <div class="reports-section">
+                    <div class="reports-title">Последние отчеты</div>
+                    <div class="loading" id="reportsLoading" style="display:none;">
+                        <div class="spinner"></div>
+                        <p>Загрузка отчетов...</p>
+                    </div>
+                    <table class="reports-table" id="reportsTable" style="display:none;">
+                        <thead>
+                            <tr>
+                                <th>Дата</th>
+                                <th>Тип</th>
+                                <th>Название</th>
+                                <th>Стоимость</th>
+                            </tr>
+                        </thead>
+                        <tbody id="reportsTableBody">
+                        </tbody>
+                    </table>
+                    <div id="noReports" style="display:none; text-align: center; padding: 20px; color: #666;">
+                        У пользователя пока нет отчетов
+                    </div>
+                    <div class="pagination" id="userReportsPagination" style="display:none;"></div>
+                </div>
+            </div>
         </div>
+
         <div class="section" id="section-reports" style="display:none;">
             <div class="section-title">Отчеты</div>
             <div>Здесь будет список отчетов (реализуйте по необходимости).</div>
@@ -61,6 +229,9 @@
         <button class="admin-btn back-btn" onclick="goBack()">Назад в меню</button>
     </div>
     <script>
+        let currentPage = 0;
+        let currentFilters = {};
+        
         function showSection(section) {
             document.getElementById('section-users').style.display = 'none';
             document.getElementById('section-reports').style.display = 'none';
@@ -68,10 +239,17 @@
             document.getElementById('pubSuccess').style.display = 'none';
             document.getElementById('pubError').style.display = 'none';
             document.getElementById('section-' + section).style.display = 'block';
+            
+            if (section === 'users') {
+                loadUsersStats();
+                loadUsers();
+            }
         }
+        
         function goBack() {
             window.location.href = '/webapp';
         }
+        
         async function topUpBalance() {
             let telegram_id = null;
             if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe && window.Telegram.WebApp.initDataUnsafe.user) {
@@ -99,6 +277,443 @@
                 alert('Ошибка сети при пополнении баланса');
             }
         }
+        
+        async function loadUsersStats() {
+            try {
+                const resp = await fetch('/api/admin/users/stats');
+                const data = await resp.json();
+                if (resp.ok) {
+                    document.getElementById('totalUsers').textContent = data.total || 0;
+                    document.getElementById('newWeek').textContent = data.new_week || 0;
+                    document.getElementById('activeWeek').textContent = data.active_week || 0;
+                    document.getElementById('reportsWeek').textContent = data.reports_week || 0;
+                }
+            } catch (err) {
+                console.error('Error loading users stats:', err);
+            }
+        }
+        
+        async function loadUsers(page = 0) {
+            document.getElementById('usersLoading').style.display = 'block';
+            document.getElementById('usersTable').style.display = 'none';
+            
+            try {
+                const params = new URLSearchParams({
+                    offset: page * 20,
+                    limit: 20,
+                    ...currentFilters
+                });
+                
+                const resp = await fetch(`/api/admin/users?${params}`);
+                const data = await resp.json();
+                
+                if (resp.ok) {
+                    displayUsers(data.users || []);
+                    displayPagination(data.total || 0, page);
+                } else {
+                    console.error('Error loading users:', data.error);
+                }
+            } catch (err) {
+                console.error('Error loading users:', err);
+            } finally {
+                document.getElementById('usersLoading').style.display = 'none';
+                document.getElementById('usersTable').style.display = 'table';
+            }
+        }
+        
+        function displayUsers(users) {
+            const tbody = document.getElementById('usersTableBody');
+            tbody.innerHTML = '';
+            
+            users.forEach(user => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${user.telegram_id}</td>
+                    <td>${user.tg_name || user.username || 'N/A'}</td>
+                    <td><span class="user-status status-${user.user_status}">${user.user_status}</span></td>
+                    <td>€${user.balance || 0}</td>
+                    <td>${user.total_reports || 0}</td>
+                    <td class="user-actions">
+                        <button class="action-btn btn-view" onclick="viewUser(${user.telegram_id})">Детали</button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+        
+        function displayPagination(total, currentPage) {
+            const pagination = document.getElementById('pagination');
+            const totalPages = Math.ceil(total / 20);
+            
+            if (totalPages <= 1) {
+                pagination.style.display = 'none';
+                return;
+            }
+            
+            pagination.style.display = 'flex';
+            pagination.innerHTML = '';
+            
+            // Кнопка "Предыдущая"
+            if (currentPage > 0) {
+                const prevBtn = document.createElement('button');
+                prevBtn.className = 'page-btn';
+                prevBtn.textContent = '←';
+                prevBtn.onclick = () => loadUsers(currentPage - 1);
+                pagination.appendChild(prevBtn);
+            }
+            
+            // Номера страниц
+            for (let i = Math.max(0, currentPage - 2); i <= Math.min(totalPages - 1, currentPage + 2); i++) {
+                const pageBtn = document.createElement('button');
+                pageBtn.className = `page-btn ${i === currentPage ? 'active' : ''}`;
+                pageBtn.textContent = i + 1;
+                pageBtn.onclick = () => loadUsers(i);
+                pagination.appendChild(pageBtn);
+            }
+            
+            // Кнопка "Следующая"
+            if (currentPage < totalPages - 1) {
+                const nextBtn = document.createElement('button');
+                nextBtn.className = 'page-btn';
+                nextBtn.textContent = '→';
+                nextBtn.onclick = () => loadUsers(currentPage + 1);
+                pagination.appendChild(nextBtn);
+            }
+        }
+        
+        function filterUsers() {
+            const search = document.getElementById('searchInput').value;
+            const status = document.getElementById('statusFilter').value;
+            
+            currentFilters = {};
+            if (search) currentFilters.search = search;
+            if (status) currentFilters.status = status;
+            
+            currentPage = 0;
+            loadUsers(0);
+        }
+        
+        let currentUserDetail = null;
+        let userReportsPage = 0;
+        let userReportsTotal = 0;
+        const userReportsPageSize = 10;
+
+        function viewUser(telegramId) {
+            loadUserDetail(telegramId);
+        }
+        
+        async function loadUserDetail(telegramId) {
+            try {
+                const resp = await fetch(`/api/admin/users/${telegramId}`);
+                const data = await resp.json();
+                if (resp.ok) {
+                    currentUserDetail = data.user;
+                    displayUserDetail(data);
+                    // Показываем детальный вид
+                    document.getElementById('usersTable').style.display = 'none';
+                    document.getElementById('pagination').style.display = 'none';
+                    document.getElementById('userDetail').style.display = 'block';
+                    // Загружаем аналитику и историю отчетов
+                    userReportsPage = 0;
+                    loadUserReports(telegramId, 0);
+                } else {
+                    alert('Ошибка загрузки данных пользователя: ' + (data.error || 'Неизвестная ошибка'));
+                }
+            } catch (err) {
+                console.error('Error loading user detail:', err);
+                alert('Ошибка сети при загрузке данных пользователя');
+            }
+        }
+
+        async function loadUserReports(telegramId, page) {
+            const offset = page * userReportsPageSize;
+            document.getElementById('reportsLoading').style.display = 'block';
+            try {
+                const resp = await fetch(`/api/admin/users/${telegramId}/reports?offset=${offset}&limit=${userReportsPageSize}`);
+                const data = await resp.json();
+                if (resp.ok) {
+                    userReportsTotal = data.total || 0;
+                    displayUserReports(data.reports || []);
+                    displayUserReportsAnalytics(data);
+                    displayUserReportsPagination(page, userReportsTotal);
+                }
+            } catch (err) {
+                console.error('Error loading user reports:', err);
+            } finally {
+                document.getElementById('reportsLoading').style.display = 'none';
+            }
+        }
+
+        function displayUserReportsAnalytics(data) {
+            // Показываем аналитику: отчеты за неделю/месяц, timeline
+            let analyticsHtml = `<div class='stat-card'>За неделю: <b>${data.reports_week || 0}</b></div>`;
+            analyticsHtml += `<div class='stat-card'>За месяц: <b>${data.reports_month || 0}</b></div>`;
+            // Timeline (отчеты по дням)
+            if (data.timeline) {
+                analyticsHtml += `<div style='margin-top:10px;'><b>Активность по дням (30д):</b><br>`;
+                const days = Object.keys(data.timeline).sort();
+                days.forEach(day => {
+                    analyticsHtml += `<span style='font-size:12px;'>${day}: <b>${data.timeline[day]}</b></span><br>`;
+                });
+                analyticsHtml += `</div>`;
+            }
+            document.getElementById('userReportsAnalytics').innerHTML = analyticsHtml;
+        }
+
+        function displayUserReportsPagination(page, total) {
+            const pag = document.getElementById('userReportsPagination');
+            const totalPages = Math.ceil(total / userReportsPageSize);
+            if (totalPages <= 1) {
+                pag.style.display = 'none';
+                return;
+            }
+            pag.style.display = 'flex';
+            pag.innerHTML = '';
+            if (page > 0) {
+                const prevBtn = document.createElement('button');
+                prevBtn.className = 'page-btn';
+                prevBtn.textContent = '←';
+                prevBtn.onclick = () => { userReportsPage--; loadUserReports(currentUserDetail.telegram_id, userReportsPage); };
+                pag.appendChild(prevBtn);
+            }
+            for (let i = Math.max(0, page - 2); i <= Math.min(totalPages - 1, page + 2); i++) {
+                const pageBtn = document.createElement('button');
+                pageBtn.className = `page-btn ${i === page ? 'active' : ''}`;
+                pageBtn.textContent = i + 1;
+                pageBtn.onclick = () => { userReportsPage = i; loadUserReports(currentUserDetail.telegram_id, i); };
+                pag.appendChild(pageBtn);
+            }
+            if (page < totalPages - 1) {
+                const nextBtn = document.createElement('button');
+                nextBtn.className = 'page-btn';
+                nextBtn.textContent = '→';
+                nextBtn.onclick = () => { userReportsPage++; loadUserReports(currentUserDetail.telegram_id, userReportsPage); };
+                pag.appendChild(nextBtn);
+            }
+        }
+        
+        function displayUserDetail(data) {
+            const user = data.user;
+            const reports = data.reports || [];
+            
+            // Имя пользователя
+            const userName = user.tg_name || user.username || user.first_name || `Пользователь ${user.telegram_id}`;
+            document.getElementById('detailUserName').textContent = userName;
+            
+            // Информация о пользователе
+            const userInfo = document.getElementById('detailUserInfo');
+            userInfo.innerHTML = `
+                <div class="info-item">
+                    <span class="info-label">ID:</span>
+                    <span class="info-value">${user.telegram_id}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Статус:</span>
+                    <span class="info-value">
+                        <span class="user-status status-${user.user_status}">${user.user_status}</span>
+                    </span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Баланс:</span>
+                    <span class="info-value">€${user.balance || 0}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Всего отчетов:</span>
+                    <span class="info-value">${data.total_reports || 0}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Всего потрачено:</span>
+                    <span class="info-value">€${data.total_spent || 0}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Дата регистрации:</span>
+                    <span class="info-value">${formatDate(user.registration_date)}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Последняя активность:</span>
+                    <span class="info-value">${formatDate(user.last_activity)}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Язык:</span>
+                    <span class="info-value">${user.language || 'Не указан'}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Username:</span>
+                    <span class="info-value">${user.username || 'Не указан'}</span>
+                </div>
+            `;
+            
+            // Обновляем кнопку статуса
+            const statusBtn = document.getElementById('statusBtn');
+            statusBtn.textContent = user.user_status === 'admin' ? 'Сделать пользователем' : 'Сделать админом';
+            statusBtn.className = `action-panel-btn btn-status ${user.user_status === 'admin' ? 'admin' : ''}`;
+            
+            // Отображаем отчеты
+            displayUserReports(reports);
+        }
+        
+        function displayUserReports(reports) {
+            const tbody = document.getElementById('reportsTableBody');
+            const table = document.getElementById('reportsTable');
+            const noReports = document.getElementById('noReports');
+            const loading = document.getElementById('reportsLoading');
+            
+            loading.style.display = 'none';
+            
+            if (reports.length === 0) {
+                table.style.display = 'none';
+                noReports.style.display = 'block';
+                return;
+            }
+            
+            table.style.display = 'table';
+            noReports.style.display = 'none';
+            tbody.innerHTML = '';
+            
+            reports.forEach(report => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${formatDate(report.created_at)}</td>
+                    <td>${report.report_type || 'Базовый'}</td>
+                    <td>${report.title || 'Без названия'}</td>
+                    <td>€${report.cost || 0}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+        
+        function formatDate(dateString) {
+            if (!dateString) return 'Не указана';
+            try {
+                const date = new Date(dateString);
+                return date.toLocaleDateString('ru-RU', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+            } catch (e) {
+                return 'Неверная дата';
+            }
+        }
+        
+        function backToUsersList() {
+            document.getElementById('userDetail').style.display = 'none';
+            document.getElementById('usersTable').style.display = 'table';
+            document.getElementById('pagination').style.display = 'flex';
+            currentUserDetail = null;
+        }
+        
+        function toggleUserStatus() {
+            if (!currentUserDetail) return;
+            
+            const newStatus = currentUserDetail.user_status === 'admin' ? 'user' : 'admin';
+            const confirmText = newStatus === 'admin' ? 
+                'Сделать пользователя администратором?' : 
+                'Сделать администратора обычным пользователем?';
+            
+            if (confirm(confirmText)) {
+                updateUserStatus(newStatus);
+            }
+        }
+        
+        async function updateUserStatus(newStatus) {
+            if (!currentUserDetail) return;
+            
+            try {
+                const resp = await fetch(`/api/admin/users/${currentUserDetail.telegram_id}/status`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_status: newStatus })
+                });
+                
+                const data = await resp.json();
+                
+                if (resp.ok && data.success) {
+                    currentUserDetail.user_status = newStatus;
+                    displayUserDetail({
+                        user: currentUserDetail,
+                        reports: [],
+                        total_reports: 0,
+                        total_spent: 0
+                    });
+                    showDetailMessage('Статус пользователя успешно обновлен', 'success');
+                } else {
+                    showDetailMessage('Ошибка обновления статуса: ' + (data.error || 'Неизвестная ошибка'), 'error');
+                }
+            } catch (err) {
+                console.error('Error updating user status:', err);
+                showDetailMessage('Ошибка сети при обновлении статуса', 'error');
+            }
+        }
+        
+        function editUserBalance() {
+            if (!currentUserDetail) return;
+            
+            document.getElementById('newBalanceInput').value = currentUserDetail.balance || 0;
+            document.getElementById('balanceEditForm').style.display = 'block';
+        }
+        
+        function cancelBalanceEdit() {
+            document.getElementById('balanceEditForm').style.display = 'none';
+        }
+        
+        async function saveUserBalance() {
+            if (!currentUserDetail) return;
+            
+            const newBalance = parseFloat(document.getElementById('newBalanceInput').value);
+            if (isNaN(newBalance) || newBalance < 0) {
+                showDetailMessage('Введите корректную сумму', 'error');
+                return;
+            }
+            
+            try {
+                const resp = await fetch(`/api/admin/users/${currentUserDetail.telegram_id}/balance`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ balance: newBalance })
+                });
+                
+                const data = await resp.json();
+                
+                if (resp.ok && data.success) {
+                    currentUserDetail.balance = newBalance;
+                    displayUserDetail({
+                        user: currentUserDetail,
+                        reports: [],
+                        total_reports: 0,
+                        total_spent: 0
+                    });
+                    document.getElementById('balanceEditForm').style.display = 'none';
+                    showDetailMessage('Баланс пользователя успешно обновлен', 'success');
+                } else {
+                    showDetailMessage('Ошибка обновления баланса: ' + (data.error || 'Неизвестная ошибка'), 'error');
+                }
+            } catch (err) {
+                console.error('Error updating user balance:', err);
+                showDetailMessage('Ошибка сети при обновлении баланса', 'error');
+            }
+        }
+        
+        function showDetailMessage(message, type) {
+            const successMsg = document.getElementById('detailSuccessMsg');
+            const errorMsg = document.getElementById('detailErrorMsg');
+            
+            successMsg.style.display = 'none';
+            errorMsg.style.display = 'none';
+            
+            if (type === 'success') {
+                successMsg.textContent = message;
+                successMsg.style.display = 'block';
+                setTimeout(() => successMsg.style.display = 'none', 3000);
+            } else {
+                errorMsg.textContent = message;
+                errorMsg.style.display = 'block';
+                setTimeout(() => errorMsg.style.display = 'none', 5000);
+            }
+        }
+        
         async function sendPublication(e) {
             e.preventDefault();
             const text = document.getElementById('pubText').value.trim();
