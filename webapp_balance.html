@@ -3,13 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Личный кабинет — Aaadviser</title>
+    <title>Баланс — Aaadviser</title>
     <style>
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f8f9fa; margin: 0; }
         .container { max-width: 400px; margin: 40px auto; background: #fff; border-radius: 16px; box-shadow: 0 2px 12px rgba(102,126,234,0.10); padding: 32px 20px 24px 20px; text-align: center; }
         .title { font-size: 1.3em; font-weight: bold; margin-bottom: 18px; color: #333; }
-        .back-btn { margin-top: 30px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; border: none; border-radius: 10px; padding: 14px 28px; font-size: 1em; font-weight: 500; cursor: pointer; transition: background 0.2s; }
-        .back-btn:hover { background: linear-gradient(135deg, #764ba2 0%, #667eea 100%); }
         .profile-balance-block {
             background: #f8f9fa;
             border-radius: 12px;
@@ -41,44 +39,79 @@
             border-radius: 6px;
             font-size: 1.2em;
         }
-        .profile-btn {
+        .balance-btn {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: #fff;
             border: none;
             border-radius: 12px;
-            padding: 18px 20px;
+            padding: 16px 20px;
             font-size: 16px;
             font-weight: 500;
             cursor: pointer;
             margin: 12px 0 0 0;
             width: 100%;
-            text-align: left;
+            text-align: center;
             transition: all 0.2s;
             box-shadow: 0 2px 8px rgba(102,126,234,0.15);
-            display: flex;
-            align-items: center;
-            gap: 12px;
+            display: block;
         }
-        .profile-btn:hover {
+        .balance-btn:hover {
             background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
         }
-        .profile-btn-icon {
-            font-size: 20px;
-            margin-right: 10px;
-        }
+        .back-btn { margin-top: 30px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; border: none; border-radius: 10px; padding: 14px 28px; font-size: 1em; font-weight: 500; cursor: pointer; transition: background 0.2s; }
+        .back-btn:hover { background: linear-gradient(135deg, #764ba2 0%, #667eea 100%); }
+        .modal-bg { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.25); z-index: 1000; display: flex; align-items: center; justify-content: center; }
+        .modal { background: #fff; border-radius: 14px; box-shadow: 0 4px 24px rgba(102,126,234,0.18); padding: 28px 22px 22px 22px; min-width: 280px; max-width: 90vw; text-align: left; }
+        .modal-title { font-size: 1.1em; font-weight: bold; color: #333; margin-bottom: 14px; }
+        .modal-content { font-size: 15px; color: #333; margin-bottom: 18px; }
+        .modal-btn-row { display: flex; gap: 12px; }
+        .modal-btn { flex: 1; padding: 12px 0; border: none; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; }
+        .modal-btn-primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; }
+        .modal-btn-primary:hover { background: linear-gradient(135deg, #764ba2 0%, #667eea 100%); }
+        .modal-btn-secondary { background: #f1f1f1; color: #333; border: 1px solid #ddd; }
+        .modal-btn-secondary:hover { background: #e2e2e2; }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="title">Личный кабинет</div>
+        <div class="title">Баланс</div>
         <div id="balance-block" style="margin-bottom:22px;display:none;"></div>
-        <button class="back-btn" onclick="goToMainMenu()">Вернуться в главное меню</button>
+        <button class="balance-btn" onclick="showDeposit()">Пополнить</button>
+        <button class="balance-btn" onclick="showStatement()">Выписка</button>
+        <button class="balance-btn" onclick="showTariffs()">Тарифы</button>
+        <button class="back-btn" onclick="goBack()">Назад</button>
+    </div>
+    <div id="modal-bg" class="modal-bg" style="display:none;">
+        <div class="modal">
+            <div class="modal-title" id="modal-title"></div>
+            <div class="modal-content" id="modal-content"></div>
+            <div class="modal-btn-row">
+                <button class="modal-btn modal-btn-primary" onclick="closeModal()">OK</button>
+            </div>
+        </div>
     </div>
     <script>
-        function goToMainMenu() {
-            window.location.href = '/webapp';
+        function goBack() {
+            window.location.href = '/webapp_profile';
         }
-        // Баланс и приветствие
+        function showDeposit() {
+            showModal('Пополнение баланса', 'Функция в разработке');
+        }
+        function showStatement() {
+            showModal('Выписка', 'Здесь будут ваши расходы');
+        }
+        function showTariffs() {
+            showModal('Тарифы', 'Здесь будут тарифы');
+        }
+        function showModal(title, content) {
+            document.getElementById('modal-title').textContent = title;
+            document.getElementById('modal-content').textContent = content;
+            document.getElementById('modal-bg').style.display = 'flex';
+        }
+        function closeModal() {
+            document.getElementById('modal-bg').style.display = 'none';
+        }
+        // Баланс пользователя
         document.addEventListener('DOMContentLoaded', function() {
             let tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
             if (tg) {
@@ -93,7 +126,6 @@
                     userData = null;
                 }
             }
-            console.log('userData:', userData);
             if (!userData || !userData.id) {
                 document.getElementById('balance-block').innerHTML = `<div style='color:#c33;background:#fee;border-radius:10px;padding:18px 10px;font-size:1.1em;'>Пользователь не определён.<br>Пожалуйста, откройте WebApp из Telegram.</div>`;
                 document.getElementById('balance-block').style.display = '';
@@ -102,7 +134,7 @@
             fetch('/api/user', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ telegram_id: userData.id, username: userData.username, tg_name: userData.tg_name, last_name: userData.last_name })
+                body: JSON.stringify({ telegram_id: userData.id })
             })
             .then(res => res.json())
             .then(data => {
@@ -114,21 +146,11 @@
                             <div class='profile-balance-name'>Здравствуйте, <b>${name}</b>!</div>
                             <div class='profile-balance-sum'>Ваш баланс: <span class='profile-balance-amount'>$${balance}</span></div>
                         </div>
-                        <button class='profile-btn' onclick='showProfileData()'><span class='profile-btn-icon'>👤</span>Личные данные</button>
-                        <button class='profile-btn' onclick='showBalance()'><span class='profile-btn-icon'>💰</span>Баланс</button>
-                        <button class='profile-btn' onclick='showCooperation()'><span class='profile-btn-icon'>🤝</span>Сотрудничество</button>
-                        <button class='profile-btn' onclick='showLanguage()'><span class='profile-btn-icon'>🌐</span>Язык</button>
                     `;
                     document.getElementById('balance-block').style.display = '';
                 }
             });
         });
-        function showProfileData() {
-            window.location.href = '/webapp_profile_data';
-        }
-        function showBalance() { window.location.href = '/webapp_balance'; }
-        function showCooperation() { alert('Сотрудничество (в разработке)'); }
-        function showLanguage() { alert('Язык (в разработке)'); }
     </script>
 </body>
 </html> 

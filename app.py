@@ -156,7 +156,10 @@ def webapp_profile_data():
     with open('webapp_profile_data.html', 'r', encoding='utf-8') as f:
         return f.read()
 
-
+@app.route('/webapp_balance')
+def webapp_balance():
+    with open('webapp_balance.html', 'r', encoding='utf-8') as f:
+        return f.read()
 
 @app.route('/health')
 def health():
