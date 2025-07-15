@@ -1193,6 +1193,18 @@
             window.location.href = '/webapp';
         }
 
+        function getTelegramId() {
+            // Telegram WebApp
+            if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe && window.Telegram.WebApp.initDataUnsafe.user) {
+                return window.Telegram.WebApp.initDataUnsafe.user.id;
+            }
+            // fallback: localStorage
+            const id = localStorage.getItem('telegram_id');
+            if (id) return id;
+            // fallback: prompt (для отладки)
+            return prompt('Введите ваш telegram_id (только для отладки):');
+        }
+
         // Инициализация
         showStep('address');
     </script>
