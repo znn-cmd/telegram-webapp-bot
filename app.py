@@ -170,6 +170,10 @@ def health():
 def serve_logo():
     return send_from_directory('.', 'logo-sqv.png')
 
+@app.route('/logo-flt.png')
+def serve_logo_flt():
+    return send_from_directory('.', 'logo-flt.png')
+
 @app.route('/api/user', methods=['POST'])
 def api_user():
     data = request.json or {}
@@ -1578,6 +1582,30 @@ def api_admin_publish():
         except Exception:
             errors += 1
     return jsonify({'success': True, 'sent': len(users)-errors, 'errors': errors})
+
+@app.route('/api/admin_topup_balance', methods=['POST'])
+def api_admin_topup_balance():
+    data = request.json or {}
+    telegram_id = data.get('telegram_id')
+    if not telegram_id:
+        return jsonify({'success': False, 'error': 'Нет telegram_id'}), 400
+    try:
+        telegram_id = int(telegram_id)
+    except Exception:
+        return jsonify({'success': False, 'error': 'Некорректный telegram_id'}), 400
+    
+    # Проверка, что это админ
+    user = supabase.table('users').select('user_status').eq('telegram_id', telegram_id).execute().data
+    if not user or user[0].get('user_status') != 'admin':
+        return jsonify({'success': False, 'error': 'Нет прав администратора'}), 403
+    
+    # Пополняем баланс до 100
+    try:
+        supabase.table('users').update({'balance': 100}).eq('telegram_id', telegram_id).execute()
+        return jsonify({'success': True, 'message': 'Баланс пополнен до 100€'})
+    except Exception as e:
+        logger.error(f"Error updating balance: {e}")
+        return jsonify({'success': False, 'error': 'Ошибка обновления баланса'}), 500
 
 if __name__ == '__main__':
     run_flask()

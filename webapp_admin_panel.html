@@ -8,9 +8,13 @@
     <style>
         body { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; }
         .admin-container { max-width: 420px; margin: 40px auto; background: #fff; border-radius: 16px; box-shadow: 0 0 20px rgba(0,0,0,0.08); padding: 32px 24px; }
+        .logo-container { text-align: center; margin-bottom: 24px; }
+        .logo { width: 120px; height: auto; margin-bottom: 16px; }
         .admin-title { font-size: 24px; font-weight: bold; color: #667eea; text-align: center; margin-bottom: 24px; }
         .admin-btn { width: 100%; margin: 10px 0; padding: 16px; font-size: 16px; border-radius: 10px; border: none; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; font-weight: 500; cursor: pointer; transition: 0.2s; }
         .admin-btn:hover { background: linear-gradient(135deg, #764ba2 0%, #667eea 100%); }
+        .balance-btn { background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%) !important; color: #333 !important; font-weight: 600; }
+        .balance-btn:hover { background: linear-gradient(135deg, #ff9800 0%, #ffc107 100%) !important; }
         .section { margin-top: 30px; }
         .section-title { font-size: 18px; font-weight: bold; color: #333; margin-bottom: 12px; }
         .pub-form textarea { width: 100%; min-height: 80px; border-radius: 8px; border: 1px solid #ddd; padding: 10px; font-size: 15px; margin-bottom: 10px; }
@@ -23,7 +27,16 @@
 </head>
 <body>
     <div class="admin-container">
+        <!-- Логотип -->
+        <div class="logo-container">
+            <img src="logo-flt.png" alt="Aaadviser Logo" class="logo">
+        </div>
+        
         <div class="admin-title">Админ-панель</div>
+        
+        <!-- Кнопка пополнения баланса -->
+        <button class="admin-btn balance-btn" onclick="topUpBalance()">Пополнить баланс до 100€</button>
+        
         <button class="admin-btn" onclick="showSection('users')">Пользователи</button>
         <button class="admin-btn" onclick="showSection('reports')">Отчеты</button>
         <button class="admin-btn" onclick="showSection('publications')">Публикации</button>
@@ -58,6 +71,33 @@
         }
         function goBack() {
             window.location.href = '/webapp';
+        }
+        async function topUpBalance() {
+            let telegram_id = null;
+            if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe && window.Telegram.WebApp.initDataUnsafe.user) {
+                telegram_id = window.Telegram.WebApp.initDataUnsafe.user.id;
+            } else {
+                telegram_id = localStorage.getItem('telegram_id');
+            }
+            if (!telegram_id) {
+                alert('Ошибка: не удалось определить пользователя');
+                return;
+            }
+            try {
+                const resp = await fetch('/api/admin_topup_balance', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ telegram_id })
+                });
+                const data = await resp.json();
+                if (resp.ok && data.success) {
+                    alert('Баланс успешно пополнен до 100€!');
+                } else {
+                    alert(data.error || 'Ошибка пополнения баланса');
+                }
+            } catch (err) {
+                alert('Ошибка сети при пополнении баланса');
+            }
         }
         async function sendPublication(e) {
             e.preventDefault();
