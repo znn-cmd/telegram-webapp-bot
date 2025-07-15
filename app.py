@@ -67,7 +67,7 @@ GOOGLE_MAPS_API_KEY = "AIzaSyBrDkDpNKNAIyY147MQ78hchBkeyCAxhEw"
 #             supabase.table('users').insert({
 #                 'telegram_id': user.id,
 #                 'username': getattr(user, 'username', None),
-#                 'first_name': getattr(user, 'first_name', None),
+#                 'tg_name': getattr(user, 'first_name', None),
 #                 'last_name': getattr(user, 'last_name', None)
 #             }).execute()
             
@@ -178,7 +178,7 @@ def api_user():
     except (TypeError, ValueError):
         return jsonify({'error': 'Invalid telegram_id'}), 400
     username = data.get('username')
-    first_name = data.get('first_name')
+    first_name = data.get('tg_name')
     last_name = data.get('last_name')
     language_code = data.get('language_code', 'en')
     if not telegram_id:
@@ -196,7 +196,7 @@ def api_user():
             'welcome': locales[lang]['welcome_back'],
             'menu': locales[lang]['menu'],
             'name': user.get('name'),
-            'first_name': user.get('first_name'),
+            'tg_name': user.get('tg_name'),
             'last_name': user.get('last_name'),
             'username': user.get('username'),
             'balance': user.get('balance', 0),
@@ -208,7 +208,7 @@ def api_user():
         supabase.table('users').insert({
             'telegram_id': telegram_id,
             'username': username,
-            'first_name': first_name,
+            'tg_name': first_name,
             'last_name': last_name,
             'language': lang,
             'balance': 0
@@ -237,14 +237,26 @@ def api_user_profile():
         return jsonify({'error': 'Invalid telegram_id'}), 400
     if not telegram_id:
         return jsonify({'error': 'telegram_id required'}), 400
+    
+    # Проверяем, есть ли данные для обновления
+    update_data = {}
+    for field in ['tg_name', 'last_name', 'phone', 'email', 'website', 'company', 'position', 'about_me']:
+        if field in data:
+            update_data[field] = data[field]
+    
     try:
-        result = supabase.table('users').select('first_name, last_name, photo_url, phone, email, website, company, position, about_me').eq('telegram_id', telegram_id).execute()
+        if update_data:
+            # Обновляем данные пользователя
+            supabase.table('users').update(update_data).eq('telegram_id', telegram_id).execute()
+        
+        # Получаем обновленные данные
+        result = supabase.table('users').select('tg_name, last_name, photo_url, phone, email, website, company, position, about_me').eq('telegram_id', telegram_id).execute()
         if result.data and len(result.data) > 0:
             return jsonify({'success': True, 'profile': result.data[0]})
         else:
             return jsonify({'error': 'User not found'}), 404
     except Exception as e:
-        logger.error(f"Error fetching user profile: {e}")
+        logger.error(f"Error updating/fetching user profile: {e}")
         return jsonify({'error': 'Internal error'}), 500
 
 @app.route('/api/set_language', methods=['POST'])
@@ -1115,8 +1127,8 @@ def api_generate_pdf_report():
             pdf.set_font('DejaVu', 'B', 11)
             pdf.cell(0, 8, 'Контактные данные риелтора:', ln=True)
             pdf.set_font('DejaVu', '', 10)
-            if profile.get('first_name') or profile.get('last_name'):
-                pdf.cell(0, 8, f"Имя: {profile.get('first_name','')} {profile.get('last_name','')}", ln=True)
+                    if profile.get('tg_name') or profile.get('last_name'):
+            pdf.cell(0, 8, f"Имя: {profile.get('tg_name','')} {profile.get('last_name','')}", ln=True)
             if profile.get('company'):
                 pdf.cell(0, 8, f"Компания: {profile.get('company')}", ln=True)
             if profile.get('position'):
@@ -1262,11 +1274,11 @@ def api_send_report_to_client():
     
     try:
         # Получаем данные пользователя (риелтора)
-        user_result = supabase.table('users').select('first_name, last_name').eq('telegram_id', telegram_id).execute()
+        user_result = supabase.table('users').select('tg_name, last_name').eq('telegram_id', telegram_id).execute()
         if not user_result.data:
             return jsonify({'error': 'User not found'}), 404
         
-        realtor_name = f"{user_result.data[0].get('first_name', '')} {user_result.data[0].get('last_name', '')}".strip()
+        realtor_name = f"{user_result.data[0].get('tg_name', '')} {user_result.data[0].get('last_name', '')}".strip()
         
         # Генерируем PDF отчет
         pdf_path = generate_client_report_pdf(report_data, realtor_name)

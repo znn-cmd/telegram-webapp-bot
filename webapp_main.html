@@ -737,7 +737,7 @@
                     body: JSON.stringify({
                         telegram_id: userData.id,
                         username: userData.username,
-                        first_name: userData.first_name,
+                        tg_name: userData.tg_name,
                         last_name: userData.last_name,
                         language_code: userData.language_code || currentLanguage
                     })
@@ -754,7 +754,7 @@
                     }
 
                     // Приветствие
-                    const welcomeMessage = userInfo.welcome || userInfo.first_name || 'Пользователь';
+                    const welcomeMessage = userInfo.welcome || userInfo.tg_name || 'Пользователь';
                     document.getElementById('userName').textContent = welcomeMessage;
 
                     // Баланс с цветовой индикацией
@@ -775,7 +775,7 @@
                     throw new Error(err.error || 'Failed to load user data');
                 }
             } catch (error) {
-                document.getElementById('userName').textContent = userData.first_name || 'Пользователь';
+                document.getElementById('userName').textContent = userData.tg_name || 'Пользователь';
                 showToast(getText('error_loading') + ': ' + (error.message || ''), 'error', 6000);
             } finally {
                 document.getElementById('userSkeleton').classList.add('hidden');

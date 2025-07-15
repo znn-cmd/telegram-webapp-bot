@@ -6,20 +6,21 @@
     <title>Личные данные — Aaadviser</title>
     <style>
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f8f9fa; margin: 0; }
-        .container { max-width: 400px; margin: 40px auto; background: #fff; border-radius: 16px; box-shadow: 0 2px 12px rgba(102,126,234,0.10); padding: 32px 20px 24px 20px; text-align: center; }
-        .title { font-size: 1.3em; font-weight: bold; margin-bottom: 18px; color: #333; }
-        .profile-field-block { background: #f8f9fa; border-radius: 12px; padding: 16px 14px; margin-bottom: 18px; text-align: left; box-shadow: 0 2px 8px rgba(102,126,234,0.06); }
-        .profile-field-label { font-size: 15px; color: #667eea; font-weight: 600; margin-bottom: 4px; }
-        .profile-field-value { font-size: 16px; color: #222; margin-bottom: 6px; }
+        .container { max-width: 400px; margin: 20px auto; background: #fff; border-radius: 16px; box-shadow: 0 2px 12px rgba(102,126,234,0.10); padding: 24px 20px 20px 20px; text-align: center; }
+        .title { font-size: 1.3em; font-weight: bold; margin-bottom: 16px; color: #333; }
+        .profile-field-block { background: #f8f9fa; border-radius: 10px; padding: 12px 14px; margin-bottom: 12px; text-align: left; box-shadow: 0 2px 8px rgba(102,126,234,0.06); display: flex; align-items: center; justify-content: space-between; }
+        .profile-field-content { flex: 1; }
+        .profile-field-label { font-size: 14px; color: #667eea; font-weight: 600; margin-bottom: 2px; }
+        .profile-field-value { font-size: 15px; color: #222; }
         .profile-field-empty { color: #bbb; font-style: italic; }
-        .edit-btn { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; border: none; border-radius: 10px; padding: 10px 18px; font-size: 15px; font-weight: 500; cursor: pointer; margin-top: 4px; transition: background 0.2s; box-shadow: 0 2px 8px rgba(102,126,234,0.10); }
+        .edit-btn { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; border: none; border-radius: 8px; padding: 8px 12px; font-size: 14px; font-weight: 500; cursor: pointer; transition: background 0.2s; box-shadow: 0 2px 8px rgba(102,126,234,0.10); display: flex; align-items: center; gap: 6px; min-width: 40px; height: 40px; justify-content: center; }
         .edit-btn:hover { background: linear-gradient(135deg, #764ba2 0%, #667eea 100%); }
-        .back-btn { margin-top: 30px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; border: none; border-radius: 10px; padding: 14px 28px; font-size: 1em; font-weight: 500; cursor: pointer; transition: background 0.2s; width: 100%; }
+        .back-btn { margin-top: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; border: none; border-radius: 10px; padding: 14px 28px; font-size: 1em; font-weight: 500; cursor: pointer; transition: background 0.2s; width: 100%; }
         .back-btn:hover { background: linear-gradient(135deg, #764ba2 0%, #667eea 100%); }
         .modal-bg { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.25); z-index: 1000; display: flex; align-items: center; justify-content: center; }
-        .modal { background: #fff; border-radius: 14px; box-shadow: 0 4px 24px rgba(102,126,234,0.18); padding: 28px 22px 22px 22px; min-width: 280px; max-width: 90vw; text-align: left; }
+        .modal { background: #fff; border-radius: 14px; box-shadow: 0 4px 24px rgba(102,126,234,0.18); padding: 28px 22px 22px 22px; min-width: 280px; max-width: 90vw; text-align: left; box-sizing: border-box; }
         .modal-title { font-size: 1.1em; font-weight: bold; color: #333; margin-bottom: 14px; }
-        .modal-input { width: 100%; padding: 12px 14px; border: 1px solid #ddd; border-radius: 8px; font-size: 15px; margin-bottom: 18px; background: #f8f9fa; }
+        .modal-input { width: 100%; padding: 12px 14px; border: 1px solid #ddd; border-radius: 8px; font-size: 15px; margin-bottom: 18px; background: #f8f9fa; box-sizing: border-box; }
         .modal-btn-row { display: flex; gap: 12px; }
         .modal-btn { flex: 1; padding: 12px 0; border: none; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; }
         .modal-btn-primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; }
@@ -92,7 +93,15 @@
                 const val = data[f.key] && data[f.key].trim() ? data[f.key] : 'пусто';
                 const block = document.createElement('div');
                 block.className = 'profile-field-block';
-                block.innerHTML = `<div class='profile-field-label'>${f.label}</div><div class='profile-field-value${val==='пусто' ? ' profile-field-empty' : ''}'>${val}</div><button class='edit-btn' onclick="openModal('${f.key}','${f.label}','${val.replace(/'/g, "&#39;")}')">Редактировать</button>`;
+                block.innerHTML = `
+                    <div class='profile-field-content'>
+                        <div class='profile-field-label'>${f.label}</div>
+                        <div class='profile-field-value${val==='пусто' ? ' profile-field-empty' : ''}'>${val}</div>
+                    </div>
+                    <button class='edit-btn' onclick="openModal('${f.key}','${f.label}','${val.replace(/'/g, "&#39;")}')" title="Редактировать">
+                        ✏️
+                    </button>
+                `;
                 fieldsDiv.appendChild(block);
             });
         }
@@ -106,14 +115,22 @@
             .then(res => res.json())
             .then(resp => {
                 if (resp.success) {
-                    userData[field] = value;
+                    // Обновляем данные из ответа сервера
+                    if (resp.profile) {
+                        Object.assign(userData, resp.profile);
+                    } else {
+                        userData[field] = value;
+                    }
                     renderFields(userData);
                     showToast('Сохранено!');
                 } else {
-                    showToast('Ошибка сохранения');
+                    showToast('Ошибка сохранения: ' + (resp.error || 'Неизвестная ошибка'));
                 }
             })
-            .catch(() => showToast('Ошибка соединения'));
+            .catch((error) => {
+                console.error('Error updating field:', error);
+                showToast('Ошибка соединения');
+            });
         }
         // Получение пользователя (как в других разделах)
         (function init() {

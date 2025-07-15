@@ -102,12 +102,12 @@
             fetch('/api/user', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ telegram_id: userData.id, username: userData.username, first_name: userData.first_name, last_name: userData.last_name })
+                body: JSON.stringify({ telegram_id: userData.id, username: userData.username, tg_name: userData.tg_name, last_name: userData.last_name })
             })
             .then(res => res.json())
             .then(data => {
                 if (data) {
-                    let name = data.first_name && data.first_name.trim() ? data.first_name : (data.username ? '@' + data.username : 'Пользователь');
+                    let name = data.tg_name && data.tg_name.trim() ? data.tg_name : (data.username ? '@' + data.username : 'Пользователь');
                     let balance = typeof data.balance === 'number' ? data.balance : 0;
                     document.getElementById('balance-block').innerHTML = `
                         <div class='profile-balance-block'>
