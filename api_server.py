@@ -8,12 +8,21 @@ from api_functions import (
     charge_user_for_report,
     update_user_balance
 )
+from supabase import create_client, Client
+from locales import locales
 
 # Загружаем переменные окружения
 load_dotenv()
 
 app = Flask(__name__)
 CORS(app)  # Разрешаем CORS для WebApp
+
+# Инициализация Supabase
+supabase_url = os.getenv("SUPABASE_URL")
+supabase_key = os.getenv("SUPABASE_KEY")
+if not supabase_url or not supabase_key:
+    raise RuntimeError("SUPABASE_URL и SUPABASE_KEY должны быть заданы в переменных окружения!")
+supabase: Client = create_client(supabase_url, supabase_key)
 
 @app.route('/api/generate-report', methods=['POST'])
 def generate_report():
@@ -34,6 +43,66 @@ def generate_report():
         
     except Exception as e:
         return jsonify({'error': True, 'message': str(e)}), 500
+
+@app.route('/api/user', methods=['POST'])
+def api_user():
+    data = request.json or {}
+    telegram_id_raw = data.get('telegram_id')
+    if telegram_id_raw is None:
+        return jsonify({'error': 'telegram_id required'}), 400
+    try:
+        telegram_id = int(telegram_id_raw)
+    except (TypeError, ValueError):
+        return jsonify({'error': 'Invalid telegram_id'}), 400
+    username = data.get('username')
+    first_name = data.get('tg_name')
+    last_name = data.get('last_name')
+    language_code = data.get('language_code', 'en')
+    if not telegram_id:
+        return jsonify({'error': 'telegram_id required'}), 400
+    # Проверяем пользователя в базе
+    user_result = supabase.table('users').select('*').eq('telegram_id', telegram_id).execute()
+    user = user_result.data[0] if user_result.data else None
+    if user:
+        lang = user.get('language') or (language_code[:2] if language_code[:2] in locales else 'en')
+        return jsonify({
+            'exists': True,
+            'is_new_user': False,
+            'language': user.get('language') or lang,
+            'language_code': lang,
+            'welcome': locales[lang]['welcome_back'],
+            'menu': locales[lang]['menu'],
+            'name': user.get('name'),
+            'tg_name': user.get('tg_name'),
+            'last_name': user.get('last_name'),
+            'username': user.get('username'),
+            'balance': user.get('balance', 0),
+            'telegram_id': user.get('telegram_id'),
+            'user_status': user.get('user_status', None),
+        })
+    else:
+        # Новый пользователь
+        lang = language_code[:2] if language_code[:2] in locales else 'en'
+        supabase.table('users').insert({
+            'telegram_id': telegram_id,
+            'username': username,
+            'tg_name': first_name,
+            'last_name': last_name,
+            'language': lang,
+            'balance': 0
+        }).execute()
+        return jsonify({
+            'exists': False,
+            'is_new_user': True,
+            'language': lang,
+            'language_code': lang,
+            'welcome': locales[lang]['welcome_new'],
+            'choose_language': locales[lang]['choose_language'],
+            'languages': locales[lang]['language_names'],
+            'balance': 0,
+            'telegram_id': telegram_id,
+            'user_status': None,
+        })
 
 @app.route('/api/user-balance', methods=['POST'])
 def user_balance():
@@ -125,6 +194,100 @@ def top_up_balance():
         
     except Exception as e:
         return jsonify({'error': True, 'message': str(e)}), 500
+
+@app.route('/api/admin_set_balance', methods=['POST'])
+def admin_set_balance():
+    data = request.json or {}
+    telegram_id = data.get('telegram_id')
+    if not telegram_id:
+        return jsonify({'error': 'telegram_id required'}), 400
+    # Проверяем, что вызывающий пользователь — admin
+    user_result = supabase.table('users').select('user_status').eq('telegram_id', telegram_id).execute()
+    user = user_result.data[0] if user_result.data else None
+    if not user or user.get('user_status') != 'admin':
+        return jsonify({'error': 'not allowed'}), 403
+    # Устанавливаем баланс 100
+    supabase.table('users').update({'balance': 100}).eq('telegram_id', telegram_id).execute()
+    return jsonify({'success': True, 'balance': 100})
+
+@app.route('/api/admin_user_stats', methods=['POST'])
+def admin_user_stats():
+    import datetime
+    from dateutil.relativedelta import relativedelta
+    data = request.json or {}
+    telegram_id = data.get('telegram_id')
+    if not telegram_id:
+        return jsonify({'error': 'telegram_id required'}), 400
+    # Проверяем, что вызывающий пользователь — admin
+    user_result = supabase.table('users').select('user_status').eq('telegram_id', telegram_id).execute()
+    user = user_result.data[0] if user_result.data else None
+    if not user or user.get('user_status') != 'admin':
+        return jsonify({'error': 'not allowed'}), 403
+    # Даты для фильтрации
+    today = datetime.date.today()
+    week_ago = today - datetime.timedelta(days=7)
+    month_ago = today - relativedelta(months=1)
+    quarter_ago = today - relativedelta(months=3)
+    year_ago = today - relativedelta(years=1)
+    # Пользователи (без админов)
+    users = supabase.table('users').select('*').neq('user_status', 'admin').execute().data
+    all_users = supabase.table('users').select('*').execute().data
+    # Новые пользователи
+    def count_new(users, date_field, since):
+        return sum(1 for u in users if u.get(date_field) and u[date_field][:10] >= str(since))
+    total_users = len(users)
+    new_week = count_new(users, 'created_at', week_ago)
+    new_month = count_new(users, 'created_at', month_ago)
+    new_quarter = count_new(users, 'created_at', quarter_ago)
+    new_year = count_new(users, 'created_at', year_ago)
+    # Балансы
+    total_balance = sum(u.get('balance', 0) or 0 for u in users)
+    expired_users = [u for u in users if (u.get('period_end') and u['period_end'] < str(today)) or (u.get('period_end') is None)]
+    expired_balance = sum(u.get('balance', 0) or 0 for u in expired_users)
+    active_users = [u for u in users if not ((u.get('period_end') and u['period_end'] < str(today)) or (u.get('period_end') is None))]
+    active_balance = sum(u.get('balance', 0) or 0 for u in active_users)
+    # Отчеты
+    reports = supabase.table('user_reports').select('*').execute().data
+    def count_reports(since):
+        return sum(1 for r in reports if r.get('created_at') and r['created_at'][:10] >= str(since))
+    reports_week = count_reports(week_ago)
+    reports_month = count_reports(month_ago)
+    reports_quarter = count_reports(quarter_ago)
+    reports_year = count_reports(year_ago)
+    deleted_reports = sum(1 for r in reports if r.get('deleted_at'))
+    # Отчеты по expired/active
+    expired_user_ids = set(u['telegram_id'] for u in expired_users)
+    active_user_ids = set(u['telegram_id'] for u in active_users)
+    expired_reports = [r for r in reports if r.get('user_id') in expired_user_ids]
+    active_reports = [r for r in reports if r.get('user_id') in active_user_ids]
+    avg_expired_reports = len(expired_reports) / len(expired_user_ids) if expired_user_ids else 0
+    # Сумма денег за отчеты active
+    tariffs = supabase.table('tariffs').select('*').execute().data
+    full_price = 0
+    for t in tariffs:
+        if t.get('name') == 'full':
+            full_price = t.get('price', 100)
+            break
+    active_reports_money = len(active_reports) * full_price
+    return jsonify({
+        'total_users': total_users,
+        'new_week': new_week,
+        'new_month': new_month,
+        'new_quarter': new_quarter,
+        'new_year': new_year,
+        'total_balance': total_balance,
+        'expired_balance': expired_balance,
+        'active_balance': active_balance,
+        'reports_week': reports_week,
+        'reports_month': reports_month,
+        'reports_quarter': reports_quarter,
+        'reports_year': reports_year,
+        'deleted_reports': deleted_reports,
+        'expired_reports_count': len(expired_reports),
+        'avg_expired_reports': avg_expired_reports,
+        'active_reports_count': len(active_reports),
+        'active_reports_money': active_reports_money
+    })
 
 def generate_full_report(basic_report_data):
     """Генерация полного отчета на основе базового"""

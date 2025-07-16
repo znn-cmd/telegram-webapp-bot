@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Админ-панель | Aaadviser</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        .admin-logo {
+            width: 120px;
+            display: block;
+            margin: 0 auto 18px auto;
+        }
+        .admin-btn {
+            width: 100%;
+            padding: 18px 20px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            margin: 12px 0;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 2px 8px rgba(102,126,234,0.10);
+        }
+        .admin-btn-yellow {
+            background: linear-gradient(135deg, #ffe066 0%, #ffd700 100%);
+            color: #333;
+        }
+        .admin-btn-blue {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+        }
+        .admin-btn:active {
+            transform: translateY(1px);
+        }
+        .admin-section-title {
+            font-size: 20px;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 18px;
+            color: #333;
+        }
+        .admin-nav-row {
+            display: flex;
+            gap: 10px;
+            margin-top: 24px;
+            justify-content: center;
+        }
+        .admin-nav-btn {
+            background: #f1f1f1;
+            color: #333;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 10px 18px;
+            font-size: 15px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .admin-nav-btn:hover {
+            background: #e2e2e2;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img src="logo-flt.png" alt="Logo" class="admin-logo">
+        <div class="admin-section-title">Админ-панель</div>
+        <button class="admin-btn admin-btn-yellow" onclick="makeBalance100()">Сделать баланс 100</button>
+        <button class="admin-btn admin-btn-blue" onclick="showUsersStats()">Пользователи</button>
+        <button class="admin-btn admin-btn-blue" onclick="showPublication()">Публикация</button>
+        <button class="admin-btn admin-btn-blue" onclick="showSettings()">Настройки</button>
+        <div class="admin-nav-row">
+            <button class="admin-nav-btn" onclick="goBack()">Назад</button>
+            <button class="admin-nav-btn" onclick="goToMainMenu()">В главное меню</button>
+        </div>
+        <div id="adminContent" style="margin-top:30px;"></div>
+    </div>
+    <script>
+        let tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
+        let userData = null;
+        if (tg && tg.initDataUnsafe && tg.initDataUnsafe.user) {
+            userData = tg.initDataUnsafe.user;
+        } else {
+            try {
+                const stored = localStorage.getItem('aaadviser_user');
+                if (stored) userData = JSON.parse(stored);
+            } catch (e) {}
+        }
+        function goBack() {
+            window.history.back();
+        }
+        function goToMainMenu() {
+            window.location.href = '/webapp';
+        }
+        async function makeBalance100() {
+            if (!userData || !userData.id) {
+                document.getElementById('adminContent').innerHTML = '<div class="loading">Пользователь не определён</div>';
+                return;
+            }
+            document.getElementById('adminContent').innerHTML = '<div class="loading">Устанавливаем баланс...</div>';
+            try {
+                const resp = await fetch('/api/admin_set_balance', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ telegram_id: userData.id })
+                });
+                const data = await resp.json();
+                if (data.success) {
+                    document.getElementById('adminContent').innerHTML = '<div style="color:green;font-weight:bold;">Баланс успешно установлен: $100</div>';
+                } else {
+                    document.getElementById('adminContent').innerHTML = '<div style="color:red;">Ошибка: ' + (data.error || 'Не удалось установить баланс') + '</div>';
+                }
+            } catch (e) {
+                document.getElementById('adminContent').innerHTML = '<div style="color:red;">Ошибка соединения</div>';
+            }
+        }
+        function showUsersStats() {
+            document.getElementById('adminContent').innerHTML = '<div class="loading">Загрузка статистики пользователей...</div>';
+            // TODO: реализовать загрузку статистики
+        }
+        function showPublication() {
+            document.getElementById('adminContent').innerHTML = '<div class="loading">Загрузка публикаций...</div>';
+            // TODO: реализовать публикации
+        }
+        function showSettings() {
+            document.getElementById('adminContent').innerHTML = '<div class="loading">Загрузка настроек...</div>';
+            // TODO: реализовать настройки
+        }
+    </script>
+</body>
+</html> 
