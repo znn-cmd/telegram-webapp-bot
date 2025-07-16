@@ -1,7 +1,8 @@
 import os
 import logging
 from flask import Flask, request, jsonify, send_file, send_from_directory
-from telegram import Update, WebAppInfo, KeyboardButton, ReplyKeyboardMarkup, Bot, ParseMode
+from telegram import Update, WebAppInfo, KeyboardButton, ReplyKeyboardMarkup, Bot
+from telegram.constants import ParseMode
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
 from supabase import create_client, Client
 from dotenv import load_dotenv
