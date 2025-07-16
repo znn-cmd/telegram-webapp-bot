@@ -5,21 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Помощь — Aaadviser</title>
     <link rel="stylesheet" href="styles.css">
-    <style>
-        body { background: #f8f9fa; margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
-        .container { max-width: 420px; margin: 40px auto; background: #fff; border-radius: 16px; box-shadow: 0 2px 12px rgba(102,126,234,0.10); padding: 32px 20px 24px 20px; text-align: center; }
-        .help-title { font-size: 1.3em; font-weight: bold; margin-bottom: 18px; color: #333; }
-        .help-btn { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; border: none; border-radius: 12px; padding: 16px 20px; font-size: 16px; font-weight: 500; cursor: pointer; width: 100%; margin-bottom: 18px; transition: all 0.2s; box-shadow: 0 2px 8px rgba(102,126,234,0.15); }
-        .help-btn:hover { background: linear-gradient(135deg, #764ba2 0%, #667eea 100%); }
-    </style>
 </head>
 <body>
     <div class="container">
-        <div class="help-title">Помощь и поддержка</div>
-        <button class="help-btn" onclick="location.href='/webapp_about'">О приложении</button>
-        <button class="help-btn" onclick="location.href='/webapp_instruction'">Инструкция</button>
-        <button class="help-btn" onclick="location.href='/webapp_geography'">Наша география</button>
-        <button class="help-btn" onclick="location.href='/webapp_support'">Техническая поддержка</button>
+        <div class="logo" onclick="location.href='/webapp_main'">
+            <img src="logo-sqv.png" alt="Aaadviser" style="width: 64px; height: 64px; display:block; margin:0 auto 8px;">
+            Aaadviser
+        </div>
+        <div class="title" style="margin-bottom: 24px;">Помощь и поддержка</div>
+        <button class="menu-btn" onclick="location.href='/webapp_about'">О приложении</button>
+        <button class="menu-btn" onclick="location.href='/webapp_instruction'">Инструкция</button>
+        <button class="menu-btn" onclick="location.href='/webapp_geography'">Наша география</button>
+        <button class="menu-btn" onclick="location.href='/webapp_support'">Техническая поддержка</button>
+        <button class="btn btn-secondary mt-4" onclick="location.href='/webapp_main'">В главное меню</button>
     </div>
 </body>
 </html> 
