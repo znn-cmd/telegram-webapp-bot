@@ -172,6 +172,10 @@ def health():
 def serve_logo():
     return send_from_directory('.', 'logo-sqv.png')
 
+@app.route('/logo-flt.png')
+def serve_logo_flt():
+    return send_from_directory('.', 'logo-flt.png')
+
 @app.route('/api/user', methods=['POST'])
 def api_user():
     data = request.json or {}
