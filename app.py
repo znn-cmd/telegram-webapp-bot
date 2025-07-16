@@ -1635,44 +1635,119 @@ def api_admin_users_stats():
 
 @app.route('/api/admin_publication', methods=['POST'])
 def api_admin_publication():
+    import requests
     data = request.json or {}
     text = data.get('text', '').strip()
+    only_admins = data.get('only_admins', True)
+    save_to_db = data.get('save_to_db', False)
+    auto_translate = data.get('auto_translate', False)
+    test_send = data.get('test_send', False)
     if not text:
         return jsonify({'error': 'text required'}), 400
     # Получаем всех пользователей
-    users = supabase.table('users').select('telegram_id, user_status').execute().data or []
-    # Используем рабочий токен
+    users = supabase.table('users').select('telegram_id, user_status, language').execute().data or []
+    # Получаем OpenAI API ключ
+    openai_key_row = supabase.table('api_keys').select('key_value').eq('key_name', 'OPENAI_API').execute().data
+    if openai_key_row and isinstance(openai_key_row, list) and len(openai_key_row) > 0 and openai_key_row[0] and isinstance(openai_key_row[0], dict) and 'key_value' in openai_key_row[0]:
+        openai_key = openai_key_row[0]['key_value']
+    else:
+        openai_key = ''
+    # Языки и поля для перевода
+    lang_map = {'ru': 'ru', 'en': 'us', 'de': 'de', 'fr': 'ft', 'tr': 'tr'}
+    translations = {'ru': text, 'us': '', 'de': '', 'ft': '', 'tr': ''}
+    # Переводим, если нужно
+    if auto_translate and openai_key:
+        def gpt_translate(prompt, target_lang):
+            headers = {"Authorization": f"Bearer {openai_key}", "Content-Type": "application/json"}
+            payload = {
+                "model": "gpt-3.5-turbo",
+                "messages": [
+                    {"role": "system", "content": f"You are a professional translator. Translate the following text to {target_lang} (no explanation, only translation):"},
+                    {"role": "user", "content": prompt}
+                ],
+                "max_tokens": 1024,
+                "temperature": 0.3
+            }
+            resp = requests.post("https://api.openai.com/v1/chat/completions", json=payload, headers=headers, timeout=30)
+            if resp.status_code == 200:
+                return resp.json()['choices'][0]['message']['content'].strip()
+            return ''
+        translations['us'] = gpt_translate(text, 'English')
+        translations['de'] = gpt_translate(text, 'German')
+        translations['ft'] = gpt_translate(text, 'French')
+        translations['tr'] = gpt_translate(text, 'Turkish')
+    # Определяем получателей
+    recipients = []
+    if test_send:
+        # Только админы, но каждому отправить все переводы
+        recipients = [u for u in users if u.get('user_status') == 'admin']
+    elif only_admins:
+        recipients = [u for u in users if u.get('user_status') == 'admin']
+    else:
+        recipients = users
+    # Рассылка
     bot_token = '7215676549:AAFS86JbRCqwzTKQG-dF96JX-C1aWNvBoLo'
-    import requests
+    send_url = f'https://api.telegram.org/bot{bot_token}/sendMessage'
+    lang_stats = {'ru': 0, 'us': 0, 'de': 0, 'ft': 0, 'tr': 0}
     admin_count = 0
     user_count = 0
     total = 0
-    for u in users:
+    for u in recipients:
         tid = u.get('telegram_id')
         if not tid:
             continue
-        try:
-            send_url = f'https://api.telegram.org/bot{bot_token}/sendMessage'
-            data_send = {
-                'chat_id': tid,
-                'text': text,
-                'parse_mode': 'HTML',
-                'disable_web_page_preview': True
-            }
+        lang = (u.get('language') or 'ru')[:2]
+        # Для тестовой рассылки — всем админам все переводы
+        if test_send:
+            for l, field in lang_map.items():
+                msg = translations[field] if translations[field] else text
+                data_send = {'chat_id': tid, 'text': msg, 'parse_mode': 'HTML', 'disable_web_page_preview': True}
+                resp = requests.post(send_url, data=data_send)
+                if resp.status_code == 200 and resp.json().get('ok'):
+                    lang_stats[field] += 1
+                    if u.get('user_status') == 'admin':
+                        admin_count += 1
+                    else:
+                        user_count += 1
+                    total += 1
+        else:
+            # Обычная рассылка — каждому на его языке, если перевод есть
+            field = lang_map.get(lang, 'ru')
+            msg = translations[field] if translations[field] else text
+            data_send = {'chat_id': tid, 'text': msg, 'parse_mode': 'HTML', 'disable_web_page_preview': True}
             resp = requests.post(send_url, data=data_send)
             if resp.status_code == 200 and resp.json().get('ok'):
+                lang_stats[field] += 1
                 if u.get('user_status') == 'admin':
                     admin_count += 1
                 else:
                     user_count += 1
                 total += 1
-            else:
-                continue
-        except Exception as e:
-            continue
+    # Сохраняем в базу, если нужно
+    if save_to_db or test_send:
+        supabase.table('texts_promo').insert({
+            'base': text,
+            'ru': translations['ru'],
+            'us': translations['us'],
+            'de': translations['de'],
+            'ft': translations['ft'],
+            'tr': translations['tr'],
+            'qtty_ru': lang_stats['ru'],
+            'qtty_us': lang_stats['us'],
+            'qtty_de': lang_stats['de'],
+            'qtty_ft': lang_stats['ft'],
+            'qtty_tr': lang_stats['tr'],
+        }).execute()
     # Формируем строку-отчет для пользователя
     result_message = f"Всего отправлено: {total}\nПользователям: {user_count}\nАдминистраторам: {admin_count}"
-    return jsonify({'success': True, 'total': total, 'users': user_count, 'admins': admin_count, 'result_message': result_message})
+    return jsonify({
+        'success': True,
+        'total': total,
+        'users': user_count,
+        'admins': admin_count,
+        'result_message': result_message,
+        'lang_stats': lang_stats
+    })
 
 @app.route('/api/admin_add_apikey', methods=['POST'])
 def api_admin_add_apikey():

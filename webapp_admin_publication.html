@@ -29,6 +29,20 @@
     <div class="container">
         <div class="admin-title">Публикация для всех пользователей</div>
         <textarea class="pub-textarea" id="pubText" placeholder="Введите текст публикации...\nПоддерживается форматирование, смайлы и оформление."></textarea>
+        <div style="text-align:left; margin: 10px 0 16px 0;">
+            <label style="display:block; margin-bottom:6px;">
+                <input type="checkbox" id="onlyAdmins" checked /> Только администраторы
+            </label>
+            <label style="display:block; margin-bottom:6px;">
+                <input type="checkbox" id="saveToDb" /> Сохранить в базу
+            </label>
+            <label style="display:block; margin-bottom:6px;">
+                <input type="checkbox" id="autoTranslate" disabled /> Сделать автоперевод
+            </label>
+            <label style="display:block; margin-bottom:6px;">
+                <input type="checkbox" id="testSend" /> Тестовая отправка
+            </label>
+        </div>
         <div class="pub-report" id="pubReport" style="display: block;"></div>
         <button class="pub-btn" id="sendBtn" onclick="sendPublication()">Отправить</button>
         <div class="nav-btn-row">
@@ -48,30 +62,40 @@
             container.appendChild(toast);
             setTimeout(() => { toast.remove(); }, duration);
         }
+        document.getElementById('saveToDb').addEventListener('change', function() {
+            document.getElementById('autoTranslate').disabled = !this.checked;
+            if (!this.checked) document.getElementById('autoTranslate').checked = false;
+        });
         function sendPublication() {
             const text = document.getElementById('pubText').value.trim();
             const btn = document.getElementById('sendBtn');
+            const onlyAdmins = document.getElementById('onlyAdmins').checked;
+            const saveToDb = document.getElementById('saveToDb').checked;
+            const autoTranslate = document.getElementById('autoTranslate').checked;
+            const testSend = document.getElementById('testSend').checked;
             if (!text) { alert('Введите текст публикации!'); return; }
             btn.disabled = true;
             document.getElementById('pubReport').innerHTML = '';
             fetch('/api/admin_publication', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ text })
+                body: JSON.stringify({ text, only_admins: onlyAdmins, save_to_db: saveToDb, auto_translate: autoTranslate, test_send: testSend })
             })
             .then(res => res.json())
             .then(data => {
                 btn.disabled = false;
                 if (data.success) {
-                    // Показываем подробный отчет, если есть
                     let reportMsg = '<b>Рассылка завершена!</b>';
                     if (data.result_message) {
                         reportMsg += '<br>' + data.result_message.replace(/\n/g, '<br>');
-                    } else {
-                        reportMsg += `<br>Всего пользователей: ${data.total}<br>Обычных: ${data.users}<br>Админов: ${data.admins}`;
+                    }
+                    if (data.lang_stats) {
+                        reportMsg += '<br><b>По языкам:</b>';
+                        for (const [lang, qtty] of Object.entries(data.lang_stats)) {
+                            reportMsg += `<br>${lang.toUpperCase()}: ${qtty}`;
+                        }
                     }
                     document.getElementById('pubReport').innerHTML = reportMsg;
-                    // Прокручиваем к отчету, чтобы пользователь сразу видел статистику
                     document.getElementById('pubReport').scrollIntoView({behavior: 'smooth'});
                     showToast('Публикация успешно отправлена!', 'success');
                     document.getElementById('pubText').value = '';
