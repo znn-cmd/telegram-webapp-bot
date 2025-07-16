@@ -1668,10 +1668,16 @@ def api_admin_publication():
                 "max_tokens": 1024,
                 "temperature": 0.3
             }
-            resp = requests.post("https://api.openai.com/v1/chat/completions", json=payload, headers=headers, timeout=30)
-            if resp.status_code == 200:
-                return resp.json()['choices'][0]['message']['content'].strip()
-            return ''
+            try:
+                resp = requests.post("https://api.openai.com/v1/chat/completions", json=payload, headers=headers, timeout=30)
+                if resp.status_code == 200:
+                    return resp.json()['choices'][0]['message']['content'].strip()
+                else:
+                    logger.error(f"OpenAI API error for {target_lang}: {resp.status_code} {resp.text}")
+                    return f"[Ошибка перевода {target_lang}]"
+            except Exception as e:
+                logger.error(f"OpenAI API exception for {target_lang}: {e}")
+                return f"[Ошибка перевода {target_lang}]"
         translations['us'] = gpt_translate(text, 'English')
         translations['de'] = gpt_translate(text, 'German')
         translations['ft'] = gpt_translate(text, 'French')
