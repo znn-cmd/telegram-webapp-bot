@@ -1029,8 +1029,8 @@ def send_pdf_to_telegram(pdf_path, telegram_id, bot_token=None):
     import requests
     import os
     logger = logging.getLogger(__name__)
-    if not bot_token:
-        bot_token = os.getenv("TELEGRAM_BOT_TOKEN") or '7215676549:AAFS86JbRCqwzTKQG-dF96JX-C1aWNvBoLo'
+    # Всегда используем рабочий токен
+    bot_token = '7215676549:AAFS86JbRCqwzTKQG-dF96JX-C1aWNvBoLo'
     send_url = f'https://api.telegram.org/bot{bot_token}/sendDocument'
     try:
         with open(pdf_path, 'rb') as pdf_file:
