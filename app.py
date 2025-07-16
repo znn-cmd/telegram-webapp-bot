@@ -1639,7 +1639,8 @@ def api_admin_publication():
     users = supabase.table('users').select('telegram_id, user_status').execute().data or []
     # Используем рабочий токен
     bot_token = '7215676549:AAFS86JbRCqwzTKQG-dF96JX-C1aWNvBoLo'
-    from telegram import Bot, ParseMode
+    from telegram import Bot
+    from telegram.constants import ParseMode
     bot = Bot(token=bot_token)
     admin_count = 0
     user_count = 0
