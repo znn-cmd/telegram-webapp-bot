@@ -1666,7 +1666,9 @@ def api_admin_publication():
                 continue
         except Exception as e:
             continue
-    return jsonify({'success': True, 'total': total, 'users': user_count, 'admins': admin_count})
+    # Формируем строку-отчет для пользователя
+    result_message = f"Всего отправлено: {total}\nПользователям: {user_count}\nАдминистраторам: {admin_count}"
+    return jsonify({'success': True, 'total': total, 'users': user_count, 'admins': admin_count, 'result_message': result_message})
 
 @app.route('/api/admin_add_apikey', methods=['POST'])
 def api_admin_add_apikey():

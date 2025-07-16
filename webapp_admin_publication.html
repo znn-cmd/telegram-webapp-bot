@@ -63,7 +63,14 @@
             .then(data => {
                 btn.disabled = false;
                 if (data.success) {
-                    document.getElementById('pubReport').innerHTML = `<b>Рассылка завершена!</b><br>Всего пользователей: ${data.total}<br>Обычных: ${data.users}<br>Админов: ${data.admins}`;
+                    // Показываем подробный отчет, если есть
+                    let reportMsg = '<b>Рассылка завершена!</b>';
+                    if (data.result_message) {
+                        reportMsg += '<br>' + data.result_message.replace(/\n/g, '<br>');
+                    } else {
+                        reportMsg += `<br>Всего пользователей: ${data.total}<br>Обычных: ${data.users}<br>Админов: ${data.admins}`;
+                    }
+                    document.getElementById('pubReport').innerHTML = reportMsg;
                     document.getElementById('pubReport').style.display = '';
                     showToast('Публикация успешно отправлена!', 'success');
                     document.getElementById('pubText').value = '';
