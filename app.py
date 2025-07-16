@@ -1656,7 +1656,9 @@ def api_admin_publication():
     lang_map = {'ru': 'ru', 'en': 'us', 'de': 'de', 'fr': 'ft', 'tr': 'tr'}
     translations = {'ru': text, 'us': '', 'de': '', 'ft': '', 'tr': ''}
     # Переводим, если нужно
-    if auto_translate and openai_key:
+    print(f"DEBUG: auto_translate={auto_translate}, openai_key={'есть' if openai_key else 'нет'}")
+    # Временно форсируем выполнение перевода для диагностики
+    if True:
         logger.info(f"auto_translate={auto_translate}, openai_key={'есть' if openai_key else 'нет'}")
         def gpt_translate(prompt, target_lang):
             logger.info(f"Запрос к OpenAI для {target_lang}")
