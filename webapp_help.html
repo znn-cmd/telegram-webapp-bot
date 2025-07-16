@@ -5,40 +5,84 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Помощь — Aaadviser</title>
     <link rel="stylesheet" href="styles.css">
+    <script src="ux-utils.js"></script>
 </head>
 <body>
     <div class="container">
+        <!-- Логотип -->
         <div class="logo" onclick="location.href='/webapp_main'">
             <img src="logo-sqv.png" alt="Aaadviser" style="width: 64px; height: 64px; display:block; margin:0 auto 8px;">
             Aaadviser
         </div>
-        <div class="title" style="margin-bottom: 24px;">Помощь и поддержка</div>
         
-        <button class="menu-btn" onclick="location.href='/webapp_about'">
-            <span class="menu-btn-icon">ℹ️</span>
-            <div class="menu-btn-text">О приложении</div>
-            <div class="menu-btn-description">Информация о сервисе</div>
+        <!-- Заголовок страницы -->
+        <div class="title">Помощь и поддержка</div>
+        
+        <!-- Кнопки в стиле личного кабинета -->
+        <button class="profile-btn" onclick="location.href='/webapp_about'">
+            <span class="profile-btn-icon">ℹ️</span>
+            <span>О приложении</span>
         </button>
         
-        <button class="menu-btn" onclick="location.href='/webapp_instruction'">
-            <span class="menu-btn-icon">📖</span>
-            <div class="menu-btn-text">Инструкция</div>
-            <div class="menu-btn-description">Как пользоваться приложением</div>
+        <button class="profile-btn" onclick="location.href='/webapp_instruction'">
+            <span class="profile-btn-icon">📖</span>
+            <span>Инструкция</span>
         </button>
         
-        <button class="menu-btn" onclick="location.href='/webapp_geography'">
-            <span class="menu-btn-icon">🌍</span>
-            <div class="menu-btn-text">Наша география</div>
-            <div class="menu-btn-description">Страны и регионы работы</div>
+        <button class="profile-btn" onclick="location.href='/webapp_geography'">
+            <span class="profile-btn-icon">🌍</span>
+            <span>Наша география</span>
         </button>
         
-        <button class="menu-btn" onclick="location.href='/webapp_support'">
-            <span class="menu-btn-icon">🛠️</span>
-            <div class="menu-btn-text">Техническая поддержка</div>
-            <div class="menu-btn-description">Обратиться за помощью</div>
+        <button class="profile-btn" onclick="location.href='/webapp_support'">
+            <span class="profile-btn-icon">🛠️</span>
+            <span>Техническая поддержка</span>
         </button>
         
-        <button class="btn btn-secondary mt-4" onclick="location.href='/webapp_main'">В главное меню</button>
+        <!-- Кнопка назад в стиле личного кабинета -->
+        <button class="back-btn" onclick="location.href='/webapp_main'">В главное меню</button>
     </div>
+    
+    <!-- Toast контейнер для уведомлений -->
+    <div id="toastContainer" class="toast-container"></div>
+    
+    <script>
+        // Инициализация Telegram WebApp
+        document.addEventListener('DOMContentLoaded', function() {
+            let tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
+            if (tg) {
+                tg.ready();
+                tg.expand && tg.expand();
+            }
+            
+            // Инициализация UX утилит
+            if (typeof UXUtils !== 'undefined') {
+                UXUtils.initUX();
+            }
+        });
+        
+        // Показать toast уведомление
+        function showToast(message, type = 'success', duration = 3000) {
+            if (typeof UXUtils !== 'undefined') {
+                UXUtils.showToast(message, type, duration);
+            } else {
+                // Fallback если UXUtils не загружен
+                const container = document.getElementById('toastContainer');
+                const toast = document.createElement('div');
+                toast.className = `toast ${type}`;
+                toast.innerHTML = `
+                    <span class="toast-icon">${type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️'}</span>
+                    <span class="toast-message">${message}</span>
+                    <button class="toast-close" onclick="this.parentElement.remove()">×</button>
+                `;
+                container.appendChild(toast);
+                setTimeout(() => {
+                    if (toast.parentElement) {
+                        toast.remove();
+                    }
+                }, duration);
+            }
+        }
+    </script>
 </body>
 </html> 

@@ -5,34 +5,84 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>О приложении — Aaadviser</title>
     <link rel="stylesheet" href="styles.css">
-    <style>
-        body { background: #f8f9fa; margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
-        .container { max-width: 420px; margin: 40px auto; background: #fff; border-radius: 16px; box-shadow: 0 2px 12px rgba(102,126,234,0.10); padding: 32px 20px 24px 20px; text-align: center; }
-        .about-title { font-size: 1.3em; font-weight: bold; margin-bottom: 18px; color: #333; }
-        .about-text { font-size: 1.1em; color: #444; margin-bottom: 18px; }
-    </style>
+    <script src="ux-utils.js"></script>
 </head>
 <body>
-    <div class="container">
-        <div class="about-title">Aaadviser — ваш эксперт по недвижимости</div>
-        <div class="about-text">
-            <b>Добро пожаловать в Aaadviser!</b><br><br>
-            Мы — ваш цифровой советник и аналитик на рынке недвижимости.<br><br>
-            <b>Что умеет приложение?</b><br>
-            — Мгновенно анализирует объекты недвижимости в разных странах<br>
-            — Сравнивает цены, доходность и перспективы<br>
-            — Даёт персональные рекомендации и прогнозы<br>
-            — Помогает управлять вашими отчетами и инвестициями<br>
-            — Работает на русском, английском, немецком, французском и турецком языках<br>
-            — Охватывает рынки Европы, Ближнего Востока, США и других стран<br><br>
-            <b>Почему выбирают Aaadviser?</b><br>
-            — Экономия времени и денег: все данные и аналитика — в одном месте<br>
-            — Современный дизайн и удобство для пользователя<br>
-            — Безопасность и конфиденциальность ваших данных<br>
-            — Профессиональная поддержка и постоянное развитие сервиса<br><br>
-            <i>С Aaadviser у вас легкий доступ к данным!</i>
+    <div class="container container-wide">
+        <!-- Логотип -->
+        <div class="logo" onclick="location.href='/webapp_main'">
+            <img src="logo-sqv.png" alt="Aaadviser" style="width: 64px; height: 64px; display:block; margin:0 auto 8px;">
+            Aaadviser
         </div>
-        <button class="help-btn" onclick="location.href='/webapp_help'">Назад</button>
+        
+        <!-- Заголовок страницы -->
+        <div class="title">Aaadviser — ваш эксперт по недвижимости</div>
+        
+        <!-- Основной контент -->
+        <div class="content">
+            <div class="about-text">
+                <b>Добро пожаловать в Aaadviser!</b><br><br>
+                Мы — ваш цифровой советник и аналитик на рынке недвижимости.<br><br>
+                <b>Что умеет приложение?</b><br>
+                — Мгновенно анализирует объекты недвижимости в разных странах<br>
+                — Сравнивает цены, доходность и перспективы<br>
+                — Даёт персональные рекомендации и прогнозы<br>
+                — Помогает управлять вашими отчетами и инвестициями<br>
+                — Работает на русском, английском, немецком, французском и турецком языках<br>
+                — Охватывает рынки Европы, Ближнего Востока, США и других стран<br><br>
+                <b>Почему выбирают Aaadviser?</b><br>
+                — Экономия времени и денег: все данные и аналитика — в одном месте<br>
+                — Современный дизайн и удобство для пользователя<br>
+                — Безопасность и конфиденциальность ваших данных<br>
+                — Профессиональная поддержка и постоянное развитие сервиса<br><br>
+                <i>С Aaadviser у вас легкий доступ к данным!</i>
+            </div>
+        </div>
+        
+        <!-- Кнопка назад в стиле личного кабинета -->
+        <button class="back-btn" onclick="location.href='/webapp_help'">Назад</button>
     </div>
+    
+    <!-- Toast контейнер для уведомлений -->
+    <div id="toastContainer" class="toast-container"></div>
+    
+    <script>
+        // Инициализация Telegram WebApp
+        document.addEventListener('DOMContentLoaded', function() {
+            let tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
+            if (tg) {
+                tg.ready();
+                tg.expand && tg.expand();
+            }
+            
+            // Инициализация UX утилит
+            if (typeof UXUtils !== 'undefined') {
+                UXUtils.initUX();
+            }
+        });
+        
+        // Показать toast уведомление
+        function showToast(message, type = 'success', duration = 3000) {
+            if (typeof UXUtils !== 'undefined') {
+                UXUtils.showToast(message, type, duration);
+            } else {
+                // Fallback если UXUtils не загружен
+                const container = document.getElementById('toastContainer');
+                const toast = document.createElement('div');
+                toast.className = `toast ${type}`;
+                toast.innerHTML = `
+                    <span class="toast-icon">${type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️'}</span>
+                    <span class="toast-message">${message}</span>
+                    <button class="toast-close" onclick="this.parentElement.remove()">×</button>
+                `;
+                container.appendChild(toast);
+                setTimeout(() => {
+                    if (toast.parentElement) {
+                        toast.remove();
+                    }
+                }, duration);
+            }
+        }
+    </script>
 </body>
 </html> 

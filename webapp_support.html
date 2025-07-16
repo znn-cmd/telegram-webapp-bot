@@ -5,30 +5,105 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Техническая поддержка — Aaadviser</title>
     <link rel="stylesheet" href="styles.css">
+    <script src="ux-utils.js"></script>
 </head>
 <body>
     <div class="container">
+        <!-- Логотип -->
         <div class="logo" onclick="location.href='/webapp_main'">
             <img src="logo-sqv.png" alt="Aaadviser" style="width: 64px; height: 64px; display:block; margin:0 auto 8px;">
             Aaadviser
         </div>
-        <div class="title" style="margin-bottom: 24px;">Техническая поддержка</div>
-        <form class="support-form" enctype="multipart/form-data" onsubmit="event.preventDefault(); showSupportStub();">
-            <textarea class="form-input" id="supportMsg" placeholder="Опишите вашу проблему или вопрос..." required></textarea>
-            <input class="form-input" type="file" id="supportFile" accept="image/*,.pdf,.doc,.docx,.txt" />
-            <button class="btn btn-large" type="submit">Отправить</button>
-        </form>
-        <div id="supportStub" style="display:none; color:#28a745; margin-top:16px; font-weight:bold; text-align:center;">Ваше обращение отправлено! Мы свяжемся с вами в ближайшее время.</div>
-        <button class="btn btn-secondary mt-4" onclick="location.href='/webapp_main'">В главное меню</button>
+        
+        <!-- Заголовок страницы -->
+        <div class="title">Техническая поддержка</div>
+        
+        <!-- Форма поддержки -->
+        <div class="content">
+            <form class="support-form" enctype="multipart/form-data" onsubmit="event.preventDefault(); showSupportStub();">
+                <div class="form-group">
+                    <label class="form-label" for="supportMsg">Опишите вашу проблему или вопрос:</label>
+                    <textarea class="form-input" id="supportMsg" placeholder="Опишите вашу проблему или вопрос..." required rows="4"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="supportFile">Прикрепить файл (необязательно):</label>
+                    <input class="form-input" type="file" id="supportFile" accept="image/*,.pdf,.doc,.docx,.txt" />
+                </div>
+                
+                <button class="btn btn-large btn-full" type="submit">Отправить</button>
+            </form>
+            
+            <div id="supportStub" style="display:none; color:#28a745; margin-top:16px; font-weight:bold; text-align:center;">
+                Ваше обращение отправлено! Мы свяжемся с вами в ближайшее время.
+            </div>
+        </div>
+        
+        <!-- Кнопка назад в стиле личного кабинета -->
+        <button class="back-btn" onclick="location.href='/webapp_help'">Назад</button>
     </div>
+    
+    <!-- Toast контейнер для уведомлений -->
+    <div id="toastContainer" class="toast-container"></div>
+    
     <script>
+        // Инициализация Telegram WebApp
+        document.addEventListener('DOMContentLoaded', function() {
+            let tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
+            if (tg) {
+                tg.ready();
+                tg.expand && tg.expand();
+            }
+            
+            // Инициализация UX утилит
+            if (typeof UXUtils !== 'undefined') {
+                UXUtils.initUX();
+            }
+        });
+        
+        // Показать сообщение об отправке
         function showSupportStub() {
-            document.getElementById('supportStub').style.display = '';
-            document.getElementById('supportMsg').value = '';
-            document.getElementById('supportFile').value = '';
+            const stub = document.getElementById('supportStub');
+            const msg = document.getElementById('supportMsg');
+            const file = document.getElementById('supportFile');
+            
+            // Показать сообщение об успехе
+            stub.style.display = '';
+            
+            // Очистить форму
+            msg.value = '';
+            file.value = '';
+            
+            // Показать toast уведомление
+            showToast('Обращение отправлено! Мы свяжемся с вами в ближайшее время.', 'success');
+            
+            // Скрыть сообщение через 4 секунды
             setTimeout(() => {
-                document.getElementById('supportStub').style.display = 'none';
+                stub.style.display = 'none';
             }, 4000);
+        }
+        
+        // Показать toast уведомление
+        function showToast(message, type = 'success', duration = 3000) {
+            if (typeof UXUtils !== 'undefined') {
+                UXUtils.showToast(message, type, duration);
+            } else {
+                // Fallback если UXUtils не загружен
+                const container = document.getElementById('toastContainer');
+                const toast = document.createElement('div');
+                toast.className = `toast ${type}`;
+                toast.innerHTML = `
+                    <span class="toast-icon">${type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️'}</span>
+                    <span class="toast-message">${message}</span>
+                    <button class="toast-close" onclick="this.parentElement.remove()">×</button>
+                `;
+                container.appendChild(toast);
+                setTimeout(() => {
+                    if (toast.parentElement) {
+                        toast.remove();
+                    }
+                }, duration);
+            }
         }
     </script>
 </body>

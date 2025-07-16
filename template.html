@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{PAGE_TITLE}} — Aaadviser</title>
+    
+    <!-- Подключение дизайн-системы -->
+    <link rel="stylesheet" href="styles.css">
+    
+    <!-- Telegram WebApp API -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    
+    <!-- UX утилиты -->
+    <script src="ux-utils.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- Логотип -->
+        <div class="logo" onclick="location.href='/webapp_main'">
+            <img src="logo-sqv.png" alt="Aaadviser" style="width: 64px; height: 64px; display:block; margin:0 auto 8px;">
+            Aaadviser
+        </div>
+        
+        <!-- Заголовок страницы -->
+        <div class="title">{{PAGE_HEADER}}</div>
+        
+        <!-- Основной контент -->
+        <div class="content">
+            {{MAIN_CONTENT}}
+        </div>
+        
+        <!-- Кнопка назад -->
+        <button class="btn btn-secondary mt-4" onclick="goBack()">Назад</button>
+    </div>
+    
+    <!-- Toast контейнер для уведомлений -->
+    <div id="toastContainer" class="toast-container"></div>
+    
+    <!-- Snackbar для undo функциональности -->
+    <div id="snackbar" class="snackbar" style="display: none;">
+        <span id="snackbarMessage"></span>
+        <button class="snackbar-undo" id="snackbarUndo">Отменить</button>
+    </div>
+    
+    <script>
+        // Инициализация Telegram WebApp
+        document.addEventListener('DOMContentLoaded', function() {
+            let tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
+            if (tg) {
+                tg.ready();
+                tg.expand && tg.expand();
+            }
+            
+            // Инициализация UX утилит
+            if (typeof UXUtils !== 'undefined') {
+                UXUtils.initUX();
+            }
+        });
+        
+        // Функция возврата назад
+        function goBack() {
+            window.history.back();
+        }
+        
+        // Функция перехода в главное меню
+        function goToMainMenu() {
+            window.location.href = '/webapp_main';
+        }
+        
+        // Показать toast уведомление
+        function showToast(message, type = 'success', duration = 3000) {
+            if (typeof UXUtils !== 'undefined') {
+                UXUtils.showToast(message, type, duration);
+            } else {
+                // Fallback если UXUtils не загружен
+                const container = document.getElementById('toastContainer');
+                const toast = document.createElement('div');
+                toast.className = `toast ${type}`;
+                toast.innerHTML = `
+                    <span class="toast-icon">${type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️'}</span>
+                    <span class="toast-message">${message}</span>
+                    <button class="toast-close" onclick="this.parentElement.remove()">×</button>
+                `;
+                container.appendChild(toast);
+                setTimeout(() => {
+                    if (toast.parentElement) {
+                        toast.remove();
+                    }
+                }, duration);
+            }
+        }
+        
+        // Показать loading состояние
+        function showLoading(containerId, text = 'Загрузка...') {
+            if (typeof UXUtils !== 'undefined') {
+                UXUtils.showLoading(containerId, text);
+            }
+        }
+        
+        // Скрыть loading состояние
+        function hideLoading(containerId) {
+            if (typeof UXUtils !== 'undefined') {
+                UXUtils.hideLoading(containerId);
+            }
+        }
+        
+        // Показать пустое состояние
+        function showEmptyState(containerId, icon, title, description, actionText, actionCallback) {
+            if (typeof UXUtils !== 'undefined') {
+                UXUtils.showEmptyState(containerId, icon, title, description, actionText, actionCallback);
+            }
+        }
+        
+        // Показать skeleton loading
+        function showSkeleton(containerId, skeletonClass = 'skeleton-card', count = 3) {
+            if (typeof UXUtils !== 'undefined') {
+                UXUtils.showSkeleton(containerId, skeletonClass, count);
+            }
+        }
+        
+        // Скрыть skeleton loading
+        function hideSkeleton(containerId) {
+            if (typeof UXUtils !== 'undefined') {
+                UXUtils.hideSkeleton(containerId);
+            }
+        }
+        
+        // API запрос с обработкой ошибок
+        async function apiRequest(url, options = {}) {
+            if (typeof UXUtils !== 'undefined') {
+                return UXUtils.apiRequest(url, options);
+            } else {
+                // Fallback
+                try {
+                    const response = await fetch(url, {
+                        headers: {
+                            'Content-Type': 'application/json',
+                            ...options.headers
+                        },
+                        ...options
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    
+                    return await response.json();
+                } catch (error) {
+                    console.error('API request failed:', error);
+                    showToast('Ошибка сети. Попробуйте еще раз.', 'error');
+                    throw error;
+                }
+            }
+        }
+        
+        // Получить данные пользователя
+        function getUserData() {
+            let tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
+            let userData = tg && tg.initDataUnsafe && tg.initDataUnsafe.user ? tg.initDataUnsafe.user : null;
+            
+            if (!userData) {
+                try {
+                    userData = JSON.parse(localStorage.getItem('aaadviser_user'));
+                } catch (e) {
+                    userData = null;
+                }
+            }
+            
+            return userData;
+        }
+        
+        // Проверить авторизацию пользователя
+        function checkAuth() {
+            const userData = getUserData();
+            if (!userData || !userData.id) {
+                showToast('Пользователь не определен. Откройте WebApp из Telegram.', 'error');
+                return false;
+            }
+            return true;
+        }
+        
+        // Показать модальное окно
+        function showModal(title, content, buttons = []) {
+            if (typeof UXUtils !== 'undefined') {
+                UXUtils.showModal(title, content, buttons);
+            } else {
+                // Fallback
+                let oldModal = document.getElementById('modal');
+                if (oldModal) oldModal.remove();
+                
+                const modal = document.createElement('div');
+                modal.id = 'modal';
+                modal.className = 'modal-bg';
+                
+                const buttonHtml = buttons.map(btn => 
+                    `<button class="modal-btn ${btn.class || ''}" onclick="${btn.onclick}">${btn.text}</button>`
+                ).join('');
+                
+                modal.innerHTML = `
+                    <div class="modal">
+                        <div class="modal-title">${title}</div>
+                        <div class="modal-content">${content}</div>
+                        <div class="modal-btn-row">
+                            ${buttonHtml}
+                        </div>
+                    </div>
+                `;
+                
+                document.body.appendChild(modal);
+            }
+        }
+        
+        // Закрыть модальное окно
+        function closeModal() {
+            if (typeof UXUtils !== 'undefined') {
+                UXUtils.closeModal();
+            } else {
+                const modal = document.getElementById('modal');
+                if (modal) modal.remove();
+            }
+        }
+        
+        // Подтверждение действия
+        function confirmAction(message, onConfirm, onCancel) {
+            if (typeof UXUtils !== 'undefined') {
+                UXUtils.confirmAction(message, onConfirm, onCancel);
+            } else {
+                showModal(
+                    'Подтверждение',
+                    message,
+                    [
+                        {
+                            text: 'Отмена',
+                            class: 'modal-btn-secondary',
+                            onclick: 'closeModal(); if (typeof onCancel === "function") onCancel();'
+                        },
+                        {
+                            text: 'Подтвердить',
+                            onclick: 'closeModal(); if (typeof onConfirm === "function") onConfirm();'
+                        }
+                    ]
+                );
+            }
+        }
+    </script>
+</body>
+</html> 

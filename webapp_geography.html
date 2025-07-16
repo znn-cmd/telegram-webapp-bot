@@ -5,34 +5,92 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Наша география — Aaadviser</title>
     <link rel="stylesheet" href="styles.css">
-    <style>
-        body { background: #f8f9fa; margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
-        .container { max-width: 420px; margin: 40px auto; background: #fff; border-radius: 16px; box-shadow: 0 2px 12px rgba(102,126,234,0.10); padding: 32px 20px 24px 20px; }
-        .geo-title { font-size: 1.3em; font-weight: bold; margin-bottom: 18px; color: #333; text-align: center; }
-        .geo-list { margin: 0; padding: 0; list-style: none; }
-        .geo-list li { padding: 8px 0; border-bottom: 1px solid #eee; color: #444; font-size: 1.08em; }
-    </style>
+    <script src="ux-utils.js"></script>
 </head>
 <body>
-    <div class="container">
-        <div class="geo-title">Наша география</div>
-        <div style="color:#555; margin-bottom:12px; text-align:center;">Aaadviser предоставляет аналитику по недвижимости в следующих странах:</div>
-        <ul class="geo-list" id="geoList">
-            <!-- Список стран будет подгружаться динамически -->
-        </ul>
-        <button class="help-btn" onclick="location.href='/webapp_help'">Назад</button>
+    <div class="container container-wide">
+        <!-- Логотип -->
+        <div class="logo" onclick="location.href='/webapp_main'">
+            <img src="logo-sqv.png" alt="Aaadviser" style="width: 64px; height: 64px; display:block; margin:0 auto 8px;">
+            Aaadviser
+        </div>
+        
+        <!-- Заголовок страницы -->
+        <div class="title">Наша география</div>
+        
+        <!-- Основной контент -->
+        <div class="content">
+            <div style="color:#555; margin-bottom:12px; text-align:center;">Aaadviser предоставляет аналитику по недвижимости в следующих странах:</div>
+            <ul class="geo-list" id="geoList">
+                <!-- Список стран будет подгружаться динамически -->
+            </ul>
+        </div>
+        
+        <!-- Кнопка назад в стиле личного кабинета -->
+        <button class="back-btn" onclick="location.href='/webapp_help'">Назад</button>
     </div>
+    
+    <!-- Toast контейнер для уведомлений -->
+    <div id="toastContainer" class="toast-container"></div>
+    
     <script>
-        // Пример динамической подгрузки стран (можно заменить на API)
-        const countries = [
-            'Турция', 'Германия', 'Франция', 'Испания', 'Италия', 'ОАЭ', 'Кипр', 'Греция', 'Португалия', 'США'
-        ];
-        const geoList = document.getElementById('geoList');
-        countries.forEach(country => {
-            const li = document.createElement('li');
-            li.textContent = country;
-            geoList.appendChild(li);
+        // Инициализация Telegram WebApp
+        document.addEventListener('DOMContentLoaded', function() {
+            let tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
+            if (tg) {
+                tg.ready();
+                tg.expand && tg.expand();
+            }
+            
+            // Инициализация UX утилит
+            if (typeof UXUtils !== 'undefined') {
+                UXUtils.initUX();
+            }
+            
+            // Загрузка списка стран
+            loadCountries();
         });
+        
+        // Загрузка списка стран
+        function loadCountries() {
+            const countries = [
+                'Турция', 'Германия', 'Франция', 'Испания', 'Италия', 'ОАЭ', 'Кипр', 'Греция', 'Португалия', 'США'
+            ];
+            const geoList = document.getElementById('geoList');
+            
+            countries.forEach(country => {
+                const li = document.createElement('li');
+                li.textContent = country;
+                li.style.padding = '8px 0';
+                li.style.borderBottom = '1px solid #eee';
+                li.style.color = '#444';
+                li.style.fontSize = '1.08em';
+                geoList.appendChild(li);
+            });
+        }
+        
+        // Показать toast уведомление
+        function showToast(message, type = 'success', duration = 3000) {
+            if (typeof UXUtils !== 'undefined') {
+                UXUtils.showToast(message, type, duration);
+            } else {
+                // Fallback если UXUtils не загружен
+                const container = document.getElementById('toastContainer');
+                const toast = document.createElement('div');
+                toast.className = `toast ${type}`;
+                toast.innerHTML = `
+                    <span class="toast-icon">${type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️'}</span>
+                    <span class="toast-message">${message}</span>
+                    <button class="toast-close" onclick="this.parentElement.remove()">×</button>
+                `;
+                container.appendChild(toast);
+                setTimeout(() => {
+                    if (toast.parentElement) {
+                        toast.remove();
+                    }
+                }, duration);
+            }
+        }
     </script>
 </body>
 </html> 
