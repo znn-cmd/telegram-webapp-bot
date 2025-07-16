@@ -3,103 +3,221 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Помощь — Aaadviser</title>
+    <title>Помощь - Aaadviser</title>
     <link rel="stylesheet" href="styles.css">
-    <script src="ux-utils.js"></script>
+    <link rel="stylesheet" href="design-system.css">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
     <div class="container">
-        <!-- Логотип в шапке -->
-        <div class="logo" onclick="location.href='/webapp_main'">
-            <img src="logo-flt.png" alt="Aaadviser" style="width: 120px; height: auto; display:block; margin:0 auto 8px;">
+        <!-- Шапка с логотипом -->
+        <div class="logo">
+            <img src="logo-flt.png" alt="Aaadviser" onclick="goToMainMenu()">
         </div>
-        
-        <!-- Заголовок страницы -->
-        <div class="title">Помощь и поддержка</div>
-        
-        <!-- Основной контент -->
-        <div class="content">
-            <div class="about-text">
-                <b>Добро пожаловать в Aaadviser!</b><br><br>
-                
-                <b>Как пользоваться приложением:</b><br><br>
-                
-                <b>1. Регистрация и вход</b><br>
-                Зарегистрируйтесь через Telegram-бота. После регистрации входите в приложение с помощью Telegram — это быстро и безопасно.<br><br>
-                
-                <b>2. Главное меню</b><br>
-                В главном меню доступны: <b>создание отчёта</b>, <b>сохранённые отчёты</b>, <b>статистика</b>, <b>профиль</b>, <b>помощь</b>. Используйте навигацию для быстрого доступа к нужному разделу.<br><br>
-                
-                <b>3. Создание аналитического отчёта</b><br>
-                Введите адрес и параметры объекта (страна, город, площадь, цена и др.). Нажмите "Получить отчёт" — через несколько секунд вы увидите подробную аналитику, прогнозы и рекомендации.<br>
-                <i>Пример: "Германия, Берлин, квартира 50 м², 200 000 €"</i><br><br>
-                
-                <b>4. Сохранённые отчёты</b><br>
-                Все ваши отчёты автоматически сохраняются. Вы можете просматривать их, скачивать в PDF или отправлять себе в Telegram одним кликом.<br><br>
-                
-                <b>5. Профиль и настройки</b><br>
-                В профиле можно изменить личные данные, выбрать язык интерфейса, управлять подпиской и балансом.<br><br>
-                
-                <b>Наша география:</b><br>
-                Aaadviser предоставляет аналитику по недвижимости в следующих странах: Турция, Германия, Франция, Испания, Италия, ОАЭ, Кипр, Греция, Португалия, США.<br><br>
-                
-                <b>Почему выбирают Aaadviser?</b><br>
-                — Экономия времени и денег: все данные и аналитика — в одном месте<br>
-                — Современный дизайн и удобство для пользователя<br>
-                — Безопасность и конфиденциальность ваших данных<br>
-                — Профессиональная поддержка и постоянное развитие сервиса<br><br>
-                
-                <b>Техническая поддержка:</b><br>
-                Если у вас возникли вопросы или проблемы, обратитесь в техническую поддержку через Telegram-бота @Aaadviser_bot<br><br>
-                
-                <i>С Aaadviser у вас легкий доступ к данным!</i>
+
+        <!-- Заголовок -->
+        <h1 class="title">Помощь</h1>
+        <p class="subtitle">Ответы на часто задаваемые вопросы</p>
+
+        <!-- Секция помощи -->
+        <div class="help-section">
+            <div class="help-item">
+                <h3 class="help-question">Как получить анализ недвижимости?</h3>
+                <p class="help-answer">
+                    1. Нажмите "Получить новый отчет" в главном меню<br>
+                    2. Введите адрес недвижимости<br>
+                    3. Укажите количество спален<br>
+                    4. Введите примерную цену<br>
+                    5. Получите подробный анализ рынка
+                </p>
+            </div>
+
+            <div class="help-item">
+                <h3 class="help-question">Что включает в себя отчет?</h3>
+                <p class="help-answer">
+                    • Анализ цен в районе<br>
+                    • Статистика рынка недвижимости<br>
+                    • Сравнение с похожими объектами<br>
+                    • Прогноз изменения цен<br>
+                    • Рекомендации по инвестициям
+                </p>
+            </div>
+
+            <div class="help-item">
+                <h3 class="help-question">Как пополнить баланс?</h3>
+                <p class="help-answer">
+                    1. Перейдите в "Личный кабинет"<br>
+                    2. Нажмите "Пополнить баланс"<br>
+                    3. Выберите сумму пополнения<br>
+                    4. Следуйте инструкциям для оплаты
+                </p>
+            </div>
+
+            <div class="help-item">
+                <h3 class="help-question">Где найти мои отчеты?</h3>
+                <p class="help-answer">
+                    Все ваши отчеты сохраняются автоматически и доступны в разделе "Мои сохраненные отчеты" в главном меню.
+                </p>
+            </div>
+
+            <div class="help-item">
+                <h3 class="help-question">Как изменить язык?</h3>
+                <p class="help-answer">
+                    В главном меню нажмите на флаг языка в правом верхнем углу и выберите нужный язык из списка.
+                </p>
+            </div>
+
+            <div class="help-item">
+                <h3 class="help-question">Техническая поддержка</h3>
+                <p class="help-answer">
+                    Если у вас возникли проблемы, обратитесь в поддержку через Telegram бота @Aaadviser_support
+                </p>
             </div>
         </div>
-        
-        <!-- Кнопка возврата в главное меню -->
-        <button class="back-btn" onclick="location.href='/webapp_main'">Вернуться в главное меню</button>
+
+        <!-- Кнопка возврата -->
+        <div class="back-button-container">
+            <button class="btn btn-full" onclick="goToMainMenu()">
+                ← Вернуться в главное меню
+            </button>
+        </div>
     </div>
-    
-    <!-- Toast контейнер для уведомлений -->
-    <div id="toastContainer" class="toast-container"></div>
-    
+
+    <!-- Toast container -->
+    <div class="toast-container" id="toastContainer"></div>
+
     <script>
-        // Инициализация Telegram WebApp
-        document.addEventListener('DOMContentLoaded', function() {
-            let tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
-            if (tg) {
-                tg.ready();
-                tg.expand && tg.expand();
-            }
-            
-            // Инициализация UX утилит
-            if (typeof UXUtils !== 'undefined') {
-                UXUtils.initUX();
-            }
-        });
-        
-        // Показать toast уведомление
+        let tg = window.Telegram.WebApp;
+        tg.expand();
+        tg.ready();
+
+        // Toast notification system
         function showToast(message, type = 'success', duration = 3000) {
-            if (typeof UXUtils !== 'undefined') {
-                UXUtils.showToast(message, type, duration);
-            } else {
-                // Fallback если UXUtils не загружен
-                const container = document.getElementById('toastContainer');
-                const toast = document.createElement('div');
-                toast.className = `toast ${type}`;
-                toast.innerHTML = `
-                    <span class="toast-icon">${type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️'}</span>
-                    <span class="toast-message">${message}</span>
-                    <button class="toast-close" onclick="this.parentElement.remove()">×</button>
-                `;
-                container.appendChild(toast);
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            
+            const icons = {
+                success: '✅',
+                error: '❌',
+                warning: '⚠️',
+                info: 'ℹ️'
+            };
+            
+            toast.innerHTML = `
+                <span class="toast-icon">${icons[type]}</span>
+                <span class="toast-message">${message}</span>
+                <button class="toast-close" onclick="this.parentElement.remove()">×</button>
+            `;
+            
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                if (toast.parentElement) {
+                    toast.style.animation = 'slideOut 0.3s ease';
+                    setTimeout(() => toast.remove(), 300);
+                }
+            }, duration);
+        }
+
+        // Функция возврата в главное меню
+        function goToMainMenu() {
+            showToast('Переход в главное меню...', 'info');
+            window.location.href = '/webapp';
+        }
+
+        // Анимация появления элементов
+        document.addEventListener('DOMContentLoaded', function() {
+            const helpItems = document.querySelectorAll('.help-item');
+            helpItems.forEach((item, index) => {
                 setTimeout(() => {
-                    if (toast.parentElement) {
-                        toast.remove();
-                    }
-                }, duration);
+                    item.style.opacity = '0';
+                    item.style.transform = 'translateY(20px)';
+                    item.style.transition = 'all 0.3s ease';
+                    
+                    setTimeout(() => {
+                        item.style.opacity = '1';
+                        item.style.transform = 'translateY(0)';
+                    }, 50);
+                }, index * 100);
+            });
+        });
+    </script>
+
+    <style>
+        /* Дополнительные стили для страницы помощи */
+        .help-section {
+            margin-bottom: var(--spacing-3xl);
+        }
+
+        .help-item {
+            background: var(--background-primary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-md);
+            padding: var(--spacing-xl);
+            margin-bottom: var(--spacing-lg);
+            box-shadow: var(--shadow-sm);
+            transition: all var(--transition-normal);
+        }
+
+        .help-item:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+
+        .help-question {
+            font-size: var(--font-size-lg);
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: var(--spacing-md);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+
+        .help-question::before {
+            content: '❓';
+            font-size: var(--font-size-base);
+        }
+
+        .help-answer {
+            color: var(--text-secondary);
+            line-height: 1.6;
+            font-size: var(--font-size-base);
+        }
+
+        .back-button-container {
+            margin-top: var(--spacing-2xl);
+            padding-top: var(--spacing-xl);
+            border-top: 1px solid var(--border-color);
+        }
+
+        @keyframes slideOut {
+            from {
+                opacity: 1;
+                transform: translateX(0);
+            }
+            to {
+                opacity: 0;
+                transform: translateX(100%);
             }
         }
-    </script>
+
+        /* Адаптивность */
+        @media (max-width: 480px) {
+            .help-item {
+                padding: var(--spacing-lg);
+                margin-bottom: var(--spacing-md);
+            }
+
+            .help-question {
+                font-size: var(--font-size-base);
+            }
+
+            .help-answer {
+                font-size: var(--font-size-sm);
+            }
+        }
+    </style>
 </body>
 </html> 
