@@ -204,6 +204,7 @@ def api_user():
             'username': user.get('username'),
             'balance': user.get('balance', 0),
             'telegram_id': user.get('telegram_id'),
+            'user_status': user.get('user_status', None),
         })
     else:
         # Новый пользователь
@@ -226,6 +227,7 @@ def api_user():
             'languages': locales[lang]['language_names'],
             'balance': 0,
             'telegram_id': telegram_id,
+            'user_status': None,
         })
 
 @app.route('/api/user_profile', methods=['POST'])
