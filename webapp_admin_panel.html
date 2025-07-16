@@ -115,17 +115,23 @@
 </head>
 <body>
     <div class="container">
-        <img src="logo-flt.png" alt="Logo" class="admin-logo">
-        <div class="admin-section-title">Админ-панель</div>
+        <!-- Логотип и кнопка в главное меню -->
+        <div style="display:flex;flex-direction:column;align-items:center;margin-top:18px;margin-bottom:10px;">
+            <img src="logo-sqv.png" alt="Aaadviser Logo" style="width:110px;height:auto;display:block;margin-bottom:8px;cursor:pointer;" onclick="goToMainMenu()" />
+            <div style="font-size:15px;color:#888;font-style:italic;">Aaadviser — админ-панель</div>
+            <button class="menu-btn" style="margin-top:18px;width:100%;max-width:320px;" onclick="goToMainMenu()">
+                <span class="menu-btn-icon">🏠</span>
+                <span class="menu-btn-text">В главное меню</span>
+            </button>
+        </div>
         <div id="adminMenu">
-            <button class="admin-btn admin-btn-yellow" onclick="openAdminSection('balance')">Сделать баланс 100</button>
-            <button class="admin-btn admin-btn-blue" onclick="openAdminSection('users')">Пользователи</button>
-            <button class="admin-btn admin-btn-blue" onclick="openAdminSection('publish')">Публикация</button>
-            <button class="admin-btn admin-btn-blue" onclick="openAdminSection('settings')">Настройки</button>
+            <button class="menu-btn admin-btn-yellow" style="color:#333;font-weight:bold;background: linear-gradient(135deg, #ffe066 0%, #ffd700 100%);" onclick="openAdminSection('balance')">Сделать баланс 100</button>
+            <button class="menu-btn" onclick="openAdminSection('users')">Пользователи</button>
+            <button class="menu-btn" onclick="openAdminSection('publish')">Публикация</button>
+            <button class="menu-btn" onclick="openAdminSection('settings')">Настройки</button>
         </div>
         <div class="admin-nav-row" id="adminNavRow" style="display:none;">
             <button class="admin-nav-btn" onclick="backToAdminMenu()">Назад</button>
-            <button class="admin-nav-btn" onclick="goToMainMenu()">В главное меню</button>
         </div>
         <div id="adminContent" style="margin-top:30px;"></div>
         <div id="adminToastContainer" style="position:fixed;top:30px;right:30px;z-index:9999;"></div>
