@@ -14,18 +14,6 @@ from fpdf import FPDF
 import tempfile
 import os
 
-# Импорты для админ функций
-from api_functions import (
-    check_admin_status,
-    set_user_balance_to_100,
-    get_user_statistics,
-    send_publication_to_all_users,
-    save_promotional_text_to_db,
-    translate_with_chatgpt,
-    get_promotional_text_by_language,
-    update_text_send_count
-)
-
 # Загружаем переменные окружения
 load_dotenv()
 
@@ -175,8 +163,22 @@ def webapp_balance():
 
 @app.route('/webapp_admin')
 def webapp_admin():
-    """Страница админ панели"""
     with open('webapp_admin.html', 'r', encoding='utf-8') as f:
+        return f.read()
+
+@app.route('/webapp_admin_users')
+def webapp_admin_users():
+    with open('webapp_admin_users.html', 'r', encoding='utf-8') as f:
+        return f.read()
+
+@app.route('/webapp_admin_publications')
+def webapp_admin_publications():
+    with open('webapp_admin_publications.html', 'r', encoding='utf-8') as f:
+        return f.read()
+
+@app.route('/webapp_admin_settings')
+def webapp_admin_settings():
+    with open('webapp_admin_settings.html', 'r', encoding='utf-8') as f:
         return f.read()
 
 @app.route('/health')
@@ -187,10 +189,6 @@ def health():
 @app.route('/logo-sqv.png')
 def serve_logo():
     return send_from_directory('.', 'logo-sqv.png')
-
-@app.route('/logo-flt.png')
-def serve_logo_flt():
-    return send_from_directory('.', 'logo-flt.png')
 
 @app.route('/api/user', methods=['POST'])
 def api_user():
@@ -226,7 +224,6 @@ def api_user():
             'username': user.get('username'),
             'balance': user.get('balance', 0),
             'telegram_id': user.get('telegram_id'),
-            'is_admin': user.get('user_status') == 'admin',
         })
     else:
         # Новый пользователь
@@ -1186,13 +1183,7 @@ def api_generate_pdf_report():
         send_status = None
         if telegram_id:
             try:
-                # Получаем токен бота из базы данных
-                from api_functions import get_api_key_from_db
-                bot_token = get_api_key_from_db('telegram_bot_token')
-                if not bot_token:
-                    # Fallback на старый токен
-                    bot_token = '7215676549:AAFS86JbRCqwzTKQG-dF96JX-C1aWNvBoLo'
-                
+                bot_token = '7215676549:AAFS86JbRCqwzTKQG-dF96JX-C1aWNvBoLo'
                 send_url = f'https://api.telegram.org/bot{bot_token}/sendDocument'
                 with open(final_pdf_path, 'rb') as pdf_file:
                     files = {'document': pdf_file}
@@ -1414,6 +1405,325 @@ def api_save_user_report():
         logger.error(f"Error saving user report: {e}")
         return jsonify({'error': 'Internal error'}), 500
 
+@app.route('/api/check_admin', methods=['POST'])
+def api_check_admin():
+    """Проверка статуса администратора"""
+    data = request.json or {}
+    telegram_id_raw = data.get('telegram_id')
+    if telegram_id_raw is None:
+        return jsonify({'error': 'telegram_id required'}), 400
+    try:
+        telegram_id = int(telegram_id_raw)
+    except (TypeError, ValueError):
+        return jsonify({'error': 'Invalid telegram_id'}), 400
+    
+    try:
+        # Проверяем пользователя в базе
+        user_result = supabase.table('users').select('user_status').eq('telegram_id', telegram_id).execute()
+        user = user_result.data[0] if user_result.data else None
+        
+        if user and user.get('user_status') == 'admin':
+            return jsonify({'is_admin': True})
+        else:
+            return jsonify({'is_admin': False})
+    except Exception as e:
+        logger.error(f"Error checking admin status: {e}")
+        return jsonify({'error': 'Internal error'}), 500
+
+@app.route('/api/admin/set_balance_100', methods=['POST'])
+def api_admin_set_balance_100():
+    """Установка баланса пользователя в 100 (только для админов)"""
+    data = request.json or {}
+    telegram_id_raw = data.get('telegram_id')
+    if telegram_id_raw is None:
+        return jsonify({'error': 'telegram_id required'}), 400
+    try:
+        telegram_id = int(telegram_id_raw)
+    except (TypeError, ValueError):
+        return jsonify({'error': 'Invalid telegram_id'}), 400
+    
+    try:
+        # Проверяем права администратора
+        user_result = supabase.table('users').select('user_status').eq('telegram_id', telegram_id).execute()
+        user = user_result.data[0] if user_result.data else None
+        
+        if not user or user.get('user_status') != 'admin':
+            return jsonify({'error': 'Access denied'}), 403
+        
+        # Устанавливаем баланс в 100
+        supabase.table('users').update({'balance': 100}).eq('telegram_id', telegram_id).execute()
+        
+        return jsonify({'success': True, 'message': 'Balance set to 100'})
+    except Exception as e:
+        logger.error(f"Error setting balance: {e}")
+        return jsonify({'error': 'Internal error'}), 500
+
+@app.route('/api/admin/user_stats', methods=['POST'])
+def api_admin_user_stats():
+    """Получение статистики пользователей (только для админов)"""
+    data = request.json or {}
+    telegram_id_raw = data.get('telegram_id')
+    if telegram_id_raw is None:
+        return jsonify({'error': 'telegram_id required'}), 400
+    try:
+        telegram_id = int(telegram_id_raw)
+    except (TypeError, ValueError):
+        return jsonify({'error': 'Invalid telegram_id'}), 400
+    
+    try:
+        # Проверяем права администратора
+        user_result = supabase.table('users').select('user_status').eq('telegram_id', telegram_id).execute()
+        user = user_result.data[0] if user_result.data else None
+        
+        if not user or user.get('user_status') != 'admin':
+            return jsonify({'error': 'Access denied'}), 403
+        
+        # Получаем статистику пользователей из базы данных
+        from datetime import datetime, timedelta
+        
+        try:
+            # Получаем статистику пользователей
+            user_stats_result = supabase.table('user_statistics').select('*').execute()
+            user_stats = user_stats_result.data[0] if user_stats_result.data else {}
+            
+            # Получаем статистику отчетов
+            report_stats_result = supabase.table('report_statistics').select('*').execute()
+            report_stats = report_stats_result.data[0] if report_stats_result.data else {}
+            
+            # Получаем дополнительную статистику
+            # Количество отчетов от пользователей с истекшим периодом
+            expired_users_reports_result = supabase.table('user_reports').select('id').eq('user_id', supabase.table('users').select('id').eq('period_end', 'lt', datetime.now().date()).execute()).execute()
+            expired_users_reports = len(expired_users_reports_result.data) if expired_users_reports_result.data else 0
+            
+            # Количество пользователей с истекшим периодом
+            expired_users_result = supabase.table('users').select('id').or_('period_end.is.null', 'period_end.lt.' + datetime.now().date().isoformat()).execute()
+            expired_users_count = len(expired_users_result.data) if expired_users_result.data else 0
+            
+            # Среднее количество отчетов на пользователя с истекшим периодом
+            avg_expired_reports = expired_users_reports / expired_users_count if expired_users_count > 0 else 0
+            
+            # Количество отчетов от активных пользователей
+            active_users_reports = report_stats.get('active_users_reports', 0)
+            
+            # Стоимость отчета из таблицы tariffs
+            tariff_result = supabase.table('tariffs').select('full').eq('name', 'default').execute()
+            report_cost = tariff_result.data[0].get('full', 1.0) if tariff_result.data else 1.0
+            
+            # Потраченные деньги активными пользователями
+            active_users_spent = active_users_reports * report_cost
+            
+            stats = {
+                'total_users': user_stats.get('total_users', 0),
+                'total_balance': user_stats.get('total_balance', 0),
+                'new_users_week': user_stats.get('new_users_week', 0),
+                'new_users_month': user_stats.get('new_users_month', 0),
+                'new_users_quarter': user_stats.get('new_users_quarter', 0),
+                'new_users_year': user_stats.get('new_users_year', 0),
+                'active_users_balance': user_stats.get('active_users_balance', 0),
+                'expired_users_balance': user_stats.get('expired_users_balance', 0),
+                'other_users_balance': user_stats.get('other_users_balance', 0),
+                'reports_week': report_stats.get('reports_week', 0),
+                'reports_month': report_stats.get('reports_month', 0),
+                'reports_quarter': report_stats.get('reports_quarter', 0),
+                'reports_year': report_stats.get('reports_year', 0),
+                'deleted_reports': report_stats.get('deleted_reports', 0),
+                'expired_users_reports': expired_users_reports,
+                'avg_expired_reports': round(avg_expired_reports, 1),
+                'active_users_reports': active_users_reports,
+                'active_users_spent': round(active_users_spent, 2)
+            }
+            
+        except Exception as e:
+            logger.error(f"Error getting statistics from database: {e}")
+            # Возвращаем базовую статистику в случае ошибки
+            stats = {
+                'total_users': 0,
+                'total_balance': 0,
+                'new_users_week': 0,
+                'new_users_month': 0,
+                'new_users_quarter': 0,
+                'new_users_year': 0,
+                'active_users_balance': 0,
+                'expired_users_balance': 0,
+                'other_users_balance': 0,
+                'reports_week': 0,
+                'reports_month': 0,
+                'reports_quarter': 0,
+                'reports_year': 0,
+                'deleted_reports': 0,
+                'expired_users_reports': 0,
+                'avg_expired_reports': 0,
+                'active_users_reports': 0,
+                'active_users_spent': 0
+            }
+        
+        return jsonify(stats)
+    except Exception as e:
+        logger.error(f"Error getting user stats: {e}")
+        return jsonify({'error': 'Internal error'}), 500
+
+@app.route('/api/admin/send_publication', methods=['POST'])
+def api_admin_send_publication():
+    """Отправка публикации всем пользователям (только для админов)"""
+    data = request.json or {}
+    telegram_id_raw = data.get('telegram_id')
+    text = data.get('text', '').strip()
+    
+    if telegram_id_raw is None:
+        return jsonify({'error': 'telegram_id required'}), 400
+    try:
+        telegram_id = int(telegram_id_raw)
+    except (TypeError, ValueError):
+        return jsonify({'error': 'Invalid telegram_id'}), 400
+    
+    if not text:
+        return jsonify({'error': 'Text required'}), 400
+    
+    if len(text) > 4096:
+        return jsonify({'error': 'Text too long (max 4096 characters)'}), 400
+    
+    try:
+        # Проверяем права администратора
+        user_result = supabase.table('users').select('user_status').eq('telegram_id', telegram_id).execute()
+        user = user_result.data[0] if user_result.data else None
+        
+        if not user or user.get('user_status') != 'admin':
+            return jsonify({'error': 'Access denied'}), 403
+        
+        # Получаем всех пользователей
+        all_users_result = supabase.table('users').select('telegram_id, user_status').execute()
+        all_users = all_users_result.data if all_users_result.data else []
+        
+        admins_count = 0
+        users_count = 0
+        
+        # Отправляем сообщение всем пользователям через Telegram Bot API
+        for user in all_users:
+            user_telegram_id = user.get('telegram_id')
+            user_status = user.get('user_status', 'user')
+            
+            try:
+                # Используем существующую механику отправки сообщений
+                # Здесь нужно интегрировать с вашим Telegram ботом
+                # Пример отправки через Telegram Bot API
+                bot_token = os.getenv('TELEGRAM_BOT_TOKEN')
+                if bot_token:
+                    import requests
+                    
+                    url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
+                    payload = {
+                        'chat_id': user_telegram_id,
+                        'text': text,
+                        'parse_mode': 'Markdown'
+                    }
+                    
+                    response = requests.post(url, json=payload)
+                    
+                    if response.status_code == 200:
+                        if user_status == 'admin':
+                            admins_count += 1
+                        else:
+                            users_count += 1
+                    
+            except Exception as e:
+                logger.error(f"Error sending message to user {user_telegram_id}: {e}")
+                continue
+        
+        # Логируем результат
+        logger.info(f"Publication sent by admin {telegram_id}. Recipients: {admins_count} admins, {users_count} users")
+        
+        return jsonify({
+            'success': True,
+            'admins_count': admins_count,
+            'users_count': users_count,
+            'total_sent': admins_count + users_count
+        })
+        
+    except Exception as e:
+        logger.error(f"Error sending publication: {e}")
+        return jsonify({'error': 'Internal error'}), 500
+
+@app.route('/api/admin/get_settings', methods=['POST'])
+def api_admin_get_settings():
+    """Получение настроек API ключей (только для админов)"""
+    data = request.json or {}
+    telegram_id_raw = data.get('telegram_id')
+    if telegram_id_raw is None:
+        return jsonify({'error': 'telegram_id required'}), 400
+    try:
+        telegram_id = int(telegram_id_raw)
+    except (TypeError, ValueError):
+        return jsonify({'error': 'Invalid telegram_id'}), 400
+    
+    try:
+        # Проверяем права администратора
+        user_result = supabase.table('users').select('user_status').eq('telegram_id', telegram_id).execute()
+        user = user_result.data[0] if user_result.data else None
+        
+        if not user or user.get('user_status') != 'admin':
+            return jsonify({'error': 'Access denied'}), 403
+        
+        # Получаем настройки из таблицы api_keys
+        api_keys_result = supabase.table('api_keys').select('key_name, key_value').execute()
+        api_keys = api_keys_result.data if api_keys_result.data else []
+        
+        settings = {}
+        for key in api_keys:
+            key_name = key.get('key_name')
+            key_value = key.get('key_value')
+            if key_name and key_value:
+                settings[key_name] = key_value
+        
+        return jsonify(settings)
+        
+    except Exception as e:
+        logger.error(f"Error getting settings: {e}")
+        return jsonify({'error': 'Internal error'}), 500
+
+@app.route('/api/admin/save_settings', methods=['POST'])
+def api_admin_save_settings():
+    """Сохранение настроек API ключей (только для админов)"""
+    data = request.json or {}
+    telegram_id_raw = data.get('telegram_id')
+    settings = data.get('settings', {})
+    
+    if telegram_id_raw is None:
+        return jsonify({'error': 'telegram_id required'}), 400
+    try:
+        telegram_id = int(telegram_id_raw)
+    except (TypeError, ValueError):
+        return jsonify({'error': 'Invalid telegram_id'}), 400
+    
+    try:
+        # Проверяем права администратора
+        user_result = supabase.table('users').select('user_status').eq('telegram_id', telegram_id).execute()
+        user = user_result.data[0] if user_result.data else None
+        
+        if not user or user.get('user_status') != 'admin':
+            return jsonify({'error': 'Access denied'}), 403
+        
+        # Сохраняем настройки в таблицу api_keys
+        for key_name, key_value in settings.items():
+            if key_value.strip():  # Сохраняем только непустые значения
+                # Проверяем, существует ли уже запись с таким ключом
+                existing_result = supabase.table('api_keys').select('id').eq('key_name', key_name).execute()
+                
+                if existing_result.data:
+                    # Обновляем существующую запись
+                    supabase.table('api_keys').update({'key_value': key_value}).eq('key_name', key_name).execute()
+                else:
+                    # Создаем новую запись
+                    supabase.table('api_keys').insert({
+                        'key_name': key_name,
+                        'key_value': key_value
+                    }).execute()
+        
+        return jsonify({'success': True, 'message': 'Settings saved successfully'})
+        
+    except Exception as e:
+        logger.error(f"Error saving settings: {e}")
+        return jsonify({'error': 'Internal error'}), 500
+
 @app.route('/api/send_saved_report_pdf', methods=['POST'])
 def api_send_saved_report_pdf():
     """Генерирует PDF для сохранённого отчёта и отправляет его пользователю в Telegram (без контактов)"""
@@ -1536,29 +1846,16 @@ def api_send_saved_report_pdf():
         send_status = None
         if telegram_id:
             try:
-                # Получаем токен бота из базы данных
-                from api_functions import get_api_key_from_db
-                bot_token = get_api_key_from_db('telegram_bot_token')
-                if not bot_token:
-                    # Fallback на старый токен
-                    bot_token = '7215676549:AAFS86JbRCqwzTKQG-dF96JX-C1aWNvBoLo'
-                
+                bot_token = os.getenv("TELEGRAM_BOT_TOKEN") or '7215676549:AAFS86JbRCqwzTKQG-dF96JX-C1aWNvBoLo'
                 send_url = f'https://api.telegram.org/bot{bot_token}/sendDocument'
-                logger.info(f"Sending PDF to Telegram: chat_id={telegram_id}, file={final_pdf_path}")
-                
                 with open(final_pdf_path, 'rb') as pdf_file:
                     files = {'document': pdf_file}
                     data_send = {'chat_id': telegram_id}
                     resp = requests.post(send_url, data=data_send, files=files)
-                    
-                    logger.info(f"Telegram API response: status={resp.status_code}, body={resp.text}")
-                    
                     if resp.status_code == 200 and resp.json().get('ok'):
                         send_status = 'sent'
-                        logger.info("PDF successfully sent to Telegram")
                     else:
                         send_status = f'error: {resp.text}'
-                        logger.error(f"Telegram API error: {resp.text}")
             except Exception as e:
                 logger.error(f"Error sending PDF via Telegram bot: {e}")
                 send_status = f'error: {e}'
@@ -1566,125 +1863,11 @@ def api_send_saved_report_pdf():
             'success': True,
             'pdf_path': pdf_url,
             'telegram_send_status': send_status,
-            'message': 'PDF успешно сгенерирован и отправлен!' if send_status == 'sent' else f'PDF сгенерирован, но ошибка отправки: {send_status}'
+            'message': 'PDF успешно сгенерирован и отправлен!'
         })
     except Exception as e:
         logger.error(f"Error generating/sending PDF: {e}")
         return jsonify({'error': 'Internal error'}), 500
-
-# Админ API маршруты
-@app.route('/api/admin/set_balance_100', methods=['POST'])
-def api_admin_set_balance_100():
-    """Установка баланса пользователя в 100 (только для админов)"""
-    data = request.json or {}
-    telegram_id = data.get('telegram_id')
-    
-    if not telegram_id:
-        return jsonify({'error': 'telegram_id required'}), 400
-    
-    try:
-        # Проверяем статус админа
-        if not check_admin_status(telegram_id):
-            return jsonify({'error': 'Access denied. Admin privileges required.'}), 403
-        
-        # Устанавливаем баланс
-        if set_user_balance_to_100(telegram_id):
-            return jsonify({'success': True, 'message': 'Balance set to 100 successfully'})
-        else:
-            return jsonify({'error': 'Failed to set balance'}), 500
-            
-    except Exception as e:
-        logger.error(f"Error setting balance to 100: {e}")
-        return jsonify({'error': 'Internal server error'}), 500
-
-@app.route('/api/admin/user_stats', methods=['POST'])
-def api_admin_user_stats():
-    """Получение статистики пользователей (только для админов)"""
-    data = request.json or {}
-    telegram_id = data.get('telegram_id')
-    
-    if not telegram_id:
-        return jsonify({'error': 'telegram_id required'}), 400
-    
-    try:
-        # Проверяем статус админа
-        if not check_admin_status(telegram_id):
-            return jsonify({'error': 'Access denied. Admin privileges required.'}), 403
-        
-        # Получаем статистику
-        stats = get_user_statistics()
-        return jsonify(stats)
-            
-    except Exception as e:
-        logger.error(f"Error getting user statistics: {e}")
-        return jsonify({'error': 'Internal server error'}), 500
-
-@app.route('/api/admin/api_keys', methods=['GET', 'POST'])
-def api_admin_api_keys():
-    """Управление API ключами (только для админов)"""
-    data = request.json or {}
-    telegram_id = data.get('telegram_id')
-    
-    if not telegram_id:
-        return jsonify({'error': 'telegram_id required'}), 400
-    
-    try:
-        # Проверяем статус админа
-        if not check_admin_status(telegram_id):
-            return jsonify({'error': 'Access denied. Admin privileges required.'}), 403
-        
-        if request.method == 'GET':
-            # Получаем все ключи
-            from api_functions import get_all_api_keys
-            keys = get_all_api_keys()
-            return jsonify({'success': True, 'keys': keys})
-        
-        elif request.method == 'POST':
-            # Сохраняем/обновляем ключ
-            key_name = data.get('key_name')
-            key_value = data.get('key_value')
-            description = data.get('description', '')
-            
-            if not key_name or not key_value:
-                return jsonify({'error': 'key_name and key_value required'}), 400
-            
-            from api_functions import save_api_key_to_db
-            if save_api_key_to_db(key_name, key_value, description):
-                return jsonify({'success': True, 'message': f'API ключ {key_name} сохранен'})
-            else:
-                return jsonify({'error': 'Failed to save API key'}), 500
-                
-    except Exception as e:
-        logger.error(f"Error managing API keys: {e}")
-        return jsonify({'error': 'Internal server error'}), 500
-
-@app.route('/api/admin/send_publication', methods=['POST'])
-def api_admin_send_publication():
-    """Отправка публикации всем пользователям (только для админов)"""
-    data = request.json or {}
-    telegram_id = data.get('telegram_id')
-    text = data.get('text')
-    save_to_db = data.get('save_to_db', False)
-    make_translation = data.get('make_translation', False)
-    
-    if not telegram_id:
-        return jsonify({'error': 'telegram_id required'}), 400
-    
-    if not text:
-        return jsonify({'error': 'text required'}), 400
-    
-    try:
-        # Проверяем статус админа
-        if not check_admin_status(telegram_id):
-            return jsonify({'error': 'Access denied. Admin privileges required.'}), 403
-        
-        # Отправляем публикацию с учетом настроек
-        result = send_publication_to_all_users(text, save_to_db, make_translation)
-        return jsonify(result)
-            
-    except Exception as e:
-        logger.error(f"Error sending publication: {e}")
-        return jsonify({'error': 'Internal server error'}), 500
 
 # === Запуск Flask приложения ===
 def run_flask():

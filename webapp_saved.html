@@ -738,13 +738,8 @@
                     body: JSON.stringify({ report_id: id, telegram_id: userData.id })
                 });
                 const data = await res.json();
-                
-                if (data.success) {
-                    if (data.telegram_send_status === 'sent') {
-                        showToast('Отчет успешно отправлен в Telegram!', 'success');
-                    } else {
-                        showToast('PDF сгенерирован, но ошибка отправки в Telegram', 'warning');
-                    }
+                if (data.success && data.telegram_send_status === 'sent') {
+                    showToast('Отчет отправлен в Telegram!', 'success');
                 } else {
                     showToast('Ошибка при отправке отчета: ' + (data.message || data.error), 'error');
                 }
