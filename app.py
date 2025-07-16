@@ -1540,10 +1540,5 @@ def run_flask():
     print("====================\n")
     app.run(host='0.0.0.0', port=8080, debug=False)
 
-@app.route('/webapp_admin')
-def webapp_admin():
-    with open('webapp_admin.html', 'r', encoding='utf-8') as f:
-        return f.read()
-
 if __name__ == '__main__':
     run_flask()
