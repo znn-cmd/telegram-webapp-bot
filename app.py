@@ -1639,9 +1639,7 @@ def api_admin_publication():
     users = supabase.table('users').select('telegram_id, user_status').execute().data or []
     # Используем рабочий токен
     bot_token = '7215676549:AAFS86JbRCqwzTKQG-dF96JX-C1aWNvBoLo'
-    from telegram import Bot
-    from telegram.constants import ParseMode
-    bot = Bot(token=bot_token)
+    import requests
     admin_count = 0
     user_count = 0
     total = 0
@@ -1650,12 +1648,22 @@ def api_admin_publication():
         if not tid:
             continue
         try:
-            bot.send_message(chat_id=tid, text=text, parse_mode=ParseMode.HTML, disable_web_page_preview=True)
-            if u.get('user_status') == 'admin':
-                admin_count += 1
+            send_url = f'https://api.telegram.org/bot{bot_token}/sendMessage'
+            data_send = {
+                'chat_id': tid,
+                'text': text,
+                'parse_mode': 'HTML',
+                'disable_web_page_preview': True
+            }
+            resp = requests.post(send_url, data=data_send)
+            if resp.status_code == 200 and resp.json().get('ok'):
+                if u.get('user_status') == 'admin':
+                    admin_count += 1
+                else:
+                    user_count += 1
+                total += 1
             else:
-                user_count += 1
-            total += 1
+                continue
         except Exception as e:
             continue
     return jsonify({'success': True, 'total': total, 'users': user_count, 'admins': admin_count})
