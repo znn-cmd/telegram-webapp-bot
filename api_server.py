@@ -289,6 +289,78 @@ def admin_user_stats():
         'active_reports_money': active_reports_money
     })
 
+@app.route('/api/admin_publish', methods=['POST'])
+def admin_publish():
+    import requests
+    data = request.json or {}
+    telegram_id = data.get('telegram_id')
+    text = data.get('text')
+    if not telegram_id or not text:
+        return jsonify({'error': 'telegram_id and text required'}), 400
+    # Проверяем, что вызывающий пользователь — admin
+    user_result = supabase.table('users').select('user_status').eq('telegram_id', telegram_id).execute()
+    user = user_result.data[0] if user_result.data else None
+    if not user or user.get('user_status') != 'admin':
+        return jsonify({'error': 'not allowed'}), 403
+    # Получаем всех пользователей
+    all_users = supabase.table('users').select('telegram_id, user_status').execute().data
+    admin_count = 0
+    user_count = 0
+    bot_token = os.getenv('TELEGRAM_BOT_TOKEN')
+    send_url = f'https://api.telegram.org/bot{bot_token}/sendMessage'
+    for u in all_users:
+        uid = u.get('telegram_id')
+        if not uid:
+            continue
+        payload = {
+            'chat_id': uid,
+            'text': text,
+            'parse_mode': 'HTML',
+            'disable_web_page_preview': True
+        }
+        try:
+            resp = requests.post(send_url, json=payload, timeout=5)
+            if u.get('user_status') == 'admin':
+                admin_count += 1
+            else:
+                user_count += 1
+        except Exception:
+            pass
+    return jsonify({'success': True, 'admins': admin_count, 'users': user_count})
+
+@app.route('/api/admin_api_keys', methods=['GET', 'POST'])
+def admin_api_keys():
+    if request.method == 'GET':
+        telegram_id = request.args.get('telegram_id')
+        if not telegram_id:
+            return jsonify({'error': 'telegram_id required'}), 400
+        user_result = supabase.table('users').select('user_status').eq('telegram_id', telegram_id).execute()
+        user = user_result.data[0] if user_result.data else None
+        if not user or user.get('user_status') != 'admin':
+            return jsonify({'error': 'not allowed'}), 403
+        keys = supabase.table('api_keys').select('*').execute().data
+        return jsonify({'success': True, 'keys': keys})
+    elif request.method == 'POST':
+        data = request.json or {}
+        telegram_id = data.get('telegram_id')
+        key_name = data.get('key_name')
+        key_value = data.get('key_value')
+        if not telegram_id or not key_name or not key_value:
+            return jsonify({'error': 'telegram_id, key_name, key_value required'}), 400
+        user_result = supabase.table('users').select('user_status').eq('telegram_id', telegram_id).execute()
+        user = user_result.data[0] if user_result.data else None
+        if not user or user.get('user_status') != 'admin':
+            return jsonify({'error': 'not allowed'}), 403
+        # Обновить или добавить ключ
+        existing = supabase.table('api_keys').select('*').eq('key_name', key_name).execute().data
+        if existing:
+            supabase.table('api_keys').update({'key_value': key_value}).eq('key_name', key_name).execute()
+        else:
+            supabase.table('api_keys').insert({'key_name': key_name, 'key_value': key_value}).execute()
+        return jsonify({'success': True})
+    else:
+        return jsonify({'error': 'method not allowed'}), 405
+
 def generate_full_report(basic_report_data):
     """Генерация полного отчета на основе базового"""
     

@@ -116,17 +116,138 @@
                 document.getElementById('adminContent').innerHTML = '<div style="color:red;">Ошибка соединения</div>';
             }
         }
-        function showUsersStats() {
+        async function showUsersStats() {
+            if (!userData || !userData.id) {
+                document.getElementById('adminContent').innerHTML = '<div class="loading">Пользователь не определён</div>';
+                return;
+            }
             document.getElementById('adminContent').innerHTML = '<div class="loading">Загрузка статистики пользователей...</div>';
-            // TODO: реализовать загрузку статистики
+            try {
+                const resp = await fetch('/api/admin_user_stats', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ telegram_id: userData.id })
+                });
+                const data = await resp.json();
+                if (data.error) {
+                    document.getElementById('adminContent').innerHTML = '<div style="color:red;">Ошибка: ' + (data.error || 'Не удалось получить статистику') + '</div>';
+                    return;
+                }
+                let html = `<div style='font-size:18px;font-weight:bold;margin-bottom:16px;'>Статистика пользователей</div>`;
+                html += `<table style='width:100%;border-collapse:collapse;'>`;
+                html += `<tr><td>Всего пользователей:</td><td><b>${data.total_users}</b></td></tr>`;
+                html += `<tr><td>Новых за неделю:</td><td>${data.new_week}</td></tr>`;
+                html += `<tr><td>Новых за месяц:</td><td>${data.new_month}</td></tr>`;
+                html += `<tr><td>Новых за квартал:</td><td>${data.new_quarter}</td></tr>`;
+                html += `<tr><td>Новых за год:</td><td>${data.new_year}</td></tr>`;
+                html += `<tr><td>Общий баланс:</td><td>$${data.total_balance}</td></tr>`;
+                html += `<tr><td>Баланс пользователей с period_end < сегодня или null:</td><td>$${data.expired_balance}</td></tr>`;
+                html += `<tr><td>Баланс остальных пользователей:</td><td>$${data.active_balance}</td></tr>`;
+                html += `<tr><td>Отчетов за неделю:</td><td>${data.reports_week}</td></tr>`;
+                html += `<tr><td>Отчетов за месяц:</td><td>${data.reports_month}</td></tr>`;
+                html += `<tr><td>Отчетов за квартал:</td><td>${data.reports_quarter}</td></tr>`;
+                html += `<tr><td>Отчетов за год:</td><td>${data.reports_year}</td></tr>`;
+                html += `<tr><td>Удалённых отчетов:</td><td>${data.deleted_reports}</td></tr>`;
+                html += `<tr><td>Отчетов пользователей с period_end < сегодня или null:</td><td>${data.expired_reports_count}</td></tr>`;
+                html += `<tr><td>Среднее отчетов на такого пользователя:</td><td>${data.avg_expired_reports.toFixed(2)}</td></tr>`;
+                html += `<tr><td>Отчетов активных пользователей:</td><td>${data.active_reports_count}</td></tr>`;
+                html += `<tr><td>Сумма денег за их отчеты:</td><td>$${data.active_reports_money}</td></tr>`;
+                html += `</table>`;
+                document.getElementById('adminContent').innerHTML = html;
+            } catch (e) {
+                document.getElementById('adminContent').innerHTML = '<div style="color:red;">Ошибка соединения</div>';
+            }
         }
         function showPublication() {
-            document.getElementById('adminContent').innerHTML = '<div class="loading">Загрузка публикаций...</div>';
-            // TODO: реализовать публикации
+            if (!userData || !userData.id) {
+                document.getElementById('adminContent').innerHTML = '<div class="loading">Пользователь не определён</div>';
+                return;
+            }
+            document.getElementById('adminContent').innerHTML = `
+                <div style='font-size:18px;font-weight:bold;margin-bottom:16px;'>Публикация</div>
+                <textarea id='publishText' style='width:100%;min-height:120px;font-size:15px;padding:10px;border-radius:8px;border:1px solid #ccc;margin-bottom:12px;' placeholder='Введите текст публикации (поддерживается HTML, эмодзи, оформление)'></textarea>
+                <button class='admin-btn admin-btn-blue' style='width:100%;' onclick='sendPublication()'>Отправить всем</button>
+                <div id='publishResult' style='margin-top:16px;'></div>
+                <div style='font-size:13px;color:#888;margin-top:10px;'>Поддерживается оформление: <b>HTML</b> (жирный, курсив, ссылки, эмодзи и т.д.)</div>
+            `;
         }
-        function showSettings() {
+        async function sendPublication() {
+            const text = document.getElementById('publishText').value.trim();
+            if (!text) {
+                document.getElementById('publishResult').innerHTML = '<span style="color:red;">Введите текст публикации</span>';
+                return;
+            }
+            document.getElementById('publishResult').innerHTML = 'Отправка...';
+            try {
+                const resp = await fetch('/api/admin_publish', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ telegram_id: userData.id, text })
+                });
+                const data = await resp.json();
+                if (data.success) {
+                    document.getElementById('publishResult').innerHTML = `<span style='color:green;'>Публикация отправлена!<br>Обычных пользователей: <b>${data.users}</b><br>Админов: <b>${data.admins}</b></span>`;
+                } else {
+                    document.getElementById('publishResult').innerHTML = `<span style='color:red;'>Ошибка: ${data.error || 'Не удалось отправить публикацию'}</span>`;
+                }
+            } catch (e) {
+                document.getElementById('publishResult').innerHTML = '<span style="color:red;">Ошибка соединения</span>';
+            }
+        }
+        async function showSettings() {
+            if (!userData || !userData.id) {
+                document.getElementById('adminContent').innerHTML = '<div class="loading">Пользователь не определён</div>';
+                return;
+            }
             document.getElementById('adminContent').innerHTML = '<div class="loading">Загрузка настроек...</div>';
-            // TODO: реализовать настройки
+            try {
+                const resp = await fetch(`/api/admin_api_keys?telegram_id=${userData.id}`);
+                const data = await resp.json();
+                if (!data.success) {
+                    document.getElementById('adminContent').innerHTML = `<span style='color:red;'>Ошибка: ${data.error || 'Не удалось получить ключи'}</span>`;
+                    return;
+                }
+                let html = `<div style='font-size:18px;font-weight:bold;margin-bottom:16px;'>API-ключи</div>`;
+                html += `<table style='width:100%;border-collapse:collapse;margin-bottom:18px;'>`;
+                html += `<tr><th style='text-align:left;'>Имя</th><th style='text-align:left;'>Значение</th></tr>`;
+                for (const k of data.keys) {
+                    html += `<tr><td>${k.key_name}</td><td><span style='font-family:monospace;'>${k.key_value}</span></td></tr>`;
+                }
+                html += `</table>`;
+                html += `<div style='font-size:15px;font-weight:500;margin-bottom:8px;'>Добавить/изменить ключ</div>`;
+                html += `<input id='keyName' placeholder='Имя ключа' style='width:40%;padding:7px;border-radius:6px;border:1px solid #ccc;margin-right:8px;font-size:14px;'>`;
+                html += `<input id='keyValue' placeholder='Значение' style='width:40%;padding:7px;border-radius:6px;border:1px solid #ccc;font-size:14px;'>`;
+                html += `<button class='admin-btn admin-btn-blue' style='padding:8px 18px;font-size:14px;margin-left:8px;' onclick='saveApiKey()'>Сохранить</button>`;
+                html += `<div id='apiKeyResult' style='margin-top:12px;'></div>`;
+                document.getElementById('adminContent').innerHTML = html;
+            } catch (e) {
+                document.getElementById('adminContent').innerHTML = '<span style="color:red;">Ошибка соединения</span>';
+            }
+        }
+        async function saveApiKey() {
+            const key_name = document.getElementById('keyName').value.trim();
+            const key_value = document.getElementById('keyValue').value.trim();
+            if (!key_name || !key_value) {
+                document.getElementById('apiKeyResult').innerHTML = '<span style="color:red;">Введите имя и значение ключа</span>';
+                return;
+            }
+            document.getElementById('apiKeyResult').innerHTML = 'Сохранение...';
+            try {
+                const resp = await fetch('/api/admin_api_keys', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ telegram_id: userData.id, key_name, key_value })
+                });
+                const data = await resp.json();
+                if (data.success) {
+                    document.getElementById('apiKeyResult').innerHTML = '<span style="color:green;">Ключ сохранён</span>';
+                    showSettings();
+                } else {
+                    document.getElementById('apiKeyResult').innerHTML = `<span style='color:red;'>Ошибка: ${data.error || 'Не удалось сохранить ключ'}</span>`;
+                }
+            } catch (e) {
+                document.getElementById('apiKeyResult').innerHTML = '<span style="color:red;">Ошибка соединения</span>';
+            }
         }
     </script>
 </body>
