@@ -1657,7 +1657,9 @@ def api_admin_publication():
     translations = {'ru': text, 'us': '', 'de': '', 'ft': '', 'tr': ''}
     # Переводим, если нужно
     if auto_translate and openai_key:
+        logger.info(f"auto_translate={auto_translate}, openai_key={'есть' if openai_key else 'нет'}")
         def gpt_translate(prompt, target_lang):
+            logger.info(f"Запрос к OpenAI для {target_lang}")
             headers = {"Authorization": f"Bearer {openai_key}", "Content-Type": "application/json"}
             payload = {
                 "model": "gpt-3.5-turbo",
@@ -1671,7 +1673,9 @@ def api_admin_publication():
             try:
                 resp = requests.post("https://api.openai.com/v1/chat/completions", json=payload, headers=headers, timeout=30)
                 if resp.status_code == 200:
-                    return resp.json()['choices'][0]['message']['content'].strip()
+                    result = resp.json()['choices'][0]['message']['content'].strip()
+                    logger.info(f"Перевод {target_lang}: {result}")
+                    return result
                 else:
                     logger.error(f"OpenAI API error for {target_lang}: {resp.status_code} {resp.text}")
                     return f"[Ошибка перевода {target_lang}]"
