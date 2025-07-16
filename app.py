@@ -1637,9 +1637,8 @@ def api_admin_publication():
         return jsonify({'error': 'text required'}), 400
     # Получаем всех пользователей
     users = supabase.table('users').select('telegram_id, user_status').execute().data or []
-    bot_token = os.getenv('TELEGRAM_BOT_TOKEN')
-    if not bot_token:
-        return jsonify({'error': 'No bot token'}), 500
+    # Используем рабочий токен
+    bot_token = '7215676549:AAFS86JbRCqwzTKQG-dF96JX-C1aWNvBoLo'
     from telegram import Bot, ParseMode
     bot = Bot(token=bot_token)
     admin_count = 0
