@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Инструкция — Aaadviser</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f8f9fa; margin: 0; }
+        .container { max-width: 400px; margin: 40px auto; background: #fff; border-radius: 16px; box-shadow: 0 2px 12px rgba(102,126,234,0.10); padding: 32px 20px 24px 20px; text-align: center; }
+        .logo { width: 110px; height: auto; display: block; margin: 0 auto 18px auto; cursor: pointer; transition: transform 0.2s; }
+        .logo:hover { transform: scale(1.05); }
+        .title { font-size: 1.3em; font-weight: bold; margin-bottom: 18px; color: #333; }
+        .content { text-align: left; margin-bottom: 30px; }
+        .content h3 { color: #333; margin-bottom: 12px; font-size: 1.1em; }
+        .content p { color: #666; line-height: 1.6; margin-bottom: 16px; font-size: 14px; }
+        .content ol { color: #666; line-height: 1.6; margin-bottom: 16px; font-size: 14px; padding-left: 20px; }
+        .content li { margin-bottom: 12px; }
+        .step { background: #f8f9fa; padding: 12px; border-radius: 8px; margin-bottom: 12px; border-left: 4px solid #667eea; }
+        .step-number { font-weight: bold; color: #667eea; }
+        .nav-buttons { display: flex; gap: 12px; }
+        .nav-btn { flex: 1; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; border: none; border-radius: 10px; padding: 14px 16px; font-size: 14px; font-weight: 500; cursor: pointer; transition: background 0.2s; }
+        .nav-btn:hover { background: linear-gradient(135deg, #764ba2 0%, #667eea 100%); }
+        .back-btn { background: linear-gradient(135deg, #6c757d 0%, #495057 100%) !important; }
+        .back-btn:hover { background: linear-gradient(135deg, #495057 0%, #6c757d 100%) !important; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img src="logo-flt.png" alt="Aaadviser" class="logo" onclick="goToMainMenu()">
+        <div class="title">Инструкция</div>
+        
+        <div class="content">
+            <h3>Как получить анализ недвижимости</h3>
+            
+            <div class="step">
+                <span class="step-number">1.</span> Нажмите "Получить новый отчет" в главном меню
+            </div>
+            
+            <div class="step">
+                <span class="step-number">2.</span> Введите полный адрес недвижимости (улица, дом, город)
+            </div>
+            
+            <div class="step">
+                <span class="step-number">3.</span> Укажите количество спален в объекте
+            </div>
+            
+            <div class="step">
+                <span class="step-number">4.</span> Введите примерную цену объекта в долларах
+            </div>
+            
+            <div class="step">
+                <span class="step-number">5.</span> Дождитесь обработки данных (обычно 30-60 секунд)
+            </div>
+            
+            <div class="step">
+                <span class="step-number">6.</span> Изучите подробный отчет с анализом рынка
+            </div>
+            
+            <h3>Что включает отчет?</h3>
+            <ul>
+                <li>📊 Анализ цен в районе</li>
+                <li>📈 Статистика рынка недвижимости</li>
+                <li>🏠 Сравнение с похожими объектами</li>
+                <li>🔮 Прогноз изменения цен</li>
+                <li>💡 Рекомендации по инвестициям</li>
+            </ul>
+            
+            <h3>Дополнительные возможности</h3>
+            <ul>
+                <li>💾 Сохранение отчетов для последующего просмотра</li>
+                <li>📱 Доступ к отчетам с любого устройства</li>
+                <li>📊 Статистика рынка по регионам</li>
+                <li>🔍 Поиск похожих объектов</li>
+            </ul>
+            
+            <h3>Советы для точного анализа</h3>
+            <ul>
+                <li>✅ Указывайте точный адрес</li>
+                <li>✅ Используйте актуальную цену</li>
+                <li>✅ Учитывайте все спальни</li>
+                <li>✅ Проверяйте сохраненные отчеты</li>
+            </ul>
+        </div>
+        
+        <div class="nav-buttons">
+            <button class="nav-btn back-btn" onclick="goBack()">← Назад</button>
+            <button class="nav-btn" onclick="goToMainMenu()">В главное меню</button>
+        </div>
+    </div>
+    <script>
+        function goToMainMenu() {
+            window.location.href = '/webapp';
+        }
+        function goBack() {
+            window.location.href = '/webapp_help';
+        }
+    </script>
+</body>
+</html> 

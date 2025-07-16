@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Техническая поддержка — Aaadviser</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f8f9fa; margin: 0; }
+        .container { max-width: 400px; margin: 40px auto; background: #fff; border-radius: 16px; box-shadow: 0 2px 12px rgba(102,126,234,0.10); padding: 32px 20px 24px 20px; text-align: center; }
+        .logo { width: 110px; height: auto; display: block; margin: 0 auto 18px auto; cursor: pointer; transition: transform 0.2s; }
+        .logo:hover { transform: scale(1.05); }
+        .title { font-size: 1.3em; font-weight: bold; margin-bottom: 18px; color: #333; }
+        .content { text-align: left; margin-bottom: 30px; }
+        .content h3 { color: #333; margin-bottom: 12px; font-size: 1.1em; }
+        .content p { color: #666; line-height: 1.6; margin-bottom: 16px; font-size: 14px; }
+        .content ul { color: #666; line-height: 1.6; margin-bottom: 16px; font-size: 14px; padding-left: 20px; }
+        .content li { margin-bottom: 8px; }
+        .support-card { background: #f8f9fa; padding: 20px; border-radius: 12px; margin-bottom: 20px; border: 2px solid #667eea; }
+        .support-title { font-weight: bold; color: #333; margin-bottom: 12px; font-size: 16px; }
+        .support-desc { color: #666; font-size: 14px; margin-bottom: 16px; }
+        .chat-btn { background: linear-gradient(135deg, #28a745 0%, #20c997 100%); color: #fff; border: none; border-radius: 10px; padding: 16px 24px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.2s; width: 100%; margin-bottom: 20px; }
+        .chat-btn:hover { background: linear-gradient(135deg, #20c997 0%, #28a745 100%); transform: translateY(-2px); }
+        .nav-buttons { display: flex; gap: 12px; }
+        .nav-btn { flex: 1; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; border: none; border-radius: 10px; padding: 14px 16px; font-size: 14px; font-weight: 500; cursor: pointer; transition: background 0.2s; }
+        .nav-btn:hover { background: linear-gradient(135deg, #764ba2 0%, #667eea 100%); }
+        .back-btn { background: linear-gradient(135deg, #6c757d 0%, #495057 100%) !important; }
+        .back-btn:hover { background: linear-gradient(135deg, #495057 0%, #6c757d 100%) !important; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img src="logo-flt.png" alt="Aaadviser" class="logo" onclick="goToMainMenu()">
+        <div class="title">Техническая поддержка</div>
+        
+        <div class="content">
+            <h3>Нужна помощь?</h3>
+            <p>Наша команда поддержки готова помочь вам с любыми вопросами по использованию Aaadviser.</p>
+            
+            <div class="support-card">
+                <div class="support-title">💬 Чат с поддержкой</div>
+                <div class="support-desc">Получите мгновенную помощь от наших специалистов через Telegram чат.</div>
+                <button class="chat-btn" onclick="openSupportChat()">
+                    💬 Написать в поддержку
+                </button>
+            </div>
+            
+            <h3>Часто задаваемые вопросы</h3>
+            <ul>
+                <li>❓ Как получить анализ недвижимости?</li>
+                <li>❓ Почему не работает поиск адреса?</li>
+                <li>❓ Как пополнить баланс?</li>
+                <li>❓ Где найти мои отчеты?</li>
+                <li>❓ Как изменить язык интерфейса?</li>
+            </ul>
+            
+            <h3>Время работы поддержки</h3>
+            <ul>
+                <li>🕐 Понедельник - Пятница: 9:00 - 18:00 (МСК)</li>
+                <li>🕐 Суббота: 10:00 - 16:00 (МСК)</li>
+                <li>🕐 Воскресенье: выходной</li>
+            </ul>
+            
+            <h3>Что мы можем помочь</h3>
+            <ul>
+                <li>✅ Настройка и использование приложения</li>
+                <li>✅ Технические проблемы</li>
+                <li>✅ Вопросы по оплате</li>
+                <li>✅ Ошибки в отчетах</li>
+                <li>✅ Предложения по улучшению</li>
+            </ul>
+            
+            <h3>Альтернативные способы связи</h3>
+            <ul>
+                <li>📧 Email: support@aaadviser.com</li>
+                <li>📱 Telegram: @Aaadviser_support</li>
+                <li>🌐 Сайт: www.aaadviser.com</li>
+            </ul>
+        </div>
+        
+        <div class="nav-buttons">
+            <button class="nav-btn back-btn" onclick="goBack()">← Назад</button>
+            <button class="nav-btn" onclick="goToMainMenu()">В главное меню</button>
+        </div>
+    </div>
+    <script>
+        function goToMainMenu() {
+            window.location.href = '/webapp';
+        }
+        function goBack() {
+            window.location.href = '/webapp_help';
+        }
+        function openSupportChat() {
+            // Здесь будет ссылка на чат с поддержкой
+            // Пока что показываем уведомление
+            alert('Ссылка на чат с поддержкой будет добавлена позже. Пожалуйста, используйте контакты, указанные ниже.');
+        }
+    </script>
+</body>
+</html> 
