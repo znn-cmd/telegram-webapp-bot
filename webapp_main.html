@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aaadviser - Главное меню</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 20px;
+            background: white;
+            min-height: 100vh;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px 0;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .logo:hover {
+            transform: scale(1.05);
+        }
+
+        .slogan {
+            font-size: 14px;
+            color: #666;
+            font-style: italic;
+        }
+
+        .user-info {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 18px;
+            margin: 20px 0;
+            text-align: center;
+            border-left: 4px solid #667eea;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .user-info:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102,126,234,0.15);
+        }
+
+        .user-name {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .user-balance {
+            font-size: 14px;
+            color: #666;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .balance-amount {
+            font-weight: bold;
+            color: #007bff;
+            padding: 4px 8px;
+            background: rgba(0,123,255,0.1);
+            border-radius: 6px;
+        }
+
+        .balance-low {
+            color: #dc3545;
+            background: rgba(220,53,69,0.1);
+        }
+
+        .menu-section {
+            margin: 30px 0;
+        }
+
+        .menu-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .menu-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            margin: 10px 0;
+            padding: 18px 20px;
+            width: 100%;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: left;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(102,126,234,0.15);
+        }
+
+        .menu-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(102,126,234,0.25);
+        }
+
+        .menu-btn:active {
+            transform: translateY(-1px);
+        }
+
+        .menu-btn-icon {
+            margin-right: 12px;
+            font-size: 20px;
+        }
+
+        .menu-btn-text {
+            font-weight: 500;
+        }
+
+        .menu-btn-description {
+            font-size: 12px;
+            opacity: 0.9;
+            margin-top: 4px;
+            display: block;
+        }
+
+        .language-selector {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 18px;
+            margin: 20px 0;
+            transition: all 0.3s ease;
+        }
+
+        .language-title {
+            font-size: 14px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+
+        .language-buttons {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .lang-btn {
+            background: white;
+            color: #333;
+            border: 1px solid #ddd;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .lang-btn.selected {
+            background: #007bff;
+            color: white;
+            border-color: #007bff;
+            box-shadow: 0 2px 8px rgba(0,123,255,0.3);
+        }
+
+        .lang-btn:hover {
+            background: #f0f0f0;
+            transform: translateY(-1px);
+        }
+
+        .lang-btn.selected:hover {
+            background: #0056b3;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Skeleton loading */
+        .skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+            border-radius: 8px;
+        }
+
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        .skeleton-user {
+            height: 60px;
+            margin: 20px 0;
+        }
+
+        .skeleton-menu {
+            height: 70px;
+            margin: 10px 0;
+        }
+
+        /* Toast notifications */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            max-width: 300px;
+        }
+
+        .toast {
+            background: white;
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-bottom: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            border-left: 4px solid #28a745;
+            animation: slideIn 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toast.error {
+            border-left-color: #dc3545;
+        }
+
+        .toast.warning {
+            border-left-color: #ffc107;
+        }
+
+        .toast.info {
+            border-left-color: #17a2b8;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .toast-icon {
+            font-size: 16px;
+        }
+
+        .toast-message {
+            flex: 1;
+            font-size: 14px;
+        }
+
+        .toast-close {
+            background: none;
+            border: none;
+            color: #666;
+            cursor: pointer;
+            font-size: 16px;
+            padding: 0;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #666;
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        .empty-state-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        .empty-state-description {
+            font-size: 14px;
+            margin-bottom: 20px;
+            line-height: 1.4;
+        }
+
+        /* Floating action button */
+        .fab {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(102,126,234,0.3);
+            transition: all 0.3s ease;
+            z-index: 100;
+        }
+
+        .fab:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(102,126,234,0.4);
+        }
+
+        /* Responsive improvements */
+        @media (max-width: 480px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .menu-btn {
+                padding: 16px 18px;
+                font-size: 15px;
+            }
+            
+            .user-info {
+                padding: 16px;
+            }
+        }
+
+        /* Accessibility improvements */
+        .menu-btn:focus,
+        .lang-btn:focus,
+        .fab:focus {
+            outline: 2px solid #667eea;
+            outline-offset: 2px;
+        }
+
+        /* Smooth transitions */
+        .fade-in {
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Логотип -->
+        <div style="display:flex;flex-direction:column;align-items:center;margin-top:18px;margin-bottom:10px;">
+            <img src="logo-sqv.png" alt="Aaadviser Logo" style="width:110px;height:auto;display:block;margin-bottom:8px;cursor:pointer;" onclick="goToMainMenu()" />
+            <div style="font-size:15px;color:#888;font-style:italic;" id="slogan">Инсайты рынка недвижимости</div>
+        </div>
+
+        <!-- Skeleton loading for user info -->
+        <div class="skeleton skeleton-user" id="userSkeleton"></div>
+        <!-- Информация о пользователе -->
+        <div class="user-info hidden" id="userInfo">
+            <div class="user-name" id="userName">Загрузка...</div>
+            <div class="user-balance" style="margin-top: 10px;">
+                <span>Баланс:</span>
+                <span class="balance-amount" id="userBalance">$0</span>
+            </div>
+        </div>
+
+        <!-- Выбор языка -->
+        <div class="language-selector hidden" id="languageSelector">
+            <div class="language-title" id="languageTitle">Выберите язык</div>
+            <div class="language-buttons">
+                <button class="lang-btn selected" data-lang="ru" onclick="selectLanguage('ru')">🇷🇺 Русский</button>
+                <button class="lang-btn" data-lang="en" onclick="selectLanguage('en')">🇺🇸 English</button>
+                <button class="lang-btn" data-lang="de" onclick="selectLanguage('de')">🇩🇪 Deutsch</button>
+                <button class="lang-btn" data-lang="fr" onclick="selectLanguage('fr')">🇫🇷 Français</button>
+                <button class="lang-btn" data-lang="tr" onclick="selectLanguage('tr')">🇹🇷 Türkçe</button>
+            </div>
+            <button class="menu-btn" id="confirmLangBtn" style="margin-top:15px;width:100%;" onclick="confirmLanguage()">Подтвердить</button>
+        </div>
+
+        <!-- Skeleton loading for menu -->
+        <div id="menuSkeleton">
+            <div class="skeleton skeleton-menu"></div>
+            <div class="skeleton skeleton-menu"></div>
+            <div class="skeleton skeleton-menu"></div>
+            <div class="skeleton skeleton-menu"></div>
+        </div>
+
+        <!-- Главное меню -->
+        <div class="menu-section hidden" id="menuSection">
+            <div class="menu-title" id="menuTitle">Главное меню</div>
+            
+            <button class="menu-btn fade-in" onclick="startNewReport()">
+                <span class="menu-btn-icon">📊</span>
+                <span class="menu-btn-text" id="newReportBtn">Получить новый отчет</span>
+                <span class="menu-btn-description" id="newReportDesc">Анализ недвижимости по адресу</span>
+            </button>
+
+            <button class="menu-btn fade-in" onclick="showMarketStats()">
+                <span class="menu-btn-icon">📈</span>
+                <span class="menu-btn-text" id="marketStatsBtn">Статистика рынка</span>
+                <span class="menu-btn-description" id="marketStatsDesc">Анализ трендов и цен</span>
+            </button>
+
+            <button class="menu-btn fade-in" onclick="showSavedReports()">
+                <span class="menu-btn-icon">💾</span>
+                <span class="menu-btn-text" id="savedReportsBtn">Мои сохраненные отчеты</span>
+                <span class="menu-btn-description" id="savedReportsDesc">История ваших запросов</span>
+            </button>
+
+            <button class="menu-btn fade-in" onclick="showProfile()">
+                <span class="menu-btn-icon">👤</span>
+                <span class="menu-btn-text" id="profileBtn">Личный кабинет</span>
+                <span class="menu-btn-description" id="profileDesc">Настройки и баланс</span>
+            </button>
+
+            <!-- Кнопка Помощь -->
+            <button class="menu-btn fade-in" onclick="showHelp()">
+                <span class="menu-btn-icon">❓</span>
+                <span class="menu-btn-text">Помощь</span>
+                <span class="menu-btn-description">Ответы на вопросы и поддержка</span>
+            </button>
+        </div>
+
+        <!-- Загрузка -->
+        <div id="loading" class="loading hidden">
+            <div class="spinner"></div>
+            <p id="loadingText">Загрузка...</p>
+        </div>
+    </div>
+
+    <!-- Toast container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script>
+        let tg = window.Telegram.WebApp;
+        tg.expand();
+        tg.ready();
+
+        let userData = null;
+        let currentLanguage = 'ru';
+        let selectedLanguage = currentLanguage;
+
+        // Получаем данные пользователя
+        function getUserData() {
+            let tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
+            if (tg && tg.initDataUnsafe && tg.initDataUnsafe.user) {
+                return tg.initDataUnsafe.user;
+            }
+            // Fallback: localStorage
+            try {
+                const stored = localStorage.getItem('aaadviser_user');
+                if (stored) return JSON.parse(stored);
+            } catch (e) {}
+            return null;
+        }
+
+        userData = getUserData();
+        if (userData && userData.id) {
+            localStorage.setItem('telegram_id', userData.id);
+        }
+        currentLanguage = (userData && userData.language_code) ? userData.language_code : 'ru';
+        selectedLanguage = currentLanguage;
+
+        // Toast notification system
+        function showToast(message, type = 'success', duration = 3000) {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            
+            const icons = {
+                success: '✅',
+                error: '❌',
+                warning: '⚠️',
+                info: 'ℹ️'
+            };
+            
+            toast.innerHTML = `
+                <span class="toast-icon">${icons[type]}</span>
+                <span class="toast-message">${message}</span>
+                <button class="toast-close" onclick="this.parentElement.remove()">×</button>
+            `;
+            
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                if (toast.parentElement) {
+                    toast.style.animation = 'slideOut 0.3s ease';
+                    setTimeout(() => toast.remove(), 300);
+                }
+            }, duration);
+        }
+
+        // Локализации
+        const locales = {
+            'ru': {
+                'slogan': 'Инсайты рынка недвижимости',
+                'loading': 'Загрузка...',
+                'balance': 'Баланс: ',
+                'languageTitle': 'Выберите язык',
+                'menuTitle': 'Главное меню',
+                'newReportBtn': 'Получить новый отчет',
+                'newReportDesc': 'Анализ недвижимости по адресу',
+                'marketStatsBtn': 'Статистика рынка',
+                'marketStatsDesc': 'Анализ трендов и цен',
+                'savedReportsBtn': 'Мои сохраненные отчеты',
+                'savedReportsDesc': 'История ваших запросов',
+                'profileBtn': 'Личный кабинет',
+                'profileDesc': 'Настройки и баланс',
+                'welcome_new': 'Добро пожаловать в Aaadvisor',
+                'welcome_back': 'С возвращением!',
+                'error_loading': 'Ошибка загрузки данных',
+                'error_network': 'Ошибка сети. Проверьте соединение.',
+                'success_language': 'Язык успешно изменен',
+                'success_welcome': 'Добро пожаловать!'
+            },
+            'en': {
+                'slogan': 'Real Estate Market Insights',
+                'loading': 'Loading...',
+                'balance': 'Balance: ',
+                'languageTitle': 'Select language',
+                'menuTitle': 'Main menu',
+                'newReportBtn': 'Get new report',
+                'newReportDesc': 'Property analysis by address',
+                'marketStatsBtn': 'Market statistics',
+                'marketStatsDesc': 'Trend and price analysis',
+                'savedReportsBtn': 'My saved reports',
+                'savedReportsDesc': 'Your analysis history',
+                'profileBtn': 'Profile',
+                'profileDesc': 'Settings and balance',
+                'welcome_new': 'Welcome to Aaadvisor',
+                'welcome_back': 'Welcome back!',
+                'error_loading': 'Error loading data',
+                'error_network': 'Network error. Check your connection.',
+                'success_language': 'Language changed successfully',
+                'success_welcome': 'Welcome!'
+            },
+            'de': {
+                'slogan': 'Immobilienmarkt-Einblicke',
+                'loading': 'Laden...',
+                'balance': 'Kontostand: ',
+                'languageTitle': 'Sprache auswählen',
+                'menuTitle': 'Hauptmenü',
+                'newReportBtn': 'Neuen Bericht erstellen',
+                'newReportDesc': 'Immobilienanalyse nach Adresse',
+                'marketStatsBtn': 'Marktstatistiken',
+                'marketStatsDesc': 'Trend- und Preisanalyse',
+                'savedReportsBtn': 'Meine gespeicherten Berichte',
+                'savedReportsDesc': 'Ihre Analysehistorie',
+                'profileBtn': 'Profil',
+                'profileDesc': 'Einstellungen und Kontostand',
+                'welcome_new': 'Willkommen bei Aaadvisor',
+                'welcome_back': 'Willkommen zurück!',
+                'error_loading': 'Fehler beim Laden der Daten',
+                'error_network': 'Netzwerkfehler. Überprüfen Sie Ihre Verbindung.',
+                'success_language': 'Sprache erfolgreich geändert',
+                'success_welcome': 'Willkommen!'
+            },
+            'fr': {
+                'slogan': 'Aperçus du marché immobilier',
+                'loading': 'Chargement...',
+                'balance': 'Solde: ',
+                'languageTitle': 'Sélectionner la langue',
+                'menuTitle': 'Menu principal',
+                'newReportBtn': 'Obtenir un nouveau rapport',
+                'newReportDesc': 'Analyse immobilière par adresse',
+                'marketStatsBtn': 'Statistiques du marché',
+                'marketStatsDesc': 'Analyse des tendances et prix',
+                'savedReportsBtn': 'Mes rapports enregistrés',
+                'savedReportsDesc': 'Historique de vos analyses',
+                'profileBtn': 'Profil',
+                'profileDesc': 'Paramètres et solde',
+                'welcome_new': 'Bienvenue sur Aaadvisor',
+                'welcome_back': 'Bon retour!',
+                'error_loading': 'Erreur de chargement des données',
+                'error_network': 'Erreur réseau. Vérifiez votre connexion.',
+                'success_language': 'Langue changée avec succès',
+                'success_welcome': 'Bienvenue!'
+            },
+            'tr': {
+                'slogan': 'Gayrimenkul Piyasası İçgörüleri',
+                'loading': 'Yükleniyor...',
+                'balance': 'Bakiye: ',
+                'languageTitle': 'Dil seçin',
+                'menuTitle': 'Ana menü',
+                'newReportBtn': 'Yeni rapor al',
+                'newReportDesc': 'Adrese göre mülk analizi',
+                'marketStatsBtn': 'Piyasa istatistikleri',
+                'marketStatsDesc': 'Trend ve fiyat analizi',
+                'savedReportsBtn': 'Kayıtlı raporlarım',
+                'savedReportsDesc': 'Analiz geçmişiniz',
+                'profileBtn': 'Profil',
+                'profileDesc': 'Ayarlar ve bakiye',
+                'welcome_new': 'Aaadvisor\'a hoş geldiniz',
+                'welcome_back': 'Tekrar hoş geldiniz!',
+                'error_loading': 'Veri yükleme hatası',
+                'error_network': 'Ağ hatası. Bağlantınızı kontrol edin.',
+                'success_language': 'Dil başarıyla değiştirildi',
+                'success_welcome': 'Hoş geldiniz!'
+            }
+        };
+
+        // Функция для получения локализованного текста
+        function getText(key) {
+            const locale = locales[currentLanguage] || locales['ru'];
+            return locale[key] || key;
+        }
+
+        // Обновление текста на странице
+        function updatePageText() {
+            document.getElementById('slogan').textContent = getText('slogan');
+            document.getElementById('languageTitle').textContent = getText('languageTitle');
+            document.getElementById('menuTitle').textContent = getText('menuTitle');
+            document.getElementById('newReportBtn').textContent = getText('newReportBtn');
+            document.getElementById('newReportDesc').textContent = getText('newReportDesc');
+            document.getElementById('marketStatsBtn').textContent = getText('marketStatsBtn');
+            document.getElementById('marketStatsDesc').textContent = getText('marketStatsDesc');
+            document.getElementById('savedReportsBtn').textContent = getText('savedReportsBtn');
+            document.getElementById('savedReportsDesc').textContent = getText('savedReportsDesc');
+            document.getElementById('profileBtn').textContent = getText('profileBtn');
+            document.getElementById('profileDesc').textContent = getText('profileDesc');
+            document.getElementById('loadingText').textContent = getText('loading');
+        }
+
+        // Установка языка
+        function selectLanguage(lang) {
+            selectedLanguage = lang;
+            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('selected'));
+            document.querySelector(`[data-lang="${lang}"]`).classList.add('selected');
+        }
+
+        // Подтверждение выбора языка
+        async function confirmLanguage() {
+            try {
+                currentLanguage = selectedLanguage;
+                updatePageText();
+                
+                // Сохраняем выбор языка в базу
+                if (userData) {
+                    const response = await fetch('/api/set_language', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            telegram_id: userData.id,
+                            language: currentLanguage
+                        })
+                    });
+                    
+                    if (response.ok) {
+                        showToast(getText('success_language'), 'success');
+                    } else {
+                        showToast(getText('error_loading'), 'error');
+                    }
+                }
+                
+                // Скрываем блок выбора языка
+                document.getElementById('languageSelector').classList.add('hidden');
+                
+            } catch (error) {
+                showToast(getText('error_network'), 'error');
+            }
+        }
+
+        // Загрузка данных пользователя и баланса
+        async function loadUserData() {
+            document.getElementById('userSkeleton').classList.remove('hidden');
+            document.getElementById('userInfo').classList.add('hidden');
+
+            if (!userData) {
+                document.getElementById('userName').textContent = 'Гость';
+                document.getElementById('userSkeleton').classList.add('hidden');
+                document.getElementById('userInfo').classList.remove('hidden');
+                showToast('Пользователь не определён. Откройте WebApp из Telegram.', 'error', 6000);
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/user', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        telegram_id: userData.id,
+                        username: userData.username,
+                        tg_name: userData.tg_name,
+                        last_name: userData.last_name,
+                        language_code: userData.language_code || currentLanguage
+                    })
+                });
+
+                if (response.ok) {
+                    const userInfo = await response.json();
+
+                    // Скрыть выбор языка, если уже выбран
+                    if (userInfo.language) {
+                        document.getElementById('languageSelector').classList.add('hidden');
+                    } else {
+                        document.getElementById('languageSelector').classList.remove('hidden');
+                    }
+
+                    // Приветствие
+                    const welcomeMessage = userInfo.welcome || userInfo.tg_name || 'Пользователь';
+                    document.getElementById('userName').textContent = welcomeMessage;
+
+                    // Баланс с цветовой индикацией
+                    const balanceElement = document.getElementById('userBalance');
+                    balanceElement.textContent = `$${userInfo.balance}`;
+                    if (userInfo.balance < 5) {
+                        balanceElement.classList.add('balance-low');
+                    } else {
+                        balanceElement.classList.remove('balance-low');
+                    }
+
+                    // Показываем приветственное сообщение только для новых пользователей
+                    if (userInfo.is_new_user) {
+                        showToast(getText('success_welcome'), 'success');
+                    }
+                } else {
+                    const err = await response.json();
+                    throw new Error(err.error || 'Failed to load user data');
+                }
+            } catch (error) {
+                document.getElementById('userName').textContent = userData.tg_name || 'Пользователь';
+                showToast(getText('error_loading') + ': ' + (error.message || ''), 'error', 6000);
+            } finally {
+                document.getElementById('userSkeleton').classList.add('hidden');
+                document.getElementById('userInfo').classList.remove('hidden');
+            }
+        }
+
+        // Показ меню с анимацией
+        function showMenu() {
+            document.getElementById('menuSkeleton').classList.add('hidden');
+            document.getElementById('menuSection').classList.remove('hidden');
+            
+            // Анимация появления кнопок
+            const buttons = document.querySelectorAll('.menu-btn');
+            buttons.forEach((btn, index) => {
+                setTimeout(() => {
+                    btn.style.opacity = '0';
+                    btn.style.transform = 'translateY(20px)';
+                    btn.style.transition = 'all 0.3s ease';
+                    
+                    setTimeout(() => {
+                        btn.style.opacity = '1';
+                        btn.style.transform = 'translateY(0)';
+                    }, 50);
+                }, index * 100);
+            });
+        }
+
+        // Функции меню
+        function startNewReport() {
+            showLoading();
+            showToast('Переход к созданию отчета...', 'info');
+            // Переходим к странице создания отчета
+            window.location.href = '/webapp_report';
+        }
+
+        function showMarketStats() {
+            window.location.href = '/webapp_stats';
+        }
+
+        function showSavedReports() {
+            if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe && window.Telegram.WebApp.initDataUnsafe.user) {
+                localStorage.setItem('aaadviser_user', JSON.stringify(window.Telegram.WebApp.initDataUnsafe.user));
+            }
+            showLoading();
+            showToast('Загрузка ваших отчетов...', 'info');
+            window.location.href = '/webapp_saved';
+        }
+
+        function showProfile() {
+            window.location.href = '/webapp_profile';
+        }
+
+        function showHelp() {
+            window.location.href = '/webapp_help';
+        }
+
+        function goToMainMenu() {
+            // Просто перезагружаем страницу для возврата в главное меню
+            window.location.reload();
+        }
+
+        function showLoading() {
+            document.getElementById('loading').classList.remove('hidden');
+        }
+
+        // Инициализация
+        async function init() {
+            updatePageText();
+            await loadUserData();
+            
+            // Показываем меню с задержкой для плавности
+            setTimeout(() => {
+                showMenu();
+            }, 500);
+        }
+
+        // Запускаем инициализацию
+        init();
+    </script>
+</body>
+</html> 
