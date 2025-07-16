@@ -641,7 +641,7 @@
                 if (data.success && data.reports) {
                     const report = data.reports.find(r => r.id == id);
                     if (report && report.report_type === 'full') {
-                        showFullReportModal(report.full_report);
+                        showFullReportModal(report.full_report, report.id);
                         showToast('Отчет загружен', 'success');
                     } else {
                         showToast('Детальный просмотр доступен только для полного отчета', 'warning');
@@ -654,7 +654,7 @@
         }
 
         // Модалка для полного отчёта
-        function showFullReportModal(report) {
+        function showFullReportModal(report, reportId) {
             let oldModal = document.getElementById('full-report-modal');
             if (oldModal) oldModal.remove();
             
@@ -665,7 +665,7 @@
                 <div style="background:#fff;border-radius:18px;box-shadow:0 4px 24px rgba(102,126,234,0.18);padding:32px 18px 24px 18px;max-width:420px;width:96vw;text-align:left;max-height:90vh;overflow-y:auto;">
                     <div id="fullReportContent"></div>
                     <div style='display:flex;gap:10px;margin-top:18px;'>
-                        <button class="btn" onclick="exportPdfFlow()">Скачать PDF</button>
+                        <button class="btn" onclick="downloadPdf(window._currentReportId)">Скачать PDF</button>
                         <button class="btn back-btn" style="background:#f1f1f1;color:#333;" onclick="saveAndExitFullReport()">Сохранить и выйти</button>
                     </div>
                     <button class="btn back-btn" style="margin-top:18px;" onclick="closeFullReportModal()">Закрыть</button>
@@ -674,6 +674,7 @@
             document.body.appendChild(modal);
             showFullReport(report, 'fullReportContent');
             window._currentFullReport = report; // для экспорта/отправки
+            window._currentReportId = reportId; // сохраняем ID отчета для скачивания
         }
         
         function closeFullReportModal() {
