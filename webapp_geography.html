@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Наша география — Aaadviser</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body { background: #f8f9fa; margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+        .container { max-width: 420px; margin: 40px auto; background: #fff; border-radius: 16px; box-shadow: 0 2px 12px rgba(102,126,234,0.10); padding: 32px 20px 24px 20px; }
+        .geo-title { font-size: 1.3em; font-weight: bold; margin-bottom: 18px; color: #333; text-align: center; }
+        .geo-list { margin: 0; padding: 0; list-style: none; }
+        .geo-list li { padding: 8px 0; border-bottom: 1px solid #eee; color: #444; font-size: 1.08em; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="geo-title">Наша география</div>
+        <div style="color:#555; margin-bottom:12px; text-align:center;">Aaadviser предоставляет аналитику по недвижимости в следующих странах:</div>
+        <ul class="geo-list" id="geoList">
+            <!-- Список стран будет подгружаться динамически -->
+        </ul>
+        <button class="help-btn" onclick="location.href='/webapp_help'">Назад</button>
+    </div>
+    <script>
+        // Пример динамической подгрузки стран (можно заменить на API)
+        const countries = [
+            'Турция', 'Германия', 'Франция', 'Испания', 'Италия', 'ОАЭ', 'Кипр', 'Греция', 'Португалия', 'США'
+        ];
+        const geoList = document.getElementById('geoList');
+        countries.forEach(country => {
+            const li = document.createElement('li');
+            li.textContent = country;
+            geoList.appendChild(li);
+        });
+    </script>
+</body>
+</html> 

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Техническая поддержка — Aaadviser</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body { background: #f8f9fa; margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+        .container { max-width: 420px; margin: 40px auto; background: #fff; border-radius: 16px; box-shadow: 0 2px 12px rgba(102,126,234,0.10); padding: 32px 20px 24px 20px; }
+        .support-title { font-size: 1.3em; font-weight: bold; margin-bottom: 18px; color: #333; text-align: center; }
+        .support-form { display: flex; flex-direction: column; gap: 14px; }
+        .support-textarea { width: 100%; min-height: 90px; border-radius: 10px; border: 1px solid #ddd; padding: 12px; font-size: 1.1em; resize: vertical; }
+        .support-file { border: none; }
+        .support-btn { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; border: none; border-radius: 12px; padding: 14px 0; font-size: 16px; font-weight: 500; cursor: pointer; width: 100%; margin-top: 8px; transition: all 0.2s; box-shadow: 0 2px 8px rgba(102,126,234,0.15); }
+        .support-btn:hover { background: linear-gradient(135deg, #764ba2 0%, #667eea 100%); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="support-title">Техническая поддержка</div>
+        <form class="support-form" enctype="multipart/form-data" onsubmit="event.preventDefault(); showSupportStub();">
+            <textarea class="support-textarea" id="supportMsg" placeholder="Опишите вашу проблему или вопрос..." required></textarea>
+            <input class="support-file" type="file" id="supportFile" accept="image/*,.pdf,.doc,.docx,.txt" />
+            <button class="support-btn" type="submit">Отправить</button>
+        </form>
+        <div id="supportStub" style="display:none; color:#28a745; margin-top:16px; font-weight:bold; text-align:center;">Ваше обращение отправлено! Мы свяжемся с вами в ближайшее время.</div>
+        <button class="help-btn" onclick="location.href='/webapp_help'">Назад</button>
+    </div>
+    <script>
+        function showSupportStub() {
+            document.getElementById('supportStub').style.display = '';
+            document.getElementById('supportMsg').value = '';
+            document.getElementById('supportFile').value = '';
+            setTimeout(() => {
+                document.getElementById('supportStub').style.display = 'none';
+            }, 4000);
+        }
+    </script>
+</body>
+</html> 

@@ -1819,5 +1819,25 @@ def webapp_admin_publication():
     with open('webapp_admin_publication.html', 'r', encoding='utf-8') as f:
         return f.read()
 
+@app.route('/webapp_about')
+def webapp_about():
+    with open('webapp_about.html', 'r', encoding='utf-8') as f:
+        return f.read()
+
+@app.route('/webapp_instruction')
+def webapp_instruction():
+    with open('webapp_instruction.html', 'r', encoding='utf-8') as f:
+        return f.read()
+
+@app.route('/webapp_geography')
+def webapp_geography():
+    with open('webapp_geography.html', 'r', encoding='utf-8') as f:
+        return f.read()
+
+@app.route('/webapp_support')
+def webapp_support():
+    with open('webapp_support.html', 'r', encoding='utf-8') as f:
+        return f.read()
+
 if __name__ == '__main__':
     run_flask()
