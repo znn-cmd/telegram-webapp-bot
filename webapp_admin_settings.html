@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Настройки — Aaadviser Admin</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body { background: #f8f9fa; margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+        .container { max-width: 420px; margin: 40px auto; background: #fff; border-radius: 16px; box-shadow: 0 2px 12px rgba(102,126,234,0.10); padding: 32px 20px 24px 20px; text-align: center; }
+        .admin-title { font-size: 1.3em; font-weight: bold; margin-bottom: 18px; color: #333; }
+        .settings-form { margin-bottom: 18px; }
+        .settings-input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #ddd; font-size: 1em; margin-bottom: 10px; }
+        .settings-btn { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; border: none; border-radius: 10px; padding: 14px 0; font-size: 1em; font-weight: 500; cursor: pointer; width: 100%; margin-bottom: 10px; transition: all 0.2s; box-shadow: 0 2px 8px rgba(102,126,234,0.15); }
+        .settings-btn:hover { background: linear-gradient(135deg, #764ba2 0%, #667eea 100%); }
+        .settings-list { background: #f8f9fa; border-radius: 10px; padding: 14px 12px; margin-bottom: 18px; color: #333; font-size: 1em; text-align: left; }
+        .nav-btn-row { display: flex; gap: 10px; margin-top: 18px; }
+        .nav-btn { flex: 1; padding: 14px 0; border: none; border-radius: 10px; font-size: 1em; font-weight: 500; cursor: pointer; background: #f1f1f1; color: #333; transition: background 0.2s; }
+        .nav-btn:hover { background: #e2e2e2; }
+        .nav-btn-main { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; }
+        .nav-btn-main:hover { background: linear-gradient(135deg, #764ba2 0%, #667eea 100%); }
+        .toast-container { position: fixed; top: 20px; right: 20px; z-index: 1000; }
+        .toast { background: #fff; border-radius: 8px; padding: 12px 18px; margin-bottom: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.12); border-left: 4px solid #28a745; display: flex; align-items: center; gap: 8px; animation: fadeIn 0.4s; }
+        .toast.error { border-left-color: #dc3545; }
+        .toast.info { border-left-color: #007bff; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px);} to { opacity: 1; transform: translateY(0);} }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="admin-title">Настройки API-ключей</div>
+        <form class="settings-form" onsubmit="addApiKey(event)">
+            <input class="settings-input" id="keyName" placeholder="Имя ключа (key_name)" required />
+            <input class="settings-input" id="keyValue" placeholder="Значение ключа (key_value)" required />
+            <button class="settings-btn" type="submit">Добавить ключ</button>
+        </form>
+        <div class="settings-list" id="keysList">Загрузка...</div>
+        <div class="nav-btn-row">
+            <button class="nav-btn" onclick="goBack()">Назад</button>
+            <button class="nav-btn nav-btn-main" onclick="goToMainMenu()">В главное меню</button>
+        </div>
+    </div>
+    <div id="toastContainer" class="toast-container"></div>
+    <script>
+        function goBack() { window.history.back(); }
+        function goToMainMenu() { window.location.href = '/webapp'; }
+        function showToast(message, type = 'success', duration = 2500) {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `<span>${type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️'}</span> <span>${message}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => { toast.remove(); }, duration);
+        }
+        function addApiKey(e) {
+            e.preventDefault();
+            const name = document.getElementById('keyName').value.trim();
+            const value = document.getElementById('keyValue').value.trim();
+            if (!name || !value) return;
+            fetch('/api/admin_add_apikey', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ key_name: name, key_value: value })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('keyName').value = '';
+                    document.getElementById('keyValue').value = '';
+                    loadKeys();
+                    showToast('Ключ успешно добавлен!', 'success');
+                } else {
+                    alert('Ошибка: ' + (data.error || 'Не удалось добавить ключ.'));
+                    showToast('Ошибка: ' + (data.error || 'Не удалось добавить ключ.'), 'error');
+                }
+            })
+            .catch(() => { alert('Ошибка сети.'); showToast('Ошибка сети', 'error'); });
+        }
+        function loadKeys() {
+            fetch('/api/admin_list_apikeys')
+                .then(res => res.json())
+                .then(data => {
+                    if (!data || !Array.isArray(data.keys)) {
+                        document.getElementById('keysList').innerHTML = 'Ошибка загрузки ключей.';
+                        showToast('Ошибка загрузки ключей', 'error');
+                        return;
+                    }
+                    if (data.keys.length === 0) {
+                        document.getElementById('keysList').innerHTML = 'Нет новых ключей.';
+                        showToast('Нет новых ключей', 'info');
+                        return;
+                    }
+                    document.getElementById('keysList').innerHTML = data.keys.map(k => `<b>${k.key_name}</b>: <span style='color:#555;'>${k.key_value}</span>`).join('<br>');
+                })
+                .catch(() => { document.getElementById('keysList').innerHTML = 'Ошибка сети.'; showToast('Ошибка сети', 'error'); });
+        }
+        document.addEventListener('DOMContentLoaded', loadKeys);
+    </script>
+</body>
+</html> 

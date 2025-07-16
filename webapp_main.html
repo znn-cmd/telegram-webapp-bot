@@ -473,6 +473,13 @@
                 <span class="menu-btn-description" id="profileDesc">Настройки и баланс</span>
             </button>
 
+            <!-- Кнопка Админ-панель (отображается только для admin) -->
+            <button class="menu-btn fade-in" id="adminPanelBtn" style="display:none;background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);color:#222;" onclick="showAdminPanel()">
+                <span class="menu-btn-icon">🛠️</span>
+                <span class="menu-btn-text">Админ-панель</span>
+                <span class="menu-btn-description">Управление и статистика</span>
+            </button>
+
             <!-- Кнопка Помощь -->
             <button class="menu-btn fade-in" onclick="showHelp()">
                 <span class="menu-btn-icon">❓</span>
@@ -749,6 +756,13 @@
                 if (response.ok) {
                     const userInfo = await response.json();
 
+                    // Показываем кнопку админ-панели только если user_status === 'admin'
+                    if (userInfo.user_status === 'admin') {
+                        document.getElementById('adminPanelBtn').style.display = '';
+                    } else {
+                        document.getElementById('adminPanelBtn').style.display = 'none';
+                    }
+
                     // Скрыть выбор языка, если уже выбран
                     if (userInfo.language) {
                         document.getElementById('languageSelector').classList.add('hidden');
@@ -843,6 +857,11 @@
 
         function showLoading() {
             document.getElementById('loading').classList.remove('hidden');
+        }
+
+        // Функция перехода в админ-панель
+        function showAdminPanel() {
+            window.location.href = '/webapp_admin';
         }
 
         // Инициализация

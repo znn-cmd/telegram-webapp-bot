@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Пользователи — Aaadviser Admin</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body { background: #f8f9fa; margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+        .container { max-width: 420px; margin: 40px auto; background: #fff; border-radius: 16px; box-shadow: 0 2px 12px rgba(102,126,234,0.10); padding: 32px 20px 24px 20px; text-align: center; }
+        .admin-title { font-size: 1.3em; font-weight: bold; margin-bottom: 18px; color: #333; }
+        .stats-block { background: #f8f9fa; border-radius: 12px; padding: 18px 16px; margin: 18px 0; text-align: left; box-shadow: 0 2px 8px rgba(102,126,234,0.07); }
+        .stats-title { font-size: 1.1em; font-weight: bold; color: #333; margin-bottom: 10px; }
+        .stats-list { font-size: 1em; color: #222; line-height: 1.7; }
+        .nav-btn-row { display: flex; gap: 10px; margin-top: 28px; }
+        .nav-btn { flex: 1; padding: 14px 0; border: none; border-radius: 10px; font-size: 1em; font-weight: 500; cursor: pointer; background: #f1f1f1; color: #333; transition: background 0.2s; }
+        .nav-btn:hover { background: #e2e2e2; }
+        .nav-btn-main { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; }
+        .nav-btn-main:hover { background: linear-gradient(135deg, #764ba2 0%, #667eea 100%); }
+        .loading { color: #888; margin: 30px 0; }
+        .toast-container { position: fixed; top: 20px; right: 20px; z-index: 1000; }
+        .toast { background: #fff; border-radius: 8px; padding: 12px 18px; margin-bottom: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.12); border-left: 4px solid #28a745; display: flex; align-items: center; gap: 8px; animation: fadeIn 0.4s; }
+        .toast.error { border-left-color: #dc3545; }
+        .toast.info { border-left-color: #007bff; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px);} to { opacity: 1; transform: translateY(0);} }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="admin-title">Статистика пользователей</div>
+        <div class="stats-block">
+            <div class="stats-title">Общая статистика</div>
+            <div class="stats-list" id="generalStats">
+                <div class="loading">Загрузка...</div>
+            </div>
+        </div>
+        <div class="stats-block">
+            <div class="stats-title">Отчёты пользователей</div>
+            <div class="stats-list" id="reportsStats">
+                <div class="loading">Загрузка...</div>
+            </div>
+        </div>
+        <div class="nav-btn-row">
+            <button class="nav-btn" onclick="goBack()">Назад</button>
+            <button class="nav-btn nav-btn-main" onclick="goToMainMenu()">В главное меню</button>
+        </div>
+    </div>
+    <div id="toastContainer" class="toast-container"></div>
+    <script>
+        function goBack() { window.history.back(); }
+        function goToMainMenu() { window.location.href = '/webapp'; }
+        function showToast(message, type = 'success', duration = 2500) {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `<span>${type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️'}</span> <span>${message}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => { toast.remove(); }, duration);
+        }
+        // Динамическая загрузка статистики
+        document.addEventListener('DOMContentLoaded', function() {
+            fetch('/api/admin_users_stats')
+                .then(res => res.json())
+                .then(data => {
+                    if (!data || data.error) {
+                        document.getElementById('generalStats').innerHTML = '<div class="loading">Ошибка загрузки статистики</div>';
+                        document.getElementById('reportsStats').innerHTML = '<div class="loading">Ошибка загрузки статистики</div>';
+                        showToast('Ошибка загрузки статистики', 'error');
+                        return;
+                    }
+                    showToast('Статистика успешно загружена!', 'success');
+                    document.getElementById('generalStats').innerHTML = `
+                        <b>Всего пользователей:</b> ${data.total_users}<br>
+                        <b>Новых за неделю:</b> ${data.new_users_week}<br>
+                        <b>Новых за месяц:</b> ${data.new_users_month}<br>
+                        <b>Новых за квартал:</b> ${data.new_users_quarter}<br>
+                        <b>Новых за год:</b> ${data.new_users_year}<br>
+                        <b>Общий баланс:</b> $${data.total_balance}<br>
+                        <b>Баланс с period_end < сегодня или null:</b> $${data.expired_balance}<br>
+                        <b>Баланс остальных пользователей:</b> $${data.active_balance}<br>
+                        <b>Админов:</b> ${data.admin_count}
+                    `;
+                    document.getElementById('reportsStats').innerHTML = `
+                        <b>Отчётов за неделю:</b> ${data.reports_week}<br>
+                        <b>Отчётов за месяц:</b> ${data.reports_month}<br>
+                        <b>Отчётов за квартал:</b> ${data.reports_quarter}<br>
+                        <b>Отчётов за год:</b> ${data.reports_year}<br>
+                        <b>Удалённых отчётов:</b> ${data.deleted_reports}<br>
+                        <b>Отчётов пользователей с period_end < сегодня или null:</b> ${data.expired_reports_count}<br>
+                        <b>Среднее отчётов на такого пользователя:</b> ${data.avg_expired_reports.toFixed(2)}<br>
+                        <b>Отчётов остальных пользователей:</b> ${data.active_reports_count}<br>
+                        <b>Потрачено денег (full):</b> $${data.active_reports_cost}
+                    `;
+                })
+                .catch(() => {
+                    document.getElementById('generalStats').innerHTML = '<div class="loading">Ошибка сети</div>';
+                    document.getElementById('reportsStats').innerHTML = '<div class="loading">Ошибка сети</div>';
+                    showToast('Ошибка сети', 'error');
+                });
+        });
+    </script>
+</body>
+</html> 

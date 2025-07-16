@@ -1,7 +1,7 @@
 import os
 import logging
 from flask import Flask, request, jsonify, send_file, send_from_directory
-from telegram import Update, WebAppInfo, KeyboardButton, ReplyKeyboardMarkup, Bot
+from telegram import Update, WebAppInfo, KeyboardButton, ReplyKeyboardMarkup, Bot, ParseMode
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
 from supabase import create_client, Client
 from dotenv import load_dotenv
@@ -13,6 +13,7 @@ import datetime
 from fpdf import FPDF
 import tempfile
 import os
+from dateutil.relativedelta import relativedelta
 
 # Загружаем переменные окружения
 load_dotenv()
@@ -189,7 +190,7 @@ def api_user():
     # Проверяем пользователя в базе
     user_result = supabase.table('users').select('*').eq('telegram_id', telegram_id).execute()
     user = user_result.data[0] if user_result.data else None
-    if user:
+    if user is not None:
         lang = user.get('language') or (language_code[:2] if language_code[:2] in locales else 'en')
         return jsonify({
             'exists': True,
@@ -204,6 +205,7 @@ def api_user():
             'username': user.get('username'),
             'balance': user.get('balance', 0),
             'telegram_id': user.get('telegram_id'),
+            'user_status': user.get('user_status', None),
         })
     else:
         # Новый пользователь
@@ -1529,6 +1531,165 @@ def api_send_saved_report_pdf():
     except Exception as e:
         logger.error(f"Error generating/sending PDF: {e}")
         return jsonify({'error': 'Internal error'}), 500
+
+@app.route('/api/admin_balance_100', methods=['POST'])
+def api_admin_balance_100():
+    data = request.json or {}
+    telegram_id_raw = data.get('telegram_id')
+    if telegram_id_raw is None:
+        return jsonify({'error': 'telegram_id required'}), 400
+    try:
+        telegram_id = int(telegram_id_raw)
+    except (TypeError, ValueError):
+        return jsonify({'error': 'Invalid telegram_id'}), 400
+    # Проверяем, что пользователь админ
+    user_result = supabase.table('users').select('*').eq('telegram_id', telegram_id).execute()
+    user = user_result.data[0] if user_result.data else None
+    if not user or user.get('user_status') != 'admin':
+        return jsonify({'error': 'not admin'}), 403
+    # Обновляем баланс
+    try:
+        supabase.table('users').update({'balance': 100}).eq('telegram_id', telegram_id).execute()
+        return jsonify({'success': True, 'balance': 100})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/admin_users_stats', methods=['GET'])
+def api_admin_users_stats():
+    import datetime
+    from dateutil.relativedelta import relativedelta
+    now = datetime.datetime.now()
+    today = now.date()
+    week_ago = today - datetime.timedelta(days=7)
+    month_ago = today - relativedelta(months=1)
+    quarter_ago = today - relativedelta(months=3)
+    year_ago = today - relativedelta(years=1)
+
+    # Получаем всех пользователей
+    users = supabase.table('users').select('*').execute().data or []
+    user_reports = supabase.table('user_reports').select('*').execute().data or []
+    tariffs = supabase.table('tariffs').select('*').execute().data or []
+
+    # Фильтры
+    non_admin_users = [u for u in users if u.get('user_status') != 'admin']
+    admin_users = [u for u in users if u.get('user_status') == 'admin']
+    def parse_date(val):
+        if not val: return None
+        try:
+            return datetime.datetime.strptime(val[:10], '%Y-%m-%d').date()
+        except Exception:
+            return None
+
+    # Новые пользователи
+    def count_new(users, since):
+        return sum(1 for u in users if parse_date(u.get('created_at')) and parse_date(u.get('created_at')) >= since)
+
+    # Балансы
+    total_balance = sum(u.get('balance', 0) or 0 for u in non_admin_users)
+    expired_users = [u for u in non_admin_users if (parse_date(u.get('period_end')) is None or parse_date(u.get('period_end')) < today) and u.get('period_end')]
+    active_users = [u for u in non_admin_users if not ((parse_date(u.get('period_end')) is None or parse_date(u.get('period_end')) < today) and u.get('period_end'))]
+    expired_balance = sum(u.get('balance', 0) or 0 for u in expired_users)
+    active_balance = total_balance - expired_balance
+
+    # Отчёты
+    def count_reports(since):
+        return sum(1 for r in user_reports if parse_date(r.get('created_at')) and parse_date(r.get('created_at')) >= since and not r.get('deleted_at'))
+    def count_deleted_reports():
+        return sum(1 for r in user_reports if r.get('deleted_at'))
+    def reports_by_users(users_list):
+        ids = set(u.get('telegram_id') for u in users_list)
+        return [r for r in user_reports if r.get('user_id') in ids]
+    expired_reports = reports_by_users(expired_users)
+    active_reports = reports_by_users(active_users)
+    avg_expired_reports = len(expired_reports) / len(expired_users) if expired_users else 0
+    # Стоимость full из tariffs
+    full_price = 0
+    for t in tariffs:
+        if t.get('name') == 'full':
+            full_price = t.get('price', 0)
+            break
+    active_reports_count = len(active_reports)
+    active_reports_cost = active_reports_count * full_price
+
+    return jsonify({
+        'total_users': len(non_admin_users),
+        'new_users_week': count_new(non_admin_users, week_ago),
+        'new_users_month': count_new(non_admin_users, month_ago),
+        'new_users_quarter': count_new(non_admin_users, quarter_ago),
+        'new_users_year': count_new(non_admin_users, year_ago),
+        'total_balance': total_balance,
+        'expired_balance': expired_balance,
+        'active_balance': active_balance,
+        'reports_week': count_reports(week_ago),
+        'reports_month': count_reports(month_ago),
+        'reports_quarter': count_reports(quarter_ago),
+        'reports_year': count_reports(year_ago),
+        'deleted_reports': count_deleted_reports(),
+        'expired_reports_count': len(expired_reports),
+        'avg_expired_reports': avg_expired_reports,
+        'active_reports_count': active_reports_count,
+        'active_reports_cost': active_reports_cost,
+        'admin_count': len(admin_users),
+    })
+
+@app.route('/api/admin_publication', methods=['POST'])
+def api_admin_publication():
+    data = request.json or {}
+    text = data.get('text', '').strip()
+    if not text:
+        return jsonify({'error': 'text required'}), 400
+    # Получаем всех пользователей
+    users = supabase.table('users').select('telegram_id, user_status').execute().data or []
+    bot_token = os.getenv('TELEGRAM_BOT_TOKEN')
+    if not bot_token:
+        return jsonify({'error': 'No bot token'}), 500
+    from telegram import Bot, ParseMode
+    bot = Bot(token=bot_token)
+    admin_count = 0
+    user_count = 0
+    total = 0
+    for u in users:
+        tid = u.get('telegram_id')
+        if not tid:
+            continue
+        try:
+            bot.send_message(chat_id=tid, text=text, parse_mode=ParseMode.HTML, disable_web_page_preview=True)
+            if u.get('user_status') == 'admin':
+                admin_count += 1
+            else:
+                user_count += 1
+            total += 1
+        except Exception as e:
+            continue
+    return jsonify({'success': True, 'total': total, 'users': user_count, 'admins': admin_count})
+
+@app.route('/api/admin_add_apikey', methods=['POST'])
+def api_admin_add_apikey():
+    data = request.json or {}
+    key_name = data.get('key_name', '').strip()
+    key_value = data.get('key_value', '').strip()
+    if not key_name or not key_value:
+        return jsonify({'error': 'key_name and key_value required'}), 400
+    # Не даём добавлять ключи, которые уже используются в приложении
+    used_keys = ['SUPABASE_URL', 'SUPABASE_ANON_KEY', 'TELEGRAM_BOT_TOKEN', 'GOOGLE_MAPS_API_KEY']
+    if key_name in used_keys:
+        return jsonify({'error': 'Этот ключ уже используется приложением'}), 400
+    # Проверяем, есть ли такой ключ
+    exists = supabase.table('api_keys').select('*').eq('key_name', key_name).execute().data
+    if exists:
+        return jsonify({'error': 'Ключ с таким именем уже существует'}), 400
+    try:
+        supabase.table('api_keys').insert({'key_name': key_name, 'key_value': key_value}).execute()
+        return jsonify({'success': True})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/admin_list_apikeys', methods=['GET'])
+def api_admin_list_apikeys():
+    used_keys = ['SUPABASE_URL', 'SUPABASE_ANON_KEY', 'TELEGRAM_BOT_TOKEN', 'GOOGLE_MAPS_API_KEY']
+    all_keys = supabase.table('api_keys').select('*').execute().data or []
+    new_keys = [k for k in all_keys if k.get('key_name') not in used_keys]
+    return jsonify({'keys': new_keys})
 
 # === Запуск Flask приложения ===
 def run_flask():

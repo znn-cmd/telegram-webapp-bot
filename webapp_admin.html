@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Админ-панель — Aaadviser</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body { background: #f8f9fa; margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+        .container { max-width: 400px; margin: 40px auto; background: #fff; border-radius: 16px; box-shadow: 0 2px 12px rgba(102,126,234,0.10); padding: 32px 20px 24px 20px; text-align: center; }
+        .admin-logo { width: 120px; margin: 0 auto 18px auto; display: block; }
+        .admin-title { font-size: 1.4em; font-weight: bold; margin-bottom: 18px; color: #333; }
+        .admin-btn { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; border: none; border-radius: 12px; padding: 18px 20px; font-size: 16px; font-weight: 500; cursor: pointer; margin: 12px 0 0 0; width: 100%; text-align: left; transition: all 0.2s; box-shadow: 0 2px 8px rgba(102,126,234,0.15); display: flex; align-items: center; gap: 12px; }
+        .admin-btn:hover { background: linear-gradient(135deg, #764ba2 0%, #667eea 100%); }
+        .admin-btn-icon { font-size: 20px; margin-right: 10px; }
+        .admin-btn-yellow { background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%) !important; color: #222 !important; }
+        .nav-btn-row { display: flex; gap: 10px; margin-top: 28px; }
+        .nav-btn { flex: 1; padding: 14px 0; border: none; border-radius: 10px; font-size: 1em; font-weight: 500; cursor: pointer; background: #f1f1f1; color: #333; transition: background 0.2s; }
+        .nav-btn:hover { background: #e2e2e2; }
+        .nav-btn-main { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; }
+        .nav-btn-main:hover { background: linear-gradient(135deg, #764ba2 0%, #667eea 100%); }
+        .toast-container { position: fixed; top: 20px; right: 20px; z-index: 1000; }
+        .toast { background: #fff; border-radius: 8px; padding: 12px 18px; margin-bottom: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.12); border-left: 4px solid #28a745; display: flex; align-items: center; gap: 8px; animation: fadeIn 0.4s; }
+        .toast.error { border-left-color: #dc3545; }
+        .toast.info { border-left-color: #007bff; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px);} to { opacity: 1; transform: translateY(0);} }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img src="logo-flt.png" alt="Aaadviser Logo" class="admin-logo" />
+        <div class="admin-title">Админ-панель</div>
+        <button class="admin-btn admin-btn-yellow" onclick="makeBalance100()">
+            <span class="admin-btn-icon">💰</span>
+            <span>Сделать баланс 100</span>
+        </button>
+        <button class="admin-btn" onclick="showUsersStats()">
+            <span class="admin-btn-icon">👥</span>
+            <span>Пользователи</span>
+        </button>
+        <button class="admin-btn" onclick="showPublication()">
+            <span class="admin-btn-icon">📢</span>
+            <span>Публикация</span>
+        </button>
+        <button class="admin-btn" onclick="showSettings()">
+            <span class="admin-btn-icon">⚙️</span>
+            <span>Настройки</span>
+        </button>
+        <div class="nav-btn-row">
+            <button class="nav-btn" onclick="goBack()">Назад</button>
+            <button class="nav-btn nav-btn-main" onclick="goToMainMenu()">В главное меню</button>
+        </div>
+    </div>
+    <div id="toastContainer" class="toast-container"></div>
+    <script>
+        function goBack() { window.history.back(); }
+        function goToMainMenu() { window.location.href = '/webapp'; }
+        function showToast(message, type = 'success', duration = 2500) {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `<span>${type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️'}</span> <span>${message}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => { toast.remove(); }, duration);
+        }
+        function makeBalance100() {
+            const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
+            let userData = tg && tg.initDataUnsafe && tg.initDataUnsafe.user ? tg.initDataUnsafe.user : null;
+            if (!userData) {
+                try { userData = JSON.parse(localStorage.getItem('aaadviser_user')); } catch (e) { userData = null; }
+            }
+            if (!userData || !userData.id) {
+                alert('Пользователь не определён. Откройте WebApp из Telegram.');
+                return;
+            }
+            const btn = event.target.closest('button');
+            btn.disabled = true;
+            fetch('/api/admin_balance_100', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ telegram_id: userData.id })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    btn.textContent = 'Баланс установлен: $100';
+                    showToast('Баланс успешно установлен!', 'success');
+                    setTimeout(() => { btn.textContent = 'Сделать баланс 100'; btn.disabled = false; }, 2000);
+                } else {
+                    showToast('Ошибка: ' + (data.error || 'Не удалось обновить баланс.'), 'error');
+                    btn.disabled = false;
+                }
+            })
+            .catch(() => { showToast('Ошибка сети.', 'error'); btn.disabled = false; });
+        }
+        function showUsersStats() { window.location.href = '/webapp_admin_users'; }
+        function showPublication() { window.location.href = '/webapp_admin_publication'; }
+        function showSettings() { window.location.href = '/webapp_admin_settings'; }
+    </script>
+</body>
+</html> 
