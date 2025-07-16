@@ -1698,5 +1698,25 @@ def run_flask():
     print("====================\n")
     app.run(host='0.0.0.0', port=8080, debug=False)
 
+@app.route('/webapp_admin')
+def webapp_admin():
+    with open('webapp_admin.html', 'r', encoding='utf-8') as f:
+        return f.read()
+
+@app.route('/webapp_admin_users')
+def webapp_admin_users():
+    with open('webapp_admin_users.html', 'r', encoding='utf-8') as f:
+        return f.read()
+
+@app.route('/webapp_admin_settings')
+def webapp_admin_settings():
+    with open('webapp_admin_settings.html', 'r', encoding='utf-8') as f:
+        return f.read()
+
+@app.route('/webapp_admin_publication')
+def webapp_admin_publication():
+    with open('webapp_admin_publication.html', 'r', encoding='utf-8') as f:
+        return f.read()
+
 if __name__ == '__main__':
     run_flask()
