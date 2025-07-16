@@ -53,7 +53,7 @@
             const btn = document.getElementById('sendBtn');
             if (!text) { alert('Введите текст публикации!'); return; }
             btn.disabled = true;
-            document.getElementById('pubReport').style.display = 'none';
+            // Не скрываем pubReport, чтобы статистика всегда оставалась видимой
             fetch('/api/admin_publication', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -72,6 +72,8 @@
                     }
                     document.getElementById('pubReport').innerHTML = reportMsg;
                     document.getElementById('pubReport').style.display = '';
+                    // Прокручиваем к отчету, чтобы пользователь сразу видел статистику
+                    document.getElementById('pubReport').scrollIntoView({behavior: 'smooth'});
                     showToast('Публикация успешно отправлена!', 'success');
                     document.getElementById('pubText').value = '';
                 } else {
