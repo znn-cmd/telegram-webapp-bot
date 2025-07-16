@@ -204,7 +204,6 @@ def api_user():
             'username': user.get('username'),
             'balance': user.get('balance', 0),
             'telegram_id': user.get('telegram_id'),
-            'user_status': user.get('user_status', None),
         })
     else:
         # Новый пользователь
@@ -227,7 +226,6 @@ def api_user():
             'languages': locales[lang]['language_names'],
             'balance': 0,
             'telegram_id': telegram_id,
-            'user_status': None,
         })
 
 @app.route('/api/user_profile', methods=['POST'])
@@ -1541,11 +1539,6 @@ def run_flask():
         print(f"{rule.methods} {rule}")
     print("====================\n")
     app.run(host='0.0.0.0', port=8080, debug=False)
-
-@app.route('/admin_panel')
-def admin_panel():
-    with open('webapp_admin_panel.html', 'r', encoding='utf-8') as f:
-        return f.read()
 
 if __name__ == '__main__':
     run_flask()

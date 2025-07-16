@@ -641,7 +641,7 @@
                 if (data.success && data.reports) {
                     const report = data.reports.find(r => r.id == id);
                     if (report && report.report_type === 'full') {
-                        showFullReportModal(report.full_report, report.id);
+                        showFullReportModal(report.full_report);
                         showToast('Отчет загружен', 'success');
                     } else {
                         showToast('Детальный просмотр доступен только для полного отчета', 'warning');
@@ -654,7 +654,7 @@
         }
 
         // Модалка для полного отчёта
-        function showFullReportModal(report, reportId) {
+        function showFullReportModal(report) {
             let oldModal = document.getElementById('full-report-modal');
             if (oldModal) oldModal.remove();
             
@@ -665,7 +665,7 @@
                 <div style="background:#fff;border-radius:18px;box-shadow:0 4px 24px rgba(102,126,234,0.18);padding:32px 18px 24px 18px;max-width:420px;width:96vw;text-align:left;max-height:90vh;overflow-y:auto;">
                     <div id="fullReportContent"></div>
                     <div style='display:flex;gap:10px;margin-top:18px;'>
-                        <button class="btn" onclick="downloadPdf('${reportId}')">Скачать PDF</button>
+                        <button class="btn" onclick="exportPdfFlow()">Скачать PDF</button>
                         <button class="btn back-btn" style="background:#f1f1f1;color:#333;" onclick="saveAndExitFullReport()">Сохранить и выйти</button>
                     </div>
                     <button class="btn back-btn" style="margin-top:18px;" onclick="closeFullReportModal()">Закрыть</button>
@@ -674,7 +674,6 @@
             document.body.appendChild(modal);
             showFullReport(report, 'fullReportContent');
             window._currentFullReport = report; // для экспорта/отправки
-            window._currentReportId = reportId; // сохраняем ID отчета для скачивания
         }
         
         function closeFullReportModal() {
@@ -729,48 +728,20 @@
             document.getElementById(containerId).innerHTML = html;
         }
 
-        // Экспорт в PDF: теперь используем ту же механику, что и после формирования полного отчета
+        // Экспорт в PDF: пошаговая логика
         async function downloadPdf(id) {
-            showToast('Генерируем PDF...', 'info');
+            showToast('Отправляем PDF в Telegram...', 'info');
             try {
-                // Получаем отчет из уже загруженного списка (если есть)
-                let report = null;
-                if (window._lastReports && Array.isArray(window._lastReports)) {
-                    report = window._lastReports.find(r => r.id == id);
-                }
-                // Если нет — запрашиваем через API
-                if (!report) {
-                    const res = await fetch('/api/user_reports', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ telegram_id: userData.id })
-                    });
-                    const data = await res.json();
-                    if (data.success && data.reports) {
-                        report = data.reports.find(r => r.id == id);
-                    }
-                }
-                if (!report || !report.full_report) {
-                    showToast('Не удалось найти полный отчет для экспорта', 'error');
-                    return;
-                }
-                // Генерируем PDF через /api/generate_pdf_report
-                const res2 = await fetch('/api/generate_pdf_report', {
+                const res = await fetch('/api/send_saved_report_pdf', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        report: report.full_report,
-                        report_id: id,
-                        telegram_id: userData.id
-                    })
+                    body: JSON.stringify({ report_id: id, telegram_id: userData.id })
                 });
-                const data2 = await res2.json();
-                if (data2.success && data2.telegram_send_status === 'sent') {
-                    showToast('PDF-отчёт отправлен вам в Telegram!', 'success', 6000);
-                } else if (data2.telegram_send_status && data2.telegram_send_status.startsWith('error')) {
-                    showToast('Ошибка отправки PDF через Telegram: ' + data2.telegram_send_status, 'error', 8000);
+                const data = await res.json();
+                if (data.success && data.telegram_send_status === 'sent') {
+                    showToast('Отчет отправлен в Telegram!', 'success');
                 } else {
-                    showToast('PDF сгенерирован, но не удалось отправить через Telegram.', 'error', 8000);
+                    showToast('Ошибка при отправке отчета: ' + (data.message || data.error), 'error');
                 }
             } catch (e) {
                 showToast('Ошибка соединения с сервером', 'error');
