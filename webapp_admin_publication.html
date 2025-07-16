@@ -29,8 +29,8 @@
     <div class="container">
         <div class="admin-title">Публикация для всех пользователей</div>
         <textarea class="pub-textarea" id="pubText" placeholder="Введите текст публикации...\nПоддерживается форматирование, смайлы и оформление."></textarea>
+        <div class="pub-report" id="pubReport" style="display: block;"></div>
         <button class="pub-btn" id="sendBtn" onclick="sendPublication()">Отправить</button>
-        <div class="pub-report" id="pubReport"></div>
         <div class="nav-btn-row">
             <button class="nav-btn" onclick="goBack()">Назад</button>
             <button class="nav-btn nav-btn-main" onclick="goToMainMenu()">В главное меню</button>
@@ -53,7 +53,7 @@
             const btn = document.getElementById('sendBtn');
             if (!text) { alert('Введите текст публикации!'); return; }
             btn.disabled = true;
-            // Не скрываем pubReport, чтобы статистика всегда оставалась видимой
+            document.getElementById('pubReport').innerHTML = '';
             fetch('/api/admin_publication', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -71,21 +71,18 @@
                         reportMsg += `<br>Всего пользователей: ${data.total}<br>Обычных: ${data.users}<br>Админов: ${data.admins}`;
                     }
                     document.getElementById('pubReport').innerHTML = reportMsg;
-                    document.getElementById('pubReport').style.display = '';
                     // Прокручиваем к отчету, чтобы пользователь сразу видел статистику
                     document.getElementById('pubReport').scrollIntoView({behavior: 'smooth'});
                     showToast('Публикация успешно отправлена!', 'success');
                     document.getElementById('pubText').value = '';
                 } else {
                     document.getElementById('pubReport').innerHTML = 'Ошибка: ' + (data.error || 'Не удалось отправить публикацию.');
-                    document.getElementById('pubReport').style.display = '';
                     showToast('Ошибка: ' + (data.error || 'Не удалось отправить публикацию.'), 'error');
                 }
             })
             .catch(() => {
                 btn.disabled = false;
                 document.getElementById('pubReport').innerHTML = 'Ошибка сети.';
-                document.getElementById('pubReport').style.display = '';
                 showToast('Ошибка сети', 'error');
             });
         }
