@@ -1856,6 +1856,11 @@ def webapp_support():
     with open('webapp_support.html', 'r', encoding='utf-8') as f:
         return f.read()
 
+@app.route('/webapp_referral')
+def webapp_referral():
+    with open('webapp_referral.html', 'r', encoding='utf-8') as f:
+        return f.read()
+
 @app.route('/api/referral_info', methods=['POST'])
 def api_referral_info():
     data = request.json or {}
