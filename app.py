@@ -1877,8 +1877,18 @@ def api_referral_info():
     if not user:
         return jsonify({'error': 'User not found'}), 404
     invite_code = user.get('invite_code')
+    # Если invite_code не существует, генерируем его
     if not invite_code:
-        return jsonify({'error': 'Invite code not found'}), 404
+        def generate_invite_code():
+            return ''.join(random.choices(string.ascii_uppercase + string.digits, k=8))
+        # Проверка уникальности invite_code
+        while True:
+            invite_code = generate_invite_code()
+            code_check = supabase.table('users').select('invite_code').eq('invite_code', invite_code).execute()
+            if not code_check.data:
+                break
+        # Обновляем пользователя с новым invite_code
+        supabase.table('users').update({'invite_code': invite_code}).eq('telegram_id', telegram_id).execute()
     # Формируем персональную ссылку
     bot_link = f'https://t.me/Aaadviser_bot?start={invite_code}'
     # Получаем условия реферальной программы
