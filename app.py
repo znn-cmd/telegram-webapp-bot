@@ -1893,10 +1893,17 @@ def api_referral_info():
     bot_link = f'https://t.me/Aaadviser_bot?start={invite_code}'
     # Получаем условия реферальной программы
     # Получаем размер бонуса из tariffs
-    tariffs_result = supabase.table('tariffs').select('*').eq('invite', True).execute()
+    tariffs_result = supabase.table('tariffs').select('*').execute()
     bonus = None
     if tariffs_result.data:
-        bonus = tariffs_result.data[0].get('price')
+        # Ищем запись с типом invite или похожим
+        for tariff in tariffs_result.data:
+            if tariff.get('type') == 'invite' or tariff.get('name') == 'invite' or 'invite' in str(tariff.get('description', '')).lower():
+                bonus = tariff.get('price')
+                break
+        # Если не нашли, берем первую запись
+        if bonus is None and tariffs_result.data:
+            bonus = tariffs_result.data[0].get('price')
     referral_terms = (
         f'Пригласите друзей по вашей персональной ссылке.\n'
         f'За каждого, кто зарегистрируется и оформит хотя бы один платный отчет, вы получите бонус на баланс.'
