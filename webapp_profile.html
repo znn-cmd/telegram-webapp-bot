@@ -91,6 +91,7 @@
     <div class="container">
         <div class="title">Личный кабинет</div>
         <div id="balance-block" style="margin-bottom:22px;display:none;"></div>
+        <button class="profile-btn" onclick="goToReferral()"><span class="profile-btn-icon">🎁</span>Реферальная программа</button>
         <button class="back-btn" onclick="goToMainMenu()">Вернуться в главное меню</button>
     </div>
     <div id="modal-bg" class="modal-bg" style="display:none;">
@@ -113,6 +114,9 @@
     <script>
         function goToMainMenu() {
             window.location.href = '/webapp';
+        }
+        function goToReferral() {
+            window.location.href = '/webapp_referral';
         }
         // Баланс и приветствие
         document.addEventListener('DOMContentLoaded', function() {

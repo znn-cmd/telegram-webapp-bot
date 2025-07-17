@@ -15,6 +15,8 @@ from fpdf import FPDF
 import tempfile
 import os
 from dateutil.relativedelta import relativedelta
+import random
+import string
 
 # Загружаем переменные окружения
 load_dotenv()
@@ -190,6 +192,7 @@ def api_user():
     first_name = data.get('tg_name')
     last_name = data.get('last_name')
     language_code = data.get('language_code', 'en')
+    referal = data.get('referal')  # invite_code пригласившего, если есть
     if not telegram_id:
         return jsonify({'error': 'telegram_id required'}), 400
     # Проверяем пользователя в базе
@@ -215,14 +218,27 @@ def api_user():
     else:
         # Новый пользователь
         lang = language_code[:2] if language_code[:2] in locales else 'en'
-        supabase.table('users').insert({
+        # Генерация уникального invite_code
+        def generate_invite_code():
+            return ''.join(random.choices(string.ascii_uppercase + string.digits, k=8))
+        # Проверка уникальности invite_code
+        while True:
+            invite_code = generate_invite_code()
+            code_check = supabase.table('users').select('invite_code').eq('invite_code', invite_code).execute()
+            if not code_check.data:
+                break
+        user_data = {
             'telegram_id': telegram_id,
             'username': username,
             'tg_name': first_name,
             'last_name': last_name,
             'language': lang,
-            'balance': 0
-        }).execute()
+            'balance': 0,
+            'invite_code': invite_code
+        }
+        if referal:
+            user_data['referal'] = referal
+        supabase.table('users').insert(user_data).execute()
         return jsonify({
             'exists': False,
             'is_new_user': True,
@@ -233,6 +249,7 @@ def api_user():
             'languages': locales[lang]['language_names'],
             'balance': 0,
             'telegram_id': telegram_id,
+            'invite_code': invite_code
         })
 
 @app.route('/api/user_profile', methods=['POST'])
@@ -1838,6 +1855,59 @@ def webapp_geography():
 def webapp_support():
     with open('webapp_support.html', 'r', encoding='utf-8') as f:
         return f.read()
+
+@app.route('/api/referral_info', methods=['POST'])
+def api_referral_info():
+    data = request.json or {}
+    telegram_id_raw = data.get('telegram_id')
+    if telegram_id_raw is None:
+        return jsonify({'error': 'telegram_id required'}), 400
+    try:
+        telegram_id = int(telegram_id_raw)
+    except (TypeError, ValueError):
+        return jsonify({'error': 'Invalid telegram_id'}), 400
+    # Получаем пользователя
+    user_result = supabase.table('users').select('*').eq('telegram_id', telegram_id).execute()
+    user = user_result.data[0] if user_result.data else None
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+    invite_code = user.get('invite_code')
+    if not invite_code:
+        return jsonify({'error': 'Invite code not found'}), 404
+    # Формируем персональную ссылку
+    bot_link = f'https://t.me/Aaadviser_bot?start={invite_code}'
+    # Получаем условия реферальной программы
+    # Получаем размер бонуса из tariffs
+    tariffs_result = supabase.table('tariffs').select('*').eq('invite', True).execute()
+    bonus = None
+    if tariffs_result.data:
+        bonus = tariffs_result.data[0].get('price')
+    referral_terms = (
+        f'Пригласите друзей по вашей персональной ссылке.\n'
+        f'За каждого, кто зарегистрируется и оформит хотя бы один платный отчет, вы получите бонус на баланс.'
+    )
+    if bonus:
+        referral_terms += f' Размер бонуса: {bonus}.'
+    referral_terms += '\nБонус начисляется только после первой покупки платного отчета приглашённым.'
+    # Получаем приглашённых пользователей
+    invited_result = supabase.table('users').select('*').eq('referal', invite_code).execute()
+    invited = []
+    for invited_user in invited_result.data:
+        # Проверяем, есть ли у пользователя хотя бы один платный отчет
+        reports_result = supabase.table('reports').select('*').eq('user_id', invited_user['telegram_id']).eq('is_paid', True).execute()
+        completed = bool(reports_result.data)
+        invited.append({
+            'tg_name': invited_user.get('tg_name'),
+            'username': invited_user.get('username'),
+            'telegram_id': invited_user.get('telegram_id'),
+            'completed': completed
+        })
+    return jsonify({
+        'invite_code': invite_code,
+        'bot_link': bot_link,
+        'referral_terms': referral_terms,
+        'invited': invited
+    })
 
 if __name__ == '__main__':
     run_flask()
