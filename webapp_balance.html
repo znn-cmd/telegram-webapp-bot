@@ -70,6 +70,59 @@
         .modal-btn-primary:hover { background: linear-gradient(135deg, #764ba2 0%, #667eea 100%); }
         .modal-btn-secondary { background: #f1f1f1; color: #333; border: 1px solid #ddd; }
         .modal-btn-secondary:hover { background: #e2e2e2; }
+        .tariff-card {
+            background: #f8f9fa;
+            border-radius: 14px;
+            box-shadow: 0 2px 8px rgba(102,126,234,0.10);
+            padding: 18px 16px 14px 16px;
+            margin-bottom: 18px;
+            text-align: left;
+            border-left: 4px solid #667eea;
+            transition: box-shadow 0.2s;
+        }
+        .tariff-card:hover {
+            box-shadow: 0 4px 18px rgba(102,126,234,0.18);
+        }
+        .tariff-title {
+            font-weight: bold;
+            font-size: 1.08em;
+            color: #333;
+            margin-bottom: 6px;
+        }
+        .tariff-price {
+            color: #764ba2;
+            font-size: 1.1em;
+            margin-bottom: 4px;
+            font-weight: 500;
+        }
+        .tariff-type {
+            color: #666;
+            font-size: 0.98em;
+            margin-bottom: 2px;
+        }
+        .tariff-divider {
+            height: 1px;
+            background: #eaeaea;
+            margin: 10px 0 0 0;
+            border: none;
+        }
+        #tariffs-back-btn {
+            margin: 18px 0 0 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            padding: 14px 28px;
+            font-size: 1em;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s;
+            width: 100%;
+            display: block;
+        }
+        #tariffs-back-btn:hover {
+            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+        }
     </style>
 </head>
 <body>
@@ -108,28 +161,32 @@
                 .then(res => res.json())
                 .then(data => {
                     if (Array.isArray(data.tariffs) && data.tariffs.length > 0) {
-                        let html = '<div style="margin-bottom:10px;"></div>';
-                        data.tariffs.forEach(tariff => {
+                        let html = '';
+                        data.tariffs.forEach((tariff, idx) => {
                             let type = (tariff.tariff_type === 'subscription')
                                 ? `Подписка на ${tariff.period_days} дней`
                                 : 'Разовый';
-                            html += `<div style='margin-bottom:16px;padding:10px 0;border-bottom:1px solid #eee;'>
-                                <div style='font-weight:600;font-size:1.08em;'>${tariff.description || tariff.name || 'Тариф'}</div>
-                                <div style='color:#764ba2;font-size:1.05em;margin:4px 0;'>${tariff.price ? '$' + tariff.price : ''}</div>
-                                <div style='color:#666;font-size:0.98em;'>${type}</div>
+                            html += `<div class='tariff-card'>
+                                <div class='tariff-title'>${tariff.description || tariff.name || 'Тариф'}</div>
+                                <div class='tariff-price'>${tariff.price ? '$' + tariff.price : ''}</div>
+                                <div class='tariff-type'>${type}</div>
                             </div>`;
                         });
-                        showModal('Тарифы', html);
+                        html += `<button id='tariffs-back-btn' onclick='closeModal()'>Назад</button>`;
+                        showModal('Тарифы', html, true);
                     } else {
-                        showModal('Тарифы', 'Нет доступных тарифов.');
+                        showModal('Тарифы', 'Нет доступных тарифов.', true);
                     }
                 })
-                .catch(() => showModal('Тарифы', 'Ошибка загрузки тарифов.'));
+                .catch(() => showModal('Тарифы', 'Ошибка загрузки тарифов.', true));
         }
-        function showModal(title, content) {
+        function showModal(title, content, showLogo) {
             document.getElementById('modal-title').textContent = title;
             document.getElementById('modal-content').innerHTML = content;
             document.getElementById('modal-bg').style.display = 'flex';
+            document.getElementById('modal-logo').style.display = showLogo ? 'inline-block' : 'none';
+            // Скрыть стандартную OK-кнопку для тарифов
+            document.querySelector('.modal-btn-row').style.display = showLogo ? 'none' : 'flex';
         }
         function closeModal() {
             document.getElementById('modal-bg').style.display = 'none';
