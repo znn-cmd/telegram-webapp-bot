@@ -137,7 +137,6 @@
         <div class="title">Баланс</div>
         <div id="balance-block" style="margin-bottom:22px;display:none;"></div>
         <button class="balance-btn" onclick="showDeposit()">Пополнить</button>
-        <button class="balance-btn" onclick="showStatement()">Выписка</button>
         <button class="balance-btn" onclick="showTariffs()">Тарифы</button>
         <button class="back-btn" onclick="goBack()">Назад</button>
     </div>
@@ -158,7 +157,10 @@
             window.location.href = '/webapp_profile';
         }
         function showDeposit() {
-            showModal('Пополнение баланса', 'Функция в разработке');
+            showModal('Пополнение баланса',
+                'Сервис находится еще на стадии разработки и функционального наполнения.<br><br>' +
+                'Чтобы пополнить баланс, напишите администратору: <a href="https://t.me/zaitsevnn" target="_blank" style="color:#667eea;font-weight:500;">@zaitsevnn</a>'
+            );
         }
         function showStatement() {
             showModal('Выписка', 'Здесь будут ваши расходы');
