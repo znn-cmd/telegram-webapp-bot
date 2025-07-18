@@ -72,33 +72,40 @@
         .modal-btn-secondary:hover { background: #e2e2e2; }
         .tariff-card {
             background: #f8f9fa;
-            border-radius: 14px;
-            box-shadow: 0 2px 8px rgba(102,126,234,0.10);
-            padding: 18px 16px 14px 16px;
-            margin-bottom: 18px;
+            border-radius: 12px;
+            box-shadow: 0 1px 4px rgba(102,126,234,0.08);
+            padding: 10px 12px 8px 12px;
+            margin-bottom: 10px;
             text-align: left;
-            border-left: 4px solid #667eea;
-            transition: box-shadow 0.2s;
+            border-left: 3px solid #667eea;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 12px;
         }
         .tariff-card:hover {
             box-shadow: 0 4px 18px rgba(102,126,234,0.18);
         }
         .tariff-title {
-            font-weight: bold;
-            font-size: 1.08em;
+            font-weight: 500;
+            font-size: 1em;
             color: #333;
-            margin-bottom: 6px;
+            margin-bottom: 0;
+            flex: 1 1 auto;
+            white-space: normal;
         }
         .tariff-price {
             color: #764ba2;
-            font-size: 1.1em;
-            margin-bottom: 4px;
+            font-size: 1em;
             font-weight: 500;
+            margin-right: 10px;
+            flex-shrink: 0;
         }
         .tariff-type {
-            color: #666;
-            font-size: 0.98em;
-            margin-bottom: 2px;
+            color: #888;
+            font-size: 0.95em;
+            font-weight: 400;
+            flex-shrink: 0;
         }
         .tariff-divider {
             height: 1px;
@@ -107,12 +114,12 @@
             border: none;
         }
         #tariffs-back-btn {
-            margin: 18px 0 0 0;
+            margin: 14px 0 0 0;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: #fff;
             border: none;
             border-radius: 10px;
-            padding: 14px 28px;
+            padding: 12px 0;
             font-size: 1em;
             font-weight: 500;
             cursor: pointer;
@@ -163,9 +170,7 @@
                     if (Array.isArray(data.tariffs) && data.tariffs.length > 0) {
                         let html = '';
                         data.tariffs.forEach((tariff, idx) => {
-                            let type = (tariff.tariff_type === 'subscription')
-                                ? `Подписка на ${tariff.period_days} дней`
-                                : 'Разовый';
+                            let type = (tariff.tariff_type === 'subscription') ? 'Подписка' : 'Разовый';
                             html += `<div class='tariff-card'>
                                 <div class='tariff-title'>${tariff.description || tariff.name || 'Тариф'}</div>
                                 <div class='tariff-price'>${tariff.price ? '$' + tariff.price : ''}</div>
