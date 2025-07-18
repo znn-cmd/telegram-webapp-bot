@@ -1931,5 +1931,23 @@ def api_referral_info():
         'invited': invited
     })
 
+@app.route('/api/tariffs', methods=['GET'])
+def api_tariffs():
+    try:
+        tariffs_result = supabase.table('tariffs').select('*').execute()
+        tariffs = []
+        for t in tariffs_result.data:
+            tariffs.append({
+                'description': t.get('description'),
+                'price': t.get('price'),
+                'tariff_type': t.get('tariff_type'),
+                'period_days': t.get('period_days'),
+                'name': t.get('name'),
+            })
+        return jsonify({'tariffs': tariffs})
+    except Exception as e:
+        logger.error(f"Error loading tariffs: {e}")
+        return jsonify({'tariffs': []}), 500
+
 if __name__ == '__main__':
     run_flask()

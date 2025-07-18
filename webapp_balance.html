@@ -83,6 +83,9 @@
     </div>
     <div id="modal-bg" class="modal-bg" style="display:none;">
         <div class="modal">
+            <div style="text-align:center;margin-bottom:10px;">
+                <img src="logo-flt.png" alt="Aaadviser" style="width:70px;height:auto;display:inline-block;" id="modal-logo" />
+            </div>
             <div class="modal-title" id="modal-title"></div>
             <div class="modal-content" id="modal-content"></div>
             <div class="modal-btn-row">
@@ -101,11 +104,31 @@
             showModal('Выписка', 'Здесь будут ваши расходы');
         }
         function showTariffs() {
-            showModal('Тарифы', 'Здесь будут тарифы');
+            fetch('/api/tariffs')
+                .then(res => res.json())
+                .then(data => {
+                    if (Array.isArray(data.tariffs) && data.tariffs.length > 0) {
+                        let html = '<div style="margin-bottom:10px;"></div>';
+                        data.tariffs.forEach(tariff => {
+                            let type = (tariff.tariff_type === 'subscription')
+                                ? `Подписка на ${tariff.period_days} дней`
+                                : 'Разовый';
+                            html += `<div style='margin-bottom:16px;padding:10px 0;border-bottom:1px solid #eee;'>
+                                <div style='font-weight:600;font-size:1.08em;'>${tariff.description || tariff.name || 'Тариф'}</div>
+                                <div style='color:#764ba2;font-size:1.05em;margin:4px 0;'>${tariff.price ? '$' + tariff.price : ''}</div>
+                                <div style='color:#666;font-size:0.98em;'>${type}</div>
+                            </div>`;
+                        });
+                        showModal('Тарифы', html);
+                    } else {
+                        showModal('Тарифы', 'Нет доступных тарифов.');
+                    }
+                })
+                .catch(() => showModal('Тарифы', 'Ошибка загрузки тарифов.'));
         }
         function showModal(title, content) {
             document.getElementById('modal-title').textContent = title;
-            document.getElementById('modal-content').textContent = content;
+            document.getElementById('modal-content').innerHTML = content;
             document.getElementById('modal-bg').style.display = 'flex';
         }
         function closeModal() {
