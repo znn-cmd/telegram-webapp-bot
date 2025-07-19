@@ -26,10 +26,15 @@
             z-index: 1;
         }
         .logo {
-            font-size: 24px;
-            font-weight: bold;
-            color: #667eea;
-            margin-bottom: 8px;
+            width: 110px;
+            height: auto;
+            display: block;
+            margin: 0 auto 8px auto;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .logo:hover {
+            transform: scale(1.05);
         }
         .slogan {
             font-size: 14px;
@@ -303,7 +308,7 @@
 </head>
 <body>
     <div class="container">
-        <div class="logo">Aaadviser</div>
+        <img src="logo-flt.png" alt="Aaadviser" class="logo" onclick="goToMainMenu()">
         <div class="slogan">Инсайты рынка недвижимости</div>
 
         <!-- Шаг 1: Ввод адреса -->
