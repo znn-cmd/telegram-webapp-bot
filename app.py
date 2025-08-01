@@ -33,9 +33,9 @@ app = Flask(__name__)
 
 # Инициализация Supabase
 supabase_url = os.getenv("SUPABASE_URL")
-supabase_key = os.getenv("SUPABASE_ANON_KEY")
+supabase_key = os.getenv("SUPABASE_KEY")
 if not supabase_url or not supabase_key:
-    raise RuntimeError("SUPABASE_URL и SUPABASE_ANON_KEY должны быть заданы в переменных окружения!")
+    raise RuntimeError("SUPABASE_URL и SUPABASE_KEY должны быть заданы в переменных окружения!")
 supabase: Client = create_client(supabase_url, supabase_key)
 
 # Токен бота
@@ -1313,6 +1313,68 @@ def api_generate_pdf_report():
             pdf.cell(200, 8, txt=f"Инфляция: {report['macro']['inflation']}%", ln=True)
             pdf.cell(200, 8, txt=f"Ключевая ставка: {report['macro']['refi_rate']}%", ln=True)
             pdf.cell(200, 8, txt=f"Рост ВВП: {report['macro']['gdp_growth']}%", ln=True)
+            pdf.ln(5)
+        
+        # Экономические данные и графики
+        if 'economic_charts' in report:
+            pdf.set_font("DejaVu", 'B', 14)
+            pdf.cell(200, 10, txt="Экономические данные:", ln=True)
+            pdf.set_font("DejaVu", size=12)
+            
+            economic_charts = report['economic_charts']
+            country_name = economic_charts.get('country_name', 'Unknown')
+            
+            # Отображаем последние значения
+            latest = economic_charts.get('latest', {})
+            if latest.get('gdp'):
+                gdp_data = latest['gdp']
+                pdf.cell(200, 8, txt=f"Последний рост ВВП ({gdp_data['year']}): {gdp_data['value']}%", ln=True)
+            
+            if latest.get('inflation'):
+                inflation_data = latest['inflation']
+                pdf.cell(200, 8, txt=f"Последняя инфляция ({inflation_data['year']}): {inflation_data['value']}%", ln=True)
+            
+            # Отображаем тренды
+            trends = economic_charts.get('trends', {})
+            if trends.get('gdp_trend') is not None:
+                gdp_trend = trends['gdp_trend'] * 100  # Конвертируем в проценты
+                trend_text = f"Тренд роста ВВП: {gdp_trend > 0 and '+' or ''}{gdp_trend:.1f}%"
+                pdf.cell(200, 8, txt=trend_text, ln=True)
+            
+            if trends.get('inflation_trend') is not None:
+                inflation_trend = trends['inflation_trend'] * 100  # Конвертируем в проценты
+                trend_text = f"Тренд инфляции: {inflation_trend > 0 and '+' or ''}{inflation_trend:.1f}%"
+                pdf.cell(200, 8, txt=trend_text, ln=True)
+            
+            # Отображаем данные по годам (если есть)
+            gdp_chart = economic_charts.get('gdp_chart', {})
+            if gdp_chart.get('labels') and gdp_chart.get('datasets'):
+                pdf.ln(3)
+                pdf.set_font("DejaVu", 'B', 12)
+                pdf.cell(200, 8, txt=f"Динамика роста ВВП ({country_name}):", ln=True)
+                pdf.set_font("DejaVu", size=10)
+                
+                labels = gdp_chart['labels']
+                data = gdp_chart['datasets'][0]['data'] if gdp_chart['datasets'] else []
+                
+                for i, (year, value) in enumerate(zip(labels, data)):
+                    if i < 5:  # Показываем только последние 5 лет
+                        pdf.cell(200, 6, txt=f"{year}: {value}%", ln=True)
+            
+            inflation_chart = economic_charts.get('inflation_chart', {})
+            if inflation_chart.get('labels') and inflation_chart.get('datasets'):
+                pdf.ln(3)
+                pdf.set_font("DejaVu", 'B', 12)
+                pdf.cell(200, 8, txt=f"Динамика инфляции ({country_name}):", ln=True)
+                pdf.set_font("DejaVu", size=10)
+                
+                labels = inflation_chart['labels']
+                data = inflation_chart['datasets'][0]['data'] if inflation_chart['datasets'] else []
+                
+                for i, (year, value) in enumerate(zip(labels, data)):
+                    if i < 5:  # Показываем только последние 5 лет
+                        pdf.cell(200, 6, txt=f"{year}: {value}%", ln=True)
+            
             pdf.ln(5)
         # Налоги
         if 'taxes' in report:
