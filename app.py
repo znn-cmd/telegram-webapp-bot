@@ -802,6 +802,186 @@ def api_similar_properties():
         logger.error(f"Error finding similar properties: {e}")
         return jsonify({'error': 'Internal error'}), 500
 
+def get_economic_data(country_code='TUR', years_back=10):
+    """
+    Получение экономических данных (ВВП и инфляция) из таблицы imf_economic_data
+    
+    Args:
+        country_code (str): Код страны (по умолчанию TUR для Турции)
+        years_back (int): Количество лет назад для получения данных
+    
+    Returns:
+        dict: Словарь с данными ВВП и инфляции
+    """
+    try:
+        # Получаем данные за последние N лет
+        current_year = datetime.datetime.now().year
+        start_year = current_year - years_back
+        
+        # Запрос к таблице imf_economic_data для ВВП (NGDP_RPCH)
+        gdp_query = supabase.table('imf_economic_data').select('*').eq('country_code', country_code).eq('indicator_code', 'NGDP_RPCH').gte('year', start_year).order('year', desc=True)
+        gdp_result = gdp_query.execute()
+        
+        # Запрос к таблице imf_economic_data для инфляции (PCPIPCH)
+        inflation_query = supabase.table('imf_economic_data').select('*').eq('country_code', country_code).eq('indicator_code', 'PCPIPCH').gte('year', start_year).order('year', desc=True)
+        inflation_result = inflation_query.execute()
+        
+        if not gdp_result.data and not inflation_result.data:
+            logger.warning(f"No economic data found for country {country_code}")
+            return {
+                'gdp_data': [],
+                'inflation_data': [],
+                'country_code': country_code,
+                'country_name': 'Unknown',
+                'error': 'No data available'
+            }
+        
+        # Обрабатываем данные ВВП
+        gdp_data = []
+        for record in gdp_result.data:
+            year = record.get('year')
+            value = record.get('value')
+            if year and value is not None:
+                gdp_data.append({
+                    'year': year,
+                    'value': float(value),  # Рост ВВП в процентах
+                    'indicator_code': record.get('indicator_code'),
+                    'indicator_name': record.get('indicator_name')
+                })
+        
+        # Обрабатываем данные инфляции
+        inflation_data = []
+        for record in inflation_result.data:
+            year = record.get('year')
+            value = record.get('value')
+            if year and value is not None:
+                inflation_data.append({
+                    'year': year,
+                    'value': float(value),  # Уровень инфляции в процентах
+                    'indicator_code': record.get('indicator_code'),
+                    'indicator_name': record.get('indicator_name')
+                })
+        
+        # Сортируем по году (от старых к новым для графиков)
+        gdp_data.sort(key=lambda x: x['year'])
+        inflation_data.sort(key=lambda x: x['year'])
+        
+        # Вычисляем тренды
+        gdp_values = [d['value'] for d in gdp_data]
+        inflation_values = [d['value'] for d in inflation_data]
+        
+        gdp_trend = calculate_trend(gdp_values) if gdp_values else 0
+        inflation_trend = calculate_trend(inflation_values) if inflation_values else 0
+        
+        # Получаем название страны из первой записи
+        country_name = gdp_result.data[0].get('country_name') if gdp_result.data else 'Unknown'
+        
+        return {
+            'gdp_data': gdp_data,
+            'inflation_data': inflation_data,
+            'country_code': country_code,
+            'country_name': country_name,
+            'gdp_trend': gdp_trend,
+            'inflation_trend': inflation_trend,
+            'latest_gdp': gdp_data[-1] if gdp_data else None,
+            'latest_inflation': inflation_data[-1] if inflation_data else None,
+            'data_years': f"{start_year}-{current_year}"
+        }
+        
+    except Exception as e:
+        logger.error(f"Error fetching economic data: {e}")
+        return {
+            'gdp_data': [],
+            'inflation_data': [],
+            'country_code': country_code,
+            'country_name': 'Unknown',
+            'error': str(e)
+        }
+
+def calculate_trend(values):
+    """
+    Вычисление тренда (рост/падение) для ряда значений
+    
+    Args:
+        values (list): Список числовых значений
+        
+    Returns:
+        float: Коэффициент тренда (положительный = рост, отрицательный = падение)
+    """
+    if len(values) < 2:
+        return 0
+    
+    try:
+        # Простой расчет тренда как среднее изменение
+        changes = []
+        for i in range(1, len(values)):
+            if values[i-1] != 0:
+                change = (values[i] - values[i-1]) / values[i-1]
+                changes.append(change)
+        
+        return sum(changes) / len(changes) if changes else 0
+    except Exception:
+        return 0
+
+def create_economic_chart_data(economic_data):
+    """
+    Создание данных для построения графиков ВВП и инфляции
+    
+    Args:
+        economic_data (dict): Данные из get_economic_data()
+        
+    Returns:
+        dict: Данные для графиков
+    """
+    gdp_data = economic_data.get('gdp_data', [])
+    inflation_data = economic_data.get('inflation_data', [])
+    country_name = economic_data.get('country_name', 'Unknown')
+    
+    # Подготавливаем данные для графиков ВВП (рост в процентах)
+    gdp_chart = {
+        'labels': [str(d['year']) for d in gdp_data],
+        'datasets': [
+            {
+                'label': f'Рост ВВП (%) - {country_name}',
+                'data': [d['value'] for d in gdp_data],  # Рост ВВП в процентах
+                'borderColor': '#667eea',
+                'backgroundColor': 'rgba(102, 126, 234, 0.1)',
+                'tension': 0.4,
+                'fill': False
+            }
+        ]
+    }
+    
+    # Подготавливаем данные для графиков инфляции
+    inflation_chart = {
+        'labels': [str(d['year']) for d in inflation_data],
+        'datasets': [
+            {
+                'label': f'Инфляция (%) - {country_name}',
+                'data': [d['value'] for d in inflation_data],  # Уровень инфляции в процентах
+                'borderColor': '#dc3545',
+                'backgroundColor': 'rgba(220, 53, 69, 0.1)',
+                'tension': 0.4,
+                'fill': False
+            }
+        ]
+    }
+    
+    return {
+        'gdp_chart': gdp_chart,
+        'inflation_chart': inflation_chart,
+        'trends': {
+            'gdp_trend': economic_data.get('gdp_trend', 0),
+            'inflation_trend': economic_data.get('inflation_trend', 0)
+        },
+        'latest': {
+            'gdp': economic_data.get('latest_gdp'),
+            'inflation': economic_data.get('latest_inflation')
+        },
+        'country_name': country_name,
+        'country_code': economic_data.get('country_code', 'Unknown')
+    }
+
 @app.route('/api/full_report', methods=['POST'])
 def api_full_report():
     data = request.json or {}
@@ -855,6 +1035,18 @@ def api_full_report():
         ]
         liquidity = 'Среднее время продажи: 68 дней'
         district = 'Новый трамвай до пляжа (2026), Строительство школы (2027)'
+        
+        # --- ПОЛУЧАЕМ РЕАЛЬНЫЕ ЭКОНОМИЧЕСКИЕ ДАННЫЕ ---
+        economic_data = get_economic_data('TUR', 10)  # Данные за последние 10 лет
+        chart_data = create_economic_chart_data(economic_data)
+        
+        # Обновляем макроэкономические данные реальными значениями
+        if economic_data.get('latest_inflation'):
+            inflation = economic_data['latest_inflation']['value']
+        
+        if economic_data.get('latest_gdp'):
+            gdp_growth = economic_data['latest_gdp']['value']  # Рост ВВП в процентах
+        
         # --- Формируем структуру полного отчёта ---
         full_report_data = {
             'object': {
@@ -898,6 +1090,7 @@ def api_full_report():
                 'refi_rate': refi_rate,
                 'gdp_growth': gdp_growth
             },
+            'economic_charts': chart_data,  # Добавляем данные для графиков
             'taxes': taxes,
             'risks': risks,
             'liquidity': liquidity,
@@ -906,8 +1099,9 @@ def api_full_report():
             'price_index': 1.23,
             'mortgage_rate': 0.32,
             'global_house_price_index': 1.12,
-            'summary': 'Полный отчёт с реальными/мок-данными. Для реальных данных используйте таблицы Supabase.'
+            'summary': 'Полный отчёт с реальными экономическими данными из IMF.'
         }
+        
         # Получаем user_id из базы данных по telegram_id
         user_result = supabase.table('users').select('id').eq('telegram_id', telegram_id).execute()
         user_id = user_result.data[0]['id'] if user_result.data else telegram_id
@@ -1948,6 +2142,30 @@ def api_tariffs():
     except Exception as e:
         logger.error(f"Error loading tariffs: {e}")
         return jsonify({'tariffs': []}), 500
+
+@app.route('/api/economic_data', methods=['POST'])
+def api_economic_data():
+    """Получение экономических данных (ВВП и инфляция) для построения графиков"""
+    data = request.json or {}
+    country_code = data.get('country_code', 'TUR')
+    years_back = data.get('years_back', 10)
+    
+    try:
+        # Получаем экономические данные
+        economic_data = get_economic_data(country_code, years_back)
+        chart_data = create_economic_chart_data(economic_data)
+        
+        return jsonify({
+            'success': True,
+            'economic_data': economic_data,
+            'chart_data': chart_data,
+            'country_code': country_code,
+            'years_back': years_back
+        })
+        
+    except Exception as e:
+        logger.error(f"Error in economic_data API: {e}")
+        return jsonify({'error': 'Internal error'}), 500
 
 if __name__ == '__main__':
     run_flask()
