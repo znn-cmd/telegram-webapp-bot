@@ -1288,6 +1288,14 @@ def api_generate_pdf_report():
         # Добавляем шрифты DejaVu
         pdf.add_font('DejaVu', '', 'fonts/DejaVuSans.ttf', uni=True)
         pdf.add_font('DejaVu', 'B', 'fonts/DejaVuSans-Bold.ttf', uni=True)
+        
+        # Добавляем логотип на первую страницу (по центру сверху)
+        try:
+            pdf.image('logo-sqv.png', x=85, y=10, w=40, h=20)  # Центрируем логотип
+            pdf.ln(25)  # Отступ после логотипа
+        except Exception as e:
+            logger.warning(f"Не удалось добавить логотип на первую страницу: {e}")
+        
         pdf.set_font('DejaVu', 'B', 16)
         if client_name:
             pdf.cell(0, 10, f'Клиент: {client_name}', ln=True, align='C')
@@ -1313,46 +1321,42 @@ def api_generate_pdf_report():
             pdf.cell(200, 8, txt=f"Долгосрочная аренда: ROI {report['roi']['long_term']['roi']}%", ln=True)
             pdf.cell(200, 8, txt=f"Без аренды: ROI {report['roi']['no_rent']['roi']}%", ln=True)
             pdf.ln(5)
-        # Макроэкономика
-        if 'macro' in report:
+        # Макроэкономические показатели (объединенный блок)
+        if 'macro' in report or 'economic_charts' in report:
             pdf.set_font("DejaVu", 'B', 14)
             pdf.cell(200, 10, txt="Макроэкономические показатели:", ln=True)
             pdf.set_font("DejaVu", size=12)
-            pdf.cell(200, 8, txt=f"Инфляция: {report['macro']['inflation']}%", ln=True)
-            pdf.cell(200, 8, txt=f"Ключевая ставка: {report['macro']['refi_rate']}%", ln=True)
-            pdf.cell(200, 8, txt=f"Рост ВВП: {report['macro']['gdp_growth']}%", ln=True)
-            pdf.ln(5)
-        
-        # Экономические данные и графики
-        if 'economic_charts' in report:
-            pdf.set_font("DejaVu", 'B', 14)
-            pdf.cell(200, 10, txt="Экономические данные:", ln=True)
-            pdf.set_font("DejaVu", size=12)
             
-            economic_charts = report['economic_charts']
-            country_name = economic_charts.get('country_name', 'Unknown')
+            # Ключевая ставка из macro
+            if 'macro' in report:
+                pdf.cell(200, 8, txt=f"Ключевая ставка: {report['macro']['refi_rate']}%", ln=True)
             
-            # Отображаем последние значения
-            latest = economic_charts.get('latest', {})
-            if latest.get('gdp'):
-                gdp_data = latest['gdp']
-                pdf.cell(200, 8, txt=f"Последний рост ВВП ({gdp_data['year']}): {gdp_data['value']}%", ln=True)
-            
-            if latest.get('inflation'):
-                inflation_data = latest['inflation']
-                pdf.cell(200, 8, txt=f"Последняя инфляция ({inflation_data['year']}): {inflation_data['value']}%", ln=True)
-            
-            # Отображаем тренды
-            trends = economic_charts.get('trends', {})
-            if trends.get('gdp_trend') is not None:
-                gdp_trend = trends['gdp_trend'] * 100  # Конвертируем в проценты
-                trend_text = f"Тренд роста ВВП: {gdp_trend > 0 and '+' or ''}{gdp_trend:.1f}%"
-                pdf.cell(200, 8, txt=trend_text, ln=True)
-            
-            if trends.get('inflation_trend') is not None:
-                inflation_trend = trends['inflation_trend'] * 100  # Конвертируем в проценты
-                trend_text = f"Тренд инфляции: {inflation_trend > 0 and '+' or ''}{inflation_trend:.1f}%"
-                pdf.cell(200, 8, txt=trend_text, ln=True)
+            # Экономические данные из economic_charts
+            if 'economic_charts' in report:
+                economic_charts = report['economic_charts']
+                country_name = economic_charts.get('country_name', 'Unknown')
+                
+                # Отображаем последние значения
+                latest = economic_charts.get('latest', {})
+                if latest.get('gdp'):
+                    gdp_data = latest['gdp']
+                    pdf.cell(200, 8, txt=f"Последний рост ВВП ({gdp_data['year']}): {gdp_data['value']}%", ln=True)
+                
+                if latest.get('inflation'):
+                    inflation_data = latest['inflation']
+                    pdf.cell(200, 8, txt=f"Последняя инфляция ({inflation_data['year']}): {inflation_data['value']}%", ln=True)
+                
+                # Отображаем тренды
+                trends = economic_charts.get('trends', {})
+                if trends.get('gdp_trend') is not None:
+                    gdp_trend = trends['gdp_trend'] * 100  # Конвертируем в проценты
+                    trend_text = f"Тренд роста ВВП: {gdp_trend > 0 and '+' or ''}{gdp_trend:.1f}%"
+                    pdf.cell(200, 8, txt=trend_text, ln=True)
+                
+                if trends.get('inflation_trend') is not None:
+                    inflation_trend = trends['inflation_trend'] * 100  # Конвертируем в проценты
+                    trend_text = f"Тренд инфляции: {inflation_trend > 0 and '+' or ''}{inflation_trend:.1f}%"
+                    pdf.cell(200, 8, txt=trend_text, ln=True)
             
             # Создаем и вставляем график
             try:
@@ -1421,8 +1425,17 @@ def api_generate_pdf_report():
                             pdf.cell(200, 6, txt=f"{year}: {value}%", ln=True)
             
             pdf.ln(5)
-        # Налоги
+        
+        # Переходим на новую страницу для налогов
         if 'taxes' in report:
+            pdf.add_page()
+            
+            # Добавляем логотип в правом верхнем углу
+            try:
+                pdf.image('logo-flt.png', x=170, y=10, w=30, h=15)  # Правый верхний угол
+            except Exception as e:
+                logger.warning(f"Не удалось добавить логотип на страницу налогов: {e}")
+            
             pdf.set_font("DejaVu", 'B', 14)
             pdf.cell(200, 10, txt="Налоги и сборы:", ln=True)
             pdf.set_font("DejaVu", size=12)
@@ -1742,6 +1755,14 @@ def api_send_saved_report_pdf():
         pdf.add_page()
         pdf.add_font('DejaVu', '', 'fonts/DejaVuSans.ttf')
         pdf.add_font('DejaVu', 'B', 'fonts/DejaVuSans-Bold.ttf')
+        
+        # Добавляем логотип на первую страницу (по центру сверху)
+        try:
+            pdf.image('logo-sqv.png', x=85, y=10, w=40, h=20)  # Центрируем логотип
+            pdf.ln(25)  # Отступ после логотипа
+        except Exception as e:
+            logger.warning(f"Не удалось добавить логотип на первую страницу: {e}")
+        
         pdf.set_font('DejaVu', 'B', 16)
         pdf.cell(0, 10, 'Полный отчет по недвижимости', ln=1, align='C')
         pdf.ln(10)
