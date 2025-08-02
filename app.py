@@ -1379,6 +1379,7 @@ def api_generate_pdf_report():
                     pdf.image(chart_buffer, x=10, y=pdf.get_y(), w=190)
                     pdf.ln(85)  # Отступ после графика
                     chart_buffer.close()
+                    logger.info("Экономический график успешно вставлен в PDF")
                 else:
                     logger.warning("График не создался, используем текстовое отображение")
                     # Если график не создался, показываем текстовые данные
@@ -1437,6 +1438,7 @@ def api_generate_pdf_report():
             pdf.cell(200, 10, text="Тренды рынка недвижимости:", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
             pdf.set_font("DejaVu", size=12)
             
+            logger.info("Начинаем обработку трендов рынка недвижимости...")
             if location_data['city_name']:
                 trends_data = get_property_trends_data(
                     location_data['city_name'],
@@ -1660,6 +1662,8 @@ def api_generate_pdf_report():
         send_status = None
         if telegram_id:
             send_status = send_pdf_to_telegram(final_pdf_path, telegram_id)
+        
+        logger.info("PDF отчет успешно сгенерирован и сохранен")
         return jsonify({
             'success': True,
             'pdf_path': pdf_url,
