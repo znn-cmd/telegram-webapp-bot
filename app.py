@@ -2,7 +2,7 @@ import os
 import logging
 from flask import Flask, request, jsonify, send_file, send_from_directory
 from telegram import Update, WebAppInfo, KeyboardButton, ReplyKeyboardMarkup, Bot
-from telegram.constants import ParseMode
+from telegram import ParseMode
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
 from supabase import create_client, Client
 from dotenv import load_dotenv
@@ -17,6 +17,17 @@ import os
 from dateutil.relativedelta import relativedelta
 import random
 import string
+import json
+import math
+import re
+from datetime import datetime, timedelta
+import matplotlib.pyplot as plt
+import matplotlib
+matplotlib.use('Agg')  # Используем неинтерактивный бэкенд
+import io
+import base64
+from PIL import Image
+import numpy as np
 
 # Загружаем переменные окружения
 load_dotenv()
@@ -1346,34 +1357,60 @@ def api_generate_pdf_report():
                 trend_text = f"Тренд инфляции: {inflation_trend > 0 and '+' or ''}{inflation_trend:.1f}%"
                 pdf.cell(200, 8, txt=trend_text, ln=True)
             
-            # Отображаем данные по годам (если есть)
-            gdp_chart = economic_charts.get('gdp_chart', {})
-            if gdp_chart.get('labels') and gdp_chart.get('datasets'):
+            # Создаем и вставляем график
+            try:
+                chart_buffer = create_chart_image_for_pdf(economic_charts, f"Динамика экономических показателей ({country_name})")
+                if chart_buffer:
+                    # Вставляем график в PDF
+                    pdf.ln(5)
+                    pdf.image(chart_buffer, x=10, y=pdf.get_y(), w=190, h=80)
+                    pdf.ln(85)  # Отступ после графика
+                    chart_buffer.close()
+                else:
+                    # Если график не создался, показываем текстовые данные
+                    pdf.ln(3)
+                    pdf.set_font("DejaVu", 'B', 12)
+                    pdf.cell(200, 8, txt=f"Динамика роста ВВП ({country_name}):", ln=True)
+                    pdf.set_font("DejaVu", size=10)
+                    
+                    gdp_chart = economic_charts.get('gdp_chart', {})
+                    if gdp_chart.get('labels') and gdp_chart.get('datasets'):
+                        labels = gdp_chart['labels']
+                        data = gdp_chart['datasets'][0]['data'] if gdp_chart['datasets'] else []
+                        
+                        for i, (year, value) in enumerate(zip(labels, data)):
+                            if i < 5:  # Показываем только последние 5 лет
+                                pdf.cell(200, 6, txt=f"{year}: {value}%", ln=True)
+                    
+                    inflation_chart = economic_charts.get('inflation_chart', {})
+                    if inflation_chart.get('labels') and inflation_chart.get('datasets'):
+                        pdf.ln(3)
+                        pdf.set_font("DejaVu", 'B', 12)
+                        pdf.cell(200, 8, txt=f"Динамика инфляции ({country_name}):", ln=True)
+                        pdf.set_font("DejaVu", size=10)
+                        
+                        labels = inflation_chart['labels']
+                        data = inflation_chart['datasets'][0]['data'] if inflation_chart['datasets'] else []
+                        
+                        for i, (year, value) in enumerate(zip(labels, data)):
+                            if i < 5:  # Показываем только последние 5 лет
+                                pdf.cell(200, 6, txt=f"{year}: {value}%", ln=True)
+            except Exception as e:
+                logger.error(f"Ошибка вставки графика в PDF: {e}")
+                # Fallback к текстовому отображению
                 pdf.ln(3)
                 pdf.set_font("DejaVu", 'B', 12)
-                pdf.cell(200, 8, txt=f"Динамика роста ВВП ({country_name}):", ln=True)
+                pdf.cell(200, 8, txt=f"Динамика экономических показателей ({country_name}):", ln=True)
                 pdf.set_font("DejaVu", size=10)
                 
-                labels = gdp_chart['labels']
-                data = gdp_chart['datasets'][0]['data'] if gdp_chart['datasets'] else []
-                
-                for i, (year, value) in enumerate(zip(labels, data)):
-                    if i < 5:  # Показываем только последние 5 лет
-                        pdf.cell(200, 6, txt=f"{year}: {value}%", ln=True)
-            
-            inflation_chart = economic_charts.get('inflation_chart', {})
-            if inflation_chart.get('labels') and inflation_chart.get('datasets'):
-                pdf.ln(3)
-                pdf.set_font("DejaVu", 'B', 12)
-                pdf.cell(200, 8, txt=f"Динамика инфляции ({country_name}):", ln=True)
-                pdf.set_font("DejaVu", size=10)
-                
-                labels = inflation_chart['labels']
-                data = inflation_chart['datasets'][0]['data'] if inflation_chart['datasets'] else []
-                
-                for i, (year, value) in enumerate(zip(labels, data)):
-                    if i < 5:  # Показываем только последние 5 лет
-                        pdf.cell(200, 6, txt=f"{year}: {value}%", ln=True)
+                gdp_chart = economic_charts.get('gdp_chart', {})
+                if gdp_chart.get('labels') and gdp_chart.get('datasets'):
+                    labels = gdp_chart['labels']
+                    data = gdp_chart['datasets'][0]['data'] if gdp_chart['datasets'] else []
+                    
+                    for i, (year, value) in enumerate(zip(labels, data)):
+                        if i < 5:  # Показываем только последние 5 лет
+                            pdf.cell(200, 6, txt=f"{year}: {value}%", ln=True)
             
             pdf.ln(5)
         # Налоги
@@ -2228,6 +2265,116 @@ def api_economic_data():
     except Exception as e:
         logger.error(f"Error in economic_data API: {e}")
         return jsonify({'error': 'Internal error'}), 500
+
+def create_economic_chart_image(economic_charts_data):
+    """
+    Создает изображение графика экономических данных
+    """
+    try:
+        # Настройка для русского языка
+        plt.rcParams['font.family'] = ['DejaVu Sans', 'Arial', 'sans-serif']
+        
+        # Создаем фигуру
+        fig, ax = plt.subplots(figsize=(10, 6))
+        
+        # Получаем данные
+        gdp_chart = economic_charts_data.get('gdp_chart', {})
+        inflation_chart = economic_charts_data.get('inflation_chart', {})
+        
+        if not gdp_chart.get('labels') or not inflation_chart.get('labels'):
+            return None
+        
+        # Данные для графиков
+        years = gdp_chart['labels']
+        gdp_data = gdp_chart['datasets'][0]['data']
+        inflation_data = inflation_chart['datasets'][0]['data']
+        
+        # Создаем график
+        ax.plot(years, gdp_data, 'o-', color='#00bcd4', linewidth=2, 
+                markersize=6, label='Рост ВВП (%)', alpha=0.8)
+        ax.plot(years, inflation_data, 's-', color='#dc3545', linewidth=2, 
+                markersize=6, label='Инфляция (%)', alpha=0.8)
+        
+        # Настройка графика
+        ax.set_xlabel('Год', fontsize=12)
+        ax.set_ylabel('Процент (%)', fontsize=12)
+        ax.set_title('Динамика экономических показателей', fontsize=14, fontweight='bold')
+        ax.grid(True, alpha=0.3)
+        ax.legend(fontsize=10)
+        
+        # Поворот подписей оси X для лучшей читаемости
+        plt.xticks(rotation=45)
+        
+        # Настройка отступов
+        plt.tight_layout()
+        
+        # Сохраняем в буфер
+        buffer = io.BytesIO()
+        plt.savefig(buffer, format='png', dpi=150, bbox_inches='tight')
+        buffer.seek(0)
+        
+        # Закрываем фигуру для освобождения памяти
+        plt.close()
+        
+        return buffer
+        
+    except Exception as e:
+        logger.error(f"Ошибка создания графика: {e}")
+        return None
+
+def create_chart_image_for_pdf(chart_data, title, width=180, height=100):
+    """
+    Создает изображение графика для вставки в PDF
+    """
+    try:
+        # Настройка для русского языка
+        plt.rcParams['font.family'] = ['DejaVu Sans', 'Arial', 'sans-serif']
+        plt.rcParams['font.size'] = 8
+        
+        # Создаем фигуру с заданными размерами (в дюймах)
+        fig, ax = plt.subplots(figsize=(width/25.4, height/25.4))  # Конвертируем мм в дюймы
+        
+        # Получаем данные
+        years = chart_data.get('labels', [])
+        gdp_data = chart_data.get('gdp_chart', {}).get('datasets', [{}])[0].get('data', [])
+        inflation_data = chart_data.get('inflation_chart', {}).get('datasets', [{}])[0].get('data', [])
+        
+        if not years or not gdp_data or not inflation_data:
+            return None
+        
+        # Создаем график
+        ax.plot(years, gdp_data, 'o-', color='#00bcd4', linewidth=1.5, 
+                markersize=3, label='ВВП', alpha=0.8)
+        ax.plot(years, inflation_data, 's-', color='#dc3545', linewidth=1.5, 
+                markersize=3, label='Инфляция', alpha=0.8)
+        
+        # Настройка графика
+        ax.set_xlabel('Год', fontsize=6)
+        ax.set_ylabel('%', fontsize=6)
+        ax.set_title(title, fontsize=8, fontweight='bold')
+        ax.grid(True, alpha=0.2)
+        ax.legend(fontsize=6, loc='upper right')
+        
+        # Поворот подписей оси X
+        plt.xticks(rotation=45, fontsize=6)
+        plt.yticks(fontsize=6)
+        
+        # Настройка отступов
+        plt.tight_layout()
+        
+        # Сохраняем в буфер
+        buffer = io.BytesIO()
+        plt.savefig(buffer, format='png', dpi=200, bbox_inches='tight')
+        buffer.seek(0)
+        
+        # Закрываем фигуру
+        plt.close()
+        
+        return buffer
+        
+    except Exception as e:
+        logger.error(f"Ошибка создания графика для PDF: {e}")
+        return None
 
 if __name__ == '__main__':
     run_flask()

@@ -41,19 +41,10 @@ class EconomicChartsComponent {
             <div class="charts-section">
                 <h3 class="charts-title">📊 Экономические данные</h3>
                 
-                <div class="charts-grid">
-                    <div class="chart-wrapper">
-                        <div class="chart-title">📈 Динамика роста ВВП</div>
-                        <div class="chart-container">
-                            <canvas id="gdpChart"></canvas>
-                        </div>
-                    </div>
-                    
-                    <div class="chart-wrapper">
-                        <div class="chart-title">📉 Динамика инфляции</div>
-                        <div class="chart-container">
-                            <canvas id="inflationChart"></canvas>
-                        </div>
+                <div class="chart-wrapper">
+                    <div class="chart-title">📈 Динамика экономических показателей</div>
+                    <div class="chart-container">
+                        <canvas id="economicChart"></canvas>
                     </div>
                 </div>
                 
@@ -93,9 +84,10 @@ class EconomicChartsComponent {
             .economic-charts-container {
                 margin: 20px 0;
                 padding: 20px;
-                background: #f8f9fa;
-                border-radius: 10px;
+                background: white;
+                border-radius: 8px;
                 border: 1px solid #e9ecef;
+                box-shadow: 0 1px 3px rgba(0,0,0,0.1);
             }
             
             .charts-title {
@@ -103,34 +95,27 @@ class EconomicChartsComponent {
                 color: #495057;
                 margin-bottom: 20px;
                 font-size: 18px;
-                font-weight: bold;
-            }
-            
-            .charts-grid {
-                display: grid;
-                grid-template-columns: 1fr 1fr;
-                gap: 20px;
-                margin-bottom: 20px;
+                font-weight: 500;
             }
             
             .chart-wrapper {
                 background: white;
                 border-radius: 8px;
                 padding: 15px;
-                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                margin-bottom: 20px;
             }
             
             .chart-title {
                 font-size: 16px;
-                font-weight: bold;
+                font-weight: 500;
                 color: #495057;
-                margin-bottom: 10px;
+                margin-bottom: 15px;
                 text-align: center;
             }
             
             .chart-container {
                 position: relative;
-                height: 300px;
+                height: 400px;
             }
             
             .stats-grid {
@@ -140,58 +125,51 @@ class EconomicChartsComponent {
             }
             
             .stat-card {
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                color: white;
+                background: #f8f9fa;
+                color: #495057;
                 padding: 15px;
-                border-radius: 8px;
+                border-radius: 6px;
                 text-align: center;
-                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            }
-            
-            .stat-card.inflation {
-                background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+                border: 1px solid #e9ecef;
             }
             
             .stat-value {
                 font-size: 20px;
                 font-weight: bold;
                 margin-bottom: 5px;
+                color: #333;
             }
             
             .stat-label {
                 font-size: 12px;
-                opacity: 0.9;
-                margin-bottom: 5px;
+                color: #6c757d;
+                margin-bottom: 8px;
             }
             
             .trend-indicator {
                 font-size: 11px;
-                font-weight: bold;
-                padding: 2px 6px;
+                font-weight: 500;
+                padding: 3px 8px;
                 border-radius: 4px;
                 display: inline-block;
             }
             
             .trend-up {
-                background: #28a745;
-                color: white;
+                background: #d4edda;
+                color: #155724;
             }
             
             .trend-down {
-                background: #dc3545;
-                color: white;
+                background: #f8d7da;
+                color: #721c24;
             }
             
             .trend-stable {
-                background: #6c757d;
-                color: white;
+                background: #e2e3e5;
+                color: #383d41;
             }
             
             @media (max-width: 768px) {
-                .charts-grid {
-                    grid-template-columns: 1fr;
-                }
-                
                 .stats-grid {
                     grid-template-columns: 1fr;
                 }
@@ -230,7 +208,7 @@ class EconomicChartsComponent {
     }
 
     /**
-     * Создает графики с полученными данными
+     * Создает объединенный график с двумя линиями
      */
     createCharts(chartData) {
         if (!this.isChartJsLoaded) {
@@ -239,69 +217,113 @@ class EconomicChartsComponent {
             return;
         }
 
-        // Создаем график ВВП
-        const gdpCtx = document.getElementById('gdpChart');
-        if (gdpCtx && chartData.gdp_chart) {
-            this.charts.gdp = new Chart(gdpCtx, {
-                type: 'line',
-                data: chartData.gdp_chart,
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: true,
-                            position: 'top'
-                        },
-                        tooltip: {
-                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                            titleColor: '#fff',
-                            bodyColor: '#fff'
-                        }
+        // Создаем объединенный график
+        const ctx = document.getElementById('economicChart');
+        if (ctx && chartData.gdp_chart && chartData.inflation_chart) {
+            const economicData = {
+                labels: chartData.gdp_chart.labels,
+                datasets: [
+                    {
+                        label: 'Рост ВВП (%)',
+                        data: chartData.gdp_chart.datasets[0].data,
+                        borderColor: '#00bcd4',
+                        backgroundColor: 'rgba(0, 188, 212, 0.1)',
+                        tension: 0.4,
+                        fill: false,
+                        pointBackgroundColor: '#00bcd4',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                        pointRadius: 4,
+                        borderWidth: 2
                     },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            title: {
-                                display: true,
-                                text: 'Рост ВВП (%)'
-                            }
-                        }
+                    {
+                        label: 'Инфляция (%)',
+                        data: chartData.inflation_chart.datasets[0].data,
+                        borderColor: '#dc3545',
+                        backgroundColor: 'rgba(220, 53, 69, 0.1)',
+                        tension: 0.4,
+                        fill: false,
+                        pointBackgroundColor: '#dc3545',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                        pointRadius: 4,
+                        borderWidth: 2
                     }
-                }
-            });
-        }
+                ]
+            };
 
-        // Создаем график инфляции
-        const inflationCtx = document.getElementById('inflationChart');
-        if (inflationCtx && chartData.inflation_chart) {
-            this.charts.inflation = new Chart(inflationCtx, {
-                type: 'line',
-                data: chartData.inflation_chart,
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: true,
-                            position: 'top'
-                        },
-                        tooltip: {
-                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                            titleColor: '#fff',
-                            bodyColor: '#fff'
+            const chartOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top',
+                        labels: {
+                            font: {
+                                size: 12
+                            },
+                            usePointStyle: true,
+                            padding: 15
                         }
                     },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            title: {
-                                display: true,
-                                text: 'Инфляция (%)'
-                            }
+                    tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        titleColor: '#fff',
+                        bodyColor: '#fff',
+                        borderColor: '#00bcd4',
+                        borderWidth: 1,
+                        cornerRadius: 6
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.05)',
+                            drawBorder: false
+                        },
+                        ticks: {
+                            font: {
+                                size: 11
+                            },
+                            color: '#6c757d'
+                        },
+                        border: {
+                            display: false
+                        }
+                    },
+                    x: {
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.05)',
+                            drawBorder: false
+                        },
+                        ticks: {
+                            font: {
+                                size: 11
+                            },
+                            color: '#6c757d'
+                        },
+                        border: {
+                            display: false
                         }
                     }
+                },
+                elements: {
+                    point: {
+                        hoverRadius: 6
+                    }
+                },
+                interaction: {
+                    intersect: false,
+                    mode: 'index'
                 }
+            };
+
+            this.charts.economic = new Chart(ctx, {
+                type: 'line',
+                data: economicData,
+                options: chartOptions
             });
         }
 
@@ -377,7 +399,7 @@ class EconomicChartsComponent {
             chartsContainer.innerHTML = `
                 <div style="text-align: center; color: #6c757d; padding: 20px;">
                     <p>Не удалось загрузить экономические данные</p>
-                    <button onclick="location.reload()" style="padding: 8px 16px; background: #667eea; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                    <button onclick="location.reload()" style="padding: 8px 16px; background: #00bcd4; color: white; border: none; border-radius: 4px; cursor: pointer;">
                         Попробовать снова
                     </button>
                 </div>
@@ -418,4 +440,5 @@ if (typeof module !== 'undefined' && module.exports) {
     module.exports = EconomicChartsComponent;
 } else {
     window.EconomicChartsComponent = EconomicChartsComponent;
+} 
 } 

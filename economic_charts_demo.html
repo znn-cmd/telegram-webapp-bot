@@ -10,87 +10,82 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
             padding: 20px;
-            background-color: #f5f5f5;
+            background-color: white;
         }
         .container {
-            max-width: 1200px;
+            max-width: 1000px;
             margin: 0 auto;
             background: white;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            padding: 30px;
+            padding: 20px;
         }
         h1 {
             color: #333;
             text-align: center;
             margin-bottom: 30px;
-        }
-        .charts-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
-            margin-bottom: 30px;
+            font-size: 24px;
+            font-weight: 300;
         }
         .chart-container {
-            background: #f8f9fa;
+            background: white;
             border-radius: 8px;
             padding: 20px;
             border: 1px solid #e9ecef;
+            margin-bottom: 30px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
         .chart-title {
-            font-size: 18px;
-            font-weight: bold;
+            font-size: 16px;
+            font-weight: 500;
             color: #495057;
             margin-bottom: 15px;
             text-align: center;
         }
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-top: 30px;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
         }
         .stat-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 20px;
-            border-radius: 8px;
+            background: #f8f9fa;
+            color: #495057;
+            padding: 15px;
+            border-radius: 6px;
             text-align: center;
-        }
-        .stat-card.inflation {
-            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            border: 1px solid #e9ecef;
         }
         .stat-value {
-            font-size: 24px;
+            font-size: 20px;
             font-weight: bold;
             margin-bottom: 5px;
+            color: #333;
         }
         .stat-label {
-            font-size: 14px;
-            opacity: 0.9;
+            font-size: 12px;
+            color: #6c757d;
+            margin-bottom: 8px;
         }
         .trend-indicator {
             display: inline-block;
-            padding: 4px 8px;
+            padding: 3px 8px;
             border-radius: 4px;
-            font-size: 12px;
-            font-weight: bold;
-            margin-left: 10px;
+            font-size: 11px;
+            font-weight: 500;
         }
         .trend-up {
-            background: #28a745;
-            color: white;
+            background: #d4edda;
+            color: #155724;
         }
         .trend-down {
-            background: #dc3545;
-            color: white;
+            background: #f8d7da;
+            color: #721c24;
         }
         .trend-stable {
-            background: #6c757d;
-            color: white;
+            background: #e2e3e5;
+            color: #383d41;
         }
         @media (max-width: 768px) {
-            .charts-grid {
+            .stats-grid {
                 grid-template-columns: 1fr;
             }
         }
@@ -100,16 +95,9 @@
     <div class="container">
         <h1>📊 Экономические данные - Türkiye, Republic of</h1>
         
-        <div class="charts-grid">
-            <div class="chart-container">
-                <div class="chart-title">📈 Динамика роста ВВП</div>
-                <canvas id="gdpChart"></canvas>
-            </div>
-            
-            <div class="chart-container">
-                <div class="chart-title">📉 Динамика инфляции</div>
-                <canvas id="inflationChart"></canvas>
-            </div>
+        <div class="chart-container">
+            <div class="chart-title">📈 Динамика экономических показателей</div>
+            <canvas id="economicChart"></canvas>
         </div>
         
         <div class="stats-grid">
@@ -119,7 +107,7 @@
                 <span class="trend-indicator trend-down">↓ Тренд падения</span>
             </div>
             
-            <div class="stat-card inflation">
+            <div class="stat-card">
                 <div class="stat-value">35.9%</div>
                 <div class="stat-label">Последняя инфляция (2025)</div>
                 <span class="trend-indicator trend-down">↓ Снижение</span>
@@ -131,7 +119,7 @@
                 <span class="trend-indicator trend-up">↑ Положительный</span>
             </div>
             
-            <div class="stat-card inflation">
+            <div class="stat-card">
                 <div class="stat-value">-22.6%</div>
                 <div class="stat-label">Тренд инфляции</div>
                 <span class="trend-indicator trend-down">↓ Снижение</span>
@@ -140,41 +128,41 @@
     </div>
 
     <script>
-        // Данные для графиков (из реальных данных Supabase)
-        const gdpData = {
+        // Объединенные данные для графика
+        const economicData = {
             labels: ['2019', '2020', '2021', '2022', '2023', '2024', '2025'],
-            datasets: [{
-                label: 'Рост ВВП (%) - Türkiye, Republic of',
-                data: [0.9, 1.9, 11.4, 5.5, 5.1, 3.2, 2.7],
-                borderColor: '#667eea',
-                backgroundColor: 'rgba(102, 126, 234, 0.1)',
-                tension: 0.4,
-                fill: false,
-                pointBackgroundColor: '#667eea',
-                pointBorderColor: '#fff',
-                pointBorderWidth: 2,
-                pointRadius: 6
-            }]
+            datasets: [
+                {
+                    label: 'Рост ВВП (%)',
+                    data: [0.9, 1.9, 11.4, 5.5, 5.1, 3.2, 2.7],
+                    borderColor: '#00bcd4',
+                    backgroundColor: 'rgba(0, 188, 212, 0.1)',
+                    tension: 0.4,
+                    fill: false,
+                    pointBackgroundColor: '#00bcd4',
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2,
+                    pointRadius: 4,
+                    borderWidth: 2
+                },
+                {
+                    label: 'Инфляция (%)',
+                    data: [15.2, 12.3, 19.6, 72.3, 53.9, 58.5, 35.9],
+                    borderColor: '#dc3545',
+                    backgroundColor: 'rgba(220, 53, 69, 0.1)',
+                    tension: 0.4,
+                    fill: false,
+                    pointBackgroundColor: '#dc3545',
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2,
+                    pointRadius: 4,
+                    borderWidth: 2
+                }
+            ]
         };
 
-        const inflationData = {
-            labels: ['2019', '2020', '2021', '2022', '2023', '2024', '2025'],
-            datasets: [{
-                label: 'Инфляция (%) - Türkiye, Republic of',
-                data: [15.2, 12.3, 19.6, 72.3, 53.9, 58.5, 35.9],
-                borderColor: '#dc3545',
-                backgroundColor: 'rgba(220, 53, 69, 0.1)',
-                tension: 0.4,
-                fill: false,
-                pointBackgroundColor: '#dc3545',
-                pointBorderColor: '#fff',
-                pointBorderWidth: 2,
-                pointRadius: 6
-            }]
-        };
-
-        // Общие настройки для графиков
-        const commonOptions = {
+        // Настройки для объединенного графика
+        const chartOptions = {
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
@@ -184,102 +172,70 @@
                     labels: {
                         font: {
                             size: 12
-                        }
+                        },
+                        usePointStyle: true,
+                        padding: 15
                     }
                 },
                 tooltip: {
                     backgroundColor: 'rgba(0, 0, 0, 0.8)',
                     titleColor: '#fff',
                     bodyColor: '#fff',
-                    borderColor: '#667eea',
-                    borderWidth: 1
+                    borderColor: '#00bcd4',
+                    borderWidth: 1,
+                    cornerRadius: 6
                 }
             },
             scales: {
                 y: {
                     beginAtZero: true,
                     grid: {
-                        color: 'rgba(0, 0, 0, 0.1)'
+                        color: 'rgba(0, 0, 0, 0.05)',
+                        drawBorder: false
                     },
                     ticks: {
                         font: {
-                            size: 12
-                        }
+                            size: 11
+                        },
+                        color: '#6c757d'
+                    },
+                    border: {
+                        display: false
                     }
                 },
                 x: {
                     grid: {
-                        color: 'rgba(0, 0, 0, 0.1)'
+                        color: 'rgba(0, 0, 0, 0.05)',
+                        drawBorder: false
                     },
                     ticks: {
                         font: {
-                            size: 12
-                        }
+                            size: 11
+                        },
+                        color: '#6c757d'
+                    },
+                    border: {
+                        display: false
                     }
                 }
+            },
+            elements: {
+                point: {
+                    hoverRadius: 6
+                }
+            },
+            interaction: {
+                intersect: false,
+                mode: 'index'
             }
         };
 
-        // Создаем график ВВП
-        const gdpCtx = document.getElementById('gdpChart').getContext('2d');
-        new Chart(gdpCtx, {
+        // Создаем объединенный график
+        const ctx = document.getElementById('economicChart').getContext('2d');
+        new Chart(ctx, {
             type: 'line',
-            data: gdpData,
-            options: {
-                ...commonOptions,
-                plugins: {
-                    ...commonOptions.plugins,
-                    title: {
-                        display: true,
-                        text: 'Динамика роста ВВП - Türkiye, Republic of',
-                        font: {
-                            size: 16,
-                            weight: 'bold'
-                        }
-                    }
-                },
-                scales: {
-                    ...commonOptions.scales,
-                    y: {
-                        ...commonOptions.scales.y,
-                        title: {
-                            display: true,
-                            text: 'Рост ВВП (%)'
-                        }
-                    }
-                }
-            }
-        });
-
-        // Создаем график инфляции
-        const inflationCtx = document.getElementById('inflationChart').getContext('2d');
-        new Chart(inflationCtx, {
-            type: 'line',
-            data: inflationData,
-            options: {
-                ...commonOptions,
-                plugins: {
-                    ...commonOptions.plugins,
-                    title: {
-                        display: true,
-                        text: 'Динамика инфляции - Türkiye, Republic of',
-                        font: {
-                            size: 16,
-                            weight: 'bold'
-                        }
-                    }
-                },
-                scales: {
-                    ...commonOptions.scales,
-                    y: {
-                        ...commonOptions.scales.y,
-                        title: {
-                            display: true,
-                            text: 'Инфляция (%)'
-                        }
-                    }
-                }
-            }
+            data: economicData,
+            options: chartOptions
         });
 
         // Анимация для статистических карточек
