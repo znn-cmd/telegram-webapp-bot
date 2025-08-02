@@ -1356,14 +1356,25 @@ def api_generate_pdf_report():
             
             # Создаем и вставляем график
             try:
-                chart_buffer = create_chart_image_for_pdf(economic_charts, f"Динамика экономических показателей ({country_name})")
+                # Создаем данные для графика в правильном формате
+                chart_data = {
+                    'labels': economic_charts.get('gdp_chart', {}).get('labels', []),
+                    'gdp_chart': economic_charts.get('gdp_chart', {}),
+                    'inflation_chart': economic_charts.get('inflation_chart', {})
+                }
+                
+                logger.info(f"Создание графика для PDF: {len(chart_data.get('labels', []))} точек данных")
+                
+                chart_buffer = create_chart_image_for_pdf(chart_data, f"Динамика экономических показателей ({country_name})")
                 if chart_buffer:
+                    logger.info("График создан успешно, вставляем в PDF")
                     # Вставляем график в PDF
                     pdf.ln(5)
                     pdf.image(chart_buffer, x=10, y=pdf.get_y(), w=190, h=80)
                     pdf.ln(85)  # Отступ после графика
                     chart_buffer.close()
                 else:
+                    logger.warning("График не создался, используем текстовое отображение")
                     # Если график не создался, показываем текстовые данные
                     pdf.ln(3)
                     pdf.set_font("DejaVu", 'B', 12)
@@ -2324,6 +2335,8 @@ def create_chart_image_for_pdf(chart_data, title, width=180, height=100):
     Создает изображение графика для вставки в PDF
     """
     try:
+        logger.info(f"Создание графика для PDF: {title}")
+        
         # Настройка для русского языка
         plt.rcParams['font.family'] = ['DejaVu Sans', 'Arial', 'sans-serif']
         plt.rcParams['font.size'] = 8
@@ -2336,7 +2349,10 @@ def create_chart_image_for_pdf(chart_data, title, width=180, height=100):
         gdp_data = chart_data.get('gdp_chart', {}).get('datasets', [{}])[0].get('data', [])
         inflation_data = chart_data.get('inflation_chart', {}).get('datasets', [{}])[0].get('data', [])
         
+        logger.info(f"Данные для графика: {len(years)} лет, ВВП: {len(gdp_data)} точек, Инфляция: {len(inflation_data)} точек")
+        
         if not years or not gdp_data or not inflation_data:
+            logger.warning("Недостаточно данных для создания графика")
             return None
         
         # Создаем график
