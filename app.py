@@ -1444,81 +1444,122 @@ def api_generate_pdf_report():
                     location_data['county_name']
                 )
                 
+                # Получаем исторические данные для графиков
+                historical_data = get_historical_property_trends(
+                    location_data['city_name'],
+                    location_data['district_name'],
+                    location_data['county_name']
+                )
+                
+                # Данные по продаже
+                pdf.set_font("DejaVu", 'B', 12)
+                pdf.cell(200, 8, text="Данные по продаже:", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                pdf.set_font("DejaVu", size=10)
+                
                 if trends_data:
-                    # Цены на продажу
                     if trends_data.get('unit_price_for_sale'):
-                        pdf.cell(200, 8, text=f"Средняя цена за м² (продажа): €{trends_data['unit_price_for_sale']:,.2f}", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                        pdf.cell(200, 6, text=f"Средняя цена за м² (продажа): €{trends_data['unit_price_for_sale']:,.2f}", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
                     else:
-                        pdf.cell(200, 8, text="Средняя цена за м² (продажа): н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                        pdf.cell(200, 6, text="Средняя цена за м² (продажа): н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
                     
                     if trends_data.get('price_change_sale'):
                         change_percent = trends_data['price_change_sale'] * 100
-                        pdf.cell(200, 8, text=f"Изменение цен (продажа): {change_percent:+.2f}%", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                        pdf.cell(200, 6, text=f"Изменение цен (продажа): {change_percent:+.2f}%", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
                     else:
-                        pdf.cell(200, 8, text="Изменение цен (продажа): н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                        pdf.cell(200, 6, text="Изменение цен (продажа): н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
                     
-                    # Цены на аренду
-                    if trends_data.get('unit_price_for_rent'):
-                        pdf.cell(200, 8, text=f"Средняя цена за м² (аренда): €{trends_data['unit_price_for_rent']:,.2f}", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                    if trends_data.get('listing_period_for_sale'):
+                        pdf.cell(200, 6, text=f"Средний период продажи: {trends_data['listing_period_for_sale']} дней", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
                     else:
-                        pdf.cell(200, 8, text="Средняя цена за м² (аренда): н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                        pdf.cell(200, 6, text="Средний период продажи: н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                    
+                    if trends_data.get('count_for_sale'):
+                        pdf.cell(200, 6, text=f"Объектов на продажу: {trends_data['count_for_sale']}", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                    else:
+                        pdf.cell(200, 6, text="Объектов на продажу: н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                else:
+                    pdf.cell(200, 6, text="Средняя цена за м² (продажа): н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                    pdf.cell(200, 6, text="Изменение цен (продажа): н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                    pdf.cell(200, 6, text="Средний период продажи: н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                    pdf.cell(200, 6, text="Объектов на продажу: н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                
+                # График изменения цен на продажу
+                if historical_data:
+                    sale_chart_buffer = create_property_trends_chart(historical_data, 'sale', 180, 80)
+                    if sale_chart_buffer:
+                        pdf.ln(3)
+                        pdf.image(sale_chart_buffer, x=15, w=180)
+                        pdf.ln(3)
+                
+                pdf.ln(5)
+                
+                # Данные по аренде (долгосрочная)
+                pdf.set_font("DejaVu", 'B', 12)
+                pdf.cell(200, 8, text="Данные по долгосрочной аренде:", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                pdf.set_font("DejaVu", size=10)
+                
+                if trends_data:
+                    if trends_data.get('unit_price_for_rent'):
+                        pdf.cell(200, 6, text=f"Средняя цена за м² (аренда): €{trends_data['unit_price_for_rent']:,.2f}", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                    else:
+                        pdf.cell(200, 6, text="Средняя цена за м² (аренда): н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
                     
                     if trends_data.get('price_change_rent'):
                         change_percent = trends_data['price_change_rent'] * 100
-                        pdf.cell(200, 8, text=f"Изменение цен (аренда): {change_percent:+.2f}%", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                        pdf.cell(200, 6, text=f"Изменение цен (аренда): {change_percent:+.2f}%", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
                     else:
-                        pdf.cell(200, 8, text="Изменение цен (аренда): н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                        pdf.cell(200, 6, text="Изменение цен (аренда): н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                    
+                    if trends_data.get('listing_period_for_rent'):
+                        pdf.cell(200, 6, text=f"Средний период аренды: {trends_data['listing_period_for_rent']} дней", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                    else:
+                        pdf.cell(200, 6, text="Средний период аренды: н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                    
+                    if trends_data.get('count_for_rent'):
+                        pdf.cell(200, 6, text=f"Объектов на аренду: {trends_data['count_for_rent']}", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                    else:
+                        pdf.cell(200, 6, text="Объектов на аренду: н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
                     
                     # Доходность
                     if trends_data.get('yield'):
                         yield_percent = trends_data['yield'] * 100
-                        pdf.cell(200, 8, text=f"Доходность: {yield_percent:.2f}%", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                        pdf.cell(200, 6, text=f"Доходность: {yield_percent:.2f}%", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
                     else:
-                        pdf.cell(200, 8, text="Доходность: н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-                    
-                    # Период размещения
-                    if trends_data.get('listing_period_for_sale'):
-                        pdf.cell(200, 8, text=f"Средний период продажи: {trends_data['listing_period_for_sale']} дней", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-                    else:
-                        pdf.cell(200, 8, text="Средний период продажи: н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-                    
-                    if trends_data.get('listing_period_for_rent'):
-                        pdf.cell(200, 8, text=f"Средний период аренды: {trends_data['listing_period_for_rent']} дней", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-                    else:
-                        pdf.cell(200, 8, text="Средний период аренды: н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-                    
-                    # Количество объектов
-                    if trends_data.get('count_for_sale'):
-                        pdf.cell(200, 8, text=f"Объектов на продажу: {trends_data['count_for_sale']}", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-                    else:
-                        pdf.cell(200, 8, text="Объектов на продажу: н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-                    
-                    if trends_data.get('count_for_rent'):
-                        pdf.cell(200, 8, text=f"Объектов на аренду: {trends_data['count_for_rent']}", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-                    else:
-                        pdf.cell(200, 8, text="Объектов на аренду: н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                        pdf.cell(200, 6, text="Доходность: н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
                 else:
-                    # Данные не найдены - показываем "н/д" для всех полей
-                    pdf.cell(200, 8, text="Средняя цена за м² (продажа): н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-                    pdf.cell(200, 8, text="Изменение цен (продажа): н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-                    pdf.cell(200, 8, text="Средняя цена за м² (аренда): н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-                    pdf.cell(200, 8, text="Изменение цен (аренда): н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-                    pdf.cell(200, 8, text="Доходность: н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-                    pdf.cell(200, 8, text="Средний период продажи: н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-                    pdf.cell(200, 8, text="Средний период аренды: н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-                    pdf.cell(200, 8, text="Объектов на продажу: н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-                    pdf.cell(200, 8, text="Объектов на аренду: н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                    pdf.cell(200, 6, text="Средняя цена за м² (аренда): н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                    pdf.cell(200, 6, text="Изменение цен (аренда): н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                    pdf.cell(200, 6, text="Средний период аренды: н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                    pdf.cell(200, 6, text="Объектов на аренду: н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                    pdf.cell(200, 6, text="Доходность: н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                
+                # График изменения цен на аренду
+                if historical_data:
+                    rent_chart_buffer = create_property_trends_chart(historical_data, 'rent', 180, 80)
+                    if rent_chart_buffer:
+                        pdf.ln(3)
+                        pdf.image(rent_chart_buffer, x=15, w=180)
+                        pdf.ln(3)
             else:
                 # Адрес не содержит информации о городе - показываем "н/д" для всех полей
-                pdf.cell(200, 8, text="Средняя цена за м² (продажа): н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-                pdf.cell(200, 8, text="Изменение цен (продажа): н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-                pdf.cell(200, 8, text="Средняя цена за м² (аренда): н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-                pdf.cell(200, 8, text="Изменение цен (аренда): н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-                pdf.cell(200, 8, text="Доходность: н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-                pdf.cell(200, 8, text="Средний период продажи: н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-                pdf.cell(200, 8, text="Средний период аренды: н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-                pdf.cell(200, 8, text="Объектов на продажу: н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-                pdf.cell(200, 8, text="Объектов на аренду: н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                pdf.set_font("DejaVu", 'B', 12)
+                pdf.cell(200, 8, text="Данные по продаже:", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                pdf.set_font("DejaVu", size=10)
+                pdf.cell(200, 6, text="Средняя цена за м² (продажа): н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                pdf.cell(200, 6, text="Изменение цен (продажа): н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                pdf.cell(200, 6, text="Средний период продажи: н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                pdf.cell(200, 6, text="Объектов на продажу: н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                
+                pdf.ln(5)
+                
+                pdf.set_font("DejaVu", 'B', 12)
+                pdf.cell(200, 8, text="Данные по долгосрочной аренде:", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                pdf.set_font("DejaVu", size=10)
+                pdf.cell(200, 6, text="Средняя цена за м² (аренда): н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                pdf.cell(200, 6, text="Изменение цен (аренда): н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                pdf.cell(200, 6, text="Средний период аренды: н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                pdf.cell(200, 6, text="Объектов на аренду: н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                pdf.cell(200, 6, text="Доходность: н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
             
             pdf.ln(5)
         
@@ -1911,81 +1952,122 @@ def api_send_saved_report_pdf():
                     location_data['county_name']
                 )
                 
+                # Получаем исторические данные для графиков
+                historical_data = get_historical_property_trends(
+                    location_data['city_name'],
+                    location_data['district_name'],
+                    location_data['county_name']
+                )
+                
+                # Данные по продаже
+                pdf.set_font("DejaVu", 'B', 12)
+                pdf.cell(0, 8, "Данные по продаже:", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                pdf.set_font("DejaVu", size=10)
+                
                 if trends_data:
-                    # Цены на продажу
                     if trends_data.get('unit_price_for_sale'):
-                        pdf.cell(0, 8, f"Средняя цена за м² (продажа): €{trends_data['unit_price_for_sale']:,.2f}", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                        pdf.cell(0, 6, f"Средняя цена за м² (продажа): €{trends_data['unit_price_for_sale']:,.2f}", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
                     else:
-                        pdf.cell(0, 8, "Средняя цена за м² (продажа): н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                        pdf.cell(0, 6, "Средняя цена за м² (продажа): н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
                     
                     if trends_data.get('price_change_sale'):
                         change_percent = trends_data['price_change_sale'] * 100
-                        pdf.cell(0, 8, f"Изменение цен (продажа): {change_percent:+.2f}%", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                        pdf.cell(0, 6, f"Изменение цен (продажа): {change_percent:+.2f}%", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
                     else:
-                        pdf.cell(0, 8, "Изменение цен (продажа): н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                        pdf.cell(0, 6, "Изменение цен (продажа): н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
                     
-                    # Цены на аренду
-                    if trends_data.get('unit_price_for_rent'):
-                        pdf.cell(0, 8, f"Средняя цена за м² (аренда): €{trends_data['unit_price_for_rent']:,.2f}", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                    if trends_data.get('listing_period_for_sale'):
+                        pdf.cell(0, 6, f"Средний период продажи: {trends_data['listing_period_for_sale']} дней", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
                     else:
-                        pdf.cell(0, 8, "Средняя цена за м² (аренда): н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                        pdf.cell(0, 6, "Средний период продажи: н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                    
+                    if trends_data.get('count_for_sale'):
+                        pdf.cell(0, 6, f"Объектов на продажу: {trends_data['count_for_sale']}", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                    else:
+                        pdf.cell(0, 6, "Объектов на продажу: н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                else:
+                    pdf.cell(0, 6, "Средняя цена за м² (продажа): н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                    pdf.cell(0, 6, "Изменение цен (продажа): н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                    pdf.cell(0, 6, "Средний период продажи: н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                    pdf.cell(0, 6, "Объектов на продажу: н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                
+                # График изменения цен на продажу
+                if historical_data:
+                    sale_chart_buffer = create_property_trends_chart(historical_data, 'sale', 180, 80)
+                    if sale_chart_buffer:
+                        pdf.ln(3)
+                        pdf.image(sale_chart_buffer, x=15, w=180)
+                        pdf.ln(3)
+                
+                pdf.ln(5)
+                
+                # Данные по аренде (долгосрочная)
+                pdf.set_font("DejaVu", 'B', 12)
+                pdf.cell(0, 8, "Данные по долгосрочной аренде:", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                pdf.set_font("DejaVu", size=10)
+                
+                if trends_data:
+                    if trends_data.get('unit_price_for_rent'):
+                        pdf.cell(0, 6, f"Средняя цена за м² (аренда): €{trends_data['unit_price_for_rent']:,.2f}", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                    else:
+                        pdf.cell(0, 6, "Средняя цена за м² (аренда): н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
                     
                     if trends_data.get('price_change_rent'):
                         change_percent = trends_data['price_change_rent'] * 100
-                        pdf.cell(0, 8, f"Изменение цен (аренда): {change_percent:+.2f}%", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                        pdf.cell(0, 6, f"Изменение цен (аренда): {change_percent:+.2f}%", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
                     else:
-                        pdf.cell(0, 8, "Изменение цен (аренда): н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                        pdf.cell(0, 6, "Изменение цен (аренда): н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                    
+                    if trends_data.get('listing_period_for_rent'):
+                        pdf.cell(0, 6, f"Средний период аренды: {trends_data['listing_period_for_rent']} дней", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                    else:
+                        pdf.cell(0, 6, "Средний период аренды: н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                    
+                    if trends_data.get('count_for_rent'):
+                        pdf.cell(0, 6, f"Объектов на аренду: {trends_data['count_for_rent']}", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                    else:
+                        pdf.cell(0, 6, "Объектов на аренду: н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
                     
                     # Доходность
                     if trends_data.get('yield'):
                         yield_percent = trends_data['yield'] * 100
-                        pdf.cell(0, 8, f"Доходность: {yield_percent:.2f}%", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                        pdf.cell(0, 6, f"Доходность: {yield_percent:.2f}%", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
                     else:
-                        pdf.cell(0, 8, "Доходность: н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-                    
-                    # Период размещения
-                    if trends_data.get('listing_period_for_sale'):
-                        pdf.cell(0, 8, f"Средний период продажи: {trends_data['listing_period_for_sale']} дней", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-                    else:
-                        pdf.cell(0, 8, "Средний период продажи: н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-                    
-                    if trends_data.get('listing_period_for_rent'):
-                        pdf.cell(0, 8, f"Средний период аренды: {trends_data['listing_period_for_rent']} дней", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-                    else:
-                        pdf.cell(0, 8, "Средний период аренды: н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-                    
-                    # Количество объектов
-                    if trends_data.get('count_for_sale'):
-                        pdf.cell(0, 8, f"Объектов на продажу: {trends_data['count_for_sale']}", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-                    else:
-                        pdf.cell(0, 8, "Объектов на продажу: н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-                    
-                    if trends_data.get('count_for_rent'):
-                        pdf.cell(0, 8, f"Объектов на аренду: {trends_data['count_for_rent']}", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-                    else:
-                        pdf.cell(0, 8, "Объектов на аренду: н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                        pdf.cell(0, 6, "Доходность: н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
                 else:
-                    # Данные не найдены - показываем "н/д" для всех полей
-                    pdf.cell(0, 8, "Средняя цена за м² (продажа): н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-                    pdf.cell(0, 8, "Изменение цен (продажа): н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-                    pdf.cell(0, 8, "Средняя цена за м² (аренда): н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-                    pdf.cell(0, 8, "Изменение цен (аренда): н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-                    pdf.cell(0, 8, "Доходность: н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-                    pdf.cell(0, 8, "Средний период продажи: н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-                    pdf.cell(0, 8, "Средний период аренды: н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-                    pdf.cell(0, 8, "Объектов на продажу: н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-                    pdf.cell(0, 8, "Объектов на аренду: н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                    pdf.cell(0, 6, "Средняя цена за м² (аренда): н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                    pdf.cell(0, 6, "Изменение цен (аренда): н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                    pdf.cell(0, 6, "Средний период аренды: н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                    pdf.cell(0, 6, "Объектов на аренду: н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                    pdf.cell(0, 6, "Доходность: н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                
+                # График изменения цен на аренду
+                if historical_data:
+                    rent_chart_buffer = create_property_trends_chart(historical_data, 'rent', 180, 80)
+                    if rent_chart_buffer:
+                        pdf.ln(3)
+                        pdf.image(rent_chart_buffer, x=15, w=180)
+                        pdf.ln(3)
             else:
                 # Адрес не содержит информации о городе - показываем "н/д" для всех полей
-                pdf.cell(0, 8, "Средняя цена за м² (продажа): н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-                pdf.cell(0, 8, "Изменение цен (продажа): н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-                pdf.cell(0, 8, "Средняя цена за м² (аренда): н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-                pdf.cell(0, 8, "Изменение цен (аренда): н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-                pdf.cell(0, 8, "Доходность: н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-                pdf.cell(0, 8, "Средний период продажи: н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-                pdf.cell(0, 8, "Средний период аренды: н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-                pdf.cell(0, 8, "Объектов на продажу: н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-                pdf.cell(0, 8, "Объектов на аренду: н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                pdf.set_font("DejaVu", 'B', 12)
+                pdf.cell(0, 8, "Данные по продаже:", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                pdf.set_font("DejaVu", size=10)
+                pdf.cell(0, 6, "Средняя цена за м² (продажа): н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                pdf.cell(0, 6, "Изменение цен (продажа): н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                pdf.cell(0, 6, "Средний период продажи: н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                pdf.cell(0, 6, "Объектов на продажу: н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                
+                pdf.ln(5)
+                
+                pdf.set_font("DejaVu", 'B', 12)
+                pdf.cell(0, 8, "Данные по долгосрочной аренде:", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                pdf.set_font("DejaVu", size=10)
+                pdf.cell(0, 6, "Средняя цена за м² (аренда): н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                pdf.cell(0, 6, "Изменение цен (аренда): н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                pdf.cell(0, 6, "Средний период аренды: н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                pdf.cell(0, 6, "Объектов на аренду: н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                pdf.cell(0, 6, "Доходность: н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
             
             pdf.ln(5)
         
@@ -2719,6 +2801,172 @@ def extract_location_from_address(address):
             'district_name': None,
             'county_name': None
         }
+
+def get_historical_property_trends(city_name, district_name, county_name, years_back=5):
+    """
+    Получает исторические данные трендов недвижимости за последние годы
+    
+    Args:
+        city_name (str): Название города
+        district_name (str): Название района
+        county_name (str): Название округа/провинции
+        years_back (int): Количество лет назад для получения данных
+    
+    Returns:
+        dict: Словарь с данными по годам для продажи и аренды
+    """
+    try:
+        from datetime import datetime
+        current_date = datetime.now()
+        current_year = current_date.year
+        
+        # Получаем данные за последние years_back лет
+        historical_data = {
+            'sale_prices': [],
+            'rent_prices': [],
+            'years': []
+        }
+        
+        for year_offset in range(years_back):
+            target_year = current_year - year_offset
+            
+            # Запрос к таблице property_trends
+            query = supabase.table('property_trends').select('*').eq('city_name', city_name)
+            
+            # Добавляем фильтры если они есть
+            if district_name:
+                query = query.eq('district_name', district_name)
+            if county_name:
+                query = query.eq('county_name', county_name)
+            
+            # Фильтруем по году
+            query = query.eq('property_year', target_year)
+            
+            # Получаем данные
+            result = query.execute()
+            
+            if result.data and len(result.data) > 0:
+                # Берем среднее значение за год
+                sale_prices = []
+                rent_prices = []
+                
+                for record in result.data:
+                    if record.get('unit_price_for_sale'):
+                        sale_prices.append(record['unit_price_for_sale'])
+                    if record.get('unit_price_for_rent'):
+                        rent_prices.append(record['unit_price_for_rent'])
+                
+                # Добавляем средние значения
+                if sale_prices:
+                    historical_data['sale_prices'].append(sum(sale_prices) / len(sale_prices))
+                else:
+                    historical_data['sale_prices'].append(None)
+                
+                if rent_prices:
+                    historical_data['rent_prices'].append(sum(rent_prices) / len(rent_prices))
+                else:
+                    historical_data['rent_prices'].append(None)
+                
+                historical_data['years'].append(target_year)
+            else:
+                historical_data['sale_prices'].append(None)
+                historical_data['rent_prices'].append(None)
+                historical_data['years'].append(target_year)
+        
+        # Переворачиваем списки чтобы годы шли в хронологическом порядке
+        historical_data['sale_prices'].reverse()
+        historical_data['rent_prices'].reverse()
+        historical_data['years'].reverse()
+        
+        logger.info(f"Получены исторические данные: {len(historical_data['years'])} лет")
+        return historical_data
+        
+    except Exception as e:
+        logger.error(f"Ошибка получения исторических данных трендов: {e}")
+        return None
+
+def create_property_trends_chart(historical_data, chart_type='sale', width=180, height=100):
+    """
+    Создает график трендов недвижимости для PDF
+    
+    Args:
+        historical_data (dict): Исторические данные трендов
+        chart_type (str): Тип графика ('sale' или 'rent')
+        width (int): Ширина графика в мм
+        height (int): Высота графика в мм
+    
+    Returns:
+        BytesIO: Буфер с изображением графика или None при ошибке
+    """
+    try:
+        import matplotlib.pyplot as plt
+        import matplotlib.font_manager as fm
+        from io import BytesIO
+        import numpy as np
+        
+        # Настройка шрифта для русского языка
+        plt.rcParams['font.family'] = 'DejaVu Sans'
+        
+        # Создаем фигуру
+        fig, ax = plt.subplots(figsize=(width/25.4, height/25.4), dpi=200)
+        
+        years = historical_data['years']
+        if chart_type == 'sale':
+            prices = historical_data['sale_prices']
+            title = 'Динамика цен на продажу (€/м²)'
+            color = '#667eea'
+        else:
+            prices = historical_data['rent_prices']
+            title = 'Динамика цен на аренду (€/м²)'
+            color = '#dc3545'
+        
+        # Фильтруем None значения
+        valid_data = [(year, price) for year, price in zip(years, prices) if price is not None]
+        
+        if valid_data:
+            valid_years, valid_prices = zip(*valid_data)
+            
+            # Создаем график
+            ax.plot(valid_years, valid_prices, marker='o', linewidth=2, markersize=4, 
+                   color=color, alpha=0.8)
+            
+            # Настройка осей
+            ax.set_title(title, fontsize=10, fontname='DejaVu Sans', pad=10)
+            ax.set_xlabel('Год', fontsize=8, fontname='DejaVu Sans')
+            ax.set_ylabel('Цена (€/м²)', fontsize=8, fontname='DejaVu Sans')
+            
+            # Настройка сетки
+            ax.grid(True, alpha=0.3)
+            
+            # Настройка тиков
+            ax.tick_params(axis='both', which='major', labelsize=7)
+            
+            # Поворот подписей оси X для лучшей читаемости
+            plt.setp(ax.get_xticklabels(), rotation=45, ha='right')
+            
+            # Убираем лишние отступы
+            plt.tight_layout()
+        else:
+            # Если нет данных, показываем пустой график с сообщением
+            ax.text(0.5, 0.5, 'Нет данных', ha='center', va='center', 
+                   transform=ax.transAxes, fontsize=10, fontname='DejaVu Sans')
+            ax.set_title(title, fontsize=10, fontname='DejaVu Sans', pad=10)
+            ax.set_xlim(0, 1)
+            ax.set_ylim(0, 1)
+            ax.axis('off')
+        
+        # Сохраняем в буфер
+        buffer = BytesIO()
+        plt.savefig(buffer, format='png', dpi=200, bbox_inches='tight')
+        buffer.seek(0)
+        plt.close()
+        
+        logger.info(f"Создан график трендов {chart_type}: {len(valid_data) if valid_data else 0} точек данных")
+        return buffer
+        
+    except Exception as e:
+        logger.error(f"Ошибка создания графика трендов {chart_type}: {e}")
+        return None
 
 if __name__ == '__main__':
     run_flask()
