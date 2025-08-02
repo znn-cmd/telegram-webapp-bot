@@ -2435,15 +2435,22 @@ def create_economic_chart_image(economic_charts_data):
         ax.plot(years, inflation_data, 's-', color='#dc3545', linewidth=2, 
                 markersize=6, label='Инфляция (%)', alpha=0.8)
         
-        # Настройка графика
-        ax.set_xlabel('Год', fontsize=12)
-        ax.set_ylabel('Процент (%)', fontsize=12)
-        ax.set_title('Динамика экономических показателей', fontsize=14, fontweight='bold')
+        # Настройка графика с явным указанием шрифта
+        ax.set_xlabel('Год', fontsize=12, fontname='DejaVu Sans')
+        ax.set_ylabel('Процент (%)', fontsize=12, fontname='DejaVu Sans')
+        ax.set_title('Динамика экономических показателей', fontsize=14, fontweight='bold', fontname='DejaVu Sans')
         ax.grid(True, alpha=0.3)
-        ax.legend(fontsize=10)
+        
+        # Настройка легенды с явным указанием шрифта
+        legend = ax.legend(fontsize=10)
+        for text in legend.get_texts():
+            text.set_fontname('DejaVu Sans')
         
         # Поворот подписей оси X для лучшей читаемости
         plt.xticks(rotation=45)
+        # Устанавливаем шрифт для меток осей
+        for label in ax.get_xticklabels() + ax.get_yticklabels():
+            label.set_fontname('DejaVu Sans')
         
         # Настройка отступов
         plt.tight_layout()
@@ -2493,16 +2500,24 @@ def create_chart_image_for_pdf(chart_data, title, width=180, height=100):
         ax.plot(years, inflation_data, 's-', color='#dc3545', linewidth=1.5, 
                 markersize=3, label='Инфляция', alpha=0.8)
         
-        # Настройка графика
-        ax.set_xlabel('Год', fontsize=6)
-        ax.set_ylabel('%', fontsize=6)
-        ax.set_title(title, fontsize=8, fontweight='bold')
+        # Настройка графика с явным указанием шрифта
+        ax.set_xlabel('Год', fontsize=6, fontname='DejaVu Sans')
+        ax.set_ylabel('%', fontsize=6, fontname='DejaVu Sans')
+        ax.set_title(title, fontsize=8, fontweight='bold', fontname='DejaVu Sans')
         ax.grid(True, alpha=0.2)
-        ax.legend(fontsize=6, loc='upper right')
+        
+        # Настройка легенды с явным указанием шрифта
+        legend = ax.legend(fontsize=6, loc='upper right')
+        for text in legend.get_texts():
+            text.set_fontname('DejaVu Sans')
         
         # Поворот подписей оси X
         plt.xticks(rotation=45, fontsize=6)
         plt.yticks(fontsize=6)
+        
+        # Устанавливаем шрифт для меток осей
+        for label in ax.get_xticklabels() + ax.get_yticklabels():
+            label.set_fontname('DejaVu Sans')
         
         # Настройка отступов
         plt.tight_layout()
