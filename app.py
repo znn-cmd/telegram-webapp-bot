@@ -8,7 +8,7 @@ import threading
 import asyncio
 from locales import locales
 import requests
-import datetime
+from datetime import datetime, timedelta
 from fpdf import FPDF
 import tempfile
 import os
@@ -18,7 +18,6 @@ import string
 import json
 import math
 import re
-from datetime import datetime, timedelta
 import matplotlib.pyplot as plt
 import matplotlib
 matplotlib.use('Agg')  # Используем неинтерактивный бэкенд
@@ -824,7 +823,7 @@ def get_economic_data(country_code='TUR', years_back=10):
     """
     try:
         # Получаем данные за последние N лет
-        current_year = datetime.datetime.now().year
+        current_year = datetime.now().year
         start_year = current_year - years_back
         
         # Запрос к таблице imf_economic_data для ВВП (NGDP_RPCH)
@@ -1115,7 +1114,7 @@ def api_full_report():
         user_result = supabase.table('users').select('id').eq('telegram_id', telegram_id).execute()
         user_id = user_result.data[0]['id'] if user_result.data else telegram_id
         
-        created_at = datetime.datetime.now().isoformat()
+        created_at = datetime.now().isoformat()
         
         report_data = {
             'user_id': user_id,
@@ -1205,7 +1204,7 @@ def api_delete_user_report():
             logger.error(f"Report {report_id} not found or not owned by user_id {user_id} or already deleted")
             return jsonify({'error': 'Report not found or not owned by user'}), 404
         # Soft delete: выставляем deleted_at
-        now = datetime.datetime.utcnow().isoformat()
+        now = datetime.utcnow().isoformat()
         supabase.table('user_reports').update({'deleted_at': now}).eq('id', report_id).execute()
         return jsonify({'success': True})
     except Exception as e:
@@ -1237,7 +1236,7 @@ def api_save_object():
         saved_object = {
             'user_id': user_id,
             'object_data': object_data,
-            'saved_at': datetime.datetime.now().isoformat()
+            'saved_at': datetime.now().isoformat()
         }
         
         supabase.table('saved_objects').insert(saved_object).execute()
@@ -1666,7 +1665,7 @@ def api_update_user_report():
         # TODO: здесь должна быть логика перегенерации отчета
         # Пока просто обновляем дату
         supabase.table('user_reports').update({
-            'updated_at': datetime.datetime.now().isoformat()
+            'updated_at': datetime.now().isoformat()
         }).eq('id', report_id).execute()
         return jsonify({'success': True, 'balance': new_balance})
     except Exception as e:
@@ -1699,8 +1698,8 @@ def api_save_user_report():
             'report_type': report_type,
             'address': address,
             'full_report': full_report,
-            'created_at': datetime.datetime.now().isoformat(),
-            'updated_at': datetime.datetime.now().isoformat()
+            'created_at': datetime.now().isoformat(),
+            'updated_at': datetime.now().isoformat()
         }
         result = supabase.table('user_reports').insert(report_data).execute()
         new_id = result.data[0]['id'] if hasattr(result, 'data') and result.data else None
@@ -1867,7 +1866,7 @@ def api_admin_balance_100():
 def api_admin_users_stats():
     import datetime
     from dateutil.relativedelta import relativedelta
-    now = datetime.datetime.now()
+    now = datetime.now()
     today = now.date()
     week_ago = today - datetime.timedelta(days=7)
     month_ago = today - relativedelta(months=1)
@@ -1885,7 +1884,7 @@ def api_admin_users_stats():
     def parse_date(val):
         if not val: return None
         try:
-            return datetime.datetime.strptime(val[:10], '%Y-%m-%d').date()
+            return datetime.strptime(val[:10], '%Y-%m-%d').date()
         except Exception:
             return None
 
