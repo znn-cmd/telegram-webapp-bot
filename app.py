@@ -1376,9 +1376,13 @@ def api_generate_pdf_report():
                     logger.info("График создан успешно, вставляем в PDF")
                     # Вставляем график в PDF
                     pdf.ln(5)
+                    logger.info("Перед вставкой графика в PDF - позиция Y: %s", pdf.get_y())
                     pdf.image(chart_buffer, x=10, y=pdf.get_y(), w=190)
+                    logger.info("График вставлен в PDF успешно")
                     pdf.ln(85)  # Отступ после графика
+                    logger.info("Отступ после графика добавлен")
                     chart_buffer.close()
+                    logger.info("Буфер графика закрыт")
                     logger.info("Экономический график успешно вставлен в PDF")
                 else:
                     logger.warning("График не создался, используем текстовое отображение")
@@ -1428,6 +1432,7 @@ def api_generate_pdf_report():
                             pdf.cell(200, 6, text=f"{year}: {value}%", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
             
             pdf.ln(5)
+            logger.info("Экономический раздел завершен, переходим к трендам недвижимости")
         
         # Данные трендов недвижимости
         if report.get('object') and report['object'].get('address'):
