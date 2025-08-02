@@ -1287,8 +1287,8 @@ def api_generate_pdf_report():
         pdf = FPDF()
         pdf.add_page()
         # Добавляем шрифты DejaVu
-        pdf.add_font('DejaVu', '', 'fonts/DejaVuSans.ttf', uni=True)
-        pdf.add_font('DejaVu', 'B', 'fonts/DejaVuSans-Bold.ttf', uni=True)
+        pdf.add_font('DejaVu', '', 'fonts/DejaVuSans.ttf')
+        pdf.add_font('DejaVu', 'B', 'fonts/DejaVuSans-Bold.ttf')
         
         # Добавляем логотип на первую страницу (по центру сверху)
         try:
