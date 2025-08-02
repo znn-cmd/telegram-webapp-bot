@@ -1291,7 +1291,7 @@ def api_generate_pdf_report():
         
         # Добавляем логотип на первую страницу (по центру сверху)
         try:
-            pdf.image('logo-sqv.png', x=85, y=10, w=40, h=20)  # Центрируем логотип
+            pdf.image('logo-sqv.png', x=85, y=10, w=40)  # Центрируем логотип
             pdf.ln(25)  # Отступ после логотипа
         except Exception as e:
             logger.warning(f"Не удалось добавить логотип на первую страницу: {e}")
@@ -1350,12 +1350,12 @@ def api_generate_pdf_report():
                 trends = economic_charts.get('trends', {})
                 if trends.get('gdp_trend') is not None:
                     gdp_trend = trends['gdp_trend'] * 100  # Конвертируем в проценты
-                    trend_text = f"Тренд роста ВВП: {gdp_trend > 0 and '+' or ''}{gdp_trend:.1f}%"
+                    trend_text = f"Тренд роста ВВП: {gdp_trend:.1f}%"
                     pdf.cell(200, 8, txt=trend_text, ln=True)
                 
                 if trends.get('inflation_trend') is not None:
                     inflation_trend = trends['inflation_trend'] * 100  # Конвертируем в проценты
-                    trend_text = f"Тренд инфляции: {inflation_trend > 0 and '+' or ''}{inflation_trend:.1f}%"
+                    trend_text = f"Тренд инфляции: {inflation_trend:.1f}%"
                     pdf.cell(200, 8, txt=trend_text, ln=True)
             
             # Создаем и вставляем график
@@ -1374,7 +1374,7 @@ def api_generate_pdf_report():
                     logger.info("График создан успешно, вставляем в PDF")
                     # Вставляем график в PDF
                     pdf.ln(5)
-                    pdf.image(chart_buffer, x=10, y=pdf.get_y(), w=190, h=80)
+                    pdf.image(chart_buffer, x=10, y=pdf.get_y(), w=190)
                     pdf.ln(85)  # Отступ после графика
                     chart_buffer.close()
                 else:
@@ -1432,7 +1432,7 @@ def api_generate_pdf_report():
             
             # Добавляем логотип в правом верхнем углу
             try:
-                pdf.image('logo-flt.png', x=170, y=10, w=30, h=15)  # Правый верхний угол
+                pdf.image('logo-flt.png', x=170, y=10, w=30)  # Правый верхний угол
             except Exception as e:
                 logger.warning(f"Не удалось добавить логотип на страницу налогов: {e}")
             
@@ -1758,7 +1758,7 @@ def api_send_saved_report_pdf():
         
         # Добавляем логотип на первую страницу (по центру сверху)
         try:
-            pdf.image('logo-sqv.png', x=85, y=10, w=40, h=20)  # Центрируем логотип
+            pdf.image('logo-sqv.png', x=85, y=10, w=40)  # Центрируем логотип
             pdf.ln(25)  # Отступ после логотипа
         except Exception as e:
             logger.warning(f"Не удалось добавить логотип на первую страницу: {e}")
