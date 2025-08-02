@@ -10,6 +10,7 @@ from locales import locales
 import requests
 from datetime import datetime, timedelta
 from fpdf import FPDF
+from fpdf.enums import XPos, YPos
 import tempfile
 import os
 from dateutil.relativedelta import relativedelta
@@ -1299,38 +1300,38 @@ def api_generate_pdf_report():
         
         pdf.set_font('DejaVu', 'B', 16)
         if client_name:
-            pdf.cell(0, 10, f'Клиент: {client_name}', ln=True, align='C')
-            pdf.ln(2)
-        pdf.cell(0, 10, 'Полный отчет по недвижимости', ln=True, align='C')
+                    pdf.cell(0, 10, f'Клиент: {client_name}', new_x=XPos.LMARGIN, new_y=YPos.NEXT, align='C')
+        pdf.ln(2)
+        pdf.cell(0, 10, 'Полный отчет по недвижимости', new_x=XPos.LMARGIN, new_y=YPos.NEXT, align='C')
         pdf.ln(10)
         if report.get('object'):
             pdf.set_font('DejaVu', 'B', 12)
-            pdf.cell(0, 10, 'Информация об объекте:', ln=True)
+            pdf.cell(0, 10, 'Информация об объекте:', new_x=XPos.LMARGIN, new_y=YPos.NEXT)
             pdf.set_font('DejaVu', '', 10)
             obj = report['object']
-            pdf.cell(0, 8, f'Адрес: {obj.get("address", "Не указан")}', ln=True)
-            pdf.cell(0, 8, f'Спален: {obj.get("bedrooms", "Не указано")}', ln=True)
-            pdf.cell(0, 8, f'Цена: €{obj.get("purchase_price", "Не указана")}', ln=True)
+            pdf.cell(0, 8, f'Адрес: {obj.get("address", "Не указан")}', new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            pdf.cell(0, 8, f'Спален: {obj.get("bedrooms", "Не указано")}', new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            pdf.cell(0, 8, f'Цена: €{obj.get("purchase_price", "Не указана")}', new_x=XPos.LMARGIN, new_y=YPos.NEXT)
             pdf.ln(5)
         # Печатаем остальные блоки отчёта (без вложенности)
         # ROI анализ
         if 'roi' in report:
             pdf.set_font("DejaVu", 'B', 14)
-            pdf.cell(200, 10, txt="Инвестиционный анализ (ROI):", ln=True)
+            pdf.cell(200, 10, text="Инвестиционный анализ (ROI):", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
             pdf.set_font("DejaVu", size=12)
-            pdf.cell(200, 8, txt=f"Краткосрочная аренда: ROI {report['roi']['short_term']['roi']}%", ln=True)
-            pdf.cell(200, 8, txt=f"Долгосрочная аренда: ROI {report['roi']['long_term']['roi']}%", ln=True)
-            pdf.cell(200, 8, txt=f"Без аренды: ROI {report['roi']['no_rent']['roi']}%", ln=True)
+            pdf.cell(200, 8, text=f"Краткосрочная аренда: ROI {report['roi']['short_term']['roi']}%", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            pdf.cell(200, 8, text=f"Долгосрочная аренда: ROI {report['roi']['long_term']['roi']}%", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            pdf.cell(200, 8, text=f"Без аренды: ROI {report['roi']['no_rent']['roi']}%", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
             pdf.ln(5)
         # Макроэкономические показатели (объединенный блок)
         if 'macro' in report or 'economic_charts' in report:
             pdf.set_font("DejaVu", 'B', 14)
-            pdf.cell(200, 10, txt="Макроэкономические показатели:", ln=True)
+            pdf.cell(200, 10, text="Макроэкономические показатели:", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
             pdf.set_font("DejaVu", size=12)
             
             # Ключевая ставка из macro
             if 'macro' in report:
-                pdf.cell(200, 8, txt=f"Ключевая ставка: {report['macro']['refi_rate']}%", ln=True)
+                pdf.cell(200, 8, text=f"Ключевая ставка: {report['macro']['refi_rate']}%", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
             
             # Экономические данные из economic_charts
             if 'economic_charts' in report:
@@ -1341,23 +1342,23 @@ def api_generate_pdf_report():
                 latest = economic_charts.get('latest', {})
                 if latest.get('gdp'):
                     gdp_data = latest['gdp']
-                    pdf.cell(200, 8, txt=f"Последний рост ВВП ({gdp_data['year']}): {gdp_data['value']}%", ln=True)
+                    pdf.cell(200, 8, text=f"Последний рост ВВП ({gdp_data['year']}): {gdp_data['value']}%", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
                 
                 if latest.get('inflation'):
                     inflation_data = latest['inflation']
-                    pdf.cell(200, 8, txt=f"Последняя инфляция ({inflation_data['year']}): {inflation_data['value']}%", ln=True)
+                    pdf.cell(200, 8, text=f"Последняя инфляция ({inflation_data['year']}): {inflation_data['value']}%", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
                 
                 # Отображаем тренды
                 trends = economic_charts.get('trends', {})
                 if trends.get('gdp_trend') is not None:
                     gdp_trend = trends['gdp_trend'] * 100  # Конвертируем в проценты
                     trend_text = f"Тренд роста ВВП: {gdp_trend:.1f}%"
-                    pdf.cell(200, 8, txt=trend_text, ln=True)
+                    pdf.cell(200, 8, text=trend_text, new_x=XPos.LMARGIN, new_y=YPos.NEXT)
                 
                 if trends.get('inflation_trend') is not None:
                     inflation_trend = trends['inflation_trend'] * 100  # Конвертируем в проценты
                     trend_text = f"Тренд инфляции: {inflation_trend:.1f}%"
-                    pdf.cell(200, 8, txt=trend_text, ln=True)
+                    pdf.cell(200, 8, text=trend_text, new_x=XPos.LMARGIN, new_y=YPos.NEXT)
             
             # Создаем и вставляем график
             try:
@@ -1383,7 +1384,7 @@ def api_generate_pdf_report():
                     # Если график не создался, показываем текстовые данные
                     pdf.ln(3)
                     pdf.set_font("DejaVu", 'B', 12)
-                    pdf.cell(200, 8, txt=f"Динамика роста ВВП ({country_name}):", ln=True)
+                    pdf.cell(200, 8, text=f"Динамика роста ВВП ({country_name}):", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
                     pdf.set_font("DejaVu", size=10)
                     
                     gdp_chart = economic_charts.get('gdp_chart', {})
@@ -1393,13 +1394,13 @@ def api_generate_pdf_report():
                         
                         for i, (year, value) in enumerate(zip(labels, data)):
                             if i < 5:  # Показываем только последние 5 лет
-                                pdf.cell(200, 6, txt=f"{year}: {value}%", ln=True)
+                                pdf.cell(200, 6, text=f"{year}: {value}%", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
                     
                     inflation_chart = economic_charts.get('inflation_chart', {})
                     if inflation_chart.get('labels') and inflation_chart.get('datasets'):
                         pdf.ln(3)
                         pdf.set_font("DejaVu", 'B', 12)
-                        pdf.cell(200, 8, txt=f"Динамика инфляции ({country_name}):", ln=True)
+                        pdf.cell(200, 8, text=f"Динамика инфляции ({country_name}):", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
                         pdf.set_font("DejaVu", size=10)
                         
                         labels = inflation_chart['labels']
@@ -1407,13 +1408,13 @@ def api_generate_pdf_report():
                         
                         for i, (year, value) in enumerate(zip(labels, data)):
                             if i < 5:  # Показываем только последние 5 лет
-                                pdf.cell(200, 6, txt=f"{year}: {value}%", ln=True)
+                                pdf.cell(200, 6, text=f"{year}: {value}%", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
             except Exception as e:
                 logger.error(f"Ошибка вставки графика в PDF: {e}")
                 # Fallback к текстовому отображению
                 pdf.ln(3)
                 pdf.set_font("DejaVu", 'B', 12)
-                pdf.cell(200, 8, txt=f"Динамика экономических показателей ({country_name}):", ln=True)
+                pdf.cell(200, 8, text=f"Динамика экономических показателей ({country_name}):", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
                 pdf.set_font("DejaVu", size=10)
                 
                 gdp_chart = economic_charts.get('gdp_chart', {})
@@ -1423,7 +1424,7 @@ def api_generate_pdf_report():
                     
                     for i, (year, value) in enumerate(zip(labels, data)):
                         if i < 5:  # Показываем только последние 5 лет
-                            pdf.cell(200, 6, txt=f"{year}: {value}%", ln=True)
+                            pdf.cell(200, 6, text=f"{year}: {value}%", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
             
             pdf.ln(5)
         
@@ -1441,43 +1442,43 @@ def api_generate_pdf_report():
                 
                 if trends_data:
                     pdf.set_font("DejaVu", 'B', 14)
-                    pdf.cell(200, 10, txt="Тренды рынка недвижимости:", ln=True)
+                    pdf.cell(200, 10, text="Тренды рынка недвижимости:", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
                     pdf.set_font("DejaVu", size=12)
                     
                     # Цены на продажу
                     if trends_data.get('unit_price_for_sale'):
-                        pdf.cell(200, 8, txt=f"Средняя цена за м² (продажа): €{trends_data['unit_price_for_sale']:,.2f}", ln=True)
+                        pdf.cell(200, 8, text=f"Средняя цена за м² (продажа): €{trends_data['unit_price_for_sale']:,.2f}", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
                     
                     if trends_data.get('price_change_sale'):
                         change_percent = trends_data['price_change_sale'] * 100
-                        pdf.cell(200, 8, txt=f"Изменение цен (продажа): {change_percent:+.2f}%", ln=True)
+                        pdf.cell(200, 8, text=f"Изменение цен (продажа): {change_percent:+.2f}%", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
                     
                     # Цены на аренду
                     if trends_data.get('unit_price_for_rent'):
-                        pdf.cell(200, 8, txt=f"Средняя цена за м² (аренда): €{trends_data['unit_price_for_rent']:,.2f}", ln=True)
+                        pdf.cell(200, 8, text=f"Средняя цена за м² (аренда): €{trends_data['unit_price_for_rent']:,.2f}", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
                     
                     if trends_data.get('price_change_rent'):
                         change_percent = trends_data['price_change_rent'] * 100
-                        pdf.cell(200, 8, txt=f"Изменение цен (аренда): {change_percent:+.2f}%", ln=True)
+                        pdf.cell(200, 8, text=f"Изменение цен (аренда): {change_percent:+.2f}%", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
                     
                     # Доходность
                     if trends_data.get('yield'):
                         yield_percent = trends_data['yield'] * 100
-                        pdf.cell(200, 8, txt=f"Доходность: {yield_percent:.2f}%", ln=True)
+                        pdf.cell(200, 8, text=f"Доходность: {yield_percent:.2f}%", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
                     
                     # Период размещения
                     if trends_data.get('listing_period_for_sale'):
-                        pdf.cell(200, 8, txt=f"Средний период продажи: {trends_data['listing_period_for_sale']} дней", ln=True)
+                        pdf.cell(200, 8, text=f"Средний период продажи: {trends_data['listing_period_for_sale']} дней", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
                     
                     if trends_data.get('listing_period_for_rent'):
-                        pdf.cell(200, 8, txt=f"Средний период аренды: {trends_data['listing_period_for_rent']} дней", ln=True)
+                        pdf.cell(200, 8, text=f"Средний период аренды: {trends_data['listing_period_for_rent']} дней", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
                     
                     # Количество объектов
                     if trends_data.get('count_for_sale'):
-                        pdf.cell(200, 8, txt=f"Объектов на продажу: {trends_data['count_for_sale']}", ln=True)
+                        pdf.cell(200, 8, text=f"Объектов на продажу: {trends_data['count_for_sale']}", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
                     
                     if trends_data.get('count_for_rent'):
-                        pdf.cell(200, 8, txt=f"Объектов на аренду: {trends_data['count_for_rent']}", ln=True)
+                        pdf.cell(200, 8, text=f"Объектов на аренду: {trends_data['count_for_rent']}", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
                     
                     pdf.ln(5)
         
@@ -1492,48 +1493,48 @@ def api_generate_pdf_report():
                 logger.warning(f"Не удалось добавить логотип на страницу налогов: {e}")
             
             pdf.set_font("DejaVu", 'B', 14)
-            pdf.cell(200, 10, txt="Налоги и сборы:", ln=True)
+            pdf.cell(200, 10, text="Налоги и сборы:", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
             pdf.set_font("DejaVu", size=12)
-            pdf.cell(200, 8, txt=f"Налог на перевод: {report['taxes']['transfer_tax']*100}%", ln=True)
-            pdf.cell(200, 8, txt=f"Гербовый сбор: {report['taxes']['stamp_duty']*100}%", ln=True)
-            pdf.cell(200, 8, txt=f"Нотариус: €{report['taxes']['notary']}", ln=True)
+            pdf.cell(200, 8, text=f"Налог на перевод: {report['taxes']['transfer_tax']*100}%", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            pdf.cell(200, 8, text=f"Гербовый сбор: {report['taxes']['stamp_duty']*100}%", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            pdf.cell(200, 8, text=f"Нотариус: €{report['taxes']['notary']}", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
             pdf.ln(5)
         # Блок: Альтернативы
         if 'alternatives' in report and isinstance(report['alternatives'], list):
             pdf.set_font('DejaVu', 'B', 14)
-            pdf.cell(0, 10, 'Сравнение с альтернативами (5 лет):', ln=True)
+            pdf.cell(0, 10, 'Сравнение с альтернативами (5 лет):', new_x=XPos.LMARGIN, new_y=YPos.NEXT)
             pdf.set_font('DejaVu', '', 12)
             for alt in report['alternatives']:
                 name = alt.get('name', '-')
                 yld = alt.get('yield', 0)
-                pdf.cell(0, 8, f'{name}: {round(yld*100, 1)}%', ln=True)
+                pdf.cell(0, 8, f'{name}: {round(yld*100, 1)}%', new_x=XPos.LMARGIN, new_y=YPos.NEXT)
             pdf.ln(5)
         # Блок: Профессиональные метрики
         if 'yield' in report or 'price_index' in report or 'mortgage_rate' in report or 'global_house_price_index' in report:
             pdf.set_font('DejaVu', 'B', 14)
-            pdf.cell(0, 10, 'Профессиональные метрики:', ln=True)
+            pdf.cell(0, 10, 'Профессиональные метрики:', new_x=XPos.LMARGIN, new_y=YPos.NEXT)
             pdf.set_font('DejaVu', '', 12)
             if 'yield' in report:
-                pdf.cell(0, 8, f'Yield: {round(report["yield"]*100, 1)}%', ln=True)
+                pdf.cell(0, 8, f'Yield: {round(report["yield"]*100, 1)}%', new_x=XPos.LMARGIN, new_y=YPos.NEXT)
             if 'price_index' in report:
-                pdf.cell(0, 8, f'Индекс цен: {report["price_index"]}', ln=True)
+                pdf.cell(0, 8, f'Индекс цен: {report["price_index"]}', new_x=XPos.LMARGIN, new_y=YPos.NEXT)
             if 'mortgage_rate' in report:
-                pdf.cell(0, 8, f'Ипотечная ставка: {round(report["mortgage_rate"]*100, 1)}%', ln=True)
+                pdf.cell(0, 8, f'Ипотечная ставка: {round(report["mortgage_rate"]*100, 1)}%', new_x=XPos.LMARGIN, new_y=YPos.NEXT)
             if 'global_house_price_index' in report:
-                pdf.cell(0, 8, f'Глобальный индекс цен: {report["global_house_price_index"]}', ln=True)
+                pdf.cell(0, 8, f'Глобальный индекс цен: {report["global_house_price_index"]}', new_x=XPos.LMARGIN, new_y=YPos.NEXT)
             pdf.ln(5)
         # Блок: Риски и развитие района
         if 'risks' in report or 'liquidity' in report or 'district' in report:
             pdf.set_font('DejaVu', 'B', 14)
-            pdf.cell(0, 10, 'Риски и развитие района:', ln=True)
+            pdf.cell(0, 10, 'Риски и развитие района:', new_x=XPos.LMARGIN, new_y=YPos.NEXT)
             pdf.set_font('DejaVu', '', 12)
             if 'risks' in report and isinstance(report['risks'], list):
                 for idx, risk in enumerate(report['risks']):
-                    pdf.cell(0, 8, f'Риск {idx+1}: {risk}', ln=True)
+                    pdf.cell(0, 8, f'Риск {idx+1}: {risk}', new_x=XPos.LMARGIN, new_y=YPos.NEXT)
             if 'liquidity' in report:
-                pdf.cell(0, 8, f'Ликвидность: {report["liquidity"]}', ln=True)
+                pdf.cell(0, 8, f'Ликвидность: {report["liquidity"]}', new_x=XPos.LMARGIN, new_y=YPos.NEXT)
             if 'district' in report:
-                pdf.cell(0, 8, f'Развитие района: {report["district"]}', ln=True)
+                pdf.cell(0, 8, f'Развитие района: {report["district"]}', new_x=XPos.LMARGIN, new_y=YPos.NEXT)
             pdf.ln(5)
         # Удаляем блок summary/заключение
         # if 'summary' in report:
@@ -1545,20 +1546,20 @@ def api_generate_pdf_report():
         if profile:
             pdf.set_y(-60)
             pdf.set_font('DejaVu', 'B', 11)
-            pdf.cell(0, 8, 'Контактные данные риелтора:', ln=True)
+            pdf.cell(0, 8, 'Контактные данные риелтора:', new_x=XPos.LMARGIN, new_y=YPos.NEXT)
             pdf.set_font('DejaVu', '', 10)
             if profile.get('tg_name') or profile.get('last_name'):
-                pdf.cell(0, 8, f"Имя: {profile.get('tg_name','')} {profile.get('last_name','')}", ln=True)
+                pdf.cell(0, 8, f"Имя: {profile.get('tg_name','')} {profile.get('last_name','')}", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
             if profile.get('company'):
-                pdf.cell(0, 8, f"Компания: {profile.get('company')}", ln=True)
+                pdf.cell(0, 8, f"Компания: {profile.get('company')}", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
             if profile.get('position'):
-                pdf.cell(0, 8, f"Должность: {profile.get('position')}", ln=True)
+                pdf.cell(0, 8, f"Должность: {profile.get('position')}", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
             if profile.get('phone'):
-                pdf.cell(0, 8, f"Телефон: {profile.get('phone')}", ln=True)
+                pdf.cell(0, 8, f"Телефон: {profile.get('phone')}", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
             if profile.get('email'):
-                pdf.cell(0, 8, f"Email: {profile.get('email')}", ln=True)
+                pdf.cell(0, 8, f"Email: {profile.get('email')}", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
             if profile.get('website'):
-                pdf.cell(0, 8, f"Сайт: {profile.get('website')}", ln=True)
+                pdf.cell(0, 8, f"Сайт: {profile.get('website')}", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
             if profile.get('about_me'):
                 pdf.multi_cell(0, 8, f"О себе: {profile.get('about_me')}")
         # Сохраняем PDF во временный файл
@@ -1820,38 +1821,38 @@ def api_send_saved_report_pdf():
             pdf.ln(35)  # Отступ даже если логотип не загрузился
         
         pdf.set_font('DejaVu', 'B', 16)
-        pdf.cell(0, 10, 'Полный отчет по недвижимости', ln=1, align='C')
+        pdf.cell(0, 10, 'Полный отчет по недвижимости', new_x=XPos.LMARGIN, new_y=YPos.NEXT, align='C')
         pdf.ln(10)
         obj = report.get('object') or {}
         pdf.set_font('DejaVu', 'B', 12)
-        pdf.cell(0, 10, 'Информация об объекте:', ln=1)
+        pdf.cell(0, 10, 'Информация об объекте:', new_x=XPos.LMARGIN, new_y=YPos.NEXT)
         pdf.set_font('DejaVu', '', 10)
-        pdf.cell(0, 8, f'Адрес: {obj.get("address", "Не указан")}', ln=1)
-        pdf.cell(0, 8, f'Спален: {obj.get("bedrooms", "Не указано")}', ln=1)
-        pdf.cell(0, 8, f'Цена: €{obj.get("purchase_price", "Не указана")}', ln=1)
+        pdf.cell(0, 8, f'Адрес: {obj.get("address", "Не указан")}', new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+        pdf.cell(0, 8, f'Спален: {obj.get("bedrooms", "Не указано")}', new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+        pdf.cell(0, 8, f'Цена: €{obj.get("purchase_price", "Не указана")}', new_x=XPos.LMARGIN, new_y=YPos.NEXT)
         pdf.ln(5)
         # ROI анализ
         roi = report.get('roi')
         if roi:
             pdf.set_font("DejaVu", 'B', 14)
-            pdf.cell(0, 10, "Инвестиционный анализ (ROI):", ln=1)
+            pdf.cell(0, 10, "Инвестиционный анализ (ROI):", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
             pdf.set_font("DejaVu", size=12)
             st = roi.get('short_term', {})
             lt = roi.get('long_term', {})
             nr = roi.get('no_rent', {})
-            pdf.cell(0, 8, f"Краткосрочная аренда: ROI {st.get('roi', '-')}", ln=1)
-            pdf.cell(0, 8, f"Долгосрочная аренда: ROI {lt.get('roi', '-')}", ln=1)
-            pdf.cell(0, 8, f"Без аренды: ROI {nr.get('roi', '-')}", ln=1)
+            pdf.cell(0, 8, f"Краткосрочная аренда: ROI {st.get('roi', '-')}", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            pdf.cell(0, 8, f"Долгосрочная аренда: ROI {lt.get('roi', '-')}", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            pdf.cell(0, 8, f"Без аренды: ROI {nr.get('roi', '-')}", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
             pdf.ln(5)
         # Макроэкономика
         macro = report.get('macro')
         if macro:
             pdf.set_font("DejaVu", 'B', 14)
-            pdf.cell(0, 10, "Макроэкономические показатели:", ln=1)
+            pdf.cell(0, 10, "Макроэкономические показатели:", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
             pdf.set_font("DejaVu", size=12)
-            pdf.cell(0, 8, f"Инфляция: {macro.get('inflation', '-')}%", ln=1)
-            pdf.cell(0, 8, f"Ключевая ставка: {macro.get('refi_rate', '-')}%", ln=1)
-            pdf.cell(0, 8, f"Рост ВВП: {macro.get('gdp_growth', '-')}%", ln=1)
+            pdf.cell(0, 8, f"Инфляция: {macro.get('inflation', '-')}%", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            pdf.cell(0, 8, f"Ключевая ставка: {macro.get('refi_rate', '-')}%", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            pdf.cell(0, 8, f"Рост ВВП: {macro.get('gdp_growth', '-')}%", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
             pdf.ln(5)
         
         # Данные трендов недвижимости
@@ -1868,43 +1869,43 @@ def api_send_saved_report_pdf():
                 
                 if trends_data:
                     pdf.set_font("DejaVu", 'B', 14)
-                    pdf.cell(0, 10, "Тренды рынка недвижимости:", ln=1)
+                    pdf.cell(0, 10, "Тренды рынка недвижимости:", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
                     pdf.set_font("DejaVu", size=12)
                     
                     # Цены на продажу
                     if trends_data.get('unit_price_for_sale'):
-                        pdf.cell(0, 8, f"Средняя цена за м² (продажа): €{trends_data['unit_price_for_sale']:,.2f}", ln=1)
+                        pdf.cell(0, 8, f"Средняя цена за м² (продажа): €{trends_data['unit_price_for_sale']:,.2f}", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
                     
                     if trends_data.get('price_change_sale'):
                         change_percent = trends_data['price_change_sale'] * 100
-                        pdf.cell(0, 8, f"Изменение цен (продажа): {change_percent:+.2f}%", ln=1)
+                        pdf.cell(0, 8, f"Изменение цен (продажа): {change_percent:+.2f}%", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
                     
                     # Цены на аренду
                     if trends_data.get('unit_price_for_rent'):
-                        pdf.cell(0, 8, f"Средняя цена за м² (аренда): €{trends_data['unit_price_for_rent']:,.2f}", ln=1)
+                        pdf.cell(0, 8, f"Средняя цена за м² (аренда): €{trends_data['unit_price_for_rent']:,.2f}", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
                     
                     if trends_data.get('price_change_rent'):
                         change_percent = trends_data['price_change_rent'] * 100
-                        pdf.cell(0, 8, f"Изменение цен (аренда): {change_percent:+.2f}%", ln=1)
+                        pdf.cell(0, 8, f"Изменение цен (аренда): {change_percent:+.2f}%", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
                     
                     # Доходность
                     if trends_data.get('yield'):
                         yield_percent = trends_data['yield'] * 100
-                        pdf.cell(0, 8, f"Доходность: {yield_percent:.2f}%", ln=1)
+                        pdf.cell(0, 8, f"Доходность: {yield_percent:.2f}%", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
                     
                     # Период размещения
                     if trends_data.get('listing_period_for_sale'):
-                        pdf.cell(0, 8, f"Средний период продажи: {trends_data['listing_period_for_sale']} дней", ln=1)
+                        pdf.cell(0, 8, f"Средний период продажи: {trends_data['listing_period_for_sale']} дней", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
                     
                     if trends_data.get('listing_period_for_rent'):
-                        pdf.cell(0, 8, f"Средний период аренды: {trends_data['listing_period_for_rent']} дней", ln=1)
+                        pdf.cell(0, 8, f"Средний период аренды: {trends_data['listing_period_for_rent']} дней", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
                     
                     # Количество объектов
                     if trends_data.get('count_for_sale'):
-                        pdf.cell(0, 8, f"Объектов на продажу: {trends_data['count_for_sale']}", ln=1)
+                        pdf.cell(0, 8, f"Объектов на продажу: {trends_data['count_for_sale']}", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
                     
                     if trends_data.get('count_for_rent'):
-                        pdf.cell(0, 8, f"Объектов на аренду: {trends_data['count_for_rent']}", ln=1)
+                        pdf.cell(0, 8, f"Объектов на аренду: {trends_data['count_for_rent']}", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
                     
                     pdf.ln(5)
         
@@ -1912,50 +1913,50 @@ def api_send_saved_report_pdf():
         taxes = report.get('taxes')
         if taxes:
             pdf.set_font("DejaVu", 'B', 14)
-            pdf.cell(0, 10, "Налоги и сборы:", ln=1)
+            pdf.cell(0, 10, "Налоги и сборы:", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
             pdf.set_font("DejaVu", size=12)
-            pdf.cell(0, 8, f"Налог на перевод: {taxes.get('transfer_tax', 0)*100}%", ln=1)
-            pdf.cell(0, 8, f"Гербовый сбор: {taxes.get('stamp_duty', 0)*100}%", ln=1)
-            pdf.cell(0, 8, f"Нотариус: €{taxes.get('notary', '-')}" , ln=1)
+            pdf.cell(0, 8, f"Налог на перевод: {taxes.get('transfer_tax', 0)*100}%", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            pdf.cell(0, 8, f"Гербовый сбор: {taxes.get('stamp_duty', 0)*100}%", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            pdf.cell(0, 8, f"Нотариус: €{taxes.get('notary', '-')}" , new_x=XPos.LMARGIN, new_y=YPos.NEXT)
             pdf.ln(5)
         # Альтернативы
         alternatives = report.get('alternatives')
         if isinstance(alternatives, list):
             pdf.set_font('DejaVu', 'B', 14)
-            pdf.cell(0, 10, 'Сравнение с альтернативами (5 лет):', ln=1)
+            pdf.cell(0, 10, 'Сравнение с альтернативами (5 лет):', new_x=XPos.LMARGIN, new_y=YPos.NEXT)
             pdf.set_font('DejaVu', '', 12)
             for alt in alternatives:
                 name = alt.get('name', '-')
                 yld = alt.get('yield', 0)
-                pdf.cell(0, 8, f'{name}: {round(yld*100, 1)}%', ln=1)
+                pdf.cell(0, 8, f'{name}: {round(yld*100, 1)}%', new_x=XPos.LMARGIN, new_y=YPos.NEXT)
             pdf.ln(5)
         # Профессиональные метрики
         if any(k in report for k in ['yield', 'price_index', 'mortgage_rate', 'global_house_price_index']):
             pdf.set_font('DejaVu', 'B', 14)
-            pdf.cell(0, 10, 'Профессиональные метрики:', ln=1)
+            pdf.cell(0, 10, 'Профессиональные метрики:', new_x=XPos.LMARGIN, new_y=YPos.NEXT)
             pdf.set_font('DejaVu', '', 12)
             if 'yield' in report:
-                pdf.cell(0, 8, f'Yield: {round(report.get("yield", 0)*100, 1)}%', ln=1)
+                pdf.cell(0, 8, f'Yield: {round(report.get("yield", 0)*100, 1)}%', new_x=XPos.LMARGIN, new_y=YPos.NEXT)
             if 'price_index' in report:
-                pdf.cell(0, 8, f'Индекс цен: {report.get("price_index", "-")}', ln=1)
+                pdf.cell(0, 8, f'Индекс цен: {report.get("price_index", "-")}', new_x=XPos.LMARGIN, new_y=YPos.NEXT)
             if 'mortgage_rate' in report:
-                pdf.cell(0, 8, f'Ипотечная ставка: {round(report.get("mortgage_rate", 0)*100, 1)}%', ln=1)
+                pdf.cell(0, 8, f'Ипотечная ставка: {round(report.get("mortgage_rate", 0)*100, 1)}%', new_x=XPos.LMARGIN, new_y=YPos.NEXT)
             if 'global_house_price_index' in report:
-                pdf.cell(0, 8, f'Глобальный индекс цен: {report.get("global_house_price_index", "-")}', ln=1)
+                pdf.cell(0, 8, f'Глобальный индекс цен: {report.get("global_house_price_index", "-")}', new_x=XPos.LMARGIN, new_y=YPos.NEXT)
             pdf.ln(5)
         # Риски и развитие района
         if any(k in report for k in ['risks', 'liquidity', 'district']):
             pdf.set_font('DejaVu', 'B', 14)
-            pdf.cell(0, 10, 'Риски и развитие района:', ln=1)
+            pdf.cell(0, 10, 'Риски и развитие района:', new_x=XPos.LMARGIN, new_y=YPos.NEXT)
             pdf.set_font('DejaVu', '', 12)
             risks = report.get('risks')
             if isinstance(risks, list):
                 for idx, risk in enumerate(risks):
-                    pdf.cell(0, 8, f'Риск {idx+1}: {risk}', ln=1)
+                    pdf.cell(0, 8, f'Риск {idx+1}: {risk}', new_x=XPos.LMARGIN, new_y=YPos.NEXT)
             if 'liquidity' in report:
-                pdf.cell(0, 8, f'Ликвидность: {report.get("liquidity", "-")}', ln=1)
+                pdf.cell(0, 8, f'Ликвидность: {report.get("liquidity", "-")}', new_x=XPos.LMARGIN, new_y=YPos.NEXT)
             if 'district' in report:
-                pdf.cell(0, 8, f'Развитие района: {report.get("district", "-")}', ln=1)
+                pdf.cell(0, 8, f'Развитие района: {report.get("district", "-")}', new_x=XPos.LMARGIN, new_y=YPos.NEXT)
             pdf.ln(5)
         # Сохраняем PDF во временный файл
         temp_file = tempfile.NamedTemporaryFile(delete=False, suffix='.pdf')
@@ -2426,6 +2427,8 @@ def create_economic_chart_image(economic_charts_data):
         
         # Данные для графиков
         years = gdp_chart['labels']
+        # Конвертируем годы в целые числа для правильного отображения
+        years = [int(year) for year in years]
         gdp_data = gdp_chart['datasets'][0]['data']
         inflation_data = inflation_chart['datasets'][0]['data']
         
@@ -2485,6 +2488,8 @@ def create_chart_image_for_pdf(chart_data, title, width=180, height=100):
         
         # Получаем данные
         years = chart_data.get('labels', [])
+        # Конвертируем годы в целые числа для правильного отображения
+        years = [int(year) for year in years]
         gdp_data = chart_data.get('gdp_chart', {}).get('datasets', [{}])[0].get('data', [])
         inflation_data = chart_data.get('inflation_chart', {}).get('datasets', [{}])[0].get('data', [])
         
