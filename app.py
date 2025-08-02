@@ -1292,9 +1292,10 @@ def api_generate_pdf_report():
         # Добавляем логотип на первую страницу (по центру сверху)
         try:
             pdf.image('logo-sqv.png', x=85, y=10, w=40)  # Центрируем логотип
-            pdf.ln(25)  # Отступ после логотипа
+            pdf.ln(35)  # Увеличенный отступ после логотипа
         except Exception as e:
             logger.warning(f"Не удалось добавить логотип на первую страницу: {e}")
+            pdf.ln(35)  # Отступ даже если логотип не загрузился
         
         pdf.set_font('DejaVu', 'B', 16)
         if client_name:
@@ -1425,6 +1426,60 @@ def api_generate_pdf_report():
                             pdf.cell(200, 6, txt=f"{year}: {value}%", ln=True)
             
             pdf.ln(5)
+        
+        # Данные трендов недвижимости
+        if report.get('object') and report['object'].get('address'):
+            address = report['object']['address']
+            location_data = extract_location_from_address(address)
+            
+            if location_data['city_name']:
+                trends_data = get_property_trends_data(
+                    location_data['city_name'],
+                    location_data['district_name'],
+                    location_data['county_name']
+                )
+                
+                if trends_data:
+                    pdf.set_font("DejaVu", 'B', 14)
+                    pdf.cell(200, 10, txt="Тренды рынка недвижимости:", ln=True)
+                    pdf.set_font("DejaVu", size=12)
+                    
+                    # Цены на продажу
+                    if trends_data.get('unit_price_for_sale'):
+                        pdf.cell(200, 8, txt=f"Средняя цена за м² (продажа): €{trends_data['unit_price_for_sale']:,.2f}", ln=True)
+                    
+                    if trends_data.get('price_change_sale'):
+                        change_percent = trends_data['price_change_sale'] * 100
+                        pdf.cell(200, 8, txt=f"Изменение цен (продажа): {change_percent:+.2f}%", ln=True)
+                    
+                    # Цены на аренду
+                    if trends_data.get('unit_price_for_rent'):
+                        pdf.cell(200, 8, txt=f"Средняя цена за м² (аренда): €{trends_data['unit_price_for_rent']:,.2f}", ln=True)
+                    
+                    if trends_data.get('price_change_rent'):
+                        change_percent = trends_data['price_change_rent'] * 100
+                        pdf.cell(200, 8, txt=f"Изменение цен (аренда): {change_percent:+.2f}%", ln=True)
+                    
+                    # Доходность
+                    if trends_data.get('yield'):
+                        yield_percent = trends_data['yield'] * 100
+                        pdf.cell(200, 8, txt=f"Доходность: {yield_percent:.2f}%", ln=True)
+                    
+                    # Период размещения
+                    if trends_data.get('listing_period_for_sale'):
+                        pdf.cell(200, 8, txt=f"Средний период продажи: {trends_data['listing_period_for_sale']} дней", ln=True)
+                    
+                    if trends_data.get('listing_period_for_rent'):
+                        pdf.cell(200, 8, txt=f"Средний период аренды: {trends_data['listing_period_for_rent']} дней", ln=True)
+                    
+                    # Количество объектов
+                    if trends_data.get('count_for_sale'):
+                        pdf.cell(200, 8, txt=f"Объектов на продажу: {trends_data['count_for_sale']}", ln=True)
+                    
+                    if trends_data.get('count_for_rent'):
+                        pdf.cell(200, 8, txt=f"Объектов на аренду: {trends_data['count_for_rent']}", ln=True)
+                    
+                    pdf.ln(5)
         
         # Переходим на новую страницу для налогов
         if 'taxes' in report:
@@ -1759,9 +1814,10 @@ def api_send_saved_report_pdf():
         # Добавляем логотип на первую страницу (по центру сверху)
         try:
             pdf.image('logo-sqv.png', x=85, y=10, w=40)  # Центрируем логотип
-            pdf.ln(25)  # Отступ после логотипа
+            pdf.ln(35)  # Увеличенный отступ после логотипа
         except Exception as e:
             logger.warning(f"Не удалось добавить логотип на первую страницу: {e}")
+            pdf.ln(35)  # Отступ даже если логотип не загрузился
         
         pdf.set_font('DejaVu', 'B', 16)
         pdf.cell(0, 10, 'Полный отчет по недвижимости', ln=1, align='C')
@@ -1797,6 +1853,61 @@ def api_send_saved_report_pdf():
             pdf.cell(0, 8, f"Ключевая ставка: {macro.get('refi_rate', '-')}%", ln=1)
             pdf.cell(0, 8, f"Рост ВВП: {macro.get('gdp_growth', '-')}%", ln=1)
             pdf.ln(5)
+        
+        # Данные трендов недвижимости
+        if report.get('object') and report['object'].get('address'):
+            address = report['object']['address']
+            location_data = extract_location_from_address(address)
+            
+            if location_data['city_name']:
+                trends_data = get_property_trends_data(
+                    location_data['city_name'],
+                    location_data['district_name'],
+                    location_data['county_name']
+                )
+                
+                if trends_data:
+                    pdf.set_font("DejaVu", 'B', 14)
+                    pdf.cell(0, 10, "Тренды рынка недвижимости:", ln=1)
+                    pdf.set_font("DejaVu", size=12)
+                    
+                    # Цены на продажу
+                    if trends_data.get('unit_price_for_sale'):
+                        pdf.cell(0, 8, f"Средняя цена за м² (продажа): €{trends_data['unit_price_for_sale']:,.2f}", ln=1)
+                    
+                    if trends_data.get('price_change_sale'):
+                        change_percent = trends_data['price_change_sale'] * 100
+                        pdf.cell(0, 8, f"Изменение цен (продажа): {change_percent:+.2f}%", ln=1)
+                    
+                    # Цены на аренду
+                    if trends_data.get('unit_price_for_rent'):
+                        pdf.cell(0, 8, f"Средняя цена за м² (аренда): €{trends_data['unit_price_for_rent']:,.2f}", ln=1)
+                    
+                    if trends_data.get('price_change_rent'):
+                        change_percent = trends_data['price_change_rent'] * 100
+                        pdf.cell(0, 8, f"Изменение цен (аренда): {change_percent:+.2f}%", ln=1)
+                    
+                    # Доходность
+                    if trends_data.get('yield'):
+                        yield_percent = trends_data['yield'] * 100
+                        pdf.cell(0, 8, f"Доходность: {yield_percent:.2f}%", ln=1)
+                    
+                    # Период размещения
+                    if trends_data.get('listing_period_for_sale'):
+                        pdf.cell(0, 8, f"Средний период продажи: {trends_data['listing_period_for_sale']} дней", ln=1)
+                    
+                    if trends_data.get('listing_period_for_rent'):
+                        pdf.cell(0, 8, f"Средний период аренды: {trends_data['listing_period_for_rent']} дней", ln=1)
+                    
+                    # Количество объектов
+                    if trends_data.get('count_for_sale'):
+                        pdf.cell(0, 8, f"Объектов на продажу: {trends_data['count_for_sale']}", ln=1)
+                    
+                    if trends_data.get('count_for_rent'):
+                        pdf.cell(0, 8, f"Объектов на аренду: {trends_data['count_for_rent']}", ln=1)
+                    
+                    pdf.ln(5)
+        
         # Налоги
         taxes = report.get('taxes')
         if taxes:
@@ -2409,6 +2520,105 @@ def create_chart_image_for_pdf(chart_data, title, width=180, height=100):
     except Exception as e:
         logger.error(f"Ошибка создания графика для PDF: {e}")
         return None
+
+def get_property_trends_data(city_name, district_name, county_name):
+    """
+    Получает данные трендов недвижимости из таблицы property_trends
+    
+    Args:
+        city_name (str): Название города
+        district_name (str): Название района
+        county_name (str): Название округа/провинции
+    
+    Returns:
+        dict: Данные трендов недвижимости или None если данные не найдены
+    """
+    try:
+        # Получаем текущую дату для определения последнего месяца
+        from datetime import datetime
+        current_date = datetime.now()
+        current_year = current_date.year
+        current_month = current_date.month
+        
+        # Если текущий месяц январь, берем декабрь прошлого года
+        if current_month == 1:
+            target_year = current_year - 1
+            target_month = 12
+        else:
+            target_year = current_year
+            target_month = current_month - 1
+        
+        logger.info(f"Поиск данных трендов для: {city_name}, {district_name}, {county_name}")
+        logger.info(f"Целевой период: {target_month}/{target_year}")
+        
+        # Запрос к таблице property_trends
+        query = supabase.table('property_trends').select('*').eq('city_name', city_name)
+        
+        # Добавляем фильтры если они есть
+        if district_name:
+            query = query.eq('district_name', district_name)
+        if county_name:
+            query = query.eq('county_name', county_name)
+        
+        # Фильтруем по году и месяцу
+        query = query.eq('property_year', target_year).eq('property_month', target_month)
+        
+        # Получаем данные
+        result = query.execute()
+        
+        if result.data and len(result.data) > 0:
+            trends_data = result.data[0]  # Берем первую запись
+            logger.info(f"Найдены данные трендов: {len(result.data)} записей")
+            return trends_data
+        else:
+            logger.warning(f"Данные трендов не найдены для: {city_name}, {district_name}, {county_name}")
+            return None
+            
+    except Exception as e:
+        logger.error(f"Ошибка получения данных трендов недвижимости: {e}")
+        return None
+
+def extract_location_from_address(address):
+    """
+    Извлекает город, район и округ из адреса
+    
+    Args:
+        address (str): Полный адрес
+    
+    Returns:
+        dict: Словарь с city_name, district_name, county_name
+    """
+    try:
+        # Простое извлечение - можно улучшить с помощью геокодинга
+        address_parts = address.split(',')
+        
+        location_data = {
+            'city_name': None,
+            'district_name': None,
+            'county_name': None
+        }
+        
+        if len(address_parts) >= 2:
+            # Первая часть обычно район/улица
+            location_data['district_name'] = address_parts[0].strip()
+            
+            # Вторая часть обычно город
+            location_data['city_name'] = address_parts[1].strip()
+            
+            # Третья часть может быть округом/провинцией
+            if len(address_parts) >= 3:
+                location_data['county_name'] = address_parts[2].strip()
+        
+        logger.info(f"Извлечены данные локации из адреса: {location_data}")
+        return location_data
+        
+    except Exception as e:
+        logger.error(f"Ошибка извлечения локации из адреса: {e}")
+        return {
+            'city_name': None,
+            'district_name': None,
+            'county_name': None
+        }
 
 if __name__ == '__main__':
     run_flask()
