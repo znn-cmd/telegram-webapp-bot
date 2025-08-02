@@ -1376,14 +1376,9 @@ def api_generate_pdf_report():
                     logger.info("График создан успешно, вставляем в PDF")
                     # Вставляем график в PDF
                     pdf.ln(5)
-                    logger.info("Перед вставкой графика в PDF - позиция Y: %s", pdf.get_y())
                     pdf.image(chart_buffer, x=10, y=pdf.get_y(), w=190)
-                    logger.info("График вставлен в PDF успешно")
                     pdf.ln(85)  # Отступ после графика
-                    logger.info("Отступ после графика добавлен")
                     chart_buffer.close()
-                    logger.info("Буфер графика закрыт")
-                    logger.info("Экономический график успешно вставлен в PDF")
                 else:
                     logger.warning("График не создался, используем текстовое отображение")
                     # Если график не создался, показываем текстовые данные
@@ -1432,7 +1427,6 @@ def api_generate_pdf_report():
                             pdf.cell(200, 6, text=f"{year}: {value}%", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
             
             pdf.ln(5)
-            logger.info("Экономический раздел завершен, переходим к трендам недвижимости")
         
         # Данные трендов недвижимости
         if report.get('object') and report['object'].get('address'):
@@ -1443,7 +1437,6 @@ def api_generate_pdf_report():
             pdf.cell(200, 10, text="Тренды рынка недвижимости:", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
             pdf.set_font("DejaVu", size=12)
             
-            logger.info("Начинаем обработку трендов рынка недвижимости...")
             if location_data['city_name']:
                 trends_data = get_property_trends_data(
                     location_data['city_name'],
@@ -1492,19 +1485,11 @@ def api_generate_pdf_report():
                 
                 # График изменения цен на продажу
                 if historical_data:
-                    try:
-                        logger.info("Создание графика продаж...")
-                        sale_chart_buffer = create_property_trends_chart(historical_data, 'sale', 180, 80)
-                        if sale_chart_buffer:
-                            pdf.ln(3)
-                            pdf.image(sale_chart_buffer, x=15, w=180)
-                            pdf.ln(3)
-                            sale_chart_buffer.close()
-                            logger.info("График продаж успешно вставлен и буфер закрыт")
-                        else:
-                            logger.warning("Не удалось создать график продаж")
-                    except Exception as e:
-                        logger.error(f"Ошибка создания графика продаж: {e}")
+                    sale_chart_buffer = create_property_trends_chart(historical_data, 'sale', 180, 80)
+                    if sale_chart_buffer:
+                        pdf.ln(3)
+                        pdf.image(sale_chart_buffer, x=15, w=180)
+                        pdf.ln(3)
                 
                 pdf.ln(5)
                 
@@ -1550,19 +1535,11 @@ def api_generate_pdf_report():
                 
                 # График изменения цен на аренду
                 if historical_data:
-                    try:
-                        logger.info("Создание графика аренды...")
-                        rent_chart_buffer = create_property_trends_chart(historical_data, 'rent', 180, 80)
-                        if rent_chart_buffer:
-                            pdf.ln(3)
-                            pdf.image(rent_chart_buffer, x=15, w=180)
-                            pdf.ln(3)
-                            rent_chart_buffer.close()
-                            logger.info("График аренды успешно вставлен и буфер закрыт")
-                        else:
-                            logger.warning("Не удалось создать график аренды")
-                    except Exception as e:
-                        logger.error(f"Ошибка создания графика аренды: {e}")
+                    rent_chart_buffer = create_property_trends_chart(historical_data, 'rent', 180, 80)
+                    if rent_chart_buffer:
+                        pdf.ln(3)
+                        pdf.image(rent_chart_buffer, x=15, w=180)
+                        pdf.ln(3)
             else:
                 # Адрес не содержит информации о городе - показываем "н/д" для всех полей
                 pdf.set_font("DejaVu", 'B', 12)
@@ -1683,8 +1660,6 @@ def api_generate_pdf_report():
         send_status = None
         if telegram_id:
             send_status = send_pdf_to_telegram(final_pdf_path, telegram_id)
-        
-        logger.info("PDF отчет успешно сгенерирован и сохранен")
         return jsonify({
             'success': True,
             'pdf_path': pdf_url,
@@ -2018,19 +1993,11 @@ def api_send_saved_report_pdf():
                 
                 # График изменения цен на продажу
                 if historical_data:
-                    try:
-                        logger.info("Создание графика продаж (saved report)...")
-                        sale_chart_buffer = create_property_trends_chart(historical_data, 'sale', 180, 80)
-                        if sale_chart_buffer:
-                            pdf.ln(3)
-                            pdf.image(sale_chart_buffer, x=15, w=180)
-                            pdf.ln(3)
-                            sale_chart_buffer.close()
-                            logger.info("График продаж успешно вставлен и буфер закрыт (saved report)")
-                        else:
-                            logger.warning("Не удалось создать график продаж (saved report)")
-                    except Exception as e:
-                        logger.error(f"Ошибка создания графика продаж (saved report): {e}")
+                    sale_chart_buffer = create_property_trends_chart(historical_data, 'sale', 180, 80)
+                    if sale_chart_buffer:
+                        pdf.ln(3)
+                        pdf.image(sale_chart_buffer, x=15, w=180)
+                        pdf.ln(3)
                 
                 pdf.ln(5)
                 
@@ -2076,19 +2043,11 @@ def api_send_saved_report_pdf():
                 
                 # График изменения цен на аренду
                 if historical_data:
-                    try:
-                        logger.info("Создание графика аренды (saved report)...")
-                        rent_chart_buffer = create_property_trends_chart(historical_data, 'rent', 180, 80)
-                        if rent_chart_buffer:
-                            pdf.ln(3)
-                            pdf.image(rent_chart_buffer, x=15, w=180)
-                            pdf.ln(3)
-                            rent_chart_buffer.close()
-                            logger.info("График аренды успешно вставлен и буфер закрыт (saved report)")
-                        else:
-                            logger.warning("Не удалось создать график аренды (saved report)")
-                    except Exception as e:
-                        logger.error(f"Ошибка создания графика аренды (saved report): {e}")
+                    rent_chart_buffer = create_property_trends_chart(historical_data, 'rent', 180, 80)
+                    if rent_chart_buffer:
+                        pdf.ln(3)
+                        pdf.image(rent_chart_buffer, x=15, w=180)
+                        pdf.ln(3)
             else:
                 # Адрес не содержит информации о городе - показываем "н/д" для всех полей
                 pdf.set_font("DejaVu", 'B', 12)
@@ -2943,9 +2902,6 @@ def create_property_trends_chart(historical_data, chart_type='sale', width=180, 
         import matplotlib.pyplot as plt
         import matplotlib.font_manager as fm
         from io import BytesIO
-        import numpy as np
-        
-        logger.info(f"Начинаем создание графика трендов {chart_type}...")
         
         # Настройка шрифта для русского языка
         plt.rcParams['font.family'] = 'DejaVu Sans'
@@ -2965,8 +2921,6 @@ def create_property_trends_chart(historical_data, chart_type='sale', width=180, 
         
         # Фильтруем None значения
         valid_data = [(year, price) for year, price in zip(years, prices) if price is not None]
-        
-        logger.info(f"Валидных данных для графика {chart_type}: {len(valid_data)}")
         
         if valid_data:
             valid_years, valid_prices = zip(*valid_data)
@@ -3011,11 +2965,6 @@ def create_property_trends_chart(historical_data, chart_type='sale', width=180, 
         
     except Exception as e:
         logger.error(f"Ошибка создания графика трендов {chart_type}: {e}")
-        # Попытка закрыть фигуру если она была создана
-        try:
-            plt.close('all')
-        except:
-            pass
         return None
 
 if __name__ == '__main__':
