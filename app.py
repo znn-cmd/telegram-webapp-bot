@@ -352,6 +352,19 @@ def api_geocode():
             location = result['results'][0]['geometry']['location']
             formatted_address = result['results'][0]['formatted_address']
             
+            # Детальное логирование ответа Google Places API
+            logger.info("=" * 60)
+            logger.info("🔍 ДЕТАЛЬНЫЙ АНАЛИЗ ОТВЕТА GOOGLE PLACES API")
+            logger.info("=" * 60)
+            logger.info(f"Оригинальный адрес: {address}")
+            logger.info(f"Formatted address: {formatted_address}")
+            logger.info(f"Lat: {location['lat']}, Lng: {location['lng']}")
+            
+            # Логируем все компоненты адреса от Google
+            logger.info("\n📋 Все компоненты адреса от Google:")
+            for i, component in enumerate(result['results'][0]['address_components']):
+                logger.info(f"  {i+1}. {component.get('long_name', '')} ({component.get('short_name', '')}) - Types: {component.get('types', [])}")
+            
             # Извлекаем структурированные данные из Google Places API
             location_components = extract_location_components(result['results'][0]['address_components'], address)
             
@@ -427,6 +440,11 @@ def api_generate_report():
         # Если коды локаций не переданы, пытаемся получить их из адреса
         if not location_codes:
             location_codes = get_location_codes_from_address(address)
+        
+        # Сохраняем компоненты локации для отображения в отчете
+        location_components = data.get('location_components')
+        if location_components:
+            format_simple_report.last_location_components = location_components
         
         # Формируем отчёт в текстовом формате для отображения
         report_text = format_simple_report(address, bedrooms, price, location_codes, language)
@@ -593,7 +611,7 @@ def format_simple_report(address, bedrooms, price, location_codes, language='en'
         "",
     ]
     
-    # Добавляем коды локаций
+            # Добавляем коды локаций
     if location_codes:
         report_lines.extend([
             "=== КОДЫ ЛОКАЦИЙ ===",
@@ -609,6 +627,27 @@ def format_simple_report(address, bedrooms, price, location_codes, language='en'
             "Локация не найдена в базе данных",
             "",
         ])
+    
+    # Добавляем данные от Google Places API для отладки
+    report_lines.extend([
+        "=== ДАННЫЕ GOOGLE PLACES API ===",
+        f"Formatted Address: {address}",
+    ])
+    
+    # Если есть компоненты локации, показываем их
+    if hasattr(format_simple_report, 'last_location_components'):
+        components = format_simple_report.last_location_components
+        if components:
+            report_lines.extend([
+                f"Country: {components.get('country', 'н/д')}",
+                f"Country Code: {components.get('country_code', 'н/д')}",
+                f"City: {components.get('city', 'н/д')}",
+                f"District: {components.get('district', 'н/д')}",
+                f"County: {components.get('county', 'н/д')}",
+                f"Postal Code: {components.get('postal_code', 'н/д')}",
+            ])
+    
+    report_lines.append("")
     
     # Добавляем данные объекта
     report_lines.extend([
@@ -3221,6 +3260,14 @@ def find_location_codes_from_components(location_components):
             return None
         
         logger.info(f"Ищем локацию в базе по компонентам: {search_data}")
+        
+        # Показываем все возможные варианты поиска
+        logger.info("\n🔍 ВАРИАНТЫ ПОИСКА В БАЗЕ ДАННЫХ:")
+        logger.info("1. Точное совпадение по всем полям")
+        logger.info("2. По county_name и city_name")
+        logger.info("3. По district_name и city_name")
+        logger.info("4. Только по county_name")
+        logger.info("5. Только по district_name")
         
         # Ищем в таблице locations - сначала по точному совпадению
         query = supabase.table('locations').select('*')

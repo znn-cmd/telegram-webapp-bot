@@ -597,7 +597,8 @@
                         bedrooms: parseInt(bedrooms),
                         price: parseFloat(price),
                         language: 'ru',
-                        location_codes: geoData.location_codes || null
+                        location_codes: geoData.location_codes || null,
+                        location_components: geoData.location_components || null
                     })
                 });
                 const data = await res.json();
