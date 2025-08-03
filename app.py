@@ -365,8 +365,39 @@ def api_geocode():
             for i, component in enumerate(result['results'][0]['address_components']):
                 logger.info(f"  {i+1}. {component.get('long_name', '')} ({component.get('short_name', '')}) - Types: {component.get('types', [])}")
             
+            # Анализируем, что Google не определил
+            google_components = [comp.get('long_name', '') for comp in result['results'][0]['address_components']]
+            address_parts = address.split(',')
+            first_part = address_parts[0].strip() if address_parts else ""
+            
+            logger.info(f"\n🔍 АНАЛИЗ:")
+            logger.info(f"Первая часть адреса: '{first_part}'")
+            logger.info(f"Компоненты Google: {google_components}")
+            if first_part not in google_components:
+                logger.info(f"⚠️  '{first_part}' НЕ найден в компонентах Google!")
+            else:
+                logger.info(f"✅ '{first_part}' найден в компонентах Google")
+            
             # Извлекаем структурированные данные из Google Places API
             location_components = extract_location_components(result['results'][0]['address_components'], address)
+            
+            # Дополнительно получаем данные через Nominatim
+            nominatim_data = get_nominatim_location(address)
+            
+            # Объединяем данные Google и Nominatim
+            if nominatim_data:
+                # Если Google не определил district, используем данные Nominatim
+                if not location_components.get('district') and nominatim_data.get('district'):
+                    location_components['district'] = nominatim_data['district']
+                    logger.info(f"Добавлен district из Nominatim: {nominatim_data['district']}")
+                
+                # Если Google не определил county, используем данные Nominatim
+                if not location_components.get('county') and nominatim_data.get('county'):
+                    location_components['county'] = nominatim_data['county']
+                    logger.info(f"Добавлен county из Nominatim: {nominatim_data['county']}")
+                
+                # Сохраняем данные Nominatim для отображения
+                location_components['nominatim_data'] = nominatim_data
             
             # Пытаемся найти коды локаций в базе данных
             location_codes = find_location_codes_from_components(location_components)
@@ -646,6 +677,23 @@ def format_simple_report(address, bedrooms, price, location_codes, language='en'
                 f"County: {components.get('county', 'н/д')}",
                 f"Postal Code: {components.get('postal_code', 'н/д')}",
             ])
+            
+            # Показываем данные Nominatim, если есть
+            if components.get('nominatim_data'):
+                nominatim = components['nominatim_data']
+                report_lines.extend([
+                    "",
+                    "=== ДАННЫЕ NOMINATIM (OpenStreetMap) ===",
+                    f"Display Name: {nominatim.get('display_name', 'н/д')}",
+                    f"Country: {nominatim.get('country', 'н/д')}",
+                    f"Country Code: {nominatim.get('country_code', 'н/д')}",
+                    f"City: {nominatim.get('city', 'н/д')}",
+                    f"District: {nominatim.get('district', 'н/д')}",
+                    f"County: {nominatim.get('county', 'н/д')}",
+                    f"Postal Code: {nominatim.get('postal_code', 'н/д')}",
+                    f"Road: {nominatim.get('road', 'н/д')}",
+                    f"House Number: {nominatim.get('house_number', 'н/д')}",
+                ])
     
     report_lines.append("")
     
@@ -3167,6 +3215,60 @@ def get_cascading_trends_data(location_codes, target_year, target_month):
         logger.error(f"Ошибка каскадного поиска данных: {e}")
         return None, "Ошибка при поиске данных"
 
+def get_nominatim_location(address):
+    """
+    Получает структурированные данные адреса через Nominatim API
+    
+    Args:
+        address (str): Адрес для геокодирования
+    
+    Returns:
+        dict: Структурированные данные адреса или None
+    """
+    try:
+        # Запрос к Nominatim API
+        url = "https://nominatim.openstreetmap.org/search"
+        params = {
+            'q': address,
+            'format': 'json',
+            'addressdetails': 1,
+            'limit': 1
+        }
+        headers = {
+            'User-Agent': 'Aaadviser/1.0'
+        }
+        
+        response = requests.get(url, params=params, headers=headers)
+        result = response.json()
+        
+        if result and len(result) > 0:
+            location = result[0]
+            address_details = location.get('address', {})
+            
+            # Извлекаем структурированные данные
+            location_data = {
+                'country': address_details.get('country'),
+                'country_code': address_details.get('country_code'),
+                'city': address_details.get('city') or address_details.get('town'),
+                'district': address_details.get('suburb') or address_details.get('neighbourhood'),
+                'county': address_details.get('county') or address_details.get('state'),
+                'postal_code': address_details.get('postcode'),
+                'road': address_details.get('road'),
+                'house_number': address_details.get('house_number'),
+                'lat': location.get('lat'),
+                'lon': location.get('lon'),
+                'display_name': location.get('display_name')
+            }
+            
+            logger.info(f"Nominatim данные: {location_data}")
+            return location_data
+        
+        return None
+        
+    except Exception as e:
+        logger.error(f"Ошибка Nominatim API: {e}")
+        return None
+
 def extract_location_components(address_components, original_address=None):
     """
     Извлекает структурированные данные из Google Places API address_components
@@ -3218,15 +3320,20 @@ def extract_location_components(address_components, original_address=None):
             location_data['postal_code'] = long_name
     
     # Дополнительная обработка для турецких адресов
-    if original_address and location_data['country'] == 'Turkey':
+    if original_address and (location_data['country'] == 'Turkey' or location_data['country'] == 'Türkiye'):
         # Извлекаем район из первой части адреса
         address_parts = original_address.split(',')
         if len(address_parts) >= 1:
             first_part = address_parts[0].strip()
             # Убираем суффиксы типа "Sk.", "Sok.", "Mah." и т.д.
             district_name = first_part.replace(' Sk.', '').replace(' Sok.', '').replace(' Mah.', '').replace(' Mahallesi', '')
-            location_data['district'] = district_name
-            logger.info(f"Извлечен район из адреса: {district_name}")
+            
+            # Если Google не определил district, используем извлеченный
+            if not location_data['district']:
+                location_data['district'] = district_name
+                logger.info(f"Извлечен район из адреса (Google не определил): {district_name}")
+            else:
+                logger.info(f"Google определил district: {location_data['district']}, извлеченный: {district_name}")
     
     logger.info(f"Извлечены компоненты локации: {location_data}")
     return location_data
