@@ -26,6 +26,7 @@ import io
 import base64
 from PIL import Image
 import numpy as np
+import openai
 
 # Загружаем переменные окружения
 load_dotenv()
@@ -882,6 +883,31 @@ def get_economic_data(country_code='TUR', years_back=10):
         gdp_trend = calculate_trend(gdp_values) if gdp_values else 0
         inflation_trend = calculate_trend(inflation_values) if inflation_values else 0
         
+        # Генерируем детальные расчеты
+        detailed_calculations = generate_detailed_calculations(gdp_data, inflation_data)
+        
+        # Пытаемся загрузить сохраненные интерпретации из базы данных
+        saved_interpretations, saved_calculations = load_interpretations_from_database(country_code)
+        
+        if saved_interpretations and saved_calculations:
+            # Используем сохраненные интерпретации
+            interpretations = saved_interpretations
+            detailed_calculations.update(saved_calculations)
+            logger.info(f"Using cached interpretations for {country_code}")
+        else:
+            # Генерируем новые интерпретации через ChatGPT
+            interpretations = {}
+            for lang in ['en', 'ru', 'tr', 'fr', 'de']:
+                interpretations[lang] = generate_trend_interpretation_with_chatgpt(
+                    gdp_trend, inflation_trend, gdp_data, inflation_data, lang
+                )
+            
+            # Сохраняем интерпретации в базу данных
+            try:
+                save_interpretations_to_database(country_code, interpretations, detailed_calculations)
+            except Exception as e:
+                logger.warning(f"Could not save interpretations to database: {e}")
+        
         # Получаем название страны из первой записи
         country_name = gdp_result.data[0].get('country_name') if gdp_result.data else 'Unknown'
         
@@ -894,7 +920,9 @@ def get_economic_data(country_code='TUR', years_back=10):
             'inflation_trend': inflation_trend,
             'latest_gdp': gdp_data[-1] if gdp_data else None,
             'latest_inflation': inflation_data[-1] if inflation_data else None,
-            'data_years': f"{start_year}-{current_year}"
+            'data_years': f"{start_year}-{current_year}",
+            'detailed_calculations': detailed_calculations,
+            'interpretations': interpretations
         }
         
     except Exception as e:
@@ -988,7 +1016,9 @@ def create_economic_chart_data(economic_data):
             'inflation': economic_data.get('latest_inflation')
         },
         'country_name': country_name,
-        'country_code': economic_data.get('country_code', 'Unknown')
+        'country_code': economic_data.get('country_code', 'Unknown'),
+        'detailed_calculations': economic_data.get('detailed_calculations', {}),
+        'interpretations': economic_data.get('interpretations', {})
     }
 
 @app.route('/api/full_report', methods=['POST'])
@@ -1359,6 +1389,68 @@ def api_generate_pdf_report():
                     inflation_trend = trends['inflation_trend'] * 100  # Конвертируем в проценты
                     trend_text = f"Тренд инфляции: {inflation_trend:.1f}%"
                     pdf.cell(200, 8, text=trend_text, new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                
+                # Добавляем детальные расчеты в компактной таблице
+                detailed_calculations = economic_charts.get('detailed_calculations', {})
+                if detailed_calculations:
+                    pdf.ln(5)
+                    pdf.set_font("DejaVu", 'B', 12)
+                    pdf.cell(200, 8, text="Детальные расчеты трендов:", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                    pdf.set_font("DejaVu", size=8)
+                    
+                    # Создаем компактную таблицу в 3 столбца
+                    gdp_calcs = detailed_calculations.get('gdp_calculations', [])
+                    inflation_calcs = detailed_calculations.get('inflation_calculations', [])
+                    
+                    if gdp_calcs or inflation_calcs:
+                        # Заголовки таблицы
+                        pdf.set_font("DejaVu", 'B', 9)
+                        pdf.cell(60, 6, text="Период", new_x=XPos.RIGHT, new_y=YPos.TOP)
+                        pdf.cell(60, 6, text="Расчет", new_x=XPos.RIGHT, new_y=YPos.TOP)
+                        pdf.cell(60, 6, text="Результат", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                        pdf.set_font("DejaVu", size=8)
+                        
+                        # ВВП расчеты
+                        if gdp_calcs:
+                            pdf.cell(200, 4, text="", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                            pdf.set_font("DejaVu", 'B', 8)
+                            pdf.cell(200, 5, text="ВВП:", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                            pdf.set_font("DejaVu", size=7)
+                            
+                            for calc in gdp_calcs:
+                                # Первая строка
+                                pdf.cell(60, 4, text=calc['years'], new_x=XPos.RIGHT, new_y=YPos.TOP)
+                                pdf.cell(60, 4, text=calc['calculation'], new_x=XPos.RIGHT, new_y=YPos.TOP)
+                                pdf.cell(60, 4, text=calc['result'], new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                        
+                        # Инфляция расчеты
+                        if inflation_calcs:
+                            pdf.cell(200, 4, text="", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                            pdf.set_font("DejaVu", 'B', 8)
+                            pdf.cell(200, 5, text="Инфляция:", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                            pdf.set_font("DejaVu", size=7)
+                            
+                            for calc in inflation_calcs:
+                                # Первая строка
+                                pdf.cell(60, 4, text=calc['years'], new_x=XPos.RIGHT, new_y=YPos.TOP)
+                                pdf.cell(60, 4, text=calc['calculation'], new_x=XPos.RIGHT, new_y=YPos.TOP)
+                                pdf.cell(60, 4, text=calc['result'], new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                
+                # Добавляем интерпретации
+                interpretations = economic_charts.get('interpretations', {})
+                if interpretations and 'ru' in interpretations:
+                    pdf.ln(5)
+                    pdf.set_font("DejaVu", 'B', 12)
+                    pdf.cell(200, 8, text="Интерпретация трендов:", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                    pdf.set_font("DejaVu", size=10)
+                    
+                    ru_interp = interpretations['ru']
+                    if 'gdp_interpretation' in ru_interp:
+                        pdf.cell(200, 6, text=f"ВВП: {ru_interp['gdp_interpretation']}", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                    if 'inflation_interpretation' in ru_interp:
+                        pdf.cell(200, 6, text=f"Инфляция: {ru_interp['inflation_interpretation']}", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                    if 'recent_comparison' in ru_interp:
+                        pdf.cell(200, 6, text=f"Сравнение: {ru_interp['recent_comparison']}", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
             
             # Создаем и вставляем график
             try:
@@ -1936,6 +2028,91 @@ def api_send_saved_report_pdf():
             pdf.cell(0, 8, f"Рост ВВП: {macro.get('gdp_growth', '-')}%", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
             pdf.ln(5)
         
+        # Экономические данные и тренды
+        if 'economic_charts' in report:
+            economic_charts = report['economic_charts']
+            country_name = economic_charts.get('country_name', 'Unknown')
+            
+            pdf.set_font("DejaVu", 'B', 14)
+            pdf.cell(0, 10, f"Экономические тренды ({country_name}):", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            pdf.set_font("DejaVu", size=12)
+            
+            # Отображаем тренды
+            trends = economic_charts.get('trends', {})
+            if trends.get('gdp_trend') is not None:
+                gdp_trend = trends['gdp_trend'] * 100  # Конвертируем в проценты
+                trend_text = f"Тренд роста ВВП: {gdp_trend:.1f}%"
+                pdf.cell(200, 8, text=trend_text, new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            
+            if trends.get('inflation_trend') is not None:
+                inflation_trend = trends['inflation_trend'] * 100  # Конвертируем в проценты
+                trend_text = f"Тренд инфляции: {inflation_trend:.1f}%"
+                pdf.cell(200, 8, text=trend_text, new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            
+            # Добавляем детальные расчеты в компактной таблице
+            detailed_calculations = economic_charts.get('detailed_calculations', {})
+            if detailed_calculations:
+                pdf.ln(5)
+                pdf.set_font("DejaVu", 'B', 12)
+                pdf.cell(200, 8, text="Детальные расчеты трендов:", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                pdf.set_font("DejaVu", size=8)
+                
+                # Создаем компактную таблицу в 3 столбца
+                gdp_calcs = detailed_calculations.get('gdp_calculations', [])
+                inflation_calcs = detailed_calculations.get('inflation_calculations', [])
+                
+                if gdp_calcs or inflation_calcs:
+                    # Заголовки таблицы
+                    pdf.set_font("DejaVu", 'B', 9)
+                    pdf.cell(60, 6, text="Период", new_x=XPos.RIGHT, new_y=YPos.TOP)
+                    pdf.cell(60, 6, text="Расчет", new_x=XPos.RIGHT, new_y=YPos.TOP)
+                    pdf.cell(60, 6, text="Результат", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                    pdf.set_font("DejaVu", size=8)
+                    
+                    # ВВП расчеты
+                    if gdp_calcs:
+                        pdf.cell(200, 4, text="", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                        pdf.set_font("DejaVu", 'B', 8)
+                        pdf.cell(200, 5, text="ВВП:", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                        pdf.set_font("DejaVu", size=7)
+                        
+                        for calc in gdp_calcs:
+                            # Первая строка
+                            pdf.cell(60, 4, text=calc['years'], new_x=XPos.RIGHT, new_y=YPos.TOP)
+                            pdf.cell(60, 4, text=calc['calculation'], new_x=XPos.RIGHT, new_y=YPos.TOP)
+                            pdf.cell(60, 4, text=calc['result'], new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                    
+                    # Инфляция расчеты
+                    if inflation_calcs:
+                        pdf.cell(200, 4, text="", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                        pdf.set_font("DejaVu", 'B', 8)
+                        pdf.cell(200, 5, text="Инфляция:", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                        pdf.set_font("DejaVu", size=7)
+                        
+                        for calc in inflation_calcs:
+                            # Первая строка
+                            pdf.cell(60, 4, text=calc['years'], new_x=XPos.RIGHT, new_y=YPos.TOP)
+                            pdf.cell(60, 4, text=calc['calculation'], new_x=XPos.RIGHT, new_y=YPos.TOP)
+                            pdf.cell(60, 4, text=calc['result'], new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            
+            # Добавляем интерпретации
+            interpretations = economic_charts.get('interpretations', {})
+            if interpretations and 'ru' in interpretations:
+                pdf.ln(5)
+                pdf.set_font("DejaVu", 'B', 12)
+                pdf.cell(200, 8, text="Интерпретация трендов:", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                pdf.set_font("DejaVu", size=10)
+                
+                ru_interp = interpretations['ru']
+                if 'gdp_interpretation' in ru_interp:
+                    pdf.cell(200, 6, text=f"ВВП: {ru_interp['gdp_interpretation']}", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                if 'inflation_interpretation' in ru_interp:
+                    pdf.cell(200, 6, text=f"Инфляция: {ru_interp['inflation_interpretation']}", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                if 'recent_comparison' in ru_interp:
+                    pdf.cell(200, 6, text=f"Сравнение: {ru_interp['recent_comparison']}", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            
+            pdf.ln(5)
+        
         # Данные трендов недвижимости
         if report.get('object') and report['object'].get('address'):
             address = report['object']['address']
@@ -2260,11 +2437,7 @@ def api_admin_publication():
     # Получаем всех пользователей
     users = supabase.table('users').select('telegram_id, user_status, language').execute().data or []
     # Получаем OpenAI API ключ
-    openai_key_row = supabase.table('api_keys').select('key_value').eq('key_name', 'OPENAI_API').execute().data
-    if openai_key_row and isinstance(openai_key_row, list) and len(openai_key_row) > 0 and openai_key_row[0] and isinstance(openai_key_row[0], dict) and 'key_value' in openai_key_row[0]:
-        openai_key = openai_key_row[0]['key_value']
-    else:
-        openai_key = ''
+    openai_key = get_openai_api_key()
     # Языки и поля для перевода
     lang_map = {'ru': 'ru', 'en': 'us', 'de': 'de', 'fr': 'ft', 'tr': 'tr'}
     translations = {'ru': text, 'us': '', 'de': '', 'ft': '', 'tr': ''}
@@ -2275,25 +2448,21 @@ def api_admin_publication():
         logger.info(f"auto_translate={auto_translate}, openai_key={'есть' if openai_key else 'нет'}")
         def gpt_translate(prompt, target_lang):
             logger.info(f"Запрос к OpenAI для {target_lang}")
-            headers = {"Authorization": f"Bearer {openai_key}", "Content-Type": "application/json"}
-            payload = {
-                "model": "gpt-3.5-turbo",
-                "messages": [
-                    {"role": "system", "content": f"You are a professional translator. Translate the following text to {target_lang} (no explanation, only translation):"},
-                    {"role": "user", "content": prompt}
-                ],
-                "max_tokens": 1024,
-                "temperature": 0.3
-            }
             try:
-                resp = requests.post("https://api.openai.com/v1/chat/completions", json=payload, headers=headers, timeout=30)
-                if resp.status_code == 200:
-                    result = resp.json()['choices'][0]['message']['content'].strip()
-                    logger.info(f"Перевод {target_lang}: {result}")
-                    return result
-                else:
-                    logger.error(f"OpenAI API error for {target_lang}: {resp.status_code} {resp.text}")
-                    return f"[Ошибка перевода {target_lang}]"
+                from openai import OpenAI
+                client = OpenAI(api_key=openai_key)
+                response = client.chat.completions.create(
+                    model="gpt-3.5-turbo",
+                    messages=[
+                        {"role": "system", "content": f"You are a professional translator. Translate the following text to {target_lang} (no explanation, only translation):"},
+                        {"role": "user", "content": prompt}
+                    ],
+                    max_tokens=1024,
+                    temperature=0.3
+                )
+                result = response.choices[0].message.content.strip()
+                logger.info(f"Перевод {target_lang}: {result}")
+                return result
             except Exception as e:
                 logger.error(f"OpenAI API exception for {target_lang}: {e}")
                 return f"[Ошибка перевода {target_lang}]"
@@ -2966,6 +3135,277 @@ def create_property_trends_chart(historical_data, chart_type='sale', width=180, 
     except Exception as e:
         logger.error(f"Ошибка создания графика трендов {chart_type}: {e}")
         return None
+
+def get_openai_api_key():
+    """
+    Получает OpenAI API ключ из базы данных
+    
+    Returns:
+        str: API ключ или пустая строка
+    """
+    try:
+        # Получаем API ключ из базы данных
+        openai_key_row = supabase.table('api_keys').select('key_value').eq('key_name', 'OPENAI_API').execute().data
+        
+        if openai_key_row and isinstance(openai_key_row, list) and len(openai_key_row) > 0:
+            key_data = openai_key_row[0]
+            if isinstance(key_data, dict) and 'key_value' in key_data:
+                api_key = key_data['key_value']
+                if api_key and api_key.strip():
+                    logger.info("OpenAI API key retrieved from database successfully")
+                    return api_key.strip()
+        
+        logger.warning("OpenAI API key not found in database")
+        return ''
+        
+    except Exception as e:
+        logger.error(f"Error retrieving OpenAI API key from database: {e}")
+        return ''
+
+def generate_trend_interpretation_with_chatgpt(gdp_trend, inflation_trend, gdp_data, inflation_data, language='en'):
+    """
+    Генерирует интерпретацию трендов через ChatGPT
+    
+    Args:
+        gdp_trend (float): Тренд ВВП
+        inflation_trend (float): Тренд инфляции
+        gdp_data (list): Данные ВВП
+        inflation_data (list): Данные инфляции
+        language (str): Язык интерпретации (en, ru, tr, fr, de)
+    
+    Returns:
+        dict: Интерпретации на разных языках
+    """
+    try:
+        import openai
+        
+        # Настройка языков
+        languages = {
+            'en': 'English',
+            'ru': 'Russian', 
+            'tr': 'Turkish',
+            'fr': 'French',
+            'de': 'German'
+        }
+        
+        # Получаем последние 2 года для сравнения
+        if len(gdp_data) >= 2 and len(inflation_data) >= 2:
+            gdp_last_2 = [d['value'] for d in gdp_data[-2:]]
+            inflation_last_2 = [d['value'] for d in inflation_data[-2:]]
+            recent_gdp_change = ((gdp_last_2[1] - gdp_last_2[0]) / gdp_last_2[0]) * 100 if gdp_last_2[0] != 0 else 0
+            recent_inflation_change = ((inflation_last_2[1] - inflation_last_2[0]) / inflation_last_2[0]) * 100 if inflation_last_2[0] != 0 else 0
+        else:
+            recent_gdp_change = 0
+            recent_inflation_change = 0
+        
+        # Формируем промпт для ChatGPT
+        prompt = f"""
+        Analyze economic trends for Turkey and provide interpretations in {languages.get(language, 'English')}.
+        
+        GDP Trend: {gdp_trend:.1f}%
+        Inflation Trend: {inflation_trend:.1f}%
+        Recent GDP change (last 2 years): {recent_gdp_change:.1f}%
+        Recent Inflation change (last 2 years): {recent_inflation_change:.1f}%
+        
+        GDP data: {gdp_data}
+        Inflation data: {inflation_data}
+        
+        Please provide:
+        1. GDP trend interpretation (2-3 sentences)
+        2. Inflation trend interpretation (2-3 sentences) 
+        3. Recent comparison interpretation (last 2 years, 2-3 sentences)
+        
+        Format as JSON:
+        {{
+            "gdp_interpretation": "...",
+            "inflation_interpretation": "...", 
+            "recent_comparison": "..."
+        }}
+        """
+        
+        # Получаем API ключ из базы данных
+        openai_api_key = get_openai_api_key()
+        
+        if openai_api_key:
+            try:
+                from openai import OpenAI
+                client = OpenAI(api_key=openai_api_key)
+                response = client.chat.completions.create(
+                    model="gpt-3.5-turbo",
+                    messages=[{"role": "user", "content": prompt}],
+                    max_tokens=300,
+                    temperature=0.7
+                )
+                result = json.loads(response.choices[0].message.content)
+                logger.info(f"ChatGPT interpretation generated successfully for language: {language}")
+            except Exception as e:
+                logger.warning(f"ChatGPT API error: {e}, using fallback")
+                result = {
+                    "gdp_interpretation": f"GDP trend shows {gdp_trend:.1f}% average growth, indicating strong economic expansion",
+                    "inflation_interpretation": f"Inflation trend at {inflation_trend:.1f}% shows significant price increases",
+                    "recent_comparison": f"Recent 2-year comparison shows GDP change of {recent_gdp_change:.1f}% and inflation change of {recent_inflation_change:.1f}%"
+                }
+        else:
+            # Временная заглушка без ChatGPT
+            logger.info("No OpenAI API key available, using fallback interpretation")
+            result = {
+                "gdp_interpretation": f"GDP trend shows {gdp_trend:.1f}% average growth, indicating strong economic expansion",
+                "inflation_interpretation": f"Inflation trend at {inflation_trend:.1f}% shows significant price increases",
+                "recent_comparison": f"Recent 2-year comparison shows GDP change of {recent_gdp_change:.1f}% and inflation change of {recent_inflation_change:.1f}%"
+            }
+        
+        return result
+        
+    except Exception as e:
+        logger.error(f"Error generating ChatGPT interpretation: {e}")
+        return {
+            "gdp_interpretation": f"GDP trend: {gdp_trend:.1f}%",
+            "inflation_interpretation": f"Inflation trend: {inflation_trend:.1f}%",
+            "recent_comparison": "Recent comparison data unavailable"
+        }
+
+def generate_detailed_calculations(gdp_data, inflation_data):
+    """
+    Генерирует детальные расчеты трендов
+    
+    Args:
+        gdp_data (list): Данные ВВП
+        inflation_data (list): Данные инфляции
+    
+    Returns:
+        dict: Детальные расчеты
+    """
+    try:
+        # Расчеты для ВВП
+        gdp_calculations = []
+        gdp_values = [d['value'] for d in gdp_data]
+        
+        for i in range(1, len(gdp_values)):
+            year1 = gdp_data[i-1]['year']
+            year2 = gdp_data[i]['year']
+            val1 = gdp_values[i-1]
+            val2 = gdp_values[i]
+            
+            if val1 != 0:
+                change = (val2 - val1) / val1
+                gdp_calculations.append({
+                    'years': f"{year1}→{year2}",
+                    'calculation': f"({val2:.1f} - {val1:.1f}) / {val1:.1f}",
+                    'result': f"{change:.3f}"
+                })
+        
+        # Расчеты для инфляции
+        inflation_calculations = []
+        inflation_values = [d['value'] for d in inflation_data]
+        
+        for i in range(1, len(inflation_values)):
+            year1 = inflation_data[i-1]['year']
+            year2 = inflation_data[i]['year']
+            val1 = inflation_values[i-1]
+            val2 = inflation_values[i]
+            
+            if val1 != 0:
+                change = (val2 - val1) / val1
+                inflation_calculations.append({
+                    'years': f"{year1}→{year2}",
+                    'calculation': f"({val2:.1f} - {val1:.1f}) / {val1:.1f}",
+                    'result': f"{change:.3f}"
+                })
+        
+        return {
+            'gdp_calculations': gdp_calculations,
+            'inflation_calculations': inflation_calculations,
+            'gdp_values': gdp_values,
+            'inflation_values': inflation_values
+        }
+        
+    except Exception as e:
+        logger.error(f"Error generating detailed calculations: {e}")
+        return {
+            'gdp_calculations': [],
+            'inflation_calculations': [],
+            'gdp_values': [],
+            'inflation_values': []
+        }
+
+def save_interpretations_to_database(country_code, interpretations, calculations):
+    """
+    Сохраняет интерпретации в базу данных
+    
+    Args:
+        country_code (str): Код страны
+        interpretations (dict): Интерпретации
+        calculations (dict): Детальные расчеты
+    """
+    try:
+        # Обновляем записи в таблице imf_economic_data
+        for indicator in ['NGDP_RPCH', 'PCPIPCH']:
+            supabase.table('imf_economic_data').update({
+                'gdp_trend_interpretation_en': interpretations.get('en', {}).get('gdp_interpretation', ''),
+                'gdp_trend_interpretation_ru': interpretations.get('ru', {}).get('gdp_interpretation', ''),
+                'gdp_trend_interpretation_tr': interpretations.get('tr', {}).get('gdp_interpretation', ''),
+                'gdp_trend_interpretation_fr': interpretations.get('fr', {}).get('gdp_interpretation', ''),
+                'gdp_trend_interpretation_de': interpretations.get('de', {}).get('gdp_interpretation', ''),
+                'inflation_trend_interpretation_en': interpretations.get('en', {}).get('inflation_interpretation', ''),
+                'inflation_trend_interpretation_ru': interpretations.get('ru', {}).get('inflation_interpretation', ''),
+                'inflation_trend_interpretation_tr': interpretations.get('tr', {}).get('inflation_interpretation', ''),
+                'inflation_trend_interpretation_fr': interpretations.get('fr', {}).get('inflation_interpretation', ''),
+                'inflation_trend_interpretation_de': interpretations.get('de', {}).get('inflation_interpretation', ''),
+                'recent_comparison_interpretation_en': interpretations.get('en', {}).get('recent_comparison', ''),
+                'recent_comparison_interpretation_ru': interpretations.get('ru', {}).get('recent_comparison', ''),
+                'recent_comparison_interpretation_tr': interpretations.get('tr', {}).get('recent_comparison', ''),
+                'recent_comparison_interpretation_fr': interpretations.get('fr', {}).get('recent_comparison', ''),
+                'recent_comparison_interpretation_de': interpretations.get('de', {}).get('recent_comparison', ''),
+                'gdp_calculation_details': json.dumps(calculations.get('gdp_calculations', [])),
+                'inflation_calculation_details': json.dumps(calculations.get('inflation_calculation_details', []))
+            }).eq('country_code', country_code).eq('indicator_code', indicator).execute()
+            
+        logger.info(f"Interpretations saved to database for country {country_code}")
+        
+    except Exception as e:
+        logger.error(f"Error saving interpretations to database: {e}")
+
+def load_interpretations_from_database(country_code):
+    """
+    Загружает сохраненные интерпретации из базы данных
+    
+    Args:
+        country_code (str): Код страны
+    
+    Returns:
+        dict: Загруженные интерпретации или None
+    """
+    try:
+        # Получаем записи из таблицы imf_economic_data
+        result = supabase.table('imf_economic_data').select('*').eq('country_code', country_code).eq('indicator_code', 'NGDP_RPCH').execute()
+        
+        if result.data and len(result.data) > 0:
+            record = result.data[0]
+            
+            # Проверяем, есть ли сохраненные интерпретации
+            if record.get('gdp_trend_interpretation_en') and record.get('inflation_trend_interpretation_en'):
+                interpretations = {}
+                for lang in ['en', 'ru', 'tr', 'fr', 'de']:
+                    interpretations[lang] = {
+                        'gdp_interpretation': record.get(f'gdp_trend_interpretation_{lang}', ''),
+                        'inflation_interpretation': record.get(f'inflation_trend_interpretation_{lang}', ''),
+                        'recent_comparison': record.get(f'recent_comparison_interpretation_{lang}', '')
+                    }
+                
+                # Загружаем детальные расчеты
+                calculations = {
+                    'gdp_calculations': json.loads(record.get('gdp_calculation_details', '[]')),
+                    'inflation_calculations': json.loads(record.get('inflation_calculation_details', '[]'))
+                }
+                
+                logger.info(f"Interpretations loaded from database for country {country_code}")
+                return interpretations, calculations
+        
+        return None, None
+        
+    except Exception as e:
+        logger.error(f"Error loading interpretations from database: {e}")
+        return None, None
 
 if __name__ == '__main__':
     run_flask()
