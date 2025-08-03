@@ -472,13 +472,18 @@ def api_generate_report():
         if not location_codes:
             location_codes = get_location_codes_from_address(address)
         
+        # Получаем данные рынка недвижимости
+        market_data = None
+        if location_codes:
+            market_data = get_market_data_by_location_ids(location_codes)
+        
         # Сохраняем компоненты локации для отображения в отчете
         location_components = data.get('location_components')
         if location_components:
             format_simple_report.last_location_components = location_components
         
         # Формируем отчёт в текстовом формате для отображения
-        report_text = format_simple_report(address, bedrooms, price, location_codes, language)
+        report_text = format_simple_report(address, bedrooms, price, location_codes, language, market_data)
         
         # Сохраняем отчет в базу данных (если есть telegram_id)
         if telegram_id:
@@ -629,8 +634,8 @@ def get_location_codes_from_address(address):
         logger.error(f"Error getting location codes: {e}")
         return None
 
-def format_simple_report(address, bedrooms, price, location_codes, language='en'):
-    """Форматирование простого отчёта с кодами локаций"""
+def format_simple_report(address, bedrooms, price, location_codes, language='en', market_data=None):
+    """Форматирование простого отчёта с кодами локаций и данными рынка"""
     
     # Форматируем цену
     def format_price(price):
@@ -704,10 +709,75 @@ def format_simple_report(address, bedrooms, price, location_codes, language='en'
         f"Спален: {bedrooms}",
         f"Цена: {format_price(price)}",
         "",
-        "=== АНАЛИЗ РЫНКА ===",
-        "Данные анализа рынка будут добавлены позже",
-        "",
     ])
+    
+    # Добавляем данные рынка недвижимости
+    if market_data:
+        report_lines.extend([
+            "=== ДАННЫЕ РЫНКА НЕДВИЖИМОСТИ ===",
+        ])
+        
+        # Данные property_trends
+        if market_data.get('property_trends'):
+            trends = market_data['property_trends']
+            report_lines.extend([
+                "📈 ТРЕНДЫ НЕДВИЖИМОСТИ:",
+                f"Средняя цена: €{trends.get('avg_price', 'н/д')}",
+                f"Медианная цена: €{trends.get('median_price', 'н/д')}",
+                f"Количество объектов: {trends.get('property_count', 'н/д')}",
+                f"Изменение цены: {trends.get('price_change', 'н/д')}%",
+                "",
+            ])
+        
+        # Данные age_data
+        if market_data.get('age_data'):
+            age = market_data['age_data']
+            report_lines.extend([
+                "🏠 ВОЗРАСТ НЕДВИЖИМОСТИ:",
+                f"Новые объекты (0-5 лет): {age.get('new_properties', 'н/д')}%",
+                f"Средние объекты (6-15 лет): {age.get('medium_properties', 'н/д')}%",
+                f"Старые объекты (16+ лет): {age.get('old_properties', 'н/д')}%",
+                "",
+            ])
+        
+        # Данные floor_segment_data
+        if market_data.get('floor_segment_data'):
+            floor = market_data['floor_segment_data']
+            report_lines.extend([
+                "🏢 ЭТАЖНОСТЬ:",
+                f"Низкие этажи (1-3): {floor.get('low_floors', 'н/д')}%",
+                f"Средние этажи (4-8): {floor.get('medium_floors', 'н/д')}%",
+                f"Высокие этажи (9+): {floor.get('high_floors', 'н/д')}%",
+                "",
+            ])
+        
+        # Данные general_data
+        if market_data.get('general_data'):
+            general = market_data['general_data']
+            report_lines.extend([
+                "📊 ОБЩАЯ СТАТИСТИКА:",
+                f"Общая площадь: {general.get('total_area', 'н/д')} м²",
+                f"Средняя площадь: {general.get('avg_area', 'н/д')} м²",
+                f"Плотность застройки: {general.get('density', 'н/д')}%",
+                "",
+            ])
+        
+        # Данные heating_data
+        if market_data.get('heating_data'):
+            heating = market_data['heating_data']
+            report_lines.extend([
+                "🔥 ОТОПЛЕНИЕ:",
+                f"Центральное отопление: {heating.get('central_heating', 'н/д')}%",
+                f"Индивидуальное отопление: {heating.get('individual_heating', 'н/д')}%",
+                f"Без отопления: {heating.get('no_heating', 'н/д')}%",
+                "",
+            ])
+    else:
+        report_lines.extend([
+            "=== АНАЛИЗ РЫНКА ===",
+            "Данные анализа рынка не найдены для данной локации",
+            "",
+        ])
     
     return "\n".join(report_lines)
 
@@ -3019,6 +3089,154 @@ def create_chart_image_for_pdf(chart_data, title, width=180, height=100):
         
     except Exception as e:
         logger.error(f"Ошибка создания графика для PDF: {e}")
+        return None
+
+def get_market_data_by_location_ids(location_codes, target_year=None, target_month=None):
+    """
+    Получает данные рынка недвижимости по ID локаций
+    
+    Args:
+        location_codes (dict): Коды локаций (country_id, city_id, district_id, county_id)
+        target_year (int): Год (по умолчанию текущий)
+        target_month (int): Месяц (по умолчанию текущий)
+    
+    Returns:
+        dict: Данные рынка недвижимости
+    """
+    try:
+        from datetime import datetime
+        
+        # Если год и месяц не указаны, используем текущие
+        if target_year is None or target_month is None:
+            now = datetime.now()
+            target_year = target_year or now.year
+            target_month = target_month or now.month
+        
+        logger.info(f"Получаем данные рынка для {target_year}-{target_month:02d}")
+        logger.info(f"Коды локаций: {location_codes}")
+        
+        market_data = {
+            'property_trends': None,
+            'age_data': None,
+            'floor_segment_data': None,
+            'general_data': None,
+            'heating_data': None
+        }
+        
+        # Получаем данные из property_trends
+        try:
+            query = supabase.table('property_trends').select('*')
+            if location_codes.get('country_id'):
+                query = query.eq('country_id', location_codes['country_id'])
+            if location_codes.get('city_id'):
+                query = query.eq('city_id', location_codes['city_id'])
+            if location_codes.get('district_id'):
+                query = query.eq('district_id', location_codes['district_id'])
+            if location_codes.get('county_id'):
+                query = query.eq('county_id', location_codes['county_id'])
+            query = query.eq('year', target_year).eq('month', target_month)
+            
+            result = query.execute()
+            if result.data:
+                market_data['property_trends'] = result.data[0]
+                logger.info(f"Найдены данные property_trends: {len(result.data)} записей")
+            else:
+                logger.info("Данные property_trends не найдены")
+        except Exception as e:
+            logger.error(f"Ошибка получения property_trends: {e}")
+        
+        # Получаем данные из age_data
+        try:
+            query = supabase.table('age_data').select('*')
+            if location_codes.get('country_id'):
+                query = query.eq('country_id', location_codes['country_id'])
+            if location_codes.get('city_id'):
+                query = query.eq('city_id', location_codes['city_id'])
+            if location_codes.get('district_id'):
+                query = query.eq('district_id', location_codes['district_id'])
+            if location_codes.get('county_id'):
+                query = query.eq('county_id', location_codes['county_id'])
+            query = query.eq('year', target_year).eq('month', target_month)
+            
+            result = query.execute()
+            if result.data:
+                market_data['age_data'] = result.data[0]
+                logger.info(f"Найдены данные age_data: {len(result.data)} записей")
+            else:
+                logger.info("Данные age_data не найдены")
+        except Exception as e:
+            logger.error(f"Ошибка получения age_data: {e}")
+        
+        # Получаем данные из floor_segment_data
+        try:
+            query = supabase.table('floor_segment_data').select('*')
+            if location_codes.get('country_id'):
+                query = query.eq('country_id', location_codes['country_id'])
+            if location_codes.get('city_id'):
+                query = query.eq('city_id', location_codes['city_id'])
+            if location_codes.get('district_id'):
+                query = query.eq('district_id', location_codes['district_id'])
+            if location_codes.get('county_id'):
+                query = query.eq('county_id', location_codes['county_id'])
+            query = query.eq('year', target_year).eq('month', target_month)
+            
+            result = query.execute()
+            if result.data:
+                market_data['floor_segment_data'] = result.data[0]
+                logger.info(f"Найдены данные floor_segment_data: {len(result.data)} записей")
+            else:
+                logger.info("Данные floor_segment_data не найдены")
+        except Exception as e:
+            logger.error(f"Ошибка получения floor_segment_data: {e}")
+        
+        # Получаем данные из general_data
+        try:
+            query = supabase.table('general_data').select('*')
+            if location_codes.get('country_id'):
+                query = query.eq('country_id', location_codes['country_id'])
+            if location_codes.get('city_id'):
+                query = query.eq('city_id', location_codes['city_id'])
+            if location_codes.get('district_id'):
+                query = query.eq('district_id', location_codes['district_id'])
+            if location_codes.get('county_id'):
+                query = query.eq('county_id', location_codes['county_id'])
+            query = query.eq('year', target_year).eq('month', target_month)
+            
+            result = query.execute()
+            if result.data:
+                market_data['general_data'] = result.data[0]
+                logger.info(f"Найдены данные general_data: {len(result.data)} записей")
+            else:
+                logger.info("Данные general_data не найдены")
+        except Exception as e:
+            logger.error(f"Ошибка получения general_data: {e}")
+        
+        # Получаем данные из heating_data
+        try:
+            query = supabase.table('heating_data').select('*')
+            if location_codes.get('country_id'):
+                query = query.eq('country_id', location_codes['country_id'])
+            if location_codes.get('city_id'):
+                query = query.eq('city_id', location_codes['city_id'])
+            if location_codes.get('district_id'):
+                query = query.eq('district_id', location_codes['district_id'])
+            if location_codes.get('county_id'):
+                query = query.eq('county_id', location_codes['county_id'])
+            query = query.eq('year', target_year).eq('month', target_month)
+            
+            result = query.execute()
+            if result.data:
+                market_data['heating_data'] = result.data[0]
+                logger.info(f"Найдены данные heating_data: {len(result.data)} записей")
+            else:
+                logger.info("Данные heating_data не найдены")
+        except Exception as e:
+            logger.error(f"Ошибка получения heating_data: {e}")
+        
+        return market_data
+        
+    except Exception as e:
+        logger.error(f"Ошибка получения данных рынка: {e}")
         return None
 
 def get_location_codes(city_name, district_name, county_name):
