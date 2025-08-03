@@ -1368,7 +1368,7 @@ def api_generate_pdf_report():
             
             # Ключевая ставка из macro
         if 'macro' in report:
-                pdf.cell(200, 8, text=f"Ключевая ставка: {report['macro']['refi_rate']}%", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            pdf.cell(200, 8, text=f"Ключевая ставка: {report['macro']['refi_rate']}%", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
             
             # Экономические данные из economic_charts
             if 'economic_charts' in report:
@@ -1591,13 +1591,13 @@ def api_generate_pdf_report():
                         pdf.ln(3)
                 
             pdf.ln(5)
-                
-                # Данные по аренде (долгосрочная)
-                pdf.set_font("DejaVu", 'B', 12)
-                pdf.cell(200, 8, text="Данные по долгосрочной аренде:", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-                pdf.set_font("DejaVu", size=10)
-                
-                if trends_data:
+            
+            # Данные по аренде (долгосрочная)
+            pdf.set_font("DejaVu", 'B', 12)
+            pdf.cell(200, 8, text="Данные по долгосрочной аренде:", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            pdf.set_font("DejaVu", size=10)
+            
+            if trends_data:
                     if trends_data.get('unit_price_for_rent'):
                         pdf.cell(200, 6, text=f"Средняя цена за м² (аренда): €{trends_data['unit_price_for_rent']:,.2f}", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
                     else:
@@ -1625,40 +1625,40 @@ def api_generate_pdf_report():
                         pdf.cell(200, 6, text=f"Доходность: {yield_percent:.2f}%", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
                     else:
                         pdf.cell(200, 6, text="Доходность: н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-                else:
-                    pdf.cell(200, 6, text="Средняя цена за м² (аренда): н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-                    pdf.cell(200, 6, text="Изменение цен (аренда): н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-                    pdf.cell(200, 6, text="Средний период аренды: н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-                    pdf.cell(200, 6, text="Объектов на аренду: н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-                    pdf.cell(200, 6, text="Доходность: н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-                
-                # График изменения цен на аренду
-                if historical_data:
-                    rent_chart_buffer = create_property_trends_chart(historical_data, 'rent', 180, 80)
-                    if rent_chart_buffer:
-                        pdf.ln(3)
-                        pdf.image(rent_chart_buffer, x=15, w=180)
-                        pdf.ln(3)
             else:
-                # Адрес не содержит информации о городе - показываем "н/д" для всех полей
-                pdf.set_font("DejaVu", 'B', 12)
-                pdf.cell(200, 8, text="Данные по продаже:", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-                pdf.set_font("DejaVu", size=10)
-                pdf.cell(200, 6, text="Средняя цена за м² (продажа): н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-                pdf.cell(200, 6, text="Изменение цен (продажа): н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-                pdf.cell(200, 6, text="Средний период продажи: н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-                pdf.cell(200, 6, text="Объектов на продажу: н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-                
-                pdf.ln(5)
-                
-                pdf.set_font("DejaVu", 'B', 12)
-                pdf.cell(200, 8, text="Данные по долгосрочной аренде:", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-                pdf.set_font("DejaVu", size=10)
                 pdf.cell(200, 6, text="Средняя цена за м² (аренда): н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
                 pdf.cell(200, 6, text="Изменение цен (аренда): н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
                 pdf.cell(200, 6, text="Средний период аренды: н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
                 pdf.cell(200, 6, text="Объектов на аренду: н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
                 pdf.cell(200, 6, text="Доходность: н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            
+            # График изменения цен на аренду
+            if historical_data:
+                rent_chart_buffer = create_property_trends_chart(historical_data, 'rent', 180, 80)
+                if rent_chart_buffer:
+                    pdf.ln(3)
+                    pdf.image(rent_chart_buffer, x=15, w=180)
+                    pdf.ln(3)
+        else:
+            # Адрес не содержит информации о городе - показываем "н/д" для всех полей
+            pdf.set_font("DejaVu", 'B', 12)
+            pdf.cell(200, 8, text="Данные по продаже:", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            pdf.set_font("DejaVu", size=10)
+            pdf.cell(200, 6, text="Средняя цена за м² (продажа): н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            pdf.cell(200, 6, text="Изменение цен (продажа): н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            pdf.cell(200, 6, text="Средний период продажи: н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            pdf.cell(200, 6, text="Объектов на продажу: н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            
+            pdf.ln(5)
+                
+            pdf.set_font("DejaVu", 'B', 12)
+            pdf.cell(200, 8, text="Данные по долгосрочной аренде:", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            pdf.set_font("DejaVu", size=10)
+            pdf.cell(200, 6, text="Средняя цена за м² (аренда): н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            pdf.cell(200, 6, text="Изменение цен (аренда): н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            pdf.cell(200, 6, text="Средний период аренды: н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            pdf.cell(200, 6, text="Объектов на аренду: н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            pdf.cell(200, 6, text="Доходность: н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
             
             pdf.ln(5)
         
@@ -2453,7 +2453,7 @@ def api_admin_publication():
     # Временно форсируем выполнение перевода для диагностики
     if True:
         logger.info(f"auto_translate={auto_translate}, openai_key={'есть' if openai_key else 'нет'}")
-                def gpt_translate(prompt, target_lang):
+        def gpt_translate(prompt, target_lang):
             logger.info(f"Запрос к OpenAI для {target_lang}")
             if not OPENAI_AVAILABLE:
                 logger.warning("OpenAI library not available, using fallback")
