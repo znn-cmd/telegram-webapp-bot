@@ -14,7 +14,7 @@ def test_new_report_logic():
     
     # Тестовые данные
     test_data = {
-        "address": "Zerdalilik, 07100 Muratpaşa/Antalya, Türkiye",
+        "address": "Avsallar, Cengiz Akay Sk. No:12, 07410 Alanya/Antalya, Türkiye",
         "bedrooms": 3,
         "price": 1122211,
         "language": "ru",

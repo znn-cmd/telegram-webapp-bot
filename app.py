@@ -50,9 +50,9 @@ app = Flask(__name__)
 
 # Инициализация Supabase
 supabase_url = os.getenv("SUPABASE_URL")
-supabase_key = os.getenv("SUPABASE_KEY")
+supabase_key = os.getenv("SUPABASE_ANON_KEY")
 if not supabase_url or not supabase_key:
-    raise RuntimeError("SUPABASE_URL и SUPABASE_KEY должны быть заданы в переменных окружения!")
+    raise RuntimeError("SUPABASE_URL и SUPABASE_ANON_KEY должны быть заданы в переменных окружения!")
 supabase: Client = create_client(supabase_url, supabase_key)
 
 # Токен бота
@@ -480,7 +480,13 @@ def get_location_codes_from_address(address):
         if not location_info:
             return None
         
-        # Ищем в таблице locations
+        # Исправляем названия для соответствия с базой данных
+        if location_info.get('country_name') == 'Turkey':
+            location_info['country_name'] = 'Türkiye'
+        
+        logger.info(f"Ищем локацию в базе: {location_info}")
+        
+        # Ищем в таблице locations - сначала по точному совпадению
         query = supabase.table('locations').select('*')
         
         # Добавляем условия поиска по названиям
@@ -497,6 +503,7 @@ def get_location_codes_from_address(address):
         
         if result.data and len(result.data) > 0:
             location = result.data[0]
+            logger.info(f"Найдена локация: {location}")
             return {
                 'city_id': location['city_id'],
                 'county_id': location['county_id'],
@@ -507,9 +514,56 @@ def get_location_codes_from_address(address):
                 'district_name': location['district_name'],
                 'country_name': location['country_name']
             }
-        else:
-            # Если не найдено, возвращаем None
-            return None
+        
+        # Если точное совпадение не найдено, пробуем найти по district_name и city_name
+        logger.info("Точное совпадение не найдено, ищем по district_name и city_name")
+        query = supabase.table('locations').select('*')
+        if location_info.get('district_name'):
+            query = query.eq('district_name', location_info['district_name'])
+        if location_info.get('city_name'):
+            query = query.eq('city_name', location_info['city_name'])
+        
+        result = query.execute()
+        
+        if result.data and len(result.data) > 0:
+            location = result.data[0]
+            logger.info(f"Найдена локация по district_name и city_name: {location}")
+            return {
+                'city_id': location['city_id'],
+                'county_id': location['county_id'],
+                'district_id': location['district_id'],
+                'country_id': location['country_id'],
+                'city_name': location['city_name'],
+                'county_name': location['county_name'],
+                'district_name': location['district_name'],
+                'country_name': location['country_name']
+            }
+        
+        # Если и это не помогло, ищем только по district_name
+        logger.info("Ищем только по district_name")
+        query = supabase.table('locations').select('*')
+        if location_info.get('district_name'):
+            query = query.eq('district_name', location_info['district_name'])
+        
+        result = query.execute()
+        
+        if result.data and len(result.data) > 0:
+            location = result.data[0]
+            logger.info(f"Найдена локация по district_name: {location}")
+            return {
+                'city_id': location['city_id'],
+                'county_id': location['county_id'],
+                'district_id': location['district_id'],
+                'country_id': location['country_id'],
+                'city_name': location['city_name'],
+                'county_name': location['county_name'],
+                'district_name': location['district_name'],
+                'country_name': location['country_name']
+            }
+        
+        # Если ничего не найдено, возвращаем None
+        logger.warning(f"Локация не найдена для: {location_info}")
+        return None
             
     except Exception as e:
         logger.error(f"Error getting location codes: {e}")
@@ -3089,6 +3143,11 @@ def extract_location_from_address(address):
             if 'Muratpaşa/Antalya' in address_parts[1]:
                 location_data['city_name'] = 'Antalya'
                 location_data['county_name'] = 'Muratpaşa'
+                location_data['district_name'] = address_parts[0].strip()
+            # Обрабатываем специальный случай: "Avsallar, Cengiz Akay Sk. No:12, 07410 Alanya/Antalya, Türkiye"
+            elif 'Alanya/Antalya' in address_parts[2]:
+                location_data['city_name'] = 'Antalya'
+                location_data['county_name'] = 'Alanya'
                 location_data['district_name'] = address_parts[0].strip()
             else:
                 # Для адреса: "Antalya, Alanya, Avsallar Mah., Cengiz Akay Sok., 12B"
