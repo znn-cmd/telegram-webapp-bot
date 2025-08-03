@@ -39,6 +39,10 @@ def extract_location_from_address(address):
                 location_data['city_name'] = 'Antalya'
                 location_data['county_name'] = 'Alanya'
                 location_data['district_name'] = address_parts[0].strip()
+            elif 'Kepez/Antalya' in address_parts[2]:
+                location_data['city_name'] = 'Antalya'
+                location_data['county_name'] = 'Kepez'
+                location_data['district_name'] = address_parts[0].strip()
             else:
                 location_data['city_name'] = address_parts[0].strip()
                 location_data['county_name'] = address_parts[1].strip()
@@ -165,6 +169,7 @@ def test_locations_search():
     """Тестирует поиск локаций в базе данных"""
     
     test_addresses = [
+        "Baraj, 5890. Sk. No:584, 07320 Kepez/Antalya, Türkiye",
         "Avsallar, Cengiz Akay Sk. No:12, 07410 Alanya/Antalya, Türkiye",
         "Zerdalilik, 07100 Muratpaşa/Antalya, Türkiye"
     ]

@@ -35,6 +35,11 @@ def extract_location_from_address(address):
                 location_data['city_name'] = 'Antalya'
                 location_data['county_name'] = 'Alanya'
                 location_data['district_name'] = address_parts[0].strip()
+            # Обрабатываем специальный случай: "Baraj, 5890. Sk. No:584, 07320 Kepez/Antalya, Türkiye"
+            elif 'Kepez/Antalya' in address_parts[2]:
+                location_data['city_name'] = 'Antalya'
+                location_data['county_name'] = 'Kepez'
+                location_data['district_name'] = address_parts[0].strip()
             else:
                 # Для адреса: "Antalya, Alanya, Avsallar Mah., Cengiz Akay Sok., 12B"
                 # Первая часть: город (Antalya) - это основной город
@@ -77,6 +82,7 @@ def test_address_extraction():
     """Тестирует извлечение локаций из различных адресов"""
     
     test_addresses = [
+        "Baraj, 5890. Sk. No:584, 07320 Kepez/Antalya, Türkiye",
         "Avsallar, Cengiz Akay Sk. No:12, 07410 Alanya/Antalya, Türkiye",
         "Zerdalilik, 07100 Muratpaşa/Antalya, Türkiye",
         "Antalya, Alanya, Avsallar Mah., Cengiz Akay Sok., 12B",

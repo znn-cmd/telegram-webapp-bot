@@ -332,7 +332,7 @@ def api_menu():
 
 @app.route('/api/geocode', methods=['POST'])
 def api_geocode():
-    """Геокодинг адреса через Google Maps API"""
+    """Геокодинг адреса через Google Maps API с извлечением структурированных данных"""
     data = request.json or {}
     address = data.get('address')
     if not address:
@@ -351,11 +351,20 @@ def api_geocode():
         if result['status'] == 'OK' and result['results']:
             location = result['results'][0]['geometry']['location']
             formatted_address = result['results'][0]['formatted_address']
+            
+            # Извлекаем структурированные данные из Google Places API
+            location_components = extract_location_components(result['results'][0]['address_components'])
+            
+            # Пытаемся найти коды локаций в базе данных
+            location_codes = find_location_codes_from_components(location_components)
+            
             return jsonify({
                 'success': True,
                 'lat': location['lat'],
                 'lng': location['lng'],
-                'formatted_address': formatted_address
+                'formatted_address': formatted_address,
+                'location_components': location_components,
+                'location_codes': location_codes
             })
         else:
             return jsonify({
@@ -409,13 +418,15 @@ def api_generate_report():
     lat = data.get('lat')
     lng = data.get('lng')
     telegram_id = data.get('telegram_id')
+    location_codes = data.get('location_codes')  # Получаем коды локаций из фронтенда
     
     if not all([address, bedrooms, price]):
         return jsonify({'error': 'Missing required data'}), 400
     
     try:
-        # Получаем коды локаций из таблицы locations
-        location_codes = get_location_codes_from_address(address)
+        # Если коды локаций не переданы, пытаемся получить их из адреса
+        if not location_codes:
+            location_codes = get_location_codes_from_address(address)
         
         # Формируем отчёт в текстовом формате для отображения
         report_text = format_simple_report(address, bedrooms, price, location_codes, language)
@@ -3117,6 +3128,171 @@ def get_cascading_trends_data(location_codes, target_year, target_month):
         logger.error(f"Ошибка каскадного поиска данных: {e}")
         return None, "Ошибка при поиске данных"
 
+def extract_location_components(address_components):
+    """
+    Извлекает структурированные данные из Google Places API address_components
+    
+    Args:
+        address_components (list): Список компонентов адреса от Google API
+    
+    Returns:
+        dict: Словарь с country, city, district, county
+    """
+    location_data = {
+        'country': None,
+        'country_code': None,
+        'city': None,
+        'district': None,
+        'county': None,
+        'postal_code': None
+    }
+    
+    for component in address_components:
+        types = component.get('types', [])
+        long_name = component.get('long_name', '')
+        short_name = component.get('short_name', '')
+        
+        # Страна
+        if 'country' in types:
+            location_data['country'] = long_name
+            location_data['country_code'] = short_name
+        
+        # Город (administrative_area_level_1 или locality)
+        elif 'administrative_area_level_1' in types:
+            location_data['city'] = long_name
+        elif 'locality' in types and not location_data['city']:
+            location_data['city'] = long_name
+        
+        # Район (sublocality_level_1 или administrative_area_level_2)
+        elif 'sublocality_level_1' in types:
+            location_data['district'] = long_name
+        elif 'administrative_area_level_2' in types and not location_data['district']:
+            location_data['district'] = long_name
+        
+        # Округ (administrative_area_level_2 или sublocality)
+        elif 'administrative_area_level_2' in types and not location_data['county']:
+            location_data['county'] = long_name
+        elif 'sublocality' in types and not location_data['county']:
+            location_data['county'] = long_name
+        
+        # Почтовый индекс
+        elif 'postal_code' in types:
+            location_data['postal_code'] = long_name
+    
+    logger.info(f"Извлечены компоненты локации: {location_data}")
+    return location_data
+
+def find_location_codes_from_components(location_components):
+    """
+    Находит коды локаций в базе данных на основе компонентов Google Places API
+    
+    Args:
+        location_components (dict): Структурированные данные локации
+    
+    Returns:
+        dict: Коды локаций или None
+    """
+    try:
+        if not location_components:
+            return None
+        
+        # Подготавливаем данные для поиска
+        search_data = {
+            'country_name': location_components.get('country'),
+            'city_name': location_components.get('city'),
+            'district_name': location_components.get('district'),
+            'county_name': location_components.get('county')
+        }
+        
+        # Убираем None значения
+        search_data = {k: v for k, v in search_data.items() if v is not None}
+        
+        if not search_data:
+            return None
+        
+        logger.info(f"Ищем локацию в базе по компонентам: {search_data}")
+        
+        # Ищем в таблице locations - сначала по точному совпадению
+        query = supabase.table('locations').select('*')
+        
+        if search_data.get('city_name'):
+            query = query.eq('city_name', search_data['city_name'])
+        if search_data.get('county_name'):
+            query = query.eq('county_name', search_data['county_name'])
+        if search_data.get('district_name'):
+            query = query.eq('district_name', search_data['district_name'])
+        if search_data.get('country_name'):
+            query = query.eq('country_name', search_data['country_name'])
+        
+        result = query.execute()
+        
+        if result.data and len(result.data) > 0:
+            location = result.data[0]
+            logger.info(f"✅ Найдена локация (точное совпадение): {location}")
+            return {
+                'city_id': location['city_id'],
+                'county_id': location['county_id'],
+                'district_id': location['district_id'],
+                'country_id': location['country_id'],
+                'city_name': location['city_name'],
+                'county_name': location['county_name'],
+                'district_name': location['district_name'],
+                'country_name': location['country_name']
+            }
+        
+        # Если точное совпадение не найдено, пробуем найти по district_name и city_name
+        logger.info("Точное совпадение не найдено, ищем по district_name и city_name")
+        query = supabase.table('locations').select('*')
+        if search_data.get('district_name'):
+            query = query.eq('district_name', search_data['district_name'])
+        if search_data.get('city_name'):
+            query = query.eq('city_name', search_data['city_name'])
+        
+        result = query.execute()
+        
+        if result.data and len(result.data) > 0:
+            location = result.data[0]
+            logger.info(f"✅ Найдена локация по district_name и city_name: {location}")
+            return {
+                'city_id': location['city_id'],
+                'county_id': location['county_id'],
+                'district_id': location['district_id'],
+                'country_id': location['country_id'],
+                'city_name': location['city_name'],
+                'county_name': location['county_name'],
+                'district_name': location['district_name'],
+                'country_name': location['country_name']
+            }
+        
+        # Если и это не помогло, ищем только по district_name
+        logger.info("Ищем только по district_name")
+        query = supabase.table('locations').select('*')
+        if search_data.get('district_name'):
+            query = query.eq('district_name', search_data['district_name'])
+        
+        result = query.execute()
+        
+        if result.data and len(result.data) > 0:
+            location = result.data[0]
+            logger.info(f"✅ Найдена локация по district_name: {location}")
+            return {
+                'city_id': location['city_id'],
+                'county_id': location['county_id'],
+                'district_id': location['district_id'],
+                'country_id': location['country_id'],
+                'city_name': location['city_name'],
+                'county_name': location['county_name'],
+                'district_name': location['district_name'],
+                'country_name': location['country_name']
+            }
+        
+        logger.warning(f"❌ Локация не найдена для компонентов: {search_data}")
+        return None
+            
+    except Exception as e:
+        logger.error(f"❌ Ошибка поиска кодов локаций: {e}")
+        return None
+
 def extract_location_from_address(address):
     """
     Извлекает город, район и округ из адреса
@@ -3148,6 +3324,11 @@ def extract_location_from_address(address):
             elif 'Alanya/Antalya' in address_parts[2]:
                 location_data['city_name'] = 'Antalya'
                 location_data['county_name'] = 'Alanya'
+                location_data['district_name'] = address_parts[0].strip()
+            # Обрабатываем специальный случай: "Baraj, 5890. Sk. No:584, 07320 Kepez/Antalya, Türkiye"
+            elif 'Kepez/Antalya' in address_parts[2]:
+                location_data['city_name'] = 'Antalya'
+                location_data['county_name'] = 'Kepez'
                 location_data['district_name'] = address_parts[0].strip()
             else:
                 # Для адреса: "Antalya, Alanya, Avsallar Mah., Cengiz Akay Sok., 12B"

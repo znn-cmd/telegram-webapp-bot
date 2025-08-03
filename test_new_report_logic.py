@@ -14,9 +14,9 @@ def test_new_report_logic():
     
     # Тестовые данные
     test_data = {
-        "address": "Avsallar, Cengiz Akay Sk. No:12, 07410 Alanya/Antalya, Türkiye",
+        "address": "Baraj, 5890. Sk. No:584, 07320 Kepez/Antalya, Türkiye",
         "bedrooms": 3,
-        "price": 1122211,
+        "price": 112233,
         "language": "ru",
         "lat": 36.8969,
         "lng": 30.7133,

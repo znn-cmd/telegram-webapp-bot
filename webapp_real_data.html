@@ -526,6 +526,15 @@
                     lastAddress = data.formatted_address;
                     showMap(data.lat, data.lng);
                     document.getElementById('confirmedAddress').innerText = data.formatted_address;
+                    
+                    // Сохраняем коды локаций для использования при генерации отчета
+                    if (data.location_codes) {
+                        geoData.location_codes = data.location_codes;
+                        console.log('Найдены коды локаций:', data.location_codes);
+                    } else {
+                        console.log('Коды локаций не найдены');
+                    }
+                    
                     showStep('map');
                 } else {
                     showStep('address');
@@ -587,7 +596,8 @@
                         lng: geoData.lng,
                         bedrooms: parseInt(bedrooms),
                         price: parseFloat(price),
-                        language: 'ru'
+                        language: 'ru',
+                        location_codes: geoData.location_codes || null
                     })
                 });
                 const data = await res.json();
