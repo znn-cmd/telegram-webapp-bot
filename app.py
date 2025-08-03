@@ -26,7 +26,6 @@ import io
 import base64
 from PIL import Image
 import numpy as np
-import openai
 
 # Загружаем переменные окружения
 load_dotenv()
@@ -37,6 +36,14 @@ logging.basicConfig(
     level=logging.INFO
 )
 logger = logging.getLogger(__name__)
+
+# Условный импорт openai
+try:
+    import openai
+    OPENAI_AVAILABLE = True
+except ImportError:
+    OPENAI_AVAILABLE = False
+    logger.warning("OpenAI library not available. ChatGPT features will use fallback mode.")
 
 # Инициализация Flask приложения
 app = Flask(__name__)
@@ -1330,7 +1337,7 @@ def api_generate_pdf_report():
         
         pdf.set_font('DejaVu', 'B', 16)
         if client_name:
-                    pdf.cell(0, 10, f'Клиент: {client_name}', new_x=XPos.LMARGIN, new_y=YPos.NEXT, align='C')
+            pdf.cell(0, 10, f'Клиент: {client_name}', new_x=XPos.LMARGIN, new_y=YPos.NEXT, align='C')
         pdf.ln(2)
         pdf.cell(0, 10, 'Полный отчет по недвижимости', new_x=XPos.LMARGIN, new_y=YPos.NEXT, align='C')
         pdf.ln(10)
@@ -1360,7 +1367,7 @@ def api_generate_pdf_report():
             pdf.set_font("DejaVu", size=12)
             
             # Ключевая ставка из macro
-            if 'macro' in report:
+        if 'macro' in report:
                 pdf.cell(200, 8, text=f"Ключевая ставка: {report['macro']['refi_rate']}%", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
             
             # Экономические данные из economic_charts
@@ -1583,7 +1590,7 @@ def api_generate_pdf_report():
                         pdf.image(sale_chart_buffer, x=15, w=180)
                         pdf.ln(3)
                 
-                pdf.ln(5)
+            pdf.ln(5)
                 
                 # Данные по аренде (долгосрочная)
                 pdf.set_font("DejaVu", 'B', 12)
@@ -2446,8 +2453,11 @@ def api_admin_publication():
     # Временно форсируем выполнение перевода для диагностики
     if True:
         logger.info(f"auto_translate={auto_translate}, openai_key={'есть' if openai_key else 'нет'}")
-        def gpt_translate(prompt, target_lang):
+                def gpt_translate(prompt, target_lang):
             logger.info(f"Запрос к OpenAI для {target_lang}")
+            if not OPENAI_AVAILABLE:
+                logger.warning("OpenAI library not available, using fallback")
+                return f"[Перевод недоступен - {target_lang}]"
             try:
                 from openai import OpenAI
                 client = OpenAI(api_key=openai_key)
@@ -3226,7 +3236,7 @@ def generate_trend_interpretation_with_chatgpt(gdp_trend, inflation_trend, gdp_d
         # Получаем API ключ из базы данных
         openai_api_key = get_openai_api_key()
         
-        if openai_api_key:
+        if openai_api_key and OPENAI_AVAILABLE:
             try:
                 from openai import OpenAI
                 client = OpenAI(api_key=openai_api_key)
