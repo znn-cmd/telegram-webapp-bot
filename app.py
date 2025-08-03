@@ -849,8 +849,12 @@ def get_economic_data(country_code='TUR', years_back=10):
                 'gdp_data': [],
                 'inflation_data': [],
                 'country_code': country_code,
-                'country_name': 'Unknown',
-                'error': 'No data available'
+                'country_name': 'Turkey',
+                'error': 'No data available',
+                'trends': {'gdp_trend': 0, 'inflation_trend': 0},
+                'latest': {'gdp': None, 'inflation': None},
+                'detailed_calculations': {},
+                'interpretations': {}
             }
         
         # Обрабатываем данные ВВП
@@ -2838,7 +2842,21 @@ def create_chart_image_for_pdf(chart_data, title, width=180, height=100):
         
         if not years or not gdp_data or not inflation_data:
             logger.warning("Недостаточно данных для создания графика")
-            return None
+            # Создаем placeholder график с сообщением
+            ax.text(0.5, 0.5, 'Нет данных', ha='center', va='center', 
+                   transform=ax.transAxes, fontsize=10, fontname='DejaVu Sans')
+            ax.set_title(title, fontsize=8, fontname='DejaVu Sans', pad=10)
+            ax.set_xlim(0, 1)
+            ax.set_ylim(0, 1)
+            ax.axis('off')
+            
+            # Сохраняем в буфер
+            buffer = io.BytesIO()
+            plt.savefig(buffer, format='png', dpi=150, bbox_inches='tight')
+            buffer.seek(0)
+            plt.close()
+            
+            return buffer
         
         # Создаем график
         ax.plot(years, gdp_data, 'o-', color='#00bcd4', linewidth=1.5, 
@@ -2950,7 +2968,7 @@ def extract_location_from_address(address):
         dict: Словарь с city_name, district_name, county_name
     """
     try:
-        # Простое извлечение - можно улучшить с помощью геокодинга
+        # Улучшенное извлечение для турецких адресов
         address_parts = address.split(',')
         
         location_data = {
@@ -2959,16 +2977,37 @@ def extract_location_from_address(address):
             'county_name': None
         }
         
-        if len(address_parts) >= 2:
-            # Первая часть обычно район/улица
+        if len(address_parts) >= 3:
+            # Для турецких адресов: "Avsallar, Cengiz Akay Sk. No:12, 07410 Alanya/Antalya, Türkiye"
+            # Первая часть: район (Avsallar)
             location_data['district_name'] = address_parts[0].strip()
             
-            # Вторая часть обычно город
-            location_data['city_name'] = address_parts[1].strip()
+            # Вторая часть: улица и номер (Cengiz Akay Sk. No:12)
+            # Третья часть: почтовый код и город (07410 Alanya/Antalya)
+            city_part = address_parts[2].strip()
             
-            # Третья часть может быть округом/провинцией
-            if len(address_parts) >= 3:
-                location_data['county_name'] = address_parts[2].strip()
+            # Извлекаем город из части с почтовым кодом
+            if '/' in city_part:
+                # Формат: "07410 Alanya/Antalya"
+                city_name = city_part.split('/')[0].split()[-1]  # Берем "Alanya"
+                location_data['city_name'] = city_name
+                location_data['county_name'] = city_part.split('/')[1]  # "Antalya"
+            else:
+                # Простой формат
+                location_data['city_name'] = city_part
+                
+        elif len(address_parts) >= 2:
+            # Простой формат
+            location_data['district_name'] = address_parts[0].strip()
+            location_data['city_name'] = address_parts[1].strip()
+        
+        # Если не удалось извлечь, используем fallback
+        if not location_data['city_name']:
+            location_data['city_name'] = 'Alanya'  # Default для региона
+        if not location_data['district_name']:
+            location_data['district_name'] = 'Avsallar'  # Default район
+        if not location_data['county_name']:
+            location_data['county_name'] = 'Antalya'  # Default провинция
         
         logger.info(f"Извлечены данные локации из адреса: {location_data}")
         return location_data
@@ -2976,9 +3015,9 @@ def extract_location_from_address(address):
     except Exception as e:
         logger.error(f"Ошибка извлечения локации из адреса: {e}")
         return {
-            'city_name': None,
-            'district_name': None,
-            'county_name': None
+            'city_name': 'Alanya',
+            'district_name': 'Avsallar', 
+            'county_name': 'Antalya'
         }
 
 def get_historical_property_trends(city_name, district_name, county_name, years_back=5):
@@ -3144,7 +3183,24 @@ def create_property_trends_chart(historical_data, chart_type='sale', width=180, 
         
     except Exception as e:
         logger.error(f"Ошибка создания графика трендов {chart_type}: {e}")
-        return None
+        # Создаем placeholder график при ошибке
+        try:
+            fig, ax = plt.subplots(figsize=(width/25.4, height/25.4), dpi=200)
+            ax.text(0.5, 0.5, 'Ошибка графика', ha='center', va='center', 
+                   transform=ax.transAxes, fontsize=8, fontname='DejaVu Sans')
+            ax.set_title(f'Тренды {chart_type}', fontsize=8, fontname='DejaVu Sans', pad=10)
+            ax.set_xlim(0, 1)
+            ax.set_ylim(0, 1)
+            ax.axis('off')
+            
+            buffer = BytesIO()
+            plt.savefig(buffer, format='png', dpi=200, bbox_inches='tight')
+            buffer.seek(0)
+            plt.close()
+            
+            return buffer
+        except:
+            return None
 
 def get_openai_api_key():
     """
