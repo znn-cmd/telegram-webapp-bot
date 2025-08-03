@@ -1541,7 +1541,7 @@ def api_generate_pdf_report():
             pdf.set_font("DejaVu", size=12)
             
             if location_data['city_name']:
-                trends_data = get_property_trends_data(
+                trends_data, trends_message = get_property_trends_data(
                     location_data['city_name'],
                     location_data['district_name'],
                     location_data['county_name']
@@ -1558,6 +1558,10 @@ def api_generate_pdf_report():
                 pdf.set_font("DejaVu", 'B', 12)
                 pdf.cell(200, 8, text="Данные по продаже:", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
                 pdf.set_font("DejaVu", size=10)
+                
+                # Показываем источник данных
+                if trends_message:
+                    pdf.cell(200, 6, text=f"Источник данных: {trends_message}", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
                 
                 if trends_data:
                     if trends_data.get('unit_price_for_sale'):
@@ -2134,7 +2138,7 @@ def api_send_saved_report_pdf():
             pdf.set_font("DejaVu", size=12)
             
             if location_data['city_name']:
-                trends_data = get_property_trends_data(
+                trends_data, trends_message = get_property_trends_data(
                     location_data['city_name'],
                     location_data['district_name'],
                     location_data['county_name']
@@ -2151,6 +2155,10 @@ def api_send_saved_report_pdf():
                 pdf.set_font("DejaVu", 'B', 12)
                 pdf.cell(0, 8, "Данные по продаже:", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
                 pdf.set_font("DejaVu", size=10)
+                
+                # Показываем источник данных
+                if trends_message:
+                    pdf.cell(0, 6, f"Источник данных: {trends_message}", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
                 
                 if trends_data:
                     if trends_data.get('unit_price_for_sale'):
@@ -2758,7 +2766,7 @@ def create_economic_chart_image(economic_charts_data):
     """
     try:
         # Настройка для русского языка
-        plt.rcParams['font.family'] = ['DejaVu Sans', 'Arial', 'sans-serif']
+        plt.rcParams['font.family'] = ['DejaVu Sans', 'sans-serif']
         
         # Создаем фигуру
         fig, ax = plt.subplots(figsize=(10, 6))
@@ -2825,7 +2833,7 @@ def create_chart_image_for_pdf(chart_data, title, width=180, height=100):
         logger.info(f"Создание графика для PDF: {title}")
         
         # Настройка для русского языка
-        plt.rcParams['font.family'] = ['DejaVu Sans', 'Arial', 'sans-serif']
+        plt.rcParams['font.family'] = ['DejaVu Sans', 'sans-serif']
         plt.rcParams['font.size'] = 8
         
         # Создаем фигуру с заданными размерами (в дюймах)
@@ -2900,6 +2908,74 @@ def create_chart_image_for_pdf(chart_data, title, width=180, height=100):
         logger.error(f"Ошибка создания графика для PDF: {e}")
         return None
 
+def get_location_codes(city_name, district_name, county_name):
+    """
+    Получает коды локаций из таблицы locations по названиям
+    
+    Args:
+        city_name (str): Название города
+        district_name (str): Название района
+        county_name (str): Название округа/провинции
+    
+    Returns:
+        dict: Словарь с кодами или None если не найдены
+    """
+    try:
+        location_codes = {
+            'city_code': None,
+            'district_code': None,
+            'county_code': None
+        }
+        
+        # Ищем запись с точным совпадением всех параметров
+        query = supabase.table('locations').select('*')
+        
+        # Добавляем фильтры по всем параметрам
+        if city_name:
+            query = query.eq('city_name', city_name)
+        if district_name:
+            query = query.eq('district_name', district_name)
+        if county_name:
+            query = query.eq('county_name', county_name)
+            
+        result = query.execute()
+        
+        if result.data:
+            # Найдена точная запись
+            record = result.data[0]
+            location_codes['city_code'] = record.get('city_id')
+            location_codes['district_code'] = record.get('district_id')
+            location_codes['county_code'] = record.get('county_id')
+            logger.info(f"Найдены коды локаций: {location_codes}")
+            return location_codes
+        else:
+            # Ищем частичные совпадения
+            logger.warning(f"Точное совпадение не найдено, ищем частичные совпадения")
+            
+            # Поиск по району
+            if district_name:
+                district_result = supabase.table('locations').select('*').eq('district_name', district_name).execute()
+                if district_result.data:
+                    location_codes['district_code'] = district_result.data[0].get('district_id')
+            
+            # Поиск по округу
+            if county_name:
+                county_result = supabase.table('locations').select('*').eq('county_name', county_name).execute()
+                if county_result.data:
+                    location_codes['county_code'] = county_result.data[0].get('county_id')
+            
+            # Поиск по городу
+            if city_name:
+                city_result = supabase.table('locations').select('*').eq('city_name', city_name).execute()
+                if city_result.data:
+                    location_codes['city_code'] = city_result.data[0].get('city_id')
+        
+        return location_codes
+        
+    except Exception as e:
+        logger.error(f"Ошибка получения кодов локаций: {e}")
+        return None
+
 def get_property_trends_data(city_name, district_name, county_name):
     """
     Получает данные трендов недвижимости из таблицы property_trends
@@ -2930,32 +3006,87 @@ def get_property_trends_data(city_name, district_name, county_name):
         logger.info(f"Поиск данных трендов для: {city_name}, {district_name}, {county_name}")
         logger.info(f"Целевой период: {target_month}/{target_year}")
         
-        # Запрос к таблице property_trends
-        query = supabase.table('property_trends').select('*').eq('city_name', city_name)
+        # Сначала получаем коды локаций
+        location_codes = get_location_codes(city_name, district_name, county_name)
         
-        # Добавляем фильтры если они есть
-        if district_name:
-            query = query.eq('district_name', district_name)
-        if county_name:
-            query = query.eq('county_name', county_name)
-        
-        # Фильтруем по году и месяцу
-        query = query.eq('property_year', target_year).eq('property_month', target_month)
-        
-        # Получаем данные
-        result = query.execute()
-        
-        if result.data and len(result.data) > 0:
-            trends_data = result.data[0]  # Берем первую запись
-            logger.info(f"Найдены данные трендов: {len(result.data)} записей")
-            return trends_data
-        else:
-            logger.warning(f"Данные трендов не найдены для: {city_name}, {district_name}, {county_name}")
+        if not location_codes:
+            logger.warning("Не удалось получить коды локаций")
             return None
+        
+        # Каскадный поиск данных трендов
+        trends_data, message = get_cascading_trends_data(location_codes, target_year, target_month)
+        
+        if trends_data:
+            logger.info(f"Найдены данные трендов: {message}")
+            return trends_data, message
+        else:
+            logger.warning(f"Данные трендов не найдены: {message}")
+            return None, message
             
     except Exception as e:
         logger.error(f"Ошибка получения данных трендов недвижимости: {e}")
-        return None
+        return None, "Ошибка при получении данных трендов"
+
+def get_cascading_trends_data(location_codes, target_year, target_month):
+    """
+    Каскадный поиск данных трендов с fallback логикой
+    
+    Args:
+        location_codes (dict): Словарь с кодами локаций
+        target_year (int): Целевой год
+        target_month (int): Целевой месяц
+    
+    Returns:
+        tuple: (data, message) - данные и сообщение о типе найденных данных
+    """
+    try:
+        city_code = location_codes.get('city_code')
+        district_code = location_codes.get('district_code')
+        county_code = location_codes.get('county_code')
+        country_id = 1  # Türkiye
+        
+        # 1. Пытаемся найти точное совпадение
+        if city_code and district_code and county_code:
+            query = supabase.table('property_trends').select('*').eq('city_id', city_code).eq('district_id', district_code).eq('county_id', county_code).eq('property_year', target_year).eq('property_month', target_month)
+            result = query.execute()
+            
+            if result.data:
+                logger.info("Найдены данные по точному совпадению")
+                return result.data[0], f"Данные по району (точное совпадение)"
+        
+        # 2. Если district_code не найден, ищем по county_code
+        if county_code:
+            query = supabase.table('property_trends').select('*').eq('county_id', county_code).is_('city_id', 'null').is_('district_id', 'null').eq('property_year', target_year).eq('property_month', target_month)
+            result = query.execute()
+            
+            if result.data:
+                logger.info("Найдены данные по округу")
+                return result.data[0], f"Данные по округу (county_id={county_code})"
+        
+        # 3. Если county_code не найден, ищем по city_code
+        if city_code:
+            query = supabase.table('property_trends').select('*').eq('city_id', city_code).is_('district_id', 'null').is_('county_id', 'null').eq('property_year', target_year).eq('property_month', target_month)
+            result = query.execute()
+            
+            if result.data:
+                logger.info("Найдены данные по городу")
+                return result.data[0], f"Данные по городу (city_id={city_code})"
+        
+        # 4. Если city_code не найден, ищем по country_id
+        query = supabase.table('property_trends').select('*').eq('country_id', country_id).is_('city_id', 'null').is_('district_id', 'null').is_('county_id', 'null').eq('property_year', target_year).eq('property_month', target_month)
+        result = query.execute()
+        
+        if result.data:
+            logger.info("Найдены данные по стране")
+            return result.data[0], f"Данные по стране (country_id={country_id})"
+        
+        # 5. Если ничего не найдено
+        logger.warning("Данные не найдены на всех уровнях")
+        return None, "По данной локации нет данных"
+        
+    except Exception as e:
+        logger.error(f"Ошибка каскадного поиска данных: {e}")
+        return None, "Ошибка при поиске данных"
 
 def extract_location_from_address(address):
     """
@@ -2978,23 +3109,18 @@ def extract_location_from_address(address):
         }
         
         if len(address_parts) >= 3:
-            # Для турецких адресов: "Avsallar, Cengiz Akay Sk. No:12, 07410 Alanya/Antalya, Türkiye"
-            # Первая часть: район (Avsallar)
-            location_data['district_name'] = address_parts[0].strip()
+            # Для адреса: "Antalya, Alanya, Avsallar Mah., Cengiz Akay Sok., 12B"
+            # Первая часть: город (Antalya) - это основной город
+            location_data['city_name'] = address_parts[0].strip()
             
-            # Вторая часть: улица и номер (Cengiz Akay Sk. No:12)
-            # Третья часть: почтовый код и город (07410 Alanya/Antalya)
-            city_part = address_parts[2].strip()
+            # Вторая часть: округ/район (Alanya) - это округ
+            location_data['county_name'] = address_parts[1].strip()
             
-            # Извлекаем город из части с почтовым кодом
-            if '/' in city_part:
-                # Формат: "07410 Alanya/Antalya"
-                city_name = city_part.split('/')[0].split()[-1]  # Берем "Alanya"
-                location_data['city_name'] = city_name
-                location_data['county_name'] = city_part.split('/')[1]  # "Antalya"
-            else:
-                # Простой формат
-                location_data['city_name'] = city_part
+            # Третья часть: район (Avsallar Mah.) - это район
+            district_name = address_parts[2].strip()
+            # Убираем суффиксы типа "Mah.", "Mahallesi", "Sok." и т.д.
+            district_name = district_name.replace(' Mah.', '').replace(' Mahallesi', '').replace(' Sok.', '').replace(' Sk.', '')
+            location_data['district_name'] = district_name
                 
         elif len(address_parts) >= 2:
             # Простой формат
@@ -3045,30 +3171,28 @@ def get_historical_property_trends(city_name, district_name, county_name, years_
             'years': []
         }
         
+        # Получаем коды локаций
+        location_codes = get_location_codes(city_name, district_name, county_name)
+        
+        if not location_codes:
+            logger.warning("Не удалось получить коды локаций для исторических данных")
+            return None
+        
+        # Используем каскадную логику для каждого года
+        data_source_message = None
+        
         for year_offset in range(years_back):
             target_year = current_year - year_offset
             
-            # Запрос к таблице property_trends
-            query = supabase.table('property_trends').select('*').eq('city_name', city_name)
+            # Каскадный поиск данных для текущего года
+            year_data, message = get_cascading_historical_data(location_codes, target_year)
             
-            # Добавляем фильтры если они есть
-            if district_name:
-                query = query.eq('district_name', district_name)
-            if county_name:
-                query = query.eq('county_name', county_name)
-            
-            # Фильтруем по году
-            query = query.eq('property_year', target_year)
-            
-            # Получаем данные
-            result = query.execute()
-            
-            if result.data and len(result.data) > 0:
+            if year_data:
                 # Берем среднее значение за год
                 sale_prices = []
                 rent_prices = []
                 
-                for record in result.data:
+                for record in year_data:
                     if record.get('unit_price_for_sale'):
                         sale_prices.append(record['unit_price_for_sale'])
                     if record.get('unit_price_for_rent'):
@@ -3086,6 +3210,10 @@ def get_historical_property_trends(city_name, district_name, county_name, years_
                     historical_data['rent_prices'].append(None)
                 
                 historical_data['years'].append(target_year)
+                
+                # Сохраняем сообщение о источнике данных (берем первое найденное)
+                if data_source_message is None:
+                    data_source_message = message
             else:
                 historical_data['sale_prices'].append(None)
                 historical_data['rent_prices'].append(None)
@@ -3097,11 +3225,76 @@ def get_historical_property_trends(city_name, district_name, county_name, years_
         historical_data['years'].reverse()
         
         logger.info(f"Получены исторические данные: {len(historical_data['years'])} лет")
+        
+        # Добавляем информацию об источнике данных
+        if data_source_message:
+            historical_data['data_source'] = data_source_message
+        
         return historical_data
         
     except Exception as e:
         logger.error(f"Ошибка получения исторических данных трендов: {e}")
         return None
+
+def get_cascading_historical_data(location_codes, target_year):
+    """
+    Каскадный поиск исторических данных трендов с fallback логикой
+    
+    Args:
+        location_codes (dict): Словарь с кодами локаций
+        target_year (int): Целевой год
+    
+    Returns:
+        tuple: (data, message) - данные и сообщение о типе найденных данных
+    """
+    try:
+        city_code = location_codes.get('city_code')
+        district_code = location_codes.get('district_code')
+        county_code = location_codes.get('county_code')
+        country_id = 1  # Türkiye
+        
+        # 1. Пытаемся найти точное совпадение
+        if city_code and district_code and county_code:
+            query = supabase.table('property_trends').select('*').eq('city_id', city_code).eq('district_id', district_code).eq('county_id', county_code).eq('property_year', target_year)
+            result = query.execute()
+            
+            if result.data:
+                logger.info(f"Найдены исторические данные по точному совпадению для {target_year}")
+                return result.data, f"Данные по району (точное совпадение)"
+        
+        # 2. Если district_code не найден, ищем по county_code
+        if county_code:
+            query = supabase.table('property_trends').select('*').eq('county_id', county_code).is_('city_id', 'null').is_('district_id', 'null').eq('property_year', target_year)
+            result = query.execute()
+            
+            if result.data:
+                logger.info(f"Найдены исторические данные по округу для {target_year}")
+                return result.data, f"Данные по округу (county_id={county_code})"
+        
+        # 3. Если county_code не найден, ищем по city_code
+        if city_code:
+            query = supabase.table('property_trends').select('*').eq('city_id', city_code).is_('district_id', 'null').is_('county_id', 'null').eq('property_year', target_year)
+            result = query.execute()
+            
+            if result.data:
+                logger.info(f"Найдены исторические данные по городу для {target_year}")
+                return result.data, f"Данные по городу (city_id={city_code})"
+        
+        # 4. Если city_code не найден, ищем по country_id
+        query = supabase.table('property_trends').select('*').eq('country_id', country_id).is_('city_id', 'null').is_('district_id', 'null').is_('county_id', 'null').eq('property_year', target_year)
+        result = query.execute()
+        
+        if result.data:
+            logger.info(f"Найдены исторические данные по стране для {target_year}")
+            return result.data, f"Данные по стране (country_id={country_id})"
+        
+        # 5. Если ничего не найдено
+        logger.warning(f"Исторические данные не найдены на всех уровнях для {target_year}")
+        return None, "По данной локации нет данных"
+        
+    except Exception as e:
+        logger.error(f"Ошибка каскадного поиска исторических данных: {e}")
+        return None, "Ошибка при поиске исторических данных"
 
 def create_property_trends_chart(historical_data, chart_type='sale', width=180, height=100):
     """
