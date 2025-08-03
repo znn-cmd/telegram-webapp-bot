@@ -353,7 +353,7 @@ def api_geocode():
             formatted_address = result['results'][0]['formatted_address']
             
             # Извлекаем структурированные данные из Google Places API
-            location_components = extract_location_components(result['results'][0]['address_components'])
+            location_components = extract_location_components(result['results'][0]['address_components'], address)
             
             # Пытаемся найти коды локаций в базе данных
             location_codes = find_location_codes_from_components(location_components)
@@ -3128,12 +3128,13 @@ def get_cascading_trends_data(location_codes, target_year, target_month):
         logger.error(f"Ошибка каскадного поиска данных: {e}")
         return None, "Ошибка при поиске данных"
 
-def extract_location_components(address_components):
+def extract_location_components(address_components, original_address=None):
     """
     Извлекает структурированные данные из Google Places API address_components
     
     Args:
         address_components (list): Список компонентов адреса от Google API
+        original_address (str): Оригинальный адрес для дополнительной обработки
     
     Returns:
         dict: Словарь с country, city, district, county
@@ -3176,6 +3177,17 @@ def extract_location_components(address_components):
         # Почтовый индекс
         elif 'postal_code' in types:
             location_data['postal_code'] = long_name
+    
+    # Дополнительная обработка для турецких адресов
+    if original_address and location_data['country'] == 'Turkey':
+        # Извлекаем район из первой части адреса
+        address_parts = original_address.split(',')
+        if len(address_parts) >= 1:
+            first_part = address_parts[0].strip()
+            # Убираем суффиксы типа "Sk.", "Sok.", "Mah." и т.д.
+            district_name = first_part.replace(' Sk.', '').replace(' Sok.', '').replace(' Mah.', '').replace(' Mahallesi', '')
+            location_data['district'] = district_name
+            logger.info(f"Извлечен район из адреса: {district_name}")
     
     logger.info(f"Извлечены компоненты локации: {location_data}")
     return location_data
