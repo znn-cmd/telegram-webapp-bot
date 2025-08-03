@@ -414,26 +414,11 @@ def api_generate_report():
         return jsonify({'error': 'Missing required data'}), 400
     
     try:
-        # Анализируем рынок в радиусе 5 км
-        market_analysis = analyze_market_around_location(lat, lng, bedrooms, price)
-        
-        # Получаем данные трендов недвижимости
-        try:
-            location_info = extract_location_from_address(address)
-            if location_info:
-                trends_data, trends_message = get_property_trends_data(
-                    location_info.get('city_name', ''),
-                    location_info.get('district_name', ''),
-                    location_info.get('county_name', '')
-                )
-                if trends_data:
-                    market_analysis['trends_data'] = trends_data
-                    market_analysis['trends_message'] = trends_message
-        except Exception as e:
-            logger.warning(f"Ошибка получения трендов: {e}")
+        # Получаем коды локаций из таблицы locations
+        location_codes = get_location_codes_from_address(address)
         
         # Формируем отчёт в текстовом формате для отображения
-        report_text = format_market_report(market_analysis, address, language)
+        report_text = format_simple_report(address, bedrooms, price, location_codes, language)
         
         # Сохраняем отчет в базу данных (если есть telegram_id)
         if telegram_id:
@@ -448,7 +433,8 @@ def api_generate_report():
                         'bedrooms': bedrooms,
                         'price': price,
                         'lat': lat,
-                        'lng': lng
+                        'lng': lng,
+                        'location_codes': location_codes
                     },
                     'address': address,
                     'latitude': lat,
@@ -471,7 +457,14 @@ def api_generate_report():
         
         return jsonify({
             'success': True,
-            'report': market_analysis,
+            'report': {
+                'location_codes': location_codes,
+                'property_details': {
+                    'address': address,
+                    'bedrooms': bedrooms,
+                    'price': price
+                }
+            },
             'report_text': report_text
         })
         
@@ -479,168 +472,92 @@ def api_generate_report():
         logger.error(f"Error generating report: {e}")
         return jsonify({'error': 'Internal error'}), 500
 
-def format_market_report(market_analysis, address, language='en'):
-    """Форматирование отчёта в текстовый вид"""
+def get_location_codes_from_address(address):
+    """Получает коды локаций из таблицы locations по адресу"""
+    try:
+        # Извлекаем компоненты адреса
+        location_info = extract_location_from_address(address)
+        if not location_info:
+            return None
+        
+        # Ищем в таблице locations
+        query = supabase.table('locations').select('*')
+        
+        # Добавляем условия поиска по названиям
+        if location_info.get('city_name'):
+            query = query.eq('city_name', location_info['city_name'])
+        if location_info.get('county_name'):
+            query = query.eq('county_name', location_info['county_name'])
+        if location_info.get('district_name'):
+            query = query.eq('district_name', location_info['district_name'])
+        if location_info.get('country_name'):
+            query = query.eq('country_name', location_info['country_name'])
+        
+        result = query.execute()
+        
+        if result.data and len(result.data) > 0:
+            location = result.data[0]
+            return {
+                'city_id': location['city_id'],
+                'county_id': location['county_id'],
+                'district_id': location['district_id'],
+                'country_id': location['country_id'],
+                'city_name': location['city_name'],
+                'county_name': location['county_name'],
+                'district_name': location['district_name'],
+                'country_name': location['country_name']
+            }
+        else:
+            # Если не найдено, возвращаем None
+            return None
+            
+    except Exception as e:
+        logger.error(f"Error getting location codes: {e}")
+        return None
+
+def format_simple_report(address, bedrooms, price, location_codes, language='en'):
+    """Форматирование простого отчёта с кодами локаций"""
     
-    # Получаем данные из анализа
-    short_term = market_analysis['market_analysis']['radius_5km']['short_term_rentals']
-    long_term = market_analysis['market_analysis']['radius_5km']['long_term_rentals']
-    sales = market_analysis['market_analysis']['radius_5km']['sales']
-    
-    # Форматируем цены
+    # Форматируем цену
     def format_price(price):
         return f"€{price:.2f}".replace('.00', '').replace('.', ',')
-    
-    def format_price_range(min_price, max_price):
-        return f"€{min_price:.0f} - €{max_price:.0f}"
     
     # Формируем отчёт
     report_lines = [
         f"Анализ рынка в радиусе 5 км:",
         "",
-        f"Краткосрочная аренда ({short_term['count']} объектов)",
-        f"Средняя цена за ночь: {format_price(short_term['avg_price_per_night'])}",
-        "",
-        f"Диапазон цен: {format_price_range(short_term['price_range'][0], short_term['price_range'][1])}",
-        "",
-        f"Долгосрочная аренда ({long_term['count']} объектов)",
-        f"Средняя месячная аренда: {format_price(long_term['avg_monthly_rent'])}",
-        "",
-        f"Диапазон цен: {format_price_range(long_term['price_range'][0], long_term['price_range'][1])}",
-        "",
-        f"Продажи недвижимости ({sales['count']} объектов)",
-        f"Средняя цена продажи: {format_price(sales['avg_sale_price'])}",
-        "",
-        f"Диапазон цен: {format_price_range(sales['price_range'][0], sales['price_range'][1])}",
-        "",
     ]
     
-    # Добавляем данные трендов если есть
-    trends_data = market_analysis.get('trends_data')
-    if trends_data:
+    # Добавляем коды локаций
+    if location_codes:
         report_lines.extend([
+            "=== КОДЫ ЛОКАЦИЙ ===",
+            f"Страна: {location_codes.get('country_name', 'н/д')} (ID: {location_codes.get('country_id', 'н/д')})",
+            f"Город: {location_codes.get('city_name', 'н/д')} (ID: {location_codes.get('city_id', 'н/д')})",
+            f"Район: {location_codes.get('district_name', 'н/д')} (ID: {location_codes.get('district_id', 'н/д')})",
+            f"Округ: {location_codes.get('county_name', 'н/д')} (ID: {location_codes.get('county_id', 'н/д')})",
             "",
-            "Тренды рынка недвижимости:",
-            f"Средняя цена за м²: €{trends_data.get('avg_price_per_sqm', 0):,.0f}",
-            f"Изменение цен: {trends_data.get('price_change_percent', 0):.1f}%",
-            f"Количество сделок: {trends_data.get('transaction_count', 0)}",
-            f"Среднее время продажи: {trends_data.get('days_on_market', 0)} дней",
-            f"Доходность аренды: {trends_data.get('rental_yield', 0):.1f}%",
-            f"Тренд цен: {trends_data.get('price_trend', 'stable')}",
-            f"Активность рынка: {trends_data.get('market_activity', 'moderate')}",
+        ])
+    else:
+        report_lines.extend([
+            "=== КОДЫ ЛОКАЦИЙ ===",
+            "Локация не найдена в базе данных",
             "",
         ])
     
-    # Добавляем общую информацию
+    # Добавляем данные объекта
     report_lines.extend([
-        f"Средняя цена за кв.м: €{market_analysis['market_analysis']['radius_5km']['avg_price_per_sqm']:.2f}"
+        f"Данные объекта:",
+        f"Адрес: {address}",
+        f"Спален: {bedrooms}",
+        f"Цена: {format_price(price)}",
+        "",
+        "=== АНАЛИЗ РЫНКА ===",
+        "Данные анализа рынка будут добавлены позже",
+        "",
     ])
     
     return "\n".join(report_lines)
-
-def analyze_market_around_location(lat, lng, bedrooms, target_price):
-    try:
-        radius = 0.05  # ~5.5 км
-        # Краткосрочная аренда
-        short_term_query = supabase.table('short_term_rentals') \
-            .select('property_id, price_per_night, bedrooms, latitude, longitude') \
-            .gte('latitude', lat - radius).lte('latitude', lat + radius) \
-            .gte('longitude', lng - radius).lte('longitude', lng + radius)
-        if bedrooms:
-            short_term_query = short_term_query.eq('bedrooms', bedrooms)
-        short_term_rentals = short_term_query.execute().data or []
-
-        # Долгосрочная аренда
-        long_term_query = supabase.table('long_term_rentals') \
-            .select('property_id, monthly_rent, bedrooms, latitude, longitude') \
-            .gte('latitude', lat - radius).lte('latitude', lat + radius) \
-            .gte('longitude', lng - radius).lte('longitude', lng + radius)
-        if bedrooms:
-            long_term_query = long_term_query.eq('bedrooms', bedrooms)
-        long_term_rentals = long_term_query.execute().data or []
-
-        # Продажи (используем asking_price, price_per_sqm)
-        sales_query = supabase.table('property_sales') \
-            .select('property_id, asking_price, bedrooms, latitude, longitude, price_per_sqm') \
-            .gte('latitude', lat - radius).lte('latitude', lat + radius) \
-            .gte('longitude', lng - radius).lte('longitude', lng + radius)
-        if bedrooms:
-            sales_query = sales_query.eq('bedrooms', bedrooms)
-        sales = sales_query.execute().data or []
-
-        def summarize(props, price_key):
-            prices = [p[price_key] for p in props if p.get(price_key) is not None and p[price_key] != 0]
-            total_count = len(props)
-            count = len(prices)
-            if not prices:
-                return {'avg_price': 0, 'count': count, 'total_count': total_count, 'price_range': [0, 0]}
-            return {
-                'avg_price': sum(prices) / len(prices),
-                'count': count,
-                'total_count': total_count,
-                'price_range': [min(prices), max(prices)]
-            }
-
-        short_term_stats = summarize(short_term_rentals, 'price_per_night')
-        long_term_stats = summarize(long_term_rentals, 'monthly_rent')
-        sales_stats = summarize(sales, 'asking_price')
-
-        # Средняя цена за кв.м. (только по price_per_sqm)
-        sqm_prices = [x for x in (s['price_per_sqm'] for s in sales) if isinstance(x, (int, float))]
-        avg_price_per_sqm = sum(sqm_prices) / len(sqm_prices) if sqm_prices else 0
-
-        report = {
-            'market_analysis': {
-                'radius_5km': {
-                    'short_term_rentals': {
-                        'count': short_term_stats['count'],
-                        'total_count': short_term_stats['total_count'],
-                        'avg_price_per_night': short_term_stats['avg_price'],
-                        'price_range': short_term_stats['price_range']
-                    },
-                    'long_term_rentals': {
-                        'count': long_term_stats['count'],
-                        'total_count': long_term_stats['total_count'],
-                        'avg_monthly_rent': long_term_stats['avg_price'],
-                        'price_range': long_term_stats['price_range']
-                    },
-                    'sales': {
-                        'count': sales_stats['count'],
-                        'total_count': sales_stats['total_count'],
-                        'avg_sale_price': sales_stats['avg_price'],
-                        'price_range': sales_stats['price_range']
-                    },
-                    'avg_price_per_sqm': avg_price_per_sqm
-                }
-            },
-            'property_details': {
-                'address': f'Адрес объекта',
-                'bedrooms': bedrooms,
-                'target_price': target_price,
-                'coordinates': {'lat': lat, 'lng': lng}
-            },
-            'summary': {
-                'total_properties_analyzed': short_term_stats['total_count'] + long_term_stats['total_count'] + sales_stats['total_count'],
-                'market_activity': 'high' if sales_stats['count'] > 5 else 'medium',
-                'price_trend': 'up' if sales_stats['avg_price'] > 1100000 else 'stable'
-            }
-        }
-        return report
-    except Exception as e:
-        logger.error(f"Error analyzing market data: {e}")
-        # Возвращаем пустой отчёт в случае ошибки
-        return {
-            'market_analysis': {
-                'radius_5km': {
-                    'short_term_rentals': {'count': 0, 'avg_price_per_night': 0, 'price_range': [0, 0]},
-                    'long_term_rentals': {'count': 0, 'avg_monthly_rent': 0, 'price_range': [0, 0]},
-                    'sales': {'count': 0, 'avg_sale_price': 0, 'price_range': [0, 0]},
-                    'avg_price_per_sqm': 0
-                }
-            },
-            'property_details': {'address': 'Адрес объекта', 'bedrooms': bedrooms, 'target_price': target_price, 'coordinates': {'lat': lat, 'lng': lng}},
-            'summary': {'total_properties_analyzed': 0, 'market_activity': 'none', 'price_trend': 'stable'}
-        }
 
 @app.route('/api/search_properties', methods=['POST'])
 def api_search_properties():
@@ -2968,7 +2885,8 @@ def get_location_codes(city_name, district_name, county_name):
         location_codes = {
             'city_code': None,
             'district_code': None,
-            'county_code': None
+            'county_code': None,
+            'country_code': None
         }
         
         # Ищем запись с точным совпадением всех параметров
@@ -2990,6 +2908,7 @@ def get_location_codes(city_name, district_name, county_name):
             location_codes['city_code'] = record.get('city_id')
             location_codes['district_code'] = record.get('district_id')
             location_codes['county_code'] = record.get('county_id')
+            location_codes['country_code'] = record.get('country_id')
             logger.info(f"Найдены коды локаций: {location_codes}")
             return location_codes
         else:
@@ -3161,22 +3080,29 @@ def extract_location_from_address(address):
         location_data = {
             'city_name': None,
             'district_name': None,
-            'county_name': None
+            'county_name': None,
+            'country_name': 'Turkey'  # По умолчанию для турецких адресов
         }
         
         if len(address_parts) >= 3:
-            # Для адреса: "Antalya, Alanya, Avsallar Mah., Cengiz Akay Sok., 12B"
-            # Первая часть: город (Antalya) - это основной город
-            location_data['city_name'] = address_parts[0].strip()
-            
-            # Вторая часть: округ/район (Alanya) - это округ
-            location_data['county_name'] = address_parts[1].strip()
-            
-            # Третья часть: район (Avsallar Mah.) - это район
-            district_name = address_parts[2].strip()
-            # Убираем суффиксы типа "Mah.", "Mahallesi", "Sok." и т.д.
-            district_name = district_name.replace(' Mah.', '').replace(' Mahallesi', '').replace(' Sok.', '').replace(' Sk.', '')
-            location_data['district_name'] = district_name
+            # Обрабатываем специальный случай: "Zerdalilik, 07100 Muratpaşa/Antalya, Türkiye"
+            if 'Muratpaşa/Antalya' in address_parts[1]:
+                location_data['city_name'] = 'Antalya'
+                location_data['county_name'] = 'Muratpaşa'
+                location_data['district_name'] = address_parts[0].strip()
+            else:
+                # Для адреса: "Antalya, Alanya, Avsallar Mah., Cengiz Akay Sok., 12B"
+                # Первая часть: город (Antalya) - это основной город
+                location_data['city_name'] = address_parts[0].strip()
+                
+                # Вторая часть: округ/район (Alanya) - это округ
+                location_data['county_name'] = address_parts[1].strip()
+                
+                # Третья часть: район (Avsallar Mah.) - это район
+                district_name = address_parts[2].strip()
+                # Убираем суффиксы типа "Mah.", "Mahallesi", "Sok." и т.д.
+                district_name = district_name.replace(' Mah.', '').replace(' Mahallesi', '').replace(' Sok.', '').replace(' Sk.', '')
+                location_data['district_name'] = district_name
                 
         elif len(address_parts) >= 2:
             # Простой формат
