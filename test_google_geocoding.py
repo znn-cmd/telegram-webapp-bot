@@ -14,6 +14,7 @@ def test_google_geocoding():
     
     # Тестовые адреса
     test_addresses = [
+        "Ulus, 2105. Sk. No:4, 07025 Kepez/Antalya, Türkiye",
         "Baraj, 5890. Sk. No:584, 07320 Kepez/Antalya, Türkiye",
         "Avsallar, Cengiz Akay Sk. No:12, 07410 Alanya/Antalya, Türkiye",
         "Zerdalilik, 07100 Muratpaşa/Antalya, Türkiye"

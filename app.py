@@ -3163,16 +3163,14 @@ def extract_location_components(address_components):
         elif 'locality' in types and not location_data['city']:
             location_data['city'] = long_name
         
-        # Район (sublocality_level_1 или administrative_area_level_2)
+        # Район (sublocality_level_1 или sublocality)
         elif 'sublocality_level_1' in types:
             location_data['district'] = long_name
-        elif 'administrative_area_level_2' in types and not location_data['district']:
+        elif 'sublocality' in types and not location_data['district']:
             location_data['district'] = long_name
         
-        # Округ (administrative_area_level_2 или sublocality)
+        # Округ (administrative_area_level_2)
         elif 'administrative_area_level_2' in types and not location_data['county']:
-            location_data['county'] = long_name
-        elif 'sublocality' in types and not location_data['county']:
             location_data['county'] = long_name
         
         # Почтовый индекс
@@ -3240,8 +3238,32 @@ def find_location_codes_from_components(location_components):
                 'country_name': location['country_name']
             }
         
-        # Если точное совпадение не найдено, пробуем найти по district_name и city_name
-        logger.info("Точное совпадение не найдено, ищем по district_name и city_name")
+        # Если точное совпадение не найдено, пробуем найти по county_name и city_name
+        logger.info("Точное совпадение не найдено, ищем по county_name и city_name")
+        query = supabase.table('locations').select('*')
+        if search_data.get('county_name'):
+            query = query.eq('county_name', search_data['county_name'])
+        if search_data.get('city_name'):
+            query = query.eq('city_name', search_data['city_name'])
+        
+        result = query.execute()
+        
+        if result.data and len(result.data) > 0:
+            location = result.data[0]
+            logger.info(f"✅ Найдена локация по county_name и city_name: {location}")
+            return {
+                'city_id': location['city_id'],
+                'county_id': location['county_id'],
+                'district_id': location['district_id'],
+                'country_id': location['country_id'],
+                'city_name': location['city_name'],
+                'county_name': location['county_name'],
+                'district_name': location['district_name'],
+                'country_name': location['country_name']
+            }
+        
+        # Если и это не помогло, ищем по district_name и city_name
+        logger.info("Ищем по district_name и city_name")
         query = supabase.table('locations').select('*')
         if search_data.get('district_name'):
             query = query.eq('district_name', search_data['district_name'])
@@ -3253,6 +3275,28 @@ def find_location_codes_from_components(location_components):
         if result.data and len(result.data) > 0:
             location = result.data[0]
             logger.info(f"✅ Найдена локация по district_name и city_name: {location}")
+            return {
+                'city_id': location['city_id'],
+                'county_id': location['county_id'],
+                'district_id': location['district_id'],
+                'country_id': location['country_id'],
+                'city_name': location['city_name'],
+                'county_name': location['county_name'],
+                'district_name': location['district_name'],
+                'country_name': location['country_name']
+            }
+        
+        # Если и это не помогло, ищем только по county_name
+        logger.info("Ищем только по county_name")
+        query = supabase.table('locations').select('*')
+        if search_data.get('county_name'):
+            query = query.eq('county_name', search_data['county_name'])
+        
+        result = query.execute()
+        
+        if result.data and len(result.data) > 0:
+            location = result.data[0]
+            logger.info(f"✅ Найдена локация по county_name: {location}")
             return {
                 'city_id': location['city_id'],
                 'county_id': location['county_id'],
