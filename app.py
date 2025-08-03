@@ -475,7 +475,14 @@ def api_generate_report():
         # Получаем данные рынка недвижимости
         market_data = None
         if location_codes:
+            logger.info(f"Получаем данные рынка для кодов: {location_codes}")
             market_data = get_market_data_by_location_ids(location_codes)
+            if market_data:
+                logger.info(f"Получены данные рынка: {market_data}")
+            else:
+                logger.warning("Данные рынка не найдены")
+        else:
+            logger.warning("Коды локаций отсутствуют, данные рынка не будут получены")
         
         # Сохраняем компоненты локации для отображения в отчете
         location_components = data.get('location_components')
@@ -722,10 +729,13 @@ def format_simple_report(address, bedrooms, price, location_codes, language='en'
             trends = market_data['property_trends']
             report_lines.extend([
                 "📈 ТРЕНДЫ НЕДВИЖИМОСТИ:",
-                f"Средняя цена: €{trends.get('avg_price', 'н/д')}",
-                f"Медианная цена: €{trends.get('median_price', 'н/д')}",
-                f"Количество объектов: {trends.get('property_count', 'н/д')}",
-                f"Изменение цены: {trends.get('price_change', 'н/д')}%",
+                f"Средняя цена продажи: €{trends.get('unit_price_for_sale', 'н/д')}",
+                f"Средняя цена аренды: €{trends.get('unit_price_for_rent', 'н/д')}",
+                f"Количество объектов на продажу: {trends.get('count_for_sale', 'н/д')}",
+                f"Количество объектов в аренду: {trends.get('count_for_rent', 'н/д')}",
+                f"Изменение цены продажи: {trends.get('price_change_sale', 'н/д')}%",
+                f"Изменение цены аренды: {trends.get('price_change_rent', 'н/д')}%",
+                f"Дата тренда: {trends.get('trend_date', 'н/д')}",
                 "",
             ])
         
@@ -734,9 +744,9 @@ def format_simple_report(address, bedrooms, price, location_codes, language='en'
             age = market_data['age_data']
             report_lines.extend([
                 "🏠 ВОЗРАСТ НЕДВИЖИМОСТИ:",
-                f"Новые объекты (0-5 лет): {age.get('new_properties', 'н/д')}%",
-                f"Средние объекты (6-15 лет): {age.get('medium_properties', 'н/д')}%",
-                f"Старые объекты (16+ лет): {age.get('old_properties', 'н/д')}%",
+                f"Средний возраст объектов на продажу: {age.get('average_age_for_sale', 'н/д')} лет",
+                f"Средний возраст объектов в аренду: {age.get('average_age_for_rent', 'н/д')} лет",
+                f"Дата тренда: {age.get('trend_date', 'н/д')}",
                 "",
             ])
         
@@ -745,9 +755,11 @@ def format_simple_report(address, bedrooms, price, location_codes, language='en'
             floor = market_data['floor_segment_data']
             report_lines.extend([
                 "🏢 ЭТАЖНОСТЬ:",
-                f"Низкие этажи (1-3): {floor.get('low_floors', 'н/д')}%",
-                f"Средние этажи (4-8): {floor.get('medium_floors', 'н/д')}%",
-                f"Высокие этажи (9+): {floor.get('high_floors', 'н/д')}%",
+                f"Средняя цена продажи: €{floor.get('unit_price_for_sale', 'н/д')}",
+                f"Средняя цена аренды: €{floor.get('unit_price_for_rent', 'н/д')}",
+                f"Количество объектов на продажу: {floor.get('count_for_sale', 'н/д')}",
+                f"Количество объектов в аренду: {floor.get('count_for_rent', 'н/д')}",
+                f"Дата тренда: {floor.get('trend_date', 'н/д')}",
                 "",
             ])
         
@@ -756,9 +768,13 @@ def format_simple_report(address, bedrooms, price, location_codes, language='en'
             general = market_data['general_data']
             report_lines.extend([
                 "📊 ОБЩАЯ СТАТИСТИКА:",
-                f"Общая площадь: {general.get('total_area', 'н/д')} м²",
-                f"Средняя площадь: {general.get('avg_area', 'н/д')} м²",
-                f"Плотность застройки: {general.get('density', 'н/д')}%",
+                f"Средняя цена продажи: €{general.get('unit_price_for_sale', 'н/д')}",
+                f"Средняя цена аренды: €{general.get('unit_price_for_rent', 'н/д')}",
+                f"Количество объектов на продажу: {general.get('count_for_sale', 'н/д')}",
+                f"Количество объектов в аренду: {general.get('count_for_rent', 'н/д')}",
+                f"Изменение цены продажи: {general.get('price_change_sale', 'н/д')}%",
+                f"Изменение цены аренды: {general.get('price_change_rent', 'н/д')}%",
+                f"Дата тренда: {general.get('trend_date', 'н/д')}",
                 "",
             ])
         
@@ -767,9 +783,11 @@ def format_simple_report(address, bedrooms, price, location_codes, language='en'
             heating = market_data['heating_data']
             report_lines.extend([
                 "🔥 ОТОПЛЕНИЕ:",
-                f"Центральное отопление: {heating.get('central_heating', 'н/д')}%",
-                f"Индивидуальное отопление: {heating.get('individual_heating', 'н/д')}%",
-                f"Без отопления: {heating.get('no_heating', 'н/д')}%",
+                f"Средняя цена продажи: €{heating.get('unit_price_for_sale', 'н/д')}",
+                f"Средняя цена аренды: €{heating.get('unit_price_for_rent', 'н/д')}",
+                f"Количество объектов на продажу: {heating.get('count_for_sale', 'н/д')}",
+                f"Количество объектов в аренду: {heating.get('count_for_rent', 'н/д')}",
+                f"Дата тренда: {heating.get('trend_date', 'н/д')}",
                 "",
             ])
     else:
@@ -3115,6 +3133,13 @@ def get_market_data_by_location_ids(location_codes, target_year=None, target_mon
         logger.info(f"Получаем данные рынка для {target_year}-{target_month:02d}")
         logger.info(f"Коды локаций: {location_codes}")
         
+        # Проверяем, что все необходимые коды локаций присутствуют
+        required_codes = ['country_id', 'city_id', 'district_id', 'county_id']
+        missing_codes = [code for code in required_codes if not location_codes.get(code)]
+        if missing_codes:
+            logger.warning(f"Отсутствуют коды локаций: {missing_codes}")
+            return None
+        
         market_data = {
             'property_trends': None,
             'age_data': None,
@@ -3134,12 +3159,13 @@ def get_market_data_by_location_ids(location_codes, target_year=None, target_mon
                 query = query.eq('district_id', location_codes['district_id'])
             if location_codes.get('county_id'):
                 query = query.eq('county_id', location_codes['county_id'])
-            query = query.eq('year', target_year).eq('month', target_month)
             
             result = query.execute()
             if result.data:
-                market_data['property_trends'] = result.data[0]
-                logger.info(f"Найдены данные property_trends: {len(result.data)} записей")
+                # Берем самую свежую запись
+                latest_record = max(result.data, key=lambda x: x.get('trend_date', ''))
+                market_data['property_trends'] = latest_record
+                logger.info(f"Найдены данные property_trends: {len(result.data)} записей, выбрана самая свежая: {latest_record.get('trend_date')}")
             else:
                 logger.info("Данные property_trends не найдены")
         except Exception as e:
@@ -3156,12 +3182,13 @@ def get_market_data_by_location_ids(location_codes, target_year=None, target_mon
                 query = query.eq('district_id', location_codes['district_id'])
             if location_codes.get('county_id'):
                 query = query.eq('county_id', location_codes['county_id'])
-            query = query.eq('year', target_year).eq('month', target_month)
             
             result = query.execute()
             if result.data:
-                market_data['age_data'] = result.data[0]
-                logger.info(f"Найдены данные age_data: {len(result.data)} записей")
+                # Берем самую свежую запись
+                latest_record = max(result.data, key=lambda x: x.get('trend_date', ''))
+                market_data['age_data'] = latest_record
+                logger.info(f"Найдены данные age_data: {len(result.data)} записей, выбрана самая свежая: {latest_record.get('trend_date')}")
             else:
                 logger.info("Данные age_data не найдены")
         except Exception as e:
@@ -3178,12 +3205,13 @@ def get_market_data_by_location_ids(location_codes, target_year=None, target_mon
                 query = query.eq('district_id', location_codes['district_id'])
             if location_codes.get('county_id'):
                 query = query.eq('county_id', location_codes['county_id'])
-            query = query.eq('year', target_year).eq('month', target_month)
             
             result = query.execute()
             if result.data:
-                market_data['floor_segment_data'] = result.data[0]
-                logger.info(f"Найдены данные floor_segment_data: {len(result.data)} записей")
+                # Берем самую свежую запись
+                latest_record = max(result.data, key=lambda x: x.get('trend_date', ''))
+                market_data['floor_segment_data'] = latest_record
+                logger.info(f"Найдены данные floor_segment_data: {len(result.data)} записей, выбрана самая свежая: {latest_record.get('trend_date')}")
             else:
                 logger.info("Данные floor_segment_data не найдены")
         except Exception as e:
@@ -3200,12 +3228,13 @@ def get_market_data_by_location_ids(location_codes, target_year=None, target_mon
                 query = query.eq('district_id', location_codes['district_id'])
             if location_codes.get('county_id'):
                 query = query.eq('county_id', location_codes['county_id'])
-            query = query.eq('year', target_year).eq('month', target_month)
             
             result = query.execute()
             if result.data:
-                market_data['general_data'] = result.data[0]
-                logger.info(f"Найдены данные general_data: {len(result.data)} записей")
+                # Берем самую свежую запись
+                latest_record = max(result.data, key=lambda x: x.get('trend_date', ''))
+                market_data['general_data'] = latest_record
+                logger.info(f"Найдены данные general_data: {len(result.data)} записей, выбрана самая свежая: {latest_record.get('trend_date')}")
             else:
                 logger.info("Данные general_data не найдены")
         except Exception as e:
@@ -3222,12 +3251,13 @@ def get_market_data_by_location_ids(location_codes, target_year=None, target_mon
                 query = query.eq('district_id', location_codes['district_id'])
             if location_codes.get('county_id'):
                 query = query.eq('county_id', location_codes['county_id'])
-            query = query.eq('year', target_year).eq('month', target_month)
             
             result = query.execute()
             if result.data:
-                market_data['heating_data'] = result.data[0]
-                logger.info(f"Найдены данные heating_data: {len(result.data)} записей")
+                # Берем самую свежую запись
+                latest_record = max(result.data, key=lambda x: x.get('trend_date', ''))
+                market_data['heating_data'] = latest_record
+                logger.info(f"Найдены данные heating_data: {len(result.data)} записей, выбрана самая свежая: {latest_record.get('trend_date')}")
             else:
                 logger.info("Данные heating_data не найдены")
         except Exception as e:
