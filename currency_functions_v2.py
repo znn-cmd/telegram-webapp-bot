@@ -24,6 +24,7 @@ CURRENCYLAYER_API_KEY = "c61dddb55d93e77ce5a2c8b91fb22694"
 def get_latest_currency_rate():
     """
     Получает последнюю доступную запись курса валют из базы данных.
+    Обеспечивает валидацию всех обязательных полей.
     
     Returns:
         dict: Последняя запись курса валют или None если нет записей
@@ -43,13 +44,32 @@ def get_latest_currency_rate():
                 return None
             
             # Проверяем, что все значения числовые и положительные
+            invalid_fields = []
             for field in required_fields:
                 if not isinstance(latest_record[field], (int, float)) or latest_record[field] <= 0:
+                    invalid_fields.append(field)
                     logger.warning(f"⚠️ Некорректное значение в последней записи для {field}: {latest_record[field]}")
+            
+            if invalid_fields:
+                logger.warning(f"⚠️ Некорректные значения в полях: {invalid_fields}")
+                return None
+            
+            # Дополнительная проверка - убеждаемся, что все поля имеют корректные типы
+            validated_record = {}
+            for field in required_fields:
+                if isinstance(latest_record[field], (int, float)):
+                    validated_record[field] = float(latest_record[field])
+                else:
+                    logger.warning(f"⚠️ Некорректный тип данных для {field}: {type(latest_record[field])}")
                     return None
             
-            logger.info(f"✅ Используем последнюю доступную запись курса валют: {latest_record}")
-            return latest_record
+            # Добавляем остальные поля
+            for key, value in latest_record.items():
+                if key not in validated_record:
+                    validated_record[key] = value
+            
+            logger.info(f"✅ Используем последнюю доступную запись курса валют: {validated_record}")
+            return validated_record
         else:
             logger.warning("⚠️ Нет доступных записей курса валют в базе данных")
             return None
@@ -94,6 +114,7 @@ def get_currency_rate_for_date(target_date=None):
 def fetch_and_save_currency_rates(target_date=None):
     """
     Получает курсы валют с currencylayer.com и сохраняет в базу данных.
+    Обеспечивает заполнение всех обязательных полей валют.
     
     Args:
         target_date (datetime): Дата для получения курсов (по умолчанию сегодня)
@@ -118,7 +139,7 @@ def fetch_and_save_currency_rates(target_date=None):
         }
         
         logger.info(f"🔍 Запрос курсов валют с currencylayer.com для {date_str}")
-        response = requests.get(url, params=params)
+        response = requests.get(url, params=params, timeout=30)
         
         if response.status_code != 200:
             logger.error(f"❌ Ошибка API currencylayer.com: {response.status_code} - {response.text}")
@@ -151,17 +172,34 @@ def fetch_and_save_currency_rates(target_date=None):
         }
         
         # Заполняем курсы валют с проверкой
+        missing_currencies = []
         for api_key, db_key in required_currencies.items():
-            if api_key in quotes and quotes[api_key] is not None:
+            if api_key in quotes and quotes[api_key] is not None and quotes[api_key] > 0:
                 currency_data[db_key] = quotes[api_key]
+                logger.info(f"✅ Получен курс {api_key}: {quotes[api_key]}")
             else:
-                logger.warning(f"⚠️ Курс {api_key} не получен от API, используем значение по умолчанию")
+                missing_currencies.append(api_key)
+                logger.warning(f"⚠️ Курс {api_key} не получен от API или некорректен")
                 # Используем последнюю доступную запись или значение по умолчанию
-                latest_rate = get_latest_currency_rate()
-                if latest_rate and db_key in latest_rate:
-                    currency_data[db_key] = latest_rate[db_key]
-                else:
-                    # Если нет последней записи, используем разумные значения по умолчанию
+                try:
+                    latest_rate = get_latest_currency_rate()
+                    if latest_rate and db_key in latest_rate and latest_rate[db_key] is not None and latest_rate[db_key] > 0:
+                        currency_data[db_key] = latest_rate[db_key]
+                        logger.info(f"🔄 Используем последний доступный курс для {db_key}: {latest_rate[db_key]}")
+                    else:
+                        # Если нет последней записи, используем разумные значения по умолчанию
+                        default_rates = {
+                            'rub': 90.0,  # Примерный курс RUB/EUR
+                            'usd': 1.16,  # Примерный курс USD/EUR
+                            'try': 46.0,  # Примерный курс TRY/EUR
+                            'aed': 4.26,  # Примерный курс AED/EUR
+                            'thb': 37.6   # Примерный курс THB/EUR
+                        }
+                        currency_data[db_key] = default_rates.get(db_key, 1.0)
+                        logger.warning(f"⚠️ Используем значение по умолчанию для {db_key}: {default_rates.get(db_key, 1.0)}")
+                except Exception as e:
+                    logger.error(f"❌ Ошибка получения последнего курса для {db_key}: {e}")
+                    # Используем значения по умолчанию
                     default_rates = {
                         'rub': 90.0,  # Примерный курс RUB/EUR
                         'usd': 1.16,  # Примерный курс USD/EUR
@@ -170,6 +208,7 @@ def fetch_and_save_currency_rates(target_date=None):
                         'thb': 37.6   # Примерный курс THB/EUR
                     }
                     currency_data[db_key] = default_rates.get(db_key, 1.0)
+                    logger.warning(f"⚠️ Используем значение по умолчанию для {db_key}: {default_rates.get(db_key, 1.0)}")
         
         # Проверяем, что все поля заполнены
         required_fields = ['rub', 'usd', 'euro', 'try', 'aed', 'thb']
@@ -181,17 +220,36 @@ def fetch_and_save_currency_rates(target_date=None):
             return get_latest_currency_rate()
         
         # Валидация данных - проверяем, что все значения числовые и положительные
+        invalid_fields = []
         for field in required_fields:
             if not isinstance(currency_data[field], (int, float)) or currency_data[field] <= 0:
+                invalid_fields.append(field)
                 logger.error(f"❌ Некорректное значение для {field}: {currency_data[field]}")
-                # Используем последнюю доступную запись
-                return get_latest_currency_rate()
+        
+        if invalid_fields:
+            logger.error(f"❌ Некорректные значения в полях: {invalid_fields}")
+            # Используем последнюю доступную запись
+            return get_latest_currency_rate()
+        
+        # Дополнительная проверка - убеждаемся, что все поля имеют корректные типы
+        for field in required_fields:
+            if not isinstance(currency_data[field], (int, float)):
+                currency_data[field] = float(currency_data[field])
         
         # Сохраняем в базу данных
         logger.info(f"💾 Сохраняем курсы валют в базу: {currency_data}")
         try:
-            supabase.table('currency').insert(currency_data).execute()
-            logger.info(f"✅ Курсы валют успешно получены и сохранены для {date_str}")
+            # Удаляем поле id если оно есть, чтобы база данных сама сгенерировала новый ID
+            if 'id' in currency_data:
+                del currency_data['id']
+            
+            result = supabase.table('currency').insert(currency_data).execute()
+            if result.data:
+                logger.info(f"✅ Курсы валют успешно получены и сохранены для {date_str}")
+                logger.info(f"📊 Сохраненная запись: {result.data[0]}")
+            else:
+                logger.warning(f"⚠️ Не удалось сохранить в базу: нет данных в ответе")
+                return currency_data
         except Exception as e:
             logger.warning(f"⚠️ Не удалось сохранить в базу: {e}")
             # Возвращаем данные даже если сохранение не удалось
