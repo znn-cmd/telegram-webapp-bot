@@ -31,8 +31,25 @@ def get_latest_currency_rate():
     try:
         result = supabase.table('currency').select('*').order('created_at', desc=True).limit(1).execute()
         if result.data and len(result.data) > 0:
-            logger.info(f"✅ Используем последнюю доступную запись курса валют: {result.data[0]}")
-            return result.data[0]
+            latest_record = result.data[0]
+            
+            # Проверяем, что все обязательные поля присутствуют
+            required_fields = ['rub', 'usd', 'euro', 'try', 'aed', 'thb']
+            missing_fields = [field for field in required_fields if field not in latest_record or latest_record[field] is None]
+            
+            if missing_fields:
+                logger.warning(f"⚠️ В последней записи отсутствуют поля: {missing_fields}")
+                # Возвращаем None, чтобы использовать значения по умолчанию
+                return None
+            
+            # Проверяем, что все значения числовые и положительные
+            for field in required_fields:
+                if not isinstance(latest_record[field], (int, float)) or latest_record[field] <= 0:
+                    logger.warning(f"⚠️ Некорректное значение в последней записи для {field}: {latest_record[field]}")
+                    return None
+            
+            logger.info(f"✅ Используем последнюю доступную запись курса валют: {latest_record}")
+            return latest_record
         else:
             logger.warning("⚠️ Нет доступных записей курса валют в базе данных")
             return None
@@ -118,16 +135,57 @@ def fetch_and_save_currency_rates(target_date=None):
         # Извлекаем курсы валют
         quotes = data.get('quotes', {})
         
-        # Формируем данные для сохранения в базу
+        # Проверяем, что все необходимые курсы валют получены
+        required_currencies = {
+            'EURRUB': 'rub',
+            'EURUSD': 'usd', 
+            'EURTRY': 'try',
+            'EURAED': 'aed',
+            'EURTHB': 'thb'
+        }
+        
+        # Формируем данные для сохранения в базу с проверкой
         currency_data = {
             'created_at': target_date.isoformat(),
-            'rub': quotes.get('EURRUB', 1.0),
-            'usd': quotes.get('EURUSD', 1.0),
-            'euro': 1.0,  # Базовая валюта
-            'try': quotes.get('EURTRY', 1.0),
-            'aed': quotes.get('EURAED', 1.0),
-            'thb': quotes.get('EURTHB', 1.0)
+            'euro': 1.0  # Базовая валюта всегда = 1.0
         }
+        
+        # Заполняем курсы валют с проверкой
+        for api_key, db_key in required_currencies.items():
+            if api_key in quotes and quotes[api_key] is not None:
+                currency_data[db_key] = quotes[api_key]
+            else:
+                logger.warning(f"⚠️ Курс {api_key} не получен от API, используем значение по умолчанию")
+                # Используем последнюю доступную запись или значение по умолчанию
+                latest_rate = get_latest_currency_rate()
+                if latest_rate and db_key in latest_rate:
+                    currency_data[db_key] = latest_rate[db_key]
+                else:
+                    # Если нет последней записи, используем разумные значения по умолчанию
+                    default_rates = {
+                        'rub': 90.0,  # Примерный курс RUB/EUR
+                        'usd': 1.16,  # Примерный курс USD/EUR
+                        'try': 46.0,  # Примерный курс TRY/EUR
+                        'aed': 4.26,  # Примерный курс AED/EUR
+                        'thb': 37.6   # Примерный курс THB/EUR
+                    }
+                    currency_data[db_key] = default_rates.get(db_key, 1.0)
+        
+        # Проверяем, что все поля заполнены
+        required_fields = ['rub', 'usd', 'euro', 'try', 'aed', 'thb']
+        missing_fields = [field for field in required_fields if field not in currency_data or currency_data[field] is None]
+        
+        if missing_fields:
+            logger.error(f"❌ Отсутствуют обязательные поля: {missing_fields}")
+            # Используем последнюю доступную запись
+            return get_latest_currency_rate()
+        
+        # Валидация данных - проверяем, что все значения числовые и положительные
+        for field in required_fields:
+            if not isinstance(currency_data[field], (int, float)) or currency_data[field] <= 0:
+                logger.error(f"❌ Некорректное значение для {field}: {currency_data[field]}")
+                # Используем последнюю доступную запись
+                return get_latest_currency_rate()
         
         # Сохраняем в базу данных
         logger.info(f"💾 Сохраняем курсы валют в базу: {currency_data}")

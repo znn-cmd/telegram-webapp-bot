@@ -66,6 +66,23 @@ WEBAPP_URL = "https://aaadvisor-zaicevn.amvera.io/webapp"
 # Google Maps API ключ
 GOOGLE_MAPS_API_KEY = "AIzaSyBrDkDpNKNAIyY147MQ78hchBkeyCAxhEw"
 
+# CurrencyLayer API ключ
+CURRENCYLAYER_API_KEY = "c61dddb55d93e77ce5a2c8b91fb22694"
+
+# Импорт функций для работы с валютой
+try:
+    from currency_functions_v2 import (
+        get_currency_rate_for_date,
+        convert_turkish_data_to_eur,
+        is_turkish_location,
+        get_latest_currency_rate
+    )
+    CURRENCY_FUNCTIONS_AVAILABLE = True
+    logger.info("✅ Функции валютных курсов загружены успешно")
+except ImportError as e:
+    CURRENCY_FUNCTIONS_AVAILABLE = False
+    logger.warning(f"⚠️ Функции валютных курсов недоступны: {e}")
+
 # async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 #     """Обработчик команды /start"""
 #     user = update.effective_user
@@ -591,9 +608,12 @@ def api_generate_report():
                     'address': address,
                     'bedrooms': bedrooms,
                     'price': price
-                }
-            },
-            'report_text': report_text
+                },
+                'market_data': market_data,
+                'is_turkish': is_turkish,
+                'currency_rate': currency_rate,
+                'report_text': report_text
+            }
         })
         
     except Exception as e:
@@ -704,11 +724,43 @@ def format_simple_report(address, bedrooms, price, location_codes, language='en'
     def format_price(price):
         return f"€{price:.2f}".replace('.00', '').replace('.', ',')
     
+    # Получаем текущую дату и курс валюты
+    current_date = datetime.now()
+    currency_rate = None
+    is_turkish = False
+    
+    # Проверяем, является ли локация турецкой и получаем курс валюты
+    if CURRENCY_FUNCTIONS_AVAILABLE:
+        try:
+            # Проверяем компоненты локации
+            location_components = getattr(format_simple_report, 'last_location_components', None)
+            if location_components:
+                is_turkish = is_turkish_location(location_components)
+                if is_turkish:
+                    logger.info(f"🇹🇷 Турецкая локация обнаружена, получаем курс валюты")
+                    currency_rate = get_currency_rate_for_date(current_date)
+        except Exception as e:
+            logger.error(f"❌ Ошибка при работе с валютными курсами: {e}")
+    
     # Формируем отчёт
     report_lines = [
         f"Анализ рынка в радиусе 5 км:",
         "",
     ]
+    
+    # Добавляем информацию о дате формирования отчета и курсе валюты
+    report_lines.extend([
+        f"Дата формирования отчета: {current_date.strftime('%d.%m.%Y %H:%M')}",
+    ])
+    
+    if is_turkish and currency_rate:
+        try_rate = currency_rate.get('try', 0)
+        report_lines.extend([
+            f"Курс валюты TRY/EUR: {try_rate:.4f}",
+            "",
+        ])
+    else:
+        report_lines.append("")
     
     # Добавляем коды локаций (только для админов)
     logger.info(f"📋 Форматирование кодов локаций: {location_codes}")
@@ -1036,8 +1088,8 @@ def format_simple_report(address, bedrooms, price, location_codes, language='en'
         report_lines.extend([
             "=== АНАЛИЗ РЫНКА ===",
             "Данные анализа рынка не найдены для данной локации",
-            "",
-        ])
+                    "",
+                ])
     
     return "\n".join(report_lines)
 
@@ -2605,13 +2657,13 @@ def api_send_saved_report_pdf():
                 if trends_data:
                     if trends_data.get('unit_price_for_sale'):
                         pdf.cell(0, 6, f"Средняя цена за м² (продажа): €{trends_data['unit_price_for_sale']:,.2f}", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-                    else:
+            else:
                         pdf.cell(0, 6, "Средняя цена за м² (продажа): н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
                     
                     if trends_data.get('price_change_sale'):
                         change_percent = trends_data['price_change_sale'] * 100
                         pdf.cell(0, 6, f"Изменение цен (продажа): {change_percent:+.2f}%", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-                    else:
+        else:
                         pdf.cell(0, 6, "Изменение цен (продажа): н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
                     
                     if trends_data.get('listing_period_for_sale'):
@@ -2803,7 +2855,7 @@ def api_admin_balance_100():
     try:
         supabase.table('users').update({'balance': 100}).eq('telegram_id', telegram_id).execute()
         return jsonify({'success': True, 'balance': 100})
-    except Exception as e:
+            except Exception as e:
         return jsonify({'error': str(e)}), 500
 
 @app.route('/api/admin_users_stats', methods=['GET'])
@@ -3174,7 +3226,7 @@ def api_tariffs():
                 'name': t.get('name'),
             })
         return jsonify({'tariffs': tariffs})
-    except Exception as e:
+            except Exception as e:
         logger.error(f"Error loading tariffs: {e}")
         return jsonify({'tariffs': []}), 500
 
