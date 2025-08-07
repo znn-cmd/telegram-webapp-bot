@@ -15,5 +15,5 @@ env:
     value: 7215676549:AAFS86JbRCqwzTKQG-dF96JX-C1aWNvBoLo
   - name: SUPABASE_URL
     value: https://dzllnnohurlzjyabgsft.supabase.co
-  - name: SUPABASE_KEY
+  - name: SUPABASE_ANON_KEY
     value: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR6bGxubm9odXJsemp5YWJnc2Z0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA5NDgwMjcsImV4cCI6MjA2NjUyNDAyN30.sJCIeeIm0Ye1JbAdw5HzfAMe8QLgQomArK8yoppuevQ
