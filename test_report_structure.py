@@ -60,13 +60,13 @@ def test_report_structure():
                     sections['Коды локаций'] = True
                     print(f"✅ Найдены коды локаций (строка {i+1})")
                     
-                elif '=== ДАННЫЕ GOOGLE PLACES API ===' in line:
+                elif '=== ДАННЫЕ GOOGLE PLACES API (только для администраторов) ===' in line:
                     sections['Google Places API'] = True
-                    print(f"✅ Найдены данные Google Places API (строка {i+1})")
+                    print(f"✅ Найдены данные Google Places API (только для админов) (строка {i+1})")
                     
-                elif '=== ДАННЫЕ NOMINATIM (OpenStreetMap) ===' in line:
+                elif '=== ДАННЫЕ NOMINATIM (OpenStreetMap) (только для администраторов) ===' in line:
                     sections['Nominatim'] = True
-                    print(f"✅ Найдены данные Nominatim (строка {i+1})")
+                    print(f"✅ Найдены данные Nominatim (только для админов) (строка {i+1})")
                     
                 elif '=== ОБЩИЙ ТРЕНД ===' in line:
                     sections['Общий тренд'] = True

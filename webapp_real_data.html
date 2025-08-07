@@ -670,8 +670,8 @@
             for (let line of lines) {
                 if (line.includes('=== КОДЫ ЛОКАЦИЙ (только для администраторов) ===')) { current = locationCodes; continue; }
                 if (line.includes('Данные объекта:')) { current = propertyData; continue; }
-                if (line.includes('=== ДАННЫЕ GOOGLE PLACES API ===')) { current = googleData; continue; }
-                if (line.includes('=== ДАННЫЕ NOMINATIM (OpenStreetMap) ===')) { current = nominatimData; continue; }
+                if (line.includes('=== ДАННЫЕ GOOGLE PLACES API (только для администраторов) ===')) { current = googleData; continue; }
+                if (line.includes('=== ДАННЫЕ NOMINATIM (OpenStreetMap) (только для администраторов) ===')) { current = nominatimData; continue; }
                 if (line.includes('=== ОБЩИЙ ТРЕНД ===')) { current = generalTrend; continue; }
                 if (line.includes('=== ТРЕНД ПО КОЛИЧЕСТВУ СПАЛЕН ===')) { current = houseTypeTrend; continue; }
                 if (line.includes('=== ТРЕНД ПО ВОЗРАСТУ ОБЪЕКТА ===')) { current = ageTrend; continue; }
@@ -700,8 +700,18 @@
                     console.log('  - locationCodes.length:', locationCodes.length);
                 }
                 
-                if (googleData.length) blocksHtml += block('Данные Google Places API', googleData);
-                if (nominatimData.length) blocksHtml += block('Данные Nominatim (OpenStreetMap)', nominatimData);
+                if (isAdmin && googleData.length) {
+                    console.log('✅ Показываем данные Google Places API для админа');
+                    blocksHtml += block('Данные Google Places API (только для администраторов)', googleData);
+                } else {
+                    console.log('❌ Не показываем данные Google Places API:', isAdmin, googleData.length);
+                }
+                if (isAdmin && nominatimData.length) {
+                    console.log('✅ Показываем данные Nominatim для админа');
+                    blocksHtml += block('Данные Nominatim (OpenStreetMap) (только для администраторов)', nominatimData);
+                } else {
+                    console.log('❌ Не показываем данные Nominatim:', isAdmin, nominatimData.length);
+                }
                 if (generalTrend.length) blocksHtml += block('Общий тренд', generalTrend);
                 if (houseTypeTrend.length) blocksHtml += block('Тренд по количеству спален', houseTypeTrend);
                 if (ageTrend.length) blocksHtml += block('Тренд по возрасту объекта', ageTrend);

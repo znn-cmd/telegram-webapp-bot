@@ -721,9 +721,9 @@ def format_simple_report(address, bedrooms, price, location_codes, language='en'
     
     report_lines.append("")
     
-    # Добавляем данные от Google Places API для отладки
+    # Добавляем данные от Google Places API для отладки (только для админов)
     report_lines.extend([
-        "=== ДАННЫЕ GOOGLE PLACES API ===",
+        "=== ДАННЫЕ GOOGLE PLACES API (только для администраторов) ===",
         f"Formatted Address: {address}",
     ])
     
@@ -745,7 +745,7 @@ def format_simple_report(address, bedrooms, price, location_codes, language='en'
                 nominatim = components['nominatim_data']
                 report_lines.extend([
                     "",
-                    "=== ДАННЫЕ NOMINATIM (OpenStreetMap) ===",
+                    "=== ДАННЫЕ NOMINATIM (OpenStreetMap) (только для администраторов) ===",
                     f"Display Name: {nominatim.get('display_name', 'н/д')}",
                     f"Country: {nominatim.get('country', 'н/д')}",
                     f"Country Code: {nominatim.get('country_code', 'н/д')}",
