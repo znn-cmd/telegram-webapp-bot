@@ -665,11 +665,13 @@
             }
             
             // Блоки
-            let locationCodes = [], propertyData = [], generalTrend = [], houseTypeTrend = [], ageTrend = [], floorTrend = [], heatingTrend = [];
+            let locationCodes = [], propertyData = [], generalTrend = [], houseTypeTrend = [], ageTrend = [], floorTrend = [], heatingTrend = [], googleData = [], nominatimData = [];
             let current = null;
             for (let line of lines) {
-                if (line.includes('=== КОДЫ ЛОКАЦИЙ ===')) { current = locationCodes; continue; }
+                if (line.includes('=== КОДЫ ЛОКАЦИЙ (только для администраторов) ===')) { current = locationCodes; continue; }
                 if (line.includes('Данные объекта:')) { current = propertyData; continue; }
+                if (line.includes('=== ДАННЫЕ GOOGLE PLACES API ===')) { current = googleData; continue; }
+                if (line.includes('=== ДАННЫЕ NOMINATIM (OpenStreetMap) ===')) { current = nominatimData; continue; }
                 if (line.includes('=== ОБЩИЙ ТРЕНД ===')) { current = generalTrend; continue; }
                 if (line.includes('=== ТРЕНД ПО КОЛИЧЕСТВУ СПАЛЕН ===')) { current = houseTypeTrend; continue; }
                 if (line.includes('=== ТРЕНД ПО ВОЗРАСТУ ОБЪЕКТА ===')) { current = ageTrend; continue; }
@@ -687,21 +689,19 @@
                 let blocksHtml = '';
                 
                 if (isAdmin && locationCodes.length) {
-                    console.log('✅ Показываем кнопку кодов локаций для админа');
+                    console.log('✅ Показываем коды локаций для админа');
                     blocksHtml += `<div style='background:#f8f9fa;border-radius:12px;padding:14px 12px 10px 12px;margin-bottom:14px;box-shadow:0 2px 8px rgba(102,126,234,0.06);'>
                         <div style='font-size:17px;font-weight:700;color:#667eea;margin-bottom:8px;'>Коды локаций (только для администраторов)</div>
-                        <button onclick="toggleLocationCodes()" id="show-location-codes" style='background:#667eea;color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:14px;cursor:pointer;margin-bottom:8px;'>Показать коды локаций</button>
-                        <div id="location-codes-content" style='display:none;'>
-                            ${locationCodes.map(line => `<div style='font-size:15px;color:#222;margin-bottom:7px;'>${line}</div>`).join('')}
-                        </div>
+                        ${locationCodes.map(line => `<div style='font-size:15px;color:#222;margin-bottom:7px;'>${line}</div>`).join('')}
                     </div>`;
                 } else {
-                    console.log('❌ Не показываем кнопку кодов локаций:');
+                    console.log('❌ Не показываем коды локаций:');
                     console.log('  - isAdmin:', isAdmin);
                     console.log('  - locationCodes.length:', locationCodes.length);
                 }
                 
-                if (propertyData.length) blocksHtml += block('Данные объекта', propertyData);
+                if (googleData.length) blocksHtml += block('Данные Google Places API', googleData);
+                if (nominatimData.length) blocksHtml += block('Данные Nominatim (OpenStreetMap)', nominatimData);
                 if (generalTrend.length) blocksHtml += block('Общий тренд', generalTrend);
                 if (houseTypeTrend.length) blocksHtml += block('Тренд по количеству спален', houseTypeTrend);
                 if (ageTrend.length) blocksHtml += block('Тренд по возрасту объекта', ageTrend);
@@ -1473,19 +1473,7 @@
             return false;
         }
 
-        // Функция для обработки клика по кнопке показа кодов локаций
-        function toggleLocationCodes() {
-            const content = document.getElementById('location-codes-content');
-            const button = document.getElementById('show-location-codes');
-            
-            if (content.style.display === 'none') {
-                content.style.display = 'block';
-                button.textContent = 'Скрыть коды локаций';
-            } else {
-                content.style.display = 'none';
-                button.textContent = 'Показать коды локаций';
-            }
-        }
+
 
         // Инициализация
         showStep('address');

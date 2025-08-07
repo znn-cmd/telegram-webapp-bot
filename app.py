@@ -719,6 +719,8 @@ def format_simple_report(address, bedrooms, price, location_codes, language='en'
             "",
         ])
     
+    report_lines.append("")
+    
     # Добавляем данные от Google Places API для отладки
     report_lines.extend([
         "=== ДАННЫЕ GOOGLE PLACES API ===",
@@ -756,15 +758,6 @@ def format_simple_report(address, bedrooms, price, location_codes, language='en'
                 ])
     
     report_lines.append("")
-    
-    # Добавляем данные объекта
-    report_lines.extend([
-        f"Данные объекта:",
-        f"Адрес: {address}",
-        f"Спален: {bedrooms}",
-        f"Цена: {format_price(price)}",
-        "",
-    ])
     
     # Добавляем новые разделы отчета
     if market_data:
