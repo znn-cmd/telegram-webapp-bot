@@ -21,6 +21,25 @@ supabase: Client = create_client(supabase_url, supabase_key)
 # CurrencyLayer API ключ
 CURRENCYLAYER_API_KEY = "c61dddb55d93e77ce5a2c8b91fb22694"
 
+def get_latest_currency_rate():
+    """
+    Получает последнюю доступную запись курса валют из базы данных.
+    
+    Returns:
+        dict: Последняя запись курса валют или None если нет записей
+    """
+    try:
+        result = supabase.table('currency').select('*').order('created_at', desc=True).limit(1).execute()
+        if result.data and len(result.data) > 0:
+            logger.info(f"✅ Используем последнюю доступную запись курса валют: {result.data[0]}")
+            return result.data[0]
+        else:
+            logger.warning("⚠️ Нет доступных записей курса валют в базе данных")
+            return None
+    except Exception as e:
+        logger.error(f"❌ Ошибка получения последней записи курса валют: {e}")
+        return None
+
 def get_currency_rate_for_date(target_date=None):
     """
     Получает курс валюты для указанной даты из таблицы currency.
@@ -49,11 +68,19 @@ def get_currency_rate_for_date(target_date=None):
         
         # Если записи нет, получаем с currencylayer.com
         logger.info(f"❌ Запись курса валют для {date_str} не найдена, получаем с currencylayer.com")
-        return fetch_and_save_currency_rates(target_date)
+        fresh_rate = fetch_and_save_currency_rates(target_date)
+        
+        if fresh_rate:
+            return fresh_rate
+        else:
+            # Если не удалось получить свежие курсы, используем последнюю доступную запись
+            logger.warning(f"⚠️ Не удалось получить свежие курсы, используем последнюю доступную запись")
+            return get_latest_currency_rate()
         
     except Exception as e:
         logger.error(f"❌ Ошибка получения курса валют: {e}")
-        return None
+        # Используем последнюю доступную запись при ошибке
+        return get_latest_currency_rate()
 
 def fetch_and_save_currency_rates(target_date=None):
     """
@@ -141,8 +168,14 @@ def fetch_and_save_currency_rates(target_date=None):
                 supabase.table('currency').update(currency_data).eq('id', record_id).execute()
             else:
                 logger.info(f"💾 Создаем новую запись для {date_str}")
-                # Создаем новую запись
-                supabase.table('currency').insert(currency_data).execute()
+                # Создаем новую запись без указания ID (автоинкремент)
+                insert_data = currency_data.copy()
+                # Убираем поле id если оно есть, чтобы использовать автоинкремент
+                if 'id' in insert_data:
+                    del insert_data['id']
+                
+                result = supabase.table('currency').insert(insert_data).execute()
+                logger.info(f"✅ Новая запись создана с ID: {result.data[0]['id'] if result.data else 'unknown'}")
             
             logger.info(f"✅ Курсы валют успешно получены и сохранены для {date_str}")
         except Exception as e:
