@@ -665,36 +665,59 @@
             }
             
             // Блоки
-            let locationCodes = [], propertyData = [], marketAnalysis = [];
+            let locationCodes = [], propertyData = [], generalTrend = [], houseTypeTrend = [], ageTrend = [], floorTrend = [], heatingTrend = [];
             let current = null;
             for (let line of lines) {
                 if (line.includes('=== КОДЫ ЛОКАЦИЙ ===')) { current = locationCodes; continue; }
                 if (line.includes('Данные объекта:')) { current = propertyData; continue; }
-                if (line.includes('=== АНАЛИЗ РЫНКА ===')) { current = marketAnalysis; continue; }
+                if (line.includes('=== ОБЩИЙ ТРЕНД ===')) { current = generalTrend; continue; }
+                if (line.includes('=== ТРЕНД ПО ТИПУ ОБЪЕКТА ===')) { current = houseTypeTrend; continue; }
+                if (line.includes('=== ТРЕНД ПО ВОЗРАСТУ ОБЪЕКТА ===')) { current = ageTrend; continue; }
+                if (line.includes('=== ТРЕНД ПО ЭТАЖУ ОБЪЕКТА ===')) { current = floorTrend; continue; }
+                if (line.includes('=== ТРЕНД ПО ТИПУ ОТОПЛЕНИЯ ===')) { current = heatingTrend; continue; }
                 if (current && line.trim() !== '') current.push(line);
             }
             
             let blocksHtml = '';
-            if (locationCodes.length) blocksHtml += block('Коды локаций', locationCodes);
-            if (propertyData.length) blocksHtml += block('Данные объекта', propertyData);
-            if (marketAnalysis.length) blocksHtml += block('Анализ рынка', marketAnalysis);
+            
+            // Проверяем статус админа и показываем коды локаций только для админов
+            checkAdminStatus().then(isAdmin => {
+                let blocksHtml = '';
+                
+                if (isAdmin && locationCodes.length) {
+                    blocksHtml += `<div style='background:#f8f9fa;border-radius:12px;padding:14px 12px 10px 12px;margin-bottom:14px;box-shadow:0 2px 8px rgba(102,126,234,0.06);'>
+                        <div style='font-size:17px;font-weight:700;color:#667eea;margin-bottom:8px;'>Коды локаций (только для администраторов)</div>
+                        <button onclick="toggleLocationCodes()" id="show-location-codes" style='background:#667eea;color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:14px;cursor:pointer;margin-bottom:8px;'>Показать коды локаций</button>
+                        <div id="location-codes-content" style='display:none;'>
+                            ${locationCodes.map(line => `<div style='font-size:15px;color:#222;margin-bottom:7px;'>${line}</div>`).join('')}
+                        </div>
+                    </div>`;
+                }
+                
+                if (propertyData.length) blocksHtml += block('Данные объекта', propertyData);
+                if (generalTrend.length) blocksHtml += block('Общий тренд', generalTrend);
+                if (houseTypeTrend.length) blocksHtml += block('Тренд по типу объекта', houseTypeTrend);
+                if (ageTrend.length) blocksHtml += block('Тренд по возрасту объекта', ageTrend);
+                if (floorTrend.length) blocksHtml += block('Тренд по этажу объекта', floorTrend);
+                if (heatingTrend.length) blocksHtml += block('Тренд по типу отопления', heatingTrend);
 
-            // CTA-блок: призыв сделать полный отчет
-            blocksHtml += `
-                <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 14px; padding: 18px 14px 16px 14px; margin-bottom: 18px; box-shadow: 0 2px 8px rgba(102,126,234,0.10); color: #fff; text-align: center;">
-                    <div style="font-size: 18px; font-weight: 800; margin-bottom: 8px;">Хотите узнать больше?</div>
-                    <div style="font-size: 15px; font-weight: 400; margin-bottom: 14px;">Получите <b>полный отчет по объекту</b> — подробный анализ доходности, рисков, налогов, сравнение с альтернативами и профессиональные рекомендации. Всё в одном PDF-документе!</div>
-                    <button class="btn btn-primary" style="width: 100%; font-size: 16px; margin-top: 4px; background: #fff; color: #667eea; border: none; font-weight: 700;" onclick="showFullReportStub()">Получить полный отчет</button>
-                </div>
-            `;
+                // CTA-блок: призыв сделать полный отчет
+                blocksHtml += `
+                    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 14px; padding: 18px 14px 16px 14px; margin-bottom: 18px; box-shadow: 0 2px 8px rgba(102,126,234,0.10); color: #fff; text-align: center;">
+                        <div style="font-size: 18px; font-weight: 800; margin-bottom: 8px;">Хотите узнать больше?</div>
+                        <div style="font-size: 15px; font-weight: 400; margin-bottom: 14px;">Получите <b>полный отчет по объекту</b> — подробный анализ доходности, рисков, налогов, сравнение с альтернативами и профессиональные рекомендации. Всё в одном PDF-документе!</div>
+                        <button class="btn btn-primary" style="width: 100%; font-size: 16px; margin-top: 4px; background: #fff; color: #667eea; border: none; font-weight: 700;" onclick="showFullReportStub()">Получить полный отчет</button>
+                    </div>
+                `;
 
-            // Кнопки
-            const buttonsHtml = `
-                <div class="btn-row" style="margin-bottom:10px; justify-content: center; gap: 16px;">
-                    <button class="btn btn-primary" style="width:48%;min-width:140px;" onclick="copyReportToClipboard()">Скопировать данные</button>
-                </div>
-            `;
-            document.getElementById('reportResult').innerHTML = headerHtml + blocksHtml + buttonsHtml;
+                // Кнопки
+                const buttonsHtml = `
+                    <div class="btn-row" style="margin-bottom:10px; justify-content: center; gap: 16px;">
+                        <button class="btn btn-primary" style="width:48%;min-width:140px;" onclick="copyReportToClipboard()">Скопировать данные</button>
+                    </div>
+                `;
+                document.getElementById('reportResult').innerHTML = headerHtml + blocksHtml + buttonsHtml;
+            });
         }
 
         function copyReportToClipboard() {
@@ -1405,6 +1428,45 @@
                 return telegramId;
             }
             return localStorage.getItem('telegram_id');
+        }
+
+        // Функция для проверки статуса администратора
+        async function checkAdminStatus() {
+            const telegram_id = getTelegramId();
+            if (!telegram_id) {
+                return false;
+            }
+            
+            try {
+                const response = await fetch('/api/check_admin_status', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ telegram_id })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    return data.is_admin || false;
+                }
+            } catch (error) {
+                console.error('Ошибка проверки статуса админа:', error);
+            }
+            
+            return false;
+        }
+
+        // Функция для обработки клика по кнопке показа кодов локаций
+        function toggleLocationCodes() {
+            const content = document.getElementById('location-codes-content');
+            const button = document.getElementById('show-location-codes');
+            
+            if (content.style.display === 'none') {
+                content.style.display = 'block';
+                button.textContent = 'Скрыть коды локаций';
+            } else {
+                content.style.display = 'none';
+                button.textContent = 'Показать коды локаций';
+            }
         }
 
         // Инициализация

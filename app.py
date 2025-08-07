@@ -231,6 +231,7 @@ def api_user():
             'balance': user.get('balance', 0),
             'telegram_id': user.get('telegram_id'),
             'user_status': user.get('user_status', None),
+            'user_states': user.get('user_states', None),
         })
     else:
         # Новый пользователь
@@ -329,6 +330,35 @@ def api_menu():
     if language not in locales:
         language = 'en'
     return jsonify({'menu': locales[language]['menu']})
+
+@app.route('/api/check_admin_status', methods=['POST'])
+def api_check_admin_status():
+    """Проверка статуса администратора пользователя"""
+    data = request.json or {}
+    telegram_id_raw = data.get('telegram_id')
+    if telegram_id_raw is None:
+        return jsonify({'error': 'telegram_id required'}), 400
+    try:
+        telegram_id = int(telegram_id_raw)
+    except (TypeError, ValueError):
+        return jsonify({'error': 'Invalid telegram_id'}), 400
+    
+    try:
+        # Проверяем пользователя в базе
+        user_result = supabase.table('users').select('user_states').eq('telegram_id', telegram_id).execute()
+        if user_result.data and len(user_result.data) > 0:
+            user_states = user_result.data[0].get('user_states')
+            is_admin = user_states == 'admin' if user_states else False
+            return jsonify({
+                'success': True,
+                'is_admin': is_admin,
+                'user_states': user_states
+            })
+        else:
+            return jsonify({'error': 'User not found'}), 404
+    except Exception as e:
+        logger.error(f"Error checking admin status: {e}")
+        return jsonify({'error': 'Internal error'}), 500
 
 @app.route('/api/geocode', methods=['POST'])
 def api_geocode():
@@ -654,10 +684,10 @@ def format_simple_report(address, bedrooms, price, location_codes, language='en'
         "",
     ]
     
-            # Добавляем коды локаций
+    # Добавляем коды локаций (только для админов)
     if location_codes:
         report_lines.extend([
-            "=== КОДЫ ЛОКАЦИЙ ===",
+            "=== КОДЫ ЛОКАЦИЙ (только для администраторов) ===",
             f"Страна: {location_codes.get('country_name', 'н/д')} (ID: {location_codes.get('country_id', 'н/д')})",
             f"Город: {location_codes.get('city_name', 'н/д')} (ID: {location_codes.get('city_id', 'н/д')})",
             f"Район: {location_codes.get('district_name', 'н/д')} (ID: {location_codes.get('district_id', 'н/д')})",
@@ -666,7 +696,7 @@ def format_simple_report(address, bedrooms, price, location_codes, language='en'
         ])
     else:
         report_lines.extend([
-            "=== КОДЫ ЛОКАЦИЙ ===",
+            "=== КОДЫ ЛОКАЦИЙ (только для администраторов) ===",
             "Локация не найдена в базе данных",
             "",
         ])
@@ -718,56 +748,13 @@ def format_simple_report(address, bedrooms, price, location_codes, language='en'
         "",
     ])
     
-    # Добавляем данные рынка недвижимости
+    # Добавляем новые разделы отчета
     if market_data:
-        report_lines.extend([
-            "=== ДАННЫЕ РЫНКА НЕДВИЖИМОСТИ ===",
-        ])
-        
-        # Данные property_trends
-        if market_data.get('property_trends'):
-            trends = market_data['property_trends']
-            report_lines.extend([
-                "📈 ТРЕНДЫ НЕДВИЖИМОСТИ:",
-                f"Средняя цена продажи: €{trends.get('unit_price_for_sale', 'н/д')}",
-                f"Средняя цена аренды: €{trends.get('unit_price_for_rent', 'н/д')}",
-                f"Количество объектов на продажу: {trends.get('count_for_sale', 'н/д')}",
-                f"Количество объектов в аренду: {trends.get('count_for_rent', 'н/д')}",
-                f"Изменение цены продажи: {trends.get('price_change_sale', 'н/д')}%",
-                f"Изменение цены аренды: {trends.get('price_change_rent', 'н/д')}%",
-                f"Дата тренда: {trends.get('trend_date', 'н/д')}",
-                "",
-            ])
-        
-        # Данные age_data
-        if market_data.get('age_data'):
-            age = market_data['age_data']
-            report_lines.extend([
-                "🏠 ВОЗРАСТ НЕДВИЖИМОСТИ:",
-                f"Средний возраст объектов на продажу: {age.get('average_age_for_sale', 'н/д')} лет",
-                f"Средний возраст объектов в аренду: {age.get('average_age_for_rent', 'н/д')} лет",
-                f"Дата тренда: {age.get('trend_date', 'н/д')}",
-                "",
-            ])
-        
-        # Данные floor_segment_data
-        if market_data.get('floor_segment_data'):
-            floor = market_data['floor_segment_data']
-            report_lines.extend([
-                "🏢 ЭТАЖНОСТЬ:",
-                f"Средняя цена продажи: €{floor.get('unit_price_for_sale', 'н/д')}",
-                f"Средняя цена аренды: €{floor.get('unit_price_for_rent', 'н/д')}",
-                f"Количество объектов на продажу: {floor.get('count_for_sale', 'н/д')}",
-                f"Количество объектов в аренду: {floor.get('count_for_rent', 'н/д')}",
-                f"Дата тренда: {floor.get('trend_date', 'н/д')}",
-                "",
-            ])
-        
-        # Данные general_data
+        # Общий тренд (из таблицы general_data)
         if market_data.get('general_data'):
             general = market_data['general_data']
             report_lines.extend([
-                "📊 ОБЩАЯ СТАТИСТИКА:",
+                "=== ОБЩИЙ ТРЕНД ===",
                 f"Средняя цена продажи: €{general.get('unit_price_for_sale', 'н/д')}",
                 f"Средняя цена аренды: €{general.get('unit_price_for_rent', 'н/д')}",
                 f"Количество объектов на продажу: {general.get('count_for_sale', 'н/д')}",
@@ -778,11 +765,50 @@ def format_simple_report(address, bedrooms, price, location_codes, language='en'
                 "",
             ])
         
-        # Данные heating_data
+        # Тренд по типу объекта (из таблицы house_type_data)
+        if market_data.get('house_type_data'):
+            house_type = market_data['house_type_data']
+            report_lines.extend([
+                "=== ТРЕНД ПО ТИПУ ОБЪЕКТА ===",
+                f"Средняя цена продажи: €{house_type.get('unit_price_for_sale', 'н/д')}",
+                f"Средняя цена аренды: €{house_type.get('unit_price_for_rent', 'н/д')}",
+                f"Количество объектов на продажу: {house_type.get('count_for_sale', 'н/д')}",
+                f"Количество объектов в аренду: {house_type.get('count_for_rent', 'н/д')}",
+                f"Изменение цены продажи: {house_type.get('price_change_sale', 'н/д')}%",
+                f"Изменение цены аренды: {house_type.get('price_change_rent', 'н/д')}%",
+                f"Дата тренда: {house_type.get('trend_date', 'н/д')}",
+                "",
+            ])
+        
+        # Тренд по возрасту объекта (из таблицы age_data)
+        if market_data.get('age_data'):
+            age = market_data['age_data']
+            report_lines.extend([
+                "=== ТРЕНД ПО ВОЗРАСТУ ОБЪЕКТА ===",
+                f"Средний возраст объектов на продажу: {age.get('average_age_for_sale', 'н/д')} лет",
+                f"Средний возраст объектов в аренду: {age.get('average_age_for_rent', 'н/д')} лет",
+                f"Дата тренда: {age.get('trend_date', 'н/д')}",
+                "",
+            ])
+        
+        # Тренд по этажу объекта (из таблицы floor_segment_data)
+        if market_data.get('floor_segment_data'):
+            floor = market_data['floor_segment_data']
+            report_lines.extend([
+                "=== ТРЕНД ПО ЭТАЖУ ОБЪЕКТА ===",
+                f"Средняя цена продажи: €{floor.get('unit_price_for_sale', 'н/д')}",
+                f"Средняя цена аренды: €{floor.get('unit_price_for_rent', 'н/д')}",
+                f"Количество объектов на продажу: {floor.get('count_for_sale', 'н/д')}",
+                f"Количество объектов в аренду: {floor.get('count_for_rent', 'н/д')}",
+                f"Дата тренда: {floor.get('trend_date', 'н/д')}",
+                "",
+            ])
+        
+        # Тренд по типу отопления (из таблицы heating_data)
         if market_data.get('heating_data'):
             heating = market_data['heating_data']
             report_lines.extend([
-                "🔥 ОТОПЛЕНИЕ:",
+                "=== ТРЕНД ПО ТИПУ ОТОПЛЕНИЯ ===",
                 f"Средняя цена продажи: €{heating.get('unit_price_for_sale', 'н/д')}",
                 f"Средняя цена аренды: €{heating.get('unit_price_for_rent', 'н/д')}",
                 f"Количество объектов на продажу: {heating.get('count_for_sale', 'н/д')}",
@@ -3145,7 +3171,8 @@ def get_market_data_by_location_ids(location_codes, target_year=None, target_mon
             'age_data': None,
             'floor_segment_data': None,
             'general_data': None,
-            'heating_data': None
+            'heating_data': None,
+            'house_type_data': None
         }
         
         # Получаем данные из property_trends
@@ -3262,6 +3289,29 @@ def get_market_data_by_location_ids(location_codes, target_year=None, target_mon
                 logger.info("Данные heating_data не найдены")
         except Exception as e:
             logger.error(f"Ошибка получения heating_data: {e}")
+        
+        # Получаем данные из house_type_data
+        try:
+            query = supabase.table('house_type_data').select('*')
+            if location_codes.get('country_id'):
+                query = query.eq('country_id', location_codes['country_id'])
+            if location_codes.get('city_id'):
+                query = query.eq('city_id', location_codes['city_id'])
+            if location_codes.get('district_id'):
+                query = query.eq('district_id', location_codes['district_id'])
+            if location_codes.get('county_id'):
+                query = query.eq('county_id', location_codes['county_id'])
+            
+            result = query.execute()
+            if result.data:
+                # Берем самую свежую запись
+                latest_record = max(result.data, key=lambda x: x.get('trend_date', ''))
+                market_data['house_type_data'] = latest_record
+                logger.info(f"Найдены данные house_type_data: {len(result.data)} записей, выбрана самая свежая: {latest_record.get('trend_date')}")
+            else:
+                logger.info("Данные house_type_data не найдены")
+        except Exception as e:
+            logger.error(f"Ошибка получения house_type_data: {e}")
         
         return market_data
         
