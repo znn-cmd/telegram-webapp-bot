@@ -534,8 +534,19 @@ def api_generate_report():
         if location_components:
             format_simple_report.last_location_components = location_components
         
+        # Проверяем статус администратора
+        is_admin = False
+        if telegram_id:
+            try:
+                user_result = supabase.table('users').select('user_status').eq('telegram_id', telegram_id).execute()
+                if user_result.data and len(user_result.data) > 0:
+                    user_status = user_result.data[0].get('user_status')
+                    is_admin = user_status == 'admin' if user_status else False
+            except Exception as e:
+                logger.error(f"Error checking admin status: {e}")
+        
         # Формируем отчёт в текстовом формате для отображения
-        report_text = format_simple_report(address, bedrooms, price, location_codes, language, market_data)
+        report_text = format_simple_report(address, bedrooms, price, location_codes, language, market_data, is_admin)
         
         # Сохраняем отчет в базу данных (если есть telegram_id)
         if telegram_id:
@@ -686,7 +697,7 @@ def get_location_codes_from_address(address):
         logger.error(f"Error getting location codes: {e}")
         return None
 
-def format_simple_report(address, bedrooms, price, location_codes, language='en', market_data=None):
+def format_simple_report(address, bedrooms, price, location_codes, language='en', market_data=None, is_admin=False):
     """Форматирование простого отчёта с кодами локаций и данными рынка"""
     
     # Форматируем цену
@@ -766,34 +777,31 @@ def format_simple_report(address, bedrooms, price, location_codes, language='en'
             general = market_data['general_data']
             report_lines.extend([
                 "=== ОБЩИЙ ТРЕНД ===",
-                f"Средняя цена продажи: €{general.get('unit_price_for_sale', 'н/д')}",
-                f"Минимальная цена продажи: €{general.get('min_unit_price_for_sale', 'н/д')}",
+                f"Средняя цена продажи, м²: €{general.get('unit_price_for_sale', 'н/д')}",
+                f"Минимальная цена продажи, м²: €{general.get('min_unit_price_for_sale', 'н/д')}",
                 f"Максимальная цена продажи: €{general.get('max_unit_price_for_sale', 'н/д')}",
-                f"Сопоставимая площадь для продажи: {general.get('comparable_area_for_sale', 'н/д')} м²",
+                f"Средняя площадь продажи: {general.get('comparable_area_for_sale', 'н/д')} м²",
                 f"Количество объектов на продажу: {general.get('count_for_sale', 'н/д')}",
-                f"Средняя цена аренды: €{general.get('unit_price_for_rent', 'н/д')}",
-                f"Минимальная цена аренды: €{general.get('min_unit_price_for_rent', 'н/д')}",
-                f"Максимальная цена аренды: €{general.get('max_unit_price_for_rent', 'н/д')}",
-                f"Сопоставимая площадь для аренды: {general.get('comparable_area_for_rent', 'н/д')} м²",
+                f"Средняя цена аренды, м²: €{general.get('unit_price_for_rent', 'н/д')}",
+                f"Минимальная цена аренды, м²: €{general.get('min_unit_price_for_rent', 'н/д')}",
+                f"Максимальная цена аренды, м²: €{general.get('max_unit_price_for_rent', 'н/д')}",
+                f"Средняя площадь аренды: {general.get('comparable_area_for_rent', 'н/д')} м²",
                 f"Количество объектов в аренду: {general.get('count_for_rent', 'н/д')}",
-                f"Цена для продажи: €{general.get('price_for_sale', 'н/д')}",
-                f"Цена для аренды: €{general.get('price_for_rent', 'н/д')}",
-                f"Изменение цены продажи: {general.get('price_change_sale', 'н/д')}%",
-                f"Изменение цены аренды: {general.get('price_change_rent', 'н/д')}%",
-                f"Изменение запасов продажи: {general.get('stock_change_sale', 'н/д')}%",
-                f"Изменение запасов аренды: {general.get('stock_change_rent', 'н/д')}%",
-                f"Коэффициент запасов продажи: {general.get('stock_ratio_sale', 'н/д')}",
-                f"Коэффициент запасов аренды: {general.get('stock_ratio_rent', 'н/д')}",
-                f"Средний возраст для продажи: {general.get('average_age_for_sale', 'н/д')} лет",
-                f"Средний возраст для аренды: {general.get('average_age_for_rent', 'н/д')} лет",
+                f"Цена для продажи, средняя: €{general.get('price_for_sale', 'н/д')}",
+                f"Цена для аренды, средняя: €{general.get('price_for_rent', 'н/д')}",
+                f"Средний возраст объекта для продажи: {general.get('average_age_for_sale', 'н/д')} лет",
+                f"Средний возраст объекта для аренды: {general.get('average_age_for_rent', 'н/д')} лет",
                 f"Период листинга для продажи: {general.get('listing_period_for_sale', 'н/д')} дней",
                 f"Период листинга для аренды: {general.get('listing_period_for_rent', 'н/д')} дней",
-                f"Количество объектов: {general.get('property_count', 'н/д')}",
                 f"Доходность: {general.get('yield', 'н/д')}%",
-                f"Дата тренда: {general.get('trend_date', 'н/д')}",
                 "",
             ])
-        
+            
+            # Добавляем дату тренда только для администраторов
+            if is_admin:
+                report_lines.append(f"Дата тренда: {general.get('trend_date', 'н/д')}")
+                report_lines.append("")
+    
         # Тренд по количеству спален (из таблицы house_type_data)
         if market_data.get('house_type_data'):
             house_type_data = market_data['house_type_data']
@@ -819,19 +827,11 @@ def format_simple_report(address, bedrooms, price, location_codes, language='en'
                         f"Количество объектов в аренду: {record.get('count_for_rent', 'н/д')}",
                         f"Цена для продажи: €{record.get('price_for_sale', 'н/д')}",
                         f"Цена для аренды: €{record.get('price_for_rent', 'н/д')}",
-                        f"Изменение цены продажи: {record.get('price_change_sale', 'н/д')}%",
-                        f"Изменение цены аренды: {record.get('price_change_rent', 'н/д')}%",
-                        f"Изменение запасов продажи: {record.get('stock_change_sale', 'н/д')}%",
-                        f"Изменение запасов аренды: {record.get('stock_change_rent', 'н/д')}%",
-                        f"Коэффициент запасов продажи: {record.get('stock_ratio_sale', 'н/д')}",
-                        f"Коэффициент запасов аренды: {record.get('stock_ratio_rent', 'н/д')}",
-                        f"Средний возраст для продажи: {record.get('average_age_for_sale', 'н/д')} лет",
-                        f"Средний возраст для аренды: {record.get('average_age_for_rent', 'н/д')} лет",
+                        f"Средний возраст объекта для продажи: {record.get('average_age_for_sale', 'н/д')} лет",
+                        f"Средний возраст объекта для аренды: {record.get('average_age_for_rent', 'н/д')} лет",
                         f"Период листинга для продажи: {record.get('listing_period_for_sale', 'н/д')} дней",
                         f"Период листинга для аренды: {record.get('listing_period_for_rent', 'н/д')} дней",
-                        f"Количество объектов: {record.get('property_count', 'н/д')}",
                         f"Доходность: {record.get('yield', 'н/д')}%",
-                        f"Дата тренда: {record.get('trend_date', 'н/д')}",
                         "",
                     ])
             else:
@@ -851,19 +851,11 @@ def format_simple_report(address, bedrooms, price, location_codes, language='en'
                     f"Количество объектов в аренду: {house_type_data.get('count_for_rent', 'н/д')}",
                     f"Цена для продажи: €{house_type_data.get('price_for_sale', 'н/д')}",
                     f"Цена для аренды: €{house_type_data.get('price_for_rent', 'н/д')}",
-                    f"Изменение цены продажи: {house_type_data.get('price_change_sale', 'н/д')}%",
-                    f"Изменение цены аренды: {house_type_data.get('price_change_rent', 'н/д')}%",
-                    f"Изменение запасов продажи: {house_type_data.get('stock_change_sale', 'н/д')}%",
-                    f"Изменение запасов аренды: {house_type_data.get('stock_change_rent', 'н/д')}%",
-                    f"Коэффициент запасов продажи: {house_type_data.get('stock_ratio_sale', 'н/д')}",
-                    f"Коэффициент запасов аренды: {house_type_data.get('stock_ratio_rent', 'н/д')}",
-                    f"Средний возраст для продажи: {house_type_data.get('average_age_for_sale', 'н/д')} лет",
-                    f"Средний возраст для аренды: {house_type_data.get('average_age_for_rent', 'н/д')} лет",
+                    f"Средний возраст объекта для продажи: {house_type_data.get('average_age_for_sale', 'н/д')} лет",
+                    f"Средний возраст объекта для аренды: {house_type_data.get('average_age_for_rent', 'н/д')} лет",
                     f"Период листинга для продажи: {house_type_data.get('listing_period_for_sale', 'н/д')} дней",
                     f"Период листинга для аренды: {house_type_data.get('listing_period_for_rent', 'н/д')} дней",
-                    f"Количество объектов: {house_type_data.get('property_count', 'н/д')}",
                     f"Доходность: {house_type_data.get('yield', 'н/д')}%",
-                    f"Дата тренда: {house_type_data.get('trend_date', 'н/д')}",
                     "",
                 ])
         
@@ -894,17 +886,9 @@ def format_simple_report(address, bedrooms, price, location_codes, language='en'
                         f"Количество объектов в аренду: {record.get('count_for_rent', 'н/д')}",
                         f"Цена для продажи: €{record.get('price_for_sale', 'н/д')}",
                         f"Цена для аренды: €{record.get('price_for_rent', 'н/д')}",
-                        f"Изменение цены продажи: {record.get('price_change_sale', 'н/д')}%",
-                        f"Изменение цены аренды: {record.get('price_change_rent', 'н/д')}%",
-                        f"Изменение запасов продажи: {record.get('stock_change_sale', 'н/д')}%",
-                        f"Изменение запасов аренды: {record.get('stock_change_rent', 'н/д')}%",
-                        f"Коэффициент запасов продажи: {record.get('stock_ratio_sale', 'н/д')}",
-                        f"Коэффициент запасов аренды: {record.get('stock_ratio_rent', 'н/д')}",
                         f"Период листинга для продажи: {record.get('listing_period_for_sale', 'н/д')} дней",
                         f"Период листинга для аренды: {record.get('listing_period_for_rent', 'н/д')} дней",
-                        f"Количество объектов: {record.get('property_count', 'н/д')}",
                         f"Доходность: {record.get('yield', 'н/д')}%",
-                        f"Дата тренда: {record.get('trend_date', 'н/д')}",
                         "",
                     ])
             else:
@@ -926,17 +910,9 @@ def format_simple_report(address, bedrooms, price, location_codes, language='en'
                     f"Количество объектов в аренду: {age_data.get('count_for_rent', 'н/д')}",
                     f"Цена для продажи: €{age_data.get('price_for_sale', 'н/д')}",
                     f"Цена для аренды: €{age_data.get('price_for_rent', 'н/д')}",
-                    f"Изменение цены продажи: {age_data.get('price_change_sale', 'н/д')}%",
-                    f"Изменение цены аренды: {age_data.get('price_change_rent', 'н/д')}%",
-                    f"Изменение запасов продажи: {age_data.get('stock_change_sale', 'н/д')}%",
-                    f"Изменение запасов аренды: {age_data.get('stock_change_rent', 'н/д')}%",
-                    f"Коэффициент запасов продажи: {age_data.get('stock_ratio_sale', 'н/д')}",
-                    f"Коэффициент запасов аренды: {age_data.get('stock_ratio_rent', 'н/д')}",
                     f"Период листинга для продажи: {age_data.get('listing_period_for_sale', 'н/д')} дней",
                     f"Период листинга для аренды: {age_data.get('listing_period_for_rent', 'н/д')} дней",
-                    f"Количество объектов: {age_data.get('property_count', 'н/д')}",
                     f"Доходность: {age_data.get('yield', 'н/д')}%",
-                    f"Дата тренда: {age_data.get('trend_date', 'н/д')}",
                     "",
                 ])
         
@@ -965,19 +941,11 @@ def format_simple_report(address, bedrooms, price, location_codes, language='en'
                         f"Количество объектов в аренду: {record.get('count_for_rent', 'н/д')}",
                         f"Цена для продажи: €{record.get('price_for_sale', 'н/д')}",
                         f"Цена для аренды: €{record.get('price_for_rent', 'н/д')}",
-                        f"Изменение цены продажи: {record.get('price_change_sale', 'н/д')}%",
-                        f"Изменение цены аренды: {record.get('price_change_rent', 'н/д')}%",
-                        f"Изменение запасов продажи: {record.get('stock_change_sale', 'н/д')}%",
-                        f"Изменение запасов аренды: {record.get('stock_change_rent', 'н/д')}%",
-                        f"Коэффициент запасов продажи: {record.get('stock_ratio_sale', 'н/д')}",
-                        f"Коэффициент запасов аренды: {record.get('stock_ratio_rent', 'н/д')}",
-                        f"Средний возраст для продажи: {record.get('average_age_for_sale', 'н/д')} лет",
-                        f"Средний возраст для аренды: {record.get('average_age_for_rent', 'н/д')} лет",
+                        f"Средний возраст объекта для продажи: {record.get('average_age_for_sale', 'н/д')} лет",
+                        f"Средний возраст объекта для аренды: {record.get('average_age_for_rent', 'н/д')} лет",
                         f"Период листинга для продажи: {record.get('listing_period_for_sale', 'н/д')} дней",
                         f"Период листинга для аренды: {record.get('listing_period_for_rent', 'н/д')} дней",
-                        f"Количество объектов: {record.get('property_count', 'н/д')}",
                         f"Доходность: {record.get('yield', 'н/д')}%",
-                        f"Дата тренда: {record.get('trend_date', 'н/д')}",
                         "",
                     ])
             else:
@@ -997,19 +965,11 @@ def format_simple_report(address, bedrooms, price, location_codes, language='en'
                     f"Количество объектов в аренду: {floor_data.get('count_for_rent', 'н/д')}",
                     f"Цена для продажи: €{floor_data.get('price_for_sale', 'н/д')}",
                     f"Цена для аренды: €{floor_data.get('price_for_rent', 'н/д')}",
-                    f"Изменение цены продажи: {floor_data.get('price_change_sale', 'н/д')}%",
-                    f"Изменение цены аренды: {floor_data.get('price_change_rent', 'н/д')}%",
-                    f"Изменение запасов продажи: {floor_data.get('stock_change_sale', 'н/д')}%",
-                    f"Изменение запасов аренды: {floor_data.get('stock_change_rent', 'н/д')}%",
-                    f"Коэффициент запасов продажи: {floor_data.get('stock_ratio_sale', 'н/д')}",
-                    f"Коэффициент запасов аренды: {floor_data.get('stock_ratio_rent', 'н/д')}",
-                    f"Средний возраст для продажи: {floor_data.get('average_age_for_sale', 'н/д')} лет",
-                    f"Средний возраст для аренды: {floor_data.get('average_age_for_rent', 'н/д')} лет",
+                    f"Средний возраст объекта для продажи: {floor_data.get('average_age_for_sale', 'н/д')} лет",
+                    f"Средний возраст объекта для аренды: {floor_data.get('average_age_for_rent', 'н/д')} лет",
                     f"Период листинга для продажи: {floor_data.get('listing_period_for_sale', 'н/д')} дней",
                     f"Период листинга для аренды: {floor_data.get('listing_period_for_rent', 'н/д')} дней",
-                    f"Количество объектов: {floor_data.get('property_count', 'н/д')}",
                     f"Доходность: {floor_data.get('yield', 'н/д')}%",
-                    f"Дата тренда: {floor_data.get('trend_date', 'н/д')}",
                     "",
                 ])
         
@@ -1038,19 +998,11 @@ def format_simple_report(address, bedrooms, price, location_codes, language='en'
                         f"Количество объектов в аренду: {record.get('count_for_rent', 'н/д')}",
                         f"Цена для продажи: €{record.get('price_for_sale', 'н/д')}",
                         f"Цена для аренды: €{record.get('price_for_rent', 'н/д')}",
-                        f"Изменение цены продажи: {record.get('price_change_sale', 'н/д')}%",
-                        f"Изменение цены аренды: {record.get('price_change_rent', 'н/д')}%",
-                        f"Изменение запасов продажи: {record.get('stock_change_sale', 'н/д')}%",
-                        f"Изменение запасов аренды: {record.get('stock_change_rent', 'н/д')}%",
-                        f"Коэффициент запасов продажи: {record.get('stock_ratio_sale', 'н/д')}",
-                        f"Коэффициент запасов аренды: {record.get('stock_ratio_rent', 'н/д')}",
-                        f"Средний возраст для продажи: {record.get('average_age_for_sale', 'н/д')} лет",
-                        f"Средний возраст для аренды: {record.get('average_age_for_rent', 'н/д')} лет",
+                        f"Средний возраст объекта для продажи: {record.get('average_age_for_sale', 'н/д')} лет",
+                        f"Средний возраст объекта для аренды: {record.get('average_age_for_rent', 'н/д')} лет",
                         f"Период листинга для продажи: {record.get('listing_period_for_sale', 'н/д')} дней",
                         f"Период листинга для аренды: {record.get('listing_period_for_rent', 'н/д')} дней",
-                        f"Количество объектов: {record.get('property_count', 'н/д')}",
                         f"Доходность: {record.get('yield', 'н/д')}%",
-                        f"Дата тренда: {record.get('trend_date', 'н/д')}",
                         "",
                     ])
             else:
@@ -1070,19 +1022,11 @@ def format_simple_report(address, bedrooms, price, location_codes, language='en'
                     f"Количество объектов в аренду: {heating_data.get('count_for_rent', 'н/д')}",
                     f"Цена для продажи: €{heating_data.get('price_for_sale', 'н/д')}",
                     f"Цена для аренды: €{heating_data.get('price_for_rent', 'н/д')}",
-                    f"Изменение цены продажи: {heating_data.get('price_change_sale', 'н/д')}%",
-                    f"Изменение цены аренды: {heating_data.get('price_change_rent', 'н/д')}%",
-                    f"Изменение запасов продажи: {heating_data.get('stock_change_sale', 'н/д')}%",
-                    f"Изменение запасов аренды: {heating_data.get('stock_change_rent', 'н/д')}%",
-                    f"Коэффициент запасов продажи: {heating_data.get('stock_ratio_sale', 'н/д')}",
-                    f"Коэффициент запасов аренды: {heating_data.get('stock_ratio_rent', 'н/д')}",
-                    f"Средний возраст для продажи: {heating_data.get('average_age_for_sale', 'н/д')} лет",
-                    f"Средний возраст для аренды: {heating_data.get('average_age_for_rent', 'н/д')} лет",
+                    f"Средний возраст объекта для продажи: {heating_data.get('average_age_for_sale', 'н/д')} лет",
+                    f"Средний возраст объекта для аренды: {heating_data.get('average_age_for_rent', 'н/д')} лет",
                     f"Период листинга для продажи: {heating_data.get('listing_period_for_sale', 'н/д')} дней",
                     f"Период листинга для аренды: {heating_data.get('listing_period_for_rent', 'н/д')} дней",
-                    f"Количество объектов: {heating_data.get('property_count', 'н/д')}",
                     f"Доходность: {heating_data.get('yield', 'н/д')}%",
-                    f"Дата тренда: {heating_data.get('trend_date', 'н/д')}",
                     "",
                 ])
     else:
