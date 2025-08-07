@@ -658,9 +658,62 @@
             // Парсим отчет по блокам
             const lines = reportText.split('\n');
             function block(title, contentArr) {
+                // Добавляем логику для группировки связанных данных
+                let groupedContent = [];
+                let currentGroup = [];
+                
+                for (let i = 0; i < contentArr.length; i++) {
+                    const line = contentArr[i];
+                    
+                    // Если строка содержит "---" или начинается с определенных ключевых слов, это начало новой группы
+                    if (line.includes('---') || line.startsWith('Количество спален:') || line.startsWith('Возраст здания:') || line.startsWith('Этаж объекта:') || line.startsWith('Система отопления:')) {
+                        if (currentGroup.length > 0) {
+                            groupedContent.push(currentGroup);
+                            currentGroup = [];
+                        }
+                        currentGroup.push(line);
+                    } else if (line.trim() === '') {
+                        // Пустая строка - разделитель
+                        if (currentGroup.length > 0) {
+                            groupedContent.push(currentGroup);
+                            currentGroup = [];
+                        }
+                    } else {
+                        currentGroup.push(line);
+                    }
+                }
+                
+                // Добавляем последнюю группу
+                if (currentGroup.length > 0) {
+                    groupedContent.push(currentGroup);
+                }
+                
+                let contentHtml = '';
+                groupedContent.forEach((group, index) => {
+                    if (group.length > 0) {
+                        // Добавляем группу с отступом
+                        contentHtml += `<div style='margin-bottom:${index < groupedContent.length - 1 ? '12px' : '0'};'>`;
+                        group.forEach((line, lineIndex) => {
+                            // Добавляем дополнительный отступ для заголовков групп
+                            const isGroupHeader = line.includes('---') || line.startsWith('Количество спален:') || line.startsWith('Возраст здания:') || line.startsWith('Этаж объекта:') || line.startsWith('Система отопления:');
+                            const marginBottom = isGroupHeader ? '8px' : '4px';
+                            const fontWeight = isGroupHeader ? '600' : '400';
+                            const color = isGroupHeader ? '#667eea' : '#222';
+                            
+                            contentHtml += `<div style='font-size:15px;color:${color};margin-bottom:${marginBottom};font-weight:${fontWeight};'>${line}</div>`;
+                        });
+                        contentHtml += '</div>';
+                        
+                        // Добавляем разделитель между группами (кроме последней)
+                        if (index < groupedContent.length - 1) {
+                            contentHtml += `<div style='height:1px;background:#e0e0e0;margin:8px 0;'></div>`;
+                        }
+                    }
+                });
+                
                 return `<div style='background:#f8f9fa;border-radius:12px;padding:14px 12px 10px 12px;margin-bottom:14px;box-shadow:0 2px 8px rgba(102,126,234,0.06);'>
-                    <div style='font-size:17px;font-weight:700;color:#667eea;margin-bottom:8px;'>${title}</div>
-                    ${contentArr.map(line => `<div style='font-size:15px;color:#222;margin-bottom:7px;'>${line}</div>`).join('')}
+                    <div style='font-size:17px;font-weight:700;color:#667eea;margin-bottom:12px;'>${title}</div>
+                    ${contentHtml}
                 </div>`;
             }
             
@@ -692,7 +745,12 @@
                     console.log('✅ Показываем коды локаций для админа');
                     blocksHtml += `<div style='background:#f8f9fa;border-radius:12px;padding:14px 12px 10px 12px;margin-bottom:14px;box-shadow:0 2px 8px rgba(102,126,234,0.06);'>
                         <div style='font-size:17px;font-weight:700;color:#667eea;margin-bottom:8px;'>Коды локаций (только для администраторов)</div>
-                        ${locationCodes.map(line => `<div style='font-size:15px;color:#222;margin-bottom:7px;'>${line}</div>`).join('')}
+                        ${locationCodes.map((line, index) => {
+                            const isHeader = line.includes('Страна:') || line.includes('Город:') || line.includes('Район:') || line.includes('Округ:');
+                            const marginBottom = isHeader ? '8px' : '4px';
+                            const fontWeight = isHeader ? '600' : '400';
+                            return `<div style='font-size:15px;color:#222;margin-bottom:${marginBottom};font-weight:${fontWeight};'>${line}</div>`;
+                        }).join('')}
                     </div>`;
                 } else {
                     console.log('❌ Не показываем коды локаций:');
@@ -1120,8 +1178,7 @@
             html += `<div style='font-size:17px;font-weight:700;color:#667eea;margin-bottom:12px;'>Информация об объекте</div>`;
             html += `<table style='width:100%;font-size:15px;'><tr><td style='padding:4px 0;'><b>Адрес:</b></td><td style='padding:4px 0;'>${report.object.address}</td></tr>`;
             html += `<tr><td style='padding:4px 0;'><b>Спален:</b></td><td style='padding:4px 0;'>${report.object.bedrooms}</td></tr>`;
-            html += `<tr><td style='padding:4px 0;'><b>Цена объекта:</b></td><td style='padding:4px 0;'>€${Number(report.object.purchase_price).toLocaleString('ru-RU')}</td></tr>`;
-            html += `<tr><td style='padding:4px 0;'><b>Средняя цена за м²:</b></td><td style='padding:4px 0;'>€${Number(report.object.avg_price_per_sqm).toLocaleString('ru-RU')}</td></tr></table>`;
+            html += `<tr><td style='padding:4px 0;'><b>Цена объекта:</b></td><td style='padding:4px 0;'>€${Number(report.object.purchase_price).toLocaleString('ru-RU')}</td></tr></table>`;
             html += `</div>`;
             
             // Блок: ROI

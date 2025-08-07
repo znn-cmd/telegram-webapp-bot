@@ -21,6 +21,25 @@ supabase: Client = create_client(supabase_url, supabase_key)
 # CurrencyLayer API ключ
 CURRENCYLAYER_API_KEY = "c61dddb55d93e77ce5a2c8b91fb22694"
 
+def get_latest_currency_rate():
+    """
+    Получает последнюю доступную запись курса валют из базы данных.
+    
+    Returns:
+        dict: Последняя запись курса валют или None если нет записей
+    """
+    try:
+        result = supabase.table('currency').select('*').order('created_at', desc=True).limit(1).execute()
+        if result.data and len(result.data) > 0:
+            logger.info(f"✅ Используем последнюю доступную запись курса валют: {result.data[0]}")
+            return result.data[0]
+        else:
+            logger.warning("⚠️ Нет доступных записей курса валют в базе данных")
+            return None
+    except Exception as e:
+        logger.error(f"❌ Ошибка получения последней записи курса валют: {e}")
+        return None
+
 def get_currency_rate_for_date(target_date=None):
     """
     Получает курс валюты для указанной даты из таблицы currency.
@@ -53,7 +72,7 @@ def get_currency_rate_for_date(target_date=None):
         
     except Exception as e:
         logger.error(f"❌ Ошибка получения курса валют: {e}")
-        return None
+        return get_latest_currency_rate()
 
 def fetch_and_save_currency_rates(target_date=None):
     """
@@ -86,13 +105,15 @@ def fetch_and_save_currency_rates(target_date=None):
         
         if response.status_code != 200:
             logger.error(f"❌ Ошибка API currencylayer.com: {response.status_code} - {response.text}")
-            return None
+            # Если API недоступен, используем последнюю доступную запись
+            return get_latest_currency_rate()
         
         data = response.json()
         
         if not data.get('success'):
             logger.error(f"❌ Ошибка currencylayer.com API: {data.get('error', {}).get('info', 'Unknown error')}")
-            return None
+            # Если API недоступен, используем последнюю доступную запись
+            return get_latest_currency_rate()
         
         # Извлекаем курсы валют
         quotes = data.get('quotes', {})
@@ -110,14 +131,20 @@ def fetch_and_save_currency_rates(target_date=None):
         
         # Сохраняем в базу данных
         logger.info(f"💾 Сохраняем курсы валют в базу: {currency_data}")
-        supabase.table('currency').insert(currency_data).execute()
+        try:
+            supabase.table('currency').insert(currency_data).execute()
+            logger.info(f"✅ Курсы валют успешно получены и сохранены для {date_str}")
+        except Exception as e:
+            logger.warning(f"⚠️ Не удалось сохранить в базу: {e}")
+            # Возвращаем данные даже если сохранение не удалось
+            return currency_data
         
-        logger.info(f"✅ Курсы валют успешно получены и сохранены для {date_str}")
         return currency_data
         
     except Exception as e:
         logger.error(f"❌ Ошибка получения курсов валют с currencylayer.com: {e}")
-        return None
+        # Используем последнюю доступную запись
+        return get_latest_currency_rate()
 
 def convert_turkish_data_to_eur(data, currency_rate):
     """
