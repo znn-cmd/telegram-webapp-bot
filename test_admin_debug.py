@@ -29,10 +29,12 @@ def test_admin_status():
             
             if response.status_code == 200:
                 result = response.json()
+                print(f"📊 Полный ответ: {result}")
                 if result.get('is_admin'):
                     print("✅ Пользователь является администратором")
                 else:
                     print("❌ Пользователь НЕ является администратором")
+                    print(f"💡 user_status: {result.get('user_status', 'не указан')}")
             else:
                 print("❌ Ошибка запроса")
                 

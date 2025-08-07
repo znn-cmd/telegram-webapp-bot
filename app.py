@@ -231,7 +231,6 @@ def api_user():
             'balance': user.get('balance', 0),
             'telegram_id': user.get('telegram_id'),
             'user_status': user.get('user_status', None),
-            'user_states': user.get('user_states', None),
         })
     else:
         # Новый пользователь
@@ -350,18 +349,19 @@ def api_check_admin_status():
     try:
         # Проверяем пользователя в базе
         logger.info(f"🔍 Поиск пользователя в базе для telegram_id: {telegram_id}")
-        user_result = supabase.table('users').select('user_states').eq('telegram_id', telegram_id).execute()
+        user_result = supabase.table('users').select('user_status').eq('telegram_id', telegram_id).execute()
         
         logger.info(f"📊 Результат поиска: {len(user_result.data) if user_result.data else 0} записей")
         
         if user_result.data and len(user_result.data) > 0:
-            user_states = user_result.data[0].get('user_states')
-            is_admin = user_states == 'admin' if user_states else False
-            logger.info(f"👤 Пользователь найден: user_states={user_states}, is_admin={is_admin}")
+            user_status = user_result.data[0].get('user_status')
+            is_admin = user_status == 'admin' if user_status else False
+            logger.info(f"👤 Пользователь найден: user_status={user_status}, is_admin={is_admin}")
+            logger.info(f"📋 Проверяем user_status='{user_status}' == 'admin' = {user_status == 'admin'}")
             return jsonify({
                 'success': True,
                 'is_admin': is_admin,
-                'user_states': user_states
+                'user_status': user_status
             })
         else:
             logger.warning(f"❌ Пользователь не найден для telegram_id: {telegram_id}")
