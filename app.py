@@ -2657,13 +2657,13 @@ def api_send_saved_report_pdf():
                 if trends_data:
                     if trends_data.get('unit_price_for_sale'):
                         pdf.cell(0, 6, f"Средняя цена за м² (продажа): €{trends_data['unit_price_for_sale']:,.2f}", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-            else:
+                    else:
                         pdf.cell(0, 6, "Средняя цена за м² (продажа): н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
                     
                     if trends_data.get('price_change_sale'):
                         change_percent = trends_data['price_change_sale'] * 100
                         pdf.cell(0, 6, f"Изменение цен (продажа): {change_percent:+.2f}%", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-        else:
+                    else:
                         pdf.cell(0, 6, "Изменение цен (продажа): н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
                     
                     if trends_data.get('listing_period_for_sale'):
@@ -2855,7 +2855,7 @@ def api_admin_balance_100():
     try:
         supabase.table('users').update({'balance': 100}).eq('telegram_id', telegram_id).execute()
         return jsonify({'success': True, 'balance': 100})
-            except Exception as e:
+    except Exception as e:
         return jsonify({'error': str(e)}), 500
 
 @app.route('/api/admin_users_stats', methods=['GET'])
@@ -3226,7 +3226,7 @@ def api_tariffs():
                 'name': t.get('name'),
             })
         return jsonify({'tariffs': tariffs})
-            except Exception as e:
+    except Exception as e:
         logger.error(f"Error loading tariffs: {e}")
         return jsonify({'tariffs': []}), 500
 
