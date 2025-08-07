@@ -66,23 +66,6 @@ WEBAPP_URL = "https://aaadvisor-zaicevn.amvera.io/webapp"
 # Google Maps API ключ
 GOOGLE_MAPS_API_KEY = "AIzaSyBrDkDpNKNAIyY147MQ78hchBkeyCAxhEw"
 
-# CurrencyLayer API ключ
-CURRENCYLAYER_API_KEY = "c61dddb55d93e77ce5a2c8b91fb22694"
-
-# Импорт функций для работы с валютой
-try:
-    from currency_functions_v2 import (
-        get_currency_rate_for_date,
-        convert_turkish_data_to_eur,
-        is_turkish_location,
-        get_latest_currency_rate
-    )
-    CURRENCY_FUNCTIONS_AVAILABLE = True
-    logger.info("✅ Функции валютных курсов загружены успешно")
-except ImportError as e:
-    CURRENCY_FUNCTIONS_AVAILABLE = False
-    logger.warning(f"⚠️ Функции валютных курсов недоступны: {e}")
-
 # async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 #     """Обработчик команды /start"""
 #     user = update.effective_user
@@ -389,61 +372,72 @@ def api_check_admin_status():
 
 @app.route('/api/geocode', methods=['POST'])
 def api_geocode():
-    """Геокодинг адреса через Nominatim API с fallback на Google Maps API"""
+    """Геокодинг адреса через Google Maps API с извлечением структурированных данных"""
     data = request.json or {}
     address = data.get('address')
     if not address:
         return jsonify({'error': 'Address required'}), 400
     
-    # Сначала пробуем Nominatim API (более надежный на серверах)
     try:
-        nominatim_data = get_nominatim_location(address)
-        if nominatim_data and nominatim_data.get('lat') and nominatim_data.get('lon'):
-            logger.info(f"✅ Успешно получены данные через Nominatim: {nominatim_data}")
-            
-            # Создаем структурированные данные из Nominatim
-            location_components = {
-                'country': nominatim_data.get('country'),
-                'country_code': nominatim_data.get('country_code'),
-                'city': nominatim_data.get('city'),
-                'district': nominatim_data.get('district'),
-                'county': nominatim_data.get('county'),
-                'postal_code': nominatim_data.get('postal_code'),
-                'nominatim_data': nominatim_data
-            }
-            
-            # Пытаемся найти коды локаций в базе данных
-            location_codes = find_location_codes_from_components(location_components)
-            
-            return jsonify({
-                'success': True,
-                'lat': float(nominatim_data['lat']),
-                'lng': float(nominatim_data['lon']),
-                'formatted_address': nominatim_data.get('display_name', address),
-                'location_components': location_components,
-                'location_codes': location_codes,
-                'source': 'nominatim'
-            })
-    except Exception as e:
-        logger.error(f"Nominatim geocoding error: {e}")
-    
-    # Fallback на Google Maps API (если доступен)
-    try:
-        logger.info("🔄 Пробуем Google Maps API как fallback...")
+        # Запрос к Google Maps Geocoding API
         url = f"https://maps.googleapis.com/maps/api/geocode/json"
         params = {
             'address': address,
             'key': GOOGLE_MAPS_API_KEY
         }
-        response = requests.get(url, params=params, timeout=10)
+        response = requests.get(url, params=params)
         result = response.json()
         
         if result['status'] == 'OK' and result['results']:
             location = result['results'][0]['geometry']['location']
             formatted_address = result['results'][0]['formatted_address']
             
+            # Детальное логирование ответа Google Places API
+            logger.info("=" * 60)
+            logger.info("🔍 ДЕТАЛЬНЫЙ АНАЛИЗ ОТВЕТА GOOGLE PLACES API")
+            logger.info("=" * 60)
+            logger.info(f"Оригинальный адрес: {address}")
+            logger.info(f"Formatted address: {formatted_address}")
+            logger.info(f"Lat: {location['lat']}, Lng: {location['lng']}")
+            
+            # Логируем все компоненты адреса от Google
+            logger.info("\n📋 Все компоненты адреса от Google:")
+            for i, component in enumerate(result['results'][0]['address_components']):
+                logger.info(f"  {i+1}. {component.get('long_name', '')} ({component.get('short_name', '')}) - Types: {component.get('types', [])}")
+            
+            # Анализируем, что Google не определил
+            google_components = [comp.get('long_name', '') for comp in result['results'][0]['address_components']]
+            address_parts = address.split(',')
+            first_part = address_parts[0].strip() if address_parts else ""
+            
+            logger.info(f"\n🔍 АНАЛИЗ:")
+            logger.info(f"Первая часть адреса: '{first_part}'")
+            logger.info(f"Компоненты Google: {google_components}")
+            if first_part not in google_components:
+                logger.info(f"⚠️  '{first_part}' НЕ найден в компонентах Google!")
+            else:
+                logger.info(f"✅ '{first_part}' найден в компонентах Google")
+            
             # Извлекаем структурированные данные из Google Places API
             location_components = extract_location_components(result['results'][0]['address_components'], address)
+            
+            # Дополнительно получаем данные через Nominatim
+            nominatim_data = get_nominatim_location(address)
+            
+            # Объединяем данные Google и Nominatim
+            if nominatim_data:
+                # Если Google не определил district, используем данные Nominatim
+                if not location_components.get('district') and nominatim_data.get('district'):
+                    location_components['district'] = nominatim_data['district']
+                    logger.info(f"Добавлен district из Nominatim: {nominatim_data['district']}")
+                
+                # Если Google не определил county, используем данные Nominatim
+                if not location_components.get('county') and nominatim_data.get('county'):
+                    location_components['county'] = nominatim_data['county']
+                    logger.info(f"Добавлен county из Nominatim: {nominatim_data['county']}")
+                
+                # Сохраняем данные Nominatim для отображения
+                location_components['nominatim_data'] = nominatim_data
             
             # Пытаемся найти коды локаций в базе данных
             location_codes = find_location_codes_from_components(location_components)
@@ -454,18 +448,16 @@ def api_geocode():
                 'lng': location['lng'],
                 'formatted_address': formatted_address,
                 'location_components': location_components,
-                'location_codes': location_codes,
-                'source': 'google'
+                'location_codes': location_codes
             })
         else:
-            logger.warning(f"Google Maps API вернул статус: {result.get('status')}")
             return jsonify({
                 'success': False,
-                'error': 'Address not found by any geocoding service'
+                'error': 'Address not found'
             })
     except Exception as e:
-        logger.error(f"Google Maps geocoding error: {e}")
-        return jsonify({'error': 'All geocoding services are unavailable'}), 500
+        logger.error(f"Geocoding error: {e}")
+        return jsonify({'error': 'Geocoding service error'}), 500
 
 @app.route('/api/validate_bedrooms', methods=['POST'])
 def api_validate_bedrooms():
@@ -547,14 +539,17 @@ def api_generate_report():
         if telegram_id:
             try:
                 user_result = supabase.table('users').select('user_status').eq('telegram_id', telegram_id).execute()
-                if user_result.data and len(user_result.data) > 0:
-                    user_status = user_result.data[0].get('user_status')
-                    is_admin = user_status == 'admin' if user_status else False
+                if user_result.data and user_result.data[0].get('user_status') == 'admin':
+                    is_admin = True
+                    logger.info(f"✅ Пользователь {telegram_id} имеет статус администратора")
             except Exception as e:
-                logger.error(f"Error checking admin status: {e}")
+                logger.error(f"Ошибка проверки статуса администратора: {e}")
+        
+        # Устанавливаем флаг администратора для функции форматирования
+        format_simple_report.is_admin = is_admin
         
         # Формируем отчёт в текстовом формате для отображения
-        report_text = format_simple_report(address, bedrooms, price, location_codes, language, market_data, is_admin)
+        report_text = format_simple_report(address, bedrooms, price, location_codes, language, market_data)
         
         # Сохраняем отчет в базу данных (если есть telegram_id)
         if telegram_id:
@@ -599,12 +594,9 @@ def api_generate_report():
                     'address': address,
                     'bedrooms': bedrooms,
                     'price': price
-                },
-                'market_data': market_data,
-                'is_turkish': is_turkish,
-                'currency_rate': currency_rate,
-                'report_text': report_text
-            }
+                }
+            },
+            'report_text': report_text
         })
         
     except Exception as e:
@@ -708,50 +700,18 @@ def get_location_codes_from_address(address):
         logger.error(f"Error getting location codes: {e}")
         return None
 
-def format_simple_report(address, bedrooms, price, location_codes, language='en', market_data=None, is_admin=False):
+def format_simple_report(address, bedrooms, price, location_codes, language='en', market_data=None):
     """Форматирование простого отчёта с кодами локаций и данными рынка"""
     
     # Форматируем цену
     def format_price(price):
         return f"€{price:.2f}".replace('.00', '').replace('.', ',')
     
-    # Получаем текущую дату и курс валюты
-    current_date = datetime.now()
-    currency_rate = None
-    is_turkish = False
-    
-    # Проверяем, является ли локация турецкой и получаем курс валюты
-    if CURRENCY_FUNCTIONS_AVAILABLE:
-        try:
-            # Проверяем компоненты локации
-            location_components = getattr(format_simple_report, 'last_location_components', None)
-            if location_components:
-                is_turkish = is_turkish_location(location_components)
-                if is_turkish:
-                    logger.info(f"🇹🇷 Турецкая локация обнаружена, получаем курс валюты")
-                    currency_rate = get_currency_rate_for_date(current_date)
-        except Exception as e:
-            logger.error(f"❌ Ошибка при работе с валютными курсами: {e}")
-    
     # Формируем отчёт
     report_lines = [
         f"Анализ рынка в радиусе 5 км:",
         "",
     ]
-    
-    # Добавляем информацию о дате формирования отчета и курсе валюты
-    report_lines.extend([
-        f"Дата формирования отчета: {current_date.strftime('%d.%m.%Y %H:%M')}",
-    ])
-    
-    if is_turkish and currency_rate:
-        try_rate = currency_rate.get('try', 0)
-        report_lines.extend([
-            f"Курс валюты TRY/EUR: {try_rate:.4f}",
-            "",
-        ])
-    else:
-        report_lines.append("")
     
     # Добавляем коды локаций (только для админов)
     logger.info(f"📋 Форматирование кодов локаций: {location_codes}")
@@ -816,23 +776,20 @@ def format_simple_report(address, bedrooms, price, location_codes, language='en'
     # Добавляем новые разделы отчета
     if market_data:
         # Общий тренд (из таблицы general_data)
-        if market_data.get('general_data'):
+                if market_data.get('general_data'):
             general = market_data['general_data']
             report_lines.extend([
                 "=== ОБЩИЙ ТРЕНД ===",
-                "",
                 f"Средняя цена продажи, м²: €{general.get('unit_price_for_sale', 'н/д')}",
                 f"Минимальная цена продажи, м²: €{general.get('min_unit_price_for_sale', 'н/д')}",
                 f"Максимальная цена продажи: €{general.get('max_unit_price_for_sale', 'н/д')}",
                 f"Средняя площадь продажи: {general.get('comparable_area_for_sale', 'н/д')} м²",
                 f"Количество объектов на продажу: {general.get('count_for_sale', 'н/д')}",
-                "",
                 f"Средняя цена аренды, м²: €{general.get('unit_price_for_rent', 'н/д')}",
                 f"Минимальная цена аренды, м²: €{general.get('min_unit_price_for_rent', 'н/д')}",
                 f"Максимальная цена аренды, м²: €{general.get('max_unit_price_for_rent', 'н/д')}",
                 f"Средняя площадь аренды: {general.get('comparable_area_for_rent', 'н/д')} м²",
                 f"Количество объектов в аренду: {general.get('count_for_rent', 'н/д')}",
-                "",
                 f"Цена для продажи, средняя: €{general.get('price_for_sale', 'н/д')}",
                 f"Цена для аренды, средняя: €{general.get('price_for_rent', 'н/д')}",
                 f"Средний возраст объекта для продажи: {general.get('average_age_for_sale', 'н/д')} лет",
@@ -844,14 +801,14 @@ def format_simple_report(address, bedrooms, price, location_codes, language='en'
             ])
             
             # Добавляем дату тренда только для администраторов
-            if is_admin:
+            if hasattr(format_simple_report, 'is_admin') and format_simple_report.is_admin:
                 report_lines.append(f"Дата тренда: {general.get('trend_date', 'н/д')}")
                 report_lines.append("")
     
         # Тренд по количеству спален (из таблицы house_type_data)
         if market_data.get('house_type_data'):
             house_type_data = market_data['house_type_data']
-            report_lines.extend([
+        report_lines.extend([
                 "=== ТРЕНД ПО КОЛИЧЕСТВУ СПАЛЕН ===",
             ])
             
@@ -859,20 +816,20 @@ def format_simple_report(address, bedrooms, price, location_codes, language='en'
             if isinstance(house_type_data, list):
                 for record in house_type_data:
                     listing_type = record.get('listing_type', 'н/д')
-                    report_lines.extend([
+            report_lines.extend([
                         f"--- Количество спален: {listing_type} ---",
                         f"Средняя цена продажи: €{record.get('unit_price_for_sale', 'н/д')}",
                         f"Минимальная цена продажи: €{record.get('min_unit_price_for_sale', 'н/д')}",
                         f"Максимальная цена продажи: €{record.get('max_unit_price_for_sale', 'н/д')}",
                         f"Сопоставимая площадь для продажи: {record.get('comparable_area_for_sale', 'н/д')} м²",
                         f"Количество объектов на продажу: {record.get('count_for_sale', 'н/д')}",
-                        f"Средняя цена аренды: €{record.get('unit_price_for_rent', 'н/д')}",
-                        f"Минимальная цена аренды: €{record.get('min_unit_price_for_rent', 'н/д')}",
-                        f"Максимальная цена аренды: €{record.get('max_unit_price_for_rent', 'н/д')}",
-                        f"Сопоставимая площадь для аренды: {record.get('comparable_area_for_rent', 'н/д')} м²",
+                        f"Средняя цена аренды, м²: €{record.get('unit_price_for_rent', 'н/д')}",
+                        f"Минимальная цена аренды, м²: €{record.get('min_unit_price_for_rent', 'н/д')}",
+                        f"Максимальная цена аренды, м²: €{record.get('max_unit_price_for_rent', 'н/д')}",
+                        f"Средняя площадь аренды: {record.get('comparable_area_for_rent', 'н/д')} м²",
                         f"Количество объектов в аренду: {record.get('count_for_rent', 'н/д')}",
-                        f"Цена для продажи: €{record.get('price_for_sale', 'н/д')}",
-                        f"Цена для аренды: €{record.get('price_for_rent', 'н/д')}",
+                        f"Цена для продажи, средняя: €{record.get('price_for_sale', 'н/д')}",
+                        f"Цена для аренды, средняя: €{record.get('price_for_rent', 'н/д')}",
                         f"Средний возраст объекта для продажи: {record.get('average_age_for_sale', 'н/д')} лет",
                         f"Средний возраст объекта для аренды: {record.get('average_age_for_rent', 'н/д')} лет",
                         f"Период листинга для продажи: {record.get('listing_period_for_sale', 'н/д')} дней",
@@ -890,20 +847,20 @@ def format_simple_report(address, bedrooms, price, location_codes, language='en'
                     f"Максимальная цена продажи: €{house_type_data.get('max_unit_price_for_sale', 'н/д')}",
                     f"Сопоставимая площадь для продажи: {house_type_data.get('comparable_area_for_sale', 'н/д')} м²",
                     f"Количество объектов на продажу: {house_type_data.get('count_for_sale', 'н/д')}",
-                    f"Средняя цена аренды: €{house_type_data.get('unit_price_for_rent', 'н/д')}",
-                    f"Минимальная цена аренды: €{house_type_data.get('min_unit_price_for_rent', 'н/д')}",
-                    f"Максимальная цена аренды: €{house_type_data.get('max_unit_price_for_rent', 'н/д')}",
-                    f"Сопоставимая площадь для аренды: {house_type_data.get('comparable_area_for_rent', 'н/д')} м²",
+                    f"Средняя цена аренды, м²: €{house_type_data.get('unit_price_for_rent', 'н/д')}",
+                    f"Минимальная цена аренды, м²: €{house_type_data.get('min_unit_price_for_rent', 'н/д')}",
+                    f"Максимальная цена аренды, м²: €{house_type_data.get('max_unit_price_for_rent', 'н/д')}",
+                    f"Средняя площадь аренды: {house_type_data.get('comparable_area_for_rent', 'н/д')} м²",
                     f"Количество объектов в аренду: {house_type_data.get('count_for_rent', 'н/д')}",
-                    f"Цена для продажи: €{house_type_data.get('price_for_sale', 'н/д')}",
-                    f"Цена для аренды: €{house_type_data.get('price_for_rent', 'н/д')}",
+                    f"Цена для продажи, средняя: €{house_type_data.get('price_for_sale', 'н/д')}",
+                    f"Цена для аренды, средняя: €{house_type_data.get('price_for_rent', 'н/д')}",
                     f"Средний возраст объекта для продажи: {house_type_data.get('average_age_for_sale', 'н/д')} лет",
                     f"Средний возраст объекта для аренды: {house_type_data.get('average_age_for_rent', 'н/д')} лет",
                     f"Период листинга для продажи: {house_type_data.get('listing_period_for_sale', 'н/д')} дней",
                     f"Период листинга для аренды: {house_type_data.get('listing_period_for_rent', 'н/д')} дней",
                     f"Доходность: {house_type_data.get('yield', 'н/д')}%",
-                    "",
-                ])
+                "",
+            ])
         
         # Тренд по возрасту объекта (из таблицы age_data)
         if market_data.get('age_data'):
@@ -932,9 +889,17 @@ def format_simple_report(address, bedrooms, price, location_codes, language='en'
                         f"Количество объектов в аренду: {record.get('count_for_rent', 'н/д')}",
                         f"Цена для продажи: €{record.get('price_for_sale', 'н/д')}",
                         f"Цена для аренды: €{record.get('price_for_rent', 'н/д')}",
+                        f"Изменение цены продажи: {record.get('price_change_sale', 'н/д')}%",
+                        f"Изменение цены аренды: {record.get('price_change_rent', 'н/д')}%",
+                        f"Изменение запасов продажи: {record.get('stock_change_sale', 'н/д')}%",
+                        f"Изменение запасов аренды: {record.get('stock_change_rent', 'н/д')}%",
+                        f"Коэффициент запасов продажи: {record.get('stock_ratio_sale', 'н/д')}",
+                        f"Коэффициент запасов аренды: {record.get('stock_ratio_rent', 'н/д')}",
                         f"Период листинга для продажи: {record.get('listing_period_for_sale', 'н/д')} дней",
                         f"Период листинга для аренды: {record.get('listing_period_for_rent', 'н/д')} дней",
+                        f"Количество объектов: {record.get('property_count', 'н/д')}",
                         f"Доходность: {record.get('yield', 'н/д')}%",
+                        f"Дата тренда: {record.get('trend_date', 'н/д')}",
                         "",
                     ])
             else:
@@ -949,18 +914,18 @@ def format_simple_report(address, bedrooms, price, location_codes, language='en'
                     f"Максимальная цена продажи: €{age_data.get('max_unit_price_for_sale', 'н/д')}",
                     f"Сопоставимая площадь для продажи: {age_data.get('comparable_area_for_sale', 'н/д')} м²",
                     f"Количество объектов на продажу: {age_data.get('count_for_sale', 'н/д')}",
-                    f"Средняя цена аренды: €{age_data.get('unit_price_for_rent', 'н/д')}",
-                    f"Минимальная цена аренды: €{age_data.get('min_unit_price_for_rent', 'н/д')}",
-                    f"Максимальная цена аренды: €{age_data.get('max_unit_price_for_rent', 'н/д')}",
-                    f"Сопоставимая площадь для аренды: {age_data.get('comparable_area_for_rent', 'н/д')} м²",
+                    f"Средняя цена аренды, м²: €{age_data.get('unit_price_for_rent', 'н/д')}",
+                    f"Минимальная цена аренды, м²: €{age_data.get('min_unit_price_for_rent', 'н/д')}",
+                    f"Максимальная цена аренды, м²: €{age_data.get('max_unit_price_for_rent', 'н/д')}",
+                    f"Средняя площадь аренды: {age_data.get('comparable_area_for_rent', 'н/д')} м²",
                     f"Количество объектов в аренду: {age_data.get('count_for_rent', 'н/д')}",
-                    f"Цена для продажи: €{age_data.get('price_for_sale', 'н/д')}",
-                    f"Цена для аренды: €{age_data.get('price_for_rent', 'н/д')}",
+                    f"Цена для продажи, средняя: €{age_data.get('price_for_sale', 'н/д')}",
+                    f"Цена для аренды, средняя: €{age_data.get('price_for_rent', 'н/д')}",
                     f"Период листинга для продажи: {age_data.get('listing_period_for_sale', 'н/д')} дней",
                     f"Период листинга для аренды: {age_data.get('listing_period_for_rent', 'н/д')} дней",
                     f"Доходность: {age_data.get('yield', 'н/д')}%",
-                    "",
-                ])
+                "",
+            ])
         
         # Тренд по этажу объекта (из таблицы floor_segment_data)
         if market_data.get('floor_segment_data'):
@@ -973,20 +938,20 @@ def format_simple_report(address, bedrooms, price, location_codes, language='en'
             if isinstance(floor_data, list):
                 for record in floor_data:
                     listing_type = record.get('listing_type', 'н/д')
-                    report_lines.extend([
+            report_lines.extend([
                         f"--- Этаж объекта: {listing_type} ---",
                         f"Средняя цена продажи: €{record.get('unit_price_for_sale', 'н/д')}",
                         f"Минимальная цена продажи: €{record.get('min_unit_price_for_sale', 'н/д')}",
                         f"Максимальная цена продажи: €{record.get('max_unit_price_for_sale', 'н/д')}",
                         f"Сопоставимая площадь для продажи: {record.get('comparable_area_for_sale', 'н/д')} м²",
                         f"Количество объектов на продажу: {record.get('count_for_sale', 'н/д')}",
-                        f"Средняя цена аренды: €{record.get('unit_price_for_rent', 'н/д')}",
-                        f"Минимальная цена аренды: €{record.get('min_unit_price_for_rent', 'н/д')}",
-                        f"Максимальная цена аренды: €{record.get('max_unit_price_for_rent', 'н/д')}",
-                        f"Сопоставимая площадь для аренды: {record.get('comparable_area_for_rent', 'н/д')} м²",
+                        f"Средняя цена аренды, м²: €{record.get('unit_price_for_rent', 'н/д')}",
+                        f"Минимальная цена аренды, м²: €{record.get('min_unit_price_for_rent', 'н/д')}",
+                        f"Максимальная цена аренды, м²: €{record.get('max_unit_price_for_rent', 'н/д')}",
+                        f"Средняя площадь аренды: {record.get('comparable_area_for_rent', 'н/д')} м²",
                         f"Количество объектов в аренду: {record.get('count_for_rent', 'н/д')}",
-                        f"Цена для продажи: €{record.get('price_for_sale', 'н/д')}",
-                        f"Цена для аренды: €{record.get('price_for_rent', 'н/д')}",
+                        f"Цена для продажи, средняя: €{record.get('price_for_sale', 'н/д')}",
+                        f"Цена для аренды, средняя: €{record.get('price_for_rent', 'н/д')}",
                         f"Средний возраст объекта для продажи: {record.get('average_age_for_sale', 'н/д')} лет",
                         f"Средний возраст объекта для аренды: {record.get('average_age_for_rent', 'н/д')} лет",
                         f"Период листинга для продажи: {record.get('listing_period_for_sale', 'н/д')} дней",
@@ -1004,20 +969,20 @@ def format_simple_report(address, bedrooms, price, location_codes, language='en'
                     f"Максимальная цена продажи: €{floor_data.get('max_unit_price_for_sale', 'н/д')}",
                     f"Сопоставимая площадь для продажи: {floor_data.get('comparable_area_for_sale', 'н/д')} м²",
                     f"Количество объектов на продажу: {floor_data.get('count_for_sale', 'н/д')}",
-                    f"Средняя цена аренды: €{floor_data.get('unit_price_for_rent', 'н/д')}",
-                    f"Минимальная цена аренды: €{floor_data.get('min_unit_price_for_rent', 'н/д')}",
-                    f"Максимальная цена аренды: €{floor_data.get('max_unit_price_for_rent', 'н/д')}",
-                    f"Сопоставимая площадь для аренды: {floor_data.get('comparable_area_for_rent', 'н/д')} м²",
+                    f"Средняя цена аренды, м²: €{floor_data.get('unit_price_for_rent', 'н/д')}",
+                    f"Минимальная цена аренды, м²: €{floor_data.get('min_unit_price_for_rent', 'н/д')}",
+                    f"Максимальная цена аренды, м²: €{floor_data.get('max_unit_price_for_rent', 'н/д')}",
+                    f"Средняя площадь аренды: {floor_data.get('comparable_area_for_rent', 'н/д')} м²",
                     f"Количество объектов в аренду: {floor_data.get('count_for_rent', 'н/д')}",
-                    f"Цена для продажи: €{floor_data.get('price_for_sale', 'н/д')}",
-                    f"Цена для аренды: €{floor_data.get('price_for_rent', 'н/д')}",
+                    f"Цена для продажи, средняя: €{floor_data.get('price_for_sale', 'н/д')}",
+                    f"Цена для аренды, средняя: €{floor_data.get('price_for_rent', 'н/д')}",
                     f"Средний возраст объекта для продажи: {floor_data.get('average_age_for_sale', 'н/д')} лет",
                     f"Средний возраст объекта для аренды: {floor_data.get('average_age_for_rent', 'н/д')} лет",
                     f"Период листинга для продажи: {floor_data.get('listing_period_for_sale', 'н/д')} дней",
                     f"Период листинга для аренды: {floor_data.get('listing_period_for_rent', 'н/д')} дней",
                     f"Доходность: {floor_data.get('yield', 'н/д')}%",
-                    "",
-                ])
+                "",
+            ])
         
         # Тренд по типу отопления (из таблицы heating_data)
         if market_data.get('heating_data'):
@@ -1037,13 +1002,13 @@ def format_simple_report(address, bedrooms, price, location_codes, language='en'
                         f"Максимальная цена продажи: €{record.get('max_unit_price_for_sale', 'н/д')}",
                         f"Сопоставимая площадь для продажи: {record.get('comparable_area_for_sale', 'н/д')} м²",
                         f"Количество объектов на продажу: {record.get('count_for_sale', 'н/д')}",
-                        f"Средняя цена аренды: €{record.get('unit_price_for_rent', 'н/д')}",
-                        f"Минимальная цена аренды: €{record.get('min_unit_price_for_rent', 'н/д')}",
-                        f"Максимальная цена аренды: €{record.get('max_unit_price_for_rent', 'н/д')}",
-                        f"Сопоставимая площадь для аренды: {record.get('comparable_area_for_rent', 'н/д')} м²",
+                        f"Средняя цена аренды, м²: €{record.get('unit_price_for_rent', 'н/д')}",
+                        f"Минимальная цена аренды, м²: €{record.get('min_unit_price_for_rent', 'н/д')}",
+                        f"Максимальная цена аренды, м²: €{record.get('max_unit_price_for_rent', 'н/д')}",
+                        f"Средняя площадь аренды: {record.get('comparable_area_for_rent', 'н/д')} м²",
                         f"Количество объектов в аренду: {record.get('count_for_rent', 'н/д')}",
-                        f"Цена для продажи: €{record.get('price_for_sale', 'н/д')}",
-                        f"Цена для аренды: €{record.get('price_for_rent', 'н/д')}",
+                        f"Цена для продажи, средняя: €{record.get('price_for_sale', 'н/д')}",
+                        f"Цена для аренды, средняя: €{record.get('price_for_rent', 'н/д')}",
                         f"Средний возраст объекта для продажи: {record.get('average_age_for_sale', 'н/д')} лет",
                         f"Средний возраст объекта для аренды: {record.get('average_age_for_rent', 'н/д')} лет",
                         f"Период листинга для продажи: {record.get('listing_period_for_sale', 'н/д')} дней",
@@ -1061,26 +1026,26 @@ def format_simple_report(address, bedrooms, price, location_codes, language='en'
                     f"Максимальная цена продажи: €{heating_data.get('max_unit_price_for_sale', 'н/д')}",
                     f"Сопоставимая площадь для продажи: {heating_data.get('comparable_area_for_sale', 'н/д')} м²",
                     f"Количество объектов на продажу: {heating_data.get('count_for_sale', 'н/д')}",
-                    f"Средняя цена аренды: €{heating_data.get('unit_price_for_rent', 'н/д')}",
-                    f"Минимальная цена аренды: €{heating_data.get('min_unit_price_for_rent', 'н/д')}",
-                    f"Максимальная цена аренды: €{heating_data.get('max_unit_price_for_rent', 'н/д')}",
-                    f"Сопоставимая площадь для аренды: {heating_data.get('comparable_area_for_rent', 'н/д')} м²",
+                    f"Средняя цена аренды, м²: €{heating_data.get('unit_price_for_rent', 'н/д')}",
+                    f"Минимальная цена аренды, м²: €{heating_data.get('min_unit_price_for_rent', 'н/д')}",
+                    f"Максимальная цена аренды, м²: €{heating_data.get('max_unit_price_for_rent', 'н/д')}",
+                    f"Средняя площадь аренды: {heating_data.get('comparable_area_for_rent', 'н/д')} м²",
                     f"Количество объектов в аренду: {heating_data.get('count_for_rent', 'н/д')}",
-                    f"Цена для продажи: €{heating_data.get('price_for_sale', 'н/д')}",
-                    f"Цена для аренды: €{heating_data.get('price_for_rent', 'н/д')}",
+                    f"Цена для продажи, средняя: €{heating_data.get('price_for_sale', 'н/д')}",
+                    f"Цена для аренды, средняя: €{heating_data.get('price_for_rent', 'н/д')}",
                     f"Средний возраст объекта для продажи: {heating_data.get('average_age_for_sale', 'н/д')} лет",
                     f"Средний возраст объекта для аренды: {heating_data.get('average_age_for_rent', 'н/д')} лет",
                     f"Период листинга для продажи: {heating_data.get('listing_period_for_sale', 'н/д')} дней",
                     f"Период листинга для аренды: {heating_data.get('listing_period_for_rent', 'н/д')} дней",
                     f"Доходность: {heating_data.get('yield', 'н/д')}%",
-                    "",
-                ])
+                "",
+            ])
     else:
         report_lines.extend([
             "=== АНАЛИЗ РЫНКА ===",
             "Данные анализа рынка не найдены для данной локации",
-                    "",
-                ])
+            "",
+        ])
     
     return "\n".join(report_lines)
 
@@ -2159,7 +2124,7 @@ def api_generate_pdf_report():
         if 'taxes' in report:
             pdf.add_page()
             
-            # Добавляем логотип в правый верхний угол
+            # Добавляем логотип в правом верхнем углу
             try:
                 pdf.image('logo-flt.png', x=170, y=10, w=30)  # Правый верхний угол
             except Exception as e:
@@ -3338,7 +3303,7 @@ def create_chart_image_for_pdf(chart_data, title, width=180, height=100):
             logger.warning("Недостаточно данных для создания графика")
             # Создаем placeholder график с сообщением
             ax.text(0.5, 0.5, 'Нет данных', ha='center', va='center', 
-                    transform=ax.transAxes, fontsize=10, fontname='DejaVu Sans')
+                   transform=ax.transAxes, fontsize=10, fontname='DejaVu Sans')
             ax.set_title(title, fontsize=8, fontname='DejaVu Sans', pad=10)
             ax.set_xlim(0, 1)
             ax.set_ylim(0, 1)
@@ -3835,7 +3800,7 @@ def get_nominatim_location(address):
         dict: Структурированные данные адреса или None
     """
     try:
-        # Запрос к Nominatim API с таймаутом
+        # Запрос к Nominatim API
         url = "https://nominatim.openstreetmap.org/search"
         params = {
             'q': address,
@@ -3847,8 +3812,7 @@ def get_nominatim_location(address):
             'User-Agent': 'Aaadviser/1.0'
         }
         
-        # Добавляем таймаут для предотвращения зависания
-        response = requests.get(url, params=params, headers=headers, timeout=15)
+        response = requests.get(url, params=params, headers=headers)
         result = response.json()
         
         if result and len(result) > 0:
@@ -3870,20 +3834,13 @@ def get_nominatim_location(address):
                 'display_name': location.get('display_name')
             }
             
-            logger.info(f"✅ Nominatim данные получены: {location_data}")
+            logger.info(f"Nominatim данные: {location_data}")
             return location_data
         
-        logger.warning(f"⚠️ Nominatim не нашел результатов для адреса: {address}")
         return None
         
-    except requests.exceptions.Timeout:
-        logger.error(f"⏰ Таймаут при запросе к Nominatim API для адреса: {address}")
-        return None
-    except requests.exceptions.ConnectionError as e:
-        logger.error(f"🌐 Ошибка подключения к Nominatim API: {e}")
-        return None
     except Exception as e:
-        logger.error(f"❌ Ошибка Nominatim API: {e}")
+        logger.error(f"Ошибка Nominatim API: {e}")
         return None
 
 def extract_location_components(address_components, original_address=None):
@@ -4387,7 +4344,7 @@ def create_property_trends_chart(historical_data, chart_type='sale', width=180, 
             
             # Создаем график
             ax.plot(valid_years, valid_prices, marker='o', linewidth=2, markersize=4, 
-                    color=color, alpha=0.8)
+                   color=color, alpha=0.8)
             
             # Настройка осей
             ax.set_title(title, fontsize=10, fontname='DejaVu Sans', pad=10)
@@ -4408,7 +4365,7 @@ def create_property_trends_chart(historical_data, chart_type='sale', width=180, 
         else:
             # Если нет данных, показываем пустой график с сообщением
             ax.text(0.5, 0.5, 'Нет данных', ha='center', va='center', 
-                    transform=ax.transAxes, fontsize=10, fontname='DejaVu Sans')
+                   transform=ax.transAxes, fontsize=10, fontname='DejaVu Sans')
             ax.set_title(title, fontsize=10, fontname='DejaVu Sans', pad=10)
             ax.set_xlim(0, 1)
             ax.set_ylim(0, 1)
@@ -4429,7 +4386,7 @@ def create_property_trends_chart(historical_data, chart_type='sale', width=180, 
         try:
             fig, ax = plt.subplots(figsize=(width/25.4, height/25.4), dpi=200)
             ax.text(0.5, 0.5, 'Ошибка графика', ha='center', va='center', 
-                    transform=ax.transAxes, fontsize=8, fontname='DejaVu Sans')
+                   transform=ax.transAxes, fontsize=8, fontname='DejaVu Sans')
             ax.set_title(f'Тренды {chart_type}', fontsize=8, fontname='DejaVu Sans', pad=10)
             ax.set_xlim(0, 1)
             ax.set_ylim(0, 1)
