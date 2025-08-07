@@ -77,6 +77,7 @@ def get_currency_rate_for_date(target_date=None):
 def fetch_and_save_currency_rates(target_date=None):
     """
     Получает курсы валют с currencylayer.com и сохраняет в базу данных.
+    API возвращает курсы относительно USD, поэтому конвертируем их в EUR.
     
     Args:
         target_date (datetime): Дата для получения курсов (по умолчанию сегодня)
@@ -92,15 +93,19 @@ def fetch_and_save_currency_rates(target_date=None):
         date_str = target_date.strftime('%Y-%m-%d')
         
         # Запрос к currencylayer.com API
+        # API возвращает курсы относительно USD, поэтому запрашиваем USD как базовую валюту
         url = "http://api.currencylayer.com/historical"
         params = {
             'access_key': CURRENCYLAYER_API_KEY,
             'date': date_str,
-            'base': 'EUR',
-            'currencies': 'RUB,USD,TRY,AED,THB'
+            'base': 'USD',  # API возвращает курсы относительно USD
+            'currencies': 'EUR,RUB,TRY,AED,THB'
         }
         
         logger.info(f"🔍 Запрос курсов валют с currencylayer.com для {date_str}")
+        logger.info(f"💱 Базовая валюта API: USD")
+        logger.info(f"📊 Запрашиваемые валюты: EUR, RUB, TRY, AED, THB")
+        
         response = requests.get(url, params=params)
         
         if response.status_code != 200:
@@ -115,24 +120,52 @@ def fetch_and_save_currency_rates(target_date=None):
             # Если API недоступен, используем последнюю доступную запись
             return get_latest_currency_rate()
         
-        # Извлекаем курсы валют
+        # Извлекаем курсы валют (относительно USD)
         quotes = data.get('quotes', {})
+        logger.info(f"📊 Полученные курсы валют (относительно USD): {quotes}")
+        
+        # Конвертируем курсы в EUR как базовую валюту
+        # Получаем курс USD/EUR
+        usd_eur_rate = quotes.get('USDEUR', 1.0)
+        logger.info(f"💱 Курс USD/EUR: {usd_eur_rate}")
         
         # Формируем данные для сохранения в базу
+        # Все курсы конвертируем в EUR как базовую валюту
         currency_data = {
             'created_at': target_date.isoformat(),
-            'rub': quotes.get('EURRUB', 1.0),
-            'usd': quotes.get('EURUSD', 1.0),
-            'euro': 1.0,  # Базовая валюта
-            'try': quotes.get('EURTRY', 1.0),
-            'aed': quotes.get('EURAED', 1.0),
-            'thb': quotes.get('EURTHB', 1.0)
+            'rub': quotes.get('USDRUB', 1.0) / usd_eur_rate,  # USD/RUB / (USD/EUR) = EUR/RUB
+            'usd': 1.0 / usd_eur_rate,  # USD/USD / (USD/EUR) = EUR/USD
+            'euro': 1.0,  # Базовая валюта всегда 1.0
+            'try': quotes.get('USDTRY', 1.0) / usd_eur_rate,  # USD/TRY / (USD/EUR) = EUR/TRY
+            'aed': quotes.get('USDAED', 1.0) / usd_eur_rate,  # USD/AED / (USD/EUR) = EUR/AED
+            'thb': quotes.get('USDTHB', 1.0) / usd_eur_rate   # USD/THB / (USD/EUR) = EUR/THB
         }
+        
+        logger.info(f"💾 Сохраняем курсы валют в базу (конвертированные в EUR):")
+        logger.info(f"   EUR (базовая): {currency_data['euro']}")
+        logger.info(f"   RUB: {currency_data['rub']:.6f} (1 EUR = {currency_data['rub']:.6f} RUB)")
+        logger.info(f"   USD: {currency_data['usd']:.6f} (1 EUR = {currency_data['usd']:.6f} USD)")
+        logger.info(f"   TRY: {currency_data['try']:.6f} (1 EUR = {currency_data['try']:.6f} TRY)")
+        logger.info(f"   AED: {currency_data['aed']:.6f} (1 EUR = {currency_data['aed']:.6f} AED)")
+        logger.info(f"   THB: {currency_data['thb']:.6f} (1 EUR = {currency_data['thb']:.6f} THB)")
         
         # Сохраняем в базу данных
         logger.info(f"💾 Сохраняем курсы валют в базу: {currency_data}")
         try:
-            supabase.table('currency').insert(currency_data).execute()
+            # Проверяем, есть ли уже запись для этой даты
+            date_str = target_date.strftime('%Y-%m-%d')
+            existing_query = supabase.table('currency').select('*').gte('created_at', f'{date_str} 00:00:00').lt('created_at', f'{date_str} 23:59:59').execute()
+            
+            if existing_query.data and len(existing_query.data) > 0:
+                logger.info(f"⚠️ Запись для {date_str} уже существует, обновляем данные")
+                # Обновляем существующую запись
+                record_id = existing_query.data[0]['id']
+                supabase.table('currency').update(currency_data).eq('id', record_id).execute()
+            else:
+                logger.info(f"💾 Создаем новую запись для {date_str}")
+                # Создаем новую запись
+                supabase.table('currency').insert(currency_data).execute()
+            
             logger.info(f"✅ Курсы валют успешно получены и сохранены для {date_str}")
         except Exception as e:
             logger.warning(f"⚠️ Не удалось сохранить в базу: {e}")
@@ -163,14 +196,19 @@ def convert_turkish_data_to_eur(data, currency_rate):
     
     try_rate = currency_rate['try']
     logger.info(f"💱 Конвертируем данные в EUR используя курс TRY/EUR: {try_rate}")
+    logger.info(f"📊 Формула конвертации: TRY / {try_rate} = EUR")
     
     def convert_price(price):
         """Конвертирует цену из TRY в EUR"""
         if price is None or price == 'н/д':
             return price
         try:
-            return float(price) / try_rate
+            # Правильная формула: TRY / (TRY/EUR) = EUR
+            converted_price = float(price) / try_rate
+            logger.debug(f"💱 Конвертация: {price} TRY / {try_rate} = {converted_price:.2f} EUR")
+            return converted_price
         except (ValueError, TypeError):
+            logger.warning(f"⚠️ Не удалось конвертировать цену: {price}")
             return price
     
     def convert_data_recursive(obj):
