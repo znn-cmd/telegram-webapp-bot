@@ -73,13 +73,12 @@ def get_currency_rate_for_date(target_date=None):
         if fresh_rate:
             return fresh_rate
         else:
-            # Если не удалось получить свежие курсы, используем последнюю доступную запись
-            logger.warning(f"⚠️ Не удалось получить свежие курсы, используем последнюю доступную запись")
+            # Если не удалось получить свежие данные, используем последние доступные
+            logger.info("⚠️ Не удалось получить свежие данные, используем последние доступные")
             return get_latest_currency_rate()
         
     except Exception as e:
         logger.error(f"❌ Ошибка получения курса валют: {e}")
-        # Используем последнюю доступную запись при ошибке
         return get_latest_currency_rate()
 
 def fetch_and_save_currency_rates(target_date=None):
@@ -171,14 +170,8 @@ def fetch_and_save_currency_rates(target_date=None):
                 supabase.table('currency').update(currency_data).eq('id', record_id).execute()
             else:
                 logger.info(f"💾 Создаем новую запись для {date_str}")
-                # Создаем новую запись без указания ID (автоинкремент)
-                insert_data = currency_data.copy()
-                # Убираем поле id если оно есть, чтобы использовать автоинкремент
-                if 'id' in insert_data:
-                    del insert_data['id']
-                
-                result = supabase.table('currency').insert(insert_data).execute()
-                logger.info(f"✅ Новая запись создана с ID: {result.data[0]['id'] if result.data else 'unknown'}")
+                # Создаем новую запись
+                supabase.table('currency').insert(currency_data).execute()
             
             logger.info(f"✅ Курсы валют успешно получены и сохранены для {date_str}")
         except Exception as e:
