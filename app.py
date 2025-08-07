@@ -66,6 +66,9 @@ WEBAPP_URL = "https://aaadvisor-zaicevn.amvera.io/webapp"
 # Google Maps API ключ
 GOOGLE_MAPS_API_KEY = "AIzaSyBrDkDpNKNAIyY147MQ78hchBkeyCAxhEw"
 
+# Простое кэширование результатов геокодинга
+geocoding_cache = {}
+
 # async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 #     """Обработчик команды /start"""
 #     user = update.effective_user
@@ -381,8 +384,40 @@ def api_geocode():
     
     logger.info(f"🔍 Начинаем геокодинг адреса: {address}")
     
+    # Проверяем кэш
+    if address in geocoding_cache:
+        logger.info("✅ Результат найден в кэше")
+        return jsonify(geocoding_cache[address])
+    
+    # Сначала пробуем Google Maps API
+    google_result = try_google_maps_geocoding(address)
+    
+    if google_result and google_result.get('success'):
+        logger.info("✅ Google Maps API успешно обработал адрес")
+        # Сохраняем в кэш
+        geocoding_cache[address] = google_result
+        return jsonify(google_result)
+    
+    # Если Google Maps API недоступен, пробуем Nominatim
+    logger.warning("⚠️ Google Maps API недоступен, пробуем Nominatim...")
+    nominatim_result = try_nominatim_geocoding(address)
+    
+    if nominatim_result and nominatim_result.get('success'):
+        logger.info("✅ Nominatim успешно обработал адрес")
+        # Сохраняем в кэш
+        geocoding_cache[address] = nominatim_result
+        return jsonify(nominatim_result)
+    
+    # Если оба API недоступны, возвращаем ошибку
+    logger.error("❌ Все геокодинг сервисы недоступны")
+    return jsonify({
+        'success': False,
+        'error': 'Geocoding services are temporarily unavailable. Please try again later.'
+    }), 500
+
+def try_google_maps_geocoding(address):
+    """Пытается выполнить геокодинг через Google Maps API"""
     try:
-        # Запрос к Google Maps Geocoding API
         url = f"https://maps.googleapis.com/maps/api/geocode/json"
         params = {
             'address': address,
@@ -394,7 +429,7 @@ def api_geocode():
         
         if response.status_code != 200:
             logger.error(f"❌ Google Maps API вернул код {response.status_code}: {response.text}")
-            return jsonify({'error': 'Google Maps API error'}), 500
+            return None
         
         result = response.json()
         logger.info(f"📊 Google Maps API статус: {result.get('status')}")
@@ -403,10 +438,10 @@ def api_geocode():
             location = result['results'][0]['geometry']['location']
             formatted_address = result['results'][0]['formatted_address']
             
-            logger.info(f"✅ Адрес найден: {formatted_address}")
+            logger.info(f"✅ Адрес найден через Google Maps: {formatted_address}")
             logger.info(f"📍 Координаты: {location['lat']}, {location['lng']}")
             
-            # Извлекаем структурированные данные из Google Places API
+            # Извлекаем структурированные данные
             logger.info("🔍 Извлекаем компоненты адреса...")
             location_components = extract_location_components(result['results'][0]['address_components'], address)
             
@@ -417,17 +452,10 @@ def api_geocode():
             # Объединяем данные Google и Nominatim
             if nominatim_data:
                 logger.info("✅ Данные Nominatim получены")
-                # Если Google не определил district, используем данные Nominatim
                 if not location_components.get('district') and nominatim_data.get('district'):
                     location_components['district'] = nominatim_data['district']
-                    logger.info(f"Добавлен district из Nominatim: {nominatim_data['district']}")
-                
-                # Если Google не определил county, используем данные Nominatim
                 if not location_components.get('county') and nominatim_data.get('county'):
                     location_components['county'] = nominatim_data['county']
-                    logger.info(f"Добавлен county из Nominatim: {nominatim_data['county']}")
-                
-                # Сохраняем данные Nominatim для отображения
                 location_components['nominatim_data'] = nominatim_data
             else:
                 logger.warning("⚠️ Данные Nominatim не получены")
@@ -441,32 +469,102 @@ def api_geocode():
             else:
                 logger.warning("⚠️ Коды локаций не найдены")
             
-            logger.info("✅ Геокодинг завершен успешно")
-            return jsonify({
+            return {
                 'success': True,
                 'lat': location['lat'],
                 'lng': location['lng'],
                 'formatted_address': formatted_address,
                 'location_components': location_components,
                 'location_codes': location_codes
-            })
+            }
         else:
             logger.error(f"❌ Google Maps API не нашел адрес. Статус: {result.get('status')}")
-            return jsonify({
-                'success': False,
-                'error': f"Address not found. Google status: {result.get('status')}"
-            })
+            return None
+            
     except requests.exceptions.Timeout:
         logger.error("❌ Таймаут при запросе к Google Maps API")
-        return jsonify({'error': 'Google Maps API timeout'}), 500
+        return None
     except requests.exceptions.RequestException as e:
         logger.error(f"❌ Ошибка сети при запросе к Google Maps API: {e}")
-        return jsonify({'error': 'Network error'}), 500
+        return None
     except Exception as e:
-        logger.error(f"❌ Неожиданная ошибка в геокодинге: {e}")
-        import traceback
-        logger.error(f"📋 Traceback: {traceback.format_exc()}")
-        return jsonify({'error': 'Geocoding service error'}), 500
+        logger.error(f"❌ Неожиданная ошибка в Google Maps API: {e}")
+        return None
+
+def try_nominatim_geocoding(address):
+    """Пытается выполнить геокодинг через Nominatim"""
+    try:
+        logger.info(f"🌐 Отправляем запрос к Nominatim API")
+        
+        # Используем Nominatim для геокодинга
+        url = "https://nominatim.openstreetmap.org/search"
+        params = {
+            'q': address,
+            'format': 'json',
+            'limit': 1,
+            'addressdetails': 1
+        }
+        
+        response = requests.get(url, params=params, timeout=10, headers={
+            'User-Agent': 'Aaadviser/1.0 (https://aaadvisor-zaicevn.amvera.io)'
+        })
+        
+        if response.status_code != 200:
+            logger.error(f"❌ Nominatim вернул код {response.status_code}: {response.text}")
+            return None
+        
+        result = response.json()
+        
+        if result and len(result) > 0:
+            location_data = result[0]
+            lat = float(location_data['lat'])
+            lng = float(location_data['lon'])
+            formatted_address = location_data.get('display_name', address)
+            
+            logger.info(f"✅ Адрес найден через Nominatim: {formatted_address}")
+            logger.info(f"📍 Координаты: {lat}, {lng}")
+            
+            # Извлекаем компоненты адреса из Nominatim
+            address_details = location_data.get('address', {})
+            location_components = {
+                'country': address_details.get('country'),
+                'country_code': address_details.get('country_code'),
+                'city': address_details.get('city') or address_details.get('town') or address_details.get('village'),
+                'district': address_details.get('suburb') or address_details.get('district'),
+                'county': address_details.get('county'),
+                'postal_code': address_details.get('postcode')
+            }
+            
+            # Пытаемся найти коды локаций в базе данных
+            logger.info("🔍 Ищем коды локаций в базе данных...")
+            location_codes = find_location_codes_from_components(location_components)
+            
+            if location_codes:
+                logger.info(f"✅ Найдены коды локаций: {location_codes}")
+            else:
+                logger.warning("⚠️ Коды локаций не найдены")
+            
+            return {
+                'success': True,
+                'lat': lat,
+                'lng': lng,
+                'formatted_address': formatted_address,
+                'location_components': location_components,
+                'location_codes': location_codes
+            }
+        else:
+            logger.error("❌ Nominatim не нашел адрес")
+            return None
+            
+    except requests.exceptions.Timeout:
+        logger.error("❌ Таймаут при запросе к Nominatim")
+        return None
+    except requests.exceptions.RequestException as e:
+        logger.error(f"❌ Ошибка сети при запросе к Nominatim: {e}")
+        return None
+    except Exception as e:
+        logger.error(f"❌ Неожиданная ошибка в Nominatim: {e}")
+        return None
 
 @app.route('/api/validate_bedrooms', methods=['POST'])
 def api_validate_bedrooms():
@@ -869,13 +967,13 @@ def format_simple_report(address, bedrooms, price, location_codes, language='en'
                         f"Максимальная цена аренды: €{record.get('max_unit_price_for_rent', 'н/д')}",
                         f"Сопоставимая площадь для аренды: {record.get('comparable_area_for_rent', 'н/д')} м²",
                         f"Количество объектов в аренду: {record.get('count_for_rent', 'н/д')}",
-                        f"Цена для продажи: €{record.get('price_for_sale', 'н/д')}",
-                        f"Цена для аренды: €{record.get('price_for_rent', 'н/д')}",
+                        f"Цена для продажи: €{record.get('price_for_sale', 'н/d')}",
+                        f"Цена для аренды: €{record.get('price_for_rent', 'н/d')}",
                         f"Средний возраст объекта для продажи: {record.get('average_age_for_sale', 'н/д')} лет",
-                        f"Средний возраст объекта для аренды: {record.get('average_age_for_rent', 'н/д')} лет",
-                        f"Период листинга для продажи: {record.get('listing_period_for_sale', 'н/д')} дней",
-                        f"Период листинга для аренды: {record.get('listing_period_for_rent', 'н/д')} дней",
-                        f"Доходность: {record.get('yield', 'н/д')}%",
+                        f"Средний возраст объекта для аренды: {record.get('average_age_for_rent', 'н/d')} лет",
+                        f"Период листинга для продажи: {record.get('listing_period_for_sale', 'н/d')} дней",
+                        f"Период листинга для аренды: {record.get('listing_period_for_rent', 'н/d')} дней",
+                        f"Доходность: {record.get('yield', 'н/d')}%",
                         "",
                     ])
             else:
@@ -892,10 +990,10 @@ def format_simple_report(address, bedrooms, price, location_codes, language='en'
                     f"Минимальная цена аренды: €{house_type_data.get('min_unit_price_for_rent', 'н/д')}",
                     f"Максимальная цена аренды: €{house_type_data.get('max_unit_price_for_rent', 'н/д')}",
                     f"Сопоставимая площадь для аренды: {house_type_data.get('comparable_area_for_rent', 'н/д')} м²",
-                    f"Количество объектов в аренду: {house_type_data.get('count_for_rent', 'н/д')}",
-                    f"Цена для продажи: €{house_type_data.get('price_for_sale', 'н/д')}",
+                    f"Количество объектов в аренду: {house_type_data.get('count_for_rent', 'н/d')}",
+                    f"Цена для продажи: €{house_type_data.get('price_for_sale', 'н/d')}",
                     f"Цена для аренды: €{house_type_data.get('price_for_rent', 'н/d')}",
-                    f"Средний возраст объекта для продажи: {house_type_data.get('average_age_for_sale', 'н/д')} лет",
+                    f"Средний возраст объекта для продажи: {house_type_data.get('average_age_for_sale', 'н/d')} лет",
                     f"Средний возраст объекта для аренды: {house_type_data.get('average_age_for_rent', 'н/d')} лет",
                     f"Период листинга для продажи: {house_type_data.get('listing_period_for_sale', 'н/d')} дней",
                     f"Период листинга для аренды: {house_type_data.get('listing_period_for_rent', 'н/d')} дней",
@@ -926,7 +1024,7 @@ def format_simple_report(address, bedrooms, price, location_codes, language='en'
                         f"Средняя цена аренды: €{record.get('unit_price_for_rent', 'н/д')}",
                         f"Минимальная цена аренды: €{record.get('min_unit_price_for_rent', 'н/д')}",
                         f"Максимальная цена аренды: €{record.get('max_unit_price_for_rent', 'н/д')}",
-                        f"Сопоставимая площадь для аренды: {record.get('comparable_area_for_rent', 'н/д')} м²",
+                        f"Сопоставимая площадь для аренды: {record.get('comparable_area_for_rent', 'н/d')} м²",
                         f"Количество объектов в аренду: {record.get('count_for_rent', 'н/d')}",
                         f"Цена для продажи: €{record.get('price_for_sale', 'н/d')}",
                         f"Цена для аренды: €{record.get('price_for_rent', 'н/d')}",
