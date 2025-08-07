@@ -671,7 +671,7 @@
                 if (line.includes('=== КОДЫ ЛОКАЦИЙ ===')) { current = locationCodes; continue; }
                 if (line.includes('Данные объекта:')) { current = propertyData; continue; }
                 if (line.includes('=== ОБЩИЙ ТРЕНД ===')) { current = generalTrend; continue; }
-                if (line.includes('=== ТРЕНД ПО ТИПУ ОБЪЕКТА ===')) { current = houseTypeTrend; continue; }
+                if (line.includes('=== ТРЕНД ПО КОЛИЧЕСТВУ СПАЛЕН ===')) { current = houseTypeTrend; continue; }
                 if (line.includes('=== ТРЕНД ПО ВОЗРАСТУ ОБЪЕКТА ===')) { current = ageTrend; continue; }
                 if (line.includes('=== ТРЕНД ПО ЭТАЖУ ОБЪЕКТА ===')) { current = floorTrend; continue; }
                 if (line.includes('=== ТРЕНД ПО ТИПУ ОТОПЛЕНИЯ ===')) { current = heatingTrend; continue; }
@@ -694,7 +694,7 @@
                 
                 if (propertyData.length) blocksHtml += block('Данные объекта', propertyData);
                 if (generalTrend.length) blocksHtml += block('Общий тренд', generalTrend);
-                if (houseTypeTrend.length) blocksHtml += block('Тренд по типу объекта', houseTypeTrend);
+                if (houseTypeTrend.length) blocksHtml += block('Тренд по количеству спален', houseTypeTrend);
                 if (ageTrend.length) blocksHtml += block('Тренд по возрасту объекта', ageTrend);
                 if (floorTrend.length) blocksHtml += block('Тренд по этажу объекта', floorTrend);
                 if (heatingTrend.length) blocksHtml += block('Тренд по типу отопления', heatingTrend);
