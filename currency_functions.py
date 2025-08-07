@@ -114,10 +114,25 @@ def fetch_and_save_currency_rates(target_date=None):
         quotes = data.get('quotes', {})
         logger.info(f"📊 Полученные курсы валют (относительно USD): {quotes}")
         
+        # Проверяем, что все необходимые курсы получены
+        required_quotes = ['USDEUR', 'USDRUB', 'USDTRY', 'USDAED', 'USDTHB']
+        missing_quotes = [quote for quote in required_quotes if quote not in quotes]
+        
+        if missing_quotes:
+            logger.error(f"❌ Отсутствуют необходимые курсы валют: {missing_quotes}")
+            logger.info("⚠️ Используем последнюю доступную запись из базы данных")
+            return get_latest_currency_rate()
+        
         # Конвертируем курсы в EUR как базовую валюту
         # Получаем курс USD/EUR
         usd_eur_rate = quotes.get('USDEUR', 1.0)
         logger.info(f"💱 Курс USD/EUR: {usd_eur_rate}")
+        
+        # Проверяем, что курс USD/EUR не равен 0
+        if usd_eur_rate == 0:
+            logger.error("❌ Курс USD/EUR равен 0, невозможно конвертировать")
+            logger.info("⚠️ Используем последнюю доступную запись из базы данных")
+            return get_latest_currency_rate()
         
         # Формируем данные для сохранения в базу
         # Все курсы конвертируем в EUR как базовую валюту
@@ -130,6 +145,22 @@ def fetch_and_save_currency_rates(target_date=None):
             'aed': quotes.get('USDAED', 1.0) / usd_eur_rate,  # USD/AED / (USD/EUR) = EUR/AED
             'thb': quotes.get('USDTHB', 1.0) / usd_eur_rate   # USD/THB / (USD/EUR) = EUR/THB
         }
+        
+        # Проверяем, что все поля заполнены и не равны None
+        required_fields = ['rub', 'usd', 'euro', 'try', 'aed', 'thb']
+        missing_fields = [field for field in required_fields if currency_data.get(field) is None]
+        
+        if missing_fields:
+            logger.error(f"❌ Отсутствуют обязательные поля: {missing_fields}")
+            logger.info("⚠️ Используем последнюю доступную запись из базы данных")
+            return get_latest_currency_rate()
+        
+        # Проверяем, что все значения положительные
+        negative_fields = [field for field in required_fields if currency_data.get(field, 0) <= 0]
+        if negative_fields:
+            logger.error(f"❌ Отрицательные или нулевые значения в полях: {negative_fields}")
+            logger.info("⚠️ Используем последнюю доступную запись из базы данных")
+            return get_latest_currency_rate()
         
         logger.info(f"💾 Сохраняем курсы валют в базу (конвертированные в EUR):")
         logger.info(f"   EUR (базовая): {currency_data['euro']}")
