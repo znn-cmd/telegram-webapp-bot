@@ -389,72 +389,61 @@ def api_check_admin_status():
 
 @app.route('/api/geocode', methods=['POST'])
 def api_geocode():
-    """Геокодинг адреса через Google Maps API с извлечением структурированных данных"""
+    """Геокодинг адреса через Nominatim API с fallback на Google Maps API"""
     data = request.json or {}
     address = data.get('address')
     if not address:
         return jsonify({'error': 'Address required'}), 400
     
+    # Сначала пробуем Nominatim API (более надежный на серверах)
     try:
-        # Запрос к Google Maps Geocoding API
+        nominatim_data = get_nominatim_location(address)
+        if nominatim_data and nominatim_data.get('lat') and nominatim_data.get('lon'):
+            logger.info(f"✅ Успешно получены данные через Nominatim: {nominatim_data}")
+            
+            # Создаем структурированные данные из Nominatim
+            location_components = {
+                'country': nominatim_data.get('country'),
+                'country_code': nominatim_data.get('country_code'),
+                'city': nominatim_data.get('city'),
+                'district': nominatim_data.get('district'),
+                'county': nominatim_data.get('county'),
+                'postal_code': nominatim_data.get('postal_code'),
+                'nominatim_data': nominatim_data
+            }
+            
+            # Пытаемся найти коды локаций в базе данных
+            location_codes = find_location_codes_from_components(location_components)
+            
+            return jsonify({
+                'success': True,
+                'lat': float(nominatim_data['lat']),
+                'lng': float(nominatim_data['lon']),
+                'formatted_address': nominatim_data.get('display_name', address),
+                'location_components': location_components,
+                'location_codes': location_codes,
+                'source': 'nominatim'
+            })
+    except Exception as e:
+        logger.error(f"Nominatim geocoding error: {e}")
+    
+    # Fallback на Google Maps API (если доступен)
+    try:
+        logger.info("🔄 Пробуем Google Maps API как fallback...")
         url = f"https://maps.googleapis.com/maps/api/geocode/json"
         params = {
             'address': address,
             'key': GOOGLE_MAPS_API_KEY
         }
-        response = requests.get(url, params=params)
+        response = requests.get(url, params=params, timeout=10)
         result = response.json()
         
         if result['status'] == 'OK' and result['results']:
             location = result['results'][0]['geometry']['location']
             formatted_address = result['results'][0]['formatted_address']
             
-            # Детальное логирование ответа Google Places API
-            logger.info("=" * 60)
-            logger.info("🔍 ДЕТАЛЬНЫЙ АНАЛИЗ ОТВЕТА GOOGLE PLACES API")
-            logger.info("=" * 60)
-            logger.info(f"Оригинальный адрес: {address}")
-            logger.info(f"Formatted address: {formatted_address}")
-            logger.info(f"Lat: {location['lat']}, Lng: {location['lng']}")
-            
-            # Логируем все компоненты адреса от Google
-            logger.info("\n📋 Все компоненты адреса от Google:")
-            for i, component in enumerate(result['results'][0]['address_components']):
-                logger.info(f"  {i+1}. {component.get('long_name', '')} ({component.get('short_name', '')}) - Types: {component.get('types', [])}")
-            
-            # Анализируем, что Google не определил
-            google_components = [comp.get('long_name', '') for comp in result['results'][0]['address_components']]
-            address_parts = address.split(',')
-            first_part = address_parts[0].strip() if address_parts else ""
-            
-            logger.info(f"\n🔍 АНАЛИЗ:")
-            logger.info(f"Первая часть адреса: '{first_part}'")
-            logger.info(f"Компоненты Google: {google_components}")
-            if first_part not in google_components:
-                logger.info(f"⚠️  '{first_part}' НЕ найден в компонентах Google!")
-            else:
-                logger.info(f"✅ '{first_part}' найден в компонентах Google")
-            
             # Извлекаем структурированные данные из Google Places API
             location_components = extract_location_components(result['results'][0]['address_components'], address)
-            
-            # Дополнительно получаем данные через Nominatim
-            nominatim_data = get_nominatim_location(address)
-            
-            # Объединяем данные Google и Nominatim
-            if nominatim_data:
-                # Если Google не определил district, используем данные Nominatim
-                if not location_components.get('district') and nominatim_data.get('district'):
-                    location_components['district'] = nominatim_data['district']
-                    logger.info(f"Добавлен district из Nominatim: {nominatim_data['district']}")
-                
-                # Если Google не определил county, используем данные Nominatim
-                if not location_components.get('county') and nominatim_data.get('county'):
-                    location_components['county'] = nominatim_data['county']
-                    logger.info(f"Добавлен county из Nominatim: {nominatim_data['county']}")
-                
-                # Сохраняем данные Nominatim для отображения
-                location_components['nominatim_data'] = nominatim_data
             
             # Пытаемся найти коды локаций в базе данных
             location_codes = find_location_codes_from_components(location_components)
@@ -465,16 +454,18 @@ def api_geocode():
                 'lng': location['lng'],
                 'formatted_address': formatted_address,
                 'location_components': location_components,
-                'location_codes': location_codes
+                'location_codes': location_codes,
+                'source': 'google'
             })
         else:
+            logger.warning(f"Google Maps API вернул статус: {result.get('status')}")
             return jsonify({
                 'success': False,
-                'error': 'Address not found'
+                'error': 'Address not found by any geocoding service'
             })
     except Exception as e:
-        logger.error(f"Geocoding error: {e}")
-        return jsonify({'error': 'Geocoding service error'}), 500
+        logger.error(f"Google Maps geocoding error: {e}")
+        return jsonify({'error': 'All geocoding services are unavailable'}), 500
 
 @app.route('/api/validate_bedrooms', methods=['POST'])
 def api_validate_bedrooms():
@@ -3844,7 +3835,7 @@ def get_nominatim_location(address):
         dict: Структурированные данные адреса или None
     """
     try:
-        # Запрос к Nominatim API
+        # Запрос к Nominatim API с таймаутом
         url = "https://nominatim.openstreetmap.org/search"
         params = {
             'q': address,
@@ -3856,7 +3847,8 @@ def get_nominatim_location(address):
             'User-Agent': 'Aaadviser/1.0'
         }
         
-        response = requests.get(url, params=params, headers=headers)
+        # Добавляем таймаут для предотвращения зависания
+        response = requests.get(url, params=params, headers=headers, timeout=15)
         result = response.json()
         
         if result and len(result) > 0:
@@ -3878,13 +3870,20 @@ def get_nominatim_location(address):
                 'display_name': location.get('display_name')
             }
             
-            logger.info(f"Nominatim данные: {location_data}")
+            logger.info(f"✅ Nominatim данные получены: {location_data}")
             return location_data
         
+        logger.warning(f"⚠️ Nominatim не нашел результатов для адреса: {address}")
         return None
         
+    except requests.exceptions.Timeout:
+        logger.error(f"⏰ Таймаут при запросе к Nominatim API для адреса: {address}")
+        return None
+    except requests.exceptions.ConnectionError as e:
+        logger.error(f"🌐 Ошибка подключения к Nominatim API: {e}")
+        return None
     except Exception as e:
-        logger.error(f"Ошибка Nominatim API: {e}")
+        logger.error(f"❌ Ошибка Nominatim API: {e}")
         return None
 
 def extract_location_components(address_components, original_address=None):
