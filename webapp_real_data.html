@@ -678,8 +678,6 @@
                 if (current && line.trim() !== '') current.push(line);
             }
             
-            let blocksHtml = '';
-            
             // Проверяем статус админа и показываем коды локаций только для админов
             checkAdminStatus().then(isAdmin => {
                 let blocksHtml = '';
