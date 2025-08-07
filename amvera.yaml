@@ -4,8 +4,6 @@ version: "3.11"
 
 build:
   commands:
-    - chmod +x app.py
-    - apt-get update && apt-get install -y libgl1-mesa-glx libglib2.0-0 libsm6 libxext6 libxrender-dev libgomp1
     - pip install -r requirements.txt
 
 run:
@@ -17,9 +15,5 @@ env:
     value: 7215676549:AAFS86JbRCqwzTKQG-dF96JX-C1aWNvBoLo
   - name: SUPABASE_URL
     value: https://dzllnnohurlzjyabgsft.supabase.co
-  - name: SUPABASE_ANON_KEY
+  - name: SUPABASE_KEY
     value: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR6bGxubm9odXJsemp5YWJnc2Z0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA5NDgwMjcsImV4cCI6MjA2NjUyNDAyN30.sJCIeeIm0Ye1JbAdw5HzfAMe8QLgQomArK8yoppuevQ
-
-resources:
-  memory: 512Mi
-  cpu: 250m
