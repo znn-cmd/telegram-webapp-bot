@@ -545,41 +545,8 @@ def api_generate_report():
             except Exception as e:
                 logger.error(f"Error checking admin status: {e}")
         
-        # Импортируем функции для работы с валютой
-        try:
-            from currency_functions import get_currency_rate_for_date, convert_turkish_data_to_eur, is_turkish_location
-        except ImportError:
-            # Если основной файл не найден, пробуем v2
-            try:
-                from currency_functions_v2 import get_currency_rate_for_date, convert_turkish_data_to_eur, is_turkish_location
-            except ImportError:
-                logger.error("❌ Не удалось импортировать валютные функции")
-                # Создаем заглушки функций
-                def get_currency_rate_for_date(target_date=None):
-                    logger.warning("⚠️ Валютные функции недоступны")
-                    return None
-                
-                def convert_turkish_data_to_eur(data, currency_rate):
-                    logger.warning("⚠️ Валютные функции недоступны")
-                    return data
-                
-                def is_turkish_location(location_components):
-                    logger.warning("⚠️ Валютные функции недоступны")
-                    return False
-        
-        # Проверяем, является ли локация турецкой и конвертируем данные если нужно
-        is_turkish = is_turkish_location(location_components) if location_components else False
-        currency_rate = None
-        
-        if is_turkish:
-            logger.info(f"🇹🇷 Турецкая локация обнаружена, получаем курс валюты")
-            currency_rate = get_currency_rate_for_date()
-            if currency_rate and market_data:
-                logger.info(f"💱 Конвертируем турецкие данные в EUR")
-                market_data = convert_turkish_data_to_eur(market_data, currency_rate)
-        
         # Формируем отчёт в текстовом формате для отображения
-        report_text = format_simple_report(address, bedrooms, price, location_codes, language, market_data, is_admin, currency_rate, is_turkish)
+        report_text = format_simple_report(address, bedrooms, price, location_codes, language, market_data, is_admin)
         
         # Сохраняем отчет в базу данных (если есть telegram_id)
         if telegram_id:
@@ -595,9 +562,7 @@ def api_generate_report():
                         'price': price,
                         'lat': lat,
                         'lng': lng,
-                        'location_codes': location_codes,
-                        'is_turkish': is_turkish,
-                        'currency_rate': currency_rate
+                        'location_codes': location_codes
                     },
                     'address': address,
                     'latitude': lat,
@@ -626,17 +591,14 @@ def api_generate_report():
                     'address': address,
                     'bedrooms': bedrooms,
                     'price': price
-                },
-                'market_data': market_data,
-                'is_turkish': is_turkish,
-                'currency_rate': currency_rate,
-                'report_text': report_text
-            }
+                }
+            },
+            'report_text': report_text
         })
         
     except Exception as e:
-        logger.error(f"❌ Ошибка генерации отчета: {e}")
-        return jsonify({'error': str(e)}), 500
+        logger.error(f"Error generating report: {e}")
+        return jsonify({'error': 'Internal error'}), 500
 
 def get_location_codes_from_address(address):
     """Получает коды локаций из таблицы locations по адресу"""
@@ -735,37 +697,18 @@ def get_location_codes_from_address(address):
         logger.error(f"Error getting location codes: {e}")
         return None
 
-def format_simple_report(address, bedrooms, price, location_codes, language='en', market_data=None, is_admin=False, currency_rate=None, is_turkish=False):
+def format_simple_report(address, bedrooms, price, location_codes, language='en', market_data=None, is_admin=False):
     """Форматирование простого отчёта с кодами локаций и данными рынка"""
     
     # Форматируем цену
     def format_price(price):
-        if price is None or price == 'н/д':
-            return 'н/д'
-        try:
-            return f"€{float(price):.2f}".replace('.00', '').replace('.', ',')
-        except (ValueError, TypeError):
-            return str(price)
-    
-    # Получаем текущую дату
-    from datetime import datetime
-    current_date = datetime.now().strftime('%d.%m.%Y')
+        return f"€{price:.2f}".replace('.00', '').replace('.', ',')
     
     # Формируем отчёт
     report_lines = [
         f"Анализ рынка в радиусе 5 км:",
         "",
     ]
-    
-    # Добавляем информацию о дате формирования отчета и курсе валюты для турецких локаций
-    if is_turkish and currency_rate:
-        try_rate = currency_rate.get('try', 0)
-        if try_rate > 0:
-            report_lines.extend([
-                f"📅 Дата формирования отчета: {current_date}",
-                f"💱 Курс валюты (EUR/TRY): 1 EUR = {try_rate:.4f} TRY",
-                "",
-            ])
     
     # Добавляем коды локаций (только для админов)
     logger.info(f"📋 Форматирование кодов локаций: {location_codes}")
@@ -886,12 +829,12 @@ def format_simple_report(address, bedrooms, price, location_codes, language='en'
                         f"Сопоставимая площадь для аренды: {record.get('comparable_area_for_rent', 'н/д')} м²",
                         f"Количество объектов в аренду: {record.get('count_for_rent', 'н/д')}",
                         f"Цена для продажи: €{record.get('price_for_sale', 'н/д')}",
-                        f"Цена для аренды: €{record.get('price_for_rent', 'н/d')}",
+                        f"Цена для аренды: €{record.get('price_for_rent', 'н/д')}",
                         f"Средний возраст объекта для продажи: {record.get('average_age_for_sale', 'н/д')} лет",
-                        f"Средний возраст объекта для аренды: {record.get('average_age_for_rent', 'н/d')} лет",
-                        f"Период листинга для продажи: {record.get('listing_period_for_sale', 'н/d')} дней",
-                        f"Период листинга для аренды: {record.get('listing_period_for_rent', 'н/d')} дней",
-                        f"Доходность: {record.get('yield', 'н/d')}%",
+                        f"Средний возраст объекта для аренды: {record.get('average_age_for_rent', 'н/д')} лет",
+                        f"Период листинга для продажи: {record.get('listing_period_for_sale', 'н/д')} дней",
+                        f"Период листинга для аренды: {record.get('listing_period_for_rent', 'н/д')} дней",
+                        f"Доходность: {record.get('yield', 'н/д')}%",
                         "",
                     ])
             else:
@@ -899,23 +842,23 @@ def format_simple_report(address, bedrooms, price, location_codes, language='en'
                 listing_type = house_type_data.get('listing_type', 'н/д')
                 report_lines.extend([
                     f"--- Количество спален: {listing_type} ---",
-                    f"Средняя цена продажи: €{house_type_data.get('unit_price_for_sale', 'н/d')}",
-                    f"Минимальная цена продажи: €{house_type_data.get('min_unit_price_for_sale', 'н/d')}",
-                    f"Максимальная цена продажи: €{house_type_data.get('max_unit_price_for_sale', 'н/d')}",
-                    f"Сопоставимая площадь для продажи: {house_type_data.get('comparable_area_for_sale', 'н/d')} м²",
-                    f"Количество объектов на продажу: {house_type_data.get('count_for_sale', 'н/d')}",
-                    f"Средняя цена аренды: €{house_type_data.get('unit_price_for_rent', 'н/d')}",
-                    f"Минимальная цена аренды: €{house_type_data.get('min_unit_price_for_rent', 'н/d')}",
-                    f"Максимальная цена аренды: €{house_type_data.get('max_unit_price_for_rent', 'н/d')}",
-                    f"Сопоставимая площадь для аренды: {house_type_data.get('comparable_area_for_rent', 'н/d')} м²",
-                    f"Количество объектов в аренду: {house_type_data.get('count_for_rent', 'н/d')}",
-                    f"Цена для продажи: €{house_type_data.get('price_for_sale', 'н/d')}",
-                    f"Цена для аренды: €{house_type_data.get('price_for_rent', 'н/d')}",
-                    f"Средний возраст объекта для продажи: {house_type_data.get('average_age_for_sale', 'н/d')} лет",
-                    f"Средний возраст объекта для аренды: {house_type_data.get('average_age_for_rent', 'н/d')} лет",
-                    f"Период листинга для продажи: {house_type_data.get('listing_period_for_sale', 'н/d')} дней",
-                    f"Период листинга для аренды: {house_type_data.get('listing_period_for_rent', 'н/d')} дней",
-                    f"Доходность: {house_type_data.get('yield', 'н/d')}%",
+                    f"Средняя цена продажи: €{house_type_data.get('unit_price_for_sale', 'н/д')}",
+                    f"Минимальная цена продажи: €{house_type_data.get('min_unit_price_for_sale', 'н/д')}",
+                    f"Максимальная цена продажи: €{house_type_data.get('max_unit_price_for_sale', 'н/д')}",
+                    f"Сопоставимая площадь для продажи: {house_type_data.get('comparable_area_for_sale', 'н/д')} м²",
+                    f"Количество объектов на продажу: {house_type_data.get('count_for_sale', 'н/д')}",
+                    f"Средняя цена аренды: €{house_type_data.get('unit_price_for_rent', 'н/д')}",
+                    f"Минимальная цена аренды: €{house_type_data.get('min_unit_price_for_rent', 'н/д')}",
+                    f"Максимальная цена аренды: €{house_type_data.get('max_unit_price_for_rent', 'н/д')}",
+                    f"Сопоставимая площадь для аренды: {house_type_data.get('comparable_area_for_rent', 'н/д')} м²",
+                    f"Количество объектов в аренду: {house_type_data.get('count_for_rent', 'н/д')}",
+                    f"Цена для продажи: €{house_type_data.get('price_for_sale', 'н/д')}",
+                    f"Цена для аренды: €{house_type_data.get('price_for_rent', 'н/д')}",
+                    f"Средний возраст объекта для продажи: {house_type_data.get('average_age_for_sale', 'н/д')} лет",
+                    f"Средний возраст объекта для аренды: {house_type_data.get('average_age_for_rent', 'н/д')} лет",
+                    f"Период листинга для продажи: {house_type_data.get('listing_period_for_sale', 'н/д')} дней",
+                    f"Период листинга для аренды: {house_type_data.get('listing_period_for_rent', 'н/д')} дней",
+                    f"Доходность: {house_type_data.get('yield', 'н/д')}%",
                     "",
                 ])
         
@@ -934,21 +877,21 @@ def format_simple_report(address, bedrooms, price, location_codes, language='en'
                         f"--- Возраст здания: {listing_type} ---",
                         f"Средний возраст объектов на продажу: {record.get('average_age_for_sale', 'н/д')} лет",
                         f"Средний возраст объектов в аренду: {record.get('average_age_for_rent', 'н/д')} лет",
-                        f"Средняя цена продажи: €{record.get('unit_price_for_sale', 'н/d')}",
-                        f"Минимальная цена продажи: €{record.get('min_unit_price_for_sale', 'н/d')}",
-                        f"Максимальная цена продажи: €{record.get('max_unit_price_for_sale', 'н/d')}",
-                        f"Сопоставимая площадь для продажи: {record.get('comparable_area_for_sale', 'н/d')} м²",
-                        f"Количество объектов на продажу: {record.get('count_for_sale', 'н/d')}",
-                        f"Средняя цена аренды: €{record.get('unit_price_for_rent', 'н/d')}",
-                        f"Минимальная цена аренды: €{record.get('min_unit_price_for_rent', 'н/d')}",
-                        f"Максимальная цена аренды: €{record.get('max_unit_price_for_rent', 'н/d')}",
-                        f"Сопоставимая площадь для аренды: {record.get('comparable_area_for_rent', 'н/d')} м²",
-                        f"Количество объектов в аренду: {record.get('count_for_rent', 'н/d')}",
-                        f"Цена для продажи: €{record.get('price_for_sale', 'н/d')}",
-                        f"Цена для аренды: €{record.get('price_for_rent', 'н/d')}",
-                        f"Период листинга для продажи: {record.get('listing_period_for_sale', 'н/d')} дней",
-                        f"Период листинга для аренды: {record.get('listing_period_for_rent', 'н/d')} дней",
-                        f"Доходность: {record.get('yield', 'н/d')}%",
+                        f"Средняя цена продажи: €{record.get('unit_price_for_sale', 'н/д')}",
+                        f"Минимальная цена продажи: €{record.get('min_unit_price_for_sale', 'н/д')}",
+                        f"Максимальная цена продажи: €{record.get('max_unit_price_for_sale', 'н/д')}",
+                        f"Сопоставимая площадь для продажи: {record.get('comparable_area_for_sale', 'н/д')} м²",
+                        f"Количество объектов на продажу: {record.get('count_for_sale', 'н/д')}",
+                        f"Средняя цена аренды: €{record.get('unit_price_for_rent', 'н/д')}",
+                        f"Минимальная цена аренды: €{record.get('min_unit_price_for_rent', 'н/д')}",
+                        f"Максимальная цена аренды: €{record.get('max_unit_price_for_rent', 'н/д')}",
+                        f"Сопоставимая площадь для аренды: {record.get('comparable_area_for_rent', 'н/д')} м²",
+                        f"Количество объектов в аренду: {record.get('count_for_rent', 'н/д')}",
+                        f"Цена для продажи: €{record.get('price_for_sale', 'н/д')}",
+                        f"Цена для аренды: €{record.get('price_for_rent', 'н/д')}",
+                        f"Период листинга для продажи: {record.get('listing_period_for_sale', 'н/д')} дней",
+                        f"Период листинга для аренды: {record.get('listing_period_for_rent', 'н/д')} дней",
+                        f"Доходность: {record.get('yield', 'н/д')}%",
                         "",
                     ])
             else:
@@ -956,23 +899,23 @@ def format_simple_report(address, bedrooms, price, location_codes, language='en'
                 listing_type = age_data.get('listing_type', 'н/д')
                 report_lines.extend([
                     f"--- Возраст здания: {listing_type} ---",
-                    f"Средний возраст объектов на продажу: {age_data.get('average_age_for_sale', 'н/d')} лет",
-                    f"Средний возраст объектов в аренду: {age_data.get('average_age_for_rent', 'н/d')} лет",
-                    f"Средняя цена продажи: €{age_data.get('unit_price_for_sale', 'н/d')}",
-                    f"Минимальная цена продажи: €{age_data.get('min_unit_price_for_sale', 'н/d')}",
-                    f"Максимальная цена продажи: €{age_data.get('max_unit_price_for_sale', 'н/d')}",
-                    f"Сопоставимая площадь для продажи: {age_data.get('comparable_area_for_sale', 'н/d')} м²",
-                    f"Количество объектов на продажу: {age_data.get('count_for_sale', 'н/d')}",
-                    f"Средняя цена аренды: €{age_data.get('unit_price_for_rent', 'н/d')}",
-                    f"Минимальная цена аренды: €{age_data.get('min_unit_price_for_rent', 'н/d')}",
-                    f"Максимальная цена аренды: €{age_data.get('max_unit_price_for_rent', 'н/d')}",
-                    f"Сопоставимая площадь для аренды: {age_data.get('comparable_area_for_rent', 'н/d')} м²",
-                    f"Количество объектов в аренду: {age_data.get('count_for_rent', 'н/d')}",
-                    f"Цена для продажи: €{age_data.get('price_for_sale', 'н/d')}",
-                    f"Цена для аренды: €{age_data.get('price_for_rent', 'н/d')}",
-                    f"Период листинга для продажи: {age_data.get('listing_period_for_sale', 'н/d')} дней",
-                    f"Период листинга для аренды: {age_data.get('listing_period_for_rent', 'н/d')} дней",
-                    f"Доходность: {age_data.get('yield', 'н/d')}%",
+                    f"Средний возраст объектов на продажу: {age_data.get('average_age_for_sale', 'н/д')} лет",
+                    f"Средний возраст объектов в аренду: {age_data.get('average_age_for_rent', 'н/д')} лет",
+                    f"Средняя цена продажи: €{age_data.get('unit_price_for_sale', 'н/д')}",
+                    f"Минимальная цена продажи: €{age_data.get('min_unit_price_for_sale', 'н/д')}",
+                    f"Максимальная цена продажи: €{age_data.get('max_unit_price_for_sale', 'н/д')}",
+                    f"Сопоставимая площадь для продажи: {age_data.get('comparable_area_for_sale', 'н/д')} м²",
+                    f"Количество объектов на продажу: {age_data.get('count_for_sale', 'н/д')}",
+                    f"Средняя цена аренды: €{age_data.get('unit_price_for_rent', 'н/д')}",
+                    f"Минимальная цена аренды: €{age_data.get('min_unit_price_for_rent', 'н/д')}",
+                    f"Максимальная цена аренды: €{age_data.get('max_unit_price_for_rent', 'н/д')}",
+                    f"Сопоставимая площадь для аренды: {age_data.get('comparable_area_for_rent', 'н/д')} м²",
+                    f"Количество объектов в аренду: {age_data.get('count_for_rent', 'н/д')}",
+                    f"Цена для продажи: €{age_data.get('price_for_sale', 'н/д')}",
+                    f"Цена для аренды: €{age_data.get('price_for_rent', 'н/д')}",
+                    f"Период листинга для продажи: {age_data.get('listing_period_for_sale', 'н/д')} дней",
+                    f"Период листинга для аренды: {age_data.get('listing_period_for_rent', 'н/д')} дней",
+                    f"Доходность: {age_data.get('yield', 'н/д')}%",
                     "",
                 ])
         
@@ -989,23 +932,23 @@ def format_simple_report(address, bedrooms, price, location_codes, language='en'
                     listing_type = record.get('listing_type', 'н/д')
                     report_lines.extend([
                         f"--- Этаж объекта: {listing_type} ---",
-                        f"Средняя цена продажи: €{record.get('unit_price_for_sale', 'н/d')}",
-                        f"Минимальная цена продажи: €{record.get('min_unit_price_for_sale', 'н/d')}",
-                        f"Максимальная цена продажи: €{record.get('max_unit_price_for_sale', 'н/d')}",
-                        f"Сопоставимая площадь для продажи: {record.get('comparable_area_for_sale', 'н/d')} м²",
-                        f"Количество объектов на продажу: {record.get('count_for_sale', 'н/d')}",
-                        f"Средняя цена аренды: €{record.get('unit_price_for_rent', 'н/d')}",
-                        f"Минимальная цена аренды: €{record.get('min_unit_price_for_rent', 'н/d')}",
-                        f"Максимальная цена аренды: €{record.get('max_unit_price_for_rent', 'н/d')}",
-                        f"Сопоставимая площадь для аренды: {record.get('comparable_area_for_rent', 'н/d')} м²",
-                        f"Количество объектов в аренду: {record.get('count_for_rent', 'н/d')}",
-                        f"Цена для продажи: €{record.get('price_for_sale', 'н/d')}",
-                        f"Цена для аренды: €{record.get('price_for_rent', 'н/d')}",
-                        f"Средний возраст объекта для продажи: {record.get('average_age_for_sale', 'н/d')} лет",
-                        f"Средний возраст объекта для аренды: {record.get('average_age_for_rent', 'н/d')} лет",
-                        f"Период листинга для продажи: {record.get('listing_period_for_sale', 'н/d')} дней",
-                        f"Период листинга для аренды: {record.get('listing_period_for_rent', 'н/d')} дней",
-                        f"Доходность: {record.get('yield', 'н/d')}%",
+                        f"Средняя цена продажи: €{record.get('unit_price_for_sale', 'н/д')}",
+                        f"Минимальная цена продажи: €{record.get('min_unit_price_for_sale', 'н/д')}",
+                        f"Максимальная цена продажи: €{record.get('max_unit_price_for_sale', 'н/д')}",
+                        f"Сопоставимая площадь для продажи: {record.get('comparable_area_for_sale', 'н/д')} м²",
+                        f"Количество объектов на продажу: {record.get('count_for_sale', 'н/д')}",
+                        f"Средняя цена аренды: €{record.get('unit_price_for_rent', 'н/д')}",
+                        f"Минимальная цена аренды: €{record.get('min_unit_price_for_rent', 'н/д')}",
+                        f"Максимальная цена аренды: €{record.get('max_unit_price_for_rent', 'н/д')}",
+                        f"Сопоставимая площадь для аренды: {record.get('comparable_area_for_rent', 'н/д')} м²",
+                        f"Количество объектов в аренду: {record.get('count_for_rent', 'н/д')}",
+                        f"Цена для продажи: €{record.get('price_for_sale', 'н/д')}",
+                        f"Цена для аренды: €{record.get('price_for_rent', 'н/д')}",
+                        f"Средний возраст объекта для продажи: {record.get('average_age_for_sale', 'н/д')} лет",
+                        f"Средний возраст объекта для аренды: {record.get('average_age_for_rent', 'н/д')} лет",
+                        f"Период листинга для продажи: {record.get('listing_period_for_sale', 'н/д')} дней",
+                        f"Период листинга для аренды: {record.get('listing_period_for_rent', 'н/д')} дней",
+                        f"Доходность: {record.get('yield', 'н/д')}%",
                         "",
                     ])
             else:
@@ -1013,23 +956,23 @@ def format_simple_report(address, bedrooms, price, location_codes, language='en'
                 listing_type = floor_data.get('listing_type', 'н/д')
                 report_lines.extend([
                     f"--- Этаж объекта: {listing_type} ---",
-                    f"Средняя цена продажи: €{floor_data.get('unit_price_for_sale', 'н/d')}",
-                    f"Минимальная цена продажи: €{floor_data.get('min_unit_price_for_sale', 'н/d')}",
-                    f"Максимальная цена продажи: €{floor_data.get('max_unit_price_for_sale', 'н/d')}",
-                    f"Сопоставимая площадь для продажи: {floor_data.get('comparable_area_for_sale', 'н/d')} м²",
-                    f"Количество объектов на продажу: {floor_data.get('count_for_sale', 'н/d')}",
-                    f"Средняя цена аренды: €{floor_data.get('unit_price_for_rent', 'н/d')}",
-                    f"Минимальная цена аренды: €{floor_data.get('min_unit_price_for_rent', 'н/d')}",
-                    f"Максимальная цена аренды: €{floor_data.get('max_unit_price_for_rent', 'н/d')}",
-                    f"Сопоставимая площадь для аренды: {floor_data.get('comparable_area_for_rent', 'н/d')} м²",
-                    f"Количество объектов в аренду: {floor_data.get('count_for_rent', 'н/d')}",
-                    f"Цена для продажи: €{floor_data.get('price_for_sale', 'н/d')}",
-                    f"Цена для аренды: €{floor_data.get('price_for_rent', 'н/d')}",
-                    f"Средний возраст объекта для продажи: {floor_data.get('average_age_for_sale', 'н/d')} лет",
-                    f"Средний возраст объекта для аренды: {floor_data.get('average_age_for_rent', 'н/d')} лет",
-                    f"Период листинга для продажи: {floor_data.get('listing_period_for_sale', 'н/d')} дней",
-                    f"Период листинга для аренды: {floor_data.get('listing_period_for_rent', 'н/d')} дней",
-                    f"Доходность: {floor_data.get('yield', 'н/d')}%",
+                    f"Средняя цена продажи: €{floor_data.get('unit_price_for_sale', 'н/д')}",
+                    f"Минимальная цена продажи: €{floor_data.get('min_unit_price_for_sale', 'н/д')}",
+                    f"Максимальная цена продажи: €{floor_data.get('max_unit_price_for_sale', 'н/д')}",
+                    f"Сопоставимая площадь для продажи: {floor_data.get('comparable_area_for_sale', 'н/д')} м²",
+                    f"Количество объектов на продажу: {floor_data.get('count_for_sale', 'н/д')}",
+                    f"Средняя цена аренды: €{floor_data.get('unit_price_for_rent', 'н/д')}",
+                    f"Минимальная цена аренды: €{floor_data.get('min_unit_price_for_rent', 'н/д')}",
+                    f"Максимальная цена аренды: €{floor_data.get('max_unit_price_for_rent', 'н/д')}",
+                    f"Сопоставимая площадь для аренды: {floor_data.get('comparable_area_for_rent', 'н/д')} м²",
+                    f"Количество объектов в аренду: {floor_data.get('count_for_rent', 'н/д')}",
+                    f"Цена для продажи: €{floor_data.get('price_for_sale', 'н/д')}",
+                    f"Цена для аренды: €{floor_data.get('price_for_rent', 'н/д')}",
+                    f"Средний возраст объекта для продажи: {floor_data.get('average_age_for_sale', 'н/д')} лет",
+                    f"Средний возраст объекта для аренды: {floor_data.get('average_age_for_rent', 'н/д')} лет",
+                    f"Период листинга для продажи: {floor_data.get('listing_period_for_sale', 'н/д')} дней",
+                    f"Период листинга для аренды: {floor_data.get('listing_period_for_rent', 'н/д')} дней",
+                    f"Доходность: {floor_data.get('yield', 'н/д')}%",
                     "",
                 ])
         
@@ -1046,23 +989,23 @@ def format_simple_report(address, bedrooms, price, location_codes, language='en'
                     listing_type = record.get('listing_type', 'н/д')
                     report_lines.extend([
                         f"--- Система отопления: {listing_type} ---",
-                        f"Средняя цена продажи: €{record.get('unit_price_for_sale', 'н/d')}",
-                        f"Минимальная цена продажи: €{record.get('min_unit_price_for_sale', 'н/d')}",
-                        f"Максимальная цена продажи: €{record.get('max_unit_price_for_sale', 'н/d')}",
-                        f"Сопоставимая площадь для продажи: {record.get('comparable_area_for_sale', 'н/d')} м²",
-                        f"Количество объектов на продажу: {record.get('count_for_sale', 'н/d')}",
-                        f"Средняя цена аренды: €{record.get('unit_price_for_rent', 'н/d')}",
-                        f"Минимальная цена аренды: €{record.get('min_unit_price_for_rent', 'н/d')}",
-                        f"Максимальная цена аренды: €{record.get('max_unit_price_for_rent', 'н/d')}",
-                        f"Сопоставимая площадь для аренды: {record.get('comparable_area_for_rent', 'н/d')} м²",
-                        f"Количество объектов в аренду: {record.get('count_for_rent', 'н/d')}",
-                        f"Цена для продажи: €{record.get('price_for_sale', 'н/d')}",
-                        f"Цена для аренды: €{record.get('price_for_rent', 'н/d')}",
-                        f"Средний возраст объекта для продажи: {record.get('average_age_for_sale', 'н/d')} лет",
-                        f"Средний возраст объекта для аренды: {record.get('average_age_for_rent', 'н/d')} лет",
-                        f"Период листинга для продажи: {record.get('listing_period_for_sale', 'н/d')} дней",
-                        f"Период листинга для аренды: {record.get('listing_period_for_rent', 'н/d')} дней",
-                        f"Доходность: {record.get('yield', 'н/d')}%",
+                        f"Средняя цена продажи: €{record.get('unit_price_for_sale', 'н/д')}",
+                        f"Минимальная цена продажи: €{record.get('min_unit_price_for_sale', 'н/д')}",
+                        f"Максимальная цена продажи: €{record.get('max_unit_price_for_sale', 'н/д')}",
+                        f"Сопоставимая площадь для продажи: {record.get('comparable_area_for_sale', 'н/д')} м²",
+                        f"Количество объектов на продажу: {record.get('count_for_sale', 'н/д')}",
+                        f"Средняя цена аренды: €{record.get('unit_price_for_rent', 'н/д')}",
+                        f"Минимальная цена аренды: €{record.get('min_unit_price_for_rent', 'н/д')}",
+                        f"Максимальная цена аренды: €{record.get('max_unit_price_for_rent', 'н/д')}",
+                        f"Сопоставимая площадь для аренды: {record.get('comparable_area_for_rent', 'н/д')} м²",
+                        f"Количество объектов в аренду: {record.get('count_for_rent', 'н/д')}",
+                        f"Цена для продажи: €{record.get('price_for_sale', 'н/д')}",
+                        f"Цена для аренды: €{record.get('price_for_rent', 'н/д')}",
+                        f"Средний возраст объекта для продажи: {record.get('average_age_for_sale', 'н/д')} лет",
+                        f"Средний возраст объекта для аренды: {record.get('average_age_for_rent', 'н/д')} лет",
+                        f"Период листинга для продажи: {record.get('listing_period_for_sale', 'н/д')} дней",
+                        f"Период листинга для аренды: {record.get('listing_period_for_rent', 'н/д')} дней",
+                        f"Доходность: {record.get('yield', 'н/д')}%",
                         "",
                     ])
             else:
@@ -1070,25 +1013,1798 @@ def format_simple_report(address, bedrooms, price, location_codes, language='en'
                 listing_type = heating_data.get('listing_type', 'н/д')
                 report_lines.extend([
                     f"--- Система отопления: {listing_type} ---",
-                    f"Средняя цена продажи: €{heating_data.get('unit_price_for_sale', 'н/d')}",
-                    f"Минимальная цена продажи: €{heating_data.get('min_unit_price_for_sale', 'н/d')}",
-                    f"Максимальная цена продажи: €{heating_data.get('max_unit_price_for_sale', 'н/d')}",
-                    f"Сопоставимая площадь для продажи: {heating_data.get('comparable_area_for_sale', 'н/d')} м²",
-                    f"Количество объектов на продажу: {heating_data.get('count_for_sale', 'н/d')}",
-                    f"Средняя цена аренды: €{heating_data.get('unit_price_for_rent', 'н/d')}",
-                    f"Минимальная цена аренды: €{heating_data.get('min_unit_price_for_rent', 'н/d')}",
-                    f"Максимальная цена аренды: €{heating_data.get('max_unit_price_for_rent', 'н/d')}",
-                    f"Сопоставимая площадь для аренды: {heating_data.get('comparable_area_for_rent', 'н/d')} м²",
-                    f"Количество объектов в аренду: {heating_data.get('count_for_rent', 'н/d')}",
-                    f"Цена для продажи: €{heating_data.get('price_for_sale', 'н/d')}",
-                    f"Цена для аренды: €{heating_data.get('price_for_rent', 'н/d')}",
-                    f"Средний возраст объекта для продажи: {heating_data.get('average_age_for_sale', 'н/d')} лет",
-                    f"Средний возраст объекта для аренды: {heating_data.get('average_age_for_rent', 'н/d')} лет",
-                    f"Период листинга для продажи: {heating_data.get('listing_period_for_sale', 'н/d')} дней",
-                    f"Период листинга для аренды: {heating_data.get('listing_period_for_rent', 'н/d')} дней",
-                    f"Доходность: {heating_data.get('yield', 'н/d')}%",
+                    f"Средняя цена продажи: €{heating_data.get('unit_price_for_sale', 'н/д')}",
+                    f"Минимальная цена продажи: €{heating_data.get('min_unit_price_for_sale', 'н/д')}",
+                    f"Максимальная цена продажи: €{heating_data.get('max_unit_price_for_sale', 'н/д')}",
+                    f"Сопоставимая площадь для продажи: {heating_data.get('comparable_area_for_sale', 'н/д')} м²",
+                    f"Количество объектов на продажу: {heating_data.get('count_for_sale', 'н/д')}",
+                    f"Средняя цена аренды: €{heating_data.get('unit_price_for_rent', 'н/д')}",
+                    f"Минимальная цена аренды: €{heating_data.get('min_unit_price_for_rent', 'н/д')}",
+                    f"Максимальная цена аренды: €{heating_data.get('max_unit_price_for_rent', 'н/д')}",
+                    f"Сопоставимая площадь для аренды: {heating_data.get('comparable_area_for_rent', 'н/д')} м²",
+                    f"Количество объектов в аренду: {heating_data.get('count_for_rent', 'н/д')}",
+                    f"Цена для продажи: €{heating_data.get('price_for_sale', 'н/д')}",
+                    f"Цена для аренды: €{heating_data.get('price_for_rent', 'н/д')}",
+                    f"Средний возраст объекта для продажи: {heating_data.get('average_age_for_sale', 'н/д')} лет",
+                    f"Средний возраст объекта для аренды: {heating_data.get('average_age_for_rent', 'н/д')} лет",
+                    f"Период листинга для продажи: {heating_data.get('listing_period_for_sale', 'н/д')} дней",
+                    f"Период листинга для аренды: {heating_data.get('listing_period_for_rent', 'н/д')} дней",
+                    f"Доходность: {heating_data.get('yield', 'н/д')}%",
                     "",
                 ])
+    else:
+        report_lines.extend([
+            "=== АНАЛИЗ РЫНКА ===",
+            "Данные анализа рынка не найдены для данной локации",
+            "",
+        ])
+    
+    return "\n".join(report_lines)
+
+@app.route('/api/search_properties', methods=['POST'])
+def api_search_properties():
+    """Поиск недвижимости по параметрам"""
+    data = request.json or {}
+    property_type = data.get('property_type')
+    bedrooms = data.get('bedrooms')
+    price_min = data.get('price_min')
+    price_max = data.get('price_max')
+    city = data.get('city')
+    district = data.get('district')
+    
+    try:
+        # Здесь должна быть логика поиска в базе данных
+        # Пока возвращаем демо-данные
+        
+        properties = [
+            {
+                'id': 1,
+                'address': 'ул. Ататюрка, 123, Анталья',
+                'bedrooms': bedrooms or 3,
+                'price': 250000,
+                'property_type': property_type or 'sale',
+                'latitude': 36.8969,
+                'longitude': 30.7133
+            }
+        ]
+        
+        return jsonify({
+            'success': True,
+            'properties': properties,
+            'total': len(properties)
+        })
+        
+    except Exception as e:
+        logger.error(f"Error searching properties: {e}")
+        return jsonify({'error': 'Internal error'}), 500
+
+@app.route('/api/market_statistics', methods=['POST'])
+def api_market_statistics():
+    """Получение статистики рынка по городу и району из Supabase"""
+    data = request.json or {}
+    city = data.get('city')
+    district = data.get('district')
+    try:
+        # Фильтрация по городу и району (case-insensitive)
+        filters = []
+        if city:
+            filters.append(('city', city.lower()))
+        if district:
+            filters.append(('district', district.lower()))
+        # Property sales
+        sales_query = supabase.table('property_sales').select('*')
+        if city:
+            sales_query = sales_query.ilike('city', f'%{city}%')
+        if district:
+            sales_query = sales_query.ilike('district', f'%{district}%')
+        sales = sales_query.execute().data or []
+        # Long term rentals
+        long_term_query = supabase.table('long_term_rentals').select('*')
+        if city:
+            long_term_query = long_term_query.ilike('city', f'%{city}%')
+        if district:
+            long_term_query = long_term_query.ilike('district', f'%{district}%')
+        long_term = long_term_query.execute().data or []
+        # Short term rentals
+        short_term_query = supabase.table('short_term_rentals').select('*')
+        if city:
+            short_term_query = short_term_query.ilike('city', f'%{city}%')
+        if district:
+            short_term_query = short_term_query.ilike('district', f'%{district}%')
+        short_term = short_term_query.execute().data or []
+        # Средняя цена за м²
+        sqm_prices = [x for x in (s.get('price_per_sqm') for s in sales) if isinstance(x, (int, float))]
+        avg_price_per_sqm = sum(sqm_prices) / len(sqm_prices) if sqm_prices else 0
+        # Количество объектов
+        total_properties = len(sales)
+        # Среднее время продажи
+        days_on_market = [x for x in (s.get('days_on_market') for s in sales) if isinstance(x, (int, float))]
+        avg_days_on_market = sum(days_on_market) / len(days_on_market) if days_on_market else 0
+        # Годовой рост цен (по последним 2 годам, если есть даты)
+        price_growth_yoy = 0
+        try:
+            sales_with_dates = [s for s in sales if s.get('sale_date') and isinstance(s.get('asking_price'), (int, float))]
+            if len(sales_with_dates) > 5:
+                sales_with_dates.sort(key=lambda x: x['sale_date'])
+                first_year = sales_with_dates[0]['sale_date'][:4]
+                last_year = sales_with_dates[-1]['sale_date'][:4]
+                first_prices = [s['asking_price'] for s in sales_with_dates if s['sale_date'][:4] == first_year and isinstance(s.get('asking_price'), (int, float))]
+                last_prices = [s['asking_price'] for s in sales_with_dates if s['sale_date'][:4] == last_year and isinstance(s.get('asking_price'), (int, float))]
+                if first_prices and last_prices:
+                    price_growth_yoy = (sum(last_prices)/len(last_prices) - sum(first_prices)/len(first_prices)) / (sum(first_prices)/len(first_prices)) * 100
+        except Exception:
+            price_growth_yoy = 0
+        # Доходность аренды (long_term)
+        rental_yield = 0
+        try:
+            if avg_price_per_sqm > 0 and long_term:
+                rents = [x for x in (r.get('monthly_rent') for r in long_term) if isinstance(x, (int, float))]
+                avg_rent = sum(rents) / len(rents) if rents else 0
+                prices = [x for x in (s.get('asking_price') for s in sales) if isinstance(x, (int, float))]
+                avg_price = sum(prices) / len(prices) if prices else 0
+                if avg_price > 0:
+                    rental_yield = (avg_rent * 12) / avg_price * 100
+        except Exception:
+            rental_yield = 0
+        # Активность рынка (по количеству продаж)
+        market_activity = 'high' if total_properties > 100 else 'medium' if total_properties > 20 else 'low'
+        # Тренд цен (по price_growth_yoy)
+        price_trend = 'up' if price_growth_yoy > 5 else 'stable' if price_growth_yoy > -2 else 'down'
+        stats = {
+            'avg_price_per_sqm': round(avg_price_per_sqm, 2),
+            'price_growth_yoy': round(price_growth_yoy, 2),
+            'total_properties': total_properties,
+            'avg_days_on_market': round(avg_days_on_market, 1),
+            'rental_yield': round(rental_yield, 2),
+            'price_trend': price_trend,
+            'market_activity': market_activity
+        }
+        return jsonify({
+            'success': True,
+            'statistics': stats
+        })
+    except Exception as e:
+        logger.error(f"Error getting market statistics: {e}")
+        return jsonify({'error': 'Internal error'}), 500
+
+@app.route('/api/calculate_roi', methods=['POST'])
+def api_calculate_roi():
+    data = request.json or {}
+    property_type = data.get('property_type')
+    purchase_price = data.get('purchase_price')
+    purchase_costs = data.get('purchase_costs', 0)
+    try:
+        purchase_price = float(purchase_price) if purchase_price is not None else 0
+        purchase_costs = float(purchase_costs) if purchase_costs is not None else 0
+    except (ValueError, TypeError):
+        return jsonify({'error': 'Invalid purchase_price or purchase_costs'}), 400
+
+    if property_type == 'short_term':
+        avg_nightly_rate = data.get('avg_nightly_rate')
+        occupancy_rate = data.get('occupancy_rate', 75)
+        try:
+            avg_nightly_rate = float(avg_nightly_rate) if avg_nightly_rate is not None else 0
+            occupancy_rate = float(occupancy_rate) if occupancy_rate is not None else 75
+        except (ValueError, TypeError):
+            return jsonify({'error': 'Invalid avg_nightly_rate or occupancy_rate'}), 400
+        # Расчет ROI для краткосрочной аренды
+        monthly_income = avg_nightly_rate * (occupancy_rate / 100) * 30
+        annual_income = monthly_income * 12
+        total_investment = purchase_price + purchase_costs
+        roi = (annual_income / total_investment) * 100 if total_investment else 0
+    elif property_type == 'long_term':
+        monthly_rent = data.get('monthly_rent')
+        try:
+            monthly_rent = float(monthly_rent) if monthly_rent is not None else 0
+        except (ValueError, TypeError):
+            return jsonify({'error': 'Invalid monthly_rent'}), 400
+        # Расчет ROI для долгосрочной аренды
+        annual_income = monthly_rent * 12
+        total_investment = purchase_price + purchase_costs
+        roi = (annual_income / total_investment) * 100 if total_investment else 0
+    else:
+        return jsonify({'error': 'Invalid property type'}), 400
+    
+    return jsonify({
+        'success': True,
+        'roi': round(roi, 2),
+        'annual_income': annual_income,
+        'total_investment': total_investment
+    })
+
+@app.route('/api/similar_properties', methods=['POST'])
+def api_similar_properties():
+    """Поиск похожих объектов"""
+    data = request.json or {}
+    address = data.get('address')
+    bedrooms = data.get('bedrooms')
+    price = data.get('price')
+    try:
+        price = float(price) if price is not None else 0
+    except (ValueError, TypeError):
+        price = 0
+    try:
+        # Здесь должна быть логика поиска похожих объектов
+        # Пока возвращаем демо-данные
+        
+        similar_properties = [
+            {
+                'id': 1,
+                'address': 'ул. Ататюрка, 125, Анталья',
+                'bedrooms': bedrooms,
+                'price': price * 0.95,
+                'similarity_score': 0.95
+            },
+            {
+                'id': 2,
+                'address': 'ул. Ататюрка, 127, Анталья',
+                'bedrooms': bedrooms,
+                'price': price * 1.05,
+                'similarity_score': 0.92
+            }
+        ]
+        
+        return jsonify({
+            'success': True,
+            'properties': similar_properties
+        })
+        
+    except Exception as e:
+        logger.error(f"Error finding similar properties: {e}")
+        return jsonify({'error': 'Internal error'}), 500
+
+def get_economic_data(country_code='TUR', years_back=10):
+    """
+    Получение экономических данных (ВВП и инфляция) из таблицы imf_economic_data
+    
+    Args:
+        country_code (str): Код страны (по умолчанию TUR для Турции)
+        years_back (int): Количество лет назад для получения данных
+    
+    Returns:
+        dict: Словарь с данными ВВП и инфляции
+    """
+    try:
+        # Получаем данные за последние N лет
+        current_year = datetime.now().year
+        start_year = current_year - years_back
+        
+        # Запрос к таблице imf_economic_data для ВВП (NGDP_RPCH)
+        gdp_query = supabase.table('imf_economic_data').select('*').eq('country_code', country_code).eq('indicator_code', 'NGDP_RPCH').gte('year', start_year).order('year', desc=True)
+        gdp_result = gdp_query.execute()
+        
+        # Запрос к таблице imf_economic_data для инфляции (PCPIPCH)
+        inflation_query = supabase.table('imf_economic_data').select('*').eq('country_code', country_code).eq('indicator_code', 'PCPIPCH').gte('year', start_year).order('year', desc=True)
+        inflation_result = inflation_query.execute()
+        
+        if not gdp_result.data and not inflation_result.data:
+            logger.warning(f"No economic data found for country {country_code}, using fallback data")
+            # Fallback данные для Турции
+            fallback_gdp_data = [
+                {'year': 2020, 'value': -1.2, 'indicator_code': 'NGDP_RPCH', 'indicator_name': 'GDP growth'},
+                {'year': 2021, 'value': 11.4, 'indicator_code': 'NGDP_RPCH', 'indicator_name': 'GDP growth'},
+                {'year': 2022, 'value': 5.6, 'indicator_code': 'NGDP_RPCH', 'indicator_name': 'GDP growth'},
+                {'year': 2023, 'value': 4.5, 'indicator_code': 'NGDP_RPCH', 'indicator_name': 'GDP growth'},
+                {'year': 2024, 'value': 4.1, 'indicator_code': 'NGDP_RPCH', 'indicator_name': 'GDP growth'}
+            ]
+            
+            fallback_inflation_data = [
+                {'year': 2020, 'value': 12.3, 'indicator_code': 'PCPIPCH', 'indicator_name': 'Inflation'},
+                {'year': 2021, 'value': 19.6, 'indicator_code': 'PCPIPCH', 'indicator_name': 'Inflation'},
+                {'year': 2022, 'value': 72.3, 'indicator_code': 'PCPIPCH', 'indicator_name': 'Inflation'},
+                {'year': 2023, 'value': 64.8, 'indicator_code': 'PCPIPCH', 'indicator_name': 'Inflation'},
+                {'year': 2024, 'value': 58.2, 'indicator_code': 'PCPIPCH', 'indicator_name': 'Inflation'}
+            ]
+            
+            gdp_data = fallback_gdp_data
+            inflation_data = fallback_inflation_data
+        else:
+            # Обрабатываем данные ВВП
+            gdp_data = []
+            for record in gdp_result.data:
+                year = record.get('year')
+                value = record.get('value')
+                if year and value is not None:
+                    gdp_data.append({
+                        'year': year,
+                        'value': float(value),  # Рост ВВП в процентах
+                        'indicator_code': record.get('indicator_code'),
+                        'indicator_name': record.get('indicator_name')
+                    })
+            
+            # Обрабатываем данные инфляции
+            inflation_data = []
+            for record in inflation_result.data:
+                year = record.get('year')
+                value = record.get('value')
+                if year and value is not None:
+                    inflation_data.append({
+                        'year': year,
+                        'value': float(value),  # Уровень инфляции в процентах
+                        'indicator_code': record.get('indicator_code'),
+                        'indicator_name': record.get('indicator_name')
+                    })
+        
+        # Сортируем по году (от старых к новым для графиков)
+        gdp_data.sort(key=lambda x: x['year'])
+        inflation_data.sort(key=lambda x: x['year'])
+        
+        # Вычисляем тренды
+        gdp_values = [d['value'] for d in gdp_data]
+        inflation_values = [d['value'] for d in inflation_data]
+        
+        gdp_trend = calculate_trend(gdp_values) if gdp_values else 0
+        inflation_trend = calculate_trend(inflation_values) if inflation_values else 0
+        
+        # Генерируем детальные расчеты
+        detailed_calculations = generate_detailed_calculations(gdp_data, inflation_data)
+        
+        # Пытаемся загрузить сохраненные интерпретации из базы данных
+        saved_interpretations, saved_calculations = load_interpretations_from_database(country_code)
+        
+        if saved_interpretations and saved_calculations:
+            # Используем сохраненные интерпретации
+            interpretations = saved_interpretations
+            detailed_calculations.update(saved_calculations)
+            logger.info(f"Using cached interpretations for {country_code}")
+        else:
+            # Генерируем новые интерпретации через ChatGPT
+            interpretations = {}
+            for lang in ['en', 'ru', 'tr', 'fr', 'de']:
+                interpretations[lang] = generate_trend_interpretation_with_chatgpt(
+                    gdp_trend, inflation_trend, gdp_data, inflation_data, lang
+                )
+            
+            # Сохраняем интерпретации в базу данных
+            try:
+                save_interpretations_to_database(country_code, interpretations, detailed_calculations)
+            except Exception as e:
+                logger.warning(f"Could not save interpretations to database: {e}")
+        
+        # Получаем название страны из первой записи
+        country_name = gdp_result.data[0].get('country_name') if gdp_result.data else 'Turkey'
+        
+        return {
+            'gdp_data': gdp_data,
+            'inflation_data': inflation_data,
+            'country_code': country_code,
+            'country_name': country_name,
+            'gdp_trend': gdp_trend,
+            'inflation_trend': inflation_trend,
+            'latest_gdp': gdp_data[-1] if gdp_data else None,
+            'latest_inflation': inflation_data[-1] if inflation_data else None,
+            'data_years': f"{start_year}-{current_year}",
+            'detailed_calculations': detailed_calculations,
+            'interpretations': interpretations
+        }
+        
+    except Exception as e:
+        logger.error(f"Error fetching economic data: {e}")
+        return {
+            'gdp_data': [],
+            'inflation_data': [],
+            'country_code': country_code,
+            'country_name': 'Unknown',
+            'error': str(e)
+        }
+
+def calculate_trend(values):
+    """
+    Вычисление тренда (рост/падение) для ряда значений
+    
+    Args:
+        values (list): Список числовых значений
+        
+    Returns:
+        float: Коэффициент тренда (положительный = рост, отрицательный = падение)
+    """
+    if len(values) < 2:
+        return 0
+    
+    try:
+        # Простой расчет тренда как среднее изменение
+        changes = []
+        for i in range(1, len(values)):
+            if values[i-1] != 0:
+                change = (values[i] - values[i-1]) / values[i-1]
+                changes.append(change)
+        
+        return sum(changes) / len(changes) if changes else 0
+    except Exception:
+        return 0
+
+def create_economic_chart_data(economic_data):
+    """
+    Создание данных для построения графиков ВВП и инфляции
+    
+    Args:
+        economic_data (dict): Данные из get_economic_data()
+        
+    Returns:
+        dict: Данные для графиков
+    """
+    gdp_data = economic_data.get('gdp_data', [])
+    inflation_data = economic_data.get('inflation_data', [])
+    country_name = economic_data.get('country_name', 'Unknown')
+    
+    # Подготавливаем данные для графиков ВВП (рост в процентах)
+    gdp_chart = {
+        'labels': [str(d['year']) for d in gdp_data],
+        'datasets': [
+            {
+                'label': f'Рост ВВП (%) - {country_name}',
+                'data': [d['value'] for d in gdp_data],  # Рост ВВП в процентах
+                'borderColor': '#667eea',
+                'backgroundColor': 'rgba(102, 126, 234, 0.1)',
+                'tension': 0.4,
+                'fill': False
+            }
+        ]
+    }
+    
+    # Подготавливаем данные для графиков инфляции
+    inflation_chart = {
+        'labels': [str(d['year']) for d in inflation_data],
+        'datasets': [
+            {
+                'label': f'Инфляция (%) - {country_name}',
+                'data': [d['value'] for d in inflation_data],  # Уровень инфляции в процентах
+                'borderColor': '#dc3545',
+                'backgroundColor': 'rgba(220, 53, 69, 0.1)',
+                'tension': 0.4,
+                'fill': False
+            }
+        ]
+    }
+    
+    return {
+        'gdp_chart': gdp_chart,
+        'inflation_chart': inflation_chart,
+        'trends': {
+            'gdp_trend': economic_data.get('gdp_trend', 0),
+            'inflation_trend': economic_data.get('inflation_trend', 0)
+        },
+        'latest': {
+            'gdp': economic_data.get('latest_gdp'),
+            'inflation': economic_data.get('latest_inflation')
+        },
+        'country_name': country_name,
+        'country_code': economic_data.get('country_code', 'Unknown'),
+        'detailed_calculations': economic_data.get('detailed_calculations', {}),
+        'interpretations': economic_data.get('interpretations', {})
+    }
+
+@app.route('/api/full_report', methods=['POST'])
+def api_full_report():
+    data = request.json or {}
+    telegram_id_raw = data.get('telegram_id')
+    if telegram_id_raw is None:
+        return jsonify({'error': 'Invalid telegram_id'}), 400
+    try:
+        telegram_id = int(telegram_id_raw)
+    except (TypeError, ValueError):
+        return jsonify({'error': 'Invalid telegram_id'}), 400
+    address = data.get('address')
+    lat = data.get('lat')
+    lng = data.get('lng')
+    bedrooms = data.get('bedrooms')
+    price = data.get('price')
+    try:
+        price = float(price) if price is not None else 0
+    except (ValueError, TypeError):
+        price = 0
+    try:
+        # --- MOCK/DEMO DATA ---
+        avg_sqm = 15451.29
+        price_growth = 0.042
+        short_term_income = 1950
+        short_term_net = 1560
+        long_term_income = 43000
+        long_term_net = 34400
+        five_year_growth = 0.23
+        alt_deposit = 0.128
+        alt_bonds = 0.245
+        alt_stocks = 0.382
+        alt_reits = 0.427
+        inflation = 64.8
+        eur_try = 35.2
+        eur_try_growth = 0.14
+        refi_rate = 45
+        gdp_growth = 4.1
+        taxes = {
+            'transfer_tax': 0.04,
+            'stamp_duty': 0.015,
+            'notary': 1200,
+            'annual_property_tax': 0.001,
+            'annual_property_tax_max': 0.006,
+            'rental_income_tax': '15-35%',
+            'capital_gains_tax': '15-40%'
+        }
+        risks = [
+            'Валютный: TRY/EUR ▲23% за 3 года',
+            'Политический: Выборы 2028',
+            'Экологический: Карта наводнений (NASA Earth Data)'
+        ]
+        liquidity = 'Среднее время продажи: 68 дней'
+        district = 'Новый трамвай до пляжа (2026), Строительство школы (2027)'
+        
+        # --- ПОЛУЧАЕМ РЕАЛЬНЫЕ ЭКОНОМИЧЕСКИЕ ДАННЫЕ ---
+        economic_data = get_economic_data('TUR', 10)  # Данные за последние 10 лет
+        chart_data = create_economic_chart_data(economic_data)
+        
+        # Обновляем макроэкономические данные реальными значениями
+        if economic_data.get('latest_inflation'):
+            inflation = economic_data['latest_inflation']['value']
+        
+        if economic_data.get('latest_gdp'):
+            gdp_growth = economic_data['latest_gdp']['value']  # Рост ВВП в процентах
+        
+        # --- Формируем структуру полного отчёта ---
+        full_report_data = {
+            'object': {
+                'address': address,
+                'bedrooms': bedrooms,
+                'purchase_price': price,
+                'avg_price_per_sqm': avg_sqm
+            },
+            'roi': {
+                'short_term': {
+                    'monthly_income': short_term_income,
+                    'net_income': short_term_net,
+                    'five_year_income': 93600,
+                    'final_value': price * (1 + five_year_growth),
+                    'roi': 81.5
+                },
+                'long_term': {
+                    'annual_income': long_term_income,
+                    'net_income': long_term_net,
+                    'five_year_income': 172000,
+                    'final_value': price * (1 + five_year_growth),
+                    'roi': 130.5
+                },
+                'no_rent': {
+                    'final_value': price * (1 + five_year_growth),
+                    'roi': 23
+                },
+                'price_growth': price_growth
+            },
+            'alternatives': [
+                {'name': 'Банковский депозит', 'yield': alt_deposit, 'source': 'TCMB API'},
+                {'name': 'Облигации Турции', 'yield': alt_bonds, 'source': 'Investing.com API'},
+                {'name': 'Акции (BIST30)', 'yield': alt_stocks, 'source': 'Alpha Vantage API'},
+                {'name': 'REITs (фонды)', 'yield': alt_reits, 'source': 'Financial Modeling Prep'},
+                {'name': 'Недвижимость', 'yield': 0.815, 'source': 'Ваш объект'}
+            ],
+            'macro': {
+                'inflation': inflation,
+                'eur_try': eur_try,
+                'eur_try_growth': eur_try_growth,
+                'refi_rate': refi_rate,
+                'gdp_growth': gdp_growth
+            },
+            'economic_charts': chart_data,  # Добавляем данные для графиков
+            'taxes': taxes,
+            'risks': risks,
+            'liquidity': liquidity,
+            'district': district,
+            'yield': 0.081,
+            'price_index': 1.23,
+            'mortgage_rate': 0.32,
+            'global_house_price_index': 1.12,
+            'summary': 'Полный отчёт с реальными экономическими данными из IMF.'
+        }
+        
+        # Получаем user_id из базы данных по telegram_id
+        user_result = supabase.table('users').select('id').eq('telegram_id', telegram_id).execute()
+        user_id = user_result.data[0]['id'] if user_result.data else telegram_id
+        
+        created_at = datetime.now().isoformat()
+        
+        report_data = {
+            'user_id': user_id,
+            'report_type': 'full',
+            'title': f'Полный отчет: {address}',
+            'description': f'Полный отчет по адресу {address}, {bedrooms} спален, цена {price}',
+            'parameters': {
+                'address': address,
+                'bedrooms': bedrooms,
+                'price': price,
+                'lat': lat,
+                'lng': lng
+            },
+            'address': address,
+            'latitude': lat,
+            'longitude': lng,
+            'bedrooms': bedrooms,
+            'price': price,
+            'created_at': created_at,
+            'full_report': full_report_data
+        }
+        result = supabase.table('user_reports').insert(report_data).execute()
+        report_id = result.data[0]['id'] if hasattr(result, 'data') and result.data else None
+        return jsonify({
+            'success': True, 
+            'full_report': full_report_data, 
+            'created_at': created_at, 
+            'from_cache': False,
+            'report_id': report_id
+        })
+    except Exception as e:
+        logger.error(f"Error in full_report: {e}")
+        return jsonify({'error': 'Internal error'}), 500
+
+@app.route('/api/user_reports', methods=['POST'])
+def api_user_reports():
+    """Получение списка всех отчетов пользователя по telegram_id"""
+    data = request.json or {}
+    telegram_id_raw = data.get('telegram_id')
+    if telegram_id_raw is None:
+        return jsonify({'error': 'Invalid telegram_id'}), 400
+    try:
+        telegram_id = int(telegram_id_raw)
+    except (TypeError, ValueError):
+        return jsonify({'error': 'Invalid telegram_id'}), 400
+    if not telegram_id:
+        return jsonify({'error': 'telegram_id required'}), 400
+    try:
+        # Получаем user_id из базы данных по telegram_id
+        user_result = supabase.table('users').select('id').eq('telegram_id', telegram_id).execute()
+        if not user_result.data:
+            return jsonify({'error': 'User not found'}), 404
+        user_id = user_result.data[0]['id']
+        # Возвращаем только неотвязанные отчеты
+        result = supabase.table('user_reports').select('*').eq('user_id', user_id).is_('deleted_at', None).order('created_at', desc=True).execute()
+        reports = result.data if hasattr(result, 'data') else result
+        return jsonify({'success': True, 'reports': reports})
+    except Exception as e:
+        logger.error(f"Error fetching user reports: {e}")
+        return jsonify({'error': 'Internal error'}), 500
+
+@app.route('/api/delete_user_report', methods=['POST'])
+@app.route('/api/delete_report', methods=['POST'])
+def api_delete_user_report():
+    """Soft delete отчета: выставляет deleted_at"""
+    data = request.json or {}
+    telegram_id_raw = data.get('telegram_id')
+    if telegram_id_raw is None:
+        return jsonify({'error': 'Invalid telegram_id'}), 400
+    try:
+        telegram_id = int(telegram_id_raw)
+    except (TypeError, ValueError):
+        return jsonify({'error': 'Invalid telegram_id'}), 400
+    report_id = data.get('report_id')
+    if not telegram_id or not report_id:
+        return jsonify({'error': 'Missing required data'}), 400
+    try:
+        # Получаем user_id по telegram_id
+        user_result = supabase.table('users').select('id').eq('telegram_id', telegram_id).execute()
+        if not user_result.data:
+            logger.error(f"User with telegram_id {telegram_id} not found for report deletion")
+            return jsonify({'error': 'User not found'}), 404
+        user_id = user_result.data[0]['id']
+        # Проверяем, что отчет принадлежит пользователю и не удалён
+        report_result = supabase.table('user_reports').select('id').eq('id', report_id).eq('user_id', user_id).is_('deleted_at', None).execute()
+        if not report_result.data:
+            logger.error(f"Report {report_id} not found or not owned by user_id {user_id} or already deleted")
+            return jsonify({'error': 'Report not found or not owned by user'}), 404
+        # Soft delete: выставляем deleted_at
+        now = datetime.utcnow().isoformat()
+        supabase.table('user_reports').update({'deleted_at': now}).eq('id', report_id).execute()
+        return jsonify({'success': True})
+    except Exception as e:
+        logger.error(f"Error deleting user report: {e}")
+        return jsonify({'error': f'Internal error: {str(e)}'}), 500
+
+@app.route('/api/save_object', methods=['POST'])
+def api_save_object():
+    """Сохранение объекта в избранное"""
+    data = request.json or {}
+    telegram_id_raw = data.get('telegram_id')
+    if telegram_id_raw is None:
+        return jsonify({'error': 'Invalid telegram_id'}), 400
+    try:
+        telegram_id = int(telegram_id_raw)
+    except (TypeError, ValueError):
+        return jsonify({'error': 'Invalid telegram_id'}), 400
+    object_data = data.get('object_data')
+    
+    if not telegram_id or not object_data:
+        return jsonify({'error': 'Missing required data'}), 400
+    
+    try:
+        # Получаем user_id из базы данных по telegram_id
+        user_result = supabase.table('users').select('id').eq('telegram_id', telegram_id).execute()
+        user_id = user_result.data[0]['id'] if user_result.data else telegram_id
+        
+        # Сохраняем объект в базу данных
+        saved_object = {
+            'user_id': user_id,
+            'object_data': object_data,
+            'saved_at': datetime.now().isoformat()
+        }
+        
+        supabase.table('saved_objects').insert(saved_object).execute()
+        
+        return jsonify({'success': True})
+        
+    except Exception as e:
+        logger.error(f"Error saving object: {e}")
+        return jsonify({'error': 'Internal error'}), 500
+
+def send_pdf_to_telegram(pdf_path, telegram_id, bot_token=None):
+    """Отправляет PDF-файл пользователю через Telegram-бота. Возвращает статус отправки."""
+    import requests
+    import os
+    logger = logging.getLogger(__name__)
+    # Всегда используем рабочий токен
+    bot_token = '7215676549:AAFS86JbRCqwzTKQG-dF96JX-C1aWNvBoLo'
+    send_url = f'https://api.telegram.org/bot{bot_token}/sendDocument'
+    try:
+        with open(pdf_path, 'rb') as pdf_file:
+            files = {'document': pdf_file}
+            data_send = {'chat_id': telegram_id}
+            resp = requests.post(send_url, data=data_send, files=files)
+            if resp.status_code == 200 and resp.json().get('ok'):
+                return 'sent'
+            else:
+                logger.error(f"Telegram sendDocument error: {resp.text}")
+                return f'error: {resp.text}'
+    except Exception as e:
+        logger.error(f"Error sending PDF via Telegram bot: {e}")
+        return f'error: {e}'
+
+@app.route('/api/generate_pdf_report', methods=['POST'])
+def api_generate_pdf_report():
+    """Генерация PDF отчета с поддержкой Unicode (DejaVu) и отправка через Telegram-бота"""
+    data = request.json or {}
+    logger.info(f"PDF request data: {data}")
+    report = data.get('report')
+    profile = data.get('profile') or {}
+    client_name = data.get('client_name')
+    report_id = data.get('report_id')
+    telegram_id = data.get('telegram_id')
+    if not report_id:
+        logger.error(f"PDF generation error: report_id not provided. Incoming data: {data}")
+        return jsonify({'error': 'report_id required for PDF generation', 'details': data}), 400
+    try:
+        pdf = FPDF()
+        pdf.add_page()
+        # Добавляем шрифты DejaVu
+        pdf.add_font('DejaVu', '', 'fonts/DejaVuSans.ttf')
+        pdf.add_font('DejaVu', 'B', 'fonts/DejaVuSans-Bold.ttf')
+        
+        # Добавляем логотип на первую страницу (по центру сверху)
+        try:
+            pdf.image('logo-sqv.png', x=85, y=10, w=40)  # Центрируем логотип
+            pdf.ln(35)  # Увеличенный отступ после логотипа
+        except Exception as e:
+            logger.warning(f"Не удалось добавить логотип на первую страницу: {e}")
+            pdf.ln(35)  # Отступ даже если логотип не загрузился
+        
+        pdf.set_font('DejaVu', 'B', 16)
+        if client_name:
+            pdf.cell(0, 10, f'Клиент: {client_name}', new_x=XPos.LMARGIN, new_y=YPos.NEXT, align='C')
+        pdf.ln(2)
+        pdf.cell(0, 10, 'Полный отчет по недвижимости', new_x=XPos.LMARGIN, new_y=YPos.NEXT, align='C')
+        pdf.ln(10)
+        if report.get('object'):
+            pdf.set_font('DejaVu', 'B', 12)
+            pdf.cell(0, 10, 'Информация об объекте:', new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            pdf.set_font('DejaVu', '', 10)
+            obj = report['object']
+            pdf.cell(0, 8, f'Адрес: {obj.get("address", "Не указан")}', new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            pdf.cell(0, 8, f'Спален: {obj.get("bedrooms", "Не указано")}', new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            pdf.cell(0, 8, f'Цена: €{obj.get("purchase_price", "Не указана")}', new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            pdf.ln(5)
+        # Печатаем остальные блоки отчёта (без вложенности)
+        # ROI анализ
+        if 'roi' in report:
+            pdf.set_font("DejaVu", 'B', 14)
+            pdf.cell(200, 10, text="Инвестиционный анализ (ROI):", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            pdf.set_font("DejaVu", size=12)
+            pdf.cell(200, 8, text=f"Краткосрочная аренда: ROI {report['roi']['short_term']['roi']}%", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            pdf.cell(200, 8, text=f"Долгосрочная аренда: ROI {report['roi']['long_term']['roi']}%", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            pdf.cell(200, 8, text=f"Без аренды: ROI {report['roi']['no_rent']['roi']}%", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            pdf.ln(5)
+        # Макроэкономические показатели (объединенный блок)
+        if 'macro' in report or 'economic_charts' in report:
+            pdf.set_font("DejaVu", 'B', 14)
+            pdf.cell(200, 10, text="Макроэкономические показатели:", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            pdf.set_font("DejaVu", size=12)
+            
+            # Ключевая ставка из macro
+        if 'macro' in report:
+            pdf.cell(200, 8, text=f"Ключевая ставка: {report['macro']['refi_rate']}%", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            
+            # Экономические данные из economic_charts
+            if 'economic_charts' in report:
+                economic_charts = report['economic_charts']
+                country_name = economic_charts.get('country_name', 'Unknown')
+                
+                # Отображаем последние значения
+                latest = economic_charts.get('latest', {})
+                if latest.get('gdp'):
+                    gdp_data = latest['gdp']
+                    pdf.cell(200, 8, text=f"Последний рост ВВП ({gdp_data['year']}): {gdp_data['value']}%", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                
+                if latest.get('inflation'):
+                    inflation_data = latest['inflation']
+                    pdf.cell(200, 8, text=f"Последняя инфляция ({inflation_data['year']}): {inflation_data['value']}%", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                
+                # Отображаем тренды
+                trends = economic_charts.get('trends', {})
+                if trends.get('gdp_trend') is not None:
+                    gdp_trend = trends['gdp_trend'] * 100  # Конвертируем в проценты
+                    trend_text = f"Тренд роста ВВП: {gdp_trend:.1f}%"
+                    pdf.cell(200, 8, text=trend_text, new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                
+                if trends.get('inflation_trend') is not None:
+                    inflation_trend = trends['inflation_trend'] * 100  # Конвертируем в проценты
+                    trend_text = f"Тренд инфляции: {inflation_trend:.1f}%"
+                    pdf.cell(200, 8, text=trend_text, new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                
+                # Добавляем детальные расчеты в компактной таблице
+                detailed_calculations = economic_charts.get('detailed_calculations', {})
+                if detailed_calculations:
+                    pdf.ln(5)
+                    pdf.set_font("DejaVu", 'B', 12)
+                    pdf.cell(200, 8, text="Детальные расчеты трендов:", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                    pdf.set_font("DejaVu", size=8)
+                    
+                    # Создаем компактную таблицу в 3 столбца
+                    gdp_calcs = detailed_calculations.get('gdp_calculations', [])
+                    inflation_calcs = detailed_calculations.get('inflation_calculations', [])
+                    
+                    if gdp_calcs or inflation_calcs:
+                        # Заголовки таблицы
+                        pdf.set_font("DejaVu", 'B', 9)
+                        pdf.cell(60, 6, text="Период", new_x=XPos.RIGHT, new_y=YPos.TOP)
+                        pdf.cell(60, 6, text="Расчет", new_x=XPos.RIGHT, new_y=YPos.TOP)
+                        pdf.cell(60, 6, text="Результат", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                        pdf.set_font("DejaVu", size=8)
+                        
+                        # ВВП расчеты
+                        if gdp_calcs:
+                            pdf.cell(200, 4, text="", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                            pdf.set_font("DejaVu", 'B', 8)
+                            pdf.cell(200, 5, text="ВВП:", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                            pdf.set_font("DejaVu", size=7)
+                            
+                            for calc in gdp_calcs:
+                                # Первая строка
+                                pdf.cell(60, 4, text=calc['years'], new_x=XPos.RIGHT, new_y=YPos.TOP)
+                                pdf.cell(60, 4, text=calc['calculation'], new_x=XPos.RIGHT, new_y=YPos.TOP)
+                                pdf.cell(60, 4, text=calc['result'], new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                        
+                        # Инфляция расчеты
+                        if inflation_calcs:
+                            pdf.cell(200, 4, text="", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                            pdf.set_font("DejaVu", 'B', 8)
+                            pdf.cell(200, 5, text="Инфляция:", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                            pdf.set_font("DejaVu", size=7)
+                            
+                            for calc in inflation_calcs:
+                                # Первая строка
+                                pdf.cell(60, 4, text=calc['years'], new_x=XPos.RIGHT, new_y=YPos.TOP)
+                                pdf.cell(60, 4, text=calc['calculation'], new_x=XPos.RIGHT, new_y=YPos.TOP)
+                                pdf.cell(60, 4, text=calc['result'], new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                
+                # Добавляем интерпретации
+                interpretations = economic_charts.get('interpretations', {})
+                if interpretations and 'ru' in interpretations:
+                    pdf.ln(5)
+                    pdf.set_font("DejaVu", 'B', 12)
+                    pdf.cell(200, 8, text="Интерпретация трендов:", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                    pdf.set_font("DejaVu", size=10)
+                    
+                    ru_interp = interpretations['ru']
+                    if 'gdp_interpretation' in ru_interp:
+                        pdf.cell(200, 6, text=f"ВВП: {ru_interp['gdp_interpretation']}", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                    if 'inflation_interpretation' in ru_interp:
+                        pdf.cell(200, 6, text=f"Инфляция: {ru_interp['inflation_interpretation']}", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                    if 'recent_comparison' in ru_interp:
+                        pdf.cell(200, 6, text=f"Сравнение: {ru_interp['recent_comparison']}", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            
+            # Создаем и вставляем график
+            try:
+                # Создаем данные для графика в правильном формате
+                chart_data = {
+                    'labels': economic_charts.get('gdp_chart', {}).get('labels', []),
+                    'gdp_chart': economic_charts.get('gdp_chart', {}),
+                    'inflation_chart': economic_charts.get('inflation_chart', {})
+                }
+                
+                logger.info(f"Создание графика для PDF: {len(chart_data.get('labels', []))} точек данных")
+                
+                chart_buffer = create_chart_image_for_pdf(chart_data, f"Динамика экономических показателей ({country_name})")
+                if chart_buffer:
+                    logger.info("График создан успешно, вставляем в PDF")
+                    # Вставляем график в PDF
+                    pdf.ln(5)
+                    pdf.image(chart_buffer, x=10, y=pdf.get_y(), w=190)
+                    pdf.ln(85)  # Отступ после графика
+                    chart_buffer.close()
+                else:
+                    logger.warning("График не создался, используем текстовое отображение")
+                    # Если график не создался, показываем текстовые данные
+                    pdf.ln(3)
+                    pdf.set_font("DejaVu", 'B', 12)
+                    pdf.cell(200, 8, text=f"Динамика роста ВВП ({country_name}):", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                    pdf.set_font("DejaVu", size=10)
+                    
+                    gdp_chart = economic_charts.get('gdp_chart', {})
+                    if gdp_chart.get('labels') and gdp_chart.get('datasets'):
+                        labels = gdp_chart['labels']
+                        data = gdp_chart['datasets'][0]['data'] if gdp_chart['datasets'] else []
+                        
+                        for i, (year, value) in enumerate(zip(labels, data)):
+                            if i < 5:  # Показываем только последние 5 лет
+                                pdf.cell(200, 6, text=f"{year}: {value}%", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                    
+                    inflation_chart = economic_charts.get('inflation_chart', {})
+                    if inflation_chart.get('labels') and inflation_chart.get('datasets'):
+                        pdf.ln(3)
+                        pdf.set_font("DejaVu", 'B', 12)
+                        pdf.cell(200, 8, text=f"Динамика инфляции ({country_name}):", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                        pdf.set_font("DejaVu", size=10)
+                        
+                        labels = inflation_chart['labels']
+                        data = inflation_chart['datasets'][0]['data'] if inflation_chart['datasets'] else []
+                        
+                        for i, (year, value) in enumerate(zip(labels, data)):
+                            if i < 5:  # Показываем только последние 5 лет
+                                pdf.cell(200, 6, text=f"{year}: {value}%", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            except Exception as e:
+                logger.error(f"Ошибка вставки графика в PDF: {e}")
+                # Fallback к текстовому отображению
+                pdf.ln(3)
+                pdf.set_font("DejaVu", 'B', 12)
+                pdf.cell(200, 8, text=f"Динамика экономических показателей ({country_name}):", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                pdf.set_font("DejaVu", size=10)
+                
+                gdp_chart = economic_charts.get('gdp_chart', {})
+                if gdp_chart.get('labels') and gdp_chart.get('datasets'):
+                    labels = gdp_chart['labels']
+                    data = gdp_chart['datasets'][0]['data'] if gdp_chart['datasets'] else []
+                    
+                    for i, (year, value) in enumerate(zip(labels, data)):
+                        if i < 5:  # Показываем только последние 5 лет
+                            pdf.cell(200, 6, text=f"{year}: {value}%", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            
+            pdf.ln(5)
+        
+        # Данные трендов недвижимости
+        if report.get('object') and report['object'].get('address'):
+            address = report['object']['address']
+            location_data = extract_location_from_address(address)
+            
+            pdf.set_font("DejaVu", 'B', 14)
+            pdf.cell(200, 10, text="Тренды рынка недвижимости:", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            pdf.set_font("DejaVu", size=12)
+            
+            if location_data['city_name']:
+                trends_data, trends_message = get_property_trends_data(
+                    location_data['city_name'],
+                    location_data['district_name'],
+                    location_data['county_name']
+                )
+                
+                # Получаем исторические данные для графиков
+                historical_data = get_historical_property_trends(
+                    location_data['city_name'],
+                    location_data['district_name'],
+                    location_data['county_name']
+                )
+                
+                # Данные по продаже
+                pdf.set_font("DejaVu", 'B', 12)
+                pdf.cell(200, 8, text="Данные по продаже:", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                pdf.set_font("DejaVu", size=10)
+                
+                # Показываем источник данных
+                if trends_message:
+                    pdf.cell(200, 6, text=f"Источник данных: {trends_message}", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                
+                if trends_data:
+                    if trends_data.get('unit_price_for_sale'):
+                        pdf.cell(200, 6, text=f"Средняя цена за м² (продажа): €{trends_data['unit_price_for_sale']:,.2f}", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                    else:
+                        pdf.cell(200, 6, text="Средняя цена за м² (продажа): н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                    
+                    if trends_data.get('price_change_sale'):
+                        change_percent = trends_data['price_change_sale'] * 100
+                        pdf.cell(200, 6, text=f"Изменение цен (продажа): {change_percent:+.2f}%", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                    else:
+                        pdf.cell(200, 6, text="Изменение цен (продажа): н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                    
+                    if trends_data.get('listing_period_for_sale'):
+                        pdf.cell(200, 6, text=f"Средний период продажи: {trends_data['listing_period_for_sale']} дней", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                    else:
+                        pdf.cell(200, 6, text="Средний период продажи: н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                    
+                    if trends_data.get('count_for_sale'):
+                        pdf.cell(200, 6, text=f"Объектов на продажу: {trends_data['count_for_sale']}", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                    else:
+                        pdf.cell(200, 6, text="Объектов на продажу: н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                else:
+                    pdf.cell(200, 6, text="Средняя цена за м² (продажа): н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                    pdf.cell(200, 6, text="Изменение цен (продажа): н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                    pdf.cell(200, 6, text="Средний период продажи: н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                    pdf.cell(200, 6, text="Объектов на продажу: н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                
+                # График изменения цен на продажу
+                if historical_data:
+                    sale_chart_buffer = create_property_trends_chart(historical_data, 'sale', 180, 80)
+                    if sale_chart_buffer:
+                        pdf.ln(3)
+                        pdf.image(sale_chart_buffer, x=15, w=180)
+                        pdf.ln(3)
+                
+            pdf.ln(5)
+            
+            # Данные по аренде (долгосрочная)
+            pdf.set_font("DejaVu", 'B', 12)
+            pdf.cell(200, 8, text="Данные по долгосрочной аренде:", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            pdf.set_font("DejaVu", size=10)
+            
+            if trends_data:
+                    if trends_data.get('unit_price_for_rent'):
+                        pdf.cell(200, 6, text=f"Средняя цена за м² (аренда): €{trends_data['unit_price_for_rent']:,.2f}", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                    else:
+                        pdf.cell(200, 6, text="Средняя цена за м² (аренда): н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                    
+                    if trends_data.get('price_change_rent'):
+                        change_percent = trends_data['price_change_rent'] * 100
+                        pdf.cell(200, 6, text=f"Изменение цен (аренда): {change_percent:+.2f}%", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                    else:
+                        pdf.cell(200, 6, text="Изменение цен (аренда): н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                    
+                    if trends_data.get('listing_period_for_rent'):
+                        pdf.cell(200, 6, text=f"Средний период аренды: {trends_data['listing_period_for_rent']} дней", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                    else:
+                        pdf.cell(200, 6, text="Средний период аренды: н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                    
+                    if trends_data.get('count_for_rent'):
+                        pdf.cell(200, 6, text=f"Объектов на аренду: {trends_data['count_for_rent']}", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                    else:
+                        pdf.cell(200, 6, text="Объектов на аренду: н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                    
+                    # Доходность
+                    if trends_data.get('yield'):
+                        yield_percent = trends_data['yield'] * 100
+                        pdf.cell(200, 6, text=f"Доходность: {yield_percent:.2f}%", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                    else:
+                        pdf.cell(200, 6, text="Доходность: н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            else:
+                pdf.cell(200, 6, text="Средняя цена за м² (аренда): н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                pdf.cell(200, 6, text="Изменение цен (аренда): н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                pdf.cell(200, 6, text="Средний период аренды: н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                pdf.cell(200, 6, text="Объектов на аренду: н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                pdf.cell(200, 6, text="Доходность: н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            
+            # График изменения цен на аренду
+            if historical_data:
+                rent_chart_buffer = create_property_trends_chart(historical_data, 'rent', 180, 80)
+                if rent_chart_buffer:
+                    pdf.ln(3)
+                    pdf.image(rent_chart_buffer, x=15, w=180)
+                    pdf.ln(3)
+        else:
+            # Адрес не содержит информации о городе - показываем "н/д" для всех полей
+            pdf.set_font("DejaVu", 'B', 12)
+            pdf.cell(200, 8, text="Данные по продаже:", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            pdf.set_font("DejaVu", size=10)
+            pdf.cell(200, 6, text="Средняя цена за м² (продажа): н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            pdf.cell(200, 6, text="Изменение цен (продажа): н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            pdf.cell(200, 6, text="Средний период продажи: н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            pdf.cell(200, 6, text="Объектов на продажу: н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            
+            pdf.ln(5)
+                
+            pdf.set_font("DejaVu", 'B', 12)
+            pdf.cell(200, 8, text="Данные по долгосрочной аренде:", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            pdf.set_font("DejaVu", size=10)
+            pdf.cell(200, 6, text="Средняя цена за м² (аренда): н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            pdf.cell(200, 6, text="Изменение цен (аренда): н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            pdf.cell(200, 6, text="Средний период аренды: н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            pdf.cell(200, 6, text="Объектов на аренду: н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            pdf.cell(200, 6, text="Доходность: н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            
+            pdf.ln(5)
+        
+        # Переходим на новую страницу для налогов
+        if 'taxes' in report:
+            pdf.add_page()
+            
+            # Добавляем логотип в правый верхний угол
+            try:
+                pdf.image('logo-flt.png', x=170, y=10, w=30)  # Правый верхний угол
+            except Exception as e:
+                logger.warning(f"Не удалось добавить логотип на страницу налогов: {e}")
+            
+            pdf.set_font("DejaVu", 'B', 14)
+            pdf.cell(200, 10, text="Налоги и сборы:", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            pdf.set_font("DejaVu", size=12)
+            pdf.cell(200, 8, text=f"Налог на перевод: {report['taxes']['transfer_tax']*100}%", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            pdf.cell(200, 8, text=f"Гербовый сбор: {report['taxes']['stamp_duty']*100}%", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            pdf.cell(200, 8, text=f"Нотариус: €{report['taxes']['notary']}", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            pdf.ln(5)
+        # Блок: Альтернативы
+        if 'alternatives' in report and isinstance(report['alternatives'], list):
+            pdf.set_font('DejaVu', 'B', 14)
+            pdf.cell(0, 10, 'Сравнение с альтернативами (5 лет):', new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            pdf.set_font('DejaVu', '', 12)
+            for alt in report['alternatives']:
+                name = alt.get('name', '-')
+                yld = alt.get('yield', 0)
+                pdf.cell(0, 8, f'{name}: {round(yld*100, 1)}%', new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            pdf.ln(5)
+        # Блок: Профессиональные метрики
+        if 'yield' in report or 'price_index' in report or 'mortgage_rate' in report or 'global_house_price_index' in report:
+            pdf.set_font('DejaVu', 'B', 14)
+            pdf.cell(0, 10, 'Профессиональные метрики:', new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            pdf.set_font('DejaVu', '', 12)
+            if 'yield' in report:
+                pdf.cell(0, 8, f'Yield: {round(report["yield"]*100, 1)}%', new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            if 'price_index' in report:
+                pdf.cell(0, 8, f'Индекс цен: {report["price_index"]}', new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            if 'mortgage_rate' in report:
+                pdf.cell(0, 8, f'Ипотечная ставка: {round(report["mortgage_rate"]*100, 1)}%', new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            if 'global_house_price_index' in report:
+                pdf.cell(0, 8, f'Глобальный индекс цен: {report["global_house_price_index"]}', new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            pdf.ln(5)
+        # Блок: Риски и развитие района
+        if 'risks' in report or 'liquidity' in report or 'district' in report:
+            pdf.set_font('DejaVu', 'B', 14)
+            pdf.cell(0, 10, 'Риски и развитие района:', new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            pdf.set_font('DejaVu', '', 12)
+            if 'risks' in report and isinstance(report['risks'], list):
+                for idx, risk in enumerate(report['risks']):
+                    pdf.cell(0, 8, f'Риск {idx+1}: {risk}', new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            if 'liquidity' in report:
+                pdf.cell(0, 8, f'Ликвидность: {report["liquidity"]}', new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            if 'district' in report:
+                pdf.cell(0, 8, f'Развитие района: {report["district"]}', new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            pdf.ln(5)
+        # Удаляем блок summary/заключение
+        # if 'summary' in report:
+        #     pdf.set_font("DejaVu", 'B', 14)
+        #     pdf.cell(200, 10, txt="Заключение:", ln=True)
+        #     pdf.set_font("DejaVu", size=12)
+        #     pdf.multi_cell(200, 8, txt=report.get('summary', 'Анализ завершен'))
+        # Подвал: контактные данные пользователя
+        if profile:
+            pdf.set_y(-60)
+            pdf.set_font('DejaVu', 'B', 11)
+            pdf.cell(0, 8, 'Контактные данные риелтора:', new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            pdf.set_font('DejaVu', '', 10)
+            if profile.get('tg_name') or profile.get('last_name'):
+                pdf.cell(0, 8, f"Имя: {profile.get('tg_name','')} {profile.get('last_name','')}", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            if profile.get('company'):
+                pdf.cell(0, 8, f"Компания: {profile.get('company')}", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            if profile.get('position'):
+                pdf.cell(0, 8, f"Должность: {profile.get('position')}", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            if profile.get('phone'):
+                pdf.cell(0, 8, f"Телефон: {profile.get('phone')}", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            if profile.get('email'):
+                pdf.cell(0, 8, f"Email: {profile.get('email')}", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            if profile.get('website'):
+                pdf.cell(0, 8, f"Сайт: {profile.get('website')}", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            if profile.get('about_me'):
+                pdf.multi_cell(0, 8, f"О себе: {profile.get('about_me')}")
+        # Сохраняем PDF во временный файл
+        temp_file = tempfile.NamedTemporaryFile(delete=False, suffix='.pdf')
+        pdf.output(temp_file.name)
+        temp_file.close()
+        # Перемещаем PDF в static/reports/
+        reports_dir = os.path.join(app.root_path, 'static', 'reports')
+        os.makedirs(reports_dir, exist_ok=True)
+        final_pdf_name = f'report_{report_id}.pdf'
+        final_pdf_path = os.path.join(reports_dir, final_pdf_name)
+        import shutil
+        shutil.move(temp_file.name, final_pdf_path)
+        pdf_url = f'/static/reports/{final_pdf_name}'
+        supabase.table('user_reports').update({'pdf_path': pdf_url}).eq('id', report_id).execute()
+        # Отправка PDF через Telegram-бота
+        send_status = None
+        if telegram_id:
+            send_status = send_pdf_to_telegram(final_pdf_path, telegram_id)
+        return jsonify({
+            'success': True,
+            'pdf_path': pdf_url,
+            'telegram_send_status': send_status,
+            'message': 'PDF успешно сгенерирован и сохранен!'
+        })
+    except Exception as e:
+        logger.error(f"Error generating PDF: {e}")
+        return jsonify({'error': 'Internal error'}), 500
+
+@app.route('/api/download_pdf', methods=['POST'])
+def api_download_pdf():
+    """Скачивание PDF отчета"""
+    data = request.json or {}
+    pdf_path = data.get('pdf_path')
+    
+    if not pdf_path or not os.path.exists(pdf_path):
+        return jsonify({'error': 'PDF file not found'}), 404
+    
+    try:
+        return send_file(pdf_path, as_attachment=True, download_name='full_report.pdf')
+    except Exception as e:
+        logger.error(f"Error downloading PDF: {e}")
+        return jsonify({'error': 'Internal error'}), 500
+
+@app.route('/api/user_balance', methods=['POST'])
+def api_user_balance():
+    """Получение или списание баланса пользователя"""
+    data = request.json or {}
+    telegram_id_raw = data.get('telegram_id')
+    if telegram_id_raw is None:
+        return jsonify({'error': 'Invalid telegram_id'}), 400
+    try:
+        telegram_id = int(telegram_id_raw)
+    except (TypeError, ValueError):
+        return jsonify({'error': 'Invalid telegram_id'}), 400
+    deduct = data.get('deduct', False)
+    if not telegram_id:
+        return jsonify({'error': 'telegram_id required'}), 400
+    try:
+        result = supabase.table('users').select('balance').eq('telegram_id', telegram_id).execute()
+        if result.data:
+            balance = result.data[0].get('balance', 0)
+        else:
+            balance = 0
+        # Если нужно списать $1
+        if deduct:
+            if balance >= 1:
+                new_balance = balance - 1
+                update_result = supabase.table('users').update({'balance': new_balance}).eq('telegram_id', telegram_id).execute()
+                # Проверяем, что обновление прошло успешно
+                if hasattr(update_result, 'data') or update_result:
+                    return jsonify({'success': True, 'balance': new_balance})
+                else:
+                    return jsonify({'error': 'Не удалось обновить баланс'}), 500
+            else:
+                return jsonify({'error': 'Недостаточно средств', 'balance': balance}), 400
+        # Просто возвращаем баланс
+        return jsonify({'balance': balance})
+    except Exception as e:
+        logger.error(f"Error getting/updating user balance: {e}")
+        return jsonify({'error': 'Internal error'}), 500
+
+# === Перемещаем эти маршруты выше запуска Flask ===
+@app.route('/api/full_report_access', methods=['POST'])
+def api_full_report_access():
+    data = request.json or {}
+    logger.info(f"/api/full_report_access incoming data: {data}")
+    telegram_id = data.get('telegram_id')
+    if telegram_id is None or str(telegram_id).strip() == '':
+        logger.warning("/api/full_report_access: telegram_id missing or empty in request")
+        return jsonify({'error': 'telegram_id required'}), 400
+    try:
+        telegram_id = int(telegram_id)
+    except (TypeError, ValueError):
+        logger.warning(f"/api/full_report_access: telegram_id not convertible to int: {telegram_id}")
+        return jsonify({'error': 'Invalid telegram_id'}), 400
+    try:
+        user_result = supabase.table('users').select('period_start, period_end, balance').eq('telegram_id', telegram_id).execute()
+        logger.info(f"/api/full_report_access user_result: {user_result.data}")
+        user = user_result.data[0] if user_result.data else None
+        if not user:
+            logger.warning(f"/api/full_report_access: User not found for telegram_id {telegram_id}")
+            return jsonify({'error': 'User not found'}), 404
+        # Получаем стоимость полного отчета
+        tariff_result = supabase.table('tariffs').select('price').eq('name', 'full report').execute()
+        tariff = tariff_result.data[0] if tariff_result.data else None
+        full_report_price = float(tariff['price']) if tariff and 'price' in tariff else 3.0
+        return jsonify({
+            'period_start': user.get('period_start'),
+            'period_end': user.get('period_end'),
+            'balance': user.get('balance', 0),
+            'full_report_price': full_report_price
+        })
+    except Exception as e:
+        logger.error(f"Error in full_report_access: {e}")
+        return jsonify({'error': 'Internal error'}), 500
+
+@app.route('/api/deduct_balance', methods=['POST'])
+def api_deduct_balance():
+    data = request.json or {}
+    telegram_id = data.get('telegram_id')
+    amount = data.get('amount')
+    logger.info(f"/api/deduct_balance incoming data: {data}")
+    if telegram_id is None or str(telegram_id).strip() == '' or amount is None:
+        logger.warning("/api/deduct_balance: telegram_id or amount missing in request")
+        return jsonify({'error': 'telegram_id and amount required'}), 400
+    try:
+        telegram_id = int(telegram_id)
+        amount = float(amount)
+    except (TypeError, ValueError):
+        logger.warning(f"/api/deduct_balance: telegram_id or amount not convertible: {telegram_id}, {amount}")
+        return jsonify({'error': 'Invalid telegram_id or amount'}), 400
+    try:
+        user_result = supabase.table('users').select('balance').eq('telegram_id', telegram_id).execute()
+        user = user_result.data[0] if user_result.data else None
+        if not user:
+            logger.warning(f"/api/deduct_balance: user not found for telegram_id {telegram_id}")
+            return jsonify({'error': 'User not found'}), 404
+        old_balance = user['balance']
+        new_balance = old_balance - amount
+        # Приводим к int для smallint
+        new_balance_int = int(new_balance)
+        logger.info(f"/api/deduct_balance: old_balance={old_balance}, amount={amount}, new_balance_int={new_balance_int}")
+        update_result = supabase.table('users').update({'balance': new_balance_int}).eq('telegram_id', telegram_id).execute()
+        logger.info(f"/api/deduct_balance: update_result={update_result}")
+        # Если не было исключения — считаем успехом
+        return jsonify({'success': True, 'new_balance': new_balance_int})
+    except Exception as e:
+        logger.error(f"Error in deduct_balance: {e}")
+        return jsonify({'error': 'Internal server error', 'details': str(e)}), 500
+@app.route('/api/update_user_report', methods=['POST'])
+def api_update_user_report():
+    """Обновление отчета пользователя (списание $1, перегенерация)"""
+    data = request.json or {}
+    telegram_id_raw = data.get('telegram_id')
+    if telegram_id_raw is None:
+        return jsonify({'error': 'Invalid telegram_id'}), 400
+    try:
+        telegram_id = int(telegram_id_raw)
+    except (TypeError, ValueError):
+        return jsonify({'error': 'Invalid telegram_id'}), 400
+    report_id = data.get('report_id')
+    if not telegram_id or not report_id:
+        return jsonify({'error': 'Missing required data'}), 400
+    try:
+        # Получаем user_id по telegram_id
+        user_result = supabase.table('users').select('id').eq('telegram_id', telegram_id).execute()
+        user_id = user_result.data[0]['id'] if user_result.data else telegram_id
+        # Проверяем, что отчет принадлежит пользователю
+        report_result = supabase.table('user_reports').select('*').eq('id', report_id).eq('user_id', user_id).execute()
+        if not report_result.data:
+            return jsonify({'error': 'Report not found or not owned by user'}), 404
+        report = report_result.data[0]
+        # Проверяем баланс
+        balance_result = supabase.table('users').select('balance').eq('telegram_id', telegram_id).execute()
+        balance = balance_result.data[0].get('balance', 0) if balance_result.data else 0
+        if balance < 1:
+            return jsonify({'error': 'Insufficient balance', 'balance': balance}), 400
+        # Списываем $1
+        new_balance = balance - 1
+        supabase.table('users').update({'balance': new_balance}).eq('telegram_id', telegram_id).execute()
+        # Перегенерируем отчет (используем существующие параметры)
+        # TODO: здесь должна быть логика перегенерации отчета
+        # Пока просто обновляем дату
+        supabase.table('user_reports').update({
+            'updated_at': datetime.now().isoformat()
+        }).eq('id', report_id).execute()
+        return jsonify({'success': True, 'balance': new_balance})
+    except Exception as e:
+        logger.error(f"Error updating user report: {e}")
+        return jsonify({'error': 'Internal error'}), 500 
+
+@app.route('/api/user_reports/save', methods=['POST'])
+def api_save_user_report():
+    """Сохраняет новый отчет пользователя и возвращает report_id"""
+    data = request.json or {}
+    telegram_id_raw = data.get('telegram_id')
+    if telegram_id_raw is None:
+        return jsonify({'error': 'Invalid telegram_id'}), 400
+    try:
+        telegram_id = int(telegram_id_raw)
+    except (TypeError, ValueError):
+        return jsonify({'error': 'Invalid telegram_id'}), 400
+    full_report = data.get('full_report')
+    address = data.get('address')
+    report_type = data.get('report_type', 'full')
+    if not telegram_id or not full_report:
+        return jsonify({'error': 'Missing required data'}), 400
+    try:
+        # Получаем user_id по telegram_id
+        user_result = supabase.table('users').select('id').eq('telegram_id', telegram_id).execute()
+        user_id = user_result.data[0]['id'] if user_result.data else telegram_id
+        # Сохраняем отчет
+        report_data = {
+            'user_id': user_id,
+            'report_type': report_type,
+            'address': address,
+            'full_report': full_report,
+            'created_at': datetime.now().isoformat(),
+            'updated_at': datetime.now().isoformat()
+        }
+        result = supabase.table('user_reports').insert(report_data).execute()
+        new_id = result.data[0]['id'] if hasattr(result, 'data') and result.data else None
+        return jsonify({'success': True, 'report_id': new_id})
+    except Exception as e:
+        logger.error(f"Error saving user report: {e}")
+        return jsonify({'error': 'Internal error'}), 500
+
+@app.route('/api/send_saved_report_pdf', methods=['POST'])
+def api_send_saved_report_pdf():
+    """Генерирует PDF для сохранённого отчёта и отправляет его пользователю в Telegram (без контактов)"""
+    data = request.json or {}
+    report_id = data.get('report_id')
+    telegram_id = data.get('telegram_id')
+    if not report_id or not telegram_id:
+        return jsonify({'error': 'report_id and telegram_id required'}), 400
+    try:
+        # Получаем отчёт из базы
+        report_result = supabase.table('user_reports').select('full_report').eq('id', report_id).execute()
+        if not report_result.data or not report_result.data[0].get('full_report'):
+            return jsonify({'error': 'Report not found'}), 404
+        report = report_result.data[0]['full_report']
+        if not isinstance(report, dict):
+            return jsonify({'error': 'Invalid report data'}), 500
+        # Генерируем PDF (без контактов)
+        from fpdf import FPDF
+        import tempfile, shutil
+        pdf = FPDF()
+        pdf.add_page()
+        pdf.add_font('DejaVu', '', 'fonts/DejaVuSans.ttf')
+        pdf.add_font('DejaVu', 'B', 'fonts/DejaVuSans-Bold.ttf')
+        
+        # Добавляем логотип на первую страницу (по центру сверху)
+        try:
+            pdf.image('logo-sqv.png', x=85, y=10, w=40)  # Центрируем логотип
+            pdf.ln(35)  # Увеличенный отступ после логотипа
+        except Exception as e:
+            logger.warning(f"Не удалось добавить логотип на первую страницу: {e}")
+            pdf.ln(35)  # Отступ даже если логотип не загрузился
+        
+        pdf.set_font('DejaVu', 'B', 16)
+        pdf.cell(0, 10, 'Полный отчет по недвижимости', new_x=XPos.LMARGIN, new_y=YPos.NEXT, align='C')
+        pdf.ln(10)
+        obj = report.get('object') or {}
+        pdf.set_font('DejaVu', 'B', 12)
+        pdf.cell(0, 10, 'Информация об объекте:', new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+        pdf.set_font('DejaVu', '', 10)
+        pdf.cell(0, 8, f'Адрес: {obj.get("address", "Не указан")}', new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+        pdf.cell(0, 8, f'Спален: {obj.get("bedrooms", "Не указано")}', new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+        pdf.cell(0, 8, f'Цена: €{obj.get("purchase_price", "Не указана")}', new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+        pdf.ln(5)
+        # ROI анализ
+        roi = report.get('roi')
+        if roi:
+            pdf.set_font("DejaVu", 'B', 14)
+            pdf.cell(0, 10, "Инвестиционный анализ (ROI):", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            pdf.set_font("DejaVu", size=12)
+            st = roi.get('short_term', {})
+            lt = roi.get('long_term', {})
+            nr = roi.get('no_rent', {})
+            pdf.cell(0, 8, f"Краткосрочная аренда: ROI {st.get('roi', '-')}", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            pdf.cell(0, 8, f"Долгосрочная аренда: ROI {lt.get('roi', '-')}", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            pdf.cell(0, 8, f"Без аренды: ROI {nr.get('roi', '-')}", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            pdf.ln(5)
+        # Макроэкономика
+        macro = report.get('macro')
+        if macro:
+            pdf.set_font("DejaVu", 'B', 14)
+            pdf.cell(0, 10, "Макроэкономические показатели:", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            pdf.set_font("DejaVu", size=12)
+            pdf.cell(0, 8, f"Инфляция: {macro.get('inflation', '-')}%", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            pdf.cell(0, 8, f"Ключевая ставка: {macro.get('refi_rate', '-')}%", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            pdf.cell(0, 8, f"Рост ВВП: {macro.get('gdp_growth', '-')}%", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            pdf.ln(5)
+        
+        # Экономические данные и тренды
+        if 'economic_charts' in report:
+            economic_charts = report['economic_charts']
+            country_name = economic_charts.get('country_name', 'Unknown')
+            
+            pdf.set_font("DejaVu", 'B', 14)
+            pdf.cell(0, 10, f"Экономические тренды ({country_name}):", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            pdf.set_font("DejaVu", size=12)
+            
+            # Отображаем тренды
+            trends = economic_charts.get('trends', {})
+            if trends.get('gdp_trend') is not None:
+                gdp_trend = trends['gdp_trend'] * 100  # Конвертируем в проценты
+                trend_text = f"Тренд роста ВВП: {gdp_trend:.1f}%"
+                pdf.cell(200, 8, text=trend_text, new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            
+            if trends.get('inflation_trend') is not None:
+                inflation_trend = trends['inflation_trend'] * 100  # Конвертируем в проценты
+                trend_text = f"Тренд инфляции: {inflation_trend:.1f}%"
+                pdf.cell(200, 8, text=trend_text, new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            
+            # Добавляем детальные расчеты в компактной таблице
+            detailed_calculations = economic_charts.get('detailed_calculations', {})
+            if detailed_calculations:
+                pdf.ln(5)
+                pdf.set_font("DejaVu", 'B', 12)
+                pdf.cell(200, 8, text="Детальные расчеты трендов:", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                pdf.set_font("DejaVu", size=8)
+                
+                # Создаем компактную таблицу в 3 столбца
+                gdp_calcs = detailed_calculations.get('gdp_calculations', [])
+                inflation_calcs = detailed_calculations.get('inflation_calculations', [])
+                
+                if gdp_calcs or inflation_calcs:
+                    # Заголовки таблицы
+                    pdf.set_font("DejaVu", 'B', 9)
+                    pdf.cell(60, 6, text="Период", new_x=XPos.RIGHT, new_y=YPos.TOP)
+                    pdf.cell(60, 6, text="Расчет", new_x=XPos.RIGHT, new_y=YPos.TOP)
+                    pdf.cell(60, 6, text="Результат", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                    pdf.set_font("DejaVu", size=8)
+                    
+                    # ВВП расчеты
+                    if gdp_calcs:
+                        pdf.cell(200, 4, text="", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                        pdf.set_font("DejaVu", 'B', 8)
+                        pdf.cell(200, 5, text="ВВП:", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                        pdf.set_font("DejaVu", size=7)
+                        
+                        for calc in gdp_calcs:
+                            # Первая строка
+                            pdf.cell(60, 4, text=calc['years'], new_x=XPos.RIGHT, new_y=YPos.TOP)
+                            pdf.cell(60, 4, text=calc['calculation'], new_x=XPos.RIGHT, new_y=YPos.TOP)
+                            pdf.cell(60, 4, text=calc['result'], new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                    
+                    # Инфляция расчеты
+                    if inflation_calcs:
+                        pdf.cell(200, 4, text="", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                        pdf.set_font("DejaVu", 'B', 8)
+                        pdf.cell(200, 5, text="Инфляция:", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                        pdf.set_font("DejaVu", size=7)
+                        
+                        for calc in inflation_calcs:
+                            # Первая строка
+                            pdf.cell(60, 4, text=calc['years'], new_x=XPos.RIGHT, new_y=YPos.TOP)
+                            pdf.cell(60, 4, text=calc['calculation'], new_x=XPos.RIGHT, new_y=YPos.TOP)
+                            pdf.cell(60, 4, text=calc['result'], new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            
+            # Добавляем интерпретации
+            interpretations = economic_charts.get('interpretations', {})
+            if interpretations and 'ru' in interpretations:
+                pdf.ln(5)
+                pdf.set_font("DejaVu", 'B', 12)
+                pdf.cell(200, 8, text="Интерпретация трендов:", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                pdf.set_font("DejaVu", size=10)
+                
+                ru_interp = interpretations['ru']
+                if 'gdp_interpretation' in ru_interp:
+                    pdf.cell(200, 6, text=f"ВВП: {ru_interp['gdp_interpretation']}", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                if 'inflation_interpretation' in ru_interp:
+                    pdf.cell(200, 6, text=f"Инфляция: {ru_interp['inflation_interpretation']}", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                if 'recent_comparison' in ru_interp:
+                    pdf.cell(200, 6, text=f"Сравнение: {ru_interp['recent_comparison']}", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            
+            pdf.ln(5)
+        
+        # Данные трендов недвижимости
+        if report.get('object') and report['object'].get('address'):
+            address = report['object']['address']
+            location_data = extract_location_from_address(address)
+            
+            pdf.set_font("DejaVu", 'B', 14)
+            pdf.cell(0, 10, "Тренды рынка недвижимости:", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            pdf.set_font("DejaVu", size=12)
+            
+            if location_data['city_name']:
+                trends_data, trends_message = get_property_trends_data(
+                    location_data['city_name'],
+                    location_data['district_name'],
+                    location_data['county_name']
+                )
+                
+                # Получаем исторические данные для графиков
+                historical_data = get_historical_property_trends(
+                    location_data['city_name'],
+                    location_data['district_name'],
+                    location_data['county_name']
+                )
+                
+                # Данные по продаже
+                pdf.set_font("DejaVu", 'B', 12)
+                pdf.cell(0, 8, "Данные по продаже:", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                pdf.set_font("DejaVu", size=10)
+                
+                # Показываем источник данных
+                if trends_message:
+                    pdf.cell(0, 6, f"Источник данных: {trends_message}", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                
+                if trends_data:
+                    if trends_data.get('unit_price_for_sale'):
+                        pdf.cell(0, 6, f"Средняя цена за м² (продажа): €{trends_data['unit_price_for_sale']:,.2f}", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                    else:
+                        pdf.cell(0, 6, "Средняя цена за м² (продажа): н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                    
+                    if trends_data.get('price_change_sale'):
+                        change_percent = trends_data['price_change_sale'] * 100
+                        pdf.cell(0, 6, f"Изменение цен (продажа): {change_percent:+.2f}%", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                    else:
+                        pdf.cell(0, 6, "Изменение цен (продажа): н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                    
+                    if trends_data.get('listing_period_for_sale'):
+                        pdf.cell(0, 6, f"Средний период продажи: {trends_data['listing_period_for_sale']} дней", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                    else:
+                        pdf.cell(0, 6, "Средний период продажи: н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                    
+                    if trends_data.get('count_for_sale'):
+                        pdf.cell(0, 6, f"Объектов на продажу: {trends_data['count_for_sale']}", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                    else:
+                        pdf.cell(0, 6, "Объектов на продажу: н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                else:
+                    pdf.cell(0, 6, "Средняя цена за м² (продажа): н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                    pdf.cell(0, 6, "Изменение цен (продажа): н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                    pdf.cell(0, 6, "Средний период продажи: н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                    pdf.cell(0, 6, "Объектов на продажу: н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                
+                # График изменения цен на продажу
+                if historical_data:
+                    sale_chart_buffer = create_property_trends_chart(historical_data, 'sale', 180, 80)
+                    if sale_chart_buffer:
+                        pdf.ln(3)
+                        pdf.image(sale_chart_buffer, x=15, w=180)
+                        pdf.ln(3)
+                
+                pdf.ln(5)
+                
+                # Данные по аренде (долгосрочная)
+                pdf.set_font("DejaVu", 'B', 12)
+                pdf.cell(0, 8, "Данные по долгосрочной аренде:", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                pdf.set_font("DejaVu", size=10)
+                
+                if trends_data:
+                    if trends_data.get('unit_price_for_rent'):
+                        pdf.cell(0, 6, f"Средняя цена за м² (аренда): €{trends_data['unit_price_for_rent']:,.2f}", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                    else:
+                        pdf.cell(0, 6, "Средняя цена за м² (аренда): н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                    
+                    if trends_data.get('price_change_rent'):
+                        change_percent = trends_data['price_change_rent'] * 100
+                        pdf.cell(0, 6, f"Изменение цен (аренда): {change_percent:+.2f}%", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                    else:
+                        pdf.cell(0, 6, "Изменение цен (аренда): н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                    
+                    if trends_data.get('listing_period_for_rent'):
+                        pdf.cell(0, 6, f"Средний период аренды: {trends_data['listing_period_for_rent']} дней", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                    else:
+                        pdf.cell(0, 6, "Средний период аренды: н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                    
+                    if trends_data.get('count_for_rent'):
+                        pdf.cell(0, 6, f"Объектов на аренду: {trends_data['count_for_rent']}", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                    else:
+                        pdf.cell(0, 6, "Объектов на аренду: н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                    
+                    # Доходность
+                    if trends_data.get('yield'):
+                        yield_percent = trends_data['yield'] * 100
+                        pdf.cell(0, 6, f"Доходность: {yield_percent:.2f}%", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                    else:
+                        pdf.cell(0, 6, "Доходность: н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                else:
+                    pdf.cell(0, 6, "Средняя цена за м² (аренда): н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                    pdf.cell(0, 6, "Изменение цен (аренда): н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                    pdf.cell(0, 6, "Средний период аренды: н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                    pdf.cell(0, 6, "Объектов на аренду: н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                    pdf.cell(0, 6, "Доходность: н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                
+                # График изменения цен на аренду
+                if historical_data:
+                    rent_chart_buffer = create_property_trends_chart(historical_data, 'rent', 180, 80)
+                    if rent_chart_buffer:
+                        pdf.ln(3)
+                        pdf.image(rent_chart_buffer, x=15, w=180)
+                        pdf.ln(3)
+            else:
+                # Адрес не содержит информации о городе - показываем "н/д" для всех полей
+                pdf.set_font("DejaVu", 'B', 12)
+                pdf.cell(0, 8, "Данные по продаже:", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                pdf.set_font("DejaVu", size=10)
+                pdf.cell(0, 6, "Средняя цена за м² (продажа): н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                pdf.cell(0, 6, "Изменение цен (продажа): н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                pdf.cell(0, 6, "Средний период продажи: н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                pdf.cell(0, 6, "Объектов на продажу: н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                
+                pdf.ln(5)
+                
+                pdf.set_font("DejaVu", 'B', 12)
+                pdf.cell(0, 8, "Данные по долгосрочной аренде:", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                pdf.set_font("DejaVu", size=10)
+                pdf.cell(0, 6, "Средняя цена за м² (аренда): н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                pdf.cell(0, 6, "Изменение цен (аренда): н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                pdf.cell(0, 6, "Средний период аренды: н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                pdf.cell(0, 6, "Объектов на аренду: н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                pdf.cell(0, 6, "Доходность: н/д", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            
+            pdf.ln(5)
+        
+        # Налоги
+        taxes = report.get('taxes')
+        if taxes:
+            pdf.set_font("DejaVu", 'B', 14)
+            pdf.cell(0, 10, "Налоги и сборы:", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            pdf.set_font("DejaVu", size=12)
+            pdf.cell(0, 8, f"Налог на перевод: {taxes.get('transfer_tax', 0)*100}%", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            pdf.cell(0, 8, f"Гербовый сбор: {taxes.get('stamp_duty', 0)*100}%", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            pdf.cell(0, 8, f"Нотариус: €{taxes.get('notary', '-')}" , new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            pdf.ln(5)
+        # Альтернативы
+        alternatives = report.get('alternatives')
+        if isinstance(alternatives, list):
+            pdf.set_font('DejaVu', 'B', 14)
+            pdf.cell(0, 10, 'Сравнение с альтернативами (5 лет):', new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            pdf.set_font('DejaVu', '', 12)
+            for alt in alternatives:
+                name = alt.get('name', '-')
+                yld = alt.get('yield', 0)
+                pdf.cell(0, 8, f'{name}: {round(yld*100, 1)}%', new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            pdf.ln(5)
+        # Профессиональные метрики
+        if any(k in report for k in ['yield', 'price_index', 'mortgage_rate', 'global_house_price_index']):
+            pdf.set_font('DejaVu', 'B', 14)
+            pdf.cell(0, 10, 'Профессиональные метрики:', new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            pdf.set_font('DejaVu', '', 12)
+            if 'yield' in report:
+                pdf.cell(0, 8, f'Yield: {round(report.get("yield", 0)*100, 1)}%', new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            if 'price_index' in report:
+                pdf.cell(0, 8, f'Индекс цен: {report.get("price_index", "-")}', new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            if 'mortgage_rate' in report:
+                pdf.cell(0, 8, f'Ипотечная ставка: {round(report.get("mortgage_rate", 0)*100, 1)}%', new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            if 'global_house_price_index' in report:
+                pdf.cell(0, 8, f'Глобальный индекс цен: {report.get("global_house_price_index", "-")}', new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            pdf.ln(5)
+        # Риски и развитие района
+        if any(k in report for k in ['risks', 'liquidity', 'district']):
+            pdf.set_font('DejaVu', 'B', 14)
+            pdf.cell(0, 10, 'Риски и развитие района:', new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            pdf.set_font('DejaVu', '', 12)
+            risks = report.get('risks')
+            if isinstance(risks, list):
+                for idx, risk in enumerate(risks):
+                    pdf.cell(0, 8, f'Риск {idx+1}: {risk}', new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            if 'liquidity' in report:
+                pdf.cell(0, 8, f'Ликвидность: {report.get("liquidity", "-")}', new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            if 'district' in report:
+                pdf.cell(0, 8, f'Развитие района: {report.get("district", "-")}', new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            pdf.ln(5)
+        # Сохраняем PDF во временный файл
+        temp_file = tempfile.NamedTemporaryFile(delete=False, suffix='.pdf')
+        pdf.output(temp_file.name)
+        temp_file.close()
+        # Перемещаем PDF в static/reports/
+        reports_dir = os.path.join(app.root_path, 'static', 'reports')
+        os.makedirs(reports_dir, exist_ok=True)
+        final_pdf_name = f'report_{report_id}.pdf'
+        final_pdf_path = os.path.join(reports_dir, final_pdf_name)
+        shutil.move(temp_file.name, final_pdf_path)
+        pdf_url = f'/static/reports/{final_pdf_name}'
+        supabase.table('user_reports').update({'pdf_path': pdf_url}).eq('id', report_id).execute()
+        # Отправка PDF через Telegram-бота (используем общую функцию)
+        send_status = None
+        if telegram_id:
+            send_status = send_pdf_to_telegram(final_pdf_path, telegram_id)
+        return jsonify({
+            'success': True,
+            'pdf_path': pdf_url,
+            'telegram_send_status': send_status,
+            'message': 'PDF успешно сгенерирован и отправлен!'
+        })
+    except Exception as e:
+        logger.error(f"Error generating/sending PDF: {e}")
+        return jsonify({'error': 'Internal error'}), 500
+
+@app.route('/api/admin_balance_100', methods=['POST'])
+def api_admin_balance_100():
+    data = request.json or {}
+    telegram_id_raw = data.get('telegram_id')
+    if telegram_id_raw is None:
+        return jsonify({'error': 'telegram_id required'}), 400
+    try:
+        telegram_id = int(telegram_id_raw)
+    except (TypeError, ValueError):
+        return jsonify({'error': 'Invalid telegram_id'}), 400
+    # Проверяем, что пользователь админ
+    user_result = supabase.table('users').select('*').eq('telegram_id', telegram_id).execute()
+    user = user_result.data[0] if user_result.data else None
+    if not user or user.get('user_status') != 'admin':
+        return jsonify({'error': 'not admin'}), 403
+    # Обновляем баланс
+    try:
+        supabase.table('users').update({'balance': 100}).eq('telegram_id', telegram_id).execute()
+        return jsonify({'success': True, 'balance': 100})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 @app.route('/api/admin_users_stats', methods=['GET'])
 def api_admin_users_stats():
