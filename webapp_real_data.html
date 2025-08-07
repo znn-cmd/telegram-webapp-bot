@@ -680,9 +680,14 @@
             
             // Проверяем статус админа и показываем коды локаций только для админов
             checkAdminStatus().then(isAdmin => {
+                console.log('🎯 Результат проверки админа:', isAdmin);
+                console.log('📋 Коды локаций:', locationCodes);
+                console.log('📏 Количество кодов локаций:', locationCodes.length);
+                
                 let blocksHtml = '';
                 
                 if (isAdmin && locationCodes.length) {
+                    console.log('✅ Показываем кнопку кодов локаций для админа');
                     blocksHtml += `<div style='background:#f8f9fa;border-radius:12px;padding:14px 12px 10px 12px;margin-bottom:14px;box-shadow:0 2px 8px rgba(102,126,234,0.06);'>
                         <div style='font-size:17px;font-weight:700;color:#667eea;margin-bottom:8px;'>Коды локаций (только для администраторов)</div>
                         <button onclick="toggleLocationCodes()" id="show-location-codes" style='background:#667eea;color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:14px;cursor:pointer;margin-bottom:8px;'>Показать коды локаций</button>
@@ -690,6 +695,10 @@
                             ${locationCodes.map(line => `<div style='font-size:15px;color:#222;margin-bottom:7px;'>${line}</div>`).join('')}
                         </div>
                     </div>`;
+                } else {
+                    console.log('❌ Не показываем кнопку кодов локаций:');
+                    console.log('  - isAdmin:', isAdmin);
+                    console.log('  - locationCodes.length:', locationCodes.length);
                 }
                 
                 if (propertyData.length) blocksHtml += block('Данные объекта', propertyData);
@@ -1431,7 +1440,10 @@
         // Функция для проверки статуса администратора
         async function checkAdminStatus() {
             const telegram_id = getTelegramId();
+            console.log('🔍 Проверка статуса админа для telegram_id:', telegram_id);
+            
             if (!telegram_id) {
+                console.log('❌ telegram_id не найден');
                 return false;
             }
             
@@ -1442,12 +1454,20 @@
                     body: JSON.stringify({ telegram_id })
                 });
                 
+                console.log('📡 Ответ сервера:', response.status, response.statusText);
+                
                 if (response.ok) {
                     const data = await response.json();
-                    return data.is_admin || false;
+                    console.log('📊 Данные ответа:', data);
+                    const isAdmin = data.is_admin || false;
+                    console.log('👑 Статус админа:', isAdmin);
+                    return isAdmin;
+                } else {
+                    const errorData = await response.json();
+                    console.log('❌ Ошибка сервера:', errorData);
                 }
             } catch (error) {
-                console.error('Ошибка проверки статуса админа:', error);
+                console.error('❌ Ошибка проверки статуса админа:', error);
             }
             
             return false;

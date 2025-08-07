@@ -336,28 +336,38 @@ def api_check_admin_status():
     """Проверка статуса администратора пользователя"""
     data = request.json or {}
     telegram_id_raw = data.get('telegram_id')
+    logger.info(f"🔍 Проверка статуса админа для telegram_id: {telegram_id_raw}")
+    
     if telegram_id_raw is None:
+        logger.error("❌ telegram_id не предоставлен")
         return jsonify({'error': 'telegram_id required'}), 400
     try:
         telegram_id = int(telegram_id_raw)
     except (TypeError, ValueError):
+        logger.error(f"❌ Неверный формат telegram_id: {telegram_id_raw}")
         return jsonify({'error': 'Invalid telegram_id'}), 400
     
     try:
         # Проверяем пользователя в базе
+        logger.info(f"🔍 Поиск пользователя в базе для telegram_id: {telegram_id}")
         user_result = supabase.table('users').select('user_states').eq('telegram_id', telegram_id).execute()
+        
+        logger.info(f"📊 Результат поиска: {len(user_result.data) if user_result.data else 0} записей")
+        
         if user_result.data and len(user_result.data) > 0:
             user_states = user_result.data[0].get('user_states')
             is_admin = user_states == 'admin' if user_states else False
+            logger.info(f"👤 Пользователь найден: user_states={user_states}, is_admin={is_admin}")
             return jsonify({
                 'success': True,
                 'is_admin': is_admin,
                 'user_states': user_states
             })
         else:
+            logger.warning(f"❌ Пользователь не найден для telegram_id: {telegram_id}")
             return jsonify({'error': 'User not found'}), 404
     except Exception as e:
-        logger.error(f"Error checking admin status: {e}")
+        logger.error(f"❌ Ошибка проверки статуса админа: {e}")
         return jsonify({'error': 'Internal error'}), 500
 
 @app.route('/api/geocode', methods=['POST'])
