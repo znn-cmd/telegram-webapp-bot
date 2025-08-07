@@ -3338,7 +3338,7 @@ def create_chart_image_for_pdf(chart_data, title, width=180, height=100):
             logger.warning("Недостаточно данных для создания графика")
             # Создаем placeholder график с сообщением
             ax.text(0.5, 0.5, 'Нет данных', ha='center', va='center', 
-                   transform=ax.transAxes, fontsize=10, fontname='DejaVu Sans')
+                    transform=ax.transAxes, fontsize=10, fontname='DejaVu Sans')
             ax.set_title(title, fontsize=8, fontname='DejaVu Sans', pad=10)
             ax.set_xlim(0, 1)
             ax.set_ylim(0, 1)
@@ -4387,7 +4387,7 @@ def create_property_trends_chart(historical_data, chart_type='sale', width=180, 
             
             # Создаем график
             ax.plot(valid_years, valid_prices, marker='o', linewidth=2, markersize=4, 
-                   color=color, alpha=0.8)
+                    color=color, alpha=0.8)
             
             # Настройка осей
             ax.set_title(title, fontsize=10, fontname='DejaVu Sans', pad=10)
@@ -4408,7 +4408,7 @@ def create_property_trends_chart(historical_data, chart_type='sale', width=180, 
         else:
             # Если нет данных, показываем пустой график с сообщением
             ax.text(0.5, 0.5, 'Нет данных', ha='center', va='center', 
-                   transform=ax.transAxes, fontsize=10, fontname='DejaVu Sans')
+                    transform=ax.transAxes, fontsize=10, fontname='DejaVu Sans')
             ax.set_title(title, fontsize=10, fontname='DejaVu Sans', pad=10)
             ax.set_xlim(0, 1)
             ax.set_ylim(0, 1)
@@ -4429,7 +4429,7 @@ def create_property_trends_chart(historical_data, chart_type='sale', width=180, 
         try:
             fig, ax = plt.subplots(figsize=(width/25.4, height/25.4), dpi=200)
             ax.text(0.5, 0.5, 'Ошибка графика', ha='center', va='center', 
-                   transform=ax.transAxes, fontsize=8, fontname='DejaVu Sans')
+                    transform=ax.transAxes, fontsize=8, fontname='DejaVu Sans')
             ax.set_title(f'Тренды {chart_type}', fontsize=8, fontname='DejaVu Sans', pad=10)
             ax.set_xlim(0, 1)
             ax.set_ylim(0, 1)
