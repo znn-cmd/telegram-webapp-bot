@@ -1647,22 +1647,22 @@ def api_full_report():
         
         created_at = datetime.now().isoformat()
         
-                report_data = {
+        report_data = {
             'user_id': user_id,
             'report_type': 'full',
             'title': f'Полный отчет: {address}',
             'description': f'Полный отчет по адресу {address}, {bedrooms} спален, цена {price}',
-                    'parameters': {
-                        'address': address,
-                        'bedrooms': bedrooms,
-                        'price': price,
-                        'lat': lat,
+            'parameters': {
+                'address': address,
+                'bedrooms': bedrooms,
+                'price': price,
+                'lat': lat,
                 'lng': lng
-                    },
-                    'address': address,
-                    'latitude': lat,
-                    'longitude': lng,
-                    'bedrooms': bedrooms,
+            },
+            'address': address,
+            'latitude': lat,
+            'longitude': lng,
+            'bedrooms': bedrooms,
             'price': price,
             'created_at': created_at,
             'full_report': full_report_data
@@ -1695,7 +1695,7 @@ def api_user_reports():
         return jsonify({'error': 'telegram_id required'}), 400
     try:
         # Получаем user_id из базы данных по telegram_id
-                user_result = supabase.table('users').select('id').eq('telegram_id', telegram_id).execute()
+        user_result = supabase.table('users').select('id').eq('telegram_id', telegram_id).execute()
         if not user_result.data:
             return jsonify({'error': 'User not found'}), 404
         user_id = user_result.data[0]['id']
