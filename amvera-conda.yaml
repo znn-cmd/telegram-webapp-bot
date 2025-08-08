@@ -4,8 +4,8 @@ version: "3.11"
 
 build:
   commands:
-    - chmod +x install-packages.sh
-    - ./install-packages.sh
+    - conda install -c conda-forge -c defaults flask flask-cors requests python-dotenv matplotlib pillow numpy python-dateutil -y
+    - pip install fpdf2 python-telegram-bot openai supabase --timeout 300 --retries 10 --index-url https://pypi.tuna.tsinghua.edu.cn/simple/ --trusted-host pypi.tuna.tsinghua.edu.cn
 
 run:
   command: python app.py
