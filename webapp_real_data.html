@@ -526,6 +526,15 @@
                     lastAddress = data.formatted_address;
                     showMap(data.lat, data.lng);
                     document.getElementById('confirmedAddress').innerText = data.formatted_address;
+                    
+                    // Сохраняем коды локаций для использования при генерации отчета
+                    if (data.location_codes) {
+                        geoData.location_codes = data.location_codes;
+                        console.log('Найдены коды локаций:', data.location_codes);
+                    } else {
+                        console.log('Коды локаций не найдены');
+                    }
+                    
                     showStep('map');
                 } else {
                     showStep('address');
@@ -587,12 +596,14 @@
                         lng: geoData.lng,
                         bedrooms: parseInt(bedrooms),
                         price: parseFloat(price),
-                        language: 'ru'
+                        language: 'ru',
+                        location_codes: geoData.location_codes || null,
+                        location_components: geoData.location_components || null
                     })
                 });
                 const data = await res.json();
                 if (data.success) {
-                    window.lastApiReport = data.report; // <--- добавлено: сохраняем отчет для корректного отображения количества объектов
+                    window.lastApiReport = data.report; // Сохраняем отчет для дальнейшего использования
                     renderReport(data.report_text, geoData.formatted_address, bedrooms, price);
                     showStep('report');
                 } else {
@@ -634,6 +645,7 @@
             lastReportBedrooms = bedrooms;
             lastReportPrice = price;
             currentReportData = { address, bedrooms, price }; // Сохраняем данные отчета
+            
             // Оставляем только один крупный заголовок
             let headerHtml = '';
             headerHtml += `<div style='font-size:22px;font-weight:800;color:#667eea;margin-bottom:10px;text-align:center;'>Аналитика по объекту</div>`;
@@ -643,57 +655,144 @@
             headerHtml += `<div style='font-size:16px;margin-bottom:0;'><b>Цена объекта:</b> <span style='color:#333;'>€${Number(price).toLocaleString('ru-RU')}</span></div>`;
             headerHtml += `</div>`;
 
-            // Получаем данные из последнего ответа API (глобальная переменная)
-            if (!window.lastApiReport) {
-                showToast('Нет данных для отображения количества объектов', 'warning');
-                window.lastApiReport = {};
-            }
-            const report = window.lastApiReport;
-            const shortCount = report?.market_analysis?.radius_5km?.short_term_rentals?.total_count ?? 0;
-            const longCount = report?.market_analysis?.radius_5km?.long_term_rentals?.total_count ?? 0;
-            const salesCount = report?.market_analysis?.radius_5km?.sales?.total_count ?? 0;
-
             // Парсим отчет по блокам
             const lines = reportText.split('\n');
-            function block(title, contentArr, count) {
-                let countLabel = (typeof count === 'number') ? ` (${getObjectLabel(count)})` : '';
+            function block(title, contentArr) {
+                // Добавляем логику для группировки связанных данных
+                let groupedContent = [];
+                let currentGroup = [];
+                
+                for (let i = 0; i < contentArr.length; i++) {
+                    const line = contentArr[i];
+                    
+                    // Если строка содержит "---" или начинается с определенных ключевых слов, это начало новой группы
+                    if (line.includes('---') || line.startsWith('Количество спален:') || line.startsWith('Возраст здания:') || line.startsWith('Этаж объекта:') || line.startsWith('Система отопления:')) {
+                        if (currentGroup.length > 0) {
+                            groupedContent.push(currentGroup);
+                            currentGroup = [];
+                        }
+                        currentGroup.push(line);
+                    } else if (line.trim() === '') {
+                        // Пустая строка - разделитель
+                        if (currentGroup.length > 0) {
+                            groupedContent.push(currentGroup);
+                            currentGroup = [];
+                        }
+                    } else {
+                        currentGroup.push(line);
+                    }
+                }
+                
+                // Добавляем последнюю группу
+                if (currentGroup.length > 0) {
+                    groupedContent.push(currentGroup);
+                }
+                
+                let contentHtml = '';
+                groupedContent.forEach((group, index) => {
+                    if (group.length > 0) {
+                        // Добавляем группу с отступом
+                        contentHtml += `<div style='margin-bottom:${index < groupedContent.length - 1 ? '12px' : '0'};'>`;
+                        group.forEach((line, lineIndex) => {
+                            // Добавляем дополнительный отступ для заголовков групп
+                            const isGroupHeader = line.includes('---') || line.startsWith('Количество спален:') || line.startsWith('Возраст здания:') || line.startsWith('Этаж объекта:') || line.startsWith('Система отопления:');
+                            const marginBottom = isGroupHeader ? '8px' : '4px';
+                            const fontWeight = isGroupHeader ? '600' : '400';
+                            const color = isGroupHeader ? '#667eea' : '#222';
+                            
+                            contentHtml += `<div style='font-size:15px;color:${color};margin-bottom:${marginBottom};font-weight:${fontWeight};'>${line}</div>`;
+                        });
+                        contentHtml += '</div>';
+                        
+                        // Добавляем разделитель между группами (кроме последней)
+                        if (index < groupedContent.length - 1) {
+                            contentHtml += `<div style='height:1px;background:#e0e0e0;margin:8px 0;'></div>`;
+                        }
+                    }
+                });
+                
                 return `<div style='background:#f8f9fa;border-radius:12px;padding:14px 12px 10px 12px;margin-bottom:14px;box-shadow:0 2px 8px rgba(102,126,234,0.06);'>
-                    <div style='font-size:17px;font-weight:700;color:#667eea;margin-bottom:8px;'>${title}${countLabel}</div>
-                    ${contentArr.map(line => `<div style='font-size:15px;color:#222;margin-bottom:7px;'>${line}</div>`).join('')}
+                    <div style='font-size:17px;font-weight:700;color:#667eea;margin-bottom:12px;'>${title}</div>
+                    ${contentHtml}
                 </div>`;
             }
+            
             // Блоки
-            let shortTerm = [], longTerm = [], sales = [], other = [];
+            let locationCodes = [], propertyData = [], generalTrend = [], houseTypeTrend = [], ageTrend = [], floorTrend = [], heatingTrend = [], googleData = [], nominatimData = [];
             let current = null;
             for (let line of lines) {
-                if (line.includes('Краткосрочная аренда')) { current = shortTerm; continue; }
-                if (line.includes('Долгосрочная аренда')) { current = longTerm; continue; }
-                if (line.includes('Продажи недвижимости')) { current = sales; continue; }
-                if (line.includes('Средняя цена за кв.м')) { other.push(line); continue; }
-                if (current) current.push(line);
+                if (line.includes('=== КОДЫ ЛОКАЦИЙ (только для администраторов) ===')) { current = locationCodes; continue; }
+                if (line.includes('Данные объекта:')) { current = propertyData; continue; }
+                if (line.includes('=== ДАННЫЕ GOOGLE PLACES API (только для администраторов) ===')) { current = googleData; continue; }
+                if (line.includes('=== ДАННЫЕ NOMINATIM (OpenStreetMap) (только для администраторов) ===')) { current = nominatimData; continue; }
+                if (line.includes('=== ОБЩИЙ ТРЕНД ===')) { current = generalTrend; continue; }
+                if (line.includes('=== ТРЕНД ПО КОЛИЧЕСТВУ СПАЛЕН ===')) { current = houseTypeTrend; continue; }
+                if (line.includes('=== ТРЕНД ПО ВОЗРАСТУ ОБЪЕКТА ===')) { current = ageTrend; continue; }
+                if (line.includes('=== ТРЕНД ПО ЭТАЖУ ОБЪЕКТА ===')) { current = floorTrend; continue; }
+                if (line.includes('=== ТРЕНД ПО ТИПУ ОТОПЛЕНИЯ ===')) { current = heatingTrend; continue; }
+                if (current && line.trim() !== '') current.push(line);
             }
-            let blocksHtml = '';
-            if (shortTerm.length) blocksHtml += block('Краткосрочная аренда', shortTerm, shortCount);
-            if (longTerm.length) blocksHtml += block('Долгосрочная аренда', longTerm, longCount);
-            if (sales.length) blocksHtml += block('Продажи недвижимости', sales, salesCount);
-            if (other.length) blocksHtml += block('Прочее', other);
+            
+            // Проверяем статус админа и показываем коды локаций только для админов
+            checkAdminStatus().then(isAdmin => {
+                console.log('🎯 Результат проверки админа:', isAdmin);
+                console.log('📋 Коды локаций:', locationCodes);
+                console.log('📏 Количество кодов локаций:', locationCodes.length);
+                
+                let blocksHtml = '';
+                
+                if (isAdmin && locationCodes.length) {
+                    console.log('✅ Показываем коды локаций для админа');
+                    blocksHtml += `<div style='background:#f8f9fa;border-radius:12px;padding:14px 12px 10px 12px;margin-bottom:14px;box-shadow:0 2px 8px rgba(102,126,234,0.06);'>
+                        <div style='font-size:17px;font-weight:700;color:#667eea;margin-bottom:8px;'>Коды локаций (только для администраторов)</div>
+                        ${locationCodes.map((line, index) => {
+                            const isHeader = line.includes('Страна:') || line.includes('Город:') || line.includes('Район:') || line.includes('Округ:');
+                            const marginBottom = isHeader ? '8px' : '4px';
+                            const fontWeight = isHeader ? '600' : '400';
+                            return `<div style='font-size:15px;color:#222;margin-bottom:${marginBottom};font-weight:${fontWeight};'>${line}</div>`;
+                        }).join('')}
+                    </div>`;
+                } else {
+                    console.log('❌ Не показываем коды локаций:');
+                    console.log('  - isAdmin:', isAdmin);
+                    console.log('  - locationCodes.length:', locationCodes.length);
+                }
+                
+                if (isAdmin && googleData.length) {
+                    console.log('✅ Показываем данные Google Places API для админа');
+                    blocksHtml += block('Данные Google Places API (только для администраторов)', googleData);
+                } else {
+                    console.log('❌ Не показываем данные Google Places API:', isAdmin, googleData.length);
+                }
+                if (isAdmin && nominatimData.length) {
+                    console.log('✅ Показываем данные Nominatim для админа');
+                    blocksHtml += block('Данные Nominatim (OpenStreetMap) (только для администраторов)', nominatimData);
+                } else {
+                    console.log('❌ Не показываем данные Nominatim:', isAdmin, nominatimData.length);
+                }
+                if (generalTrend.length) blocksHtml += block('Общий тренд', generalTrend);
+                if (houseTypeTrend.length) blocksHtml += block('Тренд по количеству спален', houseTypeTrend);
+                if (ageTrend.length) blocksHtml += block('Тренд по возрасту объекта', ageTrend);
+                if (floorTrend.length) blocksHtml += block('Тренд по этажу объекта', floorTrend);
+                if (heatingTrend.length) blocksHtml += block('Тренд по типу отопления', heatingTrend);
 
-            // CTA-блок: призыв сделать полный отчет
-            blocksHtml += `
-                <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 14px; padding: 18px 14px 16px 14px; margin-bottom: 18px; box-shadow: 0 2px 8px rgba(102,126,234,0.10); color: #fff; text-align: center;">
-                    <div style="font-size: 18px; font-weight: 800; margin-bottom: 8px;">Хотите узнать больше?</div>
-                    <div style="font-size: 15px; font-weight: 400; margin-bottom: 14px;">Получите <b>полный отчет по объекту</b> — подробный анализ доходности, рисков, налогов, сравнение с альтернативами и профессиональные рекомендации. Всё в одном PDF-документе!</div>
-                    <button class="btn btn-primary" style="width: 100%; font-size: 16px; margin-top: 4px; background: #fff; color: #667eea; border: none; font-weight: 700;" onclick="showFullReportStub()">Получить полный отчет</button>
-                </div>
-            `;
+                // CTA-блок: призыв сделать полный отчет
+                blocksHtml += `
+                    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 14px; padding: 18px 14px 16px 14px; margin-bottom: 18px; box-shadow: 0 2px 8px rgba(102,126,234,0.10); color: #fff; text-align: center;">
+                        <div style="font-size: 18px; font-weight: 800; margin-bottom: 8px;">Хотите узнать больше?</div>
+                        <div style="font-size: 15px; font-weight: 400; margin-bottom: 14px;">Получите <b>полный отчет по объекту</b> — подробный анализ доходности, рисков, налогов, сравнение с альтернативами и профессиональные рекомендации. Всё в одном PDF-документе!</div>
+                        <button class="btn btn-primary" style="width: 100%; font-size: 16px; margin-top: 4px; background: #fff; color: #667eea; border: none; font-weight: 700;" onclick="showFullReportStub()">Получить полный отчет</button>
+                    </div>
+                `;
 
-            // Кнопки
-            const buttonsHtml = `
-                <div class="btn-row" style="margin-bottom:10px; justify-content: center; gap: 16px;">
-                    <button class="btn btn-primary" style="width:48%;min-width:140px;" onclick="copyReportToClipboard()">Скопировать данные</button>
-                </div>
-            `;
-            document.getElementById('reportResult').innerHTML = headerHtml + blocksHtml + buttonsHtml;
+                // Кнопки
+                const buttonsHtml = `
+                    <div class="btn-row" style="margin-bottom:10px; justify-content: center; gap: 16px;">
+                        <button class="btn btn-primary" style="width:48%;min-width:140px;" onclick="copyReportToClipboard()">Скопировать данные</button>
+                    </div>
+                `;
+                document.getElementById('reportResult').innerHTML = headerHtml + blocksHtml + buttonsHtml;
+            });
         }
 
         function copyReportToClipboard() {
@@ -1079,8 +1178,7 @@
             html += `<div style='font-size:17px;font-weight:700;color:#667eea;margin-bottom:12px;'>Информация об объекте</div>`;
             html += `<table style='width:100%;font-size:15px;'><tr><td style='padding:4px 0;'><b>Адрес:</b></td><td style='padding:4px 0;'>${report.object.address}</td></tr>`;
             html += `<tr><td style='padding:4px 0;'><b>Спален:</b></td><td style='padding:4px 0;'>${report.object.bedrooms}</td></tr>`;
-            html += `<tr><td style='padding:4px 0;'><b>Цена объекта:</b></td><td style='padding:4px 0;'>€${Number(report.object.purchase_price).toLocaleString('ru-RU')}</td></tr>`;
-            html += `<tr><td style='padding:4px 0;'><b>Средняя цена за м²:</b></td><td style='padding:4px 0;'>€${Number(report.object.avg_price_per_sqm).toLocaleString('ru-RU')}</td></tr></table>`;
+            html += `<tr><td style='padding:4px 0;'><b>Цена объекта:</b></td><td style='padding:4px 0;'>€${Number(report.object.purchase_price).toLocaleString('ru-RU')}</td></tr></table>`;
             html += `</div>`;
             
             // Блок: ROI
@@ -1405,6 +1503,44 @@
             }
             return localStorage.getItem('telegram_id');
         }
+
+        // Функция для проверки статуса администратора
+        async function checkAdminStatus() {
+            const telegram_id = getTelegramId();
+            console.log('🔍 Проверка статуса админа для telegram_id:', telegram_id);
+            
+            if (!telegram_id) {
+                console.log('❌ telegram_id не найден');
+                return false;
+            }
+            
+            try {
+                const response = await fetch('/api/check_admin_status', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ telegram_id })
+                });
+                
+                console.log('📡 Ответ сервера:', response.status, response.statusText);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('📊 Данные ответа:', data);
+                    const isAdmin = data.is_admin || false;
+                    console.log('👑 Статус админа:', isAdmin);
+                    return isAdmin;
+                } else {
+                    const errorData = await response.json();
+                    console.log('❌ Ошибка сервера:', errorData);
+                }
+            } catch (error) {
+                console.error('❌ Ошибка проверки статуса админа:', error);
+            }
+            
+            return false;
+        }
+
+
 
         // Инициализация
         showStep('address');
