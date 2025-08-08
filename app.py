@@ -776,7 +776,7 @@ def format_simple_report(address, bedrooms, price, location_codes, language='en'
     # Добавляем новые разделы отчета
     if market_data:
         # Общий тренд (из таблицы general_data)
-                if market_data.get('general_data'):
+        if market_data.get('general_data'):
             general = market_data['general_data']
             report_lines.extend([
                 "=== ОБЩИЙ ТРЕНД ===",
@@ -808,7 +808,7 @@ def format_simple_report(address, bedrooms, price, location_codes, language='en'
         # Тренд по количеству спален (из таблицы house_type_data)
         if market_data.get('house_type_data'):
             house_type_data = market_data['house_type_data']
-        report_lines.extend([
+            report_lines.extend([
                 "=== ТРЕНД ПО КОЛИЧЕСТВУ СПАЛЕН ===",
             ])
             
@@ -816,7 +816,7 @@ def format_simple_report(address, bedrooms, price, location_codes, language='en'
             if isinstance(house_type_data, list):
                 for record in house_type_data:
                     listing_type = record.get('listing_type', 'н/д')
-            report_lines.extend([
+                    report_lines.extend([
                         f"--- Количество спален: {listing_type} ---",
                         f"Средняя цена продажи: €{record.get('unit_price_for_sale', 'н/д')}",
                         f"Минимальная цена продажи: €{record.get('min_unit_price_for_sale', 'н/д')}",
@@ -938,7 +938,7 @@ def format_simple_report(address, bedrooms, price, location_codes, language='en'
             if isinstance(floor_data, list):
                 for record in floor_data:
                     listing_type = record.get('listing_type', 'н/д')
-            report_lines.extend([
+                    report_lines.extend([
                         f"--- Этаж объекта: {listing_type} ---",
                         f"Средняя цена продажи: €{record.get('unit_price_for_sale', 'н/д')}",
                         f"Минимальная цена продажи: €{record.get('min_unit_price_for_sale', 'н/д')}",
@@ -981,8 +981,8 @@ def format_simple_report(address, bedrooms, price, location_codes, language='en'
                     f"Период листинга для продажи: {floor_data.get('listing_period_for_sale', 'н/д')} дней",
                     f"Период листинга для аренды: {floor_data.get('listing_period_for_rent', 'н/д')} дней",
                     f"Доходность: {floor_data.get('yield', 'н/д')}%",
-                "",
-            ])
+                    "",
+                ])
         
         # Тренд по типу отопления (из таблицы heating_data)
         if market_data.get('heating_data'):
@@ -1038,8 +1038,8 @@ def format_simple_report(address, bedrooms, price, location_codes, language='en'
                     f"Период листинга для продажи: {heating_data.get('listing_period_for_sale', 'н/д')} дней",
                     f"Период листинга для аренды: {heating_data.get('listing_period_for_rent', 'н/д')} дней",
                     f"Доходность: {heating_data.get('yield', 'н/д')}%",
-                "",
-            ])
+                    "",
+                ])
     else:
         report_lines.extend([
             "=== АНАЛИЗ РЫНКА ===",
