@@ -397,8 +397,18 @@ def api_geocode():
         logger.info(f"🌐 Отправляем запрос к Google Maps API: {url}")
         logger.info(f"📝 Параметры запроса: address='{address}', key='{GOOGLE_MAPS_API_KEY[:10]}...'")
         
-        response = requests.get(url, params=params)
-        logger.info(f"📡 Статус ответа Google Maps API: {response.status_code}")
+        try:
+            response = requests.get(url, params=params, timeout=30)
+            logger.info(f"📡 Статус ответа Google Maps API: {response.status_code}")
+        except requests.exceptions.Timeout:
+            logger.error("❌ Таймаут при запросе к Google Maps API (30 секунд)")
+            return jsonify({'error': 'Google Maps API timeout'}), 500
+        except requests.exceptions.ConnectionError as e:
+            logger.error(f"❌ Ошибка соединения с Google Maps API: {e}")
+            return jsonify({'error': 'Google Maps API connection error'}), 500
+        except requests.exceptions.RequestException as e:
+            logger.error(f"❌ Ошибка запроса к Google Maps API: {e}")
+            return jsonify({'error': 'Google Maps API request error'}), 500
         
         if response.status_code != 200:
             logger.error(f"❌ Ошибка HTTP от Google Maps API: {response.status_code}")
@@ -3899,8 +3909,18 @@ def get_nominatim_location(address):
             'User-Agent': 'Aaadviser/1.0'
         }
         
-        response = requests.get(url, params=params, headers=headers)
-        result = response.json()
+        try:
+            response = requests.get(url, params=params, headers=headers, timeout=30)
+            result = response.json()
+        except requests.exceptions.Timeout:
+            logger.error("❌ Таймаут при запросе к Nominatim API (30 секунд)")
+            return None
+        except requests.exceptions.ConnectionError as e:
+            logger.error(f"❌ Ошибка соединения с Nominatim API: {e}")
+            return None
+        except requests.exceptions.RequestException as e:
+            logger.error(f"❌ Ошибка запроса к Nominatim API: {e}")
+            return None
         
         if result and len(result) > 0:
             location = result[0]
