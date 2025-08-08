@@ -534,6 +534,33 @@ def api_generate_report():
         if location_components:
             format_simple_report.last_location_components = location_components
         
+        # Проверяем, является ли локация турецкой
+        is_turkish = False
+        currency_rate = None
+        currency_info = ""
+        
+        if location_components:
+            from currency_functions import is_turkish_location, get_current_currency_rate, convert_turkish_data_to_eur, format_currency_info
+            
+            is_turkish = is_turkish_location(location_components)
+            logger.info(f"🌍 Проверка локации: {'Турция' if is_turkish else 'Другая страна'}")
+            
+            if is_turkish:
+                logger.info("🇹🇷 Локация в Турции, получаем курс валют и конвертируем данные")
+                # Получаем текущий курс валют
+                currency_rate = get_current_currency_rate()
+                if currency_rate:
+                    logger.info(f"💱 Получен курс валют: {currency_rate}")
+                    # Конвертируем данные рынка в евро
+                    if market_data:
+                        market_data = convert_turkish_data_to_eur(market_data, currency_rate)
+                        logger.info("✅ Данные рынка конвертированы в евро")
+                    
+                    # Форматируем информацию о курсе валют
+                    currency_info = format_currency_info(currency_rate, language)
+                else:
+                    logger.warning("⚠️ Не удалось получить курс валют")
+        
         # Проверяем статус администратора
         is_admin = False
         if telegram_id:
@@ -549,7 +576,7 @@ def api_generate_report():
         format_simple_report.is_admin = is_admin
         
         # Формируем отчёт в текстовом формате для отображения
-        report_text = format_simple_report(address, bedrooms, price, location_codes, language, market_data)
+        report_text = format_simple_report(address, bedrooms, price, location_codes, language, market_data, currency_info)
         
         # Сохраняем отчет в базу данных (если есть telegram_id)
         if telegram_id:
@@ -565,7 +592,9 @@ def api_generate_report():
                         'price': price,
                         'lat': lat,
                         'lng': lng,
-                        'location_codes': location_codes
+                        'location_codes': location_codes,
+                        'is_turkish': is_turkish,
+                        'currency_rate': currency_rate
                     },
                     'address': address,
                     'latitude': lat,
@@ -594,7 +623,9 @@ def api_generate_report():
                     'address': address,
                     'bedrooms': bedrooms,
                     'price': price
-                }
+                },
+                'is_turkish': is_turkish,
+                'currency_info': currency_info
             },
             'report_text': report_text
         })
@@ -700,7 +731,7 @@ def get_location_codes_from_address(address):
         logger.error(f"Error getting location codes: {e}")
         return None
 
-def format_simple_report(address, bedrooms, price, location_codes, language='en', market_data=None):
+def format_simple_report(address, bedrooms, price, location_codes, language='en', market_data=None, currency_info=""):
     """Форматирование простого отчёта с кодами локаций и данными рынка"""
     
     # Форматируем цену
@@ -712,6 +743,14 @@ def format_simple_report(address, bedrooms, price, location_codes, language='en'
         f"Анализ рынка в радиусе 5 км:",
         "",
     ]
+    
+    # Добавляем информацию о курсе валют, если есть
+    if currency_info:
+        report_lines.extend([
+            "=== КУРС ВАЛЮТ ===",
+            currency_info,
+            "",
+        ])
     
     # Добавляем коды локаций (только для админов)
     logger.info(f"📋 Форматирование кодов локаций: {location_codes}")
@@ -1044,9 +1083,9 @@ def format_simple_report(address, bedrooms, price, location_codes, language='en'
         report_lines.extend([
             "=== АНАЛИЗ РЫНКА ===",
             "Данные анализа рынка не найдены для данной локации",
-            "",
-        ])
-    
+                    "",
+                ])
+        
     return "\n".join(report_lines)
 
 @app.route('/api/search_properties', methods=['POST'])
@@ -1608,22 +1647,22 @@ def api_full_report():
         
         created_at = datetime.now().isoformat()
         
-        report_data = {
+                report_data = {
             'user_id': user_id,
             'report_type': 'full',
             'title': f'Полный отчет: {address}',
             'description': f'Полный отчет по адресу {address}, {bedrooms} спален, цена {price}',
-            'parameters': {
-                'address': address,
-                'bedrooms': bedrooms,
-                'price': price,
-                'lat': lat,
+                    'parameters': {
+                        'address': address,
+                        'bedrooms': bedrooms,
+                        'price': price,
+                        'lat': lat,
                 'lng': lng
-            },
-            'address': address,
-            'latitude': lat,
-            'longitude': lng,
-            'bedrooms': bedrooms,
+                    },
+                    'address': address,
+                    'latitude': lat,
+                    'longitude': lng,
+                    'bedrooms': bedrooms,
             'price': price,
             'created_at': created_at,
             'full_report': full_report_data
@@ -1656,7 +1695,7 @@ def api_user_reports():
         return jsonify({'error': 'telegram_id required'}), 400
     try:
         # Получаем user_id из базы данных по telegram_id
-        user_result = supabase.table('users').select('id').eq('telegram_id', telegram_id).execute()
+                user_result = supabase.table('users').select('id').eq('telegram_id', telegram_id).execute()
         if not user_result.data:
             return jsonify({'error': 'User not found'}), 404
         user_id = user_result.data[0]['id']
@@ -2410,7 +2449,7 @@ def api_save_user_report():
         # Получаем user_id по telegram_id
         user_result = supabase.table('users').select('id').eq('telegram_id', telegram_id).execute()
         user_id = user_result.data[0]['id'] if user_result.data else telegram_id
-        # Сохраняем отчет
+                    # Сохраняем отчет
         report_data = {
             'user_id': user_id,
             'report_type': report_type,
@@ -2422,7 +2461,7 @@ def api_save_user_report():
         result = supabase.table('user_reports').insert(report_data).execute()
         new_id = result.data[0]['id'] if hasattr(result, 'data') and result.data else None
         return jsonify({'success': True, 'report_id': new_id})
-    except Exception as e:
+            except Exception as e:
         logger.error(f"Error saving user report: {e}")
         return jsonify({'error': 'Internal error'}), 500
 

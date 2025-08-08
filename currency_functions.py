@@ -72,23 +72,32 @@ def fetch_and_save_currency_rates(target_date=None):
         # Форматируем дату для API запроса
         date_str = target_date.strftime('%Y-%m-%d')
         
-        # Запрос к currencylayer.com API
+        # Сначала проверяем, есть ли уже запись для этой даты
+        existing_query = supabase.table('currency').select('*').gte('created_at', f'{date_str} 00:00:00').lt('created_at', f'{date_str} 23:59:59').order('created_at', desc=True).limit(1)
+        existing_result = existing_query.execute()
+        
+        if existing_result.data and len(existing_result.data) > 0:
+            logger.info(f"✅ Запись курса валют для {date_str} уже существует: {existing_result.data[0]}")
+            return existing_result.data[0]
+        
+        # Запрос к currencylayer.com API (используем USD как базовую валюту)
         url = "http://api.currencylayer.com/historical"
         params = {
             'access_key': CURRENCYLAYER_API_KEY,
             'date': date_str,
-            'base': 'EUR',
-            'currencies': 'RUB,USD,TRY,AED,THB'
+            'source': 'USD',
+            'currencies': 'RUB,TRY,AED,THB,EUR'
         }
         
         logger.info(f"🔍 Запрос курсов валют с currencylayer.com для {date_str}")
-        response = requests.get(url, params=params)
+        response = requests.get(url, params=params, timeout=30)
         
         if response.status_code != 200:
             logger.error(f"❌ Ошибка API currencylayer.com: {response.status_code} - {response.text}")
             return None
         
         data = response.json()
+        logger.info(f"🔍 Ответ API: {data}")
         
         if not data.get('success'):
             logger.error(f"❌ Ошибка currencylayer.com API: {data.get('error', {}).get('info', 'Unknown error')}")
@@ -96,23 +105,49 @@ def fetch_and_save_currency_rates(target_date=None):
         
         # Извлекаем курсы валют
         quotes = data.get('quotes', {})
+        logger.info(f"🔍 Полученные курсы: {quotes}")
         
-        # Формируем данные для сохранения в базу
+        # Конвертируем курсы из USD в EUR
+        # Сначала получаем курс EUR/USD
+        eur_usd_rate = quotes.get('USDEUR')
+        if not eur_usd_rate:
+            logger.error("❌ Не удалось получить курс EUR/USD")
+            return None
+        
+        # Конвертируем все курсы в EUR
         currency_data = {
             'created_at': target_date.isoformat(),
-            'rub': quotes.get('EURRUB', 1.0),
-            'usd': quotes.get('EURUSD', 1.0),
+            'rub': quotes.get('USDRUB', 1.0) / eur_usd_rate if quotes.get('USDRUB') else 1.0,
+            'usd': 1.0 / eur_usd_rate,  # USD к EUR
             'euro': 1.0,  # Базовая валюта
-            'try': quotes.get('EURTRY', 1.0),
-            'aed': quotes.get('EURAED', 1.0),
-            'thb': quotes.get('EURTHB', 1.0)
+            'try': quotes.get('USDTRY', 1.0) / eur_usd_rate if quotes.get('USDTRY') else 1.0,
+            'aed': quotes.get('USDAED', 1.0) / eur_usd_rate if quotes.get('USDAED') else 1.0,
+            'thb': quotes.get('USDTHB', 1.0) / eur_usd_rate if quotes.get('USDTHB') else 1.0
         }
+        
+        # Проверяем, что все курсы получены корректно
+        required_currencies = ['rub', 'usd', 'try', 'aed', 'thb']
+        missing_currencies = [curr for curr in required_currencies if currency_data.get(curr) == 1.0]
+        
+        if missing_currencies:
+            logger.warning(f"⚠️ Не удалось получить курсы для валют: {missing_currencies}")
+            # Если не удалось получить курсы, возвращаем None
+            return None
         
         # Сохраняем в базу данных
         logger.info(f"💾 Сохраняем курсы валют в базу: {currency_data}")
-        supabase.table('currency').insert(currency_data).execute()
+        try:
+            supabase.table('currency').insert(currency_data).execute()
+            logger.info(f"✅ Курсы валют успешно получены и сохранены для {date_str}")
+        except Exception as insert_error:
+            logger.warning(f"⚠️ Ошибка при сохранении курсов валют (возможно, запись уже существует): {insert_error}")
+            # Пытаемся получить существующую запись
+            existing_query = supabase.table('currency').select('*').gte('created_at', f'{date_str} 00:00:00').lt('created_at', f'{date_str} 23:59:59').order('created_at', desc=True).limit(1)
+            existing_result = existing_query.execute()
+            if existing_result.data and len(existing_result.data) > 0:
+                logger.info(f"✅ Используем существующую запись курса валют для {date_str}")
+                return existing_result.data[0]
         
-        logger.info(f"✅ Курсы валют успешно получены и сохранены для {date_str}")
         return currency_data
         
     except Exception as e:
@@ -190,3 +225,50 @@ def is_turkish_location(location_components):
     turkish_indicators = ['turkey', 'türkiye', 'tr', 'tur']
     
     return country in turkish_indicators or country_code in turkish_indicators
+
+def get_current_currency_rate():
+    """
+    Получает текущий курс валют для сегодняшней даты.
+    
+    Returns:
+        dict: Словарь с курсами валют или None если ошибка
+    """
+    return get_currency_rate_for_date(datetime.now())
+
+def format_currency_info(currency_rate, language='en'):
+    """
+    Форматирует информацию о курсе валют для отображения в отчете.
+    
+    Args:
+        currency_rate (dict): Курс валюты
+        language (str): Язык отчета
+    
+    Returns:
+        str: Отформатированная информация о курсе валют
+    """
+    if not currency_rate:
+        return ""
+    
+    try:
+        # Форматируем дату
+        created_at = currency_rate.get('created_at')
+        if created_at:
+            if isinstance(created_at, str):
+                date_obj = datetime.fromisoformat(created_at.replace('Z', '+00:00'))
+            else:
+                date_obj = created_at
+            date_str = date_obj.strftime('%d.%m.%Y')
+        else:
+            date_str = datetime.now().strftime('%d.%m.%Y')
+        
+        # Форматируем курсы
+        try_rate = currency_rate.get('try', 0)
+        usd_rate = currency_rate.get('usd', 0)
+        rub_rate = currency_rate.get('rub', 0)
+        
+        currency_info = f"Курс валют на {date_str}: 1 EUR = {try_rate:.4f} TRY, {usd_rate:.4f} USD, {rub_rate:.4f} RUB"
+        
+        return currency_info
+    except Exception as e:
+        logger.error(f"Ошибка форматирования информации о курсе валют: {e}")
+        return ""
