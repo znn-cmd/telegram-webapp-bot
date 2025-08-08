@@ -2461,7 +2461,7 @@ def api_save_user_report():
         result = supabase.table('user_reports').insert(report_data).execute()
         new_id = result.data[0]['id'] if hasattr(result, 'data') and result.data else None
         return jsonify({'success': True, 'report_id': new_id})
-            except Exception as e:
+    except Exception as e:
         logger.error(f"Error saving user report: {e}")
         return jsonify({'error': 'Internal error'}), 500
 
