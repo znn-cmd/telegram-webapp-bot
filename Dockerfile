@@ -13,11 +13,15 @@ RUN apt-get update && apt-get install -y \
 # Установка рабочей директории
 WORKDIR /app
 
+# Копирование конфигурации pip
+COPY pip.conf /etc/pip.conf
+
 # Копирование файлов зависимостей
 COPY requirements.txt .
 
-# Установка Python зависимостей
-RUN pip install --no-cache-dir -r requirements.txt
+# Установка Python зависимостей с улучшенными настройками сети
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
 
 # Копирование исходного кода
 COPY . .
