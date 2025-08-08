@@ -375,7 +375,15 @@ def api_geocode():
     """Геокодинг адреса через Google Maps API с извлечением структурированных данных"""
     data = request.json or {}
     address = data.get('address')
+    
+    # Начинаем логирование
+    logger.info("=" * 60)
+    logger.info("🔍 НАЧАЛО ГЕОКОДИНГА АДРЕСА")
+    logger.info("=" * 60)
+    logger.info(f"Получен адрес: '{address}'")
+    
     if not address:
+        logger.error("❌ Адрес не предоставлен")
         return jsonify({'error': 'Address required'}), 400
     
     try:
@@ -385,12 +393,28 @@ def api_geocode():
             'address': address,
             'key': GOOGLE_MAPS_API_KEY
         }
+        
+        logger.info(f"🌐 Отправляем запрос к Google Maps API: {url}")
+        logger.info(f"📝 Параметры запроса: address='{address}', key='{GOOGLE_MAPS_API_KEY[:10]}...'")
+        
         response = requests.get(url, params=params)
+        logger.info(f"📡 Статус ответа Google Maps API: {response.status_code}")
+        
+        if response.status_code != 200:
+            logger.error(f"❌ Ошибка HTTP от Google Maps API: {response.status_code}")
+            logger.error(f"📄 Текст ответа: {response.text}")
+            return jsonify({'error': 'Google Maps API error'}), 500
+        
         result = response.json()
+        logger.info(f"📊 Статус ответа Google Maps: {result.get('status')}")
         
         if result['status'] == 'OK' and result['results']:
             location = result['results'][0]['geometry']['location']
             formatted_address = result['results'][0]['formatted_address']
+            
+            logger.info("✅ Google Maps API вернул успешный ответ")
+            logger.info(f"📍 Координаты: lat={location['lat']}, lng={location['lng']}")
+            logger.info(f"🏠 Форматированный адрес: {formatted_address}")
             
             # Детальное логирование ответа Google Places API
             logger.info("=" * 60)
@@ -419,13 +443,17 @@ def api_geocode():
                 logger.info(f"✅ '{first_part}' найден в компонентах Google")
             
             # Извлекаем структурированные данные из Google Places API
+            logger.info("🔧 Извлекаем структурированные данные...")
             location_components = extract_location_components(result['results'][0]['address_components'], address)
+            logger.info(f"📋 Извлеченные компоненты: {location_components}")
             
             # Дополнительно получаем данные через Nominatim
+            logger.info("🌐 Получаем дополнительные данные через Nominatim...")
             nominatim_data = get_nominatim_location(address)
             
             # Объединяем данные Google и Nominatim
             if nominatim_data:
+                logger.info(f"✅ Получены данные Nominatim: {nominatim_data}")
                 # Если Google не определил district, используем данные Nominatim
                 if not location_components.get('district') and nominatim_data.get('district'):
                     location_components['district'] = nominatim_data['district']
@@ -438,9 +466,21 @@ def api_geocode():
                 
                 # Сохраняем данные Nominatim для отображения
                 location_components['nominatim_data'] = nominatim_data
+            else:
+                logger.info("⚠️ Данные Nominatim не получены")
             
             # Пытаемся найти коды локаций в базе данных
+            logger.info("🔍 Ищем коды локаций в базе данных...")
             location_codes = find_location_codes_from_components(location_components)
+            
+            if location_codes:
+                logger.info(f"✅ Найдены коды локаций: {location_codes}")
+            else:
+                logger.warning("⚠️ Коды локаций не найдены")
+            
+            logger.info("=" * 60)
+            logger.info("✅ ГЕОКОДИНГ ЗАВЕРШЕН УСПЕШНО")
+            logger.info("=" * 60)
             
             return jsonify({
                 'success': True,
@@ -451,12 +491,20 @@ def api_geocode():
                 'location_codes': location_codes
             })
         else:
+            logger.error(f"❌ Google Maps API вернул ошибку: {result.get('status')}")
+            logger.error(f"📄 Полный ответ: {result}")
+            
+            # Логируем детали ошибки
+            if result.get('error_message'):
+                logger.error(f"🚨 Сообщение об ошибке: {result['error_message']}")
+            
             return jsonify({
                 'success': False,
-                'error': 'Address not found'
+                'error': f"Address not found. Status: {result.get('status')}"
             })
     except Exception as e:
-        logger.error(f"Geocoding error: {e}")
+        logger.error(f"❌ Критическая ошибка при геокодинге: {e}")
+        logger.error(f"📄 Traceback: ", exc_info=True)
         return jsonify({'error': 'Geocoding service error'}), 500
 
 @app.route('/api/validate_bedrooms', methods=['POST'])
