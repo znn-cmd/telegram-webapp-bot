@@ -1011,6 +1011,14 @@ def format_simple_report(address, bedrooms, price, location_codes, language='en'
                 
                 if matching_records:
                     for record in matching_records:
+                        # Добавляем отладочную информацию
+                        logger.info(f"DEBUG: Processing record. Type: {type(record)}, Value: {record}")
+                        
+                        # Проверяем, что record это словарь
+                        if not isinstance(record, dict):
+                            logger.warning(f"⚠️ record не является словарем: {type(record)}, пропускаем")
+                            continue
+                        
                         listing_type = record.get('listing_type', 'н/д')
                         # Определяем отображаемое название
                         display_name = {
@@ -1068,59 +1076,67 @@ def format_simple_report(address, bedrooms, price, location_codes, language='en'
                     ])
             else:
                 # Если это одна запись
-                listing_type = house_type_data.get('listing_type', 'н/д')
-                if listing_type == target_listing_type:
-                    # Определяем отображаемое название
-                    display_name = {
-                        "0+1": "0 - студия",
-                        "1+1": "1 спальня",
-                        "2+1": "2 спальни",
-                        "3+1": "3 спальни",
-                        "4+1": "4 спальни", 
-                        "5+1": "5+ спален"
-                    }.get(listing_type, listing_type)
-                    
+                if not isinstance(house_type_data, dict):
+                    logger.warning(f"⚠️ house_type_data не является словарем: {type(house_type_data)}")
                     report_lines.extend([
-                        f"--- {display_name} ---",
-                        "",
-                        "--- ПРОДАЖИ ---",
-                        f"Минимальная цена продажи: €{format_number(house_type_data.get('min_unit_price_for_sale'))}",
-                        f"Средняя цена продажи: €{format_number(house_type_data.get('unit_price_for_sale'))}",
-                        f"Максимальная цена продажи: €{format_number(house_type_data.get('max_unit_price_for_sale'))}",
-                        f"Сопоставимая площадь для продажи: {format_number(house_type_data.get('comparable_area_for_sale'))} м²",
-                        f"Количество объектов на продажу: {format_number(house_type_data.get('count_for_sale'))}",
-                        f"Цена для продажи, средняя: €{format_number(house_type_data.get('price_for_sale'))}",
-                        f"Средний возраст объекта для продажи: {format_number(house_type_data.get('average_age_for_sale'))} лет",
-                        f"Период листинга для продажи: {format_number(house_type_data.get('listing_period_for_sale'))} дней",
-                        "",
-                        "--- АРЕНДА ---",
-                        f"Минимальная цена аренды, м²: €{format_number(house_type_data.get('min_unit_price_for_rent'))}",
-                        f"Средняя цена аренды, м²: €{format_number(house_type_data.get('unit_price_for_rent'))}",
-                        f"Максимальная цена аренды, м²: €{format_number(house_type_data.get('max_unit_price_for_rent'))}",
-                        f"Средняя площадь аренды: {format_number(house_type_data.get('comparable_area_for_rent'))} м²",
-                        f"Количество объектов в аренду: {format_number(house_type_data.get('count_for_rent'))}",
-                        f"Цена для аренды, средняя: €{format_number(house_type_data.get('price_for_rent'))}",
-                        f"Средний возраст объекта для аренды: {format_number(house_type_data.get('average_age_for_rent'))} лет",
-                        f"Период листинга для аренды: {format_number(house_type_data.get('listing_period_for_rent'))} дней",
-                        f"Доходность: {format_number(house_type_data.get('yield'))}%",
+                        "--- Ошибка данных ---",
+                        "Данные имеют неожиданный формат",
                         "",
                     ])
                 else:
-                    # Если данные не соответствуют выбранному количеству спален
-                    display_name = {
-                        0: "0 - студия",
-                        1: "1 спальня",
-                        2: "2 спальни",
-                        3: "3 спальни",
-                        4: "4 спальни",
-                        5: "5+ спален"
-                    }.get(bedrooms, f"{bedrooms} спален")
-                    
-                    report_lines.extend([
-                        f"--- {display_name} ---",
-                        "Данные для выбранного количества спален не найдены",
-                        "",
-                    ])
+                    listing_type = house_type_data.get('listing_type', 'н/д')
+                    if listing_type == target_listing_type:
+                        # Определяем отображаемое название
+                        display_name = {
+                            "0+1": "0 - студия",
+                            "1+1": "1 спальня",
+                            "2+1": "2 спальни",
+                            "3+1": "3 спальни",
+                            "4+1": "4 спальни", 
+                            "5+1": "5+ спален"
+                        }.get(listing_type, listing_type)
+                        
+                        report_lines.extend([
+                            f"--- {display_name} ---",
+                            "",
+                            "--- ПРОДАЖИ ---",
+                            f"Минимальная цена продажи: €{format_number(house_type_data.get('min_unit_price_for_sale'))}",
+                            f"Средняя цена продажи: €{format_number(house_type_data.get('unit_price_for_sale'))}",
+                            f"Максимальная цена продажи: €{format_number(house_type_data.get('max_unit_price_for_sale'))}",
+                            f"Сопоставимая площадь для продажи: {format_number(house_type_data.get('comparable_area_for_sale'))} м²",
+                            f"Количество объектов на продажу: {format_number(house_type_data.get('count_for_sale'))}",
+                            f"Цена для продажи, средняя: €{format_number(house_type_data.get('price_for_sale'))}",
+                            f"Средний возраст объекта для продажи: {format_number(house_type_data.get('average_age_for_sale'))} лет",
+                            f"Период листинга для продажи: {format_number(house_type_data.get('listing_period_for_sale'))} дней",
+                            "",
+                            "--- АРЕНДА ---",
+                            f"Минимальная цена аренды, м²: €{format_number(house_type_data.get('min_unit_price_for_rent'))}",
+                            f"Средняя цена аренды, м²: €{format_number(house_type_data.get('unit_price_for_rent'))}",
+                            f"Максимальная цена аренды, м²: €{format_number(house_type_data.get('max_unit_price_for_rent'))}",
+                            f"Средняя площадь аренды: {format_number(house_type_data.get('comparable_area_for_rent'))} м²",
+                            f"Количество объектов в аренду: {format_number(house_type_data.get('count_for_rent'))}",
+                            f"Цена для аренды, средняя: €{format_number(house_type_data.get('price_for_rent'))}",
+                            f"Средний возраст объекта для аренды: {format_number(house_type_data.get('average_age_for_rent'))} лет",
+                            f"Период листинга для аренды: {format_number(house_type_data.get('listing_period_for_rent'))} дней",
+                            f"Доходность: {format_number(house_type_data.get('yield'))}%",
+                            "",
+                        ])
+                    else:
+                        # Если данные не соответствуют выбранному количеству спален
+                        display_name = {
+                            0: "0 - студия",
+                            1: "1 спальня",
+                            2: "2 спальни",
+                            3: "3 спальни",
+                            4: "4 спальни",
+                            5: "5+ спален"
+                        }.get(bedrooms, f"{bedrooms} спален")
+                        
+                        report_lines.extend([
+                            f"--- {display_name} ---",
+                            "Данные для выбранного количества спален не найдены",
+                            "",
+                        ])
         
         # Тренд по возрасту объекта (из таблицы age_data)
         if market_data.get('age_data'):
@@ -1132,6 +1148,11 @@ def format_simple_report(address, bedrooms, price, location_codes, language='en'
             # Если age_data это список (несколько записей с разными listing_type)
             if isinstance(age_data, list):
                 for record in age_data:
+                    # Проверяем, что record это словарь
+                    if not isinstance(record, dict):
+                        logger.warning(f"⚠️ record в age_data не является словарем: {type(record)}, пропускаем")
+                        continue
+                    
                     listing_type = record.get('listing_type', 'н/д')
                     report_lines.extend([
                         f"--- Возраст здания: {listing_type} ---",
