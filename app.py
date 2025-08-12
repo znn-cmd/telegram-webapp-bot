@@ -1957,6 +1957,17 @@ def api_full_report():
     floor_id = additional_data.get('floor')
     heating_id = additional_data.get('heating')
     
+    # Получаем коды локаций
+    location_codes = data.get('location_codes', {})
+    if not location_codes:
+        # Если коды локаций не переданы, пытаемся получить их из адреса
+        try:
+            location_codes = get_location_codes_from_address(address)
+            logger.info(f"📋 Получены коды локаций из адреса: {location_codes}")
+        except Exception as e:
+            logger.warning(f"⚠️ Ошибка получения кодов локаций: {e}")
+            location_codes = {}
+    
     # Получаем язык пользователя
     user_language = 'ru'  # По умолчанию русский
     try:
@@ -2004,7 +2015,7 @@ def api_full_report():
         chart_data = create_economic_chart_data(economic_data)
         
         # Получаем рыночные данные для сравнения цен
-        market_comparison_data = await get_market_comparison_data(
+        market_comparison_data = get_market_comparison_data(
             age_id, floor_id, heating_id, area, price, location_codes
         )
         logger.info(f"✅ Получены рыночные данные для сравнения: {market_comparison_data}")
@@ -6000,7 +6011,7 @@ def load_interpretations_from_database(country_code):
         logger.error(f"Error loading interpretations from database: {e}")
         return None, None
 
-async def get_market_comparison_data(age_id, floor_id, heating_id, area, price, location_codes):
+def get_market_comparison_data(age_id, floor_id, heating_id, area, price, location_codes):
     """
     Получает рыночные данные для сравнения цен из таблиц floor_segment_data, heating_data, house_type_data, age_data
     
