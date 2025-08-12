@@ -292,6 +292,66 @@
                     </div>
                 </div>
 
+                <!-- Простой отчет -->
+                <div class="section">
+                    <h2>📋 Простой отчет</h2>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <div class="info-label">Локация</div>
+                            <div class="info-value" id="simple-location">-</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Объект</div>
+                            <div class="info-value" id="simple-property">-</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Цена за м²</div>
+                            <div class="info-value" id="simple-price-per-sqm">-</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Анализ цен на рынке -->
+                <div class="section">
+                    <h2>📊 Анализ цен на рынке</h2>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <div class="info-label">Уровень цены</div>
+                            <div class="info-value" id="price-level">-</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Диапазон цен</div>
+                            <div class="info-value" id="price-range">-</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Рекомендация</div>
+                            <div class="info-value" id="price-recommendation">-</div>
+                        </div>
+                    </div>
+                    <div class="price-comparison" id="price-comparison-details" style="margin-top: 20px;">
+                        <!-- Детали сравнения цен будут добавлены динамически -->
+                    </div>
+                </div>
+
+                <!-- Анализ аренды -->
+                <div class="section">
+                    <h2>🏠 Анализ аренды</h2>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <div class="info-label">Максимальная ставка аренды</div>
+                            <div class="info-value" id="max-rental-rate">-</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Годовая доходность</div>
+                            <div class="info-value" id="annual-rental-yield">-</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Рекомендация по аренде</div>
+                            <div class="info-value" id="rental-recommendation">-</div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- ROI анализ -->
                 <div class="section">
                     <h2>💰 ROI анализ</h2>
@@ -462,6 +522,10 @@
                 document.getElementById('loading').style.display = 'none';
                 document.getElementById('report-content').style.display = 'block';
 
+                // Отладочная информация
+                console.log('📊 Получены данные от сервера:', data);
+                console.log('🔍 Структура full_report:', data.full_report);
+
                 // Заполняем данные отчета
                 fillReportData(data);
 
@@ -475,45 +539,150 @@
 
         // Заполняем данные отчета
         function fillReportData(data) {
+            console.log('🔧 Начинаем заполнение отчета...');
+            
+            // Проверяем существование элементов
+            const elements = {
+                'object-address': document.getElementById('object-address'),
+                'object-bedrooms': document.getElementById('object-bedrooms'),
+                'object-price': document.getElementById('object-price'),
+                'object-age': document.getElementById('object-age'),
+                'object-floor': document.getElementById('object-floor'),
+                'object-heating': document.getElementById('object-heating')
+            };
+            
+            // Проверяем, что все элементы найдены
+            for (const [id, element] of Object.entries(elements)) {
+                if (!element) {
+                    console.error(`❌ Элемент ${id} не найден в DOM`);
+                    return;
+                }
+            }
+            
             // Основная информация об объекте
-            document.getElementById('object-address').textContent = reportData.address;
-            document.getElementById('object-bedrooms').textContent = reportData.bedrooms;
-            document.getElementById('object-price').textContent = `€${Number(reportData.price).toLocaleString('ru-RU')}`;
+            elements['object-address'].textContent = reportData.address;
+            elements['object-bedrooms'].textContent = reportData.bedrooms;
+            elements['object-price'].textContent = `€${Number(reportData.price).toLocaleString('ru-RU')}`;
             
-            // Дополнительные данные
-            const ageText = reportData.age === 'unknown' ? 'Не известно' : reportData.age;
-            const floorText = reportData.floor === 'unknown' ? 'Не известно' : reportData.floor;
-            const heatingText = reportData.heating === 'unknown' ? 'Не известно' : reportData.heating;
-            
-            document.getElementById('object-age').textContent = ageText;
-            document.getElementById('object-floor').textContent = floorText;
-            document.getElementById('object-heating').textContent = heatingText;
+            // Дополнительные данные - используем новую структуру из full_report
+            if (data.full_report && data.full_report.detailed_characteristics) {
+                const characteristics = data.full_report.detailed_characteristics;
+                console.log('🔍 Найдены характеристики:', characteristics);
+                
+                // Возраст объекта
+                const ageText = characteristics.age && characteristics.age.name ? 
+                    characteristics.age.name : 
+                    (reportData.age === 'unknown' ? 'Не известно' : 'Не указано');
+                elements['object-age'].textContent = ageText;
+                
+                // Этаж
+                const floorText = characteristics.floor && characteristics.floor.name ? 
+                    characteristics.floor.name : 
+                    (reportData.floor === 'unknown' ? 'Не известно' : 'Не указано');
+                elements['object-floor'].textContent = floorText;
+                
+                // Отопление
+                const heatingText = characteristics.heating && characteristics.heating.name ? 
+                    characteristics.heating.name : 
+                    (reportData.heating === 'unknown' ? 'Не известно' : 'Не указано');
+                elements['object-heating'].textContent = heatingText;
+                
+                console.log('✅ Характеристики объекта загружены:', { ageText, floorText, heatingText });
+            } else {
+                // Fallback на старые данные
+                const ageText = reportData.age === 'unknown' ? 'Не известно' : reportData.age;
+                const floorText = reportData.floor === 'unknown' ? 'Не известно' : reportData.floor;
+                const heatingText = reportData.heating === 'unknown' ? 'Не известно' : reportData.heating;
+                
+                elements['object-age'].textContent = ageText;
+                elements['object-floor'].textContent = floorText;
+                elements['object-heating'].textContent = heatingText;
+                
+                console.log('⚠️ Используются fallback данные:', { ageText, floorText, heatingText });
+            }
+
+            // Простой отчет
+            if (data.full_report && data.full_report.simple_report) {
+                const simpleReport = data.full_report.simple_report;
+                console.log('📋 Простой отчет:', simpleReport);
+                
+                const simpleElements = {
+                    'simple-location': document.getElementById('simple-location'),
+                    'simple-property': document.getElementById('simple-property'),
+                    'simple-price-per-sqm': document.getElementById('simple-price-per-sqm')
+                };
+                
+                if (simpleElements['simple-location']) {
+                    simpleElements['simple-location'].textContent = simpleReport.location_summary || reportData.address;
+                }
+                if (simpleElements['simple-property']) {
+                    simpleElements['simple-property'].textContent = simpleReport.property_summary || `${reportData.bedrooms} спален, цена €${Number(reportData.price).toLocaleString('ru-RU')}`;
+                }
+                if (simpleElements['simple-price-per-sqm']) {
+                    simpleElements['simple-price-per-sqm'].textContent = simpleReport.price_per_sqm || `€${(Number(reportData.price) / 80).toFixed(0)}/м²`;
+                }
+            }
+
+            // Анализ цен на рынке
+            if (data.full_report && data.full_report.market_price_analysis) {
+                const priceAnalysis = data.full_report.market_price_analysis;
+                document.getElementById('price-level').textContent = priceAnalysis.price_level || 'Не определен';
+                document.getElementById('price-range').textContent = priceAnalysis.price_range || 'Не определен';
+                document.getElementById('price-recommendation').textContent = priceAnalysis.price_recommendation || 'Не определен';
+                
+                // Детали сравнения цен
+                if (priceAnalysis.price_comparison) {
+                    const comparisonContainer = document.getElementById('price-comparison-details');
+                    comparisonContainer.innerHTML = `
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <div class="info-label">${priceAnalysis.price_comparison.min}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">${priceAnalysis.price_comparison.avg}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">${priceAnalysis.price_comparison.max}</div>
+                            </div>
+                        </div>
+                    `;
+                }
+            }
+
+            // Анализ аренды
+            if (data.full_report && data.full_report.rental_analysis) {
+                const rentalAnalysis = data.full_report.rental_analysis;
+                document.getElementById('max-rental-rate').textContent = rentalAnalysis.rental_recommendation || 'Не определен';
+                document.getElementById('annual-rental-yield').textContent = rentalAnalysis.annual_yield || 'Не определен';
+                document.getElementById('rental-recommendation').textContent = rentalAnalysis.rental_recommendation || 'Не определен';
+            }
 
             // ROI данные
-            if (data.roi) {
-                if (data.roi.short_term) {
-                    document.getElementById('short-term-income').textContent = `€${data.roi.short_term.monthly_income?.toLocaleString('ru-RU') || '-'}`;
+            if (data.full_report && data.full_report.roi) {
+                const roiData = data.full_report.roi;
+                if (roiData.short_term) {
+                    document.getElementById('short-term-income').textContent = `€${roiData.short_term.monthly_income?.toLocaleString('ru-RU') || '-'}`;
                 }
-                if (data.roi.long_term) {
-                    document.getElementById('long-term-income').textContent = `€${data.roi.long_term.annual_income?.toLocaleString('ru-RU') || '-'}`;
+                if (roiData.long_term) {
+                    document.getElementById('long-term-income').textContent = `€${roiData.long_term.annual_income?.toLocaleString('ru-RU') || '-'}`;
                 }
-                if (data.roi.price_growth) {
-                    document.getElementById('price-growth').textContent = `${(data.roi.price_growth * 100).toFixed(1)}%`;
+                if (roiData.price_growth) {
+                    document.getElementById('price-growth').textContent = `${(roiData.price_growth * 100).toFixed(1)}%`;
                 }
-                if (data.roi.short_term?.roi) {
-                    document.getElementById('roi-with-rent').textContent = `${data.roi.short_term.roi.toFixed(1)}%`;
+                if (roiData.short_term?.roi) {
+                    document.getElementById('roi-with-rent').textContent = `${roiData.short_term.roi.toFixed(1)}%`;
                 }
-                if (data.roi.no_rent?.roi) {
-                    document.getElementById('roi-without-rent').textContent = `${data.roi.no_rent.roi.toFixed(1)}%`;
+                if (roiData.no_rent?.roi) {
+                    document.getElementById('roi-without-rent').textContent = `${roiData.no_rent.roi.toFixed(1)}%`;
                 }
             }
 
             // Альтернативные инвестиции
-            if (data.alternatives) {
+            if (data.full_report && data.full_report.alternatives) {
                 const alternativesGrid = document.getElementById('alternatives-grid');
                 alternativesGrid.innerHTML = '';
                 
-                data.alternatives.forEach(alt => {
+                data.full_report.alternatives.forEach(alt => {
                     const altItem = document.createElement('div');
                     altItem.className = 'info-item';
                     altItem.innerHTML = `
@@ -525,25 +694,28 @@
             }
 
             // Макроэкономические данные
-            if (data.inflation !== undefined) {
-                document.getElementById('inflation').textContent = `${data.inflation.toFixed(1)}%`;
-            }
-            if (data.eur_try !== undefined) {
-                document.getElementById('eur-try').textContent = data.eur_try.toFixed(2);
-            }
-            if (data.gdp_growth !== undefined) {
-                document.getElementById('gdp-growth').textContent = `${data.gdp_growth.toFixed(1)}%`;
-            }
-            if (data.refi_rate !== undefined) {
-                document.getElementById('refi-rate').textContent = `${data.refi_rate.toFixed(1)}%`;
+            if (data.full_report && data.full_report.macro) {
+                const macroData = data.full_report.macro;
+                if (macroData.inflation !== undefined) {
+                    document.getElementById('inflation').textContent = `${macroData.inflation.toFixed(1)}%`;
+                }
+                if (macroData.eur_try !== undefined) {
+                    document.getElementById('eur-try').textContent = macroData.eur_try.toFixed(2);
+                }
+                if (macroData.gdp_growth !== undefined) {
+                    document.getElementById('gdp-growth').textContent = `${macroData.gdp_growth.toFixed(1)}%`;
+                }
+                if (macroData.refi_rate !== undefined) {
+                    document.getElementById('refi-rate').textContent = `${macroData.refi_rate.toFixed(1)}%`;
+                }
             }
 
             // Налоги
-            if (data.taxes) {
+            if (data.full_report && data.full_report.taxes) {
                 const taxesGrid = document.getElementById('taxes-grid');
                 taxesGrid.innerHTML = '';
                 
-                Object.entries(data.taxes).forEach(([key, value]) => {
+                Object.entries(data.full_report.taxes).forEach(([key, value]) => {
                     const taxItem = document.createElement('div');
                     taxItem.className = 'info-item';
                     taxItem.innerHTML = `
@@ -555,19 +727,19 @@
             }
 
             // Риски и ликвидность
-            if (data.liquidity) {
-                document.getElementById('liquidity').textContent = data.liquidity;
+            if (data.full_report && data.full_report.liquidity) {
+                document.getElementById('liquidity').textContent = data.full_report.liquidity;
             }
-            if (data.district) {
-                document.getElementById('district').textContent = data.district;
+            if (data.full_report && data.full_report.district) {
+                document.getElementById('district').textContent = data.full_report.district;
             }
 
             // Список рисков
-            if (data.risks && Array.isArray(data.risks)) {
+            if (data.full_report && data.full_report.risks && Array.isArray(data.full_report.risks)) {
                 const risksList = document.getElementById('risks-list');
                 risksList.innerHTML = '';
                 
-                data.risks.forEach(risk => {
+                data.full_report.risks.forEach(risk => {
                     const riskItem = document.createElement('div');
                     riskItem.className = 'info-item';
                     riskItem.style.marginBottom = '10px';
