@@ -269,6 +269,7 @@
             address: urlParams.get('address') || 'Не указано',
             bedrooms: urlParams.get('bedrooms') || 'Не указано',
             price: urlParams.get('price') || 'Не указано',
+            telegram_id: urlParams.get('telegram_id') || null,
             location_codes: JSON.parse(urlParams.get('location_codes') || '{}')
         };
 
@@ -289,7 +290,8 @@
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-                        location_codes: objectData.location_codes
+                        location_codes: objectData.location_codes,
+                        telegram_id: objectData.telegram_id
                     })
                 });
 
@@ -385,6 +387,7 @@
                     address: objectData.address,
                     bedrooms: objectData.bedrooms,
                     price: objectData.price,
+                    telegram_id: objectData.telegram_id,
                     age: additionalData.age,
                     floor: additionalData.floor,
                     heating: additionalData.heating,

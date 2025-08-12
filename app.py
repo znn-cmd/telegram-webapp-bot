@@ -1933,6 +1933,16 @@ def api_full_report():
     price = data.get('price')
     additional_data = data.get('additional_data', {})
     
+    # Получаем язык пользователя
+    user_language = 'ru'  # По умолчанию русский
+    try:
+        user_result = supabase.table('users').select('language').eq('telegram_id', telegram_id).execute()
+        if user_result.data:
+            user_language = user_result.data[0].get('language', 'ru')
+            logger.info(f"🌍 Язык пользователя для полного отчета: {user_language}")
+    except Exception as e:
+        logger.warning(f"⚠️ Ошибка получения языка пользователя: {e}")
+    
     try:
         price = float(price) if price is not None else 0
     except (ValueError, TypeError):
@@ -2021,6 +2031,191 @@ def api_full_report():
         
         district = ', '.join(development_projects) if development_projects else 'Стандартное развитие района'
         
+        # Функция перевода для полного отчета
+        def translate_to_language_full_report(text, target_language):
+            """Переводит турецкие значения на указанный язык для полного отчета"""
+            translations = {
+                'ru': {
+                    # Возраст объекта
+                    '0-5 yıl': '0-5 лет',
+                    '5-10 yıl': '5-10 лет', 
+                    '10-20 yıl': '10-20 лет',
+                    '20+ yıl': '20+ лет',
+                    'Yeni': 'Новый',
+                    'Eski': 'Старый',
+                    '0-4': '0-4 года',
+                    '11-15': '11-15 лет',
+                    '16 ve üzeri': '16 и более',
+                    '0': '0 лет',
+                    
+                    # Этаж
+                    'Zemin kat': 'Входной этаж',
+                    '1. kat': '1 этаж',
+                    '2. kat': '2 этаж',
+                    '3. kat': '3 этаж',
+                    '4. kat': '4 этаж',
+                    '5. kat': '5 этаж',
+                    '6-10 kat': '6-10 этаж',
+                    '11-20 kat': '11-20 этаж',
+                    'Penthouse': 'Пентхаус',
+                    'Üst kat': 'Верхний этаж',
+                    'Giriş Altı': 'Подвал',
+                    'Giriş': 'Входной этаж',
+                    'Giriş Üstü': 'Междуэтажный',
+                    'Ara Kat': 'Средний этаж',
+                    'Ara Üstü': 'Верхний средний',
+                    'En Üst': 'Самый верхний',
+                    'Müstakil': 'Отдельный',
+                    
+                    # Отопление
+                    'Merkezi': 'Центральное',
+                    'Doğalgaz': 'Газовое',
+                    'Kombi': 'Котел',
+                    'Elektrik': 'Электрическое',
+                    'Yok': 'Без отопления',
+                    'Klima': 'Кондиционер',
+                    
+                    # Общие
+                    'Belirtilmemiş': 'Не указано',
+                    'Bilinmiyor': 'Не известно'
+                },
+                'en': {
+                    # Age
+                    '0-5 yıl': '0-5 years',
+                    '5-10 yıl': '5-10 years', 
+                    '10-20 yıl': '10-20 years',
+                    '20+ yıl': '20+ years',
+                    'Yeni': 'New',
+                    'Eski': 'Old',
+                    '0-4': '0-4 years',
+                    '11-15': '11-15 years',
+                    '16 ve üzeri': '16 and over',
+                    '0': '0 years',
+                    
+                    # Floor
+                    'Zemin kat': 'Ground floor',
+                    '1. kat': '1st floor',
+                    '2. kat': '2nd floor',
+                    '3. kat': '3rd floor',
+                    '4. kat': '4th floor',
+                    '5. kat': '5th floor',
+                    '6-10 kat': '6-10 floors',
+                    '11-20 kat': '11-20 floors',
+                    'Penthouse': 'Penthouse',
+                    'Üst kat': 'Top floor',
+                    'Giriş Altı': 'Basement',
+                    'Giriş': 'Ground floor',
+                    'Giriş Üstü': 'Mezzanine',
+                    'Ara Kat': 'Middle floor',
+                    'Ara Üstü': 'Upper middle',
+                    'En Üst': 'Topmost',
+                    'Müstakil': 'Detached',
+                    
+                    # Heating
+                    'Merkezi': 'Central',
+                    'Doğalgaz': 'Gas',
+                    'Kombi': 'Boiler',
+                    'Elektrik': 'Electric',
+                    'Yok': 'None',
+                    'Klima': 'Air conditioning',
+                    
+                    # General
+                    'Belirtilmemiş': 'Not specified',
+                    'Bilinmiyor': 'Unknown'
+                },
+                'de': {
+                    # Alter
+                    '0-5 yıl': '0-5 Jahre',
+                    '5-10 yıl': '5-10 Jahre', 
+                    '10-20 yıl': '10-20 Jahre',
+                    '20+ yıl': '20+ Jahre',
+                    'Yeni': 'Neu',
+                    'Eski': 'Alt',
+                    '0-4': '0-4 Jahre',
+                    '11-15': '11-15 Jahre',
+                    '16 ve üzeri': '16 und mehr',
+                    '0': '0 Jahre',
+                    
+                    # Etage
+                    'Zemin kat': 'Erdgeschoss',
+                    '1. kat': '1. Etage',
+                    '2. kat': '2. Etage',
+                    '3. kat': '3. Etage',
+                    '4. kat': '4. Etage',
+                    '5. kat': '5. Etage',
+                    '6-10 kat': '6-10 Etagen',
+                    '11-20 kat': '11-20 Etagen',
+                    'Penthouse': 'Penthouse',
+                    'Üst kat': 'Obergeschoss',
+                    'Giriş Altı': 'Keller',
+                    'Giriş': 'Erdgeschoss',
+                    'Giriş Üstü': 'Zwischengeschoss',
+                    'Ara Kat': 'Mittelgeschoss',
+                    'Ara Üstü': 'Oberes Mittelgeschoss',
+                    'En Üst': 'Oberstes',
+                    'Müstakil': 'Frei stehend',
+                    
+                    # Heizung
+                    'Merkezi': 'Zentral',
+                    'Doğalgaz': 'Gas',
+                    'Kombi': 'Kessel',
+                    'Elektrik': 'Elektrisch',
+                    'Yok': 'Keine',
+                    'Klima': 'Klimaanlage',
+                    
+                    # Allgemein
+                    'Belirtilmemiş': 'Nicht angegeben',
+                    'Bilinmiyor': 'Unbekannt'
+                },
+                'fr': {
+                    # Âge
+                    '0-5 yıl': '0-5 ans',
+                    '5-10 yıl': '5-10 ans', 
+                    '10-20 yıl': '10-20 ans',
+                    '20+ yıl': '20+ ans',
+                    'Yeni': 'Nouveau',
+                    'Eski': 'Ancien',
+                    '0-4': '0-4 ans',
+                    '11-15': '11-15 ans',
+                    '16 ve üzeri': '16 et plus',
+                    '0': '0 ans',
+                    
+                    # Étage
+                    'Zemin kat': 'Rez-de-chaussée',
+                    '1. kat': '1er étage',
+                    '2. kat': '2e étage',
+                    '3. kat': '3e étage',
+                    '4. kat': '4e étage',
+                    '5. kat': '5e étage',
+                    '6-10 kat': '6-10 étages',
+                    '11-20 kat': '11-20 étages',
+                    'Penthouse': 'Penthouse',
+                    'Üst kat': 'Dernier étage',
+                    'Giriş Altı': 'Sous-sol',
+                    'Giriş': 'Rez-de-chaussée',
+                    'Giriş Üstü': 'Entresol',
+                    'Ara Kat': 'Étage intermédiaire',
+                    'Ara Üstü': 'Étage supérieur intermédiaire',
+                    'En Üst': 'Plus haut',
+                    'Müstakil': 'Indépendant',
+                    
+                    # Chauffage
+                    'Merkezi': 'Central',
+                    'Doğalgaz': 'Gaz',
+                    'Kombi': 'Chaudière',
+                    'Elektrik': 'Électrique',
+                    'Yok': 'Aucun',
+                    'Klima': 'Climatisation',
+                    
+                    # Général
+                    'Belirtilmemiş': 'Non spécifié',
+                    'Bilinmiyor': 'Inconnu'
+                }
+            }
+            
+            target_translations = translations.get(target_language, translations['en'])
+            return target_translations.get(text, text)
+        
         # --- АНАЛИЗ ДОПОЛНИТЕЛЬНЫХ ДАННЫХ ---
         additional_analysis = {}
         
@@ -2030,12 +2225,12 @@ def api_full_report():
                 age_result = supabase.table('age_data').select('*').eq('id', additional_data['age']).execute()
                 if age_result.data:
                     age_info = age_result.data[0]
-                    # Переводим значение на русский для анализа
-                    age_value = translate_to_russian(age_info.get('listing_type', ''))
+                    # Переводим значение на язык пользователя для анализа
+                    age_value = translate_to_language_full_report(age_info.get('listing_type', ''), user_language)
                     additional_analysis['age'] = {
                         'range': age_value,
-                        'impact': 'Положительный' if age_value in ['0-5 лет', '5-10 лет'] else 'Нейтральный',
-                        'maintenance_cost': 'Низкие' if age_value in ['0-5 лет'] else 'Средние'
+                        'impact': 'Положительный' if age_value in ['0-5 лет', '5-10 лет', '0-5 years', '5-10 years', '0-5 Jahre', '5-10 Jahre', '0-5 ans', '5-10 ans'] else 'Нейтральный',
+                        'maintenance_cost': 'Низкие' if age_value in ['0-5 лет', '0-5 years', '0-5 Jahre', '0-5 ans'] else 'Средние'
                     }
                     logger.info(f"✅ Анализ возраста: {age_value}")
             except Exception as e:
@@ -2047,12 +2242,12 @@ def api_full_report():
                 floor_result = supabase.table('floor_segment_data').select('*').eq('id', additional_data['floor']).execute()
                 if floor_result.data:
                     floor_info = floor_result.data[0]
-                    # Переводим значение на русский для анализа
-                    floor_value = translate_to_russian(floor_info.get('listing_type', ''))
+                    # Переводим значение на язык пользователя для анализа
+                    floor_value = translate_to_language_full_report(floor_info.get('listing_type', ''), user_language)
                     additional_analysis['floor'] = {
                         'type': floor_value,
-                        'accessibility': 'Высокая' if floor_value in ['Входной этаж', '1 этаж', '2 этаж'] else 'Средняя',
-                        'view': 'Хороший' if floor_value in ['Верхние этажи', 'Пентхаус'] else 'Стандартный'
+                        'accessibility': 'Высокая' if floor_value in ['Входной этаж', '1 этаж', '2 этаж', 'Ground floor', '1st floor', '2nd floor', 'Erdgeschoss', '1. Etage', '2. Etage', 'Rez-de-chaussée', '1er étage', '2e étage'] else 'Средняя',
+                        'view': 'Хороший' if floor_value in ['Верхние этажи', 'Пентхаус', 'Top floor', 'Penthouse', 'Obergeschoss', 'Penthouse', 'Dernier étage', 'Penthouse'] else 'Стандартный'
                     }
                     logger.info(f"✅ Анализ этажа: {floor_value}")
             except Exception as e:
@@ -2064,12 +2259,12 @@ def api_full_report():
                 heating_result = supabase.table('heating_type').select('*').eq('id', additional_data['heating']).execute()
                 if heating_result.data:
                     heating_info = heating_result.data[0]
-                    # Переводим значение на русский для анализа
-                    heating_value = translate_to_russian(heating_info.get('listing_type', ''))
+                    # Переводим значение на язык пользователя для анализа
+                    heating_value = translate_to_language_full_report(heating_info.get('listing_type', ''), user_language)
                     additional_analysis['heating'] = {
                         'type': heating_value,
-                        'efficiency': 'Высокая' if heating_value in ['Центральное', 'Индивидуальное газовое'] else 'Средняя',
-                        'cost': 'Низкие' if heating_value in ['Центральное'] else 'Средние'
+                        'efficiency': 'Высокая' if heating_value in ['Центральное', 'Индивидуальное газовое', 'Central', 'Individual gas', 'Zentral', 'Individuell Gas', 'Central', 'Gaz individuel'] else 'Средняя',
+                        'cost': 'Низкие' if heating_value in ['Центральное', 'Central', 'Zentral', 'Central'] else 'Средние'
                     }
                     logger.info(f"✅ Анализ отопления: {heating_value}")
             except Exception as e:
@@ -2224,48 +2419,207 @@ def api_get_additional_data_options():
     try:
         data = request.json or {}
         location_codes = data.get('location_codes', {})
+        telegram_id = data.get('telegram_id')
         
         if not location_codes:
             return jsonify({'error': 'Location codes required'}), 400
         
         logger.info(f"🔍 Получаем опции для дополнительных данных: {location_codes}")
         
-        def translate_to_russian(text):
-            """Переводит турецкие значения на русский язык"""
+        # Получаем язык пользователя
+        user_language = 'ru'  # По умолчанию русский
+        if telegram_id:
+            try:
+                user_result = supabase.table('users').select('language').eq('telegram_id', telegram_id).execute()
+                if user_result.data:
+                    user_language = user_result.data[0].get('language', 'ru')
+                    logger.info(f"🌍 Язык пользователя: {user_language}")
+            except Exception as e:
+                logger.warning(f"⚠️ Ошибка получения языка пользователя: {e}")
+        
+        def translate_to_language(text, target_language):
+            """Переводит турецкие значения на указанный язык"""
             translations = {
-                # Возраст объекта
-                '0-5 yıl': '0-5 лет',
-                '5-10 yıl': '5-10 лет', 
-                '10-20 yıl': '10-20 лет',
-                '20+ yıl': '20+ лет',
-                'Yeni': 'Новый',
-                'Eski': 'Старый',
-                
-                # Этаж
-                'Zemin kat': 'Входной этаж',
-                '1. kat': '1 этаж',
-                '2. kat': '2 этаж',
-                '3. kat': '3 этаж',
-                '4. kat': '4 этаж',
-                '5. kat': '5 этаж',
-                '6-10 kat': '6-10 этаж',
-                '11-20 kat': '11-20 этаж',
-                'Penthouse': 'Пентхаус',
-                'Üst kat': 'Верхний этаж',
-                
-                # Отопление
-                'Merkezi': 'Центральное',
-                'Doğalgaz': 'Газовое',
-                'Kombi': 'Котел',
-                'Elektrik': 'Электрическое',
-                'Yok': 'Без отопления',
-                'Klima': 'Кондиционер',
-                
-                # Общие
-                'Belirtilmemiş': 'Не указано',
-                'Bilinmiyor': 'Не известно'
+                'ru': {
+                    # Возраст объекта
+                    '0-5 yıl': '0-5 лет',
+                    '5-10 yıl': '5-10 лет', 
+                    '10-20 yıl': '10-20 лет',
+                    '20+ yıl': '20+ лет',
+                    'Yeni': 'Новый',
+                    'Eski': 'Старый',
+                    '0-4': '0-4 года',
+                    '11-15': '11-15 лет',
+                    '16 ve üzeri': '16 и более',
+                    '0': '0 лет',
+                    
+                    # Этаж
+                    'Zemin kat': 'Входной этаж',
+                    '1. kat': '1 этаж',
+                    '2. kat': '2 этаж',
+                    '3. kat': '3 этаж',
+                    '4. kat': '4 этаж',
+                    '5. kat': '5 этаж',
+                    '6-10 kat': '6-10 этаж',
+                    '11-20 kat': '11-20 этаж',
+                    'Penthouse': 'Пентхаус',
+                    'Üst kat': 'Верхний этаж',
+                    'Giriş Altı': 'Подвал',
+                    'Giriş': 'Входной этаж',
+                    'Giriş Üstü': 'Междуэтажный',
+                    'Ara Kat': 'Средний этаж',
+                    'Ara Üstü': 'Верхний средний',
+                    'En Üst': 'Самый верхний',
+                    'Müstakil': 'Отдельный',
+                    
+                    # Отопление
+                    'Merkezi': 'Центральное',
+                    'Doğalgaz': 'Газовое',
+                    'Kombi': 'Котел',
+                    'Elektrik': 'Электрическое',
+                    'Yok': 'Без отопления',
+                    'Klima': 'Кондиционер',
+                    
+                    # Общие
+                    'Belirtilmemiş': 'Не указано',
+                    'Bilinmiyor': 'Не известно'
+                },
+                'en': {
+                    # Age
+                    '0-5 yıl': '0-5 years',
+                    '5-10 yıl': '5-10 years', 
+                    '10-20 yıl': '10-20 years',
+                    '20+ yıl': '20+ years',
+                    'Yeni': 'New',
+                    'Eski': 'Old',
+                    '0-4': '0-4 years',
+                    '11-15': '11-15 years',
+                    '16 ve üzeri': '16 and over',
+                    '0': '0 years',
+                    
+                    # Floor
+                    'Zemin kat': 'Ground floor',
+                    '1. kat': '1st floor',
+                    '2. kat': '2nd floor',
+                    '3. kat': '3rd floor',
+                    '4. kat': '4th floor',
+                    '5. kat': '5th floor',
+                    '6-10 kat': '6-10 floors',
+                    '11-20 kat': '11-20 floors',
+                    'Penthouse': 'Penthouse',
+                    'Üst kat': 'Top floor',
+                    'Giriş Altı': 'Basement',
+                    'Giriş': 'Ground floor',
+                    'Giriş Üstü': 'Mezzanine',
+                    'Ara Kat': 'Middle floor',
+                    'Ara Üstü': 'Upper middle',
+                    'En Üst': 'Topmost',
+                    'Müstakil': 'Detached',
+                    
+                    # Heating
+                    'Merkezi': 'Central',
+                    'Doğalgaz': 'Gas',
+                    'Kombi': 'Boiler',
+                    'Elektrik': 'Electric',
+                    'Yok': 'None',
+                    'Klima': 'Air conditioning',
+                    
+                    # General
+                    'Belirtilmemiş': 'Not specified',
+                    'Bilinmiyor': 'Unknown'
+                },
+                'de': {
+                    # Alter
+                    '0-5 yıl': '0-5 Jahre',
+                    '5-10 yıl': '5-10 Jahre', 
+                    '10-20 yıl': '10-20 Jahre',
+                    '20+ yıl': '20+ Jahre',
+                    'Yeni': 'Neu',
+                    'Eski': 'Alt',
+                    '0-4': '0-4 Jahre',
+                    '11-15': '11-15 Jahre',
+                    '16 ve üzeri': '16 und mehr',
+                    '0': '0 Jahre',
+                    
+                    # Etage
+                    'Zemin kat': 'Erdgeschoss',
+                    '1. kat': '1. Etage',
+                    '2. kat': '2. Etage',
+                    '3. kat': '3. Etage',
+                    '4. kat': '4. Etage',
+                    '5. kat': '5. Etage',
+                    '6-10 kat': '6-10 Etagen',
+                    '11-20 kat': '11-20 Etagen',
+                    'Penthouse': 'Penthouse',
+                    'Üst kat': 'Obergeschoss',
+                    'Giriş Altı': 'Keller',
+                    'Giriş': 'Erdgeschoss',
+                    'Giriş Üstü': 'Zwischengeschoss',
+                    'Ara Kat': 'Mittelgeschoss',
+                    'Ara Üstü': 'Oberes Mittelgeschoss',
+                    'En Üst': 'Oberstes',
+                    'Müstakil': 'Frei stehend',
+                    
+                    # Heizung
+                    'Merkezi': 'Zentral',
+                    'Doğalgaz': 'Gas',
+                    'Kombi': 'Kessel',
+                    'Elektrik': 'Elektrisch',
+                    'Yok': 'Keine',
+                    'Klima': 'Klimaanlage',
+                    
+                    # Allgemein
+                    'Belirtilmemiş': 'Nicht angegeben',
+                    'Bilinmiyor': 'Unbekannt'
+                },
+                'fr': {
+                    # Âge
+                    '0-5 yıl': '0-5 ans',
+                    '5-10 yıl': '5-10 ans', 
+                    '10-20 yıl': '10-20 ans',
+                    '20+ yıl': '20+ ans',
+                    'Yeni': 'Nouveau',
+                    'Eski': 'Ancien',
+                    '0-4': '0-4 ans',
+                    '11-15': '11-15 ans',
+                    '16 ve üzeri': '16 et plus',
+                    '0': '0 ans',
+                    
+                    # Étage
+                    'Zemin kat': 'Rez-de-chaussée',
+                    '1. kat': '1er étage',
+                    '2. kat': '2e étage',
+                    '3. kat': '3e étage',
+                    '4. kat': '4e étage',
+                    '5. kat': '5e étage',
+                    '6-10 kat': '6-10 étages',
+                    '11-20 kat': '11-20 étages',
+                    'Penthouse': 'Penthouse',
+                    'Üst kat': 'Dernier étage',
+                    'Giriş Altı': 'Sous-sol',
+                    'Giriş': 'Rez-de-chaussée',
+                    'Giriş Üstü': 'Entresol',
+                    'Ara Kat': 'Étage intermédiaire',
+                    'Ara Üstü': 'Étage supérieur intermédiaire',
+                    'En Üst': 'Plus haut',
+                    'Müstakil': 'Indépendant',
+                    
+                    # Chauffage
+                    'Merkezi': 'Central',
+                    'Doğalgaz': 'Gaz',
+                    'Kombi': 'Chaudière',
+                    'Elektrik': 'Électrique',
+                    'Yok': 'Aucun',
+                    'Klima': 'Climatisation',
+                    
+                    # Général
+                    'Belirtilmemiş': 'Non spécifié',
+                    'Bilinmiyor': 'Inconnu'
+                }
             }
-            return translations.get(text, text)
+            
+            target_translations = translations.get(target_language, translations['en'])
+            return target_translations.get(text, text)
         
         def remove_duplicates(options_list):
             """Убирает дубликаты по названию, оставляя первый встреченный"""
@@ -2285,7 +2639,7 @@ def api_get_additional_data_options():
         try:
             age_result = supabase.table('age_data').select('*').eq('country_id', location_codes.get('country_id')).eq('city_id', location_codes.get('city_id')).execute()
             if age_result.data:
-                age_options = [{'id': item.get('id'), 'name': translate_to_russian(item.get('listing_type', 'Не указано'))} for item in age_result.data]
+                age_options = [{'id': item.get('id'), 'name': translate_to_language(item.get('listing_type', 'Не указано'), user_language)} for item in age_result.data]
                 logger.info(f"✅ Получены опции возраста: {len(age_options)} вариантов")
         except Exception as e:
             logger.warning(f"⚠️ Ошибка получения опций возраста: {e}")
@@ -2295,7 +2649,7 @@ def api_get_additional_data_options():
         try:
             floor_result = supabase.table('floor_segment_data').select('*').eq('country_id', location_codes.get('country_id')).eq('city_id', location_codes.get('city_id')).execute()
             if floor_result.data:
-                floor_options = [{'id': item.get('id'), 'name': translate_to_russian(item.get('listing_type', 'Не указано'))} for item in floor_result.data]
+                floor_options = [{'id': item.get('id'), 'name': translate_to_language(item.get('listing_type', 'Не указано'), user_language)} for item in floor_result.data]
                 logger.info(f"✅ Получены опции этажей: {len(floor_options)} вариантов")
         except Exception as e:
             logger.warning(f"⚠️ Ошибка получения опций этажей: {e}")
@@ -2305,7 +2659,7 @@ def api_get_additional_data_options():
         try:
             heating_result = supabase.table('heating_type').select('*').eq('country_id', location_codes.get('country_id')).eq('city_id', location_codes.get('city_id')).execute()
             if heating_result.data:
-                heating_options = [{'id': item.get('id'), 'name': translate_to_russian(item.get('listing_type', 'Не указано'))} for item in heating_result.data]
+                heating_options = [{'id': item.get('id'), 'name': translate_to_language(item.get('listing_type', 'Не указано'), user_language)} for item in heating_result.data]
                 logger.info(f"✅ Получены опции отопления: {len(heating_options)} вариантов")
         except Exception as e:
             logger.warning(f"⚠️ Ошибка получения опций отопления: {e}")
@@ -2313,31 +2667,97 @@ def api_get_additional_data_options():
         # Если опции не найдены по локации, добавляем базовые опции
         if not age_options:
             logger.info("⚠️ Опции возраста не найдены по локации, добавляем базовые")
-            age_options = [
-                {'id': 'new', 'name': '0-5 лет'},
-                {'id': 'recent', 'name': '5-10 лет'},
-                {'id': 'modern', 'name': '10-20 лет'},
-                {'id': 'old', 'name': '20+ лет'}
-            ]
+            base_age_options = {
+                'ru': [
+                    {'id': 'new', 'name': '0-5 лет'},
+                    {'id': 'recent', 'name': '5-10 лет'},
+                    {'id': 'modern', 'name': '10-20 лет'},
+                    {'id': 'old', 'name': '20+ лет'}
+                ],
+                'en': [
+                    {'id': 'new', 'name': '0-5 years'},
+                    {'id': 'recent', 'name': '5-10 years'},
+                    {'id': 'modern', 'name': '10-20 years'},
+                    {'id': 'old', 'name': '20+ years'}
+                ],
+                'de': [
+                    {'id': 'new', 'name': '0-5 Jahre'},
+                    {'id': 'recent', 'name': '5-10 Jahre'},
+                    {'id': 'modern', 'name': '10-20 Jahre'},
+                    {'id': 'old', 'name': '20+ Jahre'}
+                ],
+                'fr': [
+                    {'id': 'new', 'name': '0-5 ans'},
+                    {'id': 'recent', 'name': '5-10 ans'},
+                    {'id': 'modern', 'name': '10-20 ans'},
+                    {'id': 'old', 'name': '20+ ans'}
+                ]
+            }
+            age_options = base_age_options.get(user_language, base_age_options['en'])
         
         if not floor_options:
             logger.info("⚠️ Опции этажей не найдены по локации, добавляем базовые")
-            floor_options = [
-                {'id': 'ground', 'name': 'Первый этаж'},
-                {'id': 'low', 'name': '2-5 этаж'},
-                {'id': 'middle', 'name': '6-10 этаж'},
-                {'id': 'high', 'name': '11-20 этаж'},
-                {'id': 'penthouse', 'name': 'Пентхаус'}
-            ]
+            base_floor_options = {
+                'ru': [
+                    {'id': 'ground', 'name': 'Входной этаж'},
+                    {'id': 'low', 'name': '2-5 этаж'},
+                    {'id': 'middle', 'name': '6-10 этаж'},
+                    {'id': 'high', 'name': '11-20 этаж'},
+                    {'id': 'penthouse', 'name': 'Пентхаус'}
+                ],
+                'en': [
+                    {'id': 'ground', 'name': 'Ground floor'},
+                    {'id': 'low', 'name': '2-5 floors'},
+                    {'id': 'middle', 'name': '6-10 floors'},
+                    {'id': 'high', 'name': '11-20 floors'},
+                    {'id': 'penthouse', 'name': 'Penthouse'}
+                ],
+                'de': [
+                    {'id': 'ground', 'name': 'Erdgeschoss'},
+                    {'id': 'low', 'name': '2-5 Etagen'},
+                    {'id': 'middle', 'name': '6-10 Etagen'},
+                    {'id': 'high', 'name': '11-20 Etagen'},
+                    {'id': 'penthouse', 'name': 'Penthouse'}
+                ],
+                'fr': [
+                    {'id': 'ground', 'name': 'Rez-de-chaussée'},
+                    {'id': 'low', 'name': '2-5 étages'},
+                    {'id': 'middle', 'name': '6-10 étages'},
+                    {'id': 'high', 'name': '11-20 étages'},
+                    {'id': 'penthouse', 'name': 'Penthouse'}
+                ]
+            }
+            floor_options = base_floor_options.get(user_language, base_floor_options['en'])
         
         if not heating_options:
             logger.info("⚠️ Опции отопления не найдены по локации, добавляем базовые")
-            heating_options = [
-                {'id': 'central', 'name': 'Центральное'},
-                {'id': 'gas', 'name': 'Индивидуальное газовое'},
-                {'id': 'electric', 'name': 'Электрическое'},
-                {'id': 'none', 'name': 'Без отопления'}
-            ]
+            base_heating_options = {
+                'ru': [
+                    {'id': 'central', 'name': 'Центральное'},
+                    {'id': 'gas', 'name': 'Индивидуальное газовое'},
+                    {'id': 'electric', 'name': 'Электрическое'},
+                    {'id': 'none', 'name': 'Без отопления'}
+                ],
+                'en': [
+                    {'id': 'central', 'name': 'Central'},
+                    {'id': 'gas', 'name': 'Individual gas'},
+                    {'id': 'electric', 'name': 'Electric'},
+                    {'id': 'none', 'name': 'None'}
+                ],
+                'de': [
+                    {'id': 'central', 'name': 'Zentral'},
+                    {'id': 'gas', 'name': 'Individuell Gas'},
+                    {'id': 'electric', 'name': 'Elektrisch'},
+                    {'id': 'none', 'name': 'Keine'}
+                ],
+                'fr': [
+                    {'id': 'central', 'name': 'Central'},
+                    {'id': 'gas', 'name': 'Gaz individuel'},
+                    {'id': 'electric', 'name': 'Électrique'},
+                    {'id': 'none', 'name': 'Aucun'}
+                ]
+            }
+            heating_options = base_heating_options.get(user_language, base_heating_options['en'])
         
         # Убираем дубликаты
         age_options = remove_duplicates(age_options)
@@ -2345,9 +2765,17 @@ def api_get_additional_data_options():
         heating_options = remove_duplicates(heating_options)
         
         # Добавляем опцию "Не известно" к каждому списку
-        age_options.append({'id': 'unknown', 'name': 'Не известно'})
-        floor_options.append({'id': 'unknown', 'name': 'Не известно'})
-        heating_options.append({'id': 'unknown', 'name': 'Не известно'})
+        unknown_options = {
+            'ru': 'Не известно',
+            'en': 'Unknown',
+            'de': 'Unbekannt',
+            'fr': 'Inconnu'
+        }
+        unknown_name = unknown_options.get(user_language, 'Unknown')
+        
+        age_options.append({'id': 'unknown', 'name': unknown_name})
+        floor_options.append({'id': 'unknown', 'name': unknown_name})
+        heating_options.append({'id': 'unknown', 'name': unknown_name})
         
         logger.info(f"✅ Опции для дополнительных данных подготовлены: возраст({len(age_options)}), этаж({len(floor_options)}), отопление({len(heating_options)})")
         
