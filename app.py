@@ -2030,12 +2030,14 @@ def api_full_report():
                 age_result = supabase.table('age_data').select('*').eq('id', additional_data['age']).execute()
                 if age_result.data:
                     age_info = age_result.data[0]
+                    # Переводим значение на русский для анализа
+                    age_value = translate_to_russian(age_info.get('listing_type', ''))
                     additional_analysis['age'] = {
-                        'range': age_info.get('listing_type'),
-                        'impact': 'Положительный' if age_info.get('listing_type') in ['0-5 лет', '5-10 лет'] else 'Нейтральный',
-                        'maintenance_cost': 'Низкие' if age_info.get('listing_type') in ['0-5 лет'] else 'Средние'
+                        'range': age_value,
+                        'impact': 'Положительный' if age_value in ['0-5 лет', '5-10 лет'] else 'Нейтральный',
+                        'maintenance_cost': 'Низкие' if age_value in ['0-5 лет'] else 'Средние'
                     }
-                    logger.info(f"✅ Анализ возраста: {age_info.get('listing_type')}")
+                    logger.info(f"✅ Анализ возраста: {age_value}")
             except Exception as e:
                 logger.warning(f"⚠️ Ошибка анализа возраста: {e}")
         
@@ -2045,12 +2047,14 @@ def api_full_report():
                 floor_result = supabase.table('floor_segment_data').select('*').eq('id', additional_data['floor']).execute()
                 if floor_result.data:
                     floor_info = floor_result.data[0]
+                    # Переводим значение на русский для анализа
+                    floor_value = translate_to_russian(floor_info.get('listing_type', ''))
                     additional_analysis['floor'] = {
-                        'type': floor_info.get('listing_type'),
-                        'accessibility': 'Высокая' if floor_info.get('listing_type') in ['Первый этаж', 'Второй этаж'] else 'Средняя',
-                        'view': 'Хороший' if floor_info.get('listing_type') in ['Верхние этажи', 'Пентхаус'] else 'Стандартный'
+                        'type': floor_value,
+                        'accessibility': 'Высокая' if floor_value in ['Входной этаж', '1 этаж', '2 этаж'] else 'Средняя',
+                        'view': 'Хороший' if floor_value in ['Верхние этажи', 'Пентхаус'] else 'Стандартный'
                     }
-                    logger.info(f"✅ Анализ этажа: {floor_info.get('listing_type')}")
+                    logger.info(f"✅ Анализ этажа: {floor_value}")
             except Exception as e:
                 logger.warning(f"⚠️ Ошибка анализа этажа: {e}")
         
@@ -2060,12 +2064,14 @@ def api_full_report():
                 heating_result = supabase.table('heating_type').select('*').eq('id', additional_data['heating']).execute()
                 if heating_result.data:
                     heating_info = heating_result.data[0]
+                    # Переводим значение на русский для анализа
+                    heating_value = translate_to_russian(heating_info.get('listing_type', ''))
                     additional_analysis['heating'] = {
-                        'type': heating_info.get('listing_type'),
-                        'efficiency': 'Высокая' if heating_info.get('listing_type') in ['Центральное', 'Индивидуальное газовое'] else 'Средняя',
-                        'cost': 'Низкие' if heating_info.get('listing_type') in ['Центральное'] else 'Средние'
+                        'type': heating_value,
+                        'efficiency': 'Высокая' if heating_value in ['Центральное', 'Индивидуальное газовое'] else 'Средняя',
+                        'cost': 'Низкие' if heating_value in ['Центральное'] else 'Средние'
                     }
-                    logger.info(f"✅ Анализ отопления: {heating_info.get('listing_type')}")
+                    logger.info(f"✅ Анализ отопления: {heating_value}")
             except Exception as e:
                 logger.warning(f"⚠️ Ошибка анализа отопления: {e}")
         
@@ -2224,12 +2230,62 @@ def api_get_additional_data_options():
         
         logger.info(f"🔍 Получаем опции для дополнительных данных: {location_codes}")
         
+        def translate_to_russian(text):
+            """Переводит турецкие значения на русский язык"""
+            translations = {
+                # Возраст объекта
+                '0-5 yıl': '0-5 лет',
+                '5-10 yıl': '5-10 лет', 
+                '10-20 yıl': '10-20 лет',
+                '20+ yıl': '20+ лет',
+                'Yeni': 'Новый',
+                'Eski': 'Старый',
+                
+                # Этаж
+                'Zemin kat': 'Входной этаж',
+                '1. kat': '1 этаж',
+                '2. kat': '2 этаж',
+                '3. kat': '3 этаж',
+                '4. kat': '4 этаж',
+                '5. kat': '5 этаж',
+                '6-10 kat': '6-10 этаж',
+                '11-20 kat': '11-20 этаж',
+                'Penthouse': 'Пентхаус',
+                'Üst kat': 'Верхний этаж',
+                
+                # Отопление
+                'Merkezi': 'Центральное',
+                'Doğalgaz': 'Газовое',
+                'Kombi': 'Котел',
+                'Elektrik': 'Электрическое',
+                'Yok': 'Без отопления',
+                'Klima': 'Кондиционер',
+                
+                # Общие
+                'Belirtilmemiş': 'Не указано',
+                'Bilinmiyor': 'Не известно'
+            }
+            return translations.get(text, text)
+        
+        def remove_duplicates(options_list):
+            """Убирает дубликаты по названию, оставляя первый встреченный"""
+            seen_names = set()
+            unique_options = []
+            
+            for option in options_list:
+                name = option.get('name', '')
+                if name not in seen_names:
+                    seen_names.add(name)
+                    unique_options.append(option)
+            
+            return unique_options
+        
         # Получаем опции возраста
         age_options = []
         try:
             age_result = supabase.table('age_data').select('*').eq('country_id', location_codes.get('country_id')).eq('city_id', location_codes.get('city_id')).execute()
             if age_result.data:
-                age_options = [{'id': item.get('id'), 'name': item.get('listing_type', 'Не указано')} for item in age_result.data]
+                age_options = [{'id': item.get('id'), 'name': translate_to_russian(item.get('listing_type', 'Не указано'))} for item in age_result.data]
                 logger.info(f"✅ Получены опции возраста: {len(age_options)} вариантов")
         except Exception as e:
             logger.warning(f"⚠️ Ошибка получения опций возраста: {e}")
@@ -2239,7 +2295,7 @@ def api_get_additional_data_options():
         try:
             floor_result = supabase.table('floor_segment_data').select('*').eq('country_id', location_codes.get('country_id')).eq('city_id', location_codes.get('city_id')).execute()
             if floor_result.data:
-                floor_options = [{'id': item.get('id'), 'name': item.get('listing_type', 'Не указано')} for item in floor_result.data]
+                floor_options = [{'id': item.get('id'), 'name': translate_to_russian(item.get('listing_type', 'Не указано'))} for item in floor_result.data]
                 logger.info(f"✅ Получены опции этажей: {len(floor_options)} вариантов")
         except Exception as e:
             logger.warning(f"⚠️ Ошибка получения опций этажей: {e}")
@@ -2249,7 +2305,7 @@ def api_get_additional_data_options():
         try:
             heating_result = supabase.table('heating_type').select('*').eq('country_id', location_codes.get('country_id')).eq('city_id', location_codes.get('city_id')).execute()
             if heating_result.data:
-                heating_options = [{'id': item.get('id'), 'name': item.get('listing_type', 'Не указано')} for item in heating_result.data]
+                heating_options = [{'id': item.get('id'), 'name': translate_to_russian(item.get('listing_type', 'Не указано'))} for item in heating_result.data]
                 logger.info(f"✅ Получены опции отопления: {len(heating_options)} вариантов")
         except Exception as e:
             logger.warning(f"⚠️ Ошибка получения опций отопления: {e}")
@@ -2282,6 +2338,11 @@ def api_get_additional_data_options():
                 {'id': 'electric', 'name': 'Электрическое'},
                 {'id': 'none', 'name': 'Без отопления'}
             ]
+        
+        # Убираем дубликаты
+        age_options = remove_duplicates(age_options)
+        floor_options = remove_duplicates(floor_options)
+        heating_options = remove_duplicates(heating_options)
         
         # Добавляем опцию "Не известно" к каждому списку
         age_options.append({'id': 'unknown', 'name': 'Не известно'})
