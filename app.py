@@ -3635,14 +3635,21 @@ def get_market_data_by_location_ids(location_codes, target_year=None, target_mon
             
             result = query.execute()
             if result.data:
-                # Берем самую свежую запись
-                latest_record = max(result.data, key=lambda x: x.get('trend_date', ''))
-                market_data['property_trends'] = latest_record
-                logger.info(f"Найдены данные property_trends: {len(result.data)} записей, выбрана самая свежая: {latest_record.get('trend_date')}")
+                # Фильтруем записи с валидными датами
+                valid_records = [r for r in result.data if r.get('trend_date')]
+                if valid_records:
+                    # Берем самую свежую запись
+                    latest_record = max(valid_records, key=lambda x: x.get('trend_date', ''))
+                    market_data['property_trends'] = latest_record
+                    logger.info(f"Найдены данные property_trends: {len(result.data)} записей, выбрана самая свежая: {latest_record.get('trend_date')}")
+                else:
+                    logger.warning("Все записи property_trends имеют пустые даты")
+                    market_data['property_trends'] = result.data[0] if result.data else None
             else:
                 logger.info("Данные property_trends не найдены")
         except Exception as e:
             logger.error(f"Ошибка получения property_trends: {e}")
+            market_data['property_trends'] = None
         
         # Получаем данные из age_data
         try:
@@ -3669,7 +3676,7 @@ def get_market_data_by_location_ids(location_codes, target_year=None, target_mon
                             # Если уже есть запись для этого типа, сравниваем даты
                             existing_date = records_by_type[listing_type].get('trend_date', '')
                             current_date = record.get('trend_date', '')
-                            if current_date > existing_date:
+                            if existing_date and current_date and current_date > existing_date:
                                 records_by_type[listing_type] = record
                 
                 # Сохраняем все записи (сгруппированные по listing_type)
@@ -3679,6 +3686,7 @@ def get_market_data_by_location_ids(location_codes, target_year=None, target_mon
                 logger.info("Данные age_data не найдены")
         except Exception as e:
             logger.error(f"Ошибка получения age_data: {e}")
+            market_data['age_data'] = None
         
         # Получаем данные из floor_segment_data
         try:
@@ -3705,7 +3713,7 @@ def get_market_data_by_location_ids(location_codes, target_year=None, target_mon
                             # Если уже есть запись для этого типа, сравниваем даты
                             existing_date = records_by_type[listing_type].get('trend_date', '')
                             current_date = record.get('trend_date', '')
-                            if current_date > existing_date:
+                            if existing_date and current_date and current_date > existing_date:
                                 records_by_type[listing_type] = record
                 
                 # Сохраняем все записи (сгруппированные по listing_type)
@@ -3715,6 +3723,7 @@ def get_market_data_by_location_ids(location_codes, target_year=None, target_mon
                 logger.info("Данные floor_segment_data не найдены")
         except Exception as e:
             logger.error(f"Ошибка получения floor_segment_data: {e}")
+            market_data['floor_segment_data'] = None
         
         # Получаем данные из general_data
         try:
@@ -3730,14 +3739,21 @@ def get_market_data_by_location_ids(location_codes, target_year=None, target_mon
             
             result = query.execute()
             if result.data:
-                # Берем самую свежую запись
-                latest_record = max(result.data, key=lambda x: x.get('trend_date', ''))
-                market_data['general_data'] = latest_record
-                logger.info(f"Найдены данные general_data: {len(result.data)} записей, выбрана самая свежая: {latest_record.get('trend_date')}")
+                # Фильтруем записи с валидными датами
+                valid_records = [r for r in result.data if r.get('trend_date')]
+                if valid_records:
+                    # Берем самую свежую запись
+                    latest_record = max(valid_records, key=lambda x: x.get('trend_date', ''))
+                    market_data['general_data'] = latest_record
+                    logger.info(f"Найдены данные general_data: {len(result.data)} записей, выбрана самая свежая: {latest_record.get('trend_date')}")
+                else:
+                    logger.warning("Все записи general_data имеют пустые даты")
+                    market_data['general_data'] = result.data[0] if result.data else None
             else:
                 logger.info("Данные general_data не найдены")
         except Exception as e:
             logger.error(f"Ошибка получения general_data: {e}")
+            market_data['general_data'] = None
         
         # Получаем данные из heating_data
         try:
@@ -3764,7 +3780,7 @@ def get_market_data_by_location_ids(location_codes, target_year=None, target_mon
                             # Если уже есть запись для этого типа, сравниваем даты
                             existing_date = records_by_type[listing_type].get('trend_date', '')
                             current_date = record.get('trend_date', '')
-                            if current_date > existing_date:
+                            if existing_date and current_date and current_date > existing_date:
                                 records_by_type[listing_type] = record
                 
                 # Сохраняем все записи (сгруппированные по listing_type)
@@ -3774,6 +3790,7 @@ def get_market_data_by_location_ids(location_codes, target_year=None, target_mon
                 logger.info("Данные heating_data не найдены")
         except Exception as e:
             logger.error(f"Ошибка получения heating_data: {e}")
+            market_data['heating_data'] = None
         
         # Получаем данные из house_type_data
         try:
@@ -3800,7 +3817,7 @@ def get_market_data_by_location_ids(location_codes, target_year=None, target_mon
                             # Если уже есть запись для этого типа, сравниваем даты
                             existing_date = records_by_type[listing_type].get('trend_date', '')
                             current_date = record.get('trend_date', '')
-                            if current_date > existing_date:
+                            if existing_date and current_date and current_date > existing_date:
                                 records_by_type[listing_type] = record
                 
                 # Сохраняем все записи (сгруппированные по listing_type)
@@ -3810,6 +3827,7 @@ def get_market_data_by_location_ids(location_codes, target_year=None, target_mon
                 logger.info("Данные house_type_data не найдены")
         except Exception as e:
             logger.error(f"Ошибка получения house_type_data: {e}")
+            market_data['house_type_data'] = None
         
         return market_data
         

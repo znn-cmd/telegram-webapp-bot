@@ -137,6 +137,9 @@ def fetch_and_save_currency_rates(target_date=None):
         # Сохраняем в базу данных
         logger.info(f"💾 Сохраняем курсы валют в базу: {currency_data}")
         try:
+            # Убираем поле id из данных, чтобы Supabase сам сгенерировал его
+            if 'id' in currency_data:
+                del currency_data['id']
             supabase.table('currency').insert(currency_data).execute()
             logger.info(f"✅ Курсы валют успешно получены и сохранены для {date_str}")
         except Exception as insert_error:
@@ -147,8 +150,9 @@ def fetch_and_save_currency_rates(target_date=None):
             if existing_result.data and len(existing_result.data) > 0:
                 logger.info(f"✅ Используем существующую запись курса валют для {date_str}")
                 return existing_result.data[0]
-        
-        return currency_data
+            else:
+                logger.error(f"❌ Не удалось сохранить курсы валют и не найдена существующая запись: {insert_error}")
+                return None
         
     except Exception as e:
         logger.error(f"❌ Ошибка получения курсов валют с currencylayer.com: {e}")
