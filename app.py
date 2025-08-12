@@ -1948,6 +1948,9 @@ def api_full_report():
     price = data.get('price')
     additional_data = data.get('additional_data', {})
     
+    # Получаем площадь объекта
+    area = data.get('area')
+    
     # Получаем язык пользователя
     user_language = 'ru'  # По умолчанию русский
     try:
@@ -1973,9 +1976,22 @@ def api_full_report():
     try:
         # --- РАСЧЕТ БАЗОВЫХ ПАРАМЕТРОВ НА ОСНОВЕ ЦЕНЫ И ЛОКАЦИИ ---
         
-        # Рассчитываем среднюю цену за кв.м на основе цены объекта и типичного размера
-        typical_size = 80 if bedrooms <= 2 else 120 if bedrooms <= 3 else 150  # типичный размер в кв.м
-        avg_sqm = price / typical_size if typical_size > 0 else 0
+        # Рассчитываем среднюю цену за кв.м на основе цены объекта и площади
+        if area and area != 'unknown' and area != 'Не указано':
+            try:
+                area_value = float(area)
+                avg_sqm = price / area_value if area_value > 0 else 0
+                logger.info(f"✅ Используем реальную площадь объекта: {area_value} м²")
+            except (ValueError, TypeError):
+                # Fallback на типичный размер
+                typical_size = 80 if bedrooms <= 2 else 120 if bedrooms <= 3 else 150
+                avg_sqm = price / typical_size if typical_size > 0 else 0
+                logger.info(f"⚠️ Используем типичный размер: {typical_size} м²")
+        else:
+            # Fallback на типичный размер
+            typical_size = 80 if bedrooms <= 2 else 120 if bedrooms <= 3 else 150
+            avg_sqm = price / typical_size if typical_size > 0 else 0
+            logger.info(f"⚠️ Используем типичный размер: {typical_size} м²")
         
         # Получаем реальные экономические данные
         economic_data = get_economic_data('TUR', 10)  # Данные за последние 10 лет
@@ -2359,9 +2375,10 @@ def api_full_report():
                 'address': address,
                 'bedrooms': bedrooms,
                 'purchase_price': price,
+                'area': area if area and area != 'unknown' else 'Не указано',
                 'avg_price_per_sqm': avg_sqm,
                 'location_summary': f'Локация: {address}',
-                'property_summary': f'Объект: {bedrooms} спален, цена €{price:,.0f}',
+                'property_summary': f'Объект: {bedrooms} спален, {area if area and area != "unknown" else "площадь не указана"} м², цена €{price:,.0f}',
                 'price_per_sqm': f'Цена за м²: €{avg_sqm:.0f}'
             },
             
@@ -2483,11 +2500,12 @@ def api_full_report():
             'user_id': user_id,
             'report_type': 'full',
             'title': f'Полный отчет: {address}',
-            'description': f'Полный отчет по адресу {address}, {bedrooms} спален, цена {price}',
+            'description': f'Полный отчет по адресу {address}, {bedrooms} спален, {area if area and area != "unknown" else "площадь не указана"} м², цена {price}',
             'parameters': {
                 'address': address,
                 'bedrooms': bedrooms,
                 'price': price,
+                'area': area,
                 'lat': latitude,
                 'lng': longitude
             },
@@ -2496,6 +2514,7 @@ def api_full_report():
             'longitude': longitude,
             'bedrooms': bedrooms,
             'price': price,
+            'area': area,
             'created_at': created_at,
             'full_report': full_report_data
         }

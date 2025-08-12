@@ -289,6 +289,10 @@
                             <div class="info-label">Отопление</div>
                             <div class="info-value" id="object-heating">-</div>
                         </div>
+                        <div class="info-item">
+                            <div class="info-label">Площадь объекта</div>
+                            <div class="info-value" id="object-area">-</div>
+                        </div>
                     </div>
                 </div>
 
@@ -477,6 +481,7 @@
             age: urlParams.get('age') || 'Не указано',
             floor: urlParams.get('floor') || 'Не указано',
             heating: urlParams.get('heating') || 'Не указано',
+            area: urlParams.get('area') || 'Не указано',
             telegram_id: urlParams.get('telegram_id') || '',
             lat: urlParams.get('lat') || '',
             lng: urlParams.get('lng') || '',
@@ -563,6 +568,14 @@
             elements['object-address'].textContent = reportData.address;
             elements['object-bedrooms'].textContent = reportData.bedrooms;
             elements['object-price'].textContent = `€${Number(reportData.price).toLocaleString('ru-RU')}`;
+            
+            // Площадь объекта
+            const areaElement = document.getElementById('object-area');
+            if (areaElement) {
+                const areaValue = reportData.area && reportData.area !== 'unknown' ? 
+                    `${reportData.area} м²` : 'Не указано';
+                areaElement.textContent = areaValue;
+            }
             
             // Дополнительные данные - используем новую структуру из full_report
             if (data.full_report && data.full_report.detailed_characteristics) {
