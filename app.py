@@ -2348,6 +2348,14 @@ def api_full_report():
         
         created_at = datetime.now().isoformat()
         
+        # Преобразуем координаты в числа, если они переданы
+        try:
+            latitude = float(lat) if lat and lat != "" else None
+            longitude = float(lng) if lng and lng != "" else None
+        except (ValueError, TypeError):
+            latitude = None
+            longitude = None
+        
         report_data = {
             'user_id': user_id,
             'report_type': 'full',
@@ -2357,12 +2365,12 @@ def api_full_report():
                 'address': address,
                 'bedrooms': bedrooms,
                 'price': price,
-                'lat': lat,
-                'lng': lng
+                'lat': latitude,
+                'lng': longitude
             },
             'address': address,
-            'latitude': lat,
-            'longitude': lng,
+            'latitude': latitude,
+            'longitude': longitude,
             'bedrooms': bedrooms,
             'price': price,
             'created_at': created_at,
