@@ -442,7 +442,112 @@ def api_geocode():
                 })
             else:
                 logger.error("❌ Не удалось получить данные через Nominatim")
-                return jsonify({'error': 'Geocoding failed - both APIs unavailable'}), 500
+                # Попробуем найти адрес в базе данных по ключевым словам
+                logger.info("🔍 Пытаемся найти адрес в базе данных...")
+                try:
+                    # Ищем по ключевым словам из адреса
+                    search_terms = [word.strip() for word in address.replace(',', ' ').replace('.', ' ').split() if len(word.strip()) > 2]
+                    logger.info(f"🔍 Поисковые термины: {search_terms}")
+                    
+                    # Ищем в таблице locations по ключевым словам
+                    # Сначала попробуем найти точное совпадение по району
+                    search_result = None
+                    
+                    for term in search_terms[:3]:  # Используем первые 3 термина
+                        if term.lower() not in ['турция', 'türkiye', 'antalya', 'kepez']:  # Исключаем общие термины
+                            try:
+                                # Поиск по району
+                                result = supabase.table('locations').select('*').ilike('district_name', f'%{term}%').execute()
+                                if result.data:
+                                    search_result = result
+                                    logger.info(f"✅ Найдено по району '{term}': {len(result.data)} записей")
+                                    break
+                                
+                                # Поиск по округу
+                                result = supabase.table('locations').select('*').ilike('county_name', f'%{term}%').execute()
+                                if result.data:
+                                    search_result = result
+                                    logger.info(f"✅ Найдено по округу '{term}': {len(result.data)} записей")
+                                    break
+                                
+                                # Поиск по городу
+                                result = supabase.table('locations').select('*').ilike('city_name', f'%{term}%').execute()
+                                if result.data:
+                                    search_result = result
+                                    logger.info(f"✅ Найдено по городу '{term}': {len(result.data)} записей")
+                                    break
+                                    
+                            except Exception as e:
+                                logger.warning(f"⚠️ Ошибка поиска по термину '{term}': {e}")
+                                continue
+                    
+                    # Если ничего не найдено, попробуем поиск по Анталье
+                    if not search_result:
+                        logger.info("🔍 Поиск по городу 'Antalya'...")
+                        search_result = supabase.table('locations').select('*').eq('city_name', 'Antalya').limit(1).execute()
+                    logger.info(f"🔍 Результат поиска в БД: {len(search_result.data)} записей")
+                    
+                    if search_result.data:
+                        # Берем первую найденную локацию
+                        location = search_result.data[0]
+                        logger.info(f"✅ Найдена локация в БД: {location}")
+                        
+                        # Формируем структурированные данные
+                        nominatim_data = {
+                            'display_name': f"{location.get('district_name', '')}, {location.get('county_name', '')}, {location.get('city_name', '')}, {location.get('country_name', '')}",
+                            'lat': location.get('latitude', 0),
+                            'lon': location.get('longitude', 0),
+                            'address': {
+                                'country': location.get('country_name', ''),
+                                'city': location.get('city_name', ''),
+                                'county': location.get('county_name', ''),
+                                'district': location.get('district_name', ''),
+                                'postcode': ''
+                            }
+                        }
+                        logger.info("✅ Адрес найден в базе данных")
+                        
+                        # Пытаемся найти коды локаций в базе данных
+                        logger.info("🔍 Ищем коды локаций в базе данных...")
+                        location_codes = find_location_codes_from_components({
+                            'country': location.get('country_name', ''),
+                            'city': location.get('city_name', ''),
+                            'county': location.get('county_name', ''),
+                            'district': location.get('district_name', '')
+                        })
+                        
+                        if location_codes:
+                            logger.info(f"✅ Найдены коды локаций: {location_codes}")
+                        else:
+                            logger.warning("⚠️ Коды локаций не найдены")
+                        
+                        logger.info("=" * 60)
+                        logger.info("✅ ГЕОКОДИНГ ЗАВЕРШЕН УСПЕШНО (база данных)")
+                        logger.info("=" * 60)
+                        
+                        return jsonify({
+                            'success': True,
+                            'lat': float(location.get('latitude', 0)),
+                            'lng': float(location.get('longitude', 0)),
+                            'formatted_address': nominatim_data['display_name'],
+                            'location_components': {
+                                'country': location.get('country_name', ''),
+                                'country_code': 'TR',
+                                'city': location.get('city_name', ''),
+                                'district': location.get('district_name', ''),
+                                'county': location.get('county_name', ''),
+                                'postal_code': ''
+                            },
+                            'location_codes': location_codes,
+                            'source': 'database_fallback'
+                        })
+                    else:
+                        logger.error("❌ Адрес не найден ни в Nominatim, ни в базе данных")
+                        return jsonify({'error': 'Адрес не найден. Проверьте правильность написания.'}), 404
+                        
+                except Exception as e:
+                    logger.error(f"❌ Ошибка поиска в базе данных: {e}")
+                    return jsonify({'error': 'Ошибка поиска адреса в базе данных'}), 500
         
         # Google Maps API включен - пытаемся использовать его с повторными попытками
         logger.info("🌐 Google Maps API включен, отправляем запрос...")
@@ -4326,10 +4431,11 @@ def get_nominatim_location(address):
                 'display_name': location.get('display_name')
             }
             
-            logger.info(f"Nominatim данные: {location_data}")
+            logger.info(f"✅ Nominatim данные: {location_data}")
             return location_data
-        
-        return None
+        else:
+            logger.warning(f"⚠️ Nominatim API вернул пустой результат: {result}")
+            return None
         
     except Exception as e:
         logger.error(f"Ошибка Nominatim API: {e}")
