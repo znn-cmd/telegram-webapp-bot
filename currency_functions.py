@@ -140,6 +140,14 @@ def fetch_and_save_currency_rates(target_date=None):
             # Убираем поле id из данных, чтобы Supabase сам сгенерировал его
             if 'id' in currency_data:
                 del currency_data['id']
+            
+            # Дополнительная проверка перед вставкой
+            check_query = supabase.table('currency').select('*').gte('created_at', f'{date_str} 00:00:00').lt('created_at', f'{date_str} 23:59:59').order('created_at', desc=True).limit(1)
+            check_result = check_query.execute()
+            if check_result.data and len(check_result.data) > 0:
+                logger.info(f"✅ Запись уже существует, возвращаем её: {check_result.data[0]}")
+                return check_result.data[0]
+            
             supabase.table('currency').insert(currency_data).execute()
             logger.info(f"✅ Курсы валют успешно получены и сохранены для {date_str}")
         except Exception as insert_error:

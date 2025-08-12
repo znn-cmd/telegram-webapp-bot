@@ -633,6 +633,16 @@ def api_generate_report():
         # Устанавливаем флаг администратора для функции форматирования
         format_simple_report.is_admin = is_admin
         
+        # Добавляем отладочное логирование
+        logger.info(f"🔍 Отладка перед format_simple_report:")
+        logger.info(f"  - address: {type(address)} = {address}")
+        logger.info(f"  - bedrooms: {type(bedrooms)} = {bedrooms}")
+        logger.info(f"  - price: {type(price)} = {price}")
+        logger.info(f"  - location_codes: {type(location_codes)} = {location_codes}")
+        logger.info(f"  - language: {type(language)} = {language}")
+        logger.info(f"  - market_data: {type(market_data)} = {market_data}")
+        logger.info(f"  - currency_info: {type(currency_info)} = {currency_info}")
+        
         # Формируем отчёт в текстовом формате для отображения
         report_text = format_simple_report(address, bedrooms, price, location_codes, language, market_data, currency_info)
         
@@ -797,8 +807,17 @@ def format_simple_report(address, bedrooms, price, location_codes, language='en'
         location_codes = {}
     if market_data is None:
         market_data = {}
+    elif isinstance(market_data, list):
+        logger.warning(f"⚠️ market_data является списком, преобразуем в словарь: {market_data}")
+        market_data = {}
     if currency_info is None:
         currency_info = ""
+    
+    # Дополнительная проверка типов
+    logger.info(f"🔍 Типы параметров в format_simple_report:")
+    logger.info(f"  - location_codes: {type(location_codes)}")
+    logger.info(f"  - market_data: {type(market_data)}")
+    logger.info(f"  - currency_info: {type(currency_info)}")
     
     # Форматируем цену
     def format_price(price):
