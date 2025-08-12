@@ -780,7 +780,7 @@
                 blocksHtml += `
                     <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 14px; padding: 18px 14px 16px 14px; margin-bottom: 18px; box-shadow: 0 2px 8px rgba(102,126,234,0.10); color: #fff; text-align: center;">
                         <div style="font-size: 18px; font-weight: 800; margin-bottom: 8px;">Хотите узнать больше?</div>
-                        <div style="font-size: 15px; font-weight: 400; margin-bottom: 14px;">Получите <b>полный отчет по объекту</b> — подробный анализ доходности, рисков, налогов, сравнение с альтернативами и профессиональные рекомендации. Всё в одном PDF-документе!</div>
+                        <div style="font-size: 15px; font-weight: 400; margin-bottom: 14px;">Получите <b>экспертный анализ объекта</b> — детальную оценку этажа, возраста, системы отопления, динамику изменения цен за несколько лет, сравнение с аналогичными предложениями на рынке и альтернативными финансовыми инструментами. Профессиональные выводы в удобном PDF-формате!</div>
                         <button class="btn btn-primary" style="width: 100%; font-size: 16px; margin-top: 4px; background: #fff; color: #667eea; border: none; font-weight: 700;" onclick="showFullReportStub()">Получить полный отчет</button>
                     </div>
                 `;
@@ -804,7 +804,7 @@
             // Удаляем строку "Получить полный отчет" (кнопка)
             text = text.replace(/\n?Получить полный отчет\s*$/,'');
             // Добавляем ссылку на бота в конец копируемого текста
-            text += "\nПолучить полный отчет: https://t.me/Aaadviser_bot";
+            text += "\nПолучить экспертный анализ: https://t.me/Aaadviser_bot";
             navigator.clipboard.writeText(text).then(() => {
                 showToast(getLocalizedText('notifications.report_copied'), 'success');
             }).catch(() => {
