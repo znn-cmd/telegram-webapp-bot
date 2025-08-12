@@ -1402,17 +1402,6 @@ def format_simple_report(address, bedrooms, price, location_codes, language='en'
                             "Данные для выбранного количества спален не найдены",
                             "",
                         ])
-        
-
-
-
-            else:
-                report_lines.extend([
-                    "=== АНАЛИЗ РЫНКА ===",
-                    "Данные анализа рынка не найдены для данной локации",
-                    "",
-                ])
-        
         # Добавляем раздел с рекомендациями
         if market_data and market_data.get('general_data'):
             general = market_data['general_data']
@@ -4554,10 +4543,10 @@ def get_market_data_by_location_ids(location_codes, target_year=None, target_mon
                 # Фильтруем записи с валидными датами
                 valid_records = [r for r in result.data if r.get('trend_date')]
                 if valid_records:
-                # Берем самую свежую запись
+                    # Берем самую свежую запись
                     latest_record = max(valid_records, key=lambda x: x.get('trend_date', ''))
-                market_data['property_trends'] = latest_record
-                logger.info(f"Найдены данные property_trends: {len(result.data)} записей, выбрана самая свежая: {latest_record.get('trend_date')}")
+                    market_data['property_trends'] = latest_record
+                    logger.info(f"Найдены данные property_trends: {len(result.data)} записей, выбрана самая свежая: {latest_record.get('trend_date')}")
                 else:
                     logger.warning("Все записи property_trends имеют пустые даты")
                     market_data['property_trends'] = result.data[0] if result.data else None
@@ -4658,10 +4647,10 @@ def get_market_data_by_location_ids(location_codes, target_year=None, target_mon
                 # Фильтруем записи с валидными датами
                 valid_records = [r for r in result.data if r.get('trend_date')]
                 if valid_records:
-                # Берем самую свежую запись
+                    # Берем самую свежую запись
                     latest_record = max(valid_records, key=lambda x: x.get('trend_date', ''))
-                market_data['general_data'] = latest_record
-                logger.info(f"Найдены данные general_data: {len(result.data)} записей, выбрана самая свежая: {latest_record.get('trend_date')}")
+                    market_data['general_data'] = latest_record
+                    logger.info(f"Найдены данные general_data: {len(result.data)} записей, выбрана самая свежая: {latest_record.get('trend_date')}")
                 else:
                     logger.warning("Все записи general_data имеют пустые даты")
                     market_data['general_data'] = result.data[0] if result.data else None
@@ -4973,7 +4962,7 @@ def get_nominatim_location(address):
             logger.info(f"📝 Параметры запроса: {params}")
             response = requests.get(url, params=params, headers=headers, timeout=30)
             logger.info(f"📡 Статус ответа Nominatim API: {response.status_code}")
-        result = response.json()
+            result = response.json()
             logger.info(f"📊 Размер ответа Nominatim: {len(str(result))} символов")
         except requests.exceptions.Timeout:
             logger.error("❌ Таймаут при запросе к Nominatim API (30 секунд)")
