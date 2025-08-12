@@ -421,32 +421,43 @@ def api_geocode():
                     logger.info(f"📊 Размер ответа Google Maps: {len(str(result))} символов")
                     
                     if result.get('status') == 'OK' and result.get('results'):
-                        # Успешно получили данные от Google Maps
-                        location = result['results'][0]
-                        location_components = extract_location_components(location.get('address_components', []), address)
-                        
-                        # Пытаемся найти коды локаций в базе данных
-                        logger.info("🔍 Ищем коды локаций в базе данных...")
-                        location_codes = find_location_codes_from_components(location_components)
-                        
-                        if location_codes:
-                            logger.info(f"✅ Найдены коды локаций: {location_codes}")
-                        else:
-                            logger.warning("⚠️ Коды локаций не найдены")
-                        
-                        logger.info("=" * 60)
-                        logger.info("✅ ГЕОКОДИНГ ЗАВЕРШЕН УСПЕШНО (Google Maps API)")
-                        logger.info("=" * 60)
-                        
-                        return jsonify({
-                            'success': True,
-                            'lat': float(location['geometry']['location']['lat']),
-                            'lng': float(location['geometry']['location']['lng']),
-                            'formatted_address': location.get('formatted_address', address),
-                            'location_components': location_components,
-                            'location_codes': location_codes,
-                            'source': 'google_maps'
-                        })
+                        try:
+                            # Успешно получили данные от Google Maps
+                            location = result['results'][0]
+                            logger.info(f"📍 Получена локация от Google Maps: {location.get('formatted_address', 'N/A')}")
+                            
+                            # Извлекаем компоненты локации
+                            logger.info("🔍 Извлекаем компоненты локации...")
+                            location_components = extract_location_components(location.get('address_components', []), address)
+                            logger.info(f"✅ Компоненты локации извлечены: {location_components}")
+                            
+                            # Пытаемся найти коды локаций в базе данных
+                            logger.info("🔍 Ищем коды локаций в базе данных...")
+                            location_codes = find_location_codes_from_components(location_components)
+                            
+                            if location_codes:
+                                logger.info(f"✅ Найдены коды локаций: {location_codes}")
+                            else:
+                                logger.warning("⚠️ Коды локаций не найдены")
+                            
+                            logger.info("=" * 60)
+                            logger.info("✅ ГЕОКОДИНГ ЗАВЕРШЕН УСПЕШНО (Google Maps API)")
+                            logger.info("=" * 60)
+                            
+                            return jsonify({
+                                'success': True,
+                                'lat': float(location['geometry']['location']['lat']),
+                                'lng': float(location['geometry']['location']['lng']),
+                                'formatted_address': location.get('formatted_address', address),
+                                'location_components': location_components,
+                                'location_codes': location_codes,
+                                'source': 'google_maps'
+                            })
+                        except Exception as e:
+                            logger.error(f"❌ Ошибка при обработке ответа Google Maps: {e}")
+                            logger.error(f"📄 Traceback: ", exc_info=True)
+                            # Продолжаем к fallback
+                            break
                     else:
                         logger.warning(f"⚠️ Google Maps API вернул статус: {result.get('status')}")
                         if result.get('error_message'):
@@ -493,40 +504,47 @@ def api_geocode():
         
         # Если Google Maps API не сработал, пробуем Nominatim как fallback
         logger.info("🔄 Переключаемся на Nominatim API как fallback...")
-        nominatim_data = get_nominatim_location(address)
-        
-        if nominatim_data:
-            location_components = {
-                'country': nominatim_data.get('country'),
-                'country_code': nominatim_data.get('country_code'),
-                'city': nominatim_data.get('city'),
-                'district': nominatim_data.get('district'),
-                'county': nominatim_data.get('county'),
-                'postal_code': nominatim_data.get('postal_code')
-            }
+        try:
+            nominatim_data = get_nominatim_location(address)
             
-            # Пытаемся найти коды локаций в базе данных
-            logger.info("🔍 Ищем коды локаций в базе данных...")
-            location_codes = find_location_codes_from_components(location_components)
-            
-            if location_codes:
-                logger.info(f"✅ Найдены коды локаций: {location_codes}")
+            if nominatim_data:
+                logger.info(f"✅ Получены данные от Nominatim: {nominatim_data}")
+                location_components = {
+                    'country': nominatim_data.get('country'),
+                    'country_code': nominatim_data.get('country_code'),
+                    'city': nominatim_data.get('city'),
+                    'district': nominatim_data.get('district'),
+                    'county': nominatim_data.get('county'),
+                    'postal_code': nominatim_data.get('postal_code')
+                }
+                
+                # Пытаемся найти коды локаций в базе данных
+                logger.info("🔍 Ищем коды локаций в базе данных...")
+                location_codes = find_location_codes_from_components(location_components)
+                
+                if location_codes:
+                    logger.info(f"✅ Найдены коды локаций: {location_codes}")
+                else:
+                    logger.warning("⚠️ Коды локаций не найдены")
+                
+                logger.info("=" * 60)
+                logger.info("✅ ГЕОКОДИНГ ЗАВЕРШЕН УСПЕШНО (fallback на Nominatim)")
+                logger.info("=" * 60)
+                
+                return jsonify({
+                    'success': True,
+                    'lat': float(nominatim_data.get('lat', 0)),
+                    'lng': float(nominatim_data.get('lon', 0)),
+                    'formatted_address': nominatim_data.get('display_name', address),
+                    'location_components': location_components,
+                    'location_codes': location_codes,
+                    'source': 'nominatim_fallback'
+                })
             else:
-                logger.warning("⚠️ Коды локаций не найдены")
-            
-            logger.info("=" * 60)
-            logger.info("✅ ГЕОКОДИНГ ЗАВЕРШЕН УСПЕШНО (fallback на Nominatim)")
-            logger.info("=" * 60)
-            
-            return jsonify({
-                'success': True,
-                'lat': float(nominatim_data.get('lat', 0)),
-                'lng': float(nominatim_data.get('lon', 0)),
-                'formatted_address': nominatim_data.get('display_name', address),
-                'location_components': location_components,
-                'location_codes': location_codes,
-                'source': 'nominatim_fallback'
-            })
+                logger.warning("⚠️ Nominatim API не вернул данные")
+        except Exception as e:
+            logger.error(f"❌ Ошибка при работе с Nominatim API: {e}")
+            logger.error(f"📄 Traceback: ", exc_info=True)
         else:
             logger.error("❌ Не удалось получить данные ни через Google Maps, ни через Nominatim")
             # Попробуем найти адрес в базе данных по ключевым словам
@@ -618,6 +636,7 @@ def api_geocode():
                     
             except Exception as e:
                 logger.error(f"❌ Ошибка поиска в базе данных: {e}")
+                logger.error(f"📄 Traceback: ", exc_info=True)
                 return jsonify({'error': 'Ошибка поиска адреса в базе данных'}), 500
         
 
@@ -625,6 +644,10 @@ def api_geocode():
         logger.error(f"❌ Критическая ошибка при геокодинге: {e}")
         logger.error(f"📄 Traceback: ", exc_info=True)
         return jsonify({'error': 'Geocoding service error'}), 500
+    
+    # Если все методы не сработали, возвращаем ошибку
+    logger.error("❌ Все методы геокодинга не сработали")
+    return jsonify({'error': 'Не удалось выполнить геокодинг адреса. Попробуйте позже.'}), 500
 
 @app.route('/api/validate_bedrooms', methods=['POST'])
 def api_validate_bedrooms():
