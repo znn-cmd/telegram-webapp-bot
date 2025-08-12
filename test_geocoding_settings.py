@@ -11,8 +11,8 @@ def test_environment_variables():
     print("=" * 50)
     
     # Google Maps API настройки
-    enable_google_maps = os.getenv('ENABLE_GOOGLE_MAPS', 'false').lower() == 'true'  # По умолчанию отключен
-    google_maps_timeout = int(os.getenv('GOOGLE_MAPS_TIMEOUT', '5'))  # Минимальный таймаут
+    enable_google_maps = os.getenv('ENABLE_GOOGLE_MAPS', 'true').lower() == 'true'  # Google Maps API включен по умолчанию
+    google_maps_timeout = int(os.getenv('GOOGLE_MAPS_TIMEOUT', '30'))  # Увеличен таймаут для стабильности
     
     # Nominatim API настройки
     enable_nominatim = os.getenv('ENABLE_NOMINATIM', 'true').lower() == 'true'

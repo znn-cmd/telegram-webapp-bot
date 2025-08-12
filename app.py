@@ -69,8 +69,8 @@ GOOGLE_MAPS_API_KEY = "AIzaSyBrDkDpNKNAIyY147MQ78hchBkeyCAxhEw"
 # Настройки API
 ENABLE_NOMINATIM = os.getenv('ENABLE_NOMINATIM', 'true').lower() == 'true'
 NOMINATIM_TIMEOUT = int(os.getenv('NOMINATIM_TIMEOUT', '15'))
-ENABLE_GOOGLE_MAPS = os.getenv('ENABLE_GOOGLE_MAPS', 'false').lower() == 'true'  # По умолчанию отключен (сетевые проблемы)
-GOOGLE_MAPS_TIMEOUT = int(os.getenv('GOOGLE_MAPS_TIMEOUT', '5'))  # Минимальный таймаут
+ENABLE_GOOGLE_MAPS = os.getenv('ENABLE_GOOGLE_MAPS', 'true').lower() == 'true'  # Google Maps API включен по умолчанию
+GOOGLE_MAPS_TIMEOUT = int(os.getenv('GOOGLE_MAPS_TIMEOUT', '30'))  # Увеличен таймаут для стабильности
 
 # async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 #     """Обработчик команды /start"""
@@ -403,183 +403,27 @@ def api_geocode():
         logger.info(f"🌐 Отправляем запрос к Google Maps API: {url}")
         logger.info(f"📝 Параметры запроса: address='{address}', key='{GOOGLE_MAPS_API_KEY[:10]}...'")
         
-        # Проверяем, включен ли Google Maps API
-        if not ENABLE_GOOGLE_MAPS:
-            logger.info("🚫 Google Maps API отключен в настройках (сетевые ограничения), используем только Nominatim")
-            # Пытаемся получить данные только через Nominatim
-            nominatim_data = get_nominatim_location(address)
-            if nominatim_data:
-                location_components = {
-                    'country': nominatim_data.get('country'),
-                    'country_code': nominatim_data.get('country_code'),
-                    'city': nominatim_data.get('city'),
-                    'district': nominatim_data.get('district'),
-                    'county': nominatim_data.get('county'),
-                    'postal_code': nominatim_data.get('postal_code')
-                }
-                
-                # Пытаемся найти коды локаций в базе данных
-                logger.info("🔍 Ищем коды локаций в базе данных...")
-                location_codes = find_location_codes_from_components(location_components)
-                
-                if location_codes:
-                    logger.info(f"✅ Найдены коды локаций: {location_codes}")
-                else:
-                    logger.warning("⚠️ Коды локаций не найдены")
-                
-                logger.info("=" * 60)
-                logger.info("✅ ГЕОКОДИНГ ЗАВЕРШЕН УСПЕШНО (только Nominatim)")
-                logger.info("=" * 60)
-                
-                return jsonify({
-                    'success': True,
-                    'lat': float(nominatim_data.get('lat', 0)),
-                    'lng': float(nominatim_data.get('lon', 0)),
-                    'formatted_address': nominatim_data.get('display_name', address),
-                    'location_components': location_components,
-                    'location_codes': location_codes,
-                    'source': 'nominatim_only'
-                })
-            else:
-                logger.error("❌ Не удалось получить данные через Nominatim")
-                # Попробуем найти адрес в базе данных по ключевым словам
-                logger.info("🔍 Пытаемся найти адрес в базе данных...")
-                try:
-                    # Ищем по ключевым словам из адреса
-                    search_terms = [word.strip() for word in address.replace(',', ' ').replace('.', ' ').split() if len(word.strip()) > 2]
-                    logger.info(f"🔍 Поисковые термины: {search_terms}")
-                    
-                    # Ищем в таблице locations по ключевым словам
-                    # Сначала попробуем найти точное совпадение по району
-                    search_result = None
-                    
-                    for term in search_terms[:3]:  # Используем первые 3 термина
-                        if term.lower() not in ['турция', 'türkiye', 'antalya', 'kepez']:  # Исключаем общие термины
-                            try:
-                                # Поиск по району
-                                result = supabase.table('locations').select('*').ilike('district_name', f'%{term}%').execute()
-                                if result.data:
-                                    search_result = result
-                                    logger.info(f"✅ Найдено по району '{term}': {len(result.data)} записей")
-                                    break
-                                
-                                # Поиск по округу
-                                result = supabase.table('locations').select('*').ilike('county_name', f'%{term}%').execute()
-                                if result.data:
-                                    search_result = result
-                                    logger.info(f"✅ Найдено по округу '{term}': {len(result.data)} записей")
-                                    break
-                                
-                                # Поиск по городу
-                                result = supabase.table('locations').select('*').ilike('city_name', f'%{term}%').execute()
-                                if result.data:
-                                    search_result = result
-                                    logger.info(f"✅ Найдено по городу '{term}': {len(result.data)} записей")
-                                    break
-                                    
-                            except Exception as e:
-                                logger.warning(f"⚠️ Ошибка поиска по термину '{term}': {e}")
-                                continue
-                    
-                    # Если ничего не найдено, попробуем поиск по Анталье
-                    if not search_result:
-                        logger.info("🔍 Поиск по городу 'Antalya'...")
-                        search_result = supabase.table('locations').select('*').eq('city_name', 'Antalya').limit(1).execute()
-                    logger.info(f"🔍 Результат поиска в БД: {len(search_result.data)} записей")
-                    
-                    if search_result.data:
-                        # Берем первую найденную локацию
-                        location = search_result.data[0]
-                        logger.info(f"✅ Найдена локация в БД: {location}")
-                        
-                        # Формируем структурированные данные
-                        nominatim_data = {
-                            'display_name': f"{location.get('district_name', '')}, {location.get('county_name', '')}, {location.get('city_name', '')}, {location.get('country_name', '')}",
-                            'lat': location.get('latitude', 0),
-                            'lon': location.get('longitude', 0),
-                            'address': {
-                                'country': location.get('country_name', ''),
-                                'city': location.get('city_name', ''),
-                                'county': location.get('county_name', ''),
-                                'district': location.get('district_name', ''),
-                                'postcode': ''
-                            }
-                        }
-                        logger.info("✅ Адрес найден в базе данных")
-                        
-                        # Пытаемся найти коды локаций в базе данных
-                        logger.info("🔍 Ищем коды локаций в базе данных...")
-                        location_codes = find_location_codes_from_components({
-                            'country': location.get('country_name', ''),
-                            'city': location.get('city_name', ''),
-                            'county': location.get('county_name', ''),
-                            'district': location.get('district_name', '')
-                        })
-                        
-                        if location_codes:
-                            logger.info(f"✅ Найдены коды локаций: {location_codes}")
-                        else:
-                            logger.warning("⚠️ Коды локаций не найдены")
-                        
-                        logger.info("=" * 60)
-                        logger.info("✅ ГЕОКОДИНГ ЗАВЕРШЕН УСПЕШНО (база данных)")
-                        logger.info("=" * 60)
-                        
-                        return jsonify({
-                            'success': True,
-                            'lat': float(location.get('latitude', 0)),
-                            'lng': float(location.get('longitude', 0)),
-                            'formatted_address': nominatim_data['display_name'],
-                            'location_components': {
-                                'country': location.get('country_name', ''),
-                                'country_code': 'TR',
-                                'city': location.get('city_name', ''),
-                                'district': location.get('district_name', ''),
-                                'county': location.get('county_name', ''),
-                                'postal_code': ''
-                            },
-                            'location_codes': location_codes,
-                            'source': 'database_fallback'
-                        })
-                    else:
-                        logger.error("❌ Адрес не найден ни в Nominatim, ни в базе данных")
-                        return jsonify({'error': 'Адрес не найден. Проверьте правильность написания.'}), 404
-                        
-                except Exception as e:
-                    logger.error(f"❌ Ошибка поиска в базе данных: {e}")
-                    return jsonify({'error': 'Ошибка поиска адреса в базе данных'}), 500
-        
-        # Google Maps API включен - пытаемся использовать его с повторными попытками
+        # Google Maps API включен - используем его как основной источник
         logger.info("🌐 Google Maps API включен, отправляем запрос...")
         
-        # Пытаемся сделать запрос с несколькими попытками
-        max_retries = 2
+        # Пытаемся сделать запрос с несколькими попытками и улучшенной обработкой ошибок
+        max_retries = 3
         for attempt in range(max_retries):
             try:
                 logger.info(f"🔄 Попытка {attempt + 1}/{max_retries}: отправляем HTTP запрос к Google Maps API...")
                 
-                # Используем более короткий таймаут для каждой попытки
-                attempt_timeout = min(GOOGLE_MAPS_TIMEOUT // 2, 10)
-                response = requests.get(url, params=params, timeout=attempt_timeout)
+                # Используем полный таймаут для каждой попытки
+                response = requests.get(url, params=params, timeout=GOOGLE_MAPS_TIMEOUT)
                 logger.info(f"📡 Статус ответа Google Maps API: {response.status_code}")
-                break  # Успешно получили ответ
                 
-            except requests.exceptions.Timeout:
-                logger.warning(f"⏰ Попытка {attempt + 1}: таймаут Google Maps API ({attempt_timeout} секунд)")
-                if attempt == max_retries - 1:
-                    logger.error(f"❌ Все попытки Google Maps API завершились таймаутом")
-                    # Fallback на Nominatim
-                    logger.info("🔄 Переключаемся на Nominatim API...")
-                    nominatim_data = get_nominatim_location(address)
-                    if nominatim_data:
-                        location_components = {
-                            'country': nominatim_data.get('country'),
-                            'country_code': nominatim_data.get('country_code'),
-                            'city': nominatim_data.get('city'),
-                            'district': nominatim_data.get('district'),
-                            'county': nominatim_data.get('county'),
-                            'postal_code': nominatim_data.get('postal_code')
-                        }
+                if response.status_code == 200:
+                    result = response.json()
+                    logger.info(f"📊 Размер ответа Google Maps: {len(str(result))} символов")
+                    
+                    if result.get('status') == 'OK' and result.get('results'):
+                        # Успешно получили данные от Google Maps
+                        location = result['results'][0]
+                        location_components = extract_location_components(location.get('address_components', []), address)
                         
                         # Пытаемся найти коды локаций в базе данных
                         logger.info("🔍 Ищем коды локаций в базе данных...")
@@ -591,130 +435,75 @@ def api_geocode():
                             logger.warning("⚠️ Коды локаций не найдены")
                         
                         logger.info("=" * 60)
-                        logger.info("✅ ГЕОКОДИНГ ЗАВЕРШЕН УСПЕШНО (fallback на Nominatim)")
+                        logger.info("✅ ГЕОКОДИНГ ЗАВЕРШЕН УСПЕШНО (Google Maps API)")
                         logger.info("=" * 60)
                         
                         return jsonify({
                             'success': True,
-                            'lat': float(nominatim_data.get('lat', 0)),
-                            'lng': float(nominatim_data.get('lon', 0)),
-                            'formatted_address': nominatim_data.get('display_name', address),
+                            'lat': float(location['geometry']['location']['lat']),
+                            'lng': float(location['geometry']['location']['lng']),
+                            'formatted_address': location.get('formatted_address', address),
                             'location_components': location_components,
                             'location_codes': location_codes,
-                            'source': 'nominatim_fallback'
+                            'source': 'google_maps'
                         })
                     else:
-                        logger.error("❌ Не удалось получить данные через Nominatim fallback")
-                        return jsonify({'error': 'Geocoding failed - all APIs unavailable'}), 500
+                        logger.warning(f"⚠️ Google Maps API вернул статус: {result.get('status')}")
+                        if result.get('error_message'):
+                            logger.warning(f"⚠️ Сообщение об ошибке: {result.get('error_message')}")
                         
+                        # Если Google Maps не смог найти адрес, пробуем Nominatim
+                        logger.info("🔄 Google Maps не смог найти адрес, пробуем Nominatim...")
+                        break
+                        
+                else:
+                    logger.warning(f"⚠️ Попытка {attempt + 1}: HTTP статус {response.status_code}")
+                    if attempt == max_retries - 1:
+                        logger.error(f"❌ Все попытки Google Maps API завершились с ошибкой HTTP {response.status_code}")
+                        break
+                    continue
+                    
+            except requests.exceptions.Timeout:
+                logger.warning(f"⏰ Попытка {attempt + 1}: таймаут Google Maps API ({GOOGLE_MAPS_TIMEOUT} секунд)")
+                if attempt == max_retries - 1:
+                    logger.error(f"❌ Все попытки Google Maps API завершились таймаутом")
+                    break
+                continue
+                
             except requests.exceptions.ConnectionError as e:
-                logger.warning(f"❌ Попытка {attempt + 1}: ошибка соединения с Google Maps API: {e}")
+                logger.warning(f"🔌 Попытка {attempt + 1}: ошибка соединения Google Maps API: {e}")
                 if attempt == max_retries - 1:
-                    logger.error("❌ Все попытки Google Maps API завершились ошибкой соединения")
-                    return jsonify({'error': 'Google Maps API connection error'}), 500
-                    
+                    logger.error(f"❌ Все попытки Google Maps API завершились ошибкой соединения")
+                    break
+                continue
+                
             except requests.exceptions.RequestException as e:
-                logger.warning(f"❌ Попытка {attempt + 1}: ошибка запроса к Google Maps API: {e}")
+                logger.warning(f"📡 Попытка {attempt + 1}: ошибка запроса Google Maps API: {e}")
                 if attempt == max_retries - 1:
-                    logger.error("❌ Все попытки Google Maps API завершились ошибкой запроса")
-                    return jsonify({'error': 'Google Maps API request error'}), 500
-                    
+                    logger.error(f"❌ Все попытки Google Maps API завершились ошибкой запроса")
+                    break
+                continue
+                
             except Exception as e:
-                logger.error(f"❌ Неожиданная ошибка при запросе к Google Maps API: {e}")
-                return jsonify({'error': 'Google Maps API unexpected error'}), 500
+                logger.error(f"❌ Попытка {attempt + 1}: неожиданная ошибка Google Maps API: {e}")
+                if attempt == max_retries - 1:
+                    logger.error(f"❌ Все попытки Google Maps API завершились неожиданной ошибкой")
+                    break
+                continue
         
-        if response.status_code != 200:
-            logger.error(f"❌ Ошибка HTTP от Google Maps API: {response.status_code}")
-            logger.error(f"📄 Текст ответа: {response.text}")
-            return jsonify({'error': 'Google Maps API error'}), 500
+        # Если Google Maps API не сработал, пробуем Nominatim как fallback
+        logger.info("🔄 Переключаемся на Nominatim API как fallback...")
+        nominatim_data = get_nominatim_location(address)
         
-        result = response.json()
-        logger.info(f"📊 Статус ответа Google Maps: {result.get('status')}")
-        
-        if result['status'] == 'OK' and result['results']:
-            location = result['results'][0]['geometry']['location']
-            formatted_address = result['results'][0]['formatted_address']
-            
-            logger.info("✅ Google Maps API вернул успешный ответ")
-            logger.info(f"📍 Координаты: lat={location['lat']}, lng={location['lng']}")
-            logger.info(f"🏠 Форматированный адрес: {formatted_address}")
-            
-            # Детальное логирование ответа Google Places API
-            logger.info("=" * 60)
-            logger.info("🔍 ДЕТАЛЬНЫЙ АНАЛИЗ ОТВЕТА GOOGLE PLACES API")
-            logger.info("=" * 60)
-            logger.info(f"Оригинальный адрес: {address}")
-            logger.info(f"Formatted address: {formatted_address}")
-            logger.info(f"Lat: {location['lat']}, Lng: {location['lng']}")
-            
-            # Логируем все компоненты адреса от Google
-            logger.info("\n📋 Все компоненты адреса от Google:")
-            for i, component in enumerate(result['results'][0]['address_components']):
-                logger.info(f"  {i+1}. {component.get('long_name', '')} ({component.get('short_name', '')}) - Types: {component.get('types', [])}")
-            
-            # Анализируем, что Google не определил
-            google_components = [comp.get('long_name', '') for comp in result['results'][0]['address_components']]
-            address_parts = address.split(',')
-            first_part = address_parts[0].strip() if address_parts else ""
-            
-            logger.info(f"\n🔍 АНАЛИЗ:")
-            logger.info(f"Первая часть адреса: '{first_part}'")
-            logger.info(f"Компоненты Google: {google_components}")
-            if first_part not in google_components:
-                logger.info(f"⚠️  '{first_part}' НЕ найден в компонентах Google!")
-            else:
-                logger.info(f"✅ '{first_part}' найден в компонентах Google")
-            
-            # Извлекаем структурированные данные из Google Places API
-            logger.info("🔧 Извлекаем структурированные данные...")
-            location_components = extract_location_components(result['results'][0]['address_components'], address)
-            logger.info(f"📋 Извлеченные компоненты: {location_components}")
-            
-            # Дополнительно получаем данные через Nominatim (если включено)
-            nominatim_data = None
-            if ENABLE_NOMINATIM:
-                logger.info("🌐 Получаем дополнительные данные через Nominatim...")
-                try:
-                    # Устанавливаем таймаут для всего процесса Nominatim
-                    import signal
-                    
-                    def timeout_handler(signum, frame):
-                        raise TimeoutError("Nominatim API timeout")
-                    
-                    # Устанавливаем таймаут из настроек
-                    signal.signal(signal.SIGALRM, timeout_handler)
-                    signal.alarm(NOMINATIM_TIMEOUT)
-                    
-                    nominatim_data = get_nominatim_location(address)
-                    
-                    # Отменяем таймаут
-                    signal.alarm(0)
-                    
-                    if nominatim_data:
-                        logger.info(f"✅ Получены данные Nominatim: {nominatim_data}")
-                        # Если Google не определил district, используем данные Nominatim
-                        if not location_components.get('district') and nominatim_data.get('district'):
-                            location_components['district'] = nominatim_data['district']
-                            logger.info(f"Добавлен district из Nominatim: {nominatim_data['district']}")
-                        
-                        # Если Google не определил county, используем данные Nominatim
-                        if not location_components.get('county') and nominatim_data.get('county'):
-                            location_components['county'] = nominatim_data['county']
-                            logger.info(f"Добавлен county из Nominatim: {nominatim_data['county']}")
-                        
-                        # Сохраняем данные Nominatim для отображения
-                        location_components['nominatim_data'] = nominatim_data
-                    else:
-                        logger.info("⚠️ Данные Nominatim не получены")
-                        
-                except TimeoutError:
-                    logger.warning(f"⏰ Таймаут Nominatim API ({NOMINATIM_TIMEOUT} секунд), продолжаем без дополнительных данных")
-                    nominatim_data = None
-                except Exception as e:
-                    logger.warning(f"⚠️ Ошибка при получении данных Nominatim: {e}, продолжаем без дополнительных данных")
-                    nominatim_data = None
-            else:
-                logger.info("🚫 Nominatim API отключен в настройках")
+        if nominatim_data:
+            location_components = {
+                'country': nominatim_data.get('country'),
+                'country_code': nominatim_data.get('country_code'),
+                'city': nominatim_data.get('city'),
+                'district': nominatim_data.get('district'),
+                'county': nominatim_data.get('county'),
+                'postal_code': nominatim_data.get('postal_code')
+            }
             
             # Пытаемся найти коды локаций в базе данных
             logger.info("🔍 Ищем коды локаций в базе данных...")
@@ -726,29 +515,112 @@ def api_geocode():
                 logger.warning("⚠️ Коды локаций не найдены")
             
             logger.info("=" * 60)
-            logger.info("✅ ГЕОКОДИНГ ЗАВЕРШЕН УСПЕШНО")
+            logger.info("✅ ГЕОКОДИНГ ЗАВЕРШЕН УСПЕШНО (fallback на Nominatim)")
             logger.info("=" * 60)
             
             return jsonify({
                 'success': True,
-                'lat': location['lat'],
-                'lng': location['lng'],
-                'formatted_address': formatted_address,
+                'lat': float(nominatim_data.get('lat', 0)),
+                'lng': float(nominatim_data.get('lon', 0)),
+                'formatted_address': nominatim_data.get('display_name', address),
                 'location_components': location_components,
-                'location_codes': location_codes
+                'location_codes': location_codes,
+                'source': 'nominatim_fallback'
             })
         else:
-            logger.error(f"❌ Google Maps API вернул ошибку: {result.get('status')}")
-            logger.error(f"📄 Полный ответ: {result}")
-            
-            # Логируем детали ошибки
-            if result.get('error_message'):
-                logger.error(f"🚨 Сообщение об ошибке: {result['error_message']}")
-            
-            return jsonify({
-                'success': False,
-                'error': f"Address not found. Status: {result.get('status')}"
-            })
+            logger.error("❌ Не удалось получить данные ни через Google Maps, ни через Nominatim")
+            # Попробуем найти адрес в базе данных по ключевым словам
+            logger.info("🔍 Пытаемся найти адрес в базе данных...")
+            try:
+                # Ищем по ключевым словам из адреса
+                search_terms = [word.strip() for word in address.replace(',', ' ').replace('.', ' ').split() if len(word.strip()) > 2]
+                logger.info(f"🔍 Поисковые термины: {search_terms}")
+                
+                # Ищем в таблице locations по ключевым словам
+                search_result = None
+                
+                for term in search_terms[:3]:  # Используем первые 3 термина
+                    if term.lower() not in ['турция', 'türkiye', 'antalya', 'kepez']:  # Исключаем общие термины
+                        try:
+                            # Поиск по району
+                            result = supabase.table('locations').select('*').ilike('district_name', f'%{term}%').execute()
+                            if result.data:
+                                search_result = result
+                                logger.info(f"✅ Найдено по району '{term}': {len(result.data)} записей")
+                                break
+                            
+                            # Поиск по округу
+                            result = supabase.table('locations').select('*').ilike('county_name', f'%{term}%').execute()
+                            if result.data:
+                                search_result = result
+                                logger.info(f"✅ Найдено по округу '{term}': {len(result.data)} записей")
+                                break
+                            
+                            # Поиск по городу
+                            result = supabase.table('locations').select('*').ilike('city_name', f'%{term}%').execute()
+                            if result.data:
+                                search_result = result
+                                logger.info(f"✅ Найдено по городу '{term}': {len(result.data)} записей")
+                                break
+                                
+                        except Exception as e:
+                            logger.warning(f"⚠️ Ошибка поиска по термину '{term}': {e}")
+                            continue
+                
+                # Если ничего не найдено, попробуем поиск по Анталье
+                if not search_result:
+                    logger.info("🔍 Поиск по городу 'Antalya'...")
+                    search_result = supabase.table('locations').select('*').eq('city_name', 'Antalya').limit(1).execute()
+                logger.info(f"🔍 Результат поиска в БД: {len(search_result.data)} записей")
+                
+                if search_result.data:
+                    # Берем первую найденную локацию
+                    location = search_result.data[0]
+                    logger.info(f"✅ Найдена локация в БД: {location}")
+                    
+                    # Пытаемся найти коды локаций в базе данных
+                    logger.info("🔍 Ищем коды локаций в базе данных...")
+                    location_codes = find_location_codes_from_components({
+                        'country': location.get('country_name', ''),
+                        'city': location.get('city_name', ''),
+                        'county': location.get('county_name', ''),
+                        'district': location.get('district_name', '')
+                    })
+                    
+                    if location_codes:
+                        logger.info(f"✅ Найдены коды локаций: {location_codes}")
+                    else:
+                        logger.warning("⚠️ Коды локаций не найдены")
+                    
+                    logger.info("=" * 60)
+                    logger.info("✅ ГЕОКОДИНГ ЗАВЕРШЕН УСПЕШНО (база данных)")
+                    logger.info("=" * 60)
+                    
+                    return jsonify({
+                        'success': True,
+                        'lat': float(location.get('latitude', 0)),
+                        'lng': float(location.get('longitude', 0)),
+                        'formatted_address': f"{location.get('district_name', '')}, {location.get('county_name', '')}, {location.get('city_name', '')}, {location.get('country_name', '')}",
+                        'location_components': {
+                            'country': location.get('country_name', ''),
+                            'country_code': 'TR',
+                            'city': location.get('city_name', ''),
+                            'district': location.get('district_name', ''),
+                            'county': location.get('county_name', ''),
+                            'postal_code': ''
+                        },
+                        'location_codes': location_codes,
+                        'source': 'database_fallback'
+                    })
+                else:
+                    logger.error("❌ Адрес не найден ни в Google Maps, ни в Nominatim, ни в базе данных")
+                    return jsonify({'error': 'Адрес не найден. Проверьте правильность написания.'}), 404
+                    
+            except Exception as e:
+                logger.error(f"❌ Ошибка поиска в базе данных: {e}")
+                return jsonify({'error': 'Ошибка поиска адреса в базе данных'}), 500
+        
+
     except Exception as e:
         logger.error(f"❌ Критическая ошибка при геокодинге: {e}")
         logger.error(f"📄 Traceback: ", exc_info=True)
