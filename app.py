@@ -2031,11 +2031,11 @@ def api_full_report():
                 if age_result.data:
                     age_info = age_result.data[0]
                     additional_analysis['age'] = {
-                        'range': age_info.get('age_range'),
-                        'impact': 'Положительный' if age_info.get('age_range') in ['0-5 лет', '5-10 лет'] else 'Нейтральный',
-                        'maintenance_cost': 'Низкие' if age_info.get('age_range') in ['0-5 лет'] else 'Средние'
+                        'range': age_info.get('listing_type'),
+                        'impact': 'Положительный' if age_info.get('listing_type') in ['0-5 лет', '5-10 лет'] else 'Нейтральный',
+                        'maintenance_cost': 'Низкие' if age_info.get('listing_type') in ['0-5 лет'] else 'Средние'
                     }
-                    logger.info(f"✅ Анализ возраста: {age_info.get('age_range')}")
+                    logger.info(f"✅ Анализ возраста: {age_info.get('listing_type')}")
             except Exception as e:
                 logger.warning(f"⚠️ Ошибка анализа возраста: {e}")
         
@@ -2046,26 +2046,26 @@ def api_full_report():
                 if floor_result.data:
                     floor_info = floor_result.data[0]
                     additional_analysis['floor'] = {
-                        'type': floor_info.get('floor_type'),
-                        'accessibility': 'Высокая' if floor_info.get('floor_type') in ['Первый этаж', 'Второй этаж'] else 'Средняя',
-                        'view': 'Хороший' if floor_info.get('floor_type') in ['Верхние этажи', 'Пентхаус'] else 'Стандартный'
+                        'type': floor_info.get('listing_type'),
+                        'accessibility': 'Высокая' if floor_info.get('listing_type') in ['Первый этаж', 'Второй этаж'] else 'Средняя',
+                        'view': 'Хороший' if floor_info.get('listing_type') in ['Верхние этажи', 'Пентхаус'] else 'Стандартный'
                     }
-                    logger.info(f"✅ Анализ этажа: {floor_info.get('floor_type')}")
+                    logger.info(f"✅ Анализ этажа: {floor_info.get('listing_type')}")
             except Exception as e:
                 logger.warning(f"⚠️ Ошибка анализа этажа: {e}")
         
         # Анализ отопления
         if additional_data.get('heating') and additional_data.get('heating') != 'unknown':
             try:
-                heating_result = supabase.table('heating_data').select('*').eq('id', additional_data['heating']).execute()
+                heating_result = supabase.table('heating_type').select('*').eq('id', additional_data['heating']).execute()
                 if heating_result.data:
                     heating_info = heating_result.data[0]
                     additional_analysis['heating'] = {
-                        'type': heating_info.get('heating_type'),
-                        'efficiency': 'Высокая' if heating_info.get('heating_type') in ['Центральное', 'Индивидуальное газовое'] else 'Средняя',
-                        'cost': 'Низкие' if heating_info.get('heating_type') in ['Центральное'] else 'Средние'
+                        'type': heating_info.get('listing_type'),
+                        'efficiency': 'Высокая' if heating_info.get('listing_type') in ['Центральное', 'Индивидуальное газовое'] else 'Средняя',
+                        'cost': 'Низкие' if heating_info.get('listing_type') in ['Центральное'] else 'Средние'
                     }
-                    logger.info(f"✅ Анализ отопления: {heating_info.get('heating_type')}")
+                    logger.info(f"✅ Анализ отопления: {heating_info.get('listing_type')}")
             except Exception as e:
                 logger.warning(f"⚠️ Ошибка анализа отопления: {e}")
         
@@ -2229,7 +2229,7 @@ def api_get_additional_data_options():
         try:
             age_result = supabase.table('age_data').select('*').eq('country_id', location_codes.get('country_id')).eq('city_id', location_codes.get('city_id')).execute()
             if age_result.data:
-                age_options = [{'id': item.get('id'), 'name': item.get('age_range', 'Не указано')} for item in age_result.data]
+                age_options = [{'id': item.get('id'), 'name': item.get('listing_type', 'Не указано')} for item in age_result.data]
                 logger.info(f"✅ Получены опции возраста: {len(age_options)} вариантов")
         except Exception as e:
             logger.warning(f"⚠️ Ошибка получения опций возраста: {e}")
@@ -2239,7 +2239,7 @@ def api_get_additional_data_options():
         try:
             floor_result = supabase.table('floor_segment_data').select('*').eq('country_id', location_codes.get('country_id')).eq('city_id', location_codes.get('city_id')).execute()
             if floor_result.data:
-                floor_options = [{'id': item.get('id'), 'name': item.get('floor_type', 'Не указано')} for item in floor_result.data]
+                floor_options = [{'id': item.get('id'), 'name': item.get('listing_type', 'Не указано')} for item in floor_result.data]
                 logger.info(f"✅ Получены опции этажей: {len(floor_options)} вариантов")
         except Exception as e:
             logger.warning(f"⚠️ Ошибка получения опций этажей: {e}")
@@ -2247,19 +2247,48 @@ def api_get_additional_data_options():
         # Получаем опции отопления
         heating_options = []
         try:
-            heating_result = supabase.table('heating_data').select('*').eq('country_id', location_codes.get('country_id')).eq('city_id', location_codes.get('city_id')).execute()
+            heating_result = supabase.table('heating_type').select('*').eq('country_id', location_codes.get('country_id')).eq('city_id', location_codes.get('city_id')).execute()
             if heating_result.data:
-                heating_options = [{'id': item.get('id'), 'name': item.get('heating_type', 'Не указано')} for item in heating_result.data]
+                heating_options = [{'id': item.get('id'), 'name': item.get('listing_type', 'Не указано')} for item in heating_result.data]
                 logger.info(f"✅ Получены опции отопления: {len(heating_options)} вариантов")
         except Exception as e:
             logger.warning(f"⚠️ Ошибка получения опций отопления: {e}")
+        
+        # Если опции не найдены по локации, добавляем базовые опции
+        if not age_options:
+            logger.info("⚠️ Опции возраста не найдены по локации, добавляем базовые")
+            age_options = [
+                {'id': 'new', 'name': '0-5 лет'},
+                {'id': 'recent', 'name': '5-10 лет'},
+                {'id': 'modern', 'name': '10-20 лет'},
+                {'id': 'old', 'name': '20+ лет'}
+            ]
+        
+        if not floor_options:
+            logger.info("⚠️ Опции этажей не найдены по локации, добавляем базовые")
+            floor_options = [
+                {'id': 'ground', 'name': 'Первый этаж'},
+                {'id': 'low', 'name': '2-5 этаж'},
+                {'id': 'middle', 'name': '6-10 этаж'},
+                {'id': 'high', 'name': '11-20 этаж'},
+                {'id': 'penthouse', 'name': 'Пентхаус'}
+            ]
+        
+        if not heating_options:
+            logger.info("⚠️ Опции отопления не найдены по локации, добавляем базовые")
+            heating_options = [
+                {'id': 'central', 'name': 'Центральное'},
+                {'id': 'gas', 'name': 'Индивидуальное газовое'},
+                {'id': 'electric', 'name': 'Электрическое'},
+                {'id': 'none', 'name': 'Без отопления'}
+            ]
         
         # Добавляем опцию "Не известно" к каждому списку
         age_options.append({'id': 'unknown', 'name': 'Не известно'})
         floor_options.append({'id': 'unknown', 'name': 'Не известно'})
         heating_options.append({'id': 'unknown', 'name': 'Не известно'})
         
-        logger.info("✅ Опции для дополнительных данных подготовлены")
+        logger.info(f"✅ Опции для дополнительных данных подготовлены: возраст({len(age_options)}), этаж({len(floor_options)}), отопление({len(heating_options)})")
         
         return jsonify({
             'success': True,
