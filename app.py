@@ -66,6 +66,10 @@ WEBAPP_URL = "https://aaadvisor-zaicevn.amvera.io/webapp"
 # Google Maps API ключ
 GOOGLE_MAPS_API_KEY = "AIzaSyBrDkDpNKNAIyY147MQ78hchBkeyCAxhEw"
 
+# Настройки API
+ENABLE_NOMINATIM = os.getenv('ENABLE_NOMINATIM', 'true').lower() == 'true'
+NOMINATIM_TIMEOUT = int(os.getenv('NOMINATIM_TIMEOUT', '15'))
+
 # async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 #     """Обработчик команды /start"""
 #     user = update.effective_user
@@ -398,6 +402,7 @@ def api_geocode():
         logger.info(f"📝 Параметры запроса: address='{address}', key='{GOOGLE_MAPS_API_KEY[:10]}...'")
         
         try:
+            logger.info("🔄 Отправляем HTTP запрос к Google Maps API...")
             response = requests.get(url, params=params, timeout=30)
             logger.info(f"📡 Статус ответа Google Maps API: {response.status_code}")
         except requests.exceptions.Timeout:
@@ -409,6 +414,9 @@ def api_geocode():
         except requests.exceptions.RequestException as e:
             logger.error(f"❌ Ошибка запроса к Google Maps API: {e}")
             return jsonify({'error': 'Google Maps API request error'}), 500
+        except Exception as e:
+            logger.error(f"❌ Неожиданная ошибка при запросе к Google Maps API: {e}")
+            return jsonify({'error': 'Google Maps API unexpected error'}), 500
         
         if response.status_code != 200:
             logger.error(f"❌ Ошибка HTTP от Google Maps API: {response.status_code}")
@@ -457,27 +465,51 @@ def api_geocode():
             location_components = extract_location_components(result['results'][0]['address_components'], address)
             logger.info(f"📋 Извлеченные компоненты: {location_components}")
             
-            # Дополнительно получаем данные через Nominatim
-            logger.info("🌐 Получаем дополнительные данные через Nominatim...")
-            nominatim_data = get_nominatim_location(address)
-            
-            # Объединяем данные Google и Nominatim
-            if nominatim_data:
-                logger.info(f"✅ Получены данные Nominatim: {nominatim_data}")
-                # Если Google не определил district, используем данные Nominatim
-                if not location_components.get('district') and nominatim_data.get('district'):
-                    location_components['district'] = nominatim_data['district']
-                    logger.info(f"Добавлен district из Nominatim: {nominatim_data['district']}")
-                
-                # Если Google не определил county, используем данные Nominatim
-                if not location_components.get('county') and nominatim_data.get('county'):
-                    location_components['county'] = nominatim_data['county']
-                    logger.info(f"Добавлен county из Nominatim: {nominatim_data['county']}")
-                
-                # Сохраняем данные Nominatim для отображения
-                location_components['nominatim_data'] = nominatim_data
+            # Дополнительно получаем данные через Nominatim (если включено)
+            nominatim_data = None
+            if ENABLE_NOMINATIM:
+                logger.info("🌐 Получаем дополнительные данные через Nominatim...")
+                try:
+                    # Устанавливаем таймаут для всего процесса Nominatim
+                    import signal
+                    
+                    def timeout_handler(signum, frame):
+                        raise TimeoutError("Nominatim API timeout")
+                    
+                    # Устанавливаем таймаут из настроек
+                    signal.signal(signal.SIGALRM, timeout_handler)
+                    signal.alarm(NOMINATIM_TIMEOUT)
+                    
+                    nominatim_data = get_nominatim_location(address)
+                    
+                    # Отменяем таймаут
+                    signal.alarm(0)
+                    
+                    if nominatim_data:
+                        logger.info(f"✅ Получены данные Nominatim: {nominatim_data}")
+                        # Если Google не определил district, используем данные Nominatim
+                        if not location_components.get('district') and nominatim_data.get('district'):
+                            location_components['district'] = nominatim_data['district']
+                            logger.info(f"Добавлен district из Nominatim: {nominatim_data['district']}")
+                        
+                        # Если Google не определил county, используем данные Nominatim
+                        if not location_components.get('county') and nominatim_data.get('county'):
+                            location_components['county'] = nominatim_data['county']
+                            logger.info(f"Добавлен county из Nominatim: {nominatim_data['county']}")
+                        
+                        # Сохраняем данные Nominatim для отображения
+                        location_components['nominatim_data'] = nominatim_data
+                    else:
+                        logger.info("⚠️ Данные Nominatim не получены")
+                        
+                except TimeoutError:
+                    logger.warning(f"⏰ Таймаут Nominatim API ({NOMINATIM_TIMEOUT} секунд), продолжаем без дополнительных данных")
+                    nominatim_data = None
+                except Exception as e:
+                    logger.warning(f"⚠️ Ошибка при получении данных Nominatim: {e}, продолжаем без дополнительных данных")
+                    nominatim_data = None
             else:
-                logger.info("⚠️ Данные Nominatim не получены")
+                logger.info("🚫 Nominatim API отключен в настройках")
             
             # Пытаемся найти коды локаций в базе данных
             logger.info("🔍 Ищем коды локаций в базе данных...")
@@ -4532,8 +4564,12 @@ def get_nominatim_location(address):
         }
         
         try:
+            logger.info(f"🔄 Отправляем HTTP запрос к Nominatim API: {url}")
+            logger.info(f"📝 Параметры запроса: {params}")
             response = requests.get(url, params=params, headers=headers, timeout=30)
+            logger.info(f"📡 Статус ответа Nominatim API: {response.status_code}")
             result = response.json()
+            logger.info(f"📊 Размер ответа Nominatim: {len(str(result))} символов")
         except requests.exceptions.Timeout:
             logger.error("❌ Таймаут при запросе к Nominatim API (30 секунд)")
             return None
@@ -4542,6 +4578,9 @@ def get_nominatim_location(address):
             return None
         except requests.exceptions.RequestException as e:
             logger.error(f"❌ Ошибка запроса к Nominatim API: {e}")
+            return None
+        except Exception as e:
+            logger.error(f"❌ Неожиданная ошибка при запросе к Nominatim API: {e}")
             return None
         
         if result and len(result) > 0:
