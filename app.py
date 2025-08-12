@@ -792,6 +792,14 @@ def get_location_codes_from_address(address):
 def format_simple_report(address, bedrooms, price, location_codes, language='en', market_data=None, currency_info=""):
     """Форматирование простого отчёта с кодами локаций и данными рынка"""
     
+    # Проверяем и инициализируем параметры
+    if location_codes is None:
+        location_codes = {}
+    if market_data is None:
+        market_data = {}
+    if currency_info is None:
+        currency_info = ""
+    
     # Форматируем цену
     def format_price(price):
         return f"€{price:.2f}".replace('.00', '').replace('.', ',')
