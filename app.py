@@ -1379,7 +1379,7 @@ def format_simple_report(address, bedrooms, price, location_codes, language='en'
                             f"💰 Средняя цена аренды, м²: €{format_number(house_type_data.get('unit_price_for_rent'))}",
                             f"💰 Максимальная цена аренды, м²: €{format_number(house_type_data.get('max_unit_price_for_rent'))}",
                             f"📏 Средняя площадь аренды: {format_number(house_type_data.get('comparable_area_for_rent'))} м²",
-                            f"📊 Количество объектов в аренду: {format_number(record.get('count_for_rent'))}",
+                            f"📊 Количество объектов в аренду: {format_number(house_type_data.get('count_for_rent'))}",
                             f"💰 Цена для аренды, средняя: €{format_number(house_type_data.get('price_for_rent'))}",
                             f"🏗️ Средний возраст объекта для аренды: {format_number(house_type_data.get('average_age_for_rent'))} лет",
                             f"⏱️ Период листинга для аренды: {format_number(house_type_data.get('listing_period_for_rent'))} дней",
@@ -1400,53 +1400,53 @@ def format_simple_report(address, bedrooms, price, location_codes, language='en'
                         report_lines.extend([
                             f"--- {display_name} ---",
                             "Данные для выбранного количества спален не найдены",
-                "",
-            ])
+                            "",
+                        ])
         
 
 
 
-    else:
-        report_lines.extend([
-            "=== АНАЛИЗ РЫНКА ===",
-            "Данные анализа рынка не найдены для данной локации",
-            "",
-        ])
-    
-    # Добавляем раздел с рекомендациями
-    if market_data and market_data.get('general_data'):
-        general = market_data['general_data']
-        avg_price_sale = general.get('unit_price_for_sale', 0)
-        avg_price_rent = general.get('unit_price_for_rent', 0)
-        yield_value = general.get('yield', 0)
-        
-        report_lines.extend([
-            "",
-            "💡 РЕКОМЕНДАЦИИ",
-            "",
-        ])
-        
-        # Анализ цены продажи
-        if price and avg_price_sale:
-            price_per_sqm = price / 100  # Предполагаем площадь 100м²
-            if price_per_sqm < avg_price_sale * 0.8:
-                report_lines.extend([
-                    "✅ Цена ниже рыночной на 20%+",
-                    "Это может быть хорошей инвестицией",
-                    "",
-                ])
-            elif price_per_sqm > avg_price_sale * 1.2:
-                report_lines.extend([
-                    "⚠️ Цена выше рыночной на 20%+",
-                    "Рассмотрите торг или поиск альтернатив",
-                    "",
-                ])
             else:
                 report_lines.extend([
-                    "📊 Цена в пределах рыночного диапазона",
-                    "Справедливая оценка",
+                    "=== АНАЛИЗ РЫНКА ===",
+                    "Данные анализа рынка не найдены для данной локации",
                     "",
                 ])
+        
+        # Добавляем раздел с рекомендациями
+        if market_data and market_data.get('general_data'):
+            general = market_data['general_data']
+            avg_price_sale = general.get('unit_price_for_sale', 0)
+            avg_price_rent = general.get('unit_price_for_rent', 0)
+            yield_value = general.get('yield', 0)
+            
+            report_lines.extend([
+                "",
+                "💡 РЕКОМЕНДАЦИИ",
+                "",
+            ])
+            
+            # Анализ цены продажи
+            if price and avg_price_sale:
+                price_per_sqm = price / 100  # Предполагаем площадь 100м²
+                if price_per_sqm < avg_price_sale * 0.8:
+                    report_lines.extend([
+                        "✅ Цена ниже рыночной на 20%+",
+                        "Это может быть хорошей инвестицией",
+                        "",
+                    ])
+                elif price_per_sqm > avg_price_sale * 1.2:
+                    report_lines.extend([
+                        "⚠️ Цена выше рыночной на 20%+",
+                        "Рассмотрите торг или поиск альтернатив",
+                        "",
+                    ])
+                else:
+                    report_lines.extend([
+                        "📊 Цена в пределах рыночного диапазона",
+                        "Справедливая оценка",
+                        "",
+                    ])
         
         # Анализ доходности
         if yield_value:
@@ -1479,7 +1479,7 @@ def format_simple_report(address, bedrooms, price, location_codes, language='en'
         "=" * 50,
         "Отчет сгенерирован автоматически",
         f"Дата: {datetime.now().strftime('%d.%m.%Y %H:%M')}",
-        ])
+    ])
     
     return "\n".join(report_lines)
 
@@ -1947,6 +1947,12 @@ def api_full_report():
         price = float(price) if price is not None else 0
     except (ValueError, TypeError):
         price = 0
+    
+    # Преобразуем bedrooms в число
+    try:
+        bedrooms = int(bedrooms) if bedrooms is not None else 1
+    except (ValueError, TypeError):
+        bedrooms = 1
         
     logger.info(f"🔍 Формируем полный отчет для {address} с дополнительными данными: {additional_data}")
     try:
@@ -2256,7 +2262,7 @@ def api_full_report():
         # Анализ отопления
         if additional_data.get('heating') and additional_data.get('heating') != 'unknown':
             try:
-                heating_result = supabase.table('heating_type').select('*').eq('id', additional_data['heating']).execute()
+                heating_result = supabase.table('heating_data').select('*').eq('id', additional_data['heating']).execute()
                 if heating_result.data:
                     heating_info = heating_result.data[0]
                     # Переводим значение на язык пользователя для анализа
@@ -2330,9 +2336,9 @@ def api_full_report():
                 {'name': 'REITs (фонды)', 'yield': alt_reits, 'source': 'Financial Modeling Prep'},
                 {'name': 'Недвижимость', 'yield': short_term_roi / 100, 'source': 'Ваш объект'}
             ],
-            'inflation': inflation,
-            'eur_try': eur_try,
-            'refi_rate': refi_rate,
+                'inflation': inflation,
+                'eur_try': eur_try,
+                'refi_rate': refi_rate,
             'gdp_growth': gdp_growth,
             'economic_charts': chart_data,  # Добавляем данные для графиков
             'taxes': taxes,
@@ -2637,7 +2643,7 @@ def api_get_additional_data_options():
         # Получаем опции возраста
         age_options = []
         try:
-            age_result = supabase.table('age_data').select('*').eq('country_id', location_codes.get('country_id')).eq('city_id', location_codes.get('city_id')).execute()
+            age_result = supabase.table('age_data').select('*').eq('country_id', location_codes.get('country_id')).eq('city_id', location_codes.get('city_id')).eq('county_id', location_codes.get('county_id')).eq('district_id', location_codes.get('district_id')).execute()
             if age_result.data:
                 age_options = [{'id': item.get('id'), 'name': translate_to_language(item.get('listing_type', 'Не указано'), user_language)} for item in age_result.data]
                 logger.info(f"✅ Получены опции возраста: {len(age_options)} вариантов")
@@ -2647,7 +2653,7 @@ def api_get_additional_data_options():
         # Получаем опции этажей
         floor_options = []
         try:
-            floor_result = supabase.table('floor_segment_data').select('*').eq('country_id', location_codes.get('country_id')).eq('city_id', location_codes.get('city_id')).execute()
+            floor_result = supabase.table('floor_segment_data').select('*').eq('country_id', location_codes.get('country_id')).eq('city_id', location_codes.get('city_id')).eq('county_id', location_codes.get('county_id')).eq('district_id', location_codes.get('district_id')).execute()
             if floor_result.data:
                 floor_options = [{'id': item.get('id'), 'name': translate_to_language(item.get('listing_type', 'Не указано'), user_language)} for item in floor_result.data]
                 logger.info(f"✅ Получены опции этажей: {len(floor_options)} вариантов")
@@ -2657,7 +2663,7 @@ def api_get_additional_data_options():
         # Получаем опции отопления
         heating_options = []
         try:
-            heating_result = supabase.table('heating_type').select('*').eq('country_id', location_codes.get('country_id')).eq('city_id', location_codes.get('city_id')).execute()
+            heating_result = supabase.table('heating_data').select('*').eq('country_id', location_codes.get('country_id')).eq('city_id', location_codes.get('city_id')).eq('county_id', location_codes.get('county_id')).eq('district_id', location_codes.get('district_id')).execute()
             if heating_result.data:
                 heating_options = [{'id': item.get('id'), 'name': translate_to_language(item.get('listing_type', 'Не указано'), user_language)} for item in heating_result.data]
                 logger.info(f"✅ Получены опции отопления: {len(heating_options)} вариантов")
@@ -4548,10 +4554,10 @@ def get_market_data_by_location_ids(location_codes, target_year=None, target_mon
                 # Фильтруем записи с валидными датами
                 valid_records = [r for r in result.data if r.get('trend_date')]
                 if valid_records:
-                    # Берем самую свежую запись
+                # Берем самую свежую запись
                     latest_record = max(valid_records, key=lambda x: x.get('trend_date', ''))
-                    market_data['property_trends'] = latest_record
-                    logger.info(f"Найдены данные property_trends: {len(result.data)} записей, выбрана самая свежая: {latest_record.get('trend_date')}")
+                market_data['property_trends'] = latest_record
+                logger.info(f"Найдены данные property_trends: {len(result.data)} записей, выбрана самая свежая: {latest_record.get('trend_date')}")
                 else:
                     logger.warning("Все записи property_trends имеют пустые даты")
                     market_data['property_trends'] = result.data[0] if result.data else None
@@ -4652,10 +4658,10 @@ def get_market_data_by_location_ids(location_codes, target_year=None, target_mon
                 # Фильтруем записи с валидными датами
                 valid_records = [r for r in result.data if r.get('trend_date')]
                 if valid_records:
-                    # Берем самую свежую запись
+                # Берем самую свежую запись
                     latest_record = max(valid_records, key=lambda x: x.get('trend_date', ''))
-                    market_data['general_data'] = latest_record
-                    logger.info(f"Найдены данные general_data: {len(result.data)} записей, выбрана самая свежая: {latest_record.get('trend_date')}")
+                market_data['general_data'] = latest_record
+                logger.info(f"Найдены данные general_data: {len(result.data)} записей, выбрана самая свежая: {latest_record.get('trend_date')}")
                 else:
                     logger.warning("Все записи general_data имеют пустые даты")
                     market_data['general_data'] = result.data[0] if result.data else None
@@ -4967,7 +4973,7 @@ def get_nominatim_location(address):
             logger.info(f"📝 Параметры запроса: {params}")
             response = requests.get(url, params=params, headers=headers, timeout=30)
             logger.info(f"📡 Статус ответа Nominatim API: {response.status_code}")
-            result = response.json()
+        result = response.json()
             logger.info(f"📊 Размер ответа Nominatim: {len(str(result))} символов")
         except requests.exceptions.Timeout:
             logger.error("❌ Таймаут при запросе к Nominatim API (30 секунд)")
@@ -5005,7 +5011,7 @@ def get_nominatim_location(address):
             return location_data
         else:
             logger.warning(f"⚠️ Nominatim API вернул пустой результат: {result}")
-            return None
+        return None
         
     except Exception as e:
         logger.error(f"Ошибка Nominatim API: {e}")
