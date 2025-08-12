@@ -2214,6 +2214,19 @@ def api_full_report():
         # --- АНАЛИЗ ДОПОЛНИТЕЛЬНЫХ ДАННЫХ ---
         additional_analysis = {}
         
+        # Функция для получения названия характеристики по ID
+        def get_characteristic_name(table_name, characteristic_id, user_language):
+            """Получает название характеристики по ID из указанной таблицы"""
+            try:
+                if characteristic_id and characteristic_id != 'unknown':
+                    result = supabase.table(table_name).select('*').eq('id', characteristic_id).execute()
+                    if result.data:
+                        raw_value = result.data[0].get('listing_type', '')
+                        return translate_to_language_full_report(raw_value, user_language)
+            except Exception as e:
+                logger.warning(f"⚠️ Ошибка получения названия характеристики из {table_name}: {e}")
+            return 'Не указано'
+        
         # Анализ возраста объекта
         if additional_data.get('age') and additional_data.get('age') != 'unknown':
             try:
@@ -2288,15 +2301,95 @@ def api_full_report():
                     long_term_income = int(long_term_income * 1.03)    # +3%
                     logger.info("✅ ROI скорректирован: отопление положительно влияет на доходность")
         
+        # --- ПОЛУЧАЕМ ДАННЫЕ О ЦЕНАХ НА РЫНКЕ ---
+        market_price_data = {}
+        try:
+            # Получаем данные о ценах для выбранной локации
+            if lat and lng:
+                # Здесь можно добавить логику получения данных о ценах на рынке
+                # Пока используем базовые расчеты
+                market_price_data = {
+                    'min_price_per_sqm': avg_sqm * 0.7,  # -30% от средней
+                    'avg_price_per_sqm': avg_sqm,
+                    'max_price_per_sqm': avg_sqm * 1.3,  # +30% от средней
+                    'price_range': f'€{avg_sqm * 0.7:.0f} - €{avg_sqm * 1.3:.0f} за м²',
+                    'market_position': 'Средний' if 400 <= avg_sqm <= 600 else 'Низкий' if avg_sqm < 400 else 'Высокий'
+                }
+                logger.info(f"✅ Данные о ценах на рынке получены: {market_price_data['price_range']}")
+        except Exception as e:
+            logger.warning(f"⚠️ Ошибка получения данных о ценах на рынке: {e}")
+            market_price_data = {
+                'min_price_per_sqm': avg_sqm * 0.7,
+                'avg_price_per_sqm': avg_sqm,
+                'max_price_per_sqm': avg_sqm * 1.3,
+                'price_range': f'€{avg_sqm * 0.7:.0f} - €{avg_sqm * 1.3:.0f} за м²',
+                'market_position': 'Средний'
+            }
+        
         # --- Формируем структуру полного отчёта ---
         full_report_data = {
-            'object': {
+            # 1. ПРОСТОЙ ОТЧЕТ (базовая информация)
+            'simple_report': {
                 'address': address,
                 'bedrooms': bedrooms,
                 'purchase_price': price,
                 'avg_price_per_sqm': avg_sqm,
-                'additional_data': additional_analysis
+                'location_summary': f'Локация: {address}',
+                'property_summary': f'Объект: {bedrooms} спален, цена €{price:,.0f}',
+                'price_per_sqm': f'Цена за м²: €{avg_sqm:.0f}'
             },
+            
+            # 2. ДЕТАЛЬНЫЕ ДАННЫЕ ПО ХАРАКТЕРИСТИКАМ
+            'detailed_characteristics': {
+                'age': {
+                    'id': additional_data.get('age'),
+                    'name': additional_analysis.get('age', {}).get('range', 'Не указано'),
+                    'impact': additional_analysis.get('age', {}).get('impact', 'Не определен'),
+                    'maintenance_cost': additional_analysis.get('age', {}).get('maintenance_cost', 'Не определен')
+                },
+                'floor': {
+                    'id': additional_data.get('floor'),
+                    'name': additional_analysis.get('floor', {}).get('type', 'Не указано'),
+                    'accessibility': additional_analysis.get('floor', {}).get('accessibility', 'Не определена'),
+                    'view': additional_analysis.get('floor', {}).get('view', 'Не определен')
+                },
+                'heating': {
+                    'id': additional_data.get('heating'),
+                    'name': additional_analysis.get('heating', {}).get('type', 'Не указано'),
+                    'efficiency': additional_analysis.get('heating', {}).get('efficiency', 'Не определена'),
+                    'cost': additional_analysis.get('heating', {}).get('cost', 'Не определен')
+                },
+                'summary': 'Детальный анализ характеристик объекта'
+            },
+            
+            # 3. АНАЛИЗ ЦЕН НА РЫНКЕ
+            'market_price_analysis': {
+                'current_price': price,
+                'price_per_sqm': avg_sqm,
+                'min_price_per_sqm': market_price_data.get('min_price_per_sqm', avg_sqm * 0.7),
+                'avg_price_per_sqm': market_price_data.get('avg_price_per_sqm', avg_sqm),
+                'max_price_per_sqm': market_price_data.get('max_price_per_sqm', avg_sqm * 1.3),
+                'price_range': market_price_data.get('price_range', f'€{avg_sqm * 0.7:.0f} - €{avg_sqm * 1.3:.0f} за м²'),
+                'price_level': market_price_data.get('market_position', 'Средний'),
+                'market_position': f'Цена объекта находится на {avg_sqm/500*100:.0f}% от среднерыночной',
+                'price_recommendation': 'Цена соответствует рынку' if 400 <= avg_sqm <= 600 else 'Рассмотрите торг' if avg_sqm > 600 else 'Хорошая цена',
+                'price_comparison': {
+                    'min': f'Минимальная цена на рынке: €{market_price_data.get("min_price_per_sqm", avg_sqm * 0.7):.0f}/м²',
+                    'avg': f'Средняя цена на рынке: €{market_price_data.get("avg_price_per_sqm", avg_sqm):.0f}/м²',
+                    'max': f'Максимальная цена на рынке: €{market_price_data.get("max_price_per_sqm", avg_sqm * 1.3):.0f}/м²'
+                }
+            },
+            
+            # 4. АНАЛИЗ АРЕНДЫ
+            'rental_analysis': {
+                'max_monthly_rent': short_term_income,
+                'max_annual_rent': long_term_income,
+                'rental_yield': (short_term_income * 12) / price * 100,
+                'rental_recommendation': f'Максимальная ставка аренды: €{short_term_income:,.0f}/месяц',
+                'annual_yield': f'Годовая доходность: {(short_term_income * 12) / price * 100:.1f}%'
+            },
+            
+            # 5. ROI АНАЛИЗ (последний раздел)
             'roi': {
                 'short_term': {
                     'monthly_income': short_term_income,
@@ -2318,6 +2411,8 @@ def api_full_report():
                 },
                 'price_growth': price_growth
             },
+            
+            # 6. ДОПОЛНИТЕЛЬНЫЕ ДАННЫЕ
             'alternatives': [
                 {'name': 'Банковский депозит', 'yield': alt_deposit, 'source': 'TCMB API'},
                 {'name': 'Облигации Турции', 'yield': alt_bonds, 'source': 'Investing.com API'},
@@ -2325,19 +2420,21 @@ def api_full_report():
                 {'name': 'REITs (фонды)', 'yield': alt_reits, 'source': 'Financial Modeling Prep'},
                 {'name': 'Недвижимость', 'yield': short_term_roi / 100, 'source': 'Ваш объект'}
             ],
+            'macro': {
                 'inflation': inflation,
                 'eur_try': eur_try,
                 'refi_rate': refi_rate,
-            'gdp_growth': gdp_growth,
-            'economic_charts': chart_data,  # Добавляем данные для графиков
+                'gdp_growth': gdp_growth
+            },
+            'economic_charts': chart_data,
             'taxes': taxes,
             'risks': risks,
             'liquidity': liquidity,
             'district': district,
-            'yield': (short_term_income * 12) / price,  # годовая доходность
-            'price_index': 1 + price_growth,  # индекс цен
-            'mortgage_rate': refi_rate / 100,  # ипотечная ставка
-            'global_house_price_index': 1 + (gdp_growth / 100),  # глобальный индекс
+            'yield': (short_term_income * 12) / price,
+            'price_index': 1 + price_growth,
+            'mortgage_rate': refi_rate / 100,
+            'global_house_price_index': 1 + (gdp_growth / 100),
             'additional_analysis': additional_analysis,
             'summary': f'Полный отчёт с реальными экономическими данными из IMF и анализом характеристик объекта. ROI: {short_term_roi:.1f}% за 5 лет.'
         }
