@@ -69,6 +69,8 @@ GOOGLE_MAPS_API_KEY = "AIzaSyBrDkDpNKNAIyY147MQ78hchBkeyCAxhEw"
 # Настройки API
 ENABLE_NOMINATIM = os.getenv('ENABLE_NOMINATIM', 'true').lower() == 'true'
 NOMINATIM_TIMEOUT = int(os.getenv('NOMINATIM_TIMEOUT', '15'))
+ENABLE_GOOGLE_MAPS = os.getenv('ENABLE_GOOGLE_MAPS', 'true').lower() == 'true'
+GOOGLE_MAPS_TIMEOUT = int(os.getenv('GOOGLE_MAPS_TIMEOUT', '20'))
 
 # async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 #     """Обработчик команды /start"""
@@ -401,12 +403,56 @@ def api_geocode():
         logger.info(f"🌐 Отправляем запрос к Google Maps API: {url}")
         logger.info(f"📝 Параметры запроса: address='{address}', key='{GOOGLE_MAPS_API_KEY[:10]}...'")
         
+        # Проверяем, включен ли Google Maps API
+        if not ENABLE_GOOGLE_MAPS:
+            logger.info("🚫 Google Maps API отключен в настройках, используем только Nominatim")
+            # Пытаемся получить данные только через Nominatim
+            nominatim_data = get_nominatim_location(address)
+            if nominatim_data:
+                location_components = {
+                    'country': nominatim_data.get('country'),
+                    'country_code': nominatim_data.get('country_code'),
+                    'city': nominatim_data.get('city'),
+                    'district': nominatim_data.get('district'),
+                    'county': nominatim_data.get('county'),
+                    'postal_code': nominatim_data.get('postal_code')
+                }
+                
+                # Пытаемся найти коды локаций в базе данных
+                logger.info("🔍 Ищем коды локаций в базе данных...")
+                location_codes = find_location_codes_from_components(location_components)
+                
+                if location_codes:
+                    logger.info(f"✅ Найдены коды локаций: {location_codes}")
+                else:
+                    logger.warning("⚠️ Коды локаций не найдены")
+                
+                logger.info("=" * 60)
+                logger.info("✅ ГЕОКОДИНГ ЗАВЕРШЕН УСПЕШНО (только Nominatim)")
+                logger.info("=" * 60)
+                
+                return jsonify({
+                    'success': True,
+                    'lat': float(nominatim_data.get('lat', 0)),
+                    'lng': float(nominatim_data.get('lon', 0)),
+                    'formatted_address': nominatim_data.get('display_name', address),
+                    'location_components': location_components,
+                    'location_codes': location_codes,
+                    'source': 'nominatim_only'
+                })
+            else:
+                logger.error("❌ Не удалось получить данные через Nominatim")
+                return jsonify({'error': 'Geocoding failed - both APIs unavailable'}), 500
+        
+        # Google Maps API включен - пытаемся использовать его
+        logger.info("🌐 Google Maps API включен, отправляем запрос...")
+        
         try:
             logger.info("🔄 Отправляем HTTP запрос к Google Maps API...")
-            response = requests.get(url, params=params, timeout=30)
+            response = requests.get(url, params=params, timeout=GOOGLE_MAPS_TIMEOUT)
             logger.info(f"📡 Статус ответа Google Maps API: {response.status_code}")
         except requests.exceptions.Timeout:
-            logger.error("❌ Таймаут при запросе к Google Maps API (30 секунд)")
+            logger.error(f"❌ Таймаут при запросе к Google Maps API ({GOOGLE_MAPS_TIMEOUT} секунд)")
             return jsonify({'error': 'Google Maps API timeout'}), 500
         except requests.exceptions.ConnectionError as e:
             logger.error(f"❌ Ошибка соединения с Google Maps API: {e}")
