@@ -1951,6 +1951,12 @@ def api_full_report():
     # Получаем площадь объекта
     area = data.get('area')
     
+    # Получаем дополнительные данные
+    additional_data = data.get('additional_data', {})
+    age_id = additional_data.get('age')
+    floor_id = additional_data.get('floor')
+    heating_id = additional_data.get('heating')
+    
     # Получаем язык пользователя
     user_language = 'ru'  # По умолчанию русский
     try:
@@ -1996,6 +2002,12 @@ def api_full_report():
         # Получаем реальные экономические данные
         economic_data = get_economic_data('TUR', 10)  # Данные за последние 10 лет
         chart_data = create_economic_chart_data(economic_data)
+        
+        # Получаем рыночные данные для сравнения цен
+        market_comparison_data = await get_market_comparison_data(
+            age_id, floor_id, heating_id, area, price, location_codes
+        )
+        logger.info(f"✅ Получены рыночные данные для сравнения: {market_comparison_data}")
         
         # Базовые макроэкономические показатели
         inflation = economic_data.get('latest_inflation', {}).get('value', 35.9) if economic_data else 35.9
@@ -2404,6 +2416,9 @@ def api_full_report():
                 },
                 'summary': 'Детальный анализ характеристик объекта'
             },
+            
+            # 2.1. РЫНОЧНЫЕ ДАННЫЕ ДЛЯ СРАВНЕНИЯ ЦЕН
+            'market_comparison': market_comparison_data,
             
             # 3. АНАЛИЗ ЦЕН НА РЫНКЕ
             'market_price_analysis': {
@@ -5984,6 +5999,165 @@ def load_interpretations_from_database(country_code):
     except Exception as e:
         logger.error(f"Error loading interpretations from database: {e}")
         return None, None
+
+async def get_market_comparison_data(age_id, floor_id, heating_id, area, price, location_codes):
+    """
+    Получает рыночные данные для сравнения цен из таблиц floor_segment_data, heating_data, house_type_data, age_data
+    
+    Args:
+        age_id (str): ID возраста объекта
+        floor_id (str): ID этажа
+        heating_id (str): ID типа отопления
+        area (str): Площадь объекта в м²
+        price (float): Цена объекта пользователя
+        location_codes (dict): Коды локации
+    
+    Returns:
+        dict: Данные для сравнения цен
+    """
+    try:
+        logger.info(f"🔍 Получаем рыночные данные для сравнения: age_id={age_id}, floor_id={floor_id}, heating_id={heating_id}, area={area}, price={price}")
+        
+        # Получаем данные из таблиц
+        comparisons = {}
+        
+        # 1. Сравнение по возрасту объекта
+        if age_id and age_id != 'unknown':
+            try:
+                age_result = supabase.table('age_data').select('min_price, max_price').eq('id', age_id).execute()
+                if age_result.data:
+                    age_data = age_result.data[0]
+                    min_price = float(age_data.get('min_price', 0))
+                    max_price = float(age_data.get('max_price', 0))
+                    
+                    if area and area != 'unknown':
+                        area_value = float(area)
+                        min_total = min_price * area_value
+                        max_total = max_price * area_value
+                        
+                        comparisons['age'] = {
+                            'min_price': min_total,
+                            'max_price': max_total,
+                            'user_price': price,
+                            'deviation_min': ((price - min_total) / min_total * 100) if min_total > 0 else 0,
+                            'deviation_max': ((price - max_total) / max_total * 100) if max_total > 0 else 0
+                        }
+                        logger.info(f"✅ Данные по возрасту: min={min_total:.0f}, max={max_total:.0f}, user={price:.0f}")
+            except Exception as e:
+                logger.error(f"❌ Ошибка получения данных по возрасту: {e}")
+        
+        # 2. Сравнение по этажу
+        if floor_id and floor_id != 'unknown':
+            try:
+                floor_result = supabase.table('floor_segment_data').select('min_price, max_price').eq('id', floor_id).execute()
+                if floor_result.data:
+                    floor_data = floor_result.data[0]
+                    min_price = float(floor_data.get('min_price', 0))
+                    max_price = float(floor_data.get('max_price', 0))
+                    
+                    if area and area != 'unknown':
+                        area_value = float(area)
+                        min_total = min_price * area_value
+                        max_total = max_price * area_value
+                        
+                        comparisons['floor'] = {
+                            'min_price': min_total,
+                            'max_price': max_total,
+                            'user_price': price,
+                            'deviation_min': ((price - min_total) / min_total * 100) if min_total > 0 else 0,
+                            'deviation_max': ((price - max_total) / max_total * 100) if max_total > 0 else 0
+                        }
+                        logger.info(f"✅ Данные по этажу: min={min_total:.0f}, max={max_total:.0f}, user={price:.0f}")
+            except Exception as e:
+                logger.error(f"❌ Ошибка получения данных по этажу: {e}")
+        
+        # 3. Сравнение по типу отопления
+        if heating_id and heating_id != 'unknown':
+            try:
+                heating_result = supabase.table('heating_data').select('min_price, max_price').eq('id', heating_id).execute()
+                if heating_result.data:
+                    heating_data = heating_result.data[0]
+                    min_price = float(heating_data.get('min_price', 0))
+                    max_price = float(heating_data.get('max_price', 0))
+                    
+                    if area and area != 'unknown':
+                        area_value = float(area)
+                        min_total = min_price * area_value
+                        max_total = max_price * area_value
+                        
+                        comparisons['heating'] = {
+                            'min_price': min_total,
+                            'max_price': max_total,
+                            'user_price': price,
+                            'deviation_min': ((price - min_total) / min_total * 100) if min_total > 0 else 0,
+                            'deviation_max': ((price - max_total) / max_total * 100) if max_total > 0 else 0
+                        }
+                        logger.info(f"✅ Данные по отоплению: min={min_total:.0f}, max={max_total:.0f}, user={price:.0f}")
+            except Exception as e:
+                logger.error(f"❌ Ошибка получения данных по отоплению: {e}")
+        
+        # 4. Сравнение по типу дома (используем количество спален как приближение)
+        try:
+            # Определяем тип дома на основе количества спален
+            if 'bedrooms' in location_codes:
+                bedrooms = int(location_codes.get('bedrooms', 2))
+                house_type = 'apartment' if bedrooms <= 2 else 'villa' if bedrooms >= 4 else 'townhouse'
+                
+                house_result = supabase.table('house_type_data').select('min_price, max_price').eq('type', house_type).execute()
+                if house_result.data:
+                    house_data = house_result.data[0]
+                    min_price = float(house_data.get('min_price', 0))
+                    max_price = float(house_data.get('max_price', 0))
+                    
+                    if area and area != 'unknown':
+                        area_value = float(area)
+                        min_total = min_price * area_value
+                        max_total = max_price * area_value
+                        
+                        comparisons['house_type'] = {
+                            'min_price': min_total,
+                            'max_price': max_total,
+                            'user_price': price,
+                            'deviation_min': ((price - min_total) / min_total * 100) if min_total > 0 else 0,
+                            'deviation_max': ((price - max_total) / max_total * 100) if max_total > 0 else 0
+                        }
+                        logger.info(f"✅ Данные по типу дома: min={min_total:.0f}, max={max_total:.0f}, user={price:.0f}")
+        except Exception as e:
+            logger.error(f"❌ Ошибка получения данных по типу дома: {e}")
+        
+        # 5. Рассчитываем итоговые средние значения
+        if comparisons:
+            all_min_prices = [comp['min_price'] for comp in comparisons.values() if comp['min_price'] > 0]
+            all_max_prices = [comp['max_price'] for comp in comparisons.values() if comp['max_price'] > 0]
+            
+            if all_min_prices and all_max_prices:
+                avg_min_price = sum(all_min_prices) / len(all_min_prices)
+                avg_max_price = sum(all_max_prices) / len(all_max_prices)
+                
+                comparisons['final'] = {
+                    'avg_min_price': avg_min_price,
+                    'avg_max_price': avg_max_price,
+                    'user_price': price,
+                    'deviation_min': ((price - avg_min_price) / avg_min_price * 100) if avg_min_price > 0 else 0,
+                    'deviation_max': ((price - avg_max_price) / avg_max_price * 100) if avg_max_price > 0 else 0
+                }
+                
+                # Определяем вывод по цене
+                if price < avg_min_price:
+                    price_conclusion = f"Цена ниже рыночной на {abs(comparisons['final']['deviation_min']):.1f}% - выгодное предложение!"
+                elif price > avg_max_price:
+                    price_conclusion = f"Цена выше рыночной на {comparisons['final']['deviation_max']:.1f}% - завышена"
+                else:
+                    price_conclusion = f"Цена в рыночном диапазоне (отклонение: {comparisons['final']['deviation_min']:.1f}% до {comparisons['final']['deviation_max']:.1f}%)"
+                
+                comparisons['price_conclusion'] = price_conclusion
+                logger.info(f"✅ Итоговое сравнение: avg_min={avg_min_price:.0f}, avg_max={avg_max_price:.0f}, вывод: {price_conclusion}")
+        
+        return comparisons
+        
+    except Exception as e:
+        logger.error(f"❌ Ошибка получения рыночных данных для сравнения: {e}")
+        return {}
 
 if __name__ == '__main__':
     run_flask()

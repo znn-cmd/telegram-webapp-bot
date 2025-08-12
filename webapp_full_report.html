@@ -214,6 +214,53 @@
             margin-left: 10px;
         }
 
+        .price-comparison-section {
+            margin-top: 25px;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            border: 1px solid #e9ecef;
+        }
+
+        .price-comparison-section h3 {
+            color: #495057;
+            font-size: 18px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .comparison-item, .final-comparison, .price-conclusion {
+            margin-bottom: 15px;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .comparison-label, .conclusion-label {
+            font-weight: 600;
+            color: #495057;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .comparison-values, .conclusion-value {
+            color: #333;
+            font-size: 16px;
+            font-weight: 500;
+            line-height: 1.4;
+        }
+
+        .final-comparison {
+            background: #e8f4fd;
+            border-left-color: #17a2b8;
+        }
+
+        .price-conclusion {
+            background: #fff3cd;
+            border-left-color: #ffc107;
+        }
+
         @media (max-width: 768px) {
             .container {
                 margin: 10px;
@@ -296,9 +343,9 @@
                     </div>
                 </div>
 
-                <!-- Простой отчет -->
+                <!-- Базовый анализ -->
                 <div class="section">
-                    <h2>📋 Простой отчет</h2>
+                    <h2>📋 Базовый анализ</h2>
                     <div class="info-grid">
                         <div class="info-item">
                             <div class="info-label">Локация</div>
@@ -311,6 +358,47 @@
                         <div class="info-item">
                             <div class="info-label">Цена за м²</div>
                             <div class="info-value" id="simple-price-per-sqm">-</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Сравнение цен по критериям -->
+                    <div class="price-comparison-section">
+                        <h3>📊 Сравнение с рыночными ценами</h3>
+                        
+                        <!-- Возраст объекта -->
+                        <div class="comparison-item">
+                            <div class="comparison-label">По возрасту объекта:</div>
+                            <div class="comparison-values" id="age-comparison">-</div>
+                        </div>
+                        
+                        <!-- Этаж -->
+                        <div class="comparison-item">
+                            <div class="comparison-label">По этажу:</div>
+                            <div class="comparison-values" id="floor-comparison">-</div>
+                        </div>
+                        
+                        <!-- Тип отопления -->
+                        <div class="comparison-item">
+                            <div class="comparison-label">По типу отопления:</div>
+                            <div class="comparison-values" id="heating-comparison">-</div>
+                        </div>
+                        
+                        <!-- Тип дома -->
+                        <div class="comparison-item">
+                            <div class="comparison-label">По типу дома:</div>
+                            <div class="comparison-values" id="house-type-comparison">-</div>
+                        </div>
+                        
+                        <!-- Итоговое сравнение -->
+                        <div class="final-comparison">
+                            <div class="comparison-label">Итоговое сравнение:</div>
+                            <div class="comparison-values" id="final-comparison">-</div>
+                        </div>
+                        
+                        <!-- Вывод по цене -->
+                        <div class="price-conclusion">
+                            <div class="conclusion-label">Вывод по цене:</div>
+                            <div class="conclusion-value" id="price-conclusion">-</div>
                         </div>
                     </div>
                 </div>
@@ -614,10 +702,10 @@
                 console.log('⚠️ Используются fallback данные:', { ageText, floorText, heatingText });
             }
 
-            // Простой отчет
+            // Базовый анализ
             if (data.full_report && data.full_report.simple_report) {
                 const simpleReport = data.full_report.simple_report;
-                console.log('📋 Простой отчет:', simpleReport);
+                console.log('📋 Базовый анализ:', simpleReport);
                 
                 const simpleElements = {
                     'simple-location': document.getElementById('simple-location'),
@@ -633,6 +721,52 @@
                 }
                 if (simpleElements['simple-price-per-sqm']) {
                     simpleElements['simple-price-per-sqm'].textContent = simpleReport.price_per_sqm || `€${(Number(reportData.price) / 80).toFixed(0)}/м²`;
+                }
+            }
+            
+            // Рыночные данные для сравнения цен
+            if (data.full_report && data.full_report.market_comparison) {
+                const marketComparison = data.full_report.market_comparison;
+                console.log('📊 Рыночные данные для сравнения:', marketComparison);
+                
+                // Заполняем сравнение по возрасту
+                if (marketComparison.age) {
+                    const ageComparison = marketComparison.age;
+                    const ageText = `€${ageComparison.min_price.toLocaleString('ru-RU')} - €${Number(reportData.price).toLocaleString('ru-RU')} - €${ageComparison.max_price.toLocaleString('ru-RU')} (отклонение: ${ageComparison.deviation_min.toFixed(1)}% до ${ageComparison.deviation_max.toFixed(1)}%)`;
+                    document.getElementById('age-comparison').textContent = ageText;
+                }
+                
+                // Заполняем сравнение по этажу
+                if (marketComparison.floor) {
+                    const floorComparison = marketComparison.floor;
+                    const floorText = `€${floorComparison.min_price.toLocaleString('ru-RU')} - €${Number(reportData.price).toLocaleString('ru-RU')} - €${floorComparison.max_price.toLocaleString('ru-RU')} (отклонение: ${floorComparison.deviation_min.toFixed(1)}% до ${floorComparison.deviation_max.toFixed(1)}%)`;
+                    document.getElementById('floor-comparison').textContent = floorText;
+                }
+                
+                // Заполняем сравнение по отоплению
+                if (marketComparison.heating) {
+                    const heatingComparison = marketComparison.heating;
+                    const heatingText = `€${heatingComparison.min_price.toLocaleString('ru-RU')} - €${Number(reportData.price).toLocaleString('ru-RU')} - €${heatingComparison.max_price.toLocaleString('ru-RU')} (отклонение: ${heatingComparison.deviation_min.toFixed(1)}% до ${heatingComparison.deviation_max.toFixed(1)}%)`;
+                    document.getElementById('heating-comparison').textContent = heatingText;
+                }
+                
+                // Заполняем сравнение по типу дома
+                if (marketComparison.house_type) {
+                    const houseTypeComparison = marketComparison.house_type;
+                    const houseTypeText = `€${houseTypeComparison.min_price.toLocaleString('ru-RU')} - €${Number(reportData.price).toLocaleString('ru-RU')} - €${houseTypeComparison.max_price.toLocaleString('ru-RU')} (отклонение: ${houseTypeComparison.deviation_min.toFixed(1)}% до ${houseTypeComparison.deviation_max.toFixed(1)}%)`;
+                    document.getElementById('house-type-comparison').textContent = houseTypeText;
+                }
+                
+                // Заполняем итоговое сравнение
+                if (marketComparison.final) {
+                    const finalComparison = marketComparison.final;
+                    const finalText = `€${finalComparison.avg_min_price.toLocaleString('ru-RU')} - €${Number(reportData.price).toLocaleString('ru-RU')} - €${finalComparison.avg_max_price.toLocaleString('ru-RU')} (отклонение: ${finalComparison.deviation_min.toFixed(1)}% до ${finalComparison.deviation_max.toFixed(1)}%)`;
+                    document.getElementById('final-comparison').textContent = finalText;
+                }
+                
+                // Заполняем вывод по цене
+                if (marketComparison.price_conclusion) {
+                    document.getElementById('price-conclusion').textContent = marketComparison.price_conclusion;
                 }
             }
 
