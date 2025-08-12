@@ -819,6 +819,17 @@ def format_simple_report(address, bedrooms, price, location_codes, language='en'
     logger.info(f"  - market_data: {type(market_data)}")
     logger.info(f"  - currency_info: {type(currency_info)}")
     
+    # Проверяем, есть ли last_location_components и их тип
+    if hasattr(format_simple_report, 'last_location_components'):
+        components = format_simple_report.last_location_components
+        logger.info(f"🔍 last_location_components: {type(components)}")
+        if components and isinstance(components, dict):
+            nominatim_data = components.get('nominatim_data')
+            if nominatim_data:
+                logger.info(f"🔍 nominatim_data тип: {type(nominatim_data)}")
+                if isinstance(nominatim_data, list):
+                    logger.warning(f"⚠️ nominatim_data является списком: {nominatim_data}")
+    
     # Форматируем цену
     def format_price(price):
         return f"€{price:.2f}".replace('.00', '').replace('.', ',')
@@ -893,19 +904,37 @@ def format_simple_report(address, bedrooms, price, location_codes, language='en'
             # Показываем данные Nominatim, если есть
             if components.get('nominatim_data'):
                 nominatim = components['nominatim_data']
-                report_lines.extend([
-                    "",
-                    "=== ДАННЫЕ NOMINATIM (OpenStreetMap) (только для администраторов) ===",
-                    f"Display Name: {nominatim.get('display_name', 'н/д')}",
-                    f"Country: {nominatim.get('country', 'н/д')}",
-                    f"Country Code: {nominatim.get('country_code', 'н/д')}",
-                    f"City: {nominatim.get('city', 'н/д')}",
-                    f"District: {nominatim.get('district', 'н/д')}",
-                    f"County: {nominatim.get('county', 'н/д')}",
-                    f"Postal Code: {nominatim.get('postal_code', 'н/д')}",
-                    f"Road: {nominatim.get('road', 'н/д')}",
-                    f"House Number: {nominatim.get('house_number', 'н/д')}",
-                ])
+                
+                # Проверяем, что nominatim это словарь, а не список
+                if isinstance(nominatim, list):
+                    logger.warning(f"⚠️ nominatim_data является списком, берем первый элемент: {nominatim}")
+                    if len(nominatim) > 0:
+                        nominatim = nominatim[0]
+                    else:
+                        nominatim = {}
+                
+                # Проверяем, что nominatim это словарь перед вызовом .get()
+                if isinstance(nominatim, dict):
+                    report_lines.extend([
+                        "",
+                        "=== ДАННЫЕ NOMINATIM (OpenStreetMap) (только для администраторов) ===",
+                        f"Display Name: {nominatim.get('display_name', 'н/д')}",
+                        f"Country: {nominatim.get('country', 'н/д')}",
+                        f"Country Code: {nominatim.get('country_code', 'н/д')}",
+                        f"City: {nominatim.get('city', 'н/д')}",
+                        f"District: {nominatim.get('district', 'н/д')}",
+                        f"County: {nominatim.get('county', 'н/д')}",
+                        f"Postal Code: {nominatim.get('postal_code', 'н/д')}",
+                        f"Road: {nominatim.get('road', 'н/д')}",
+                        f"House Number: {nominatim.get('house_number', 'н/д')}",
+                    ])
+                else:
+                    logger.warning(f"⚠️ nominatim_data имеет неожиданный тип: {type(nominatim)}, значение: {nominatim}")
+                    report_lines.extend([
+                        "",
+                        "=== ДАННЫЕ NOMINATIM (OpenStreetMap) (только для администраторов) ===",
+                        "Ошибка: данные Nominatim имеют неожиданный формат",
+                    ])
     
     report_lines.append("")
     
@@ -971,11 +1000,14 @@ def format_simple_report(address, bedrooms, price, location_codes, language='en'
             }
             
             target_listing_type = bedroom_mapping.get(bedrooms)
+            logger.info(f"🔍 Ищем данные для {bedrooms} спален, target_listing_type: {target_listing_type}")
             
             # Если house_type_data это список (несколько записей с разными listing_type)
             if isinstance(house_type_data, list):
+                logger.info(f"🔍 house_type_data это список с {len(house_type_data)} записями")
                 # Фильтруем только данные, соответствующие выбранному количеству спален
                 matching_records = [record for record in house_type_data if record.get('listing_type') == target_listing_type]
+                logger.info(f"🔍 Найдено {len(matching_records)} записей для {target_listing_type}")
                 
                 if matching_records:
                     for record in matching_records:
@@ -1021,10 +1053,13 @@ def format_simple_report(address, bedrooms, price, location_codes, language='en'
                         0: "0 - студия",
                         1: "1 спальня",
                         2: "2 спальни",
-                        3: "3 спальни", 
+                        3: "3 спальни",
                         4: "4 спальни",
                         5: "5+ спален"
                     }.get(bedrooms, f"{bedrooms} спален")
+                    
+                    logger.warning(f"⚠️ Данные для {bedrooms} спален ({target_listing_type}) не найдены в house_type_data")
+                    logger.info(f"🔍 Доступные listing_type: {[record.get('listing_type') for record in house_type_data]}")
                     
                     report_lines.extend([
                         f"--- {display_name} ---",

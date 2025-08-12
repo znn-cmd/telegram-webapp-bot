@@ -148,13 +148,21 @@ def fetch_and_save_currency_rates(target_date=None):
                 logger.info(f"✅ Запись уже существует, возвращаем её: {check_result.data[0]}")
                 return check_result.data[0]
             
-            supabase.table('currency').insert(currency_data).execute()
+            # Пытаемся вставить новую запись
+            insert_result = supabase.table('currency').insert(currency_data).execute()
             logger.info(f"✅ Курсы валют успешно получены и сохранены для {date_str}")
+            
+            # Если вставка прошла успешно, возвращаем вставленные данные
+            if insert_result.data and len(insert_result.data) > 0:
+                return insert_result.data[0]
+            else:
+                return currency_data
+                
         except Exception as insert_error:
-            logger.warning(f"⚠️ Ошибка при сохранении курсов валют (возможно, запись уже существует): {insert_error}")
+            logger.warning(f"⚠️ Ошибка при сохранении курсов валют: {insert_error}")
             
             # Проверяем, является ли это ошибкой RLS
-            if 'row-level security policy' in str(insert_error):
+            if 'row-level security policy' in str(insert_error) or '42501' in str(insert_error):
                 logger.warning("🔒 Обнаружена ошибка RLS политики. Пытаемся получить существующую запись...")
                 
                 # Пытаемся получить существующую запись
@@ -167,6 +175,18 @@ def fetch_and_save_currency_rates(target_date=None):
                     logger.warning("⚠️ RLS политика блокирует вставку, но существующая запись не найдена. Возвращаем данные без сохранения.")
                     # Возвращаем данные без сохранения в базу
                     return currency_data
+            elif 'duplicate key' in str(insert_error) or '23505' in str(insert_error):
+                logger.warning("🔑 Обнаружена ошибка дублирования ключа. Пытаемся получить существующую запись...")
+                
+                # Пытаемся получить существующую запись
+                existing_query = supabase.table('currency').select('*').gte('created_at', f'{date_str} 00:00:00').lt('created_at', f'{date_str} 23:59:59').order('created_at', desc=True).limit(1)
+                existing_result = existing_query.execute()
+                if existing_result.data and len(existing_result.data) > 0:
+                    logger.info(f"✅ Используем существующую запись курса валют для {date_str}")
+                    return existing_result.data[0]
+                else:
+                    logger.error(f"❌ Не удалось сохранить курсы валют и не найдена существующая запись: {insert_error}")
+                    return None
             else:
                 # Пытаемся получить существующую запись
                 existing_query = supabase.table('currency').select('*').gte('created_at', f'{date_str} 00:00:00').lt('created_at', f'{date_str} 23:59:59').order('created_at', desc=True).limit(1)
