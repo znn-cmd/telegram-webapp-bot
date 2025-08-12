@@ -846,11 +846,102 @@ def format_simple_report(address, bedrooms, price, location_codes, language='en'
         except:
             return str(value)
     
+    # Создаем прогресс-бар для визуализации соотношения цен
+    def create_price_bar(min_val, avg_val, max_val, width=20):
+        if not all(isinstance(x, (int, float)) for x in [min_val, avg_val, max_val]):
+            return "📊 Данные недоступны"
+        
+        if max_val == min_val:
+            return "📊 Все цены одинаковы"
+        
+        # Нормализуем значения от 0 до width
+        range_val = max_val - min_val
+        min_pos = 0
+        avg_pos = int(((avg_val - min_val) / range_val) * width) if range_val > 0 else width // 2
+        max_pos = width
+        
+        # Создаем прогресс-бар
+        bar = ['⬜'] * width
+        bar[min_pos] = '🔵'  # Минимальная цена
+        bar[avg_pos] = '🟢'  # Средняя цена
+        bar[max_pos-1] = '🔴'  # Максимальная цена
+        
+        return f"📊 {' '.join(bar)} | Мин:🔵 Сред:🟢 Макс:🔴"
+    
+    # Создаем индикатор тренда
+    def create_trend_indicator(current, previous=None):
+        if previous is None or not isinstance(current, (int, float)) or not isinstance(previous, (int, float)):
+            return ""
+        
+        if current > previous:
+            return "📈 +"
+        elif current < previous:
+            return "📉 -"
+        else:
+            return "➡️ ="
+    
+    # Создаем разворачивающуюся секцию
+    def create_collapsible_section(title, content, is_expanded=False):
+        if is_expanded:
+            return [
+                f"🔽 {title}",
+                *content
+            ]
+        else:
+            return [
+                f"▶️ {title} (нажмите для разворачивания)",
+                "..." if content else "Нет данных"
+            ]
+    
     # Формируем отчёт
     report_lines = [
-        f"Анализ рынка в радиусе 5 км:",
+        "🏠 АНАЛИЗ НЕДВИЖИМОСТИ",
+        "=" * 50,
+        f"📍 Адрес: {address}",
+        f"🛏️ Количество спален: {bedrooms}",
+        f"💰 Цена: €{format_number(price)}",
+        "",
+        "📊 АНАЛИЗ РЫНКА В РАДИУСЕ 5 КМ",
         "",
     ]
+    
+    # Добавляем краткое резюме
+    if market_data and market_data.get('general_data'):
+        general = market_data['general_data']
+        avg_price_sale = general.get('unit_price_for_sale', 0)
+        avg_price_rent = general.get('unit_price_for_rent', 0)
+        
+        # Создаем разворачивающиеся секции
+        summary_sections = [
+            ("💰 Цены продажи", [
+                f"Средняя: €{format_number(avg_price_sale)}/м²",
+                f"Диапазон: €{format_number(general.get('min_unit_price_for_sale', 0))} - €{format_number(general.get('max_unit_price_for_sale', 0))}/м²"
+            ]),
+            ("🏠 Цены аренды", [
+                f"Средняя: €{format_number(avg_price_rent)}/м²",
+                f"Диапазон: €{format_number(general.get('min_unit_price_for_rent', 0))} - €{format_number(general.get('max_unit_price_for_rent', 0))}/м²"
+            ]),
+            ("📊 Статистика рынка", [
+                f"Объектов на продажу: {format_number(general.get('count_for_sale', 0))}",
+                f"Объектов в аренду: {format_number(general.get('count_for_rent', 0))}",
+                f"Доходность: {format_number(general.get('yield', 0))}%"
+            ])
+        ]
+        
+        report_lines.extend([
+            "📊 КРАТКОЕ РЕЗЮМЕ",
+            "",
+        ])
+        
+        # Добавляем разворачивающиеся секции
+        for title, content in summary_sections:
+            report_lines.extend(create_collapsible_section(title, content, is_expanded=True))
+            report_lines.append("")
+        
+        report_lines.extend([
+            "🔍 ДЕТАЛЬНЫЙ АНАЛИЗ",
+            "",
+        ])
     
     # Добавляем информацию о курсе валют, если есть
     if currency_info:
@@ -915,19 +1006,19 @@ def format_simple_report(address, bedrooms, price, location_codes, language='en'
                 
                 # Проверяем, что nominatim это словарь перед вызовом .get()
                 if isinstance(nominatim, dict):
-                    report_lines.extend([
-                        "",
-                        "=== ДАННЫЕ NOMINATIM (OpenStreetMap) (только для администраторов) ===",
-                        f"Display Name: {nominatim.get('display_name', 'н/д')}",
-                        f"Country: {nominatim.get('country', 'н/д')}",
-                        f"Country Code: {nominatim.get('country_code', 'н/д')}",
-                        f"City: {nominatim.get('city', 'н/д')}",
-                        f"District: {nominatim.get('district', 'н/д')}",
-                        f"County: {nominatim.get('county', 'н/д')}",
-                        f"Postal Code: {nominatim.get('postal_code', 'н/д')}",
-                        f"Road: {nominatim.get('road', 'н/д')}",
-                        f"House Number: {nominatim.get('house_number', 'н/д')}",
-                    ])
+                report_lines.extend([
+                    "",
+                    "=== ДАННЫЕ NOMINATIM (OpenStreetMap) (только для администраторов) ===",
+                    f"Display Name: {nominatim.get('display_name', 'н/д')}",
+                    f"Country: {nominatim.get('country', 'н/д')}",
+                    f"Country Code: {nominatim.get('country_code', 'н/д')}",
+                    f"City: {nominatim.get('city', 'н/д')}",
+                    f"District: {nominatim.get('district', 'н/д')}",
+                    f"County: {nominatim.get('county', 'н/д')}",
+                    f"Postal Code: {nominatim.get('postal_code', 'н/д')}",
+                    f"Road: {nominatim.get('road', 'н/д')}",
+                    f"House Number: {nominatim.get('house_number', 'н/д')}",
+                ])
                 else:
                     logger.warning(f"⚠️ nominatim_data имеет неожиданный тип: {type(nominatim)}, значение: {nominatim}")
                     report_lines.extend([
@@ -951,29 +1042,75 @@ def format_simple_report(address, bedrooms, price, location_codes, language='en'
         # Общий тренд (из таблицы general_data)
         if market_data.get('general_data'):
             general = market_data['general_data']
+            # Получаем значения для прогресс-баров
+            min_sale = general.get('min_unit_price_for_sale', 0)
+            avg_sale = general.get('unit_price_for_sale', 0)
+            max_sale = general.get('max_unit_price_for_sale', 0)
+            min_rent = general.get('min_unit_price_for_rent', 0)
+            avg_rent = general.get('unit_price_for_rent', 0)
+            max_rent = general.get('max_unit_price_for_rent', 0)
+            
             report_lines.extend([
-                "=== ОБЩИЙ ТРЕНД ===",
+                "=== ОБЩИЙ АНАЛИЗ РЫНКА ===",
                 "",
                 "--- ПРОДАЖИ ---",
-                f"Минимальная цена продажи, м²: €{format_number(general.get('min_unit_price_for_sale'))}",
-                f"Средняя цена продажи, м²: €{format_number(general.get('unit_price_for_sale'))}",
-                f"Максимальная цена продажи, м²: €{format_number(general.get('max_unit_price_for_sale'))}",
-                f"Средняя площадь продажи: {format_number(general.get('comparable_area_for_sale'))} м²",
-                f"Количество объектов на продажу: {format_number(general.get('count_for_sale'))}",
-                f"Цена для продажи, средняя: €{format_number(general.get('price_for_sale'))}",
-                f"Средний возраст объекта для продажи: {format_number(general.get('average_age_for_sale'))} лет",
-                f"Период листинга для продажи: {format_number(general.get('listing_period_for_sale'))} дней",
+                f"💰 Минимальная цена продажи, м²:",
+                f"€{format_number(min_sale)}",
+                "",
+                f"💰 Средняя цена продажи, м²:",
+                f"€{format_number(avg_sale)}",
+                "",
+                f"💰 Максимальная цена продажи, м²:",
+                f"€{format_number(max_sale)}",
+                "",
+                f"📊 Прогресс-бар цен продажи:",
+                create_price_bar(min_sale, avg_sale, max_sale),
+                "",
+                f"📏 Средняя площадь продажи:",
+                f"{format_number(general.get('comparable_area_for_sale'))} м²",
+                "",
+                f"📊 Количество объектов на продажу:",
+                f"{format_number(general.get('count_for_sale'))}",
+                "",
+                f"💰 Цена для продажи, средняя:",
+                f"€{format_number(general.get('price_for_sale'))}",
+                "",
+                f"🏗️ Средний возраст объекта для продажи:",
+                f"{format_number(general.get('average_age_for_sale'))} лет",
+                "",
+                f"⏱️ Период листинга для продажи:",
+                f"{format_number(general.get('listing_period_for_sale'))} дней",
                 "",
                 "--- АРЕНДА ---",
-                f"Минимальная цена аренды, м²: €{format_number(general.get('min_unit_price_for_rent'))}",
-                f"Средняя цена аренды, м²: €{format_number(general.get('unit_price_for_rent'))}",
-                f"Максимальная цена аренды, м²: €{format_number(general.get('max_unit_price_for_rent'))}",
-                f"Средняя площадь аренды: {format_number(general.get('comparable_area_for_rent'))} м²",
-                f"Количество объектов в аренду: {format_number(general.get('count_for_rent'))}",
-                f"Цена для аренды, средняя: €{format_number(general.get('price_for_rent'))}",
-                f"Средний возраст объекта для аренды: {format_number(general.get('average_age_for_rent'))} лет",
-                f"Период листинга для аренды: {format_number(general.get('listing_period_for_rent'))} дней",
-                f"Доходность: {format_number(general.get('yield'))}%",
+                f"💰 Минимальная цена аренды, м²:",
+                f"€{format_number(min_rent)}",
+                "",
+                f"💰 Средняя цена аренды, м²:",
+                f"€{format_number(avg_rent)}",
+                "",
+                f"💰 Максимальная цена аренды, м²:",
+                f"€{format_number(max_rent)}",
+                "",
+                f"📊 Прогресс-бар цен аренды:",
+                create_price_bar(min_rent, avg_rent, max_rent),
+                "",
+                f"📏 Средняя площадь аренды:",
+                f"{format_number(general.get('comparable_area_for_rent'))} м²",
+                "",
+                f"📊 Количество объектов в аренду:",
+                f"{format_number(general.get('count_for_rent'))}",
+                "",
+                f"💰 Цена для аренды, средняя:",
+                f"€{format_number(general.get('price_for_rent'))}",
+                "",
+                f"🏗️ Средний возраст объекта для аренды:",
+                f"{format_number(general.get('average_age_for_rent'))} лет",
+                "",
+                f"⏱️ Период листинга для аренды:",
+                f"{format_number(general.get('listing_period_for_rent'))} дней",
+                "",
+                f"💎 Доходность:",
+                f"{format_number(general.get('yield'))}%",
                 "",
             ])
             
@@ -982,11 +1119,13 @@ def format_simple_report(address, bedrooms, price, location_codes, language='en'
                 report_lines.append(f"Дата тренда: {general.get('trend_date', 'н/д')}")
                 report_lines.append("")
     
-        # Тренд по количеству спален (из таблицы house_type_data)
+        # Анализ по количеству спален (из таблицы house_type_data)
         if market_data.get('house_type_data'):
             house_type_data = market_data['house_type_data']
             report_lines.extend([
-                "=== ТРЕНД ПО КОЛИЧЕСТВУ СПАЛЕН ===",
+                "=== АНАЛИЗ ПО КОЛИЧЕСТВУ СПАЛЕН ===",
+                "💡 Выберите количество спален для детального анализа:",
+                "",
             ])
             
             # Определяем соответствие между bedrooms и listing_type
@@ -1019,7 +1158,7 @@ def format_simple_report(address, bedrooms, price, location_codes, language='en'
                             logger.warning(f"⚠️ record не является словарем: {type(record)}, пропускаем")
                             continue
                         
-                        listing_type = record.get('listing_type', 'н/д')
+                    listing_type = record.get('listing_type', 'н/д')
                         # Определяем отображаемое название
                         display_name = {
                             "0+1": "0 - студия",
@@ -1030,29 +1169,75 @@ def format_simple_report(address, bedrooms, price, location_codes, language='en'
                             "5+1": "5+ спален"
                         }.get(listing_type, listing_type)
                         
+                        # Получаем значения для прогресс-баров
+                        min_sale = record.get('min_unit_price_for_sale', 0)
+                        avg_sale = record.get('unit_price_for_sale', 0)
+                        max_sale = record.get('max_unit_price_for_sale', 0)
+                        min_rent = record.get('min_unit_price_for_rent', 0)
+                        avg_rent = record.get('unit_price_for_rent', 0)
+                        max_rent = record.get('max_unit_price_for_rent', 0)
+                        
                         report_lines.extend([
                             f"--- {display_name} ---",
                             "",
                             "--- ПРОДАЖИ ---",
-                            f"Минимальная цена продажи: €{format_number(record.get('min_unit_price_for_sale'))}",
-                            f"Средняя цена продажи: €{format_number(record.get('unit_price_for_sale'))}",
-                            f"Максимальная цена продажи: €{format_number(record.get('max_unit_price_for_sale'))}",
-                            f"Сопоставимая площадь для продажи: {format_number(record.get('comparable_area_for_sale'))} м²",
-                            f"Количество объектов на продажу: {format_number(record.get('count_for_sale'))}",
-                            f"Цена для продажи, средняя: €{format_number(record.get('price_for_sale'))}",
-                            f"Средний возраст объекта для продажи: {format_number(record.get('average_age_for_sale'))} лет",
-                            f"Период листинга для продажи: {format_number(record.get('listing_period_for_sale'))} дней",
+                            f"💰 Минимальная цена продажи:",
+                            f"€{format_number(min_sale)}",
+                            "",
+                            f"💰 Средняя цена продажи:",
+                            f"€{format_number(avg_sale)}",
+                            "",
+                            f"💰 Максимальная цена продажи:",
+                            f"€{format_number(max_sale)}",
+                            "",
+                            f"📊 Прогресс-бар цен продажи:",
+                            create_price_bar(min_sale, avg_sale, max_sale),
+                            "",
+                            f"📏 Сопоставимая площадь для продажи:",
+                            f"{format_number(record.get('comparable_area_for_sale'))} м²",
+                            "",
+                            f"📊 Количество объектов на продажу:",
+                            f"{format_number(record.get('count_for_sale'))}",
+                            "",
+                            f"💰 Цена для продажи, средняя:",
+                            f"€{format_number(record.get('price_for_sale'))}",
+                            "",
+                            f"🏗️ Средний возраст объекта для продажи:",
+                            f"{format_number(record.get('average_age_for_sale'))} лет",
+                            "",
+                            f"⏱️ Период листинга для продажи:",
+                            f"{format_number(record.get('listing_period_for_sale'))} дней",
                             "",
                             "--- АРЕНДА ---",
-                            f"Минимальная цена аренды, м²: €{format_number(record.get('min_unit_price_for_rent'))}",
-                            f"Средняя цена аренды, м²: €{format_number(record.get('unit_price_for_rent'))}",
-                            f"Максимальная цена аренды, м²: €{format_number(record.get('max_unit_price_for_rent'))}",
-                            f"Средняя площадь аренды: {format_number(record.get('comparable_area_for_rent'))} м²",
-                            f"Количество объектов в аренду: {format_number(record.get('count_for_rent'))}",
-                            f"Цена для аренды, средняя: €{format_number(record.get('price_for_rent'))}",
-                            f"Средний возраст объекта для аренды: {format_number(record.get('average_age_for_rent'))} лет",
-                            f"Период листинга для аренды: {format_number(record.get('listing_period_for_rent'))} дней",
-                            f"Доходность: {format_number(record.get('yield'))}%",
+                            f"💰 Минимальная цена аренды, м²:",
+                            f"€{format_number(min_rent)}",
+                            "",
+                            f"💰 Средняя цена аренды, м²:",
+                            f"€{format_number(avg_rent)}",
+                            "",
+                            f"💰 Максимальная цена аренды, м²:",
+                            f"€{format_number(max_rent)}",
+                            "",
+                            f"📊 Прогресс-бар цен аренды:",
+                            create_price_bar(min_rent, avg_rent, max_rent),
+                            "",
+                            f"📏 Средняя площадь аренды:",
+                            f"{format_number(record.get('comparable_area_for_rent'))} м²",
+                            "",
+                            f"📊 Количество объектов в аренду:",
+                            f"{format_number(record.get('count_for_rent'))}",
+                            "",
+                            f"💰 Цена для аренды, средняя:",
+                            f"€{format_number(record.get('price_for_rent'))}",
+                            "",
+                            f"🏗️ Средний возраст объекта для аренды:",
+                            f"{format_number(record.get('average_age_for_rent'))} лет",
+                            "",
+                            f"⏱️ Период листинга для аренды:",
+                            f"{format_number(record.get('listing_period_for_rent'))} дней",
+                            "",
+                            f"💎 Доходность:",
+                            f"{format_number(record.get('yield'))}%",
                             "",
                         ])
                 else:
@@ -1084,7 +1269,7 @@ def format_simple_report(address, bedrooms, price, location_codes, language='en'
                         "",
                     ])
                 else:
-                    listing_type = house_type_data.get('listing_type', 'н/д')
+                listing_type = house_type_data.get('listing_type', 'н/д')
                     if listing_type == target_listing_type:
                         # Определяем отображаемое название
                         display_name = {
@@ -1096,7 +1281,7 @@ def format_simple_report(address, bedrooms, price, location_codes, language='en'
                             "5+1": "5+ спален"
                         }.get(listing_type, listing_type)
                         
-                        report_lines.extend([
+                report_lines.extend([
                             f"--- {display_name} ---",
                             "",
                             "--- ПРОДАЖИ ---",
@@ -1135,14 +1320,14 @@ def format_simple_report(address, bedrooms, price, location_codes, language='en'
                         report_lines.extend([
                             f"--- {display_name} ---",
                             "Данные для выбранного количества спален не найдены",
-                            "",
-                        ])
+                "",
+            ])
         
         # Тренд по возрасту объекта (из таблицы age_data)
         if market_data.get('age_data'):
             age_data = market_data['age_data']
             report_lines.extend([
-                "=== ТРЕНД ПО ВОЗРАСТУ ОБЪЕКТА ===",
+                "=== АНАЛИЗ ПО ВОЗРАСТУ ОБЪЕКТА ===",
             ])
             
             # Если age_data это список (несколько записей с разными listing_type)
@@ -1158,33 +1343,80 @@ def format_simple_report(address, bedrooms, price, location_codes, language='en'
                         f"--- Возраст здания: {listing_type} ---",
                         "",
                         "--- ПРОДАЖИ ---",
-                        f"Средний возраст объектов на продажу: {format_number(record.get('average_age_for_sale'))} лет",
-                        f"Минимальная цена продажи: €{format_number(record.get('min_unit_price_for_sale'))}",
-                        f"Средняя цена продажи: €{format_number(record.get('unit_price_for_sale'))}",
-                        f"Максимальная цена продажи: €{format_number(record.get('max_unit_price_for_sale'))}",
-                        f"Сопоставимая площадь для продажи: {format_number(record.get('comparable_area_for_sale'))} м²",
-                        f"Количество объектов на продажу: {format_number(record.get('count_for_sale'))}",
-                        f"Цена для продажи: €{format_number(record.get('price_for_sale'))}",
-                        f"Изменение цены продажи: {format_number(record.get('price_change_sale'))}%",
-                        f"Изменение запасов продажи: {format_number(record.get('stock_change_sale'))}%",
-                        f"Коэффициент запасов продажи: {format_number(record.get('stock_ratio_sale'))}",
-                        f"Период листинга для продажи: {format_number(record.get('listing_period_for_sale'))} дней",
+                        f"Средний возраст объектов на продажу:",
+                        f"{format_number(record.get('average_age_for_sale'))} лет",
+                        "",
+                        f"Минимальная цена продажи:",
+                        f"€{format_number(record.get('min_unit_price_for_sale'))}",
+                        "",
+                        f"Средняя цена продажи:",
+                        f"€{format_number(record.get('unit_price_for_sale'))}",
+                        "",
+                        f"Максимальная цена продажи:",
+                        f"€{format_number(record.get('max_unit_price_for_sale'))}",
+                        "",
+                        f"Сопоставимая площадь для продажи:",
+                        f"{format_number(record.get('comparable_area_for_sale'))} м²",
+                        "",
+                        f"Количество объектов на продажу:",
+                        f"{format_number(record.get('count_for_sale'))}",
+                        "",
+                        f"Цена для продажи:",
+                        f"€{format_number(record.get('price_for_sale'))}",
+                        "",
+                        f"Изменение цены продажи:",
+                        f"{format_number(record.get('price_change_sale'))}%",
+                        "",
+                        f"Изменение запасов продажи:",
+                        f"{format_number(record.get('stock_change_sale'))}%",
+                        "",
+                        f"Коэффициент запасов продажи:",
+                        f"{format_number(record.get('stock_ratio_sale'))}",
+                        "",
+                        f"Период листинга для продажи:",
+                        f"{format_number(record.get('listing_period_for_sale'))} дней",
                         "",
                         "--- АРЕНДА ---",
-                        f"Средний возраст объектов в аренду: {format_number(record.get('average_age_for_rent'))} лет",
-                        f"Минимальная цена аренды: €{format_number(record.get('min_unit_price_for_rent'))}",
-                        f"Средняя цена аренды: €{format_number(record.get('unit_price_for_rent'))}",
-                        f"Максимальная цена аренды: €{format_number(record.get('max_unit_price_for_rent'))}",
-                        f"Сопоставимая площадь для аренды: {format_number(record.get('comparable_area_for_rent'))} м²",
-                        f"Количество объектов в аренду: {format_number(record.get('count_for_rent'))}",
-                        f"Цена для аренды: €{format_number(record.get('price_for_rent'))}",
-                        f"Изменение цены аренды: {format_number(record.get('price_change_rent'))}%",
-                        f"Изменение запасов аренды: {format_number(record.get('stock_change_rent'))}%",
-                        f"Коэффициент запасов аренды: {format_number(record.get('stock_ratio_rent'))}",
-                        f"Период листинга для аренды: {format_number(record.get('listing_period_for_rent'))} дней",
-                        f"Количество объектов: {format_number(record.get('property_count'))}",
-                        f"Доходность: {format_number(record.get('yield'))}%",
-                        f"Дата тренда: {record.get('trend_date', 'н/д')}",
+                        f"Средний возраст объектов в аренду:",
+                        f"{format_number(record.get('average_age_for_rent'))} лет",
+                        "",
+                        f"Минимальная цена аренды:",
+                        f"€{format_number(record.get('min_unit_price_for_rent'))}",
+                        "",
+                        f"Средняя цена аренды:",
+                        f"€{format_number(record.get('unit_price_for_rent'))}",
+                        "",
+                        f"Максимальная цена аренды:",
+                        f"€{format_number(record.get('max_unit_price_for_rent'))}",
+                        "",
+                        f"Сопоставимая площадь для аренды:",
+                        f"{format_number(record.get('comparable_area_for_rent'))} м²",
+                        "",
+                        f"Количество объектов в аренду:",
+                        f"{format_number(record.get('count_for_rent'))}",
+                        "",
+                        f"Цена для аренды:",
+                        f"€{format_number(record.get('price_for_rent'))}",
+                        "",
+                        f"Изменение цены аренды:",
+                        f"{format_number(record.get('price_change_rent'))}%",
+                        "",
+                        f"Изменение запасов аренды:",
+                        f"{format_number(record.get('stock_change_rent'))}%",
+                        "",
+                        f"Коэффициент запасов аренды:",
+                        f"{format_number(record.get('stock_ratio_rent'))}",
+                        "",
+                        f"Период листинга для аренды:",
+                        f"{format_number(record.get('listing_period_for_rent'))} дней",
+                        "",
+                        f"Количество объектов:",
+                        f"{format_number(record.get('property_count'))}",
+                        "",
+                        f"Доходность:",
+                        f"{format_number(record.get('yield'))}%",
+                        "",
+                        f"Дата анализа: {record.get('trend_date', 'н/д')}",
                         "",
                     ])
             else:
@@ -1197,9 +1429,9 @@ def format_simple_report(address, bedrooms, price, location_codes, language='en'
                         "",
                     ])
                 else:
-                    listing_type = age_data.get('listing_type', 'н/д')
-                    report_lines.extend([
-                        f"--- Возраст здания: {listing_type} ---",
+                listing_type = age_data.get('listing_type', 'н/д')
+                report_lines.extend([
+                    f"--- Возраст здания: {listing_type} ---",
                         "",
                         "--- ПРОДАЖИ ---",
                         f"Средний возраст объектов на продажу: {format_number(age_data.get('average_age_for_sale'))} лет",
@@ -1221,14 +1453,14 @@ def format_simple_report(address, bedrooms, price, location_codes, language='en'
                         f"Цена для аренды, средняя: €{format_number(age_data.get('price_for_rent'))}",
                         f"Период листинга для аренды: {format_number(age_data.get('listing_period_for_rent'))} дней",
                         f"Доходность: {format_number(age_data.get('yield'))}%",
-                        "",
-                    ])
+                "",
+            ])
         
         # Тренд по этажу объекта (из таблицы floor_segment_data)
         if market_data.get('floor_segment_data'):
             floor_data = market_data['floor_segment_data']
             report_lines.extend([
-                "=== ТРЕНД ПО ЭТАЖУ ОБЪЕКТА ===",
+                "=== АНАЛИЗ ПО ЭТАЖУ ОБЪЕКТА ===",
             ])
             
             # Если floor_data это список (несколько записей с разными listing_type)
@@ -1237,31 +1469,63 @@ def format_simple_report(address, bedrooms, price, location_codes, language='en'
                     listing_type = record.get('listing_type', 'н/д')
                     report_lines.extend([
                         f"--- Этаж объекта: {listing_type} ---",
-                            "",
-                            "--- ПРОДАЖИ ---",
-                            f"Минимальная цена продажи: €{format_number(record.get('min_unit_price_for_sale'))}",
-                            f"Средняя цена продажи: €{format_number(record.get('unit_price_for_sale'))}",
-                            f"Максимальная цена продажи: €{format_number(record.get('max_unit_price_for_sale'))}",
-                            f"Сопоставимая площадь для продажи: {format_number(record.get('comparable_area_for_sale'))} м²",
-                            f"Количество объектов на продажу: {format_number(record.get('count_for_sale'))}",
-                            f"Цена для продажи, средняя: €{format_number(record.get('price_for_sale'))}",
-                            f"Средний возраст объекта для продажи: {format_number(record.get('average_age_for_sale'))} лет",
-                            f"Период листинга для продажи: {format_number(record.get('listing_period_for_sale'))} дней",
-                            "",
-                            "--- АРЕНДА ---",
-                            f"Минимальная цена аренды, м²: €{format_number(record.get('min_unit_price_for_rent'))}",
-                            f"Средняя цена аренды, м²: €{format_number(record.get('unit_price_for_rent'))}",
-                            f"Максимальная цена аренды, м²: €{format_number(record.get('max_unit_price_for_rent'))}",
-                            f"Средняя площадь аренды: {format_number(record.get('comparable_area_for_rent'))} м²",
-                            f"Количество объектов в аренду: {format_number(record.get('count_for_rent'))}",
-                            f"Цена для аренды, средняя: €{format_number(record.get('price_for_rent'))}",
-                            f"Средний возраст объекта для аренды: {format_number(record.get('average_age_for_rent'))} лет",
-                            f"Период листинга для аренды: {format_number(record.get('listing_period_for_rent'))} дней",
-                            f"Доходность: {format_number(record.get('yield'))}%",
-                            "",
-                        ])
-                else:
-                    # Если это одна запись
+                        "",
+                        "--- ПРОДАЖИ ---",
+                        f"Минимальная цена продажи:",
+                        f"€{format_number(record.get('min_unit_price_for_sale'))}",
+                        "",
+                        f"Средняя цена продажи:",
+                        f"€{format_number(record.get('unit_price_for_sale'))}",
+                        "",
+                        f"Максимальная цена продажи:",
+                        f"€{format_number(record.get('max_unit_price_for_sale'))}",
+                        "",
+                        f"Сопоставимая площадь для продажи:",
+                        f"{format_number(record.get('comparable_area_for_sale'))} м²",
+                        "",
+                        f"Количество объектов на продажу:",
+                        f"{format_number(record.get('count_for_sale'))}",
+                        "",
+                        f"Цена для продажи, средняя:",
+                        f"€{format_number(record.get('price_for_sale'))}",
+                        "",
+                        f"Средний возраст объекта для продажи:",
+                        f"{format_number(record.get('average_age_for_sale'))} лет",
+                        "",
+                        f"Период листинга для продажи:",
+                        f"{format_number(record.get('listing_period_for_sale'))} дней",
+                        "",
+                        "--- АРЕНДА ---",
+                        f"Минимальная цена аренды, м²:",
+                        f"€{format_number(record.get('min_unit_price_for_rent'))}",
+                        "",
+                        f"Средняя цена аренды, м²:",
+                        f"€{format_number(record.get('unit_price_for_rent'))}",
+                        "",
+                        f"Максимальная цена аренды, м²:",
+                        f"€{format_number(record.get('max_unit_price_for_rent'))}",
+                        "",
+                        f"Средняя площадь аренды:",
+                        f"{format_number(record.get('comparable_area_for_rent'))} м²",
+                        "",
+                        f"Количество объектов в аренду:",
+                        f"{format_number(record.get('count_for_rent'))}",
+                        "",
+                        f"Цена для аренды, средняя:",
+                        f"€{format_number(record.get('price_for_rent'))}",
+                        "",
+                        f"Средний возраст объекта для аренды:",
+                        f"{format_number(record.get('average_age_for_rent'))} лет",
+                        "",
+                        f"Период листинга для аренды:",
+                        f"{format_number(record.get('listing_period_for_rent'))} дней",
+                        "",
+                        f"Доходность:",
+                        f"{format_number(record.get('yield'))}%",
+                        "",
+                    ])
+            else:
+                # Если это одна запись
                     if not isinstance(floor_data, dict):
                         logger.warning(f"⚠️ floor_data не является словарем: {type(floor_data)}")
                         report_lines.extend([
@@ -1270,9 +1534,9 @@ def format_simple_report(address, bedrooms, price, location_codes, language='en'
                             "",
                         ])
                     else:
-                        listing_type = floor_data.get('listing_type', 'н/д')
-                        report_lines.extend([
-                            f"--- Этаж объекта: {listing_type} ---",
+                listing_type = floor_data.get('listing_type', 'н/д')
+                report_lines.extend([
+                    f"--- Этаж объекта: {listing_type} ---",
                             "",
                             "--- ПРОДАЖИ ---",
                             f"Минимальная цена продажи: €{format_number(floor_data.get('min_unit_price_for_sale'))}",
@@ -1294,14 +1558,14 @@ def format_simple_report(address, bedrooms, price, location_codes, language='en'
                             f"Средний возраст объекта для аренды: {format_number(floor_data.get('average_age_for_rent'))} лет",
                             f"Период листинга для аренды: {format_number(floor_data.get('listing_period_for_rent'))} дней",
                             f"Доходность: {format_number(floor_data.get('yield'))}%",
-                            "",
-                        ])
+                    "",
+                ])
         
         # Тренд по типу отопления (из таблицы heating_data)
         if market_data.get('heating_data'):
             heating_data = market_data['heating_data']
             report_lines.extend([
-                "=== ТРЕНД ПО ТИПУ ОТОПЛЕНИЯ ===",
+                "=== АНАЛИЗ ПО ТИПУ ОТОПЛЕНИЯ ===",
             ])
             
             # Если heating_data это список (несколько записей с разными listing_type)
@@ -1312,25 +1576,57 @@ def format_simple_report(address, bedrooms, price, location_codes, language='en'
                         f"--- Система отопления: {listing_type} ---",
                         "",
                         "--- ПРОДАЖИ ---",
-                        f"Минимальная цена продажи: €{format_number(record.get('min_unit_price_for_sale'))}",
-                        f"Средняя цена продажи: €{format_number(record.get('unit_price_for_sale'))}",
-                        f"Максимальная цена продажи: €{format_number(record.get('max_unit_price_for_sale'))}",
-                        f"Сопоставимая площадь для продажи: {format_number(record.get('comparable_area_for_sale'))} м²",
-                        f"Количество объектов на продажу: {format_number(record.get('count_for_sale'))}",
-                        f"Цена для продажи, средняя: €{format_number(record.get('price_for_sale'))}",
-                        f"Средний возраст объекта для продажи: {format_number(record.get('average_age_for_sale'))} лет",
-                        f"Период листинга для продажи: {format_number(record.get('listing_period_for_sale'))} дней",
+                        f"Минимальная цена продажи:",
+                        f"€{format_number(record.get('min_unit_price_for_sale'))}",
+                        "",
+                        f"Средняя цена продажи:",
+                        f"€{format_number(record.get('unit_price_for_sale'))}",
+                        "",
+                        f"Максимальная цена продажи:",
+                        f"€{format_number(record.get('max_unit_price_for_sale'))}",
+                        "",
+                        f"Сопоставимая площадь для продажи:",
+                        f"{format_number(record.get('comparable_area_for_sale'))} м²",
+                        "",
+                        f"Количество объектов на продажу:",
+                        f"{format_number(record.get('count_for_sale'))}",
+                        "",
+                        f"Цена для продажи, средняя:",
+                        f"€{format_number(record.get('price_for_sale'))}",
+                        "",
+                        f"Средний возраст объекта для продажи:",
+                        f"{format_number(record.get('average_age_for_sale'))} лет",
+                        "",
+                        f"Период листинга для продажи:",
+                        f"{format_number(record.get('listing_period_for_sale'))} дней",
                         "",
                         "--- АРЕНДА ---",
-                        f"Минимальная цена аренды, м²: €{format_number(record.get('min_unit_price_for_rent'))}",
-                        f"Средняя цена аренды, м²: €{format_number(record.get('unit_price_for_rent'))}",
-                        f"Максимальная цена аренды, м²: €{format_number(record.get('max_unit_price_for_rent'))}",
-                        f"Средняя площадь аренды: {format_number(record.get('comparable_area_for_rent'))} м²",
-                        f"Количество объектов в аренду: {format_number(record.get('count_for_rent'))}",
-                        f"Цена для аренды, средняя: €{format_number(record.get('price_for_rent'))}",
-                        f"Средний возраст объекта для аренды: {format_number(record.get('average_age_for_rent'))} лет",
-                        f"Период листинга для аренды: {format_number(record.get('listing_period_for_rent'))} дней",
-                        f"Доходность: {format_number(record.get('yield'))}%",
+                        f"Минимальная цена аренды, м²:",
+                        f"€{format_number(record.get('min_unit_price_for_rent'))}",
+                        "",
+                        f"Средняя цена аренды, м²:",
+                        f"€{format_number(record.get('unit_price_for_rent'))}",
+                        "",
+                        f"Максимальная цена аренды, м²:",
+                        f"€{format_number(record.get('max_unit_price_for_rent'))}",
+                        "",
+                        f"Средняя площадь аренды:",
+                        f"{format_number(record.get('comparable_area_for_rent'))} м²",
+                        "",
+                        f"Количество объектов в аренду:",
+                        f"{format_number(record.get('count_for_rent'))}",
+                        "",
+                        f"Цена для аренды, средняя:",
+                        f"€{format_number(record.get('price_for_rent'))}",
+                        "",
+                        f"Средний возраст объекта для аренды:",
+                        f"{format_number(record.get('average_age_for_rent'))} лет",
+                        "",
+                        f"Период листинга для аренды:",
+                        f"{format_number(record.get('listing_period_for_rent'))} дней",
+                        "",
+                        f"Доходность:",
+                        f"{format_number(record.get('yield'))}%",
                         "",
                     ])
             else:
@@ -1343,9 +1639,9 @@ def format_simple_report(address, bedrooms, price, location_codes, language='en'
                         "",
                     ])
                 else:
-                    listing_type = heating_data.get('listing_type', 'н/д')
-                    report_lines.extend([
-                        f"--- Система отопления: {listing_type} ---",
+                listing_type = heating_data.get('listing_type', 'н/д')
+                report_lines.extend([
+                    f"--- Система отопления: {listing_type} ---",
                         "",
                         "--- ПРОДАЖИ ---",
                         f"Минимальная цена продажи: €{format_number(heating_data.get('min_unit_price_for_sale'))}",
@@ -1367,15 +1663,91 @@ def format_simple_report(address, bedrooms, price, location_codes, language='en'
                         f"Средний возраст объекта для аренды: {format_number(heating_data.get('average_age_for_rent'))} лет",
                         f"Период листинга для аренды: {format_number(heating_data.get('listing_period_for_rent'))} дней",
                         f"Доходность: {format_number(heating_data.get('yield'))}%",
-                        "",
-                    ])
+                    "",
+                ])
     else:
         report_lines.extend([
             "=== АНАЛИЗ РЫНКА ===",
             "Данные анализа рынка не найдены для данной локации",
             "",
         ])
+    
+    # Добавляем раздел с рекомендациями
+    if market_data and market_data.get('general_data'):
+        general = market_data['general_data']
+        avg_price_sale = general.get('unit_price_for_sale', 0)
+        avg_price_rent = general.get('unit_price_for_rent', 0)
+        yield_value = general.get('yield', 0)
         
+        report_lines.extend([
+            "",
+            "💡 РЕКОМЕНДАЦИИ",
+            "",
+        ])
+        
+        # Анализ цены продажи
+        if price and avg_price_sale:
+            price_per_sqm = price / 100  # Предполагаем площадь 100м²
+            if price_per_sqm < avg_price_sale * 0.8:
+                report_lines.extend([
+                    "✅ Цена ниже рыночной на 20%+",
+                    "Это может быть хорошей инвестицией",
+                    "",
+                ])
+            elif price_per_sqm > avg_price_sale * 1.2:
+                report_lines.extend([
+                    "⚠️ Цена выше рыночной на 20%+",
+                    "Рассмотрите торг или поиск альтернатив",
+                    "",
+                ])
+            else:
+                report_lines.extend([
+                    "📊 Цена в пределах рыночного диапазона",
+                    "Справедливая оценка",
+                    "",
+                ])
+        
+        # Анализ доходности
+        if yield_value:
+            if yield_value > 8:
+                report_lines.extend([
+                    "💰 Высокая доходность (>8%)",
+                    "Отличный потенциал для инвестиций",
+                    "",
+                ])
+            elif yield_value > 6:
+                report_lines.extend([
+                    "💡 Хорошая доходность (6-8%)",
+                    "Стабильный доход",
+                    "",
+                ])
+            else:
+                report_lines.extend([
+                    "📉 Низкая доходность (<6%)",
+                    "Рассмотрите другие варианты",
+                    "",
+                ])
+        
+        # Общие рекомендации
+        report_lines.extend([
+            "🔍 СЛЕДУЮЩИЕ ШАГИ:",
+            "• Сравните с похожими объектами в районе",
+            "• Изучите динамику цен за последние месяцы",
+            "• Оцените транспортную доступность",
+            "• Проверьте планы развития района",
+            "",
+        ])
+    
+    # Добавляем контактную информацию
+    report_lines.extend([
+        "📞 НУЖНА ПОМОЩЬ?",
+        "Обратитесь к нашему боту: @Aaadviser_bot",
+        "",
+        "=" * 50,
+        "Отчет сгенерирован автоматически",
+        f"Дата: {datetime.now().strftime('%d.%m.%Y %H:%M')}",
+        ])
+    
     return "\n".join(report_lines)
 
 @app.route('/api/search_properties', methods=['POST'])
@@ -2739,7 +3111,7 @@ def api_save_user_report():
         # Получаем user_id по telegram_id
         user_result = supabase.table('users').select('id').eq('telegram_id', telegram_id).execute()
         user_id = user_result.data[0]['id'] if user_result.data else telegram_id
-                    # Сохраняем отчет
+        # Сохраняем отчет
         report_data = {
             'user_id': user_id,
             'report_type': report_type,
@@ -3745,10 +4117,10 @@ def get_market_data_by_location_ids(location_codes, target_year=None, target_mon
                 # Фильтруем записи с валидными датами
                 valid_records = [r for r in result.data if r.get('trend_date')]
                 if valid_records:
-                    # Берем самую свежую запись
+                # Берем самую свежую запись
                     latest_record = max(valid_records, key=lambda x: x.get('trend_date', ''))
-                    market_data['property_trends'] = latest_record
-                    logger.info(f"Найдены данные property_trends: {len(result.data)} записей, выбрана самая свежая: {latest_record.get('trend_date')}")
+                market_data['property_trends'] = latest_record
+                logger.info(f"Найдены данные property_trends: {len(result.data)} записей, выбрана самая свежая: {latest_record.get('trend_date')}")
                 else:
                     logger.warning("Все записи property_trends имеют пустые даты")
                     market_data['property_trends'] = result.data[0] if result.data else None
@@ -3849,10 +4221,10 @@ def get_market_data_by_location_ids(location_codes, target_year=None, target_mon
                 # Фильтруем записи с валидными датами
                 valid_records = [r for r in result.data if r.get('trend_date')]
                 if valid_records:
-                    # Берем самую свежую запись
+                # Берем самую свежую запись
                     latest_record = max(valid_records, key=lambda x: x.get('trend_date', ''))
-                    market_data['general_data'] = latest_record
-                    logger.info(f"Найдены данные general_data: {len(result.data)} записей, выбрана самая свежая: {latest_record.get('trend_date')}")
+                market_data['general_data'] = latest_record
+                logger.info(f"Найдены данные general_data: {len(result.data)} записей, выбрана самая свежая: {latest_record.get('trend_date')}")
                 else:
                     logger.warning("Все записи general_data имеют пустые даты")
                     market_data['general_data'] = result.data[0] if result.data else None
@@ -4161,7 +4533,7 @@ def get_nominatim_location(address):
         
         try:
             response = requests.get(url, params=params, headers=headers, timeout=30)
-            result = response.json()
+        result = response.json()
         except requests.exceptions.Timeout:
             logger.error("❌ Таймаут при запросе к Nominatim API (30 секунд)")
             return None
