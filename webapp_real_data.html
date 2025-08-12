@@ -876,9 +876,9 @@
         // Новая функция: вызывается по клику на 'Да, продолжить' в модалке
         async function onConfirmFullReport(address, bedrooms, price, telegram_id, isFree, fullReportPrice, balance) {
             if (isFree) {
-                showToast('Для вас отчет бесплатный! Формируем отчет...', 'success');
-                showProgressBar('Формируем отчет...', 30);
-                afterFullReportPayment(address, bedrooms, price, geoData.lat, geoData.lng, telegram_id);
+                showToast('Для вас отчет бесплатный! Переходим к сбору дополнительных данных...', 'success');
+                // Переходим на страницу сбора дополнительных данных
+                goToAdditionalDataPage(address, bedrooms, price, telegram_id);
                 return;
             }
             if (parseFloat(balance) >= parseFloat(fullReportPrice)) {
@@ -893,9 +893,9 @@
                     const deductData = await deductRes.json();
                     hideProgressBar();
                     if (deductData.success) {
-                        showToast('Средства успешно списаны. Формируем отчет...', 'success');
-                        showProgressBar('Формируем отчет...', 30);
-                        afterFullReportPayment(address, bedrooms, price, geoData.lat, geoData.lng, telegram_id);
+                        showToast('Средства успешно списаны. Переходим к сбору дополнительных данных...', 'success');
+                        // Переходим на страницу сбора дополнительных данных
+                        goToAdditionalDataPage(address, bedrooms, price, telegram_id);
                     } else if (deductData.error === 'Insufficient balance') {
                         showModalTopup(`Недостаточно средств для получения полного отчета.<br>Стоимость: <b>${fullReportPrice} EUR</b>`, () => {
                             closeModalTopup();
@@ -919,6 +919,23 @@
                     closeModalTopup();
                 }, balance);
             }
+        }
+
+        // Функция перехода на страницу сбора дополнительных данных
+        function goToAdditionalDataPage(address, bedrooms, price, telegram_id) {
+            // Формируем параметры для передачи на страницу дополнительных данных
+            const params = new URLSearchParams({
+                address: address,
+                bedrooms: bedrooms,
+                price: price,
+                telegram_id: telegram_id,
+                lat: geoData.lat,
+                lng: geoData.lng,
+                location_codes: JSON.stringify(geoData.location_codes || {})
+            });
+            
+            // Переходим на страницу сбора дополнительных данных
+            window.location.href = `/webapp_additional_data?${params.toString()}`;
         }
 
         // Универсальные модалки

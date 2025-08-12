@@ -1931,55 +1931,166 @@ def api_full_report():
     lng = data.get('lng')
     bedrooms = data.get('bedrooms')
     price = data.get('price')
+    additional_data = data.get('additional_data', {})
+    
     try:
         price = float(price) if price is not None else 0
     except (ValueError, TypeError):
         price = 0
-    try:
-        # --- MOCK/DEMO DATA ---
-        avg_sqm = 15451.29
-        price_growth = 0.042
-        short_term_income = 1950
-        short_term_net = 1560
-        long_term_income = 43000
-        long_term_net = 34400
-        five_year_growth = 0.23
-        alt_deposit = 0.128
-        alt_bonds = 0.245
-        alt_stocks = 0.382
-        alt_reits = 0.427
-        inflation = 64.8
-        eur_try = 35.2
-        eur_try_growth = 0.14
-        refi_rate = 45
-        gdp_growth = 4.1
-        taxes = {
-            'transfer_tax': 0.04,
-            'stamp_duty': 0.015,
-            'notary': 1200,
-            'annual_property_tax': 0.001,
-            'annual_property_tax_max': 0.006,
-            'rental_income_tax': '15-35%',
-            'capital_gains_tax': '15-40%'
-        }
-        risks = [
-            'Валютный: TRY/EUR ▲23% за 3 года',
-            'Политический: Выборы 2028',
-            'Экологический: Карта наводнений (NASA Earth Data)'
-        ]
-        liquidity = 'Среднее время продажи: 68 дней'
-        district = 'Новый трамвай до пляжа (2026), Строительство школы (2027)'
         
-        # --- ПОЛУЧАЕМ РЕАЛЬНЫЕ ЭКОНОМИЧЕСКИЕ ДАННЫЕ ---
+    logger.info(f"🔍 Формируем полный отчет для {address} с дополнительными данными: {additional_data}")
+    try:
+        # --- РАСЧЕТ БАЗОВЫХ ПАРАМЕТРОВ НА ОСНОВЕ ЦЕНЫ И ЛОКАЦИИ ---
+        
+        # Рассчитываем среднюю цену за кв.м на основе цены объекта и типичного размера
+        typical_size = 80 if bedrooms <= 2 else 120 if bedrooms <= 3 else 150  # типичный размер в кв.м
+        avg_sqm = price / typical_size if typical_size > 0 else 0
+        
+        # Получаем реальные экономические данные
         economic_data = get_economic_data('TUR', 10)  # Данные за последние 10 лет
         chart_data = create_economic_chart_data(economic_data)
         
-        # Обновляем макроэкономические данные реальными значениями
-        if economic_data.get('latest_inflation'):
-            inflation = economic_data['latest_inflation']['value']
+        # Базовые макроэкономические показатели
+        inflation = economic_data.get('latest_inflation', {}).get('value', 35.9) if economic_data else 35.9
+        eur_try = economic_data.get('latest_exchange_rate', {}).get('value', 35.2) if economic_data else 35.2
+        refi_rate = economic_data.get('latest_interest_rate', {}).get('value', 45.0) if economic_data else 45.0
+        gdp_growth = economic_data.get('latest_gdp', {}).get('value', 2.7) if economic_data else 2.7
         
-        if economic_data.get('latest_gdp'):
-            gdp_growth = economic_data['latest_gdp']['value']  # Рост ВВП в процентах
+        # Рассчитываем рост цен на недвижимость на основе экономических данных
+        price_growth = (inflation * 0.3 + gdp_growth * 0.4 + (refi_rate * 0.1)) / 100
+        five_year_growth = price_growth * 5
+        
+        # Рассчитываем доходность от аренды на основе цены и локации
+        base_monthly_rent = price * 0.008  # базовая месячная аренда 0.8% от цены
+        base_annual_rent = base_monthly_rent * 12
+        
+        # Корректируем на основе количества спален
+        bedroom_multiplier = 1.0 + (bedrooms - 1) * 0.15  # каждая дополнительная спальня +15%
+        short_term_income = int(base_monthly_rent * bedroom_multiplier * 1.2)  # краткосрочная аренда +20%
+        long_term_income = int(base_annual_rent * bedroom_multiplier)
+        
+        # Рассчитываем чистый доход (после налогов и расходов)
+        short_term_net = int(short_term_income * 0.8)  # 20% на налоги и расходы
+        long_term_net = int(long_term_income * 0.8)
+        
+        # Рассчитываем ROI
+        short_term_roi = ((short_term_income * 12 * 5) / price) * 100
+        long_term_roi = ((long_term_income * 5) / price) * 100
+        no_rent_roi = (five_year_growth / price) * 100
+        
+        # Альтернативные инвестиции на основе реальных экономических данных
+        alt_deposit = (refi_rate * 0.8) / 100  # депозит ниже ключевой ставки
+        alt_bonds = (refi_rate * 1.1) / 100    # облигации выше ключевой ставки
+        alt_stocks = (gdp_growth * 2.5) / 100  # акции как множитель роста ВВП
+        alt_reits = (price_growth * 1.5) / 100 # REITs как множитель роста цен на недвижимость
+        
+        # Налоги и сборы на основе цены объекта
+        taxes = {
+            'transfer_tax': 0.04,  # 4% от цены
+            'stamp_duty': 0.015,   # 1.5% от цены
+            'notary': min(1200, price * 0.01),  # нотариус: минимум 1200 или 1% от цены
+            'annual_property_tax': 0.001,       # 0.1% от цены
+            'annual_property_tax_max': 0.006,   # максимум 0.6%
+            'rental_income_tax': '15-35%',      # прогрессивная шкала
+            'capital_gains_tax': '15-40%'       # прогрессивная шкала
+        }
+        
+        # Риски на основе экономических данных
+        risks = []
+        if eur_try > 30:
+            risks.append(f'Валютный: TRY/EUR ▲{((eur_try - 30) / 30 * 100):.1f}% за последний период')
+        if refi_rate > 40:
+            risks.append(f'Монетарный: Высокая ключевая ставка {refi_rate:.1f}%')
+        if inflation > 30:
+            risks.append(f'Инфляционный: Высокая инфляция {inflation:.1f}%')
+        if gdp_growth < 3:
+            risks.append(f'Экономический: Низкий рост ВВП {gdp_growth:.1f}%')
+        
+        # Ликвидность на основе цены и локации
+        days_on_market = int(60 + (price / 10000) * 2)  # чем дороже, тем дольше продается
+        liquidity = f'Среднее время продажи: {days_on_market} дней'
+        
+        # Развитие района на основе экономических данных
+        development_projects = []
+        if gdp_growth > 4:
+            development_projects.append('Активное развитие инфраструктуры')
+        if refi_rate < 50:
+            development_projects.append('Благоприятные условия кредитования')
+        if inflation < 40:
+            development_projects.append('Стабильная экономическая среда')
+        
+        district = ', '.join(development_projects) if development_projects else 'Стандартное развитие района'
+        
+        # --- АНАЛИЗ ДОПОЛНИТЕЛЬНЫХ ДАННЫХ ---
+        additional_analysis = {}
+        
+        # Анализ возраста объекта
+        if additional_data.get('age') and additional_data.get('age') != 'unknown':
+            try:
+                age_result = supabase.table('age_data').select('*').eq('id', additional_data['age']).execute()
+                if age_result.data:
+                    age_info = age_result.data[0]
+                    additional_analysis['age'] = {
+                        'range': age_info.get('age_range'),
+                        'impact': 'Положительный' if age_info.get('age_range') in ['0-5 лет', '5-10 лет'] else 'Нейтральный',
+                        'maintenance_cost': 'Низкие' if age_info.get('age_range') in ['0-5 лет'] else 'Средние'
+                    }
+                    logger.info(f"✅ Анализ возраста: {age_info.get('age_range')}")
+            except Exception as e:
+                logger.warning(f"⚠️ Ошибка анализа возраста: {e}")
+        
+        # Анализ этажа
+        if additional_data.get('floor') and additional_data.get('floor') != 'unknown':
+            try:
+                floor_result = supabase.table('floor_segment_data').select('*').eq('id', additional_data['floor']).execute()
+                if floor_result.data:
+                    floor_info = floor_result.data[0]
+                    additional_analysis['floor'] = {
+                        'type': floor_info.get('floor_type'),
+                        'accessibility': 'Высокая' if floor_info.get('floor_type') in ['Первый этаж', 'Второй этаж'] else 'Средняя',
+                        'view': 'Хороший' if floor_info.get('floor_type') in ['Верхние этажи', 'Пентхаус'] else 'Стандартный'
+                    }
+                    logger.info(f"✅ Анализ этажа: {floor_info.get('floor_type')}")
+            except Exception as e:
+                logger.warning(f"⚠️ Ошибка анализа этажа: {e}")
+        
+        # Анализ отопления
+        if additional_data.get('heating') and additional_data.get('heating') != 'unknown':
+            try:
+                heating_result = supabase.table('heating_data').select('*').eq('id', additional_data['heating']).execute()
+                if heating_result.data:
+                    heating_info = heating_result.data[0]
+                    additional_analysis['heating'] = {
+                        'type': heating_info.get('heating_type'),
+                        'efficiency': 'Высокая' if heating_info.get('heating_type') in ['Центральное', 'Индивидуальное газовое'] else 'Средняя',
+                        'cost': 'Низкие' if heating_info.get('heating_type') in ['Центральное'] else 'Средние'
+                    }
+                    logger.info(f"✅ Анализ отопления: {heating_info.get('heating_type')}")
+            except Exception as e:
+                logger.warning(f"⚠️ Ошибка анализа отопления: {e}")
+        
+        # Корректируем ROI на основе дополнительных данных
+        if additional_analysis:
+            # Корректируем доходность на основе возраста
+            if additional_analysis.get('age'):
+                if additional_analysis['age']['impact'] == 'Положительный':
+                    short_term_income = int(short_term_income * 1.1)  # +10%
+                    long_term_income = int(long_term_income * 1.05)   # +5%
+                    logger.info("✅ ROI скорректирован: возраст объекта положительно влияет на доходность")
+            
+            # Корректируем на основе этажа
+            if additional_analysis.get('floor'):
+                if additional_analysis['floor']['view'] == 'Хороший':
+                    short_term_income = int(short_term_income * 1.15)  # +15%
+                    long_term_income = int(long_term_income * 1.08)    # +8%
+                    logger.info("✅ ROI скорректирован: этаж объекта положительно влияет на доходность")
+            
+            # Корректируем на основе отопления
+            if additional_analysis.get('heating'):
+                if additional_analysis['heating']['efficiency'] == 'Высокая':
+                    short_term_income = int(short_term_income * 1.05)  # +5%
+                    long_term_income = int(long_term_income * 1.03)    # +3%
+                    logger.info("✅ ROI скорректирован: отопление положительно влияет на доходность")
         
         # --- Формируем структуру полного отчёта ---
         full_report_data = {
@@ -1987,26 +2098,27 @@ def api_full_report():
                 'address': address,
                 'bedrooms': bedrooms,
                 'purchase_price': price,
-                'avg_price_per_sqm': avg_sqm
+                'avg_price_per_sqm': avg_sqm,
+                'additional_data': additional_analysis
             },
             'roi': {
                 'short_term': {
                     'monthly_income': short_term_income,
                     'net_income': short_term_net,
-                    'five_year_income': 93600,
+                    'five_year_income': short_term_income * 12 * 5,
                     'final_value': price * (1 + five_year_growth),
-                    'roi': 81.5
+                    'roi': short_term_roi
                 },
                 'long_term': {
                     'annual_income': long_term_income,
                     'net_income': long_term_net,
-                    'five_year_income': 172000,
+                    'five_year_income': long_term_income * 5,
                     'final_value': price * (1 + five_year_growth),
-                    'roi': 130.5
+                    'roi': long_term_roi
                 },
                 'no_rent': {
                     'final_value': price * (1 + five_year_growth),
-                    'roi': 23
+                    'roi': no_rent_roi
                 },
                 'price_growth': price_growth
             },
@@ -2015,25 +2127,23 @@ def api_full_report():
                 {'name': 'Облигации Турции', 'yield': alt_bonds, 'source': 'Investing.com API'},
                 {'name': 'Акции (BIST30)', 'yield': alt_stocks, 'source': 'Alpha Vantage API'},
                 {'name': 'REITs (фонды)', 'yield': alt_reits, 'source': 'Financial Modeling Prep'},
-                {'name': 'Недвижимость', 'yield': 0.815, 'source': 'Ваш объект'}
+                {'name': 'Недвижимость', 'yield': short_term_roi / 100, 'source': 'Ваш объект'}
             ],
-            'macro': {
-                'inflation': inflation,
-                'eur_try': eur_try,
-                'eur_try_growth': eur_try_growth,
-                'refi_rate': refi_rate,
-                'gdp_growth': gdp_growth
-            },
+            'inflation': inflation,
+            'eur_try': eur_try,
+            'refi_rate': refi_rate,
+            'gdp_growth': gdp_growth,
             'economic_charts': chart_data,  # Добавляем данные для графиков
             'taxes': taxes,
             'risks': risks,
             'liquidity': liquidity,
             'district': district,
-            'yield': 0.081,
-            'price_index': 1.23,
-            'mortgage_rate': 0.32,
-            'global_house_price_index': 1.12,
-            'summary': 'Полный отчёт с реальными экономическими данными из IMF.'
+            'yield': (short_term_income * 12) / price,  # годовая доходность
+            'price_index': 1 + price_growth,  # индекс цен
+            'mortgage_rate': refi_rate / 100,  # ипотечная ставка
+            'global_house_price_index': 1 + (gdp_growth / 100),  # глобальный индекс
+            'additional_analysis': additional_analysis,
+            'summary': f'Полный отчёт с реальными экономическими данными из IMF и анализом характеристик объекта. ROI: {short_term_roi:.1f}% за 5 лет.'
         }
         
         # Получаем user_id из базы данных по telegram_id
@@ -2100,6 +2210,66 @@ def api_user_reports():
         return jsonify({'success': True, 'reports': reports})
     except Exception as e:
         logger.error(f"Error fetching user reports: {e}")
+        return jsonify({'error': 'Internal error'}), 500
+
+@app.route('/api/get_additional_data_options', methods=['POST'])
+def api_get_additional_data_options():
+    """Получает опции для дополнительных параметров отчета (возраст, этаж, отопление)"""
+    try:
+        data = request.json or {}
+        location_codes = data.get('location_codes', {})
+        
+        if not location_codes:
+            return jsonify({'error': 'Location codes required'}), 400
+        
+        logger.info(f"🔍 Получаем опции для дополнительных данных: {location_codes}")
+        
+        # Получаем опции возраста
+        age_options = []
+        try:
+            age_result = supabase.table('age_data').select('*').eq('country_id', location_codes.get('country_id')).eq('city_id', location_codes.get('city_id')).execute()
+            if age_result.data:
+                age_options = [{'id': item.get('id'), 'name': item.get('age_range', 'Не указано')} for item in age_result.data]
+                logger.info(f"✅ Получены опции возраста: {len(age_options)} вариантов")
+        except Exception as e:
+            logger.warning(f"⚠️ Ошибка получения опций возраста: {e}")
+        
+        # Получаем опции этажей
+        floor_options = []
+        try:
+            floor_result = supabase.table('floor_segment_data').select('*').eq('country_id', location_codes.get('country_id')).eq('city_id', location_codes.get('city_id')).execute()
+            if floor_result.data:
+                floor_options = [{'id': item.get('id'), 'name': item.get('floor_type', 'Не указано')} for item in floor_result.data]
+                logger.info(f"✅ Получены опции этажей: {len(floor_options)} вариантов")
+        except Exception as e:
+            logger.warning(f"⚠️ Ошибка получения опций этажей: {e}")
+        
+        # Получаем опции отопления
+        heating_options = []
+        try:
+            heating_result = supabase.table('heating_data').select('*').eq('country_id', location_codes.get('country_id')).eq('city_id', location_codes.get('city_id')).execute()
+            if heating_result.data:
+                heating_options = [{'id': item.get('id'), 'name': item.get('heating_type', 'Не указано')} for item in heating_result.data]
+                logger.info(f"✅ Получены опции отопления: {len(heating_options)} вариантов")
+        except Exception as e:
+            logger.warning(f"⚠️ Ошибка получения опций отопления: {e}")
+        
+        # Добавляем опцию "Не известно" к каждому списку
+        age_options.append({'id': 'unknown', 'name': 'Не известно'})
+        floor_options.append({'id': 'unknown', 'name': 'Не известно'})
+        heating_options.append({'id': 'unknown', 'name': 'Не известно'})
+        
+        logger.info("✅ Опции для дополнительных данных подготовлены")
+        
+        return jsonify({
+            'success': True,
+            'age_options': age_options,
+            'floor_options': floor_options,
+            'heating_options': heating_options
+        })
+        
+    except Exception as e:
+        logger.error(f"❌ Ошибка получения опций дополнительных данных: {e}")
         return jsonify({'error': 'Internal error'}), 500
 
 @app.route('/api/delete_user_report', methods=['POST'])
@@ -3530,6 +3700,16 @@ def webapp_support():
 @app.route('/webapp_referral')
 def webapp_referral():
     with open('webapp_referral.html', 'r', encoding='utf-8') as f:
+        return f.read()
+
+@app.route('/webapp_additional_data')
+def webapp_additional_data():
+    with open('webapp_additional_data.html', 'r', encoding='utf-8') as f:
+        return f.read()
+
+@app.route('/webapp_full_report')
+def webapp_full_report():
+    with open('webapp_full_report.html', 'r', encoding='utf-8') as f:
         return f.read()
 
 @app.route('/api/referral_info', methods=['POST'])

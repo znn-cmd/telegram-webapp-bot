@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Дополнительные данные объекта - Aaadviser</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px 25px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 30px 25px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .form-group select {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 12px;
+            font-size: 16px;
+            background: white;
+            color: #333;
+            transition: all 0.3s ease;
+        }
+
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-group select option {
+            padding: 10px;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 16px 24px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            text-align: center;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: #f8f9fa;
+            color: #6c757d;
+            border: 2px solid #e9ecef;
+        }
+
+        .btn-secondary:hover {
+            background: #e9ecef;
+            border-color: #dee2e6;
+        }
+
+        .info-box {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+
+        .info-box h3 {
+            color: #495057;
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            padding: 8px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .info-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .info-value {
+            color: #6c757d;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #6c757d;
+        }
+
+        .error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            color: #721c24;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                margin: 10px;
+                border-radius: 15px;
+            }
+            
+            .header {
+                padding: 25px 20px;
+            }
+            
+            .content {
+                padding: 25px 20px;
+            }
+            
+            .buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📋 Дополнительные данные</h1>
+            <p>Укажите характеристики объекта для детального анализа</p>
+        </div>
+
+        <div class="content">
+            <!-- Информация об объекте -->
+            <div class="info-box">
+                <h3>🏠 Информация об объекте</h3>
+                <div class="info-item">
+                    <span class="info-label">Адрес:</span>
+                    <span class="info-value" id="object-address">Загрузка...</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Спальни:</span>
+                    <span class="info-value" id="object-bedrooms">Загрузка...</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Цена:</span>
+                    <span class="info-value" id="object-price">Загрузка...</span>
+                </div>
+            </div>
+
+            <!-- Форма дополнительных данных -->
+            <form id="additional-data-form">
+                <div class="form-group">
+                    <label for="age-select">🏗️ Возраст объекта:</label>
+                    <select id="age-select" name="age" required>
+                        <option value="">Выберите возраст объекта...</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="floor-select">🏢 Этаж объекта:</label>
+                    <select id="floor-select" name="floor" required>
+                        <option value="">Выберите этаж...</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="heating-select">🔥 Тип отопления:</label>
+                    <select id="heating-select" name="heating" required>
+                        <option value="">Выберите тип отопления...</option>
+                    </select>
+                </div>
+
+                <div class="buttons">
+                    <button type="submit" class="btn btn-primary">
+                        ✅ Продолжить
+                    </button>
+                    <button type="button" class="btn btn-secondary" onclick="skipAdditionalData()">
+                        ⏭️ Пропустить
+                    </button>
+                </div>
+            </form>
+
+            <div id="loading" class="loading" style="display: none;">
+                <p>🔄 Загружаем опции...</p>
+            </div>
+
+            <div id="error" class="error" style="display: none;">
+                <p>❌ Произошла ошибка при загрузке данных</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Получаем данные из URL параметров
+        const urlParams = new URLSearchParams(window.location.search);
+        const objectData = {
+            address: urlParams.get('address') || 'Не указано',
+            bedrooms: urlParams.get('bedrooms') || 'Не указано',
+            price: urlParams.get('price') || 'Не указано',
+            location_codes: JSON.parse(urlParams.get('location_codes') || '{}')
+        };
+
+        // Отображаем информацию об объекте
+        document.getElementById('object-address').textContent = objectData.address;
+        document.getElementById('object-bedrooms').textContent = objectData.bedrooms;
+        document.getElementById('object-price').textContent = objectData.price;
+
+        // Загружаем опции для дополнительных данных
+        async function loadAdditionalDataOptions() {
+            try {
+                document.getElementById('loading').style.display = 'block';
+                document.getElementById('error').style.display = 'none';
+
+                const response = await fetch('/api/get_additional_data_options', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        location_codes: objectData.location_codes
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Заполняем опции возраста
+                    const ageSelect = document.getElementById('age-select');
+                    data.age_options.forEach(option => {
+                        const optionElement = document.createElement('option');
+                        optionElement.value = option.id;
+                        optionElement.textContent = option.name;
+                        ageSelect.appendChild(optionElement);
+                    });
+
+                    // Заполняем опции этажей
+                    const floorSelect = document.getElementById('floor-select');
+                    data.floor_options.forEach(option => {
+                        const optionElement = document.createElement('option');
+                        optionElement.value = option.id;
+                        optionElement.textContent = option.name;
+                        floorSelect.appendChild(optionElement);
+                    });
+
+                    // Заполняем опции отопления
+                    const heatingSelect = document.getElementById('heating-select');
+                    data.heating_options.forEach(option => {
+                        const optionElement = document.createElement('option');
+                        optionElement.value = option.id;
+                        optionElement.textContent = option.name;
+                        heatingSelect.appendChild(optionElement);
+                    });
+
+                    document.getElementById('loading').style.display = 'none';
+                } else {
+                    throw new Error(data.error || 'Неизвестная ошибка');
+                }
+            } catch (error) {
+                console.error('Ошибка загрузки опций:', error);
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('error').style.display = 'block';
+                document.getElementById('error').innerHTML = `<p>❌ Ошибка загрузки опций: ${error.message}</p>`;
+            }
+        }
+
+        // Обработка отправки формы
+        document.getElementById('additional-data-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const additionalData = {
+                age: formData.get('age'),
+                floor: formData.get('floor'),
+                heating: formData.get('heating')
+            };
+
+            // Проверяем, что выбраны все поля
+            if (!additionalData.age || !additionalData.floor || !additionalData.heating) {
+                alert('Пожалуйста, заполните все поля или выберите "Не известно"');
+                return;
+            }
+
+            // Сохраняем данные и переходим к полному отчету
+            await generateFullReport(additionalData);
+        });
+
+        // Пропустить дополнительные данные
+        async function skipAdditionalData() {
+            const additionalData = {
+                age: 'unknown',
+                floor: 'unknown',
+                heating: 'unknown'
+            };
+            await generateFullReport(additionalData);
+        }
+
+        // Генерация полного отчета
+        async function generateFullReport(additionalData) {
+            try {
+                // Показываем загрузку
+                document.getElementById('loading').style.display = 'block';
+                document.getElementById('loading').innerHTML = '<p>🔄 Формируем полный отчет...</p>';
+
+                // Формируем данные для отчета
+                const reportData = {
+                    ...objectData,
+                    additional_data: additionalData
+                };
+
+                // Здесь будет вызов API для генерации полного отчета
+                // Пока что просто переходим на страницу отчета
+                const params = new URLSearchParams({
+                    address: objectData.address,
+                    bedrooms: objectData.bedrooms,
+                    price: objectData.price,
+                    age: additionalData.age,
+                    floor: additionalData.floor,
+                    heating: additionalData.heating,
+                    location_codes: JSON.stringify(objectData.location_codes)
+                });
+
+                // Переходим на страницу полного отчета
+                window.location.href = `/webapp_full_report?${params.toString()}`;
+
+            } catch (error) {
+                console.error('Ошибка генерации отчета:', error);
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('error').style.display = 'block';
+                document.getElementById('error').innerHTML = `<p>❌ Ошибка генерации отчета: ${error.message}</p>`;
+            }
+        }
+
+        // Загружаем опции при загрузке страницы
+        document.addEventListener('DOMContentLoaded', loadAdditionalDataOptions);
+    </script>
+</body>
+</html>

@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Полный отчет - Aaadviser</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px 25px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 30px 25px;
+        }
+
+        .section {
+            margin-bottom: 30px;
+            padding: 25px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            border: 1px solid #e9ecef;
+        }
+
+        .section h2 {
+            color: #495057;
+            font-size: 22px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section h3 {
+            color: #6c757d;
+            font-size: 18px;
+            margin-bottom: 15px;
+            margin-top: 20px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .info-item {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid #e9ecef;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: #495057;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .info-value {
+            color: #333;
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .highlight {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+        }
+
+        .highlight h3 {
+            color: white;
+            margin-bottom: 15px;
+        }
+
+        .highlight .value {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .highlight .description {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+
+        .chart-container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid #e9ecef;
+            margin: 20px 0;
+        }
+
+        .chart-placeholder {
+            height: 200px;
+            background: #f8f9fa;
+            border: 2px dashed #dee2e6;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #6c757d;
+            font-size: 16px;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            flex: 1;
+            min-width: 150px;
+            padding: 16px 24px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            text-align: center;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: #f8f9fa;
+            color: #6c757d;
+            border: 2px solid #e9ecef;
+        }
+
+        .btn-secondary:hover {
+            background: #e9ecef;
+            border-color: #dee2e6;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #6c757d;
+        }
+
+        .error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            color: #721c24;
+            text-align: center;
+        }
+
+        .additional-data-badge {
+            display: inline-block;
+            background: #28a745;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                border-radius: 15px;
+            }
+            
+            .header {
+                padding: 25px 20px;
+            }
+            
+            .content {
+                padding: 25px 20px;
+            }
+            
+            .section {
+                padding: 20px;
+            }
+            
+            .buttons {
+                flex-direction: column;
+            }
+            
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 Полный отчет</h1>
+            <p>Детальный анализ объекта недвижимости</p>
+        </div>
+
+        <div class="content">
+            <div id="loading" class="loading">
+                <h3>🔄 Формируем полный отчет...</h3>
+                <p>Пожалуйста, подождите</p>
+            </div>
+
+            <div id="error" class="error" style="display: none;">
+                <h3>❌ Ошибка загрузки отчета</h3>
+                <p id="error-message">Произошла ошибка при формировании отчета</p>
+            </div>
+
+            <div id="report-content" style="display: none;">
+                <!-- Основная информация об объекте -->
+                <div class="section">
+                    <h2>🏠 Информация об объекте</h2>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <div class="info-label">Адрес</div>
+                            <div class="info-value" id="object-address">-</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Спальни</div>
+                            <div class="info-value" id="object-bedrooms">-</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Цена</div>
+                            <div class="info-value" id="object-price">-</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Возраст объекта</div>
+                            <div class="info-value" id="object-age">-</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Этаж</div>
+                            <div class="info-value" id="object-floor">-</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Отопление</div>
+                            <div class="info-value" id="object-heating">-</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ROI анализ -->
+                <div class="section">
+                    <h2>💰 ROI анализ</h2>
+                    
+                    <div class="highlight">
+                        <h3>Краткосрочная аренда (Airbnb)</h3>
+                        <div class="value" id="short-term-income">-</div>
+                        <div class="description">Доход в месяц</div>
+                    </div>
+
+                    <div class="highlight">
+                        <h3>Долгосрочная аренда</h3>
+                        <div class="value" id="long-term-income">-</div>
+                        <div class="description">Доход в год</div>
+                    </div>
+
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <div class="info-label">Рост цены (5 лет)</div>
+                            <div class="info-value" id="price-growth">-</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">ROI с арендой</div>
+                            <div class="info-value" id="roi-with-rent">-</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">ROI без аренды</div>
+                            <div class="info-value" id="roi-without-rent">-</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Альтернативные инвестиции -->
+                <div class="section">
+                    <h2>📈 Альтернативные инвестиции</h2>
+                    <div class="info-grid" id="alternatives-grid">
+                        <!-- Альтернативы будут добавлены динамически -->
+                    </div>
+                </div>
+
+                <!-- Макроэкономические данные -->
+                <div class="section">
+                    <h2>🌍 Макроэкономические данные</h2>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <div class="info-label">Инфляция</div>
+                            <div class="info-value" id="inflation">-</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Курс EUR/TRY</div>
+                            <div class="info-value" id="eur-try">-</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Рост ВВП</div>
+                            <div class="info-value" id="gdp-growth">-</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Ставка рефинансирования</div>
+                            <div class="info-value" id="refi-rate">-</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Налоги и сборы -->
+                <div class="section">
+                    <h2>🏛️ Налоги и сборы</h2>
+                    <div class="info-grid" id="taxes-grid">
+                        <!-- Налоги будут добавлены динамически -->
+                    </div>
+                </div>
+
+                <!-- Риски и ликвидность -->
+                <div class="section">
+                    <h2>⚠️ Риски и ликвидность</h2>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <div class="info-label">Ликвидность</div>
+                            <div class="info-value" id="liquidity">-</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Район</div>
+                            <div class="info-value" id="district">-</div>
+                        </div>
+                    </div>
+                    <div id="risks-list">
+                        <!-- Риски будут добавлены динамически -->
+                    </div>
+                </div>
+
+                <!-- Экономические графики -->
+                <div class="section">
+                    <h2>📊 Экономические тренды</h2>
+                    <div class="chart-container">
+                        <div class="chart-placeholder">
+                            📈 График экономических показателей
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Кнопки действий -->
+                <div class="buttons">
+                    <button class="btn btn-primary" onclick="downloadPDF()">
+                        📥 Скачать PDF
+                    </button>
+                    <button class="btn btn-secondary" onclick="saveReport()">
+                        💾 Сохранить отчет
+                    </button>
+                    <button class="btn btn-secondary" onclick="goBack()">
+                        ← Назад
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Получаем данные из URL параметров
+        const urlParams = new URLSearchParams(window.location.search);
+        const reportData = {
+            address: urlParams.get('address') || 'Не указано',
+            bedrooms: urlParams.get('bedrooms') || 'Не указано',
+            price: urlParams.get('price') || 'Не указано',
+            age: urlParams.get('age') || 'Не указано',
+            floor: urlParams.get('floor') || 'Не указано',
+            heating: urlParams.get('heating') || 'Не указано',
+            telegram_id: urlParams.get('telegram_id') || '',
+            lat: urlParams.get('lat') || '',
+            lng: urlParams.get('lng') || '',
+            location_codes: JSON.parse(urlParams.get('location_codes') || '{}')
+        };
+
+        // Загружаем полный отчет
+        async function loadFullReport() {
+            try {
+                // Показываем загрузку
+                document.getElementById('loading').style.display = 'block';
+                document.getElementById('error').style.display = 'none';
+                document.getElementById('report-content').style.display = 'none';
+
+                // Вызываем API для получения полного отчета
+                const response = await fetch('/api/full_report', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        address: reportData.address,
+                        bedrooms: reportData.bedrooms,
+                        price: reportData.price,
+                        lat: reportData.lat,
+                        lng: reportData.lng,
+                        telegram_id: reportData.telegram_id,
+                        additional_data: {
+                            age: reportData.age,
+                            floor: reportData.floor,
+                            heating: reportData.heating
+                        }
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+
+                // Скрываем загрузку и показываем отчет
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('report-content').style.display = 'block';
+
+                // Заполняем данные отчета
+                fillReportData(data);
+
+            } catch (error) {
+                console.error('Ошибка загрузки отчета:', error);
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('error').style.display = 'block';
+                document.getElementById('error-message').textContent = error.message || 'Неизвестная ошибка';
+            }
+        }
+
+        // Заполняем данные отчета
+        function fillReportData(data) {
+            // Основная информация об объекте
+            document.getElementById('object-address').textContent = reportData.address;
+            document.getElementById('object-bedrooms').textContent = reportData.bedrooms;
+            document.getElementById('object-price').textContent = `€${Number(reportData.price).toLocaleString('ru-RU')}`;
+            
+            // Дополнительные данные
+            const ageText = reportData.age === 'unknown' ? 'Не известно' : reportData.age;
+            const floorText = reportData.floor === 'unknown' ? 'Не известно' : reportData.floor;
+            const heatingText = reportData.heating === 'unknown' ? 'Не известно' : reportData.heating;
+            
+            document.getElementById('object-age').textContent = ageText;
+            document.getElementById('object-floor').textContent = floorText;
+            document.getElementById('object-heating').textContent = heatingText;
+
+            // ROI данные
+            if (data.roi) {
+                if (data.roi.short_term) {
+                    document.getElementById('short-term-income').textContent = `€${data.roi.short_term.monthly_income?.toLocaleString('ru-RU') || '-'}`;
+                }
+                if (data.roi.long_term) {
+                    document.getElementById('long-term-income').textContent = `€${data.roi.long_term.annual_income?.toLocaleString('ru-RU') || '-'}`;
+                }
+                if (data.roi.price_growth) {
+                    document.getElementById('price-growth').textContent = `${(data.roi.price_growth * 100).toFixed(1)}%`;
+                }
+                if (data.roi.short_term?.roi) {
+                    document.getElementById('roi-with-rent').textContent = `${data.roi.short_term.roi.toFixed(1)}%`;
+                }
+                if (data.roi.no_rent?.roi) {
+                    document.getElementById('roi-without-rent').textContent = `${data.roi.no_rent.roi.toFixed(1)}%`;
+                }
+            }
+
+            // Альтернативные инвестиции
+            if (data.alternatives) {
+                const alternativesGrid = document.getElementById('alternatives-grid');
+                alternativesGrid.innerHTML = '';
+                
+                data.alternatives.forEach(alt => {
+                    const altItem = document.createElement('div');
+                    altItem.className = 'info-item';
+                    altItem.innerHTML = `
+                        <div class="info-label">${alt.name}</div>
+                        <div class="info-value">${(alt.yield * 100).toFixed(1)}%</div>
+                    `;
+                    alternativesGrid.appendChild(altItem);
+                });
+            }
+
+            // Макроэкономические данные
+            if (data.inflation !== undefined) {
+                document.getElementById('inflation').textContent = `${data.inflation.toFixed(1)}%`;
+            }
+            if (data.eur_try !== undefined) {
+                document.getElementById('eur-try').textContent = data.eur_try.toFixed(2);
+            }
+            if (data.gdp_growth !== undefined) {
+                document.getElementById('gdp-growth').textContent = `${data.gdp_growth.toFixed(1)}%`;
+            }
+            if (data.refi_rate !== undefined) {
+                document.getElementById('refi-rate').textContent = `${data.refi_rate.toFixed(1)}%`;
+            }
+
+            // Налоги
+            if (data.taxes) {
+                const taxesGrid = document.getElementById('taxes-grid');
+                taxesGrid.innerHTML = '';
+                
+                Object.entries(data.taxes).forEach(([key, value]) => {
+                    const taxItem = document.createElement('div');
+                    taxItem.className = 'info-item';
+                    taxItem.innerHTML = `
+                        <div class="info-label">${getTaxLabel(key)}</div>
+                        <div class="info-value">${formatTaxValue(value)}</div>
+                    `;
+                    taxesGrid.appendChild(taxItem);
+                });
+            }
+
+            // Риски и ликвидность
+            if (data.liquidity) {
+                document.getElementById('liquidity').textContent = data.liquidity;
+            }
+            if (data.district) {
+                document.getElementById('district').textContent = data.district;
+            }
+
+            // Список рисков
+            if (data.risks && Array.isArray(data.risks)) {
+                const risksList = document.getElementById('risks-list');
+                risksList.innerHTML = '';
+                
+                data.risks.forEach(risk => {
+                    const riskItem = document.createElement('div');
+                    riskItem.className = 'info-item';
+                    riskItem.style.marginBottom = '10px';
+                    riskItem.innerHTML = `
+                        <div class="info-value">⚠️ ${risk}</div>
+                    `;
+                    risksList.appendChild(riskItem);
+                });
+            }
+        }
+
+        // Получаем читаемые названия налогов
+        function getTaxLabel(key) {
+            const labels = {
+                'transfer_tax': 'Налог на передачу',
+                'stamp_duty': 'Гербовый сбор',
+                'notary': 'Услуги нотариуса',
+                'annual_property_tax': 'Годовой налог на недвижимость',
+                'rental_income_tax': 'Налог на доход от аренды',
+                'capital_gains_tax': 'Налог на прирост капитала'
+            };
+            return labels[key] || key;
+        }
+
+        // Форматируем значения налогов
+        function formatTaxValue(value) {
+            if (typeof value === 'number') {
+                if (value < 1) {
+                    return `${(value * 100).toFixed(1)}%`;
+                } else {
+                    return `€${value.toLocaleString('ru-RU')}`;
+                }
+            }
+            return value;
+        }
+
+        // Скачать PDF
+        function downloadPDF() {
+            // Здесь будет логика скачивания PDF
+            alert('Функция скачивания PDF будет добавлена позже');
+        }
+
+        // Сохранить отчет
+        function saveReport() {
+            // Здесь будет логика сохранения отчета
+            alert('Функция сохранения отчета будет добавлена позже');
+        }
+
+        // Вернуться назад
+        function goBack() {
+            window.history.back();
+        }
+
+        // Загружаем отчет при загрузке страницы
+        document.addEventListener('DOMContentLoaded', loadFullReport);
+    </script>
+</body>
+</html>
