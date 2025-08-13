@@ -408,6 +408,8 @@ def api_geocode():
         
         # Пытаемся сделать запрос с несколькими попытками и улучшенной обработкой ошибок
         max_retries = 3
+        google_maps_success = False
+        
         for attempt in range(max_retries):
             try:
                 logger.info(f"🔄 Попытка {attempt + 1}/{max_retries}: отправляем HTTP запрос к Google Maps API...")
@@ -415,6 +417,7 @@ def api_geocode():
                 logger.info(f"📝 Параметры: {params}")
                 
                 # Используем полный таймаут для каждой попытки
+                logger.info(f"⏱️ Отправляем запрос с таймаутом {GOOGLE_MAPS_TIMEOUT} секунд...")
                 response = requests.get(url, params=params, timeout=GOOGLE_MAPS_TIMEOUT)
                 logger.info(f"📡 Статус ответа Google Maps API: {response.status_code}")
                 
@@ -447,6 +450,8 @@ def api_geocode():
                             logger.info("✅ ГЕОКОДИНГ ЗАВЕРШЕН УСПЕШНО (Google Maps API)")
                             logger.info("=" * 60)
                             
+                            logger.info("✅ Google Maps API успешно обработал адрес")
+                            google_maps_success = True
                             return jsonify({
                                 'success': True,
                                 'lat': float(location['geometry']['location']['lat']),
@@ -505,6 +510,11 @@ def api_geocode():
                     logger.error(f"❌ Все попытки Google Maps API завершились неожиданной ошибкой")
                     break
                 continue
+        
+        # Проверяем, был ли Google Maps API успешным
+        if google_maps_success:
+            logger.info("✅ Google Maps API уже успешно обработал адрес")
+            return  # Этот return не должен выполниться, но на всякий случай
         
         # Если Google Maps API не сработал, пробуем Nominatim как fallback
         logger.info("🔄 Переключаемся на Nominatim API как fallback...")
@@ -5183,7 +5193,7 @@ def get_nominatim_location(address):
             return location_data
         else:
             logger.warning(f"⚠️ Nominatim API вернул пустой результат: {result}")
-        return None
+            return None
         
     except Exception as e:
         logger.error(f"Ошибка Nominatim API: {e}")
