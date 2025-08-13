@@ -617,7 +617,7 @@ def api_geocode():
                 logger.info("✅ ГЕОКОДИНГ ЗАВЕРШЕН УСПЕШНО (база данных)")
                 logger.info("=" * 60)
                 
-                return jsonify({
+            return jsonify({
                     'success': True,
                     'lat': float(location.get('latitude', 0)),
                     'lng': float(location.get('longitude', 0)),
@@ -637,7 +637,7 @@ def api_geocode():
                 logger.error("❌ Адрес не найден ни в Google Maps, ни в Nominatim, ни в базе данных")
                 return jsonify({'error': 'Адрес не найден. Проверьте правильность написания.'}), 404
                 
-        except Exception as e:
+    except Exception as e:
             logger.error(f"❌ Ошибка поиска в базе данных: {e}")
             logger.error(f"📄 Traceback: ", exc_info=True)
             return jsonify({'error': 'Ошибка поиска адреса в базе данных'}), 500
@@ -1121,19 +1121,19 @@ def format_simple_report(address, bedrooms, price, location_codes, language='en'
                 
                 # Проверяем, что nominatim это словарь перед вызовом .get()
                 if isinstance(nominatim, dict):
-                    report_lines.extend([
-                        "",
-                        "=== ДАННЫЕ NOMINATIM (OpenStreetMap) (только для администраторов) ===",
-                        f"Display Name: {nominatim.get('display_name', 'н/д')}",
-                        f"Country: {nominatim.get('country', 'н/д')}",
-                        f"Country Code: {nominatim.get('country_code', 'н/д')}",
-                        f"City: {nominatim.get('city', 'н/д')}",
-                        f"District: {nominatim.get('district', 'н/д')}",
-                        f"County: {nominatim.get('county', 'н/д')}",
-                        f"Postal Code: {nominatim.get('postal_code', 'н/д')}",
-                        f"Road: {nominatim.get('road', 'н/д')}",
-                        f"House Number: {nominatim.get('house_number', 'н/д')}",
-                    ])
+                report_lines.extend([
+                    "",
+                    "=== ДАННЫЕ NOMINATIM (OpenStreetMap) (только для администраторов) ===",
+                    f"Display Name: {nominatim.get('display_name', 'н/д')}",
+                    f"Country: {nominatim.get('country', 'н/д')}",
+                    f"Country Code: {nominatim.get('country_code', 'н/д')}",
+                    f"City: {nominatim.get('city', 'н/д')}",
+                    f"District: {nominatim.get('district', 'н/д')}",
+                    f"County: {nominatim.get('county', 'н/д')}",
+                    f"Postal Code: {nominatim.get('postal_code', 'н/д')}",
+                    f"Road: {nominatim.get('road', 'н/д')}",
+                    f"House Number: {nominatim.get('house_number', 'н/д')}",
+                ])
                 else:
                     logger.warning(f"⚠️ nominatim_data имеет неожиданный тип: {type(nominatim)}, значение: {nominatim}")
                     report_lines.extend([
@@ -1268,7 +1268,7 @@ def format_simple_report(address, bedrooms, price, location_codes, language='en'
                             logger.warning(f"⚠️ record не является словарем: {type(record)}, пропускаем")
                             continue
                         
-                        listing_type = record.get('listing_type', 'н/д')
+                    listing_type = record.get('listing_type', 'н/д')
                         # Определяем отображаемое название
                         display_name = {
                             "0+1": "0 - студия",
@@ -1287,7 +1287,7 @@ def format_simple_report(address, bedrooms, price, location_codes, language='en'
                         avg_rent = record.get('unit_price_for_rent', 0)
                         max_rent = record.get('max_unit_price_for_rent', 0)
                         
-                        report_lines.extend([
+                    report_lines.extend([
                             f"--- {display_name} ---",
                             "",
                             "--- ПРОДАЖИ ---",
@@ -1344,9 +1344,9 @@ def format_simple_report(address, bedrooms, price, location_codes, language='en'
                             "",
                             f"💎 Доходность:",
                             f"{format_number(record.get('yield'))}%",
-                            "",
-                        ])
-                else:
+                        "",
+                    ])
+            else:
                     # Если данные для выбранного количества спален не найдены
                     display_name = {
                         0: "0 - студия",
@@ -1360,16 +1360,16 @@ def format_simple_report(address, bedrooms, price, location_codes, language='en'
                     logger.warning(f"⚠️ Данные для {bedrooms} спален ({target_listing_type}) не найдены в house_type_data")
                     logger.info(f"🔍 Доступные listing_type: {[record.get('listing_type') for record in house_type_data]}")
                     
-                    report_lines.extend([
+                report_lines.extend([
                         f"--- {display_name} ---",
                         "Данные для выбранного количества спален не найдены",
-                        "",
-                    ])
+                "",
+            ])
             else:
                 # Если это одна запись
                 if not isinstance(house_type_data, dict):
                     logger.warning(f"⚠️ house_type_data не является словарем: {type(house_type_data)}")
-                    report_lines.extend([
+            report_lines.extend([
                         "--- Ошибка данных ---",
                         "Данные имеют неожиданный формат",
                         "",
@@ -1387,7 +1387,7 @@ def format_simple_report(address, bedrooms, price, location_codes, language='en'
                             "5+1": "5+ спален"
                         }.get(listing_type, listing_type)
                         
-                        report_lines.extend([
+                    report_lines.extend([
                             f"--- {display_name} ---",
                             "",
                             "--- ПРОДАЖИ ---",
@@ -1410,9 +1410,9 @@ def format_simple_report(address, bedrooms, price, location_codes, language='en'
                             f"🏗️ Средний возраст объекта для аренды: {format_number(house_type_data.get('average_age_for_rent'))} лет",
                             f"⏱️ Период листинга для аренды: {format_number(house_type_data.get('listing_period_for_rent'))} дней",
                             f"💎 Доходность: {format_number(house_type_data.get('yield'))}%",
-                            "",
-                        ])
-                    else:
+                        "",
+                    ])
+            else:
                         # Если данные не соответствуют выбранному количеству спален
                         display_name = {
                             0: "0 - студия",
@@ -1423,11 +1423,11 @@ def format_simple_report(address, bedrooms, price, location_codes, language='en'
                             5: "5+ спален"
                         }.get(bedrooms, f"{bedrooms} спален")
                         
-                        report_lines.extend([
+                report_lines.extend([
                             f"--- {display_name} ---",
                             "Данные для выбранного количества спален не найдены",
-                            "",
-                        ])
+                "",
+            ])
         # Добавляем раздел с рекомендациями
         if market_data and market_data.get('general_data'):
             general = market_data['general_data']
@@ -1456,27 +1456,27 @@ def format_simple_report(address, bedrooms, price, location_codes, language='en'
                         "Рассмотрите торг или поиск альтернатив",
                         "",
                     ])
-                else:
-                    report_lines.extend([
+            else:
+                report_lines.extend([
                         "📊 Цена в пределах рыночного диапазона",
                         "Справедливая оценка",
-                        "",
-                    ])
+                    "",
+                ])
         
         # Анализ доходности
         if yield_value:
             if yield_value > 8:
-                report_lines.extend([
+            report_lines.extend([
                     "💰 Высокая доходность (>8%)",
                     "Отличный потенциал для инвестиций",
                     "",
                 ])
             elif yield_value > 6:
-                report_lines.extend([
+                    report_lines.extend([
                     "💡 Хорошая доходность (6-8%)",
                     "Стабильный доход",
-                    "",
-                ])
+                        "",
+                    ])
             else:
                 report_lines.extend([
                     "📉 Низкая доходность (<6%)",
@@ -1494,7 +1494,7 @@ def format_simple_report(address, bedrooms, price, location_codes, language='en'
         "=" * 50,
         "Отчет сгенерирован автоматически",
         f"Дата: {datetime.now().strftime('%d.%m.%Y %H:%M')}",
-    ])
+        ])
     
     return "\n".join(report_lines)
 
@@ -4719,10 +4719,10 @@ def get_market_data_by_location_ids(location_codes, target_year=None, target_mon
                 # Фильтруем записи с валидными датами
                 valid_records = [r for r in result.data if r.get('trend_date')]
                 if valid_records:
-                    # Берем самую свежую запись
+                # Берем самую свежую запись
                     latest_record = max(valid_records, key=lambda x: x.get('trend_date', ''))
-                    market_data['property_trends'] = latest_record
-                    logger.info(f"Найдены данные property_trends: {len(result.data)} записей, выбрана самая свежая: {latest_record.get('trend_date')}")
+                market_data['property_trends'] = latest_record
+                logger.info(f"Найдены данные property_trends: {len(result.data)} записей, выбрана самая свежая: {latest_record.get('trend_date')}")
                 else:
                     logger.warning("Все записи property_trends имеют пустые даты")
                     market_data['property_trends'] = result.data[0] if result.data else None
@@ -4823,10 +4823,10 @@ def get_market_data_by_location_ids(location_codes, target_year=None, target_mon
                 # Фильтруем записи с валидными датами
                 valid_records = [r for r in result.data if r.get('trend_date')]
                 if valid_records:
-                    # Берем самую свежую запись
+                # Берем самую свежую запись
                     latest_record = max(valid_records, key=lambda x: x.get('trend_date', ''))
-                    market_data['general_data'] = latest_record
-                    logger.info(f"Найдены данные general_data: {len(result.data)} записей, выбрана самая свежая: {latest_record.get('trend_date')}")
+                market_data['general_data'] = latest_record
+                logger.info(f"Найдены данные general_data: {len(result.data)} записей, выбрана самая свежая: {latest_record.get('trend_date')}")
                 else:
                     logger.warning("Все записи general_data имеют пустые даты")
                     market_data['general_data'] = result.data[0] if result.data else None
@@ -5138,7 +5138,7 @@ def get_nominatim_location(address):
             logger.info(f"📝 Параметры запроса: {params}")
             response = requests.get(url, params=params, headers=headers, timeout=30)
             logger.info(f"📡 Статус ответа Nominatim API: {response.status_code}")
-            result = response.json()
+        result = response.json()
             logger.info(f"📊 Размер ответа Nominatim: {len(str(result))} символов")
         except requests.exceptions.Timeout:
             logger.error("❌ Таймаут при запросе к Nominatim API (30 секунд)")
@@ -6016,32 +6016,68 @@ def get_market_comparison_data(age_id, floor_id, heating_id, area, price, locati
     Получает рыночные данные для сравнения цен из таблиц floor_segment_data, heating_data, house_type_data, age_data
     
     Args:
-        age_id (str): ID возраста объекта
-        floor_id (str): ID этажа
-        heating_id (str): ID типа отопления
+        age_id (str): Выбранный пользователем возраст объекта (listing_type)
+        floor_id (str): Выбранный пользователем этаж (listing_type)
+        heating_id (str): Выбранный пользователем тип отопления (listing_type)
         area (str): Площадь объекта в м²
         price (float): Цена объекта пользователя
-        location_codes (dict): Коды локации
+        location_codes (dict): Коды локации (country_id, city_id, county_id, district_id)
     
     Returns:
-        dict: Данные для сравнения цен
+        dict: Данные для сравнения цен и графики изменения цен
     """
     try:
-        logger.info(f"🔍 Получаем рыночные данные для сравнения: age_id={age_id}, floor_id={floor_id}, heating_id={heating_id}, area={area}, price={price}")
+        logger.info(f"🔍 Получаем рыночные данные для сравнения:")
+        logger.info(f"📍 Возраст: {age_id}, Этаж: {floor_id}, Отопление: {heating_id}")
+        logger.info(f"📍 Площадь: {area} м², Цена: €{price}")
+        logger.info(f"📍 Коды локации: {location_codes}")
         
         # Получаем данные из таблиц
         comparisons = {}
+        price_trends = {}  # Для графиков изменения цен
+        
+        # Получаем текущую дату для фильтрации по trend_date
+        current_date = datetime.now().date()
+        twelve_months_ago = current_date - timedelta(days=365)  # 12 месяцев для графиков
         
         # 1. Сравнение по возрасту объекта
         if age_id and age_id != 'unknown':
             try:
-                age_result = supabase.table('age_data').select('min_price, max_price').eq('id', age_id).execute()
+                # Получаем данные по возрасту с учетом локации, listing_type и даты
+                age_query = supabase.table('age_data').select('trend_date, min_unit_price_for_sale, max_unit_price_for_sale, unit_price_for_sale')
+                
+                # 1. Фильтр по локации
+                if location_codes.get('country_id'):
+                    age_query = age_query.eq('country_id', location_codes['country_id'])
+                if location_codes.get('city_id'):
+                    age_query = age_query.eq('city_id', location_codes['city_id'])
+                if location_codes.get('county_id'):
+                    age_query = age_query.eq('county_id', location_codes['county_id'])
+                if location_codes.get('district_id'):
+                    age_query = age_query.eq('district_id', location_codes['district_id'])
+                
+                # 2. Фильтр по выбранному возрасту (listing_type)
+                age_query = age_query.eq('listing_type', age_id)
+                
+                # 3. Фильтр по дате (последние 12 месяцев)
+                age_query = age_query.gte('trend_date', twelve_months_ago).lte('trend_date', current_date)
+                
+                age_result = age_query.execute()
+                logger.info(f"🔍 Результат запроса по возрасту: {len(age_result.data)} записей")
+                
                 if age_result.data:
-                    age_data = age_result.data[0]
-                    min_price = float(age_data.get('min_price', 0))
-                    max_price = float(age_data.get('max_price', 0))
+                    # Сохраняем данные для графика
+                    price_trends['age'] = {
+                        'dates': [record.get('trend_date') for record in age_result.data],
+                        'prices': [float(record.get('unit_price_for_sale', 0)) for record in age_result.data if record.get('unit_price_for_sale')]
+                    }
                     
-                    if area and area != 'unknown':
+                    # Берем последнюю запись для расчетов
+                    latest_record = max(age_result.data, key=lambda x: x.get('trend_date', ''))
+                    min_price = float(latest_record.get('min_unit_price_for_sale', 0))
+                    max_price = float(latest_record.get('max_unit_price_for_sale', 0))
+                    
+                    if min_price > 0 and max_price > 0 and area and area != 'unknown':
                         area_value = float(area)
                         min_total = min_price * area_value
                         max_total = max_price * area_value
@@ -6051,7 +6087,8 @@ def get_market_comparison_data(age_id, floor_id, heating_id, area, price, locati
                             'max_price': max_total,
                             'user_price': price,
                             'deviation_min': ((price - min_total) / min_total * 100) if min_total > 0 else 0,
-                            'deviation_max': ((price - max_total) / max_total * 100) if max_total > 0 else 0
+                            'deviation_max': ((price - max_total) / max_total * 100) if max_total > 0 else 0,
+                            'trend_data': price_trends['age']
                         }
                         logger.info(f"✅ Данные по возрасту: min={min_total:.0f}, max={max_total:.0f}, user={price:.0f}")
             except Exception as e:
@@ -6060,13 +6097,41 @@ def get_market_comparison_data(age_id, floor_id, heating_id, area, price, locati
         # 2. Сравнение по этажу
         if floor_id and floor_id != 'unknown':
             try:
-                floor_result = supabase.table('floor_segment_data').select('min_price, max_price').eq('id', floor_id).execute()
+                # Получаем данные по этажу с учетом локации, listing_type и даты
+                floor_query = supabase.table('floor_segment_data').select('trend_date, min_unit_price_for_sale, max_unit_price_for_sale, unit_price_for_sale')
+                
+                # 1. Фильтр по локации
+                if location_codes.get('country_id'):
+                    floor_query = floor_query.eq('country_id', location_codes['country_id'])
+                if location_codes.get('city_id'):
+                    floor_query = floor_query.eq('city_id', location_codes['city_id'])
+                if location_codes.get('county_id'):
+                    floor_query = floor_query.eq('county_id', location_codes['county_id'])
+                if location_codes.get('district_id'):
+                    floor_query = floor_query.eq('district_id', location_codes['district_id'])
+                
+                # 2. Фильтр по выбранному этажу (listing_type)
+                floor_query = floor_query.eq('listing_type', floor_id)
+                
+                # 3. Фильтр по дате (последние 12 месяцев)
+                floor_query = floor_query.gte('trend_date', twelve_months_ago).lte('trend_date', current_date)
+                
+                floor_result = floor_query.execute()
+                logger.info(f"🔍 Результат запроса по этажу: {len(floor_result.data)} записей")
+                
                 if floor_result.data:
-                    floor_data = floor_result.data[0]
-                    min_price = float(floor_data.get('min_price', 0))
-                    max_price = float(floor_data.get('max_price', 0))
+                    # Сохраняем данные для графика
+                    price_trends['floor'] = {
+                        'dates': [record.get('trend_date') for record in floor_result.data],
+                        'prices': [float(record.get('unit_price_for_sale', 0)) for record in floor_result.data if record.get('unit_price_for_sale')]
+                    }
                     
-                    if area and area != 'unknown':
+                    # Берем последнюю запись для расчетов
+                    latest_record = max(floor_result.data, key=lambda x: x.get('trend_date', ''))
+                    min_price = float(latest_record.get('min_unit_price_for_sale', 0))
+                    max_price = float(latest_record.get('max_unit_price_for_sale', 0))
+                    
+                    if min_price > 0 and max_price > 0 and area and area != 'unknown':
                         area_value = float(area)
                         min_total = min_price * area_value
                         max_total = max_price * area_value
@@ -6076,7 +6141,8 @@ def get_market_comparison_data(age_id, floor_id, heating_id, area, price, locati
                             'max_price': max_total,
                             'user_price': price,
                             'deviation_min': ((price - min_total) / min_total * 100) if min_total > 0 else 0,
-                            'deviation_max': ((price - max_total) / max_total * 100) if max_total > 0 else 0
+                            'deviation_max': ((price - max_total) / max_total * 100) if max_total > 0 else 0,
+                            'trend_data': price_trends['floor']
                         }
                         logger.info(f"✅ Данные по этажу: min={min_total:.0f}, max={max_total:.0f}, user={price:.0f}")
             except Exception as e:
@@ -6085,13 +6151,41 @@ def get_market_comparison_data(age_id, floor_id, heating_id, area, price, locati
         # 3. Сравнение по типу отопления
         if heating_id and heating_id != 'unknown':
             try:
-                heating_result = supabase.table('heating_data').select('min_price, max_price').eq('id', heating_id).execute()
+                # Получаем данные по отоплению с учетом локации, listing_type и даты
+                heating_query = supabase.table('heating_data').select('trend_date, min_unit_price_for_sale, max_unit_price_for_sale, unit_price_for_sale')
+                
+                # 1. Фильтр по локации
+                if location_codes.get('country_id'):
+                    heating_query = heating_query.eq('country_id', location_codes['country_id'])
+                if location_codes.get('city_id'):
+                    heating_query = heating_query.eq('city_id', location_codes['city_id'])
+                if location_codes.get('county_id'):
+                    heating_query = heating_query.eq('county_id', location_codes['county_id'])
+                if location_codes.get('district_id'):
+                    heating_query = heating_query.eq('district_id', location_codes['district_id'])
+                
+                # 2. Фильтр по выбранному типу отопления (listing_type)
+                heating_query = heating_query.eq('listing_type', heating_id)
+                
+                # 3. Фильтр по дате (последние 12 месяцев)
+                heating_query = heating_query.gte('trend_date', twelve_months_ago).lte('trend_date', current_date)
+                
+                heating_result = heating_query.execute()
+                logger.info(f"🔍 Результат запроса по отоплению: {len(heating_result.data)} записей")
+                
                 if heating_result.data:
-                    heating_data = heating_result.data[0]
-                    min_price = float(heating_data.get('min_price', 0))
-                    max_price = float(heating_data.get('max_price', 0))
+                    # Сохраняем данные для графика
+                    price_trends['heating'] = {
+                        'dates': [record.get('trend_date') for record in heating_result.data],
+                        'prices': [float(record.get('unit_price_for_sale', 0)) for record in heating_result.data if record.get('unit_price_for_sale')]
+                    }
                     
-                    if area and area != 'unknown':
+                    # Берем последнюю запись для расчетов
+                    latest_record = max(heating_result.data, key=lambda x: x.get('trend_date', ''))
+                    min_price = float(latest_record.get('min_unit_price_for_sale', 0))
+                    max_price = float(latest_record.get('max_unit_price_for_sale', 0))
+                    
+                    if min_price > 0 and max_price > 0 and area and area != 'unknown':
                         area_value = float(area)
                         min_total = min_price * area_value
                         max_total = max_price * area_value
@@ -6101,26 +6195,55 @@ def get_market_comparison_data(age_id, floor_id, heating_id, area, price, locati
                             'max_price': max_total,
                             'user_price': price,
                             'deviation_min': ((price - min_total) / min_total * 100) if min_total > 0 else 0,
-                            'deviation_max': ((price - max_total) / max_total * 100) if max_total > 0 else 0
+                            'deviation_max': ((price - max_total) / max_total * 100) if max_total > 0 else 0,
+                            'trend_data': price_trends['heating']
                         }
                         logger.info(f"✅ Данные по отоплению: min={min_total:.0f}, max={max_total:.0f}, user={price:.0f}")
             except Exception as e:
                 logger.error(f"❌ Ошибка получения данных по отоплению: {e}")
         
-        # 4. Сравнение по типу дома (используем количество спален как приближение)
+        # 4. Сравнение по типу дома (используем количество спален)
         try:
-            # Определяем тип дома на основе количества спален
             if 'bedrooms' in location_codes:
                 bedrooms = int(location_codes.get('bedrooms', 2))
+                # Определяем тип дома на основе количества спален
                 house_type = 'apartment' if bedrooms <= 2 else 'villa' if bedrooms >= 4 else 'townhouse'
                 
-                house_result = supabase.table('house_type_data').select('min_price, max_price').eq('type', house_type).execute()
+                # Получаем данные по типу дома с учетом локации, listing_type и даты
+                house_query = supabase.table('house_type_data').select('trend_date, min_unit_price_for_sale, max_unit_price_for_sale, unit_price_for_sale')
+                
+                # 1. Фильтр по локации
+                if location_codes.get('country_id'):
+                    house_query = house_query.eq('country_id', location_codes['country_id'])
+                if location_codes.get('city_id'):
+                    house_query = house_query.eq('city_id', location_codes['city_id'])
+                if location_codes.get('county_id'):
+                    house_query = house_query.eq('county_id', location_codes['county_id'])
+                if location_codes.get('district_id'):
+                    house_query = house_query.eq('district_id', location_codes['district_id'])
+                
+                # 2. Фильтр по типу дома (listing_type)
+                house_query = house_query.eq('listing_type', house_type)
+                
+                # 3. Фильтр по дате (последние 12 месяцев)
+                house_query = house_query.gte('trend_date', twelve_months_ago).lte('trend_date', current_date)
+                
+                house_result = house_query.execute()
+                logger.info(f"🔍 Результат запроса по типу дома: {len(house_result.data)} записей")
+                
                 if house_result.data:
-                    house_data = house_result.data[0]
-                    min_price = float(house_data.get('min_price', 0))
-                    max_price = float(house_data.get('max_price', 0))
+                    # Сохраняем данные для графика
+                    price_trends['house_type'] = {
+                        'dates': [record.get('trend_date') for record in house_result.data],
+                        'prices': [float(record.get('unit_price_for_sale', 0)) for record in house_result.data if record.get('unit_price_for_sale')]
+                    }
                     
-                    if area and area != 'unknown':
+                    # Берем последнюю запись для расчетов
+                    latest_record = max(house_result.data, key=lambda x: x.get('trend_date', ''))
+                    min_price = float(latest_record.get('min_unit_price_for_sale', 0))
+                    max_price = float(latest_record.get('max_unit_price_for_sale', 0))
+                    
+                    if min_price > 0 and max_price > 0 and area and area != 'unknown':
                         area_value = float(area)
                         min_total = min_price * area_value
                         max_total = max_price * area_value
@@ -6130,7 +6253,8 @@ def get_market_comparison_data(age_id, floor_id, heating_id, area, price, locati
                             'max_price': max_total,
                             'user_price': price,
                             'deviation_min': ((price - min_total) / min_total * 100) if min_total > 0 else 0,
-                            'deviation_max': ((price - max_total) / max_total * 100) if max_total > 0 else 0
+                            'deviation_max': ((price - max_total) / max_total * 100) if max_total > 0 else 0,
+                            'trend_data': price_trends['house_type']
                         }
                         logger.info(f"✅ Данные по типу дома: min={min_total:.0f}, max={max_total:.0f}, user={price:.0f}")
         except Exception as e:
@@ -6164,6 +6288,10 @@ def get_market_comparison_data(age_id, floor_id, heating_id, area, price, locati
                 comparisons['price_conclusion'] = price_conclusion
                 logger.info(f"✅ Итоговое сравнение: avg_min={avg_min_price:.0f}, avg_max={avg_max_price:.0f}, вывод: {price_conclusion}")
         
+        # 6. Добавляем данные для графиков
+        comparisons['price_trends'] = price_trends
+        
+        logger.info(f"📊 Итоговые данные сравнения: {comparisons}")
         return comparisons
         
     except Exception as e:
