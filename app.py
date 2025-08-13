@@ -617,7 +617,7 @@ def api_geocode():
                 logger.info("✅ ГЕОКОДИНГ ЗАВЕРШЕН УСПЕШНО (база данных)")
                 logger.info("=" * 60)
                 
-            return jsonify({
+                return jsonify({
                     'success': True,
                     'lat': float(location.get('latitude', 0)),
                     'lng': float(location.get('longitude', 0)),
@@ -637,12 +637,11 @@ def api_geocode():
                 logger.error("❌ Адрес не найден ни в Google Maps, ни в Nominatim, ни в базе данных")
                 return jsonify({'error': 'Адрес не найден. Проверьте правильность написания.'}), 404
                 
-    except Exception as e:
+        except Exception as e:
             logger.error(f"❌ Ошибка поиска в базе данных: {e}")
             logger.error(f"📄 Traceback: ", exc_info=True)
             return jsonify({'error': 'Ошибка поиска адреса в базе данных'}), 500
         
-
     except Exception as e:
         logger.error(f"❌ Критическая ошибка при геокодинге: {e}")
         logger.error(f"📄 Traceback: ", exc_info=True)
@@ -1121,26 +1120,26 @@ def format_simple_report(address, bedrooms, price, location_codes, language='en'
                 
                 # Проверяем, что nominatim это словарь перед вызовом .get()
                 if isinstance(nominatim, dict):
-                report_lines.extend([
-                    "",
-                    "=== ДАННЫЕ NOMINATIM (OpenStreetMap) (только для администраторов) ===",
-                    f"Display Name: {nominatim.get('display_name', 'н/д')}",
-                    f"Country: {nominatim.get('country', 'н/д')}",
-                    f"Country Code: {nominatim.get('country_code', 'н/д')}",
-                    f"City: {nominatim.get('city', 'н/д')}",
-                    f"District: {nominatim.get('district', 'н/д')}",
-                    f"County: {nominatim.get('county', 'н/д')}",
-                    f"Postal Code: {nominatim.get('postal_code', 'н/д')}",
-                    f"Road: {nominatim.get('road', 'н/д')}",
-                    f"House Number: {nominatim.get('house_number', 'н/д')}",
-                ])
+                    report_lines.extend([
+                        "",
+                        "=== ДАННЫЕ NOMINATIM (OpenStreetMap) (только для администраторов) ===",
+                        f"Display Name: {nominatim.get('display_name', 'н/д')}",
+                        f"Country: {nominatim.get('country', 'н/д')}",
+                        f"Country Code: {nominatim.get('country_code', 'н/д')}",
+                        f"City: {nominatim.get('city', 'н/д')}",
+                        f"District: {nominatim.get('district', 'н/д')}",
+                        f"County: {nominatim.get('county', 'н/д')}",
+                        f"Postal Code: {nominatim.get('postal_code', 'н/д')}",
+                        f"Road: {nominatim.get('road', 'н/д')}",
+                        f"House Number: {nominatim.get('house_number', 'н/д')}",
+                    ])
                 else:
                     logger.warning(f"⚠️ nominatim_data имеет неожиданный тип: {type(nominatim)}, значение: {nominatim}")
                     report_lines.extend([
                         "",
                         "=== ДАННЫЕ NOMINATIM (OpenStreetMap) (только для администраторов) ===",
                         "Ошибка: данные Nominatim имеют неожиданный формат",
-                    ])
+                ])
     
     report_lines.append("")
     
@@ -1269,111 +1268,111 @@ def format_simple_report(address, bedrooms, price, location_codes, language='en'
                             continue
                         
                     listing_type = record.get('listing_type', 'н/д')
-                        # Определяем отображаемое название
-                        display_name = {
-                            "0+1": "0 - студия",
-                            "1+1": "1 спальня",
-                            "2+1": "2 спальни", 
-                            "3+1": "3 спальни",
-                            "4+1": "4 спальни",
-                            "5+1": "5+ спален"
-                        }.get(listing_type, listing_type)
-                        
-                        # Получаем значения для прогресс-баров
-                        min_sale = record.get('min_unit_price_for_sale', 0)
-                        avg_sale = record.get('unit_price_for_sale', 0)
-                        max_sale = record.get('max_unit_price_for_sale', 0)
-                        min_rent = record.get('min_unit_price_for_rent', 0)
-                        avg_rent = record.get('unit_price_for_rent', 0)
-                        max_rent = record.get('max_unit_price_for_rent', 0)
-                        
-                    report_lines.extend([
-                            f"--- {display_name} ---",
-                            "",
-                            "--- ПРОДАЖИ ---",
-                            f"💰 Минимальная цена продажи:",
-                            f"€{format_number(min_sale)}",
-                            "",
-                            f"💰 Средняя цена продажи:",
-                            f"€{format_number(avg_sale)}",
-                            "",
-                            f"💰 Максимальная цена продажи:",
-                            f"€{format_number(max_sale)}",
-                            "",
-
-                            f"📏 Сопоставимая площадь для продажи:",
-                            f"{format_number(record.get('comparable_area_for_sale'))} м²",
-                            "",
-                            f"📊 Количество объектов на продажу:",
-                            f"{format_number(record.get('count_for_sale'))}",
-                            "",
-                            f"💰 Цена для продажи, средняя:",
-                            f"€{format_number(record.get('price_for_sale'))}",
-                            "",
-                            f"🏗️ Средний возраст объекта для продажи:",
-                            f"{format_number(record.get('average_age_for_sale'))} лет",
-                            "",
-                            f"⏱️ Период листинга для продажи:",
-                            f"{format_number(record.get('listing_period_for_sale'))} дней",
-                            "",
-                            "--- АРЕНДА ---",
-                            f"💰 Минимальная цена аренды, м²:",
-                            f"€{format_number(min_rent)}",
-                            "",
-                            f"💰 Средняя цена аренды, м²:",
-                            f"€{format_number(avg_rent)}",
-                            "",
-                            f"💰 Максимальная цена аренды, м²:",
-                            f"€{format_number(max_rent)}",
-                            "",
-
-                            f"📏 Средняя площадь аренды:",
-                            f"{format_number(record.get('comparable_area_for_rent'))} м²",
-                            "",
-                            f"📊 Количество объектов в аренду:",
-                            f"{format_number(record.get('count_for_rent'))}",
-                            "",
-                            f"💰 Цена для аренды, средняя:",
-                            f"€{format_number(record.get('price_for_rent'))}",
-                            "",
-                            f"🏗️ Средний возраст объекта для аренды:",
-                            f"{format_number(record.get('average_age_for_rent'))} лет",
-                            "",
-                            f"⏱️ Период листинга для аренды:",
-                            f"{format_number(record.get('listing_period_for_rent'))} дней",
-                            "",
-                            f"💎 Доходность:",
-                            f"{format_number(record.get('yield'))}%",
-                        "",
-                    ])
-            else:
-                    # Если данные для выбранного количества спален не найдены
+                    # Определяем отображаемое название
                     display_name = {
-                        0: "0 - студия",
-                        1: "1 спальня",
-                        2: "2 спальни",
-                        3: "3 спальни",
-                        4: "4 спальни",
-                        5: "5+ спален"
-                    }.get(bedrooms, f"{bedrooms} спален")
+                        "0+1": "0 - студия",
+                        "1+1": "1 спальня",
+                        "2+1": "2 спальни", 
+                        "3+1": "3 спальни",
+                        "4+1": "4 спальни",
+                        "5+1": "5+ спален"
+                    }.get(listing_type, listing_type)
                     
-                    logger.warning(f"⚠️ Данные для {bedrooms} спален ({target_listing_type}) не найдены в house_type_data")
-                    logger.info(f"🔍 Доступные listing_type: {[record.get('listing_type') for record in house_type_data]}")
+                    # Получаем значения для прогресс-баров
+                    min_sale = record.get('min_unit_price_for_sale', 0)
+                    avg_sale = record.get('unit_price_for_sale', 0)
+                    max_sale = record.get('max_unit_price_for_sale', 0)
+                    min_rent = record.get('min_unit_price_for_rent', 0)
+                    avg_rent = record.get('unit_price_for_rent', 0)
+                    max_rent = record.get('max_unit_price_for_rent', 0)
                     
-                report_lines.extend([
+                    report_lines.extend([
                         f"--- {display_name} ---",
-                        "Данные для выбранного количества спален не найдены",
-                "",
-            ])
-            else:
-                # Если это одна запись
-                if not isinstance(house_type_data, dict):
-                    logger.warning(f"⚠️ house_type_data не является словарем: {type(house_type_data)}")
-            report_lines.extend([
-                        "--- Ошибка данных ---",
-                        "Данные имеют неожиданный формат",
+                        "",
+                        "--- ПРОДАЖИ ---",
+                        f"💰 Минимальная цена продажи:",
+                        f"€{format_number(min_sale)}",
+                        "",
+                        f"💰 Средняя цена продажи:",
+                        f"€{format_number(avg_sale)}",
+                        "",
+                        f"💰 Максимальная цена продажи:",
+                        f"€{format_number(max_sale)}",
+                        "",
+
+                        f"📏 Сопоставимая площадь для продажи:",
+                        f"{format_number(record.get('comparable_area_for_sale'))} м²",
+                        "",
+                        f"📊 Количество объектов на продажу:",
+                        f"{format_number(record.get('count_for_sale'))}",
+                        "",
+                        f"💰 Цена для продажи, средняя:",
+                        f"€{format_number(record.get('price_for_sale'))}",
+                        "",
+                        f"🏗️ Средний возраст объекта для продажи:",
+                        f"{format_number(record.get('average_age_for_sale'))} лет",
+                        "",
+                        f"⏱️ Период листинга для продажи:",
+                        f"{format_number(record.get('listing_period_for_sale'))} дней",
+                        "",
+                        "--- АРЕНДА ---",
+                        f"💰 Минимальная цена аренды, м²:",
+                        f"€{format_number(min_rent)}",
+                        "",
+                        f"💰 Средняя цена аренды, м²:",
+                        f"€{format_number(avg_rent)}",
+                        "",
+                        f"💰 Максимальная цена аренды, м²:",
+                        f"€{format_number(max_rent)}",
+                        "",
+
+                        f"📏 Средняя площадь аренды:",
+                        f"{format_number(record.get('comparable_area_for_rent'))} м²",
+                        "",
+                        f"📊 Количество объектов в аренду:",
+                        f"{format_number(record.get('count_for_rent'))}",
+                        "",
+                        f"💰 Цена для аренды, средняя:",
+                        f"€{format_number(record.get('price_for_rent'))}",
+                        "",
+                        f"🏗️ Средний возраст объекта для аренды:",
+                        f"{format_number(record.get('average_age_for_rent'))} лет",
+                        "",
+                        f"⏱️ Период листинга для аренды:",
+                        f"{format_number(record.get('listing_period_for_rent'))} дней",
+                        "",
+                        f"💎 Доходность:",
+                        f"{format_number(record.get('yield'))}%",
                         "",
                     ])
+            else:
+                # Если данные для выбранного количества спален не найдены
+                display_name = {
+                    0: "0 - студия",
+                    1: "1 спальня",
+                    2: "2 спальни",
+                    3: "3 спальни",
+                    4: "4 спальни",
+                    5: "5+ спален"
+                }.get(bedrooms, f"{bedrooms} спален")
+                
+                logger.warning(f"⚠️ Данные для {bedrooms} спален ({target_listing_type}) не найдены в house_type_data")
+                logger.info(f"🔍 Доступные listing_type: {[record.get('listing_type') for record in house_type_data]}")
+                
+                report_lines.extend([
+                    f"--- {display_name} ---",
+                    "Данные для выбранного количества спален не найдены",
+                    "",
+                ])
+        else:
+            # Если это одна запись
+            if not isinstance(house_type_data, dict):
+                logger.warning(f"⚠️ house_type_data не является словарем: {type(house_type_data)}")
+                report_lines.extend([
+                    "--- Ошибка данных ---",
+                    "Данные имеют неожиданный формат",
+                    "",
+                ])
                 else:
                     listing_type = house_type_data.get('listing_type', 'н/д')
                     if listing_type == target_listing_type:
