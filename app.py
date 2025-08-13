@@ -1949,6 +1949,8 @@ def api_full_report():
     
     # Получаем площадь объекта
     area = data.get('area')
+    logger.info(f"🔍 Полученная площадь из POST-данных: {area}")
+    logger.info(f"🔍 Все POST-данные: {data}")
     
     # Получаем дополнительные данные
     additional_data = data.get('additional_data', {})
@@ -6021,9 +6023,9 @@ def get_market_comparison_data(age_id, floor_id, heating_id, area, price, locati
     Получает рыночные данные для сравнения цен из таблиц floor_segment_data, heating_data, house_type_data, age_data
     
     Args:
-        age_id (str): Выбранный пользователем возраст объекта (listing_type)
-        floor_id (str): Выбранный пользователем этаж (listing_type)
-        heating_id (str): Выбранный пользователем тип отопления (listing_type)
+        age_id (str): ID записи возраста объекта
+        floor_id (str): ID записи этажа объекта
+        heating_id (str): ID записи типа отопления
         area (str): Площадь объекта в м²
         price (float): Цена объекта пользователя
         location_codes (dict): Коды локации (country_id, city_id, county_id, district_id)
@@ -6036,6 +6038,7 @@ def get_market_comparison_data(age_id, floor_id, heating_id, area, price, locati
         logger.info(f"📍 Возраст: {age_id}, Этаж: {floor_id}, Отопление: {heating_id}")
         logger.info(f"📍 Площадь: {area} м², Цена: €{price}")
         logger.info(f"📍 Коды локации: {location_codes}")
+        logger.info(f"🔍 Типы данных: age_id={type(age_id)}, floor_id={type(floor_id)}, heating_id={type(heating_id)}")
         
         # Получаем данные из таблиц
         comparisons = {}
@@ -6048,27 +6051,33 @@ def get_market_comparison_data(age_id, floor_id, heating_id, area, price, locati
         # 1. Сравнение по возрасту объекта
         if age_id and age_id != 'unknown':
             try:
-                # Получаем данные по возрасту с учетом локации, listing_type и даты
-                age_query = supabase.table('age_data').select('trend_date, min_unit_price_for_sale, max_unit_price_for_sale, unit_price_for_sale')
-                
-                # 1. Фильтр по локации
-                if location_codes.get('country_id'):
-                    age_query = age_query.eq('country_id', location_codes['country_id'])
-                if location_codes.get('city_id'):
-                    age_query = age_query.eq('city_id', location_codes['city_id'])
-                if location_codes.get('county_id'):
-                    age_query = age_query.eq('county_id', location_codes['county_id'])
-                if location_codes.get('district_id'):
-                    age_query = age_query.eq('district_id', location_codes['district_id'])
-                
-                # 2. Фильтр по выбранному возрасту (listing_type)
-                age_query = age_query.eq('listing_type', age_id)
-                
-                # 3. Фильтр по дате (последние 12 месяцев)
-                age_query = age_query.gte('trend_date', twelve_months_ago).lte('trend_date', current_date)
-                
-                age_result = age_query.execute()
-                logger.info(f"🔍 Результат запроса по возрасту: {len(age_result.data)} записей")
+                # Сначала получаем listing_type по ID записи
+                age_record = supabase.table('age_data').select('listing_type').eq('id', age_id).execute()
+                if age_record.data:
+                    age_listing_type = age_record.data[0].get('listing_type')
+                    logger.info(f"🔍 Найден listing_type для возраста {age_id}: {age_listing_type}")
+                    
+                    # Получаем данные по возрасту с учетом локации, listing_type и даты
+                    age_query = supabase.table('age_data').select('trend_date, min_unit_price_for_sale, max_unit_price_for_sale, unit_price_for_sale')
+                    
+                    # 1. Фильтр по локации
+                    if location_codes.get('country_id'):
+                        age_query = age_query.eq('country_id', location_codes['country_id'])
+                    if location_codes.get('city_id'):
+                        age_query = age_query.eq('city_id', location_codes['city_id'])
+                    if location_codes.get('county_id'):
+                        age_query = age_query.eq('county_id', location_codes['county_id'])
+                    if location_codes.get('district_id'):
+                        age_query = age_query.eq('district_id', location_codes['district_id'])
+                    
+                    # 2. Фильтр по listing_type (а не по ID)
+                    age_query = age_query.eq('listing_type', age_listing_type)
+                    
+                    # 3. Фильтр по дате (последние 12 месяцев)
+                    age_query = age_query.gte('trend_date', twelve_months_ago).lte('trend_date', current_date)
+                    
+                    age_result = age_query.execute()
+                    logger.info(f"🔍 Результат запроса по возрасту (listing_type={age_listing_type}): {len(age_result.data)} записей")
                 
                 if age_result.data:
                     # Сохраняем данные для графика
@@ -6096,33 +6105,41 @@ def get_market_comparison_data(age_id, floor_id, heating_id, area, price, locati
                             'trend_data': price_trends['age']
                         }
                         logger.info(f"✅ Данные по возрасту: min={min_total:.0f}, max={max_total:.0f}, user={price:.0f}")
+                else:
+                    logger.warning(f"⚠️ Данные по возрасту не найдены для listing_type={age_listing_type}")
             except Exception as e:
                 logger.error(f"❌ Ошибка получения данных по возрасту: {e}")
         
         # 2. Сравнение по этажу
         if floor_id and floor_id != 'unknown':
             try:
-                # Получаем данные по этажу с учетом локации, listing_type и даты
-                floor_query = supabase.table('floor_segment_data').select('trend_date, min_unit_price_for_sale, max_unit_price_for_sale, unit_price_for_sale')
-                
-                # 1. Фильтр по локации
-                if location_codes.get('country_id'):
-                    floor_query = floor_query.eq('country_id', location_codes['country_id'])
-                if location_codes.get('city_id'):
-                    floor_query = floor_query.eq('city_id', location_codes['city_id'])
-                if location_codes.get('county_id'):
-                    floor_query = floor_query.eq('county_id', location_codes['county_id'])
-                if location_codes.get('district_id'):
-                    floor_query = floor_query.eq('district_id', location_codes['district_id'])
-                
-                # 2. Фильтр по выбранному этажу (listing_type)
-                floor_query = floor_query.eq('listing_type', floor_id)
-                
-                # 3. Фильтр по дате (последние 12 месяцев)
-                floor_query = floor_query.gte('trend_date', twelve_months_ago).lte('trend_date', current_date)
-                
-                floor_result = floor_query.execute()
-                logger.info(f"🔍 Результат запроса по этажу: {len(floor_result.data)} записей")
+                # Сначала получаем listing_type по ID записи
+                floor_record = supabase.table('floor_segment_data').select('listing_type').eq('id', floor_id).execute()
+                if floor_record.data:
+                    floor_listing_type = floor_record.data[0].get('listing_type')
+                    logger.info(f"🔍 Найден listing_type для этажа {floor_id}: {floor_listing_type}")
+                    
+                    # Получаем данные по этажу с учетом локации, listing_type и даты
+                    floor_query = supabase.table('floor_segment_data').select('trend_date, min_unit_price_for_sale, max_unit_price_for_sale, unit_price_for_sale')
+                    
+                    # 1. Фильтр по локации
+                    if location_codes.get('country_id'):
+                        floor_query = floor_query.eq('country_id', location_codes['country_id'])
+                    if location_codes.get('city_id'):
+                        floor_query = floor_query.eq('city_id', location_codes['city_id'])
+                    if location_codes.get('county_id'):
+                        floor_query = floor_query.eq('county_id', location_codes['county_id'])
+                    if location_codes.get('district_id'):
+                        floor_query = floor_query.eq('district_id', location_codes['district_id'])
+                    
+                    # 2. Фильтр по listing_type (а не по ID)
+                    floor_query = floor_query.eq('listing_type', floor_listing_type)
+                    
+                    # 3. Фильтр по дате (последние 12 месяцев)
+                    floor_query = floor_query.gte('trend_date', twelve_months_ago).lte('trend_date', current_date)
+                    
+                    floor_result = floor_query.execute()
+                    logger.info(f"🔍 Результат запроса по этажу (listing_type={floor_listing_type}): {len(floor_result.data)} записей")
                 
                 if floor_result.data:
                     # Сохраняем данные для графика
@@ -6150,33 +6167,41 @@ def get_market_comparison_data(age_id, floor_id, heating_id, area, price, locati
                             'trend_data': price_trends['floor']
                         }
                         logger.info(f"✅ Данные по этажу: min={min_total:.0f}, max={max_total:.0f}, user={price:.0f}")
+                else:
+                    logger.warning(f"⚠️ Данные по этажу не найдены для listing_type={floor_listing_type}")
             except Exception as e:
                 logger.error(f"❌ Ошибка получения данных по этажу: {e}")
         
         # 3. Сравнение по типу отопления
         if heating_id and heating_id != 'unknown':
             try:
-                # Получаем данные по отоплению с учетом локации, listing_type и даты
-                heating_query = supabase.table('heating_data').select('trend_date, min_unit_price_for_sale, max_unit_price_for_sale, unit_price_for_sale')
-                
-                # 1. Фильтр по локации
-                if location_codes.get('country_id'):
-                    heating_query = heating_query.eq('country_id', location_codes['country_id'])
-                if location_codes.get('city_id'):
-                    heating_query = heating_query.eq('city_id', location_codes['city_id'])
-                if location_codes.get('county_id'):
-                    heating_query = heating_query.eq('county_id', location_codes['county_id'])
-                if location_codes.get('district_id'):
-                    heating_query = heating_query.eq('district_id', location_codes['district_id'])
-                
-                # 2. Фильтр по выбранному типу отопления (listing_type)
-                heating_query = heating_query.eq('listing_type', heating_id)
-                
-                # 3. Фильтр по дате (последние 12 месяцев)
-                heating_query = heating_query.gte('trend_date', twelve_months_ago).lte('trend_date', current_date)
-                
-                heating_result = heating_query.execute()
-                logger.info(f"🔍 Результат запроса по отоплению: {len(heating_result.data)} записей")
+                # Сначала получаем listing_type по ID записи
+                heating_record = supabase.table('heating_data').select('listing_type').eq('id', heating_id).execute()
+                if heating_record.data:
+                    heating_listing_type = heating_record.data[0].get('listing_type')
+                    logger.info(f"🔍 Найден listing_type для отопления {heating_id}: {heating_listing_type}")
+                    
+                    # Получаем данные по отоплению с учетом локации, listing_type и даты
+                    heating_query = supabase.table('heating_data').select('trend_date, min_unit_price_for_sale, max_unit_price_for_sale, unit_price_for_sale')
+                    
+                    # 1. Фильтр по локации
+                    if location_codes.get('country_id'):
+                        heating_query = heating_query.eq('country_id', location_codes['country_id'])
+                    if location_codes.get('city_id'):
+                        heating_query = heating_query.eq('city_id', location_codes['city_id'])
+                    if location_codes.get('county_id'):
+                        heating_query = heating_query.eq('county_id', location_codes['county_id'])
+                    if location_codes.get('district_id'):
+                        heating_query = heating_query.eq('district_id', location_codes['district_id'])
+                    
+                    # 2. Фильтр по listing_type (а не по ID)
+                    heating_query = heating_query.eq('listing_type', heating_listing_type)
+                    
+                    # 3. Фильтр по дате (последние 12 месяцев)
+                    heating_query = heating_query.gte('trend_date', twelve_months_ago).lte('trend_date', current_date)
+                    
+                    heating_result = heating_query.execute()
+                    logger.info(f"🔍 Результат запроса по отоплению (listing_type={heating_listing_type}): {len(heating_result.data)} записей")
                 
                 if heating_result.data:
                     # Сохраняем данные для графика
@@ -6204,6 +6229,8 @@ def get_market_comparison_data(age_id, floor_id, heating_id, area, price, locati
                             'trend_data': price_trends['heating']
                         }
                         logger.info(f"✅ Данные по отоплению: min={min_total:.0f}, max={max_total:.0f}, user={price:.0f}")
+                else:
+                    logger.warning(f"⚠️ Данные по отоплению не найдены для listing_type={heating_listing_type}")
             except Exception as e:
                 logger.error(f"❌ Ошибка получения данных по отоплению: {e}")
         
