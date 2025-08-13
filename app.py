@@ -2017,7 +2017,7 @@ def api_full_report():
         
         # Получаем рыночные данные для сравнения цен
         market_comparison_data = get_market_comparison_data(
-            age_id, floor_id, heating_id, area, price, location_codes
+            age_id, floor_id, heating_id, area, price, location_codes, bedrooms
         )
         logger.info(f"✅ Получены рыночные данные для сравнения: {market_comparison_data}")
         
@@ -6018,7 +6018,7 @@ def load_interpretations_from_database(country_code):
         logger.error(f"Error loading interpretations from database: {e}")
         return None, None
 
-def get_market_comparison_data(age_id, floor_id, heating_id, area, price, location_codes):
+def get_market_comparison_data(age_id, floor_id, heating_id, area, price, location_codes, bedrooms=2):
     """
     Получает рыночные данные для сравнения цен из таблиц floor_segment_data, heating_data, house_type_data, age_data
     
@@ -6029,6 +6029,7 @@ def get_market_comparison_data(age_id, floor_id, heating_id, area, price, locati
         area (str): Площадь объекта в м²
         price (float): Цена объекта пользователя
         location_codes (dict): Коды локации (country_id, city_id, county_id, district_id)
+        bedrooms (int): Количество спален для расчета типичного размера
     
     Returns:
         dict: Данные для сравнения цен и графики изменения цен
@@ -6091,8 +6092,15 @@ def get_market_comparison_data(age_id, floor_id, heating_id, area, price, locati
                     min_price = float(latest_record.get('min_unit_price_for_sale', 0))
                     max_price = float(latest_record.get('max_unit_price_for_sale', 0))
                     
-                    if min_price > 0 and max_price > 0 and area and area != 'unknown':
-                        area_value = float(area)
+                    if min_price > 0 and max_price > 0:
+                        # Используем типичный размер, если area не указан
+                        if area and area != 'unknown':
+                            area_value = float(area)
+                        else:
+                            # Типичный размер на основе количества спален
+                            area_value = 80 if bedrooms <= 2 else 120 if bedrooms <= 3 else 150
+                            logger.info(f"⚠️ Используем типичный размер для сравнения: {area_value} м²")
+                        
                         min_total = min_price * area_value
                         max_total = max_price * area_value
                         
@@ -6153,8 +6161,15 @@ def get_market_comparison_data(age_id, floor_id, heating_id, area, price, locati
                     min_price = float(latest_record.get('min_unit_price_for_sale', 0))
                     max_price = float(latest_record.get('max_unit_price_for_sale', 0))
                     
-                    if min_price > 0 and max_price > 0 and area and area != 'unknown':
-                        area_value = float(area)
+                    if min_price > 0 and max_price > 0:
+                        # Используем типичный размер, если area не указан
+                        if area and area != 'unknown':
+                            area_value = float(area)
+                        else:
+                            # Типичный размер на основе количества спален
+                            area_value = 80 if bedrooms <= 2 else 120 if bedrooms <= 3 else 150
+                            logger.info(f"⚠️ Используем типичный размер для сравнения этажа: {area_value} м²")
+                        
                         min_total = min_price * area_value
                         max_total = max_price * area_value
                         
@@ -6215,8 +6230,15 @@ def get_market_comparison_data(age_id, floor_id, heating_id, area, price, locati
                     min_price = float(latest_record.get('min_unit_price_for_sale', 0))
                     max_price = float(latest_record.get('max_unit_price_for_sale', 0))
                     
-                    if min_price > 0 and max_price > 0 and area and area != 'unknown':
-                        area_value = float(area)
+                    if min_price > 0 and max_price > 0:
+                        # Используем типичный размер, если area не указан
+                        if area and area != 'unknown':
+                            area_value = float(area)
+                        else:
+                            # Типичный размер на основе количества спален
+                            area_value = 80 if bedrooms <= 2 else 120 if bedrooms <= 3 else 150
+                            logger.info(f"⚠️ Используем типичный размер для сравнения отопления: {area_value} м²")
+                        
                         min_total = min_price * area_value
                         max_total = max_price * area_value
                         
@@ -6275,8 +6297,15 @@ def get_market_comparison_data(age_id, floor_id, heating_id, area, price, locati
                     min_price = float(latest_record.get('min_unit_price_for_sale', 0))
                     max_price = float(latest_record.get('max_unit_price_for_sale', 0))
                     
-                    if min_price > 0 and max_price > 0 and area and area != 'unknown':
-                        area_value = float(area)
+                    if min_price > 0 and max_price > 0:
+                        # Используем типичный размер, если area не указан
+                        if area and area != 'unknown':
+                            area_value = float(area)
+                        else:
+                            # Типичный размер на основе количества спален
+                            area_value = 80 if bedrooms <= 2 else 120 if bedrooms <= 3 else 150
+                            logger.info(f"⚠️ Используем типичный размер для сравнения типа дома: {area_value} м²")
+                        
                         min_total = min_price * area_value
                         max_total = max_price * area_value
                         
@@ -6324,6 +6353,12 @@ def get_market_comparison_data(age_id, floor_id, heating_id, area, price, locati
         comparisons['price_trends'] = price_trends
         
         logger.info(f"📊 Итоговые данные сравнения: {comparisons}")
+        logger.info(f"🔍 Структура comparisons:")
+        for key, value in comparisons.items():
+            if isinstance(value, dict) and 'min_price' in value:
+                logger.info(f"  {key}: min={value.get('min_price', 0):.0f}, max={value.get('max_price', 0):.0f}, deviation_min={value.get('deviation_min', 0):.1f}%, deviation_max={value.get('deviation_max', 0):.1f}%")
+            else:
+                logger.info(f"  {key}: {value}")
         return comparisons
         
     except Exception as e:
