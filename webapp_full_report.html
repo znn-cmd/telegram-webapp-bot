@@ -343,23 +343,9 @@
                     </div>
                 </div>
 
-                <!-- Базовый анализ -->
+                <!-- Рыночный анализ -->
                 <div class="section">
-                    <h2>📋 Базовый анализ</h2>
-                    <div class="info-grid">
-                        <div class="info-item">
-                            <div class="info-label">Локация</div>
-                            <div class="info-value" id="simple-location">-</div>
-                        </div>
-                        <div class="info-item">
-                            <div class="info-label">Объект</div>
-                            <div class="info-value" id="simple-property">-</div>
-                        </div>
-                        <div class="info-item">
-                            <div class="info-label">Цена за м²</div>
-                            <div class="info-value" id="simple-price-per-sqm">-</div>
-                        </div>
-                    </div>
+                    <h2>📊 Рыночный анализ</h2>
                     
                     <!-- Сравнение цен по критериям -->
                     <div class="price-comparison-section">
@@ -702,26 +688,10 @@
                 console.log('⚠️ Используются fallback данные:', { ageText, floorText, heatingText });
             }
 
-            // Базовый анализ
+            // Рыночный анализ - рыночные данные для сравнения цен
             if (data.full_report && data.full_report.simple_report) {
                 const simpleReport = data.full_report.simple_report;
-                console.log('📋 Базовый анализ:', simpleReport);
-                
-                const simpleElements = {
-                    'simple-location': document.getElementById('simple-location'),
-                    'simple-property': document.getElementById('simple-property'),
-                    'simple-price-per-sqm': document.getElementById('simple-price-per-sqm')
-                };
-                
-                if (simpleElements['simple-location']) {
-                    simpleElements['simple-location'].textContent = simpleReport.location_summary || reportData.address;
-                }
-                if (simpleElements['simple-property']) {
-                    simpleElements['simple-property'].textContent = simpleReport.property_summary || `${reportData.bedrooms} спален, цена €${Number(reportData.price).toLocaleString('ru-RU')}`;
-                }
-                if (simpleElements['simple-price-per-sqm']) {
-                    simpleElements['simple-price-per-sqm'].textContent = simpleReport.price_per_sqm || `€${(Number(reportData.price) / 80).toFixed(0)}/м²`;
-                }
+                console.log('📊 Рыночный анализ:', simpleReport);
             }
             
             // Рыночные данные для сравнения цен
