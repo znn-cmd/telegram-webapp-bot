@@ -1373,60 +1373,60 @@ def format_simple_report(address, bedrooms, price, location_codes, language='en'
                     "Данные имеют неожиданный формат",
                     "",
                 ])
-                else:
-                    listing_type = house_type_data.get('listing_type', 'н/д')
-                    if listing_type == target_listing_type:
-                        # Определяем отображаемое название
-                        display_name = {
-                            "0+1": "0 - студия",
-                            "1+1": "1 спальня",
-                            "2+1": "2 спальни",
-                            "3+1": "3 спальни",
-                            "4+1": "4 спальни", 
-                            "5+1": "5+ спален"
-                        }.get(listing_type, listing_type)
-                        
+            else:
+                listing_type = house_type_data.get('listing_type', 'н/д')
+                if listing_type == target_listing_type:
+                    # Определяем отображаемое название
+                    display_name = {
+                        "0+1": "0 - студия",
+                        "1+1": "1 спальня",
+                        "2+1": "2 спальни",
+                        "3+1": "3 спальни",
+                        "4+1": "4 спальни", 
+                        "5+1": "5+ спален"
+                    }.get(listing_type, listing_type)
+                    
                     report_lines.extend([
-                            f"--- {display_name} ---",
-                            "",
-                            "--- ПРОДАЖИ ---",
-                            f"💰 Минимальная цена продажи: €{format_number(house_type_data.get('min_unit_price_for_sale'))}",
-                            f"💰 Средняя цена продажи: €{format_number(house_type_data.get('unit_price_for_sale'))}",
-                            f"💰 Максимальная цена продажи: €{format_number(house_type_data.get('max_unit_price_for_sale'))}",
-                            f"📏 Сопоставимая площадь для продажи: {format_number(house_type_data.get('comparable_area_for_sale'))} м²",
-                            f"📊 Количество объектов на продажу: {format_number(house_type_data.get('count_for_sale'))}",
-                            f"💰 Цена для продажи, средняя: €{format_number(house_type_data.get('price_for_sale'))}",
-                            f"🏗️ Средний возраст объекта для продажи: {format_number(house_type_data.get('average_age_for_sale'))} лет",
-                            f"⏱️ Период листинга для продажи: {format_number(house_type_data.get('listing_period_for_sale'))} дней",
-                            "",
-                            "--- АРЕНДА ---",
-                            f"💰 Минимальная цена аренды, м²: €{format_number(house_type_data.get('min_unit_price_for_rent'))}",
-                            f"💰 Средняя цена аренды, м²: €{format_number(house_type_data.get('unit_price_for_rent'))}",
-                            f"💰 Максимальная цена аренды, м²: €{format_number(house_type_data.get('max_unit_price_for_rent'))}",
-                            f"📏 Средняя площадь аренды: {format_number(house_type_data.get('comparable_area_for_rent'))} м²",
-                            f"📊 Количество объектов в аренду: {format_number(house_type_data.get('count_for_rent'))}",
-                            f"💰 Цена для аренды, средняя: €{format_number(house_type_data.get('price_for_rent'))}",
-                            f"🏗️ Средний возраст объекта для аренды: {format_number(house_type_data.get('average_age_for_rent'))} лет",
-                            f"⏱️ Период листинга для аренды: {format_number(house_type_data.get('listing_period_for_rent'))} дней",
-                            f"💎 Доходность: {format_number(house_type_data.get('yield'))}%",
+                        f"--- {display_name} ---",
+                        "",
+                        "--- ПРОДАЖИ ---",
+                        f"💰 Минимальная цена продажи: €{format_number(house_type_data.get('min_unit_price_for_sale'))}",
+                        f"💰 Средняя цена продажи: €{format_number(house_type_data.get('unit_price_for_sale'))}",
+                        f"💰 Максимальная цена продажи: €{format_number(house_type_data.get('max_unit_price_for_sale'))}",
+                        f"📏 Сопоставимая площадь для продажи: {format_number(house_type_data.get('comparable_area_for_sale'))} м²",
+                        f"📊 Количество объектов на продажу: {format_number(house_type_data.get('count_for_sale'))}",
+                        f"💰 Цена для продажи, средняя: €{format_number(house_type_data.get('price_for_sale'))}",
+                        f"🏗️ Средний возраст объекта для продажи: {format_number(house_type_data.get('average_age_for_sale'))} лет",
+                        f"⏱️ Период листинга для продажи: {format_number(house_type_data.get('listing_period_for_sale'))} дней",
+                        "",
+                        "--- АРЕНДА ---",
+                        f"💰 Минимальная цена аренды, м²: €{format_number(house_type_data.get('min_unit_price_for_rent'))}",
+                        f"💰 Средняя цена аренды, м²: €{format_number(house_type_data.get('unit_price_for_rent'))}",
+                        f"💰 Максимальная цена аренды, м²: €{format_number(house_type_data.get('max_unit_price_for_rent'))}",
+                        f"📏 Средняя площадь аренды: {format_number(house_type_data.get('comparable_area_for_rent'))} м²",
+                        f"📊 Количество объектов в аренду: {format_number(house_type_data.get('count_for_rent'))}",
+                        f"💰 Цена для аренды, средняя: €{format_number(house_type_data.get('price_for_rent'))}",
+                        f"🏗️ Средний возраст объекта для аренды: {format_number(house_type_data.get('average_age_for_rent'))} лет",
+                        f"⏱️ Период листинга для аренды: {format_number(house_type_data.get('listing_period_for_rent'))} дней",
+                        f"💎 Доходность: {format_number(house_type_data.get('yield'))}%",
                         "",
                     ])
-            else:
-                        # Если данные не соответствуют выбранному количеству спален
-                        display_name = {
-                            0: "0 - студия",
-                            1: "1 спальня",
-                            2: "2 спальни",
-                            3: "3 спальни",
-                            4: "4 спальни",
-                            5: "5+ спален"
-                        }.get(bedrooms, f"{bedrooms} спален")
-                        
-                report_lines.extend([
-                            f"--- {display_name} ---",
-                            "Данные для выбранного количества спален не найдены",
-                "",
-            ])
+                else:
+                    # Если данные не соответствуют выбранному количеству спален
+                    display_name = {
+                        0: "0 - студия",
+                        1: "1 спальня",
+                        2: "2 спальни",
+                        3: "3 спальни",
+                        4: "4 спальни",
+                        5: "5+ спален"
+                    }.get(bedrooms, f"{bedrooms} спален")
+                    
+                    report_lines.extend([
+                        f"--- {display_name} ---",
+                        "Данные для выбранного количества спален не найдены",
+                        "",
+                    ])
         # Добавляем раздел с рекомендациями
         if market_data and market_data.get('general_data'):
             general = market_data['general_data']
@@ -1465,17 +1465,17 @@ def format_simple_report(address, bedrooms, price, location_codes, language='en'
         # Анализ доходности
         if yield_value:
             if yield_value > 8:
-            report_lines.extend([
+                report_lines.extend([
                     "💰 Высокая доходность (>8%)",
                     "Отличный потенциал для инвестиций",
                     "",
                 ])
             elif yield_value > 6:
-                    report_lines.extend([
+                report_lines.extend([
                     "💡 Хорошая доходность (6-8%)",
                     "Стабильный доход",
-                        "",
-                    ])
+                    "",
+                ])
             else:
                 report_lines.extend([
                     "📉 Низкая доходность (<6%)",
@@ -4718,10 +4718,10 @@ def get_market_data_by_location_ids(location_codes, target_year=None, target_mon
                 # Фильтруем записи с валидными датами
                 valid_records = [r for r in result.data if r.get('trend_date')]
                 if valid_records:
-                # Берем самую свежую запись
+                    # Берем самую свежую запись
                     latest_record = max(valid_records, key=lambda x: x.get('trend_date', ''))
-                market_data['property_trends'] = latest_record
-                logger.info(f"Найдены данные property_trends: {len(result.data)} записей, выбрана самая свежая: {latest_record.get('trend_date')}")
+                    market_data['property_trends'] = latest_record
+                    logger.info(f"Найдены данные property_trends: {len(result.data)} записей, выбрана самая свежая: {latest_record.get('trend_date')}")
                 else:
                     logger.warning("Все записи property_trends имеют пустые даты")
                     market_data['property_trends'] = result.data[0] if result.data else None
@@ -4822,10 +4822,10 @@ def get_market_data_by_location_ids(location_codes, target_year=None, target_mon
                 # Фильтруем записи с валидными датами
                 valid_records = [r for r in result.data if r.get('trend_date')]
                 if valid_records:
-                # Берем самую свежую запись
+                    # Берем самую свежую запись
                     latest_record = max(valid_records, key=lambda x: x.get('trend_date', ''))
-                market_data['general_data'] = latest_record
-                logger.info(f"Найдены данные general_data: {len(result.data)} записей, выбрана самая свежая: {latest_record.get('trend_date')}")
+                    market_data['general_data'] = latest_record
+                    logger.info(f"Найдены данные general_data: {len(result.data)} записей, выбрана самая свежая: {latest_record.get('trend_date')}")
                 else:
                     logger.warning("Все записи general_data имеют пустые даты")
                     market_data['general_data'] = result.data[0] if result.data else None
@@ -5137,8 +5137,14 @@ def get_nominatim_location(address):
             logger.info(f"📝 Параметры запроса: {params}")
             response = requests.get(url, params=params, headers=headers, timeout=30)
             logger.info(f"📡 Статус ответа Nominatim API: {response.status_code}")
-        result = response.json()
-            logger.info(f"📊 Размер ответа Nominatim: {len(str(result))} символов")
+            
+            if response.status_code == 200:
+                result = response.json()
+                logger.info(f"📊 Размер ответа Nominatim: {len(str(result))} символов")
+            else:
+                logger.error(f"❌ Nominatim API вернул статус {response.status_code}")
+                return None
+                
         except requests.exceptions.Timeout:
             logger.error("❌ Таймаут при запросе к Nominatim API (30 секунд)")
             return None
