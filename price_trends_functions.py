@@ -53,12 +53,19 @@ def get_price_trends_data(supabase, location_codes: Dict, area: float) -> Dict:
         current_date = datetime.now()
         
         # Вычисляем дату 3 года назад
-        three_years_ago = current_date - timedelta(days=3*365)
+        three_years_ago_year = current_date.year - 3
+        three_years_ago_month = current_date.month
         
         # Вычисляем дату через 3 месяца
-        three_months_ahead = current_date + timedelta(days=3*30)
+        three_months_ahead_year = current_date.year
+        three_months_ahead_month = current_date.month + 3
         
-        logger.info(f"📅 Анализируем период: с {three_years_ago.strftime('%Y-%m')} по {three_months_ahead.strftime('%Y-%m')}")
+        # Корректируем год и месяц если месяц > 12
+        if three_months_ahead_month > 12:
+            three_months_ahead_year += 1
+            three_months_ahead_month -= 12
+        
+        logger.info(f"📅 Анализируем период: с {three_years_ago_year}-{three_years_ago_month:02d} по {three_months_ahead_year}-{three_months_ahead_month:02d}")
         
         # Формируем запрос к таблице property_trends
         query = supabase.table('property_trends').select('*').eq('country_id', location_codes['country_id'])
@@ -70,19 +77,45 @@ def get_price_trends_data(supabase, location_codes: Dict, area: float) -> Dict:
         if location_codes.get('district_id'):
             query = query.eq('district_id', location_codes['district_id'])
         
-        # Фильтруем по периоду
-        query = query.gte('property_year', three_years_ago.year)
-        query = query.lte('property_year', three_months_ahead.year)
+        # Сначала получаем все данные для локации без фильтра по дате
+        # Это поможет понять, есть ли вообще данные
+        logger.info("🔍 Получаем все данные для локации без фильтра по дате...")
+        
+        # Фильтруем по периоду - используем отдельные поля property_year и property_month
+        # Но сначала попробуем получить данные за последние 5 лет
+        query = query.gte('property_year', current_date.year - 5)
+        query = query.lte('property_year', current_date.year)
+        
+        # Добавляем дополнительную отладочную информацию
+        logger.info(f"🔍 Фильтры запроса:")
+        logger.info(f"  - country_id = {location_codes.get('country_id')}")
+        logger.info(f"  - city_id = {location_codes.get('city_id')}")
+        logger.info(f"  - county_id = {location_codes.get('county_id')}")
+        logger.info(f"  - district_id = {location_codes.get('district_id')}")
+        logger.info(f"  - property_year >= {current_date.year - 5}")
+        logger.info(f"  - property_year <= {current_date.year}")
         
         # Сортируем по дате
         query = query.order('property_year', desc=False).order('property_month', desc=False)
         
         logger.info("🔍 Выполняем запрос к базе данных...")
+        logger.info(f"🔍 Параметры запроса:")
+        logger.info(f"  - country_id: {location_codes.get('country_id')}")
+        logger.info(f"  - city_id: {location_codes.get('city_id')}")
+        logger.info(f"  - county_id: {location_codes.get('county_id')}")
+        logger.info(f"  - district_id: {location_codes.get('district_id')}")
+        logger.info(f"  - период: с {current_date.year - 5} по {current_date.year}")
         logger.info(f"🔍 SQL запрос: {query}")
         
         try:
             response = query.execute()
-            logger.info(f"✅ Запрос выполнен успешно, статус: {response}")
+            logger.info(f"✅ Запрос выполнен успешно")
+            logger.info(f"🔍 Тип ответа: {type(response)}")
+            logger.info(f"🔍 Атрибуты ответа: {dir(response)}")
+            if hasattr(response, 'data'):
+                logger.info(f"🔍 Данные ответа: {response.data}")
+            else:
+                logger.info(f"🔍 Ответ не содержит атрибут 'data'")
         except Exception as e:
             logger.error(f"❌ Ошибка выполнения запроса: {e}")
             return {
