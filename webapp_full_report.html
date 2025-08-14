@@ -260,7 +260,7 @@
             background: #fff3cd;
             border-left-color: #ffc107;
         }
-        
+
         .currency-info {
             background: #fff3e0;
             border-left-color: #ff9800;
@@ -752,7 +752,7 @@
 
     <!-- Chart.js для построения графиков -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
+
     <script>
         // Получаем данные из URL параметров
         const urlParams = new URLSearchParams(window.location.search);
@@ -822,7 +822,7 @@
                         heating: reportData.heating
                     }
                 });
-                
+
                 // Вызываем API для получения полного отчета
                 const response = await fetch('/api/full_report', {
                     method: 'POST',
@@ -851,7 +851,7 @@
                     console.error('❌ HTTP ошибка full_report:', response.status, errorText);
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
-                
+
                 const data = await response.json();
                 console.log('📊 Ответ API full_report:', data);
 
@@ -873,7 +873,7 @@
 
                 // Заполняем данные отчета
                 try {
-                    fillReportData(data);
+                fillReportData(data);
                     console.log('✅ Основной отчет заполнен успешно');
                 } catch (error) {
                     console.error('❌ Ошибка заполнения основного отчета:', error);
@@ -890,7 +890,7 @@
                 if (reportData && reportData.location_codes && reportData.area) {
                     try {
                         await loadPriceTrendsData();
-                    } catch (error) {
+            } catch (error) {
                     console.error('❌ Ошибка загрузки данных о трендах, но отчет продолжает загружаться:', error);
                     // Показываем сообщение об ошибке в блоке трендов
                     const trendAnalysisElement = document.getElementById('trend-analysis');
@@ -1268,7 +1268,7 @@
                 }
             }
         }
-        
+
         // Заполняем данные отчета
         function fillReportData(data) {
             console.log('🔧 Начинаем заполнение отчета...');
