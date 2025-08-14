@@ -6462,26 +6462,8 @@ def api_price_trends():
         logger.info(f"  - county_id: {location_codes.get('county_id')} (тип: {type(location_codes.get('county_id'))})")
         logger.info(f"  - district_id: {location_codes.get('district_id')} (тип: {type(location_codes.get('district_id'))})")
         
-        # Сначала делаем тестовый запрос без фильтров по дате
-        logger.info("🔍 Делаем тестовый запрос без фильтров по дате...")
-        test_query = supabase.table('property_trends').select('id, property_year, property_month').eq('country_id', location_codes['country_id'])
-        if location_codes.get('city_id'):
-            test_query = test_query.eq('city_id', location_codes['city_id'])
-        if location_codes.get('county_id'):
-            test_query = test_query.eq('county_id', location_codes['county_id'])
-        if location_codes.get('district_id'):
-            test_query = test_query.eq('district_id', location_codes['district_id'])
-        
-        try:
-            test_response = test_query.limit(5).execute()
-            logger.info(f"🔍 Тестовый запрос: найдено {len(test_response.data) if test_response.data else 0} записей")
-            if test_response.data:
-                logger.info(f"🔍 Первые записи: {test_response.data[:3]}")
-        except Exception as e:
-            logger.error(f"❌ Ошибка тестового запроса: {e}")
-        
-        # Убираем проверку на наличие данных - пусть функция get_price_trends_data сама разберется
-        logger.info("🔍 Пропускаем проверку на наличие данных, сразу вызываем get_price_trends_data")
+        # Сразу вызываем функцию get_price_trends_data
+        logger.info("🔍 Вызываем функцию get_price_trends_data для получения всех данных")
         
         # Проверяем, что функция импортирована
         if get_price_trends_data is None:

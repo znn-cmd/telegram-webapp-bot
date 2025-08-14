@@ -49,25 +49,10 @@ def get_price_trends_data(supabase, location_codes: Dict, area: float) -> Dict:
                 'chart_data': []
             }
         
-        # Получаем текущую дату
-        current_date = datetime.now()
-        current_year = current_date.year
-        current_month = current_date.month
+        # Сначала получаем ВСЕ данные для локации без фильтров по дате
+        logger.info("🔍 Получаем ВСЕ данные для локации без фильтров по дате...")
         
-        # Вычисляем период: ищем данные за последние 3 года + текущий год + 1 год вперед
-        # Начинаем с 3 лет назад
-        start_year = current_year - 3
-        
-        # Конечный период: текущий год + 1 год вперед
-        end_year = current_year + 1
-        
-        logger.info(f"📅 Анализируем период: с {start_year} по {end_year}")
-        logger.info(f"📅 Текущая дата: {current_year}-{current_month:02d}")
-        
-        # Формируем запрос к таблице property_trends
-        logger.info(f"🔍 Формируем запрос к таблице property_trends")
-        logger.info(f"🔍 Базовый запрос: select * from property_trends")
-        
+        # Формируем простой запрос только по кодам локации
         query = supabase.table('property_trends').select('*').eq('country_id', location_codes['country_id'])
         logger.info(f"🔍 Добавляем фильтр: country_id = {location_codes['country_id']}")
         
@@ -81,48 +66,7 @@ def get_price_trends_data(supabase, location_codes: Dict, area: float) -> Dict:
             query = query.eq('district_id', location_codes['district_id'])
             logger.info(f"🔍 Добавляем фильтр: district_id = {location_codes['district_id']}")
         
-        # Фильтруем по периоду - используем отдельные поля property_year и property_month
-        # Получаем данные за последние 12 месяцев + текущий месяц + 1 месяц вперед
-        
-        # Упрощенная логика фильтрации
-        # Получаем данные за последние 12 месяцев + текущий месяц + 1 месяц вперед
-        
-        # Сначала делаем тестовый запрос без фильтров по дате
-        logger.info("🔍 Делаем тестовый запрос без фильтров по дате...")
-        test_query = supabase.table('property_trends').select('id, property_year, property_month').eq('country_id', location_codes['country_id'])
-        if location_codes.get('city_id'):
-            test_query = test_query.eq('city_id', location_codes['city_id'])
-        if location_codes.get('county_id'):
-            test_query = test_query.eq('county_id', location_codes['county_id'])
-        if location_codes.get('district_id'):
-            test_query = test_query.eq('district_id', location_codes['district_id'])
-        
-        try:
-            test_response = test_query.limit(5).execute()
-            logger.info(f"🔍 Тестовый запрос: найдено {len(test_response.data) if test_response.data else 0} записей")
-            if test_response.data:
-                logger.info(f"🔍 Первые записи: {test_response.data[:3]}")
-        except Exception as e:
-            logger.error(f"❌ Ошибка тестового запроса: {e}")
-        
-        # Теперь делаем основной запрос с фильтрами по дате
-        logger.info("🔍 Делаем основной запрос с фильтрами по дате...")
-        
-        # Используем простую фильтрацию: год >= start_year и год <= end_year
-        logger.info(f"🔍 Добавляем фильтр по году: property_year >= {start_year}")
-        query = query.gte('property_year', start_year)
-        logger.info(f"🔍 Добавляем фильтр по году: property_year <= {end_year}")
-        query = query.lte('property_year', end_year)
-        
-        # Добавляем дополнительную отладочную информацию
-        logger.info(f"🔍 Фильтры запроса:")
-        logger.info(f"  - country_id = {location_codes.get('country_id')}")
-        logger.info(f"  - city_id = {location_codes.get('city_id')}")
-        logger.info(f"  - county_id = {location_codes.get('county_id')}")
-        logger.info(f"  - district_id = {location_codes.get('district_id')}")
-        logger.info(f"  - период: с {start_year} по {end_year}")
-        
-        # Сортируем по дате
+        # Сортируем по дате для удобства
         query = query.order('property_year', desc=False).order('property_month', desc=False)
         
         logger.info("🔍 Выполняем запрос к базе данных...")
@@ -131,25 +75,23 @@ def get_price_trends_data(supabase, location_codes: Dict, area: float) -> Dict:
         logger.info(f"  - city_id: {location_codes.get('city_id')}")
         logger.info(f"  - county_id: {location_codes.get('county_id')}")
         logger.info(f"  - district_id: {location_codes.get('district_id')}")
-        logger.info(f"  - период: с {start_year} по {end_year}")
         logger.info(f"🔍 SQL запрос: {query}")
         
         try:
             response = query.execute()
             logger.info(f"✅ Запрос выполнен успешно")
             logger.info(f"🔍 Тип ответа: {type(response)}")
-            logger.info(f"🔍 Атрибуты ответа: {dir(response)}")
             if hasattr(response, 'data'):
                 logger.info(f"🔍 Данные ответа: {response.data}")
                 logger.info(f"🔍 Количество записей: {len(response.data) if response.data else 0}")
                 if response.data:
                     logger.info(f"🔍 Первая запись: {response.data[0]}")
                     logger.info(f"🔍 Последняя запись: {response.data[-1]}")
-                    logger.info(f"🔍 Все записи: {response.data}")
+                    logger.info(f"🔍 ВСЕ записи:")
+                    for i, record in enumerate(response.data):
+                        logger.info(f"  {i+1}. ID: {record.get('id')}, Год: {record.get('property_year')}, Месяц: {record.get('property_month')}, Цена продажи: {record.get('unit_price_for_sale')}, Цена аренды: {record.get('unit_price_for_rent')}")
                 else:
                     logger.warning(f"⚠️ Ответ пустой - данных нет")
-                    logger.warning(f"⚠️ Проверьте фильтры по дате: property_year >= {start_year} и property_year <= {end_year}")
-                    logger.warning(f"⚠️ Возможно, данные есть, но не попадают в диапазон дат")
             else:
                 logger.info(f"🔍 Ответ не содержит атрибут 'data'")
         except Exception as e:
@@ -167,7 +109,6 @@ def get_price_trends_data(supabase, location_codes: Dict, area: float) -> Dict:
         
         if response.data is None:
             logger.warning("⚠️ Нет данных о трендах цен (response.data is None)")
-            logger.warning(f"⚠️ Проверьте SQL запрос: {query}")
             return {
                 'error': 'Нет данных о трендах цен для указанной локации',
                 'trend': 'Не определен',
@@ -180,45 +121,11 @@ def get_price_trends_data(supabase, location_codes: Dict, area: float) -> Dict:
         
         trends_data = response.data
         logger.info(f"📊 Получено {len(trends_data)} записей о трендах цен")
-        if trends_data:
-            logger.info(f"🔍 Первые 3 записи: {trends_data[:3]}")
-            logger.info(f"🔍 Последние 3 записи: {trends_data[-3:]}")
-        else:
+        
+        if not trends_data:
             logger.warning(f"⚠️ trends_data пустой - данных нет")
-            logger.warning(f"⚠️ Проверьте SQL запрос: {query}")
-            logger.warning(f"⚠️ Проверьте фильтры: country_id={location_codes.get('country_id')}, city_id={location_codes.get('city_id')}, county_id={location_codes.get('county_id')}, district_id={location_codes.get('district_id')}")
-        
-        # Обрабатываем данные и вычисляем общие цены объектов
-        processed_data = []
-        logger.info(f"🔍 Обрабатываем {len(trends_data)} записей...")
-        
-        for i, record in enumerate(trends_data):
-            try:
-                unit_price = float(record.get('unit_price_for_sale', 0))
-                total_price = unit_price * area
-                
-                processed_record = {
-                    'year': record.get('property_year'),
-                    'month': record.get('property_month'),
-                    'unit_price': unit_price,
-                    'total_price': total_price,
-                    'date_key': f"{record.get('property_year')}-{record.get('property_month'):02d}"
-                }
-                processed_data.append(processed_record)
-                
-                if i < 3:  # Логируем первые 3 записи
-                    logger.info(f"🔍 Запись {i+1}: год={record.get('property_year')}, месяц={record.get('property_month')}, цена/м²={unit_price}, общая цена={total_price}")
-                
-            except (ValueError, TypeError) as e:
-                logger.warning(f"⚠️ Ошибка обработки записи {i+1}: {e}, данные: {record}")
-                continue
-        
-        if not processed_data:
-            logger.warning("⚠️ Нет валидных данных для анализа")
-            logger.warning(f"⚠️ trends_data: {trends_data}")
-            logger.warning(f"⚠️ Проверьте SQL запрос: {query}")
             return {
-                'error': 'Нет валидных данных о трендах цен',
+                'error': 'Нет данных о трендах цен для указанной локации',
                 'trend': 'Не определен',
                 'change_3y': 0,
                 'forecast_3m': 0,
@@ -227,35 +134,21 @@ def get_price_trends_data(supabase, location_codes: Dict, area: float) -> Dict:
                 'chart_data': []
             }
         
-        # Сортируем по дате
-        processed_data.sort(key=lambda x: x['date_key'])
-        
-        # Анализируем тренд
-        trend_analysis = analyze_price_trend(processed_data)
-        
-        # Вычисляем изменение за 3 года
-        change_3y = calculate_3year_change(processed_data)
-        
-        # Вычисляем прогноз на 3 месяца
-        forecast_3m = calculate_3month_forecast(processed_data)
-        
-        # Формируем данные для графика
-        chart_data = format_chart_data(processed_data)
-        
+        # Пока просто возвращаем информацию о найденных данных
+        # Позже доработаем анализ
         result = {
-            'trend': trend_analysis['trend'],
-            'change_3y': change_3y,
-            'forecast_3m': forecast_3m,
-            'analysis': trend_analysis['analysis'],
-            'recommendation': trend_analysis['recommendation'],
-            'chart_data': chart_data,
-            'raw_data_count': len(processed_data)
+            'trend': 'Данные найдены',
+            'change_3y': 0,
+            'forecast_3m': 0,
+            'analysis': f'Найдено {len(trends_data)} записей о трендах цен',
+            'recommendation': 'Данные получены, анализ в разработке',
+            'chart_data': [],
+            'raw_data_count': len(trends_data),
+            'raw_data': trends_data[:5]  # Первые 5 записей для отладки
         }
         
-        logger.info(f"✅ Анализ трендов завершен: {result['trend']}, изменение за 3 года: {change_3y:.1f}%")
+        logger.info(f"✅ Данные получены: {len(trends_data)} записей")
         logger.info(f"📊 Финальный результат: {result}")
-        logger.info(f"🔍 Количество обработанных записей: {len(processed_data)}")
-        logger.info(f"🔍 Данные для графика: {chart_data}")
         return result
         
     except Exception as e:
