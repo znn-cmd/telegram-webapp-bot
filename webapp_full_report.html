@@ -756,6 +756,8 @@
     <script>
         // Получаем данные из URL параметров
         const urlParams = new URLSearchParams(window.location.search);
+        console.log('🔍 URL параметры:', Object.fromEntries(urlParams));
+        
         const reportData = {
             address: urlParams.get('address') || 'Не указано',
             bedrooms: urlParams.get('bedrooms') || 'Не указано',
@@ -769,9 +771,12 @@
             lng: urlParams.get('lng') || '',
             location_codes: JSON.parse(urlParams.get('location_codes') || '{}')
         };
+        
+        console.log('📋 reportData создан:', reportData);
 
         // Загружаем полный отчет
         async function loadFullReport() {
+            console.log('🚀 Функция loadFullReport вызвана');
             try {
                 // Проверяем, что reportData определен
                 if (!reportData) {
@@ -885,7 +890,7 @@
                 if (reportData && reportData.location_codes && reportData.area) {
                     try {
                         await loadPriceTrendsData();
-                                    } catch (error) {
+                    } catch (error) {
                     console.error('❌ Ошибка загрузки данных о трендах, но отчет продолжает загружаться:', error);
                     // Показываем сообщение об ошибке в блоке трендов
                     const trendAnalysisElement = document.getElementById('trend-analysis');
@@ -909,33 +914,33 @@
                         priceForecastElement.textContent = 'Недоступно';
                     }
                 }
-            } else {
-                console.log('⚠️ Отсутствуют необходимые данные для загрузки трендов:', {
-                    hasLocationCodes: !!reportData?.location_codes,
-                    hasArea: !!reportData?.area
-                });
-                // Показываем сообщение об отсутствии данных
-                const trendAnalysisElement = document.getElementById('trend-analysis');
-                if (trendAnalysisElement) {
-                    trendAnalysisElement.textContent = 'Недостаточно данных для анализа трендов';
+                } else {
+                    console.log('⚠️ Отсутствуют необходимые данные для загрузки трендов:', {
+                        hasLocationCodes: !!reportData?.location_codes,
+                        hasArea: !!reportData?.area
+                    });
+                    // Показываем сообщение об отсутствии данных
+                    const trendAnalysisElement = document.getElementById('trend-analysis');
+                    if (trendAnalysisElement) {
+                        trendAnalysisElement.textContent = 'Недостаточно данных для анализа трендов';
+                    }
+                    
+                    // Заполняем остальные поля значением "Недоступно"
+                    const priceTrendElement = document.getElementById('price-trend');
+                    if (priceTrendElement) {
+                        priceTrendElement.textContent = 'Недоступно';
+                    }
+                    
+                    const priceChangeElement = document.getElementById('price-change-3y');
+                    if (priceChangeElement) {
+                        priceChangeElement.textContent = 'Недоступно';
+                    }
+                    
+                    const priceForecastElement = document.getElementById('price-forecast');
+                    if (priceForecastElement) {
+                        priceForecastElement.textContent = 'Недоступно';
+                    }
                 }
-                
-                // Заполняем остальные поля значением "Недоступно"
-                const priceTrendElement = document.getElementById('price-trend');
-                if (priceTrendElement) {
-                    priceTrendElement.textContent = 'Недоступно';
-                }
-                
-                const priceChangeElement = document.getElementById('price-change-3y');
-                if (priceChangeElement) {
-                    priceChangeElement.textContent = 'Недоступно';
-                }
-                
-                const priceForecastElement = document.getElementById('price-forecast');
-                if (priceForecastElement) {
-                    priceForecastElement.textContent = 'Недоступно';
-                }
-            }
 
             } catch (error) {
                 console.error('❌ Ошибка загрузки отчета:', error);
@@ -1553,7 +1558,10 @@
         }
 
         // Загружаем отчет при загрузке страницы
-        document.addEventListener('DOMContentLoaded', loadFullReport);
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('🚀 DOM загружен, вызываем loadFullReport');
+            loadFullReport();
+        });
     </script>
 </body>
 </html>
