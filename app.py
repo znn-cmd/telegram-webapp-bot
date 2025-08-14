@@ -26,6 +26,16 @@ import io
 import base64
 from PIL import Image
 import numpy as np
+try:
+    from price_trends_functions import get_price_trends_data, analyze_price_trend, calculate_3year_change, calculate_3month_forecast, format_chart_data
+    logger.info("✅ Модуль price_trends_functions успешно импортирован")
+except ImportError as e:
+    logger.error(f"❌ Ошибка импорта модуля price_trends_functions: {e}")
+    get_price_trends_data = None
+    analyze_price_trend = None
+    calculate_3year_change = None
+    calculate_3month_forecast = None
+    format_chart_data = None
 
 # Загружаем переменные окружения
 load_dotenv()
@@ -6404,6 +6414,49 @@ def api_price_trends():
             return jsonify({'error': 'Invalid area value'}), 400
         
         logger.info(f"📈 Запрос данных о трендах цен для локации: {location_codes}, площадь: {area_value} м²")
+        
+        # Проверяем наличие данных в таблице property_trends
+        try:
+            # Простой запрос для проверки наличия данных
+            check_query = supabase.table('property_trends').select('id').eq('country_id', location_codes.get('country_id', 0))
+            if location_codes.get('city_id'):
+                check_query = check_query.eq('city_id', location_codes['city_id'])
+            if location_codes.get('county_id'):
+                check_query = check_query.eq('county_id', location_codes['county_id'])
+            if location_codes.get('district_id'):
+                check_query = check_query.eq('district_id', location_codes['district_id'])
+            
+            check_response = check_query.limit(1).execute()
+            logger.info(f"🔍 Проверка наличия данных в property_trends: найдено {len(check_response.data) if check_response.data else 0} записей")
+            
+            if not check_response.data:
+                logger.warning("⚠️ В таблице property_trends нет данных для указанной локации")
+                return jsonify({
+                    'error': 'Нет данных о трендах цен для указанной локации',
+                    'trend': 'Не определен',
+                    'change_3y': 0,
+                    'forecast_3m': 0,
+                    'analysis': 'Данные о трендах цен отсутствуют',
+                    'recommendation': 'Попробуйте позже или выберите другую локацию',
+                    'chart_data': []
+                }), 404
+        
+        except Exception as e:
+            logger.error(f"❌ Ошибка проверки данных в property_trends: {e}")
+            # Продолжаем выполнение, возможно данные есть
+        
+        # Проверяем, что функция импортирована
+        if get_price_trends_data is None:
+            logger.error("❌ Функция get_price_trends_data не импортирована")
+            return jsonify({
+                'error': 'Функция анализа трендов недоступна',
+                'trend': 'Не определен',
+                'change_3y': 0,
+                'forecast_3m': 0,
+                'analysis': 'Система анализа трендов недоступна',
+                'recommendation': 'Обратитесь к администратору',
+                'chart_data': []
+            }), 500
         
         # Получаем данные о трендах цен
         trends_data = get_price_trends_data(supabase, location_codes, area_value)

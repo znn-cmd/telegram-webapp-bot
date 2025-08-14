@@ -10,6 +10,14 @@ import math
 
 logger = logging.getLogger(__name__)
 
+# Настраиваем логирование, если оно не настроено
+if not logger.handlers:
+    handler = logging.StreamHandler()
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
+    logger.setLevel(logging.INFO)
+
 def get_price_trends_data(supabase, location_codes: Dict, area: float) -> Dict:
     """
     Получает данные о динамике цен из таблицы property_trends
@@ -70,7 +78,22 @@ def get_price_trends_data(supabase, location_codes: Dict, area: float) -> Dict:
         query = query.order('property_year', desc=False).order('property_month', desc=False)
         
         logger.info("🔍 Выполняем запрос к базе данных...")
-        response = query.execute()
+        logger.info(f"🔍 SQL запрос: {query}")
+        
+        try:
+            response = query.execute()
+            logger.info(f"✅ Запрос выполнен успешно, статус: {response}")
+        except Exception as e:
+            logger.error(f"❌ Ошибка выполнения запроса: {e}")
+            return {
+                'error': f'Ошибка выполнения запроса: {str(e)}',
+                'trend': 'Не определен',
+                'change_3y': 0,
+                'forecast_3m': 0,
+                'analysis': 'Произошла ошибка при запросе к базе данных',
+                'recommendation': 'Попробуйте позже',
+                'chart_data': []
+            }
         
         if response.data is None:
             logger.warning("⚠️ Нет данных о трендах цен")
@@ -86,10 +109,13 @@ def get_price_trends_data(supabase, location_codes: Dict, area: float) -> Dict:
         
         trends_data = response.data
         logger.info(f"📊 Получено {len(trends_data)} записей о трендах цен")
+        logger.info(f"🔍 Первые 3 записи: {trends_data[:3] if trends_data else 'Нет данных'}")
         
         # Обрабатываем данные и вычисляем общие цены объектов
         processed_data = []
-        for record in trends_data:
+        logger.info(f"🔍 Обрабатываем {len(trends_data)} записей...")
+        
+        for i, record in enumerate(trends_data):
             try:
                 unit_price = float(record.get('unit_price_for_sale', 0))
                 total_price = unit_price * area
@@ -103,8 +129,11 @@ def get_price_trends_data(supabase, location_codes: Dict, area: float) -> Dict:
                 }
                 processed_data.append(processed_record)
                 
+                if i < 3:  # Логируем первые 3 записи
+                    logger.info(f"🔍 Запись {i+1}: год={record.get('property_year')}, месяц={record.get('property_month')}, цена/м²={unit_price}, общая цена={total_price}")
+                
             except (ValueError, TypeError) as e:
-                logger.warning(f"⚠️ Ошибка обработки записи: {e}, данные: {record}")
+                logger.warning(f"⚠️ Ошибка обработки записи {i+1}: {e}, данные: {record}")
                 continue
         
         if not processed_data:
@@ -145,6 +174,7 @@ def get_price_trends_data(supabase, location_codes: Dict, area: float) -> Dict:
         }
         
         logger.info(f"✅ Анализ трендов завершен: {result['trend']}, изменение за 3 года: {change_3y:.1f}%")
+        logger.info(f"📊 Финальный результат: {result}")
         return result
         
     except Exception as e:
