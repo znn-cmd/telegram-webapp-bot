@@ -260,6 +260,83 @@
             background: #fff3cd;
             border-left-color: #ffc107;
         }
+        
+        .currency-info {
+            background: #fff3e0;
+            border-left-color: #ff9800;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+        
+        /* Компактные стили для блока "Информация об объекте" */
+        .section.object-info {
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+        
+        .section.object-info h2 {
+            font-size: 20px;
+            margin-bottom: 15px;
+            gap: 8px;
+        }
+        
+        .section.object-info h2::before {
+            font-size: 18px;
+        }
+        
+        .section.object-info .info-grid {
+            gap: 12px;
+            margin-bottom: 15px;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        }
+        
+        /* На больших экранах делаем более компактное расположение */
+        @media (min-width: 1200px) {
+            .section.object-info .info-grid {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 10px;
+            }
+        }
+        
+        /* На очень больших экранах делаем 5 колонок */
+        @media (min-width: 1400px) {
+            .section.object-info .info-grid {
+                grid-template-columns: repeat(5, 1fr);
+                gap: 8px;
+            }
+        }
+        
+        /* На средних экранах делаем 3 колонки */
+        @media (min-width: 768px) and (max-width: 1199px) {
+            .section.object-info .info-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 10px;
+            }
+        }
+        
+        .section.object-info .info-item {
+            padding: 12px;
+            border-radius: 8px;
+        }
+        
+        .section.object-info .info-label {
+            font-size: 12px;
+            margin-bottom: 4px;
+            line-height: 1.2;
+        }
+        
+        .section.object-info .info-value {
+            font-size: 14px;
+            line-height: 1.3;
+        }
+        
+        /* Дополнительные компактные стили для значений */
+        .section.object-info .info-value:empty::before {
+            content: '-';
+            color: #6c757d;
+            font-style: italic;
+        }
 
         @media (max-width: 768px) {
             .container {
@@ -279,12 +356,67 @@
                 padding: 20px;
             }
             
+            .section.object-info {
+                padding: 15px;
+            }
+            
+            .section.object-info .info-grid {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            
+            .section.object-info .info-item {
+                padding: 10px;
+            }
+            
             .buttons {
                 flex-direction: column;
             }
             
             .info-grid {
                 grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Дополнительные компактные стили для очень маленьких экранов */
+        @media (max-width: 480px) {
+            .section.object-info {
+                padding: 12px;
+                margin-bottom: 20px;
+            }
+            
+            .section.object-info h2 {
+                font-size: 18px;
+                margin-bottom: 12px;
+            }
+            
+            .section.object-info .info-grid {
+                gap: 8px;
+            }
+            
+            .section.object-info .info-item {
+                padding: 8px;
+            }
+            
+            .section.object-info .info-label {
+                font-size: 11px;
+                margin-bottom: 3px;
+            }
+            
+            .section.object-info .info-value {
+                font-size: 13px;
+            }
+        }
+        
+        /* Стили для портретной ориентации на мобильных устройствах */
+        @media (max-width: 480px) and (orientation: portrait) {
+            .section.object-info .info-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 6px;
+            }
+            
+            .section.object-info .info-item {
+                padding: 6px;
             }
         }
     </style>
@@ -309,7 +441,7 @@
 
             <div id="report-content" style="display: none;">
                 <!-- Основная информация об объекте -->
-                <div class="section">
+                <div class="section object-info">
                     <h2>🏠 Информация об объекте</h2>
                     <div class="info-grid">
                         <div class="info-item">
@@ -369,11 +501,7 @@
                             <div class="comparison-values" id="heating-comparison">-</div>
                         </div>
                         
-                        <!-- Тип дома -->
-                        <div class="comparison-item">
-                            <div class="comparison-label">По типу дома:</div>
-                            <div class="comparison-values" id="house-type-comparison">-</div>
-                        </div>
+                        <!-- Тип дома - УБРАНО по требованию -->
                         
                         <!-- Итоговое сравнение -->
                         <div class="final-comparison">
@@ -385,6 +513,12 @@
                         <div class="price-conclusion">
                             <div class="conclusion-label">Вывод по цене:</div>
                             <div class="conclusion-value" id="price-conclusion">-</div>
+                        </div>
+                        
+                        <!-- Информация о конвертации валют -->
+                        <div class="currency-info" id="currency-info" style="display: none;">
+                            <div class="info-label">💱 Конвертация валют:</div>
+                            <div class="info-value" id="currency-info-value">-</div>
                         </div>
                     </div>
                 </div>
@@ -722,12 +856,7 @@
                     document.getElementById('heating-comparison').textContent = heatingText;
                 }
                 
-                // Заполняем сравнение по типу дома
-                if (marketComparison.house_type) {
-                    const houseTypeComparison = marketComparison.house_type;
-                    const houseTypeText = `€${houseTypeComparison.min_price.toLocaleString('ru-RU')} - €${Number(reportData.price).toLocaleString('ru-RU')} - €${houseTypeComparison.max_price.toLocaleString('ru-RU')} (отклонение: ${houseTypeComparison.deviation_min.toFixed(1)}% до ${houseTypeComparison.deviation_max.toFixed(1)}%)`;
-                    document.getElementById('house-type-comparison').textContent = houseTypeText;
-                }
+                // Заполняем сравнение по типу дома - УБРАНО по требованию
                 
                 // Заполняем итоговое сравнение
                 if (marketComparison.final) {
@@ -739,6 +868,25 @@
                 // Заполняем вывод по цене
                 if (marketComparison.price_conclusion) {
                     document.getElementById('price-conclusion').textContent = marketComparison.price_conclusion;
+                }
+                
+                // Показываем информацию о конвертации валют, если она применялась
+                if (data.full_report && data.full_report.currency_info) {
+                    const currencyInfo = data.full_report.currency_info;
+                    if (currencyInfo.conversion_applied) {
+                        const currencyElement = document.getElementById('currency-info');
+                        const currencyValueElement = document.getElementById('currency-info-value');
+                        
+                        if (currencyInfo.currency_rate && currencyInfo.currency_rate.try) {
+                            const tryRate = currencyInfo.currency_rate.try;
+                            const date = new Date(currencyInfo.currency_rate.created_at).toLocaleDateString('ru-RU');
+                            currencyValueElement.textContent = `Курс на ${date}: 1 EUR = ${tryRate.toFixed(4)} TRY. Все цены конвертированы в евро.`;
+                        } else {
+                            currencyValueElement.textContent = 'Все цены конвертированы в евро.';
+                        }
+                        
+                        currencyElement.style.display = 'block';
+                    }
                 }
             }
 

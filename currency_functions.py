@@ -218,14 +218,19 @@ def convert_turkish_data_to_eur(data, currency_rate):
     
     try_rate = currency_rate['try']
     logger.info(f"💱 Конвертируем данные в EUR используя курс TRY/EUR: {try_rate}")
+    logger.info(f"📊 Пример: 1000 TRY = {1000/try_rate:.2f} EUR")
     
     def convert_price(price):
         """Конвертирует цену из TRY в EUR"""
         if price is None or price == 'н/д':
             return price
         try:
-            return float(price) / try_rate
+            # try_rate уже представлен как TRY/EUR, поэтому делим на него
+            converted_price = float(price) / try_rate
+            logger.debug(f"💱 Конвертация: {price} TRY / {try_rate} = {converted_price:.2f} EUR")
+            return converted_price
         except (ValueError, TypeError):
+            logger.warning(f"⚠️ Не удалось конвертировать цену: {price}")
             return price
     
     def convert_data_recursive(obj):

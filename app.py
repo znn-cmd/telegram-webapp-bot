@@ -2021,13 +2021,52 @@ def api_full_report():
             avg_sqm = price / typical_size if typical_size > 0 else 0
             logger.info(f"⚠️ Используем типичный размер: {typical_size} м²")
         
+        # Определяем, находится ли объект в Турции
+        is_turkish = False
+        currency_rate = None
+        if location_codes:
+            from currency_functions import is_turkish_location, get_current_currency_rate
+            # Проверяем по кодам локации
+            country_id = location_codes.get('country_id')
+            if country_id:
+                # Получаем название страны по ID
+                try:
+                    country_result = supabase.table('locations').select('country_name').eq('country_id', country_id).limit(1).execute()
+                    if country_result.data:
+                        country_name = country_result.data[0].get('country_name', '').lower()
+                        is_turkish = country_name in ['turkey', 'türkiye', 'tr', 'tur']
+                        logger.info(f"🌍 Проверка страны по ID {country_id}: {country_name}, Турция: {is_turkish}")
+                except Exception as e:
+                    logger.warning(f"⚠️ Ошибка проверки страны: {e}")
+            
+            # Если не удалось определить по ID, проверяем по адресу
+            if not is_turkish:
+                try:
+                    # Создаем временные компоненты локации для проверки
+                    temp_location_components = {
+                        'country': location_codes.get('country_name', ''),
+                        'country_code': location_codes.get('country_code', '')
+                    }
+                    is_turkish = is_turkish_location(temp_location_components)
+                    logger.info(f"🌍 Проверка по адресу: Турция: {is_turkish}")
+                except Exception as e:
+                    logger.warning(f"⚠️ Ошибка проверки локации по адресу: {e}")
+            
+            # Получаем курс валют, если объект в Турции
+            if is_turkish:
+                currency_rate = get_current_currency_rate()
+                if currency_rate:
+                    logger.info(f"💱 Получен курс валют для Турции: {currency_rate}")
+                else:
+                    logger.warning("⚠️ Не удалось получить курс валют для Турции")
+        
         # Получаем реальные экономические данные
         economic_data = get_economic_data('TUR', 10)  # Данные за последние 10 лет
         chart_data = create_economic_chart_data(economic_data)
         
         # Получаем рыночные данные для сравнения цен
         market_comparison_data = get_market_comparison_data(
-            age_id, floor_id, heating_id, area, price, location_codes, bedrooms
+            age_id, floor_id, heating_id, area, price, location_codes, bedrooms, is_turkish, currency_rate
         )
         logger.info(f"✅ Получены рыночные данные для сравнения: {market_comparison_data}")
         
@@ -2441,6 +2480,11 @@ def api_full_report():
             
             # 2.1. РЫНОЧНЫЕ ДАННЫЕ ДЛЯ СРАВНЕНИЯ ЦЕН
             'market_comparison': market_comparison_data,
+            'currency_info': {
+                'is_turkish': is_turkish,
+                'currency_rate': currency_rate,
+                'conversion_applied': is_turkish and currency_rate is not None
+            },
             
             # 3. АНАЛИЗ ЦЕН НА РЫНКЕ
             'market_price_analysis': {
@@ -6028,7 +6072,7 @@ def load_interpretations_from_database(country_code):
         logger.error(f"Error loading interpretations from database: {e}")
         return None, None
 
-def get_market_comparison_data(age_id, floor_id, heating_id, area, price, location_codes, bedrooms=2):
+def get_market_comparison_data(age_id, floor_id, heating_id, area, price, location_codes, bedrooms=2, is_turkish=False, currency_rate=None):
     """
     Получает рыночные данные для сравнения цен из таблиц floor_segment_data, heating_data, house_type_data, age_data
     
@@ -6050,6 +6094,12 @@ def get_market_comparison_data(age_id, floor_id, heating_id, area, price, locati
         logger.info(f"📍 Площадь: {area} м², Цена: €{price}")
         logger.info(f"📍 Коды локации: {location_codes}")
         logger.info(f"🔍 Типы данных: age_id={type(age_id)}, floor_id={type(floor_id)}, heating_id={type(heating_id)}")
+        logger.info(f"🌍 Турция: {is_turkish}, Курс валют: {currency_rate}")
+        
+        # Импортируем функции конвертации валют
+        if is_turkish and currency_rate:
+            from currency_functions import convert_turkish_data_to_eur
+            logger.info("💱 Конвертация данных из TRY в EUR включена")
         
         # Получаем данные из таблиц
         comparisons = {}
@@ -6091,6 +6141,11 @@ def get_market_comparison_data(age_id, floor_id, heating_id, area, price, locati
                     logger.info(f"🔍 Результат запроса по возрасту (listing_type={age_listing_type}): {len(age_result.data)} записей")
                 
                 if age_result.data:
+                    # Конвертируем данные в евро, если объект в Турции
+                    if is_turkish and currency_rate:
+                        age_result.data = convert_turkish_data_to_eur(age_result.data, currency_rate)
+                        logger.info("💱 Данные по возрасту конвертированы в EUR")
+                    
                     # Сохраняем данные для графика
                     price_trends['age'] = {
                         'dates': [record.get('trend_date') for record in age_result.data],
@@ -6160,6 +6215,11 @@ def get_market_comparison_data(age_id, floor_id, heating_id, area, price, locati
                     logger.info(f"🔍 Результат запроса по этажу (listing_type={floor_listing_type}): {len(floor_result.data)} записей")
                 
                 if floor_result.data:
+                    # Конвертируем данные в евро, если объект в Турции
+                    if is_turkish and currency_rate:
+                        floor_result.data = convert_turkish_data_to_eur(floor_result.data, currency_rate)
+                        logger.info("💱 Данные по этажу конвертированы в EUR")
+                    
                     # Сохраняем данные для графика
                     price_trends['floor'] = {
                         'dates': [record.get('trend_date') for record in floor_result.data],
@@ -6229,6 +6289,11 @@ def get_market_comparison_data(age_id, floor_id, heating_id, area, price, locati
                     logger.info(f"🔍 Результат запроса по отоплению (listing_type={heating_listing_type}): {len(heating_result.data)} записей")
                 
                 if heating_result.data:
+                    # Конвертируем данные в евро, если объект в Турции
+                    if is_turkish and currency_rate:
+                        heating_result.data = convert_turkish_data_to_eur(heating_result.data, currency_rate)
+                        logger.info("💱 Данные по отоплению конвертированы в EUR")
+                    
                     # Сохраняем данные для графика
                     price_trends['heating'] = {
                         'dates': [record.get('trend_date') for record in heating_result.data],
@@ -6266,71 +6331,8 @@ def get_market_comparison_data(age_id, floor_id, heating_id, area, price, locati
             except Exception as e:
                 logger.error(f"❌ Ошибка получения данных по отоплению: {e}")
         
-        # 4. Сравнение по типу дома (используем количество спален)
-        try:
-            if 'bedrooms' in location_codes:
-                bedrooms = int(location_codes.get('bedrooms', 2))
-                # Определяем тип дома на основе количества спален
-                house_type = 'apartment' if bedrooms <= 2 else 'villa' if bedrooms >= 4 else 'townhouse'
-                
-                # Получаем данные по типу дома с учетом локации, listing_type и даты
-                house_query = supabase.table('house_type_data').select('trend_date, min_unit_price_for_sale, max_unit_price_for_sale, unit_price_for_sale')
-                
-                # 1. Фильтр по локации
-                if location_codes.get('country_id'):
-                    house_query = house_query.eq('country_id', location_codes['country_id'])
-                if location_codes.get('city_id'):
-                    house_query = house_query.eq('city_id', location_codes['city_id'])
-                if location_codes.get('county_id'):
-                    house_query = house_query.eq('county_id', location_codes['county_id'])
-                if location_codes.get('district_id'):
-                    house_query = house_query.eq('district_id', location_codes['district_id'])
-                
-                # 2. Фильтр по типу дома (listing_type)
-                house_query = house_query.eq('listing_type', house_type)
-                
-                # 3. Фильтр по дате (последние 12 месяцев)
-                house_query = house_query.gte('trend_date', twelve_months_ago).lte('trend_date', current_date)
-                
-                house_result = house_query.execute()
-                logger.info(f"🔍 Результат запроса по типу дома: {len(house_result.data)} записей")
-                
-                if house_result.data:
-                    # Сохраняем данные для графика
-                    price_trends['house_type'] = {
-                        'dates': [record.get('trend_date') for record in house_result.data],
-                        'prices': [float(record.get('unit_price_for_sale', 0)) for record in house_result.data if record.get('unit_price_for_sale')]
-                    }
-                    
-                    # Берем последнюю запись для расчетов
-                    latest_record = max(house_result.data, key=lambda x: x.get('trend_date', ''))
-                    min_price = float(latest_record.get('min_unit_price_for_sale', 0))
-                    max_price = float(latest_record.get('max_unit_price_for_sale', 0))
-                    
-                    if min_price > 0 and max_price > 0:
-                        # Используем типичный размер, если area не указан
-                        if area and area != 'unknown':
-                            area_value = float(area)
-                        else:
-                            # Типичный размер на основе количества спален
-                            area_value = 80 if bedrooms <= 2 else 120 if bedrooms <= 3 else 150
-                            logger.info(f"⚠️ Используем типичный размер для сравнения типа дома: {area_value} м²")
-                        
-                        min_total = min_price * area_value
-                        max_total = max_price * area_value
-                        
-                        comparisons['house_type'] = {
-                            'min_price': min_total,
-                            'max_price': max_total,
-                            'user_price': price,
-                            'deviation_min': ((price - min_total) / min_total * 100) if min_total > 0 else 0,
-                            'deviation_max': ((price - max_total) / max_total * 100) if max_total > 0 else 0,
-                            'trend_data': price_trends['house_type']
-                        }
-                        logger.info(f"✅ Данные по типу дома: min={min_total:.0f}, max={max_total:.0f}, user={price:.0f}")
-        except Exception as e:
-            logger.error(f"❌ Ошибка получения данных по типу дома: {e}")
-        
+        # 4. Сравнение по типу дома - УБРАНО по требованию
+        # Блок "По типу дома" был удален из сравнения с рыночными ценами
         # 5. Рассчитываем итоговые средние значения
         if comparisons:
             all_min_prices = [comp['min_price'] for comp in comparisons.values() if comp['min_price'] > 0]
