@@ -742,7 +742,8 @@ def api_generate_report():
         currency_info = ""
         
         if location_components:
-            from currency_functions import is_turkish_location, get_current_currency_rate, convert_turkish_data_to_eur, format_currency_info
+            from currency_functions import is_turkish_location, get_current_currency_rate, convert_turkish_data_to_eur
+            from price_trends_functions import get_price_trends_data
             
             is_turkish = is_turkish_location(location_components)
             logger.info(f"🌍 Проверка локации: {'Турция' if is_turkish else 'Другая страна'}")
@@ -6376,6 +6377,56 @@ def get_market_comparison_data(age_id, floor_id, heating_id, area, price, locati
     except Exception as e:
         logger.error(f"❌ Ошибка получения рыночных данных для сравнения: {e}")
         return {}
+
+
+@app.route('/api/price_trends', methods=['POST'])
+def api_price_trends():
+    """
+    API endpoint для получения данных о динамике цен недвижимости
+    """
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({'error': 'Missing request data'}), 400
+        
+        location_codes = data.get('location_codes', {})
+        area = data.get('area')
+        
+        if not location_codes:
+            return jsonify({'error': 'Missing location_codes'}), 400
+        
+        if not area or area == 'unknown':
+            return jsonify({'error': 'Missing or invalid area'}), 400
+        
+        try:
+            area_value = float(area)
+        except (ValueError, TypeError):
+            return jsonify({'error': 'Invalid area value'}), 400
+        
+        logger.info(f"📈 Запрос данных о трендах цен для локации: {location_codes}, площадь: {area_value} м²")
+        
+        # Получаем данные о трендах цен
+        trends_data = get_price_trends_data(supabase, location_codes, area_value)
+        
+        if 'error' in trends_data:
+            logger.warning(f"⚠️ Ошибка получения данных о трендах: {trends_data['error']}")
+            return jsonify(trends_data), 400
+        
+        logger.info(f"✅ Данные о трендах цен успешно получены: {trends_data['trend']}")
+        return jsonify(trends_data)
+        
+    except Exception as e:
+        logger.error(f"❌ Ошибка API price_trends: {e}")
+        return jsonify({
+            'error': f'Internal server error: {str(e)}',
+            'trend': 'Не определен',
+            'change_3y': 0,
+            'forecast_3m': 0,
+            'analysis': 'Произошла ошибка при получении данных',
+            'recommendation': 'Попробуйте позже',
+            'chart_data': []
+        }), 500
+
 
 if __name__ == '__main__':
     run_flask()

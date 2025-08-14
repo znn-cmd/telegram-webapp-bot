@@ -269,6 +269,60 @@
             margin-top: 15px;
         }
         
+        /* Стили для анализа динамики цен */
+        .price-chart-container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid #e9ecef;
+        }
+        
+        .price-chart-container h3 {
+            color: #495057;
+            font-size: 18px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .chart-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 200px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+        }
+        
+        .trend-analysis {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid #e9ecef;
+        }
+        
+        .trend-item {
+            margin-bottom: 15px;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .trend-label {
+            font-weight: 600;
+            color: #495057;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+        
+        .trend-value {
+            color: #333;
+            font-size: 16px;
+            font-weight: 500;
+            line-height: 1.4;
+        }
+        
         /* Компактные стили для блока "Информация об объекте" */
         .section.object-info {
             padding: 20px;
@@ -523,25 +577,42 @@
                     </div>
                 </div>
 
-                <!-- Анализ цен на рынке -->
+                <!-- Анализ динамики цен -->
                 <div class="section">
-                    <h2>📊 Анализ цен на рынке</h2>
+                    <h2>📊 Анализ динамики цен</h2>
                     <div class="info-grid">
                         <div class="info-item">
-                            <div class="info-label">Уровень цены</div>
-                            <div class="info-value" id="price-level">-</div>
+                            <div class="info-label">Тренд цен</div>
+                            <div class="info-value" id="price-trend">-</div>
                         </div>
                         <div class="info-item">
-                            <div class="info-label">Диапазон цен</div>
-                            <div class="info-value" id="price-range">-</div>
+                            <div class="info-label">Изменение за 3 года</div>
+                            <div class="info-value" id="price-change-3y">-</div>
                         </div>
                         <div class="info-item">
-                            <div class="info-label">Рекомендация</div>
-                            <div class="info-value" id="price-recommendation">-</div>
+                            <div class="info-label">Прогноз на 3 месяца</div>
+                            <div class="info-value" id="price-forecast">-</div>
                         </div>
                     </div>
-                    <div class="price-comparison" id="price-comparison-details" style="margin-top: 20px;">
-                        <!-- Детали сравнения цен будут добавлены динамически -->
+                    
+                    <!-- График динамики цен -->
+                    <div class="price-chart-container" style="margin-top: 20px;">
+                        <h3>📈 График изменения цен</h3>
+                        <div class="chart-wrapper">
+                            <canvas id="priceChart" width="400" height="200"></canvas>
+                        </div>
+                    </div>
+                    
+                    <!-- Анализ тренда -->
+                    <div class="trend-analysis" style="margin-top: 20px;">
+                        <div class="trend-item">
+                            <div class="trend-label">Анализ тренда:</div>
+                            <div class="trend-value" id="trend-analysis">-</div>
+                        </div>
+                        <div class="trend-item">
+                            <div class="trend-label">Рекомендация:</div>
+                            <div class="trend-value" id="trend-recommendation">-</div>
+                        </div>
                     </div>
                 </div>
 
@@ -679,6 +750,9 @@
         </div>
     </div>
 
+    <!-- Chart.js для построения графиков -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
     <script>
         // Получаем данные из URL параметров
         const urlParams = new URLSearchParams(window.location.search);
@@ -743,6 +817,9 @@
 
                 // Заполняем данные отчета
                 fillReportData(data);
+                
+                // Загружаем данные о динамике цен
+                await loadPriceTrendsData();
 
             } catch (error) {
                 console.error('Ошибка загрузки отчета:', error);
@@ -751,7 +828,185 @@
                 document.getElementById('error-message').textContent = error.message || 'Неизвестная ошибка';
             }
         }
+        
+        // Загружаем данные о динамике цен
+        async function loadPriceTrendsData() {
+            try {
+                console.log('📈 Загружаем данные о динамике цен...');
+                
+                const response = await fetch('/api/price_trends', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        location_codes: reportData.location_codes,
+                        area: reportData.area
+                    })
+                });
 
+                const trendsData = await response.json();
+
+                if (trendsData.error) {
+                    throw new Error(trendsData.error);
+                }
+
+                console.log('📊 Данные о динамике цен получены:', trendsData);
+                
+                // Заполняем данные о трендах
+                fillPriceTrendsData(trendsData);
+                
+                // Строим график
+                buildPriceChart(trendsData);
+                
+            } catch (error) {
+                console.error('Ошибка загрузки данных о динамике цен:', error);
+                // Показываем сообщение об ошибке в блоке трендов
+                document.getElementById('trend-analysis').textContent = 'Ошибка загрузки данных о трендах';
+            }
+
+
+                // Скрываем загрузку и показываем отчет
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('report-content').style.display = 'block';
+
+                // Отладочная информация
+                console.log('📊 Получены данные от сервера:', data);
+                console.log('🔍 Структура full_report:', data.full_report);
+
+                // Заполняем данные отчета
+                fillReportData(data);
+
+            } catch (error) {
+                console.error('Ошибка загрузки отчета:', error);
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('error').style.display = 'block';
+                document.getElementById('error-message').textContent = error.message || 'Неизвестная ошибка';
+            }
+                }
+        
+        // Заполняем данные о трендах цен
+        function fillPriceTrendsData(trendsData) {
+            try {
+                console.log('🔧 Заполняем данные о трендах цен...');
+                
+                // Тренд цен
+                const trendElement = document.getElementById('price-trend');
+                if (trendElement && trendsData.trend) {
+                    trendElement.textContent = trendsData.trend;
+                }
+                
+                // Изменение за 3 года
+                const change3yElement = document.getElementById('price-change-3y');
+                if (change3yElement && trendsData.change_3y !== undefined) {
+                    const changePercent = trendsData.change_3y;
+                    const changeText = changePercent >= 0 ? 
+                        `+${changePercent.toFixed(1)}%` : 
+                        `${changePercent.toFixed(1)}%`;
+                    change3yElement.textContent = changeText;
+                }
+                
+                // Прогноз на 3 месяца
+                const forecastElement = document.getElementById('price-forecast');
+                if (forecastElement && trendsData.forecast_3m !== undefined) {
+                    const forecastPercent = trendsData.forecast_3m;
+                    const forecastText = forecastPercent >= 0 ? 
+                        `+${forecastPercent.toFixed(1)}%` : 
+                        `${forecastPercent.toFixed(1)}%`;
+                    forecastElement.textContent = forecastText;
+                }
+                
+                // Анализ тренда
+                const analysisElement = document.getElementById('trend-analysis');
+                if (analysisElement && trendsData.analysis) {
+                    analysisElement.textContent = trendsData.analysis;
+                }
+                
+                // Рекомендация по тренду
+                const recommendationElement = document.getElementById('trend-recommendation');
+                if (recommendationElement && trendsData.recommendation) {
+                    recommendationElement.textContent = trendsData.recommendation;
+                }
+                
+                console.log('✅ Данные о трендах цен заполнены');
+                
+            } catch (error) {
+                console.error('Ошибка заполнения данных о трендах:', error);
+            }
+        }
+        
+        // Строим график динамики цен
+        function buildPriceChart(trendsData) {
+            try {
+                console.log('📊 Строим график динамики цен...');
+                
+                const ctx = document.getElementById('priceChart');
+                if (!ctx) {
+                    console.error('Canvas элемент не найден');
+                    return;
+                }
+                
+                // Уничтожаем предыдущий график, если он существует
+                if (window.priceChart) {
+                    window.priceChart.destroy();
+                }
+                
+                const chartData = trendsData.chart_data || [];
+                const labels = chartData.map(item => `${item.month}/${item.year}`);
+                const prices = chartData.map(item => item.total_price);
+                
+                window.priceChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Цена объекта (€)',
+                            data: prices,
+                            borderColor: '#667eea',
+                            backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                            borderWidth: 3,
+                            fill: true,
+                            tension: 0.4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: 'Динамика цен за 3 года + прогноз на 3 месяца'
+                            },
+                            legend: {
+                                display: true,
+                                position: 'top'
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: false,
+                                title: {
+                                    display: true,
+                                    text: 'Цена (€)'
+                                }
+                            },
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Период'
+                                }
+                            }
+                        }
+                    }
+                });
+                
+                console.log('✅ График динамики цен построен');
+                
+            } catch (error) {
+                console.error('Ошибка построения графика:', error);
+            }
+        }
+        
         // Заполняем данные отчета
         function fillReportData(data) {
             console.log('🔧 Начинаем заполнение отчета...');
@@ -890,31 +1145,7 @@
                 }
             }
 
-            // Анализ цен на рынке
-            if (data.full_report && data.full_report.market_price_analysis) {
-                const priceAnalysis = data.full_report.market_price_analysis;
-                document.getElementById('price-level').textContent = priceAnalysis.price_level || 'Не определен';
-                document.getElementById('price-range').textContent = priceAnalysis.price_range || 'Не определен';
-                document.getElementById('price-recommendation').textContent = priceAnalysis.price_recommendation || 'Не определен';
-                
-                // Детали сравнения цен
-                if (priceAnalysis.price_comparison) {
-                    const comparisonContainer = document.getElementById('price-comparison-details');
-                    comparisonContainer.innerHTML = `
-                        <div class="info-grid">
-                            <div class="info-item">
-                                <div class="info-label">${priceAnalysis.price_comparison.min}</div>
-                            </div>
-                            <div class="info-item">
-                                <div class="info-label">${priceAnalysis.price_comparison.avg}</div>
-                            </div>
-                            <div class="info-item">
-                                <div class="info-label">${priceAnalysis.price_comparison.max}</div>
-                            </div>
-                        </div>
-                    `;
-                }
-            }
+            // Анализ динамики цен - теперь загружается отдельно через loadPriceTrendsData()
 
             // Анализ аренды
             if (data.full_report && data.full_report.rental_analysis) {
