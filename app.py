@@ -719,11 +719,14 @@ def api_generate_report():
     location_codes = data.get('location_codes')  # Получаем коды локаций из фронтенда
     
     if not all([address, bedrooms, price]):
+        logger.error(f"❌ Отсутствуют обязательные данные: address={address}, bedrooms={bedrooms}, price={price}")
         return jsonify({'error': 'Missing required data'}), 400
     
     try:
         logger.info(f"🔍 Генерация отчета для адреса: {address}")
         logger.info(f"📋 Полученные коды локаций: {location_codes}")
+        logger.info(f"🔍 Все полученные данные: {data}")
+        logger.info(f"🔍 Типы данных: address={type(address)}, bedrooms={type(bedrooms)}, price={type(price)}, location_codes={type(location_codes)}")
         
         # Если коды локаций не переданы, пытаемся получить их из адреса
         if not location_codes:
@@ -856,22 +859,35 @@ def api_generate_report():
         })
         
     except Exception as e:
-        logger.error(f"Error generating report: {e}")
-        return jsonify({'error': 'Internal error'}), 500
+        logger.error(f"❌ Ошибка генерации отчета: {e}")
+        logger.error(f"❌ Данные запроса: {data}")
+        logger.error(f"❌ Адрес: {address}")
+        logger.error(f"❌ Коды локаций: {location_codes}")
+        return jsonify({'error': f'Internal error: {str(e)}'}), 500
 
 def get_location_codes_from_address(address):
     """Получает коды локаций из таблицы locations по адресу"""
     try:
         # Извлекаем компоненты адреса
+        logger.info(f"🔍 Извлекаем компоненты адреса: {address}")
         location_info = extract_location_from_address(address)
+        logger.info(f"🔍 Результат извлечения: {location_info}")
         if not location_info:
+            logger.warning(f"⚠️ Не удалось извлечь компоненты адреса: {address}")
             return None
         
         # Исправляем названия для соответствия с базой данных
         if location_info.get('country_name') == 'Turkey':
             location_info['country_name'] = 'Türkiye'
         
-        logger.info(f"Ищем локацию в базе: {location_info}")
+        # Проверяем наличие всех необходимых полей
+        required_fields = ['city_name', 'county_name', 'district_name', 'country_name']
+        missing_fields = [field for field in required_fields if not location_info.get(field)]
+        if missing_fields:
+            logger.warning(f"⚠️ Отсутствуют поля в location_info: {missing_fields}")
+            logger.warning(f"⚠️ Доступные поля: {list(location_info.keys())}")
+        
+        logger.info(f"🔍 Ищем локацию в базе: {location_info}")
         
         # Ищем в таблице locations - сначала по точному совпадению
         query = supabase.table('locations').select('*')
@@ -887,10 +903,11 @@ def get_location_codes_from_address(address):
             query = query.eq('country_name', location_info['country_name'])
         
         result = query.execute()
+        logger.info(f"🔍 Результат поиска в базе: {result.data if result.data else 'Нет данных'}")
         
         if result.data and len(result.data) > 0:
             location = result.data[0]
-            logger.info(f"Найдена локация: {location}")
+            logger.info(f"✅ Найдена локация: {location}")
             return {
                 'city_id': location['city_id'],
                 'county_id': location['county_id'],
@@ -949,11 +966,13 @@ def get_location_codes_from_address(address):
             }
         
         # Если ничего не найдено, возвращаем None
-        logger.warning(f"Локация не найдена для: {location_info}")
+        logger.warning(f"⚠️ Локация не найдена для: {location_info}")
+        logger.warning(f"⚠️ Попробуйте проверить названия в базе данных")
         return None
             
     except Exception as e:
-        logger.error(f"Error getting location codes: {e}")
+        logger.error(f"❌ Ошибка получения кодов локаций: {e}")
+        logger.error(f"❌ Адрес: {address}")
         return None
 
 def format_simple_report(address, bedrooms, price, location_codes, language='en', market_data=None, currency_info=""):
@@ -1984,7 +2003,7 @@ def api_full_report():
     # Получаем коды локаций
     location_codes = data.get('location_codes', {})
     if not location_codes:
-        # Если коды локаций не переданы, пытаемся получить их из адреса
+        # Если коды локаций не переданы, пытаемся получить их из адресаотчет
         try:
             location_codes = get_location_codes_from_address(address)
             logger.info(f"📋 Получены коды локаций из адреса: {location_codes}")
@@ -5501,8 +5520,10 @@ def extract_location_from_address(address):
         dict: Словарь с city_name, district_name, county_name
     """
     try:
+        logger.info(f"🔍 Извлекаем компоненты адреса: {address}")
         # Улучшенное извлечение для турецких адресов
         address_parts = address.split(',')
+        logger.info(f"🔍 Части адреса: {address_parts}")
         
         location_data = {
             'city_name': None,
@@ -5514,20 +5535,27 @@ def extract_location_from_address(address):
         if len(address_parts) >= 3:
             # Обрабатываем специальный случай: "Zerdalilik, 07100 Muratpaşa/Antalya, Türkiye"
             if 'Muratpaşa/Antalya' in address_parts[1]:
+                logger.info(f"🔍 Обрабатываем случай Muratpaşa/Antalya")
                 location_data['city_name'] = 'Antalya'
                 location_data['county_name'] = 'Muratpaşa'
                 location_data['district_name'] = address_parts[0].strip()
+                location_data['country_name'] = 'Türkiye'  # Исправляем название страны
             # Обрабатываем специальный случай: "Avsallar, Cengiz Akay Sk. No:12, 07410 Alanya/Antalya, Türkiye"
             elif 'Alanya/Antalya' in address_parts[2]:
+                logger.info(f"🔍 Обрабатываем случай Alanya/Antalya")
                 location_data['city_name'] = 'Antalya'
                 location_data['county_name'] = 'Alanya'
                 location_data['district_name'] = address_parts[0].strip()
+                location_data['country_name'] = 'Türkiye'  # Исправляем название страны
             # Обрабатываем специальный случай: "Baraj, 5890. Sk. No:584, 07320 Kepez/Antalya, Türkiye"
             elif 'Kepez/Antalya' in address_parts[2]:
+                logger.info(f"🔍 Обрабатываем случай Kepez/Antalya")
                 location_data['city_name'] = 'Antalya'
                 location_data['county_name'] = 'Kepez'
                 location_data['district_name'] = address_parts[0].strip()
+                location_data['country_name'] = 'Türkiye'  # Исправляем название страны
             else:
+                logger.info(f"🔍 Обрабатываем стандартный случай")
                 # Для адреса: "Antalya, Alanya, Avsallar Mah., Cengiz Akay Sok., 12B"
                 # Первая часть: город (Antalya) - это основной город
                 location_data['city_name'] = address_parts[0].strip()
@@ -5542,27 +5570,37 @@ def extract_location_from_address(address):
                 location_data['district_name'] = district_name
                 
         elif len(address_parts) >= 2:
+            logger.info(f"🔍 Обрабатываем простой формат (2 части)")
             # Простой формат
             location_data['district_name'] = address_parts[0].strip()
             location_data['city_name'] = address_parts[1].strip()
         
         # Если не удалось извлечь, используем fallback
         if not location_data['city_name']:
-            location_data['city_name'] = 'Alanya'  # Default для региона
+            logger.info(f"🔍 Используем fallback для city_name: Antalya")
+            location_data['city_name'] = 'Antalya'  # Default для региона
         if not location_data['district_name']:
-            location_data['district_name'] = 'Avsallar'  # Default район
+            logger.info(f"🔍 Используем fallback для district_name: Baraj")
+            location_data['district_name'] = 'Baraj'  # Default район
         if not location_data['county_name']:
-            location_data['county_name'] = 'Antalya'  # Default провинция
+            logger.info(f"🔍 Используем fallback для county_name: Kepez")
+            location_data['county_name'] = 'Kepez'  # Default провинция
+        if not location_data['country_name']:
+            logger.info(f"🔍 Используем fallback для country_name: Türkiye")
+            location_data['country_name'] = 'Türkiye'  # Default страна
         
-        logger.info(f"Извлечены данные локации из адреса: {location_data}")
+        logger.info(f"✅ Извлечены данные локации из адреса: {location_data}")
         return location_data
         
     except Exception as e:
-        logger.error(f"Ошибка извлечения локации из адреса: {e}")
+        logger.error(f"❌ Ошибка извлечения локации из адреса: {e}")
+        logger.error(f"❌ Адрес: {address}")
+        logger.info(f"🔍 Возвращаем fallback значения")
         return {
-            'city_name': 'Alanya',
-            'district_name': 'Avsallar', 
-            'county_name': 'Antalya'
+            'city_name': 'Antalya',
+            'district_name': 'Baraj', 
+            'county_name': 'Kepez',
+            'country_name': 'Türkiye'
         }
 
 def get_historical_property_trends(city_name, district_name, county_name, years_back=5):
@@ -6417,35 +6455,33 @@ def api_price_trends():
         
         logger.info(f"📈 Запрос данных о трендах цен для локации: {location_codes}, площадь: {area_value} м²")
         
-        # Проверяем наличие данных в таблице property_trends
-        try:
-            # Простой запрос для проверки наличия данных
-            check_query = supabase.table('property_trends').select('id').eq('country_id', location_codes.get('country_id', 0))
-            if location_codes.get('city_id'):
-                check_query = check_query.eq('city_id', location_codes['city_id'])
-            if location_codes.get('county_id'):
-                check_query = check_query.eq('county_id', location_codes['county_id'])
-            if location_codes.get('district_id'):
-                check_query = check_query.eq('district_id', location_codes['district_id'])
-            
-            check_response = check_query.limit(1).execute()
-            logger.info(f"🔍 Проверка наличия данных в property_trends: найдено {len(check_response.data) if check_response.data else 0} записей")
-            
-            if not check_response.data:
-                logger.warning("⚠️ В таблице property_trends нет данных для указанной локации")
-                return jsonify({
-                    'error': 'Нет данных о трендах цен для указанной локации',
-                    'trend': 'Не определен',
-                    'change_3y': 0,
-                    'forecast_3m': 0,
-                    'analysis': 'Данные о трендах цен отсутствуют',
-                    'recommendation': 'Попробуйте позже или выберите другую локацию',
-                    'chart_data': []
-                }), 404
+        # Добавляем дополнительное логирование для отладки
+        logger.info(f"🔍 Проверяем коды локации:")
+        logger.info(f"  - country_id: {location_codes.get('country_id')} (тип: {type(location_codes.get('country_id'))})")
+        logger.info(f"  - city_id: {location_codes.get('city_id')} (тип: {type(location_codes.get('city_id'))})")
+        logger.info(f"  - county_id: {location_codes.get('county_id')} (тип: {type(location_codes.get('county_id'))})")
+        logger.info(f"  - district_id: {location_codes.get('district_id')} (тип: {type(location_codes.get('district_id'))})")
         
+        # Сначала делаем тестовый запрос без фильтров по дате
+        logger.info("🔍 Делаем тестовый запрос без фильтров по дате...")
+        test_query = supabase.table('property_trends').select('id, property_year, property_month').eq('country_id', location_codes['country_id'])
+        if location_codes.get('city_id'):
+            test_query = test_query.eq('city_id', location_codes['city_id'])
+        if location_codes.get('county_id'):
+            test_query = test_query.eq('county_id', location_codes['county_id'])
+        if location_codes.get('district_id'):
+            test_query = test_query.eq('district_id', location_codes['district_id'])
+        
+        try:
+            test_response = test_query.limit(5).execute()
+            logger.info(f"🔍 Тестовый запрос: найдено {len(test_response.data) if test_response.data else 0} записей")
+            if test_response.data:
+                logger.info(f"🔍 Первые записи: {test_response.data[:3]}")
         except Exception as e:
-            logger.error(f"❌ Ошибка проверки данных в property_trends: {e}")
-            # Продолжаем выполнение, возможно данные есть
+            logger.error(f"❌ Ошибка тестового запроса: {e}")
+        
+        # Убираем проверку на наличие данных - пусть функция get_price_trends_data сама разберется
+        logger.info("🔍 Пропускаем проверку на наличие данных, сразу вызываем get_price_trends_data")
         
         # Проверяем, что функция импортирована
         if get_price_trends_data is None:

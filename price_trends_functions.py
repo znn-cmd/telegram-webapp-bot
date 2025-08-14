@@ -77,14 +77,21 @@ def get_price_trends_data(supabase, location_codes: Dict, area: float) -> Dict:
         logger.info(f"📅 Текущая дата: {current_year}-{current_month:02d}")
         
         # Формируем запрос к таблице property_trends
+        logger.info(f"🔍 Формируем запрос к таблице property_trends")
+        logger.info(f"🔍 Базовый запрос: select * from property_trends")
+        
         query = supabase.table('property_trends').select('*').eq('country_id', location_codes['country_id'])
+        logger.info(f"🔍 Добавляем фильтр: country_id = {location_codes['country_id']}")
         
         if location_codes.get('city_id'):
             query = query.eq('city_id', location_codes['city_id'])
+            logger.info(f"🔍 Добавляем фильтр: city_id = {location_codes['city_id']}")
         if location_codes.get('county_id'):
             query = query.eq('county_id', location_codes['county_id'])
+            logger.info(f"🔍 Добавляем фильтр: county_id = {location_codes['county_id']}")
         if location_codes.get('district_id'):
             query = query.eq('district_id', location_codes['district_id'])
+            logger.info(f"🔍 Добавляем фильтр: district_id = {location_codes['district_id']}")
         
         # Фильтруем по периоду - используем отдельные поля property_year и property_month
         # Получаем данные за последние 12 месяцев + текущий месяц + 1 месяц вперед
@@ -104,7 +111,9 @@ def get_price_trends_data(supabase, location_codes: Dict, area: float) -> Dict:
         logger.info(f"🔍 Включаем годы: {years_to_include}")
         
         # Используем простую фильтрацию: год >= start_year и год <= end_year
+        logger.info(f"🔍 Добавляем фильтр по году: property_year >= {start_year}")
         query = query.gte('property_year', start_year)
+        logger.info(f"🔍 Добавляем фильтр по году: property_year <= {end_year}")
         query = query.lte('property_year', end_year)
         
         # Добавляем дополнительную отладочную информацию
@@ -139,10 +148,14 @@ def get_price_trends_data(supabase, location_codes: Dict, area: float) -> Dict:
                 if response.data:
                     logger.info(f"🔍 Первая запись: {response.data[0]}")
                     logger.info(f"🔍 Последняя запись: {response.data[-1]}")
+                    logger.info(f"🔍 Все записи: {response.data}")
+                else:
+                    logger.warning(f"⚠️ Ответ пустой - данных нет")
             else:
                 logger.info(f"🔍 Ответ не содержит атрибут 'data'")
         except Exception as e:
             logger.error(f"❌ Ошибка выполнения запроса: {e}")
+            logger.error(f"❌ SQL запрос: {query}")
             return {
                 'error': f'Ошибка выполнения запроса: {str(e)}',
                 'trend': 'Не определен',
@@ -154,7 +167,8 @@ def get_price_trends_data(supabase, location_codes: Dict, area: float) -> Dict:
             }
         
         if response.data is None:
-            logger.warning("⚠️ Нет данных о трендах цен")
+            logger.warning("⚠️ Нет данных о трендах цен (response.data is None)")
+            logger.warning(f"⚠️ Проверьте SQL запрос: {query}")
             return {
                 'error': 'Нет данных о трендах цен для указанной локации',
                 'trend': 'Не определен',
@@ -167,7 +181,13 @@ def get_price_trends_data(supabase, location_codes: Dict, area: float) -> Dict:
         
         trends_data = response.data
         logger.info(f"📊 Получено {len(trends_data)} записей о трендах цен")
-        logger.info(f"🔍 Первые 3 записи: {trends_data[:3] if trends_data else 'Нет данных'}")
+        if trends_data:
+            logger.info(f"🔍 Первые 3 записи: {trends_data[:3]}")
+            logger.info(f"🔍 Последние 3 записи: {trends_data[-3:]}")
+        else:
+            logger.warning(f"⚠️ trends_data пустой - данных нет")
+            logger.warning(f"⚠️ Проверьте SQL запрос: {query}")
+            logger.warning(f"⚠️ Проверьте фильтры: country_id={location_codes.get('country_id')}, city_id={location_codes.get('city_id')}, county_id={location_codes.get('county_id')}, district_id={location_codes.get('district_id')}")
         
         # Обрабатываем данные и вычисляем общие цены объектов
         processed_data = []
@@ -196,6 +216,8 @@ def get_price_trends_data(supabase, location_codes: Dict, area: float) -> Dict:
         
         if not processed_data:
             logger.warning("⚠️ Нет валидных данных для анализа")
+            logger.warning(f"⚠️ trends_data: {trends_data}")
+            logger.warning(f"⚠️ Проверьте SQL запрос: {query}")
             return {
                 'error': 'Нет валидных данных о трендах цен',
                 'trend': 'Не определен',
@@ -233,10 +255,15 @@ def get_price_trends_data(supabase, location_codes: Dict, area: float) -> Dict:
         
         logger.info(f"✅ Анализ трендов завершен: {result['trend']}, изменение за 3 года: {change_3y:.1f}%")
         logger.info(f"📊 Финальный результат: {result}")
+        logger.info(f"🔍 Количество обработанных записей: {len(processed_data)}")
+        logger.info(f"🔍 Данные для графика: {chart_data}")
         return result
         
     except Exception as e:
         logger.error(f"❌ Ошибка получения данных о трендах цен: {e}")
+        logger.error(f"❌ Коды локации: {location_codes}")
+        logger.error(f"❌ Площадь: {area}")
+        logger.error(f"❌ Тип ошибки: {type(e)}")
         return {
             'error': f'Ошибка получения данных: {str(e)}',
             'trend': 'Не определен',
