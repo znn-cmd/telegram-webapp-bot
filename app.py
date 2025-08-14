@@ -742,7 +742,7 @@ def api_generate_report():
         currency_info = ""
         
         if location_components:
-            from currency_functions import is_turkish_location, get_current_currency_rate, convert_turkish_data_to_eur
+            from currency_functions import is_turkish_location, get_current_currency_rate, convert_turkish_data_to_eur, format_currency_info
             from price_trends_functions import get_price_trends_data
             
             is_turkish = is_turkish_location(location_components)
