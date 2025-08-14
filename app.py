@@ -6465,6 +6465,60 @@ def api_price_trends():
         # Сразу вызываем функцию get_price_trends_data
         logger.info("🔍 Вызываем функцию get_price_trends_data для получения всех данных")
         
+        # ДИАГНОСТИКА: Проверим, что есть в таблице property_trends
+        logger.info("🔍 ДИАГНОСТИКА: Проверяем содержимое таблицы property_trends...")
+        
+        # 1. Проверим общее количество записей
+        try:
+            total_count_query = supabase.table('property_trends').select('id', count='exact')
+            total_count_response = total_count_query.execute()
+            total_count = total_count_response.count if hasattr(total_count_response, 'count') else 'неизвестно'
+            logger.info(f"🔍 Общее количество записей в таблице property_trends: {total_count}")
+        except Exception as e:
+            logger.error(f"❌ Ошибка подсчета общего количества записей: {e}")
+        
+        # 2. Проверим, какие country_id существуют
+        try:
+            countries_query = supabase.table('property_trends').select('country_id').limit(10)
+            countries_response = countries_query.execute()
+            if countries_response.data:
+                unique_countries = list(set([r.get('country_id') for r in countries_response.data if r.get('country_id') is not None]))
+                logger.info(f"🔍 Найденные country_id в таблице: {unique_countries}")
+            else:
+                logger.warning("⚠️ Не удалось получить country_id из таблицы")
+        except Exception as e:
+            logger.error(f"❌ Ошибка получения country_id: {e}")
+        
+        # 3. Проверим, есть ли данные для нашей страны
+        try:
+            country_query = supabase.table('property_trends').select('*').eq('country_id', location_codes['country_id']).limit(5)
+            country_response = country_query.execute()
+            logger.info(f"🔍 Данные для country_id={location_codes['country_id']}: найдено {len(country_response.data) if country_response.data else 0} записей")
+            if country_response.data:
+                logger.info(f"🔍 Пример записи для страны: {country_response.data[0]}")
+        except Exception as e:
+            logger.error(f"❌ Ошибка получения данных для страны: {e}")
+        
+        # 4. Проверим, есть ли данные для нашего города
+        try:
+            city_query = supabase.table('property_trends').select('*').eq('country_id', location_codes['country_id']).eq('city_id', location_codes['city_id']).limit(5)
+            city_response = city_query.execute()
+            logger.info(f"🔍 Данные для city_id={location_codes['city_id']}: найдено {len(city_response.data) if city_response.data else 0} записей")
+            if city_response.data:
+                logger.info(f"🔍 Пример записи для города: {city_response.data[0]}")
+        except Exception as e:
+            logger.error(f"❌ Ошибка получения данных для города: {e}")
+        
+        # 5. Проверим, есть ли данные для нашего округа
+        try:
+            county_query = supabase.table('property_trends').select('*').eq('country_id', location_codes['country_id']).eq('city_id', location_codes['city_id']).eq('county_id', location_codes['county_id']).limit(5)
+            county_response = county_query.execute()
+            logger.info(f"🔍 Данные для county_id={location_codes['county_id']}: найдено {len(county_response.data) if county_response.data else 0} записей")
+            if county_response.data:
+                logger.info(f"🔍 Пример записи для округа: {county_response.data[0]}")
+        except Exception as e:
+            logger.error(f"❌ Ошибка получения данных для округа: {e}")
+        
         # Проверяем, что функция импортирована
         if get_price_trends_data is None:
             logger.error("❌ Функция get_price_trends_data не импортирована")
