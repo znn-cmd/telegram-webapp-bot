@@ -773,11 +773,51 @@
         // Загружаем полный отчет
         async function loadFullReport() {
             try {
+                // Проверяем, что reportData определен
+                if (!reportData) {
+                    throw new Error('Данные отчета не загружены');
+                }
+                
+                console.log('📋 Данные для загрузки отчета:', reportData);
+                
+                // Проверяем наличие необходимых элементов DOM
+                const loadingElement = document.getElementById('loading');
+                const errorElement = document.getElementById('error');
+                const reportContentElement = document.getElementById('report-content');
+                
+                if (!loadingElement || !errorElement || !reportContentElement) {
+                    throw new Error('Не найдены необходимые элементы интерфейса');
+                }
+                
                 // Показываем загрузку
-                document.getElementById('loading').style.display = 'block';
-                document.getElementById('error').style.display = 'none';
-                document.getElementById('report-content').style.display = 'none';
+                loadingElement.style.display = 'block';
+                errorElement.style.display = 'none';
+                reportContentElement.style.display = 'none';
 
+                // Проверяем наличие необходимых параметров
+                const requiredParams = ['address', 'bedrooms', 'price', 'location_codes'];
+                for (const param of requiredParams) {
+                    if (!reportData[param]) {
+                        throw new Error(`Отсутствует обязательный параметр: ${param}`);
+                    }
+                }
+                
+                console.log('📤 Отправляем запрос на /api/full_report с параметрами:', {
+                    address: reportData.address,
+                    bedrooms: reportData.bedrooms,
+                    price: reportData.price,
+                    area: reportData.area,
+                    lat: reportData.lat,
+                    lng: reportData.lng,
+                    telegram_id: reportData.telegram_id,
+                    location_codes: reportData.location_codes,
+                    additional_data: {
+                        age: reportData.age,
+                        floor: reportData.floor,
+                        heating: reportData.heating
+                    }
+                });
+                
                 // Вызываем API для получения полного отчета
                 const response = await fetch('/api/full_report', {
                     method: 'POST',
@@ -801,38 +841,146 @@
                     })
                 });
 
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('❌ HTTP ошибка full_report:', response.status, errorText);
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
                 const data = await response.json();
+                console.log('📊 Ответ API full_report:', data);
 
                 if (data.error) {
                     throw new Error(data.error);
                 }
+                
+                if (!data.full_report) {
+                    throw new Error('Сервер не вернул данные полного отчета');
+                }
 
                 // Скрываем загрузку и показываем отчет
-                document.getElementById('loading').style.display = 'none';
-                document.getElementById('report-content').style.display = 'block';
+                loadingElement.style.display = 'none';
+                reportContentElement.style.display = 'block';
 
                 // Отладочная информация
                 console.log('📊 Получены данные от сервера:', data);
                 console.log('🔍 Структура full_report:', data.full_report);
 
                 // Заполняем данные отчета
-                fillReportData(data);
+                try {
+                    fillReportData(data);
+                    console.log('✅ Основной отчет заполнен успешно');
+                } catch (error) {
+                    console.error('❌ Ошибка заполнения основного отчета:', error);
+                    // Показываем сообщение об ошибке
+                    const errorElement = document.getElementById('error');
+                    if (errorElement) {
+                        errorElement.style.display = 'block';
+                        document.getElementById('error-message').textContent = `Ошибка заполнения отчета: ${error.message}`;
+                    }
+                    return;
+                }
                 
-                // Загружаем данные о динамике цен
-                await loadPriceTrendsData();
+                // Загружаем данные о динамике цен (не блокируем основной отчет)
+                if (reportData && reportData.location_codes && reportData.area) {
+                    try {
+                        await loadPriceTrendsData();
+                                    } catch (error) {
+                    console.error('❌ Ошибка загрузки данных о трендах, но отчет продолжает загружаться:', error);
+                    // Показываем сообщение об ошибке в блоке трендов
+                    const trendAnalysisElement = document.getElementById('trend-analysis');
+                    if (trendAnalysisElement) {
+                        trendAnalysisElement.textContent = `Ошибка загрузки данных о трендах: ${error.message}`;
+                    }
+                    
+                    // Заполняем остальные поля значением "Недоступно"
+                    const priceTrendElement = document.getElementById('price-trend');
+                    if (priceTrendElement) {
+                        priceTrendElement.textContent = 'Недоступно';
+                    }
+                    
+                    const priceChangeElement = document.getElementById('price-change-3y');
+                    if (priceChangeElement) {
+                        priceChangeElement.textContent = 'Недоступно';
+                    }
+                    
+                    const priceForecastElement = document.getElementById('price-forecast');
+                    if (priceForecastElement) {
+                        priceForecastElement.textContent = 'Недоступно';
+                    }
+                }
+            } else {
+                console.log('⚠️ Отсутствуют необходимые данные для загрузки трендов:', {
+                    hasLocationCodes: !!reportData?.location_codes,
+                    hasArea: !!reportData?.area
+                });
+                // Показываем сообщение об отсутствии данных
+                const trendAnalysisElement = document.getElementById('trend-analysis');
+                if (trendAnalysisElement) {
+                    trendAnalysisElement.textContent = 'Недостаточно данных для анализа трендов';
+                }
+                
+                // Заполняем остальные поля значением "Недоступно"
+                const priceTrendElement = document.getElementById('price-trend');
+                if (priceTrendElement) {
+                    priceTrendElement.textContent = 'Недоступно';
+                }
+                
+                const priceChangeElement = document.getElementById('price-change-3y');
+                if (priceChangeElement) {
+                    priceChangeElement.textContent = 'Недоступно';
+                }
+                
+                const priceForecastElement = document.getElementById('price-forecast');
+                if (priceForecastElement) {
+                    priceForecastElement.textContent = 'Недоступно';
+                }
+            }
 
             } catch (error) {
-                console.error('Ошибка загрузки отчета:', error);
-                document.getElementById('loading').style.display = 'none';
-                document.getElementById('error').style.display = 'block';
-                document.getElementById('error-message').textContent = error.message || 'Неизвестная ошибка';
+                console.error('❌ Ошибка загрузки отчета:', error);
+                
+                // Показываем ошибку, если элементы найдены
+                if (loadingElement) {
+                    loadingElement.style.display = 'none';
+                }
+                if (errorElement) {
+                    errorElement.style.display = 'block';
+                    const errorMessageElement = document.getElementById('error-message');
+                    if (errorMessageElement) {
+                        errorMessageElement.textContent = error.message || 'Неизвестная ошибка';
+                    }
+                }
             }
         }
         
         // Загружаем данные о динамике цен
         async function loadPriceTrendsData() {
             try {
+                // Проверяем, что reportData существует и содержит необходимые данные
+                if (!reportData || !reportData.location_codes || !reportData.area) {
+                    throw new Error('Отсутствуют необходимые данные для загрузки трендов');
+                }
+                
                 console.log('📈 Загружаем данные о динамике цен...');
+                console.log('📋 Отправляем данные:', {
+                    location_codes: reportData.location_codes,
+                    area: reportData.area
+                });
+                
+                // Показываем индикатор загрузки в блоке трендов
+                const trendAnalysisElement = document.getElementById('trend-analysis');
+                if (trendAnalysisElement) {
+                    trendAnalysisElement.textContent = 'Загружаем данные о трендах...';
+                }
+                
+                // Создаем AbortController для таймаута
+                let timeoutId;
+                const controller = new AbortController();
+                timeoutId = setTimeout(() => {
+                    console.log('⏰ Таймаут запроса price_trends (10 секунд)');
+                    controller.abort();
+                }, 10000); // 10 секунд таймаут
                 
                 const response = await fetch('/api/price_trends', {
                     method: 'POST',
@@ -842,58 +990,143 @@
                     body: JSON.stringify({
                         location_codes: reportData.location_codes,
                         area: reportData.area
-                    })
+                    }),
+                    signal: controller.signal
                 });
+                
+                clearTimeout(timeoutId);
+                console.log('⏰ Таймаут очищен, ответ получен');
 
-                const trendsData = await response.json();
-
-                if (trendsData.error) {
-                    throw new Error(trendsData.error);
+                console.log('📡 Ответ сервера получен, статус:', response.status);
+                
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('❌ HTTP ошибка price_trends:', response.status, errorText);
+                    throw new Error(`HTTP error! status: ${response.status}`);
                 }
 
+                const trendsData = await response.json();
                 console.log('📊 Данные о динамике цен получены:', trendsData);
+
+                if (trendsData.error) {
+                    console.error('❌ API вернул ошибку:', trendsData.error);
+                    throw new Error(trendsData.error);
+                }
                 
+                if (!trendsData.trend && !trendsData.chart_data) {
+                    console.log('⚠️ Сервер вернул пустые данные о трендах');
+                    // Показываем сообщение об отсутствии данных
+                    const trendAnalysisElement = document.getElementById('trend-analysis');
+                    if (trendAnalysisElement) {
+                        trendAnalysisElement.textContent = 'Данные о трендах цен для данной локации отсутствуют';
+                    }
+                    
+                    // Заполняем остальные поля значением "Недоступно"
+                    const priceTrendElement = document.getElementById('price-trend');
+                    if (priceTrendElement) {
+                        priceTrendElement.textContent = 'Недоступно';
+                    }
+                    
+                    const priceChangeElement = document.getElementById('price-change-3y');
+                    if (priceChangeElement) {
+                        priceChangeElement.textContent = 'Недоступно';
+                    }
+                    
+                    const priceForecastElement = document.getElementById('price-forecast');
+                    if (priceForecastElement) {
+                        priceForecastElement.textContent = 'Недоступно';
+                    }
+                    
+                    return;
+                }
+
+                // Проверяем, есть ли данные для отображения
+                if (!trendsData.chart_data || trendsData.chart_data.length === 0) {
+                    console.log('⚠️ Данные о трендах цен отсутствуют');
+                    // Показываем сообщение об отсутствии данных
+                    const trendAnalysisElement = document.getElementById('trend-analysis');
+                    if (trendAnalysisElement) {
+                        trendAnalysisElement.textContent = 'Данные о трендах цен для данной локации отсутствуют';
+                    }
+                    
+                    // Заполняем остальные поля значением "Недоступно"
+                    const priceTrendElement = document.getElementById('price-trend');
+                    if (priceTrendElement) {
+                        priceTrendElement.textContent = 'Недоступно';
+                    }
+                    
+                    const priceChangeElement = document.getElementById('price-change-3y');
+                    if (priceChangeElement) {
+                        priceChangeElement.textContent = 'Недоступно';
+                    }
+                    
+                    const priceForecastElement = document.getElementById('price-forecast');
+                    if (priceForecastElement) {
+                        priceForecastElement.textContent = 'Недоступно';
+                    }
+                    
+                    return;
+                }
+
                 // Заполняем данные о трендах
                 fillPriceTrendsData(trendsData);
                 
                 // Строим график
                 buildPriceChart(trendsData);
                 
+                console.log('✅ Загрузка данных о динамике цен завершена успешно');
+                
             } catch (error) {
-                console.error('Ошибка загрузки данных о динамике цен:', error);
-                // Показываем сообщение об ошибке в блоке трендов
-                document.getElementById('trend-analysis').textContent = 'Ошибка загрузки данных о трендах';
-            }
-
-
-                // Скрываем загрузку и показываем отчет
-                document.getElementById('loading').style.display = 'none';
-                document.getElementById('report-content').style.display = 'block';
-
-                // Отладочная информация
-                console.log('📊 Получены данные от сервера:', data);
-                console.log('🔍 Структура full_report:', data.full_report);
-
-                // Заполняем данные отчета
-                fillReportData(data);
-
-            } catch (error) {
-                console.error('Ошибка загрузки отчета:', error);
-                document.getElementById('loading').style.display = 'none';
-                document.getElementById('error').style.display = 'block';
-                document.getElementById('error-message').textContent = error.message || 'Неизвестная ошибка';
-            }
+                console.error('❌ Ошибка загрузки данных о динамике цен:', error);
+                
+                // Очищаем таймаут в случае ошибки
+                if (timeoutId) {
+                    clearTimeout(timeoutId);
                 }
+                
+                let errorMessage = 'Ошибка загрузки данных о трендах';
+                if (error.name === 'AbortError') {
+                    errorMessage = 'Превышено время ожидания ответа сервера';
+                } else if (error.message) {
+                    errorMessage = `Ошибка: ${error.message}`;
+                }
+                
+                // Показываем сообщение об ошибке в блоке трендов
+                const trendAnalysisElement = document.getElementById('trend-analysis');
+                if (trendAnalysisElement) {
+                    trendAnalysisElement.textContent = errorMessage;
+                }
+                
+                // Также показываем ошибку в других элементах
+                const priceTrendElement = document.getElementById('price-trend');
+                if (priceTrendElement) {
+                    priceTrendElement.textContent = 'Недоступно';
+                }
+                
+                const priceChangeElement = document.getElementById('price-change-3y');
+                if (priceChangeElement) {
+                    priceChangeElement.textContent = 'Недоступно';
+                }
+                
+                const priceForecastElement = document.getElementById('price-forecast');
+                if (priceForecastElement) {
+                    priceForecastElement.textContent = 'Недоступно';
+                }
+            }
+        }
         
         // Заполняем данные о трендах цен
         function fillPriceTrendsData(trendsData) {
             try {
                 console.log('🔧 Заполняем данные о трендах цен...');
+                console.log('📊 Данные для заполнения:', trendsData);
                 
                 // Тренд цен
                 const trendElement = document.getElementById('price-trend');
                 if (trendElement && trendsData.trend) {
                     trendElement.textContent = trendsData.trend;
+                } else {
+                    console.warn('⚠️ Элемент price-trend не найден или данные тренда отсутствуют');
                 }
                 
                 // Изменение за 3 года
@@ -904,6 +1137,8 @@
                         `+${changePercent.toFixed(1)}%` : 
                         `${changePercent.toFixed(1)}%`;
                     change3yElement.textContent = changeText;
+                } else {
+                    console.warn('⚠️ Элемент price-change-3y не найден или данные изменения отсутствуют');
                 }
                 
                 // Прогноз на 3 месяца
@@ -914,24 +1149,35 @@
                         `+${forecastPercent.toFixed(1)}%` : 
                         `${forecastPercent.toFixed(1)}%`;
                     forecastElement.textContent = forecastText;
+                } else {
+                    console.warn('⚠️ Элемент price-forecast не найден или данные прогноза отсутствуют');
                 }
                 
                 // Анализ тренда
                 const analysisElement = document.getElementById('trend-analysis');
                 if (analysisElement && trendsData.analysis) {
                     analysisElement.textContent = trendsData.analysis;
+                } else {
+                    console.warn('⚠️ Элемент trend-analysis не найден или данные анализа отсутствуют');
                 }
                 
                 // Рекомендация по тренду
                 const recommendationElement = document.getElementById('trend-recommendation');
                 if (recommendationElement && trendsData.recommendation) {
                     recommendationElement.textContent = trendsData.recommendation;
+                } else {
+                    console.warn('⚠️ Элемент trend-recommendation не найден или данные рекомендации отсутствуют');
                 }
                 
                 console.log('✅ Данные о трендах цен заполнены');
                 
             } catch (error) {
-                console.error('Ошибка заполнения данных о трендах:', error);
+                console.error('❌ Ошибка заполнения данных о трендах цен:', error);
+                // Показываем сообщение об ошибке
+                const trendAnalysisElement = document.getElementById('trend-analysis');
+                if (trendAnalysisElement) {
+                    trendAnalysisElement.textContent = `Ошибка заполнения данных: ${error.message}`;
+                }
             }
         }
         
@@ -952,6 +1198,12 @@
                 }
                 
                 const chartData = trendsData.chart_data || [];
+                
+                if (chartData.length === 0) {
+                    console.warn('⚠️ Данные для графика отсутствуют');
+                    return;
+                }
+                
                 const labels = chartData.map(item => `${item.month}/${item.year}`);
                 const prices = chartData.map(item => item.total_price);
                 
@@ -1003,13 +1255,20 @@
                 console.log('✅ График динамики цен построен');
                 
             } catch (error) {
-                console.error('Ошибка построения графика:', error);
+                console.error('❌ Ошибка построения графика:', error);
+                // Показываем сообщение об ошибке в блоке трендов
+                const trendAnalysisElement = document.getElementById('trend-analysis');
+                if (trendAnalysisElement) {
+                    trendAnalysisElement.textContent = `Ошибка построения графика: ${error.message}`;
+                }
             }
         }
         
         // Заполняем данные отчета
         function fillReportData(data) {
             console.log('🔧 Начинаем заполнение отчета...');
+            console.log('📊 Структура данных:', Object.keys(data));
+            console.log('📋 Данные full_report:', data.full_report);
             
             // Проверяем существование элементов
             const elements = {
@@ -1247,6 +1506,8 @@
                     risksList.appendChild(riskItem);
                 });
             }
+            
+            console.log('✅ Заполнение отчета завершено успешно');
         }
 
         // Получаем читаемые названия налогов
