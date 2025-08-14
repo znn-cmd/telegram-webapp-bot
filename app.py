@@ -26,16 +26,6 @@ import io
 import base64
 from PIL import Image
 import numpy as np
-try:
-    from price_trends_functions import get_price_trends_data, analyze_price_trend, calculate_3year_change, calculate_3month_forecast, format_chart_data
-    logger.info("✅ Модуль price_trends_functions успешно импортирован")
-except ImportError as e:
-    logger.error(f"❌ Ошибка импорта модуля price_trends_functions: {e}")
-    get_price_trends_data = None
-    analyze_price_trend = None
-    calculate_3year_change = None
-    calculate_3month_forecast = None
-    format_chart_data = None
 
 # Загружаем переменные окружения
 load_dotenv()
@@ -46,6 +36,18 @@ logging.basicConfig(
     level=logging.INFO
 )
 logger = logging.getLogger(__name__)
+
+# Импорт модуля price_trends_functions
+try:
+    from price_trends_functions import get_price_trends_data, analyze_price_trend, calculate_3year_change, calculate_3month_forecast, format_chart_data
+    logger.info("✅ Модуль price_trends_functions успешно импортирован")
+except ImportError as e:
+    logger.error(f"❌ Ошибка импорта модуля price_trends_functions: {e}")
+    get_price_trends_data = None
+    analyze_price_trend = None
+    calculate_3year_change = None
+    calculate_3month_forecast = None
+    format_chart_data = None
 
 # Условный импорт openai
 try:
