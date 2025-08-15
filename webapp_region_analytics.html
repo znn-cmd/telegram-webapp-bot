@@ -59,11 +59,19 @@
             font-weight: bold;
             color: #333;
             text-align: center;
-            margin: 20px 0;
-            padding: 15px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border-radius: 12px;
+            margin: 20px 0 10px 0;
+            padding: 0;
+            background: none;
+            border-radius: 0;
+        }
+
+        .page-description {
+            font-size: 16px;
+            color: #666;
+            text-align: center;
+            margin-bottom: 25px;
+            line-height: 1.5;
+            padding: 0 10px;
         }
 
         .back-button {
@@ -88,7 +96,7 @@
             box-shadow: 0 6px 20px rgba(40, 167, 69, 0.3);
         }
 
-        .content-section {
+        .location-selector {
             background: #f8f9fa;
             border-radius: 12px;
             padding: 20px;
@@ -96,7 +104,83 @@
             border-left: 4px solid #667eea;
         }
 
-        .content-title {
+        .selector-group {
+            margin-bottom: 20px;
+        }
+
+        .selector-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .selector-select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #333;
+            background: white;
+            cursor: pointer;
+            transition: border-color 0.3s ease;
+        }
+
+        .selector-select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .selector-select:disabled {
+            background: #f8f9fa;
+            color: #6c757d;
+            cursor: not-allowed;
+        }
+
+        .confirm-button {
+            display: block;
+            width: 100%;
+            padding: 15px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin: 20px 0;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .confirm-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .confirm-button:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .selected-location {
+            background: #e8f5e8;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            border-left: 4px solid #28a745;
+            display: none;
+        }
+
+        .selected-location.show {
+            display: block;
+        }
+
+        .location-title {
             font-size: 18px;
             font-weight: bold;
             color: #333;
@@ -104,63 +188,64 @@
             text-align: center;
         }
 
-        .content-description {
-            font-size: 14px;
-            color: #666;
-            line-height: 1.6;
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        .feature-list {
-            list-style: none;
-            padding: 0;
-        }
-
-        .feature-item {
-            background: white;
-            padding: 15px;
-            margin: 10px 0;
-            border-radius: 8px;
-            border-left: 3px solid #667eea;
+        .location-item {
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            gap: 12px;
+            padding: 10px 0;
+            border-bottom: 1px solid #d4edda;
         }
 
-        .feature-icon {
-            font-size: 20px;
-            color: #667eea;
+        .location-item:last-child {
+            border-bottom: none;
         }
 
-        .feature-text {
+        .location-name {
             font-size: 14px;
             color: #333;
+            font-weight: 500;
         }
 
-        .coming-soon {
+        .location-id {
+            font-size: 12px;
+            color: #666;
+            font-family: monospace;
+            background: #f8f9fa;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+
+        .report-section {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            border-left: 4px solid #ffc107;
+            display: none;
+        }
+
+        .report-section.show {
+            display: block;
+        }
+
+        .report-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .report-placeholder {
             text-align: center;
             padding: 40px 20px;
             color: #666;
         }
 
-        .coming-soon-icon {
+        .report-placeholder-icon {
             font-size: 48px;
             margin-bottom: 16px;
             opacity: 0.5;
-        }
-
-        .coming-soon-title {
-            font-size: 18px;
-            font-weight: bold;
-            margin-bottom: 8px;
-            color: #333;
-        }
-
-        .coming-soon-description {
-            font-size: 14px;
-            margin-bottom: 20px;
-            line-height: 1.4;
         }
 
         .hidden {
@@ -181,54 +266,83 @@
     <div class="container">
         <!-- Логотип -->
         <div style="display:flex;flex-direction:column;align-items:center;margin-top:18px;margin-bottom:10px;">
-            <img src="logo-sqv.png" alt="Aaadviser Logo" style="width:110px;height:auto;display:block;margin-bottom:8px;cursor:pointer;" onclick="goToMainMenu()" />
+            <img src="logo-flt.png" alt="Aaadviser Logo" style="width:110px;height:auto;display:block;margin-bottom:8px;cursor:pointer;" onclick="goToMainMenu()" />
             <div style="font-size:15px;color:#888;font-style:italic;" id="slogan">Инсайты рынка недвижимости</div>
         </div>
 
         <!-- Заголовок страницы -->
         <div class="page-title" id="pageTitle">Аналитика региона</div>
 
+        <!-- Описание страницы -->
+        <div class="page-description" id="pageDescription">
+            Получите детальный анализ рынка недвижимости в выбранном регионе с прогнозами цен
+        </div>
+
         <!-- Кнопка возврата -->
         <a href="/webapp_main" class="back-button" id="backButton">← Вернуться в главное меню</a>
 
-        <!-- Основной контент -->
-        <div class="content-section fade-in">
-            <div class="content-title" id="contentTitle">Отчет по региону</div>
-            <div class="content-description" id="contentDescription">
-                Получите детальный анализ рынка недвижимости в выбранном регионе с прогнозами цен и рекомендациями по инвестициям.
+        <!-- Селектор локаций -->
+        <div class="location-selector fade-in">
+            <div class="selector-group">
+                <label class="selector-label" id="countryLabel">Страна:</label>
+                <select class="selector-select" id="countrySelect" onchange="onCountryChange()">
+                    <option value="">Выберите страну</option>
+                </select>
             </div>
-            
-            <ul class="feature-list">
-                <li class="feature-item">
-                    <span class="feature-icon">📊</span>
-                    <span class="feature-text">Анализ ценовых трендов</span>
-                </li>
-                <li class="feature-item">
-                    <span class="feature-icon">📈</span>
-                    <span class="feature-text">Прогноз развития рынка</span>
-                </li>
-                <li class="feature-item">
-                    <span class="feature-icon">🏘️</span>
-                    <span class="feature-text">Статистика по типам недвижимости</span>
-                </li>
-                <li class="feature-item">
-                    <span class="feature-icon">💰</span>
-                    <span class="feature-text">Инвестиционные рекомендации</span>
-                </li>
-                <li class="feature-item">
-                    <span class="feature-icon">🌍</span>
-                    <span class="feature-text">Анализ инфраструктуры</span>
-                </li>
-            </ul>
+
+            <div class="selector-group">
+                <label class="selector-label" id="cityLabel">Город:</label>
+                <select class="selector-select" id="citySelect" onchange="onCityChange()" disabled>
+                    <option value="">Сначала выберите страну</option>
+                </select>
+            </div>
+
+            <div class="selector-group">
+                <label class="selector-label" id="countyLabel">Область/Регион:</label>
+                <select class="selector-select" id="countySelect" onchange="onCountyChange()" disabled>
+                    <option value="">Сначала выберите город</option>
+                </select>
+            </div>
+
+            <div class="selector-group">
+                <label class="selector-label" id="districtLabel">Район:</label>
+                <select class="selector-select" id="districtSelect" onchange="onDistrictChange()" disabled>
+                    <option value="">Сначала выберите область</option>
+                </select>
+            </div>
+
+            <button class="confirm-button" id="confirmButton" onclick="confirmLocationSelection()" disabled>
+                <span id="confirmButtonText">Подтвердить выбор</span>
+            </button>
         </div>
 
-        <!-- Заглушка "Скоро" -->
-        <div class="coming-soon fade-in">
-            <div class="coming-soon-icon">🚧</div>
-            <div class="coming-soon-title" id="comingSoonTitle">Функция в разработке</div>
-            <div class="coming-soon-description" id="comingSoonDescription">
-                Мы работаем над созданием мощного инструмента для анализа регионального рынка недвижимости. 
-                Скоро вы сможете получать детальные отчеты по любому региону!
+        <!-- Выбранная локация -->
+        <div class="selected-location" id="selectedLocation">
+            <div class="location-title" id="selectedLocationTitle">Выбранная локация</div>
+            <div class="location-item">
+                <span class="location-name" id="selectedCountryName">Страна: </span>
+                <span class="location-id" id="selectedCountryId"></span>
+            </div>
+            <div class="location-item">
+                <span class="location-name" id="selectedCityName">Город: </span>
+                <span class="location-id" id="selectedCityId"></span>
+            </div>
+            <div class="location-item">
+                <span class="location-name" id="selectedCountyName">Область: </span>
+                <span class="location-id" id="selectedCountyId"></span>
+            </div>
+            <div class="location-item">
+                <span class="location-name" id="selectedDistrictName">Район: </span>
+                <span class="location-id" id="selectedDistrictId"></span>
+            </div>
+        </div>
+
+        <!-- Секция отчета -->
+        <div class="report-section" id="reportSection">
+            <div class="report-title" id="reportSectionTitle">Формирование отчета</div>
+            <div class="report-placeholder">
+                <div class="report-placeholder-icon">📊</div>
+                <div id="reportPlaceholderText">Здесь будет формироваться отчет по выбранному региону</div>
             </div>
         </div>
     </div>
@@ -239,26 +353,124 @@
         tg.ready();
 
         let currentLanguage = 'ru';
+        let userInfo = null;
 
         // Локализации
         const locales = {
             'ru': {
                 'slogan': 'Инсайты рынка недвижимости',
                 'pageTitle': 'Аналитика региона',
+                'pageDescription': 'Получите детальный анализ рынка недвижимости в выбранном регионе с прогнозами цен',
                 'backButton': '← Вернуться в главное меню',
-                'contentTitle': 'Отчет по региону',
-                'contentDescription': 'Получите детальный анализ рынка недвижимости в выбранном регионе с прогнозами цен и рекомендациями по инвестициям.',
-                'comingSoonTitle': 'Функция в разработке',
-                'comingSoonDescription': 'Мы работаем над созданием мощного инструмента для анализа регионального рынка недвижимости. Скоро вы сможете получать детальные отчеты по любому региону!'
+                'countryLabel': 'Страна:',
+                'cityLabel': 'Город:',
+                'countyLabel': 'Область/Регион:',
+                'districtLabel': 'Район:',
+                'selectCountry': 'Выберите страну',
+                'selectCity': 'Сначала выберите страну',
+                'selectCounty': 'Сначала выберите город',
+                'selectDistrict': 'Сначала выберите область',
+                'confirmButton': 'Подтвердить выбор',
+                'selectedLocationTitle': 'Выбранная локация',
+                'countryName': 'Страна: ',
+                'cityName': 'Город: ',
+                'countyName': 'Область: ',
+                'districtName': 'Район: ',
+                'reportSectionTitle': 'Формирование отчета',
+                'reportPlaceholderText': 'Здесь будет формироваться отчет по выбранному региону',
+                'noValue': 'не имеет значения'
             },
             'en': {
                 'slogan': 'Real Estate Market Insights',
                 'pageTitle': 'Region Analytics',
+                'pageDescription': 'Get a detailed analysis of the real estate market in the selected region with price forecasts',
                 'backButton': '← Back to Main Menu',
-                'contentTitle': 'Region Report',
-                'contentDescription': 'Get a detailed analysis of the real estate market in the selected region with price forecasts and investment recommendations.',
-                'comingSoonTitle': 'Feature in Development',
-                'comingSoonDescription': 'We are working on creating a powerful tool for regional real estate market analysis. Soon you will be able to get detailed reports for any region!'
+                'countryLabel': 'Country:',
+                'cityLabel': 'City:',
+                'countyLabel': 'County/Region:',
+                'districtLabel': 'District:',
+                'selectCountry': 'Select country',
+                'selectCity': 'First select country',
+                'selectCounty': 'First select city',
+                'selectDistrict': 'First select county',
+                'confirmButton': 'Confirm Selection',
+                'selectedLocationTitle': 'Selected Location',
+                'countryName': 'Country: ',
+                'cityName': 'City: ',
+                'countyName': 'County: ',
+                'districtName': 'District: ',
+                'reportSectionTitle': 'Report Generation',
+                'reportPlaceholderText': 'Report for the selected region will be generated here',
+                'noValue': 'no value'
+            },
+            'de': {
+                'slogan': 'Immobilienmarkt-Einblicke',
+                'pageTitle': 'Regionsanalyse',
+                'pageDescription': 'Erhalten Sie eine detaillierte Analyse des Immobilienmarkts in der ausgewählten Region mit Preisprognosen',
+                'backButton': '← Zurück zum Hauptmenü',
+                'countryLabel': 'Land:',
+                'cityLabel': 'Stadt:',
+                'countyLabel': 'Bezirk/Region:',
+                'districtLabel': 'Viertel:',
+                'selectCountry': 'Land auswählen',
+                'selectCity': 'Zuerst Land auswählen',
+                'selectCounty': 'Zuerst Stadt auswählen',
+                'selectDistrict': 'Zuerst Bezirk auswählen',
+                'confirmButton': 'Auswahl bestätigen',
+                'selectedLocationTitle': 'Ausgewählter Standort',
+                'countryName': 'Land: ',
+                'cityName': 'Stadt: ',
+                'countyName': 'Bezirk: ',
+                'districtName': 'Viertel: ',
+                'reportSectionTitle': 'Berichtserstellung',
+                'reportPlaceholderText': 'Hier wird der Bericht für die ausgewählte Region erstellt',
+                'noValue': 'kein Wert'
+            },
+            'fr': {
+                'slogan': 'Aperçus du marché immobilier',
+                'pageTitle': 'Analyse de région',
+                'pageDescription': 'Obtenez une analyse détaillée du marché immobilier dans la région sélectionnée avec des prévisions de prix',
+                'backButton': '← Retour au menu principal',
+                'countryLabel': 'Pays:',
+                'cityLabel': 'Ville:',
+                'countyLabel': 'Comté/Région:',
+                'districtLabel': 'Quartier:',
+                'selectCountry': 'Sélectionner le pays',
+                'selectCity': 'D\'abord sélectionner le pays',
+                'selectCounty': 'D\'abord sélectionner la ville',
+                'selectDistrict': 'D\'abord sélectionner le comté',
+                'confirmButton': 'Confirmer la sélection',
+                'selectedLocationTitle': 'Emplacement sélectionné',
+                'countryName': 'Pays: ',
+                'cityName': 'Ville: ',
+                'countyName': 'Comté: ',
+                'districtName': 'Quartier: ',
+                'reportSectionTitle': 'Génération du rapport',
+                'reportPlaceholderText': 'Le rapport pour la région sélectionnée sera généré ici',
+                'noValue': 'aucune valeur'
+            },
+            'tr': {
+                'slogan': 'Emlak piyasası içgörüleri',
+                'pageTitle': 'Bölge analizi',
+                'pageDescription': 'Seçilen bölgedeki emlak piyasasının fiyat tahminleri ile detaylı analizini alın',
+                'backButton': '← Ana menüye dön',
+                'countryLabel': 'Ülke:',
+                'cityLabel': 'Şehir:',
+                'countyLabel': 'İl/Bölge:',
+                'districtLabel': 'İlçe:',
+                'selectCountry': 'Ülke seçin',
+                'selectCity': 'Önce ülke seçin',
+                'selectCounty': 'Önce şehir seçin',
+                'selectDistrict': 'Önce il seçin',
+                'confirmButton': 'Seçimi onayla',
+                'selectedLocationTitle': 'Seçilen konum',
+                'countryName': 'Ülke: ',
+                'cityName': 'Şehir: ',
+                'countyName': 'İl: ',
+                'districtName': 'İlçe: ',
+                'reportSectionTitle': 'Rapor oluşturma',
+                'reportPlaceholderText': 'Seçilen bölge için rapor burada oluşturulacak',
+                'noValue': 'değer yok'
             }
         };
 
@@ -272,11 +484,44 @@
         function updatePageText() {
             document.getElementById('slogan').textContent = getText('slogan');
             document.getElementById('pageTitle').textContent = getText('pageTitle');
+            document.getElementById('pageDescription').textContent = getText('pageDescription');
             document.getElementById('backButton').textContent = getText('backButton');
-            document.getElementById('contentTitle').textContent = getText('contentTitle');
-            document.getElementById('contentDescription').textContent = getText('contentDescription');
-            document.getElementById('comingSoonTitle').textContent = getText('comingSoonTitle');
-            document.getElementById('comingSoonDescription').textContent = getText('comingSoonDescription');
+            document.getElementById('countryLabel').textContent = getText('countryLabel');
+            document.getElementById('cityLabel').textContent = getText('cityLabel');
+            document.getElementById('countyLabel').textContent = getText('countyLabel');
+            document.getElementById('districtLabel').textContent = getText('districtLabel');
+            document.getElementById('confirmButtonText').textContent = getText('confirmButton');
+            document.getElementById('selectedLocationTitle').textContent = getText('selectedLocationTitle');
+            document.getElementById('countryName').textContent = getText('countryName');
+            document.getElementById('cityName').textContent = getText('cityName');
+            document.getElementById('countyName').textContent = getText('countyName');
+            document.getElementById('districtName').textContent = getText('districtName');
+            document.getElementById('reportSectionTitle').textContent = getText('reportSectionTitle');
+            document.getElementById('reportPlaceholderText').textContent = getText('reportPlaceholderText');
+            
+            // Обновляем placeholder тексты в селектах
+            updateSelectPlaceholders();
+        }
+
+        // Обновление placeholder текстов в селектах
+        function updateSelectPlaceholders() {
+            const countrySelect = document.getElementById('countrySelect');
+            const citySelect = document.getElementById('citySelect');
+            const countySelect = document.getElementById('countySelect');
+            const districtSelect = document.getElementById('districtSelect');
+
+            if (countrySelect.options.length === 1) {
+                countrySelect.options[0].text = getText('selectCountry');
+            }
+            if (citySelect.options.length === 1) {
+                citySelect.options[0].text = getText('selectCity');
+            }
+            if (countySelect.options.length === 1) {
+                countySelect.options[0].text = getText('selectCounty');
+            }
+            if (districtSelect.options.length === 1) {
+                districtSelect.options[0].text = getText('selectDistrict');
+            }
         }
 
         // Функция возврата в главное меню
@@ -284,9 +529,221 @@
             window.location.href = '/webapp_main';
         }
 
+        // Обработчики изменений в селектах
+        function onCountryChange() {
+            const countrySelect = document.getElementById('countrySelect');
+            const citySelect = document.getElementById('citySelect');
+            const countySelect = document.getElementById('countySelect');
+            const districtSelect = document.getElementById('districtSelect');
+            const confirmButton = document.getElementById('confirmButton');
+
+            // Сброс зависимых селектов
+            citySelect.innerHTML = '<option value="">Сначала выберите страну</option>';
+            countySelect.innerHTML = '<option value="">Сначала выберите город</option>';
+            districtSelect.innerHTML = '<option value="">Сначала выберите область</option>';
+            
+            citySelect.disabled = true;
+            countySelect.disabled = true;
+            districtSelect.disabled = true;
+            confirmButton.disabled = true;
+
+            if (countrySelect.value) {
+                // Здесь будет загрузка городов для выбранной страны
+                loadCities(countrySelect.value);
+            }
+        }
+
+        function onCityChange() {
+            const citySelect = document.getElementById('citySelect');
+            const countySelect = document.getElementById('countySelect');
+            const districtSelect = document.getElementById('districtSelect');
+            const confirmButton = document.getElementById('confirmButton');
+
+            // Сброс зависимых селектов
+            countySelect.innerHTML = '<option value="">Сначала выберите город</option>';
+            districtSelect.innerHTML = '<option value="">Сначала выберите область</option>';
+            
+            countySelect.disabled = true;
+            districtSelect.disabled = true;
+            confirmButton.disabled = true;
+
+            if (citySelect.value) {
+                // Здесь будет загрузка областей для выбранного города
+                loadCounties(citySelect.value);
+            }
+        }
+
+        function onCountyChange() {
+            const countySelect = document.getElementById('countySelect');
+            const districtSelect = document.getElementById('districtSelect');
+            const confirmButton = document.getElementById('confirmButton');
+
+            // Сброс зависимого селекта
+            districtSelect.innerHTML = '<option value="">Сначала выберите область</option>';
+            
+            districtSelect.disabled = true;
+            confirmButton.disabled = true;
+
+            if (countySelect.value) {
+                // Здесь будет загрузка районов для выбранной области
+                loadDistricts(countySelect.value);
+            }
+        }
+
+        function onDistrictChange() {
+            const districtSelect = document.getElementById('districtSelect');
+            const confirmButton = document.getElementById('confirmButton');
+
+            if (districtSelect.value) {
+                confirmButton.disabled = false;
+            } else {
+                confirmButton.disabled = true;
+            }
+        }
+
+        // Загрузка данных (заглушки для демонстрации)
+        function loadCities(countryId) {
+            const citySelect = document.getElementById('citySelect');
+            citySelect.innerHTML = '<option value="">Выберите город</option>';
+            
+            // Здесь будет API вызов для загрузки городов
+            // Пока добавляем демо данные
+            const demoCities = [
+                { id: 1, name: 'Москва' },
+                { id: 2, name: 'Санкт-Петербург' },
+                { id: 3, name: 'Новосибирск' }
+            ];
+            
+            demoCities.forEach(city => {
+                const option = document.createElement('option');
+                option.value = city.id;
+                option.textContent = city.name;
+                citySelect.appendChild(option);
+            });
+            
+            citySelect.disabled = false;
+        }
+
+        function loadCounties(cityId) {
+            const countySelect = document.getElementById('countySelect');
+            countySelect.innerHTML = '<option value="">Выберите область</option>';
+            
+            // Здесь будет API вызов для загрузки областей
+            // Пока добавляем демо данные
+            const demoCounties = [
+                { id: 1, name: 'Московская область' },
+                { id: 2, name: 'Ленинградская область' },
+                { id: 3, name: 'Новосибирская область' }
+            ];
+            
+            demoCounties.forEach(county => {
+                const option = document.createElement('option');
+                option.value = county.id;
+                option.textContent = county.name;
+                countySelect.appendChild(option);
+            });
+            
+            countySelect.disabled = false;
+        }
+
+        function loadDistricts(countyId) {
+            const districtSelect = document.getElementById('districtSelect');
+            districtSelect.innerHTML = '<option value="">Выберите район</option>';
+            
+            // Добавляем опцию "не имеет значения"
+            const noValueOption = document.createElement('option');
+            noValueOption.value = 'none';
+            noValueOption.textContent = getText('noValue');
+            districtSelect.appendChild(noValueOption);
+            
+            // Здесь будет API вызов для загрузки районов
+            // Пока добавляем демо данные
+            const demoDistricts = [
+                { id: 1, name: 'Центральный район' },
+                { id: 2, name: 'Северный район' },
+                { id: 3, name: 'Южный район' }
+            ];
+            
+            demoDistricts.forEach(district => {
+                const option = document.createElement('option');
+                option.value = district.id;
+                option.textContent = district.name;
+                districtSelect.appendChild(option);
+            });
+            
+            districtSelect.disabled = false;
+        }
+
+        // Подтверждение выбора локации
+        function confirmLocationSelection() {
+            const countrySelect = document.getElementById('countrySelect');
+            const citySelect = document.getElementById('citySelect');
+            const countySelect = document.getElementById('countySelect');
+            const districtSelect = document.getElementById('districtSelect');
+
+            // Получаем выбранные значения
+            const countryId = countrySelect.value;
+            const cityId = citySelect.value;
+            const countyId = countySelect.value;
+            const districtId = districtSelect.value;
+
+            // Получаем названия
+            const countryName = countrySelect.options[countrySelect.selectedIndex].text;
+            const cityName = citySelect.options[citySelect.selectedIndex].text;
+            const countyName = countySelect.options[countySelect.selectedIndex].text;
+            const districtName = districtSelect.options[districtSelect.selectedIndex].text;
+
+            // Обновляем отображение выбранной локации
+            document.getElementById('selectedCountryName').textContent = getText('countryName') + countryName;
+            document.getElementById('selectedCityName').textContent = getText('cityName') + cityName;
+            document.getElementById('selectedCountyName').textContent = getText('countyName') + countyName;
+            document.getElementById('selectedDistrictName').textContent = getText('districtName') + districtName;
+
+            // Отображаем ID для админов
+            if (userInfo && userInfo.user_status === 'admin') {
+                document.getElementById('selectedCountryId').textContent = `ID: ${countryId}`;
+                document.getElementById('selectedCityId').textContent = `ID: ${cityId}`;
+                document.getElementById('selectedCountyId').textContent = `ID: ${countyId}`;
+                document.getElementById('selectedDistrictId').textContent = districtId === 'none' ? 'ID: null' : `ID: ${districtId}`;
+            } else {
+                document.getElementById('selectedCountryId').textContent = '';
+                document.getElementById('selectedCityId').textContent = '';
+                document.getElementById('selectedCountyId').textContent = '';
+                document.getElementById('selectedDistrictId').textContent = '';
+            }
+
+            // Показываем секции
+            document.getElementById('selectedLocation').classList.add('show');
+            document.getElementById('reportSection').classList.add('show');
+
+            // Прокручиваем к выбранной локации
+            document.getElementById('selectedLocation').scrollIntoView({ behavior: 'smooth' });
+        }
+
         // Инициализация
         function init() {
+            // Здесь будет загрузка данных пользователя для определения статуса админа
+            // Пока устанавливаем демо данные
+            userInfo = { user_status: 'admin' }; // Для демонстрации
+            
             updatePageText();
+            
+            // Загружаем страны (демо данные)
+            const countrySelect = document.getElementById('countrySelect');
+            countrySelect.innerHTML = '<option value="">Выберите страну</option>';
+            
+            const demoCountries = [
+                { id: 1, name: 'Россия' },
+                { id: 2, name: 'Германия' },
+                { id: 3, name: 'Франция' }
+            ];
+            
+            demoCountries.forEach(country => {
+                const option = document.createElement('option');
+                option.value = country.id;
+                option.textContent = country.name;
+                countrySelect.appendChild(option);
+            });
         }
 
         // Запускаем инициализацию
