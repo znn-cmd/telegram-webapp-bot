@@ -271,6 +271,18 @@
             border-bottom: 1px solid #dee2e6;
             display: flex;
             align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .data-card-header:hover {
+            background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%);
+        }
+
+        .data-card-header-left {
+            display: flex;
+            align-items: center;
             gap: 12px;
         }
 
@@ -284,8 +296,37 @@
             color: #333;
         }
 
+        .data-card-toggle {
+            font-size: 20px;
+            color: #667eea;
+            transition: transform 0.3s ease;
+        }
+
+        .data-card-toggle.expanded {
+            transform: rotate(180deg);
+        }
+
         .data-card-content {
             padding: 20px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease, padding 0.3s ease;
+        }
+
+        .data-card-content.expanded {
+            max-height: 1000px;
+            padding: 20px;
+        }
+
+        /* Smooth animation for accordion */
+        .data-card-content {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Hover effect for toggle button */
+        .data-card-toggle:hover {
+            color: #5a6fd8;
+            transform: scale(1.1);
         }
 
         .data-item {
@@ -432,7 +473,6 @@
 
         <!-- Region Data Analysis -->
         <div class="region-data-section" id="regionDataSection" style="display: none;">
-            <div class="data-section-title" id="dataSectionTitle">Анализ данных региона</div>
             
             <!-- Loading State -->
             <div class="loading-state" id="loadingState">
@@ -442,60 +482,76 @@
             
             <!-- Data Content -->
             <div class="data-content" id="dataContent" style="display: none;">
-                <!-- General Data -->
-                <div class="data-card" id="generalDataCard">
-                    <div class="data-card-header">
-                        <div class="data-card-icon">📊</div>
-                        <div class="data-card-title" id="generalDataTitle">Общие данные</div>
-                    </div>
-                    <div class="data-card-content" id="generalDataContent">
-                        <!-- General data will be populated here -->
-                    </div>
-                </div>
-                
-                <!-- House Type Data -->
-                <div class="data-card" id="houseTypeDataCard">
-                    <div class="data-card-header">
-                        <div class="data-card-icon">🏠</div>
-                        <div class="data-card-title" id="houseTypeDataTitle">Данные по типам домов</div>
-                    </div>
-                    <div class="data-card-content" id="houseTypeDataContent">
-                        <!-- House type data will be populated here -->
-                    </div>
-                </div>
-                
-                <!-- Floor Segment Data -->
-                <div class="data-card" id="floorSegmentDataCard">
-                    <div class="data-card-header">
-                        <div class="data-card-icon">🏢</div>
-                        <div class="data-card-title" id="floorSegmentDataTitle">Данные по сегментам этажей</div>
-                    </div>
-                    <div class="data-card-content" id="floorSegmentDataContent">
-                        <!-- Floor segment data will be populated here -->
-                    </div>
-                </div>
-                
-                <!-- Age Data -->
-                <div class="data-card" id="ageDataCard">
-                    <div class="data-card-header">
-                        <div class="data-card-icon">📅</div>
-                        <div class="data-card-title" id="ageDataTitle">Данные по возрасту объектов</div>
-                    </div>
-                    <div class="data-card-content" id="ageDataContent">
-                        <!-- Age data will be populated here -->
-                    </div>
-                </div>
+                                 <!-- General Data -->
+                 <div class="data-card" id="generalDataCard">
+                     <div class="data-card-header" onclick="toggleAccordion('generalDataCard')">
+                         <div class="data-card-header-left">
+                             <div class="data-card-icon">📊</div>
+                             <div class="data-card-title" id="generalDataTitle">Общие данные</div>
+                         </div>
+                         <div class="data-card-toggle" id="generalDataToggle">▼</div>
+                     </div>
+                     <div class="data-card-content" id="generalDataContent">
+                         <!-- General data will be populated here -->
+                     </div>
+                 </div>
+                 
+                 <!-- House Type Data -->
+                 <div class="data-card" id="houseTypeDataCard">
+                     <div class="data-card-header" onclick="toggleAccordion('houseTypeDataCard')">
+                         <div class="data-card-header-left">
+                             <div class="data-card-icon">🏠</div>
+                             <div class="data-card-title" id="houseTypeDataTitle">Данные по типам домов</div>
+                         </div>
+                         <div class="data-card-toggle" id="houseTypeDataToggle">▼</div>
+                     </div>
+                     <div class="data-card-content" id="houseTypeDataContent">
+                         <!-- House type data will be populated here -->
+                     </div>
+                 </div>
+                 
+                 <!-- Floor Segment Data -->
+                 <div class="data-card" id="floorSegmentDataCard">
+                     <div class="data-card-header" onclick="toggleAccordion('floorSegmentDataCard')">
+                         <div class="data-card-header-left">
+                             <div class="data-card-icon">🏢</div>
+                             <div class="data-card-title" id="floorSegmentDataTitle">Данные по сегментам этажей</div>
+                         </div>
+                         <div class="data-card-toggle" id="floorSegmentDataToggle">▼</div>
+                     </div>
+                     <div class="data-card-content" id="floorSegmentDataContent">
+                         <!-- Floor segment data will be populated here -->
+                     </div>
+                 </div>
+                 
+                 <!-- Age Data -->
+                 <div class="data-card" id="ageDataCard">
+                     <div class="data-card-header" onclick="toggleAccordion('ageDataCard')">
+                         <div class="data-card-header-left">
+                             <div class="data-card-icon">📅</div>
+                             <div class="data-card-title" id="ageDataTitle">Данные по возрасту объектов</div>
+                         </div>
+                         <div class="data-card-toggle" id="ageDataToggle">▼</div>
+                         
+                     </div>
+                     <div class="data-card-content" id="ageDataContent">
+                         <!-- Age data will be populated here -->
+                     </div>
+                 </div>
 
-                <!-- Heating Data -->
-                <div class="data-card" id="heatingDataCard">
-                    <div class="data-card-header">
-                        <div class="data-card-icon">🔥</div>
-                        <div class="data-card-title" id="heatingDataTitle">Данные по отоплению</div>
-                    </div>
-                    <div class="data-card-content" id="heatingDataContent">
-                        <!-- Heating data will be populated here -->
-                    </div>
-                </div>
+                 <!-- Heating Data -->
+                 <div class="data-card" id="heatingDataCard">
+                     <div class="data-card-header" onclick="toggleAccordion('heatingDataCard')">
+                         <div class="data-card-header-left">
+                             <div class="data-card-icon">🔥</div>
+                             <div class="data-card-title" id="heatingDataTitle">Данные по отоплению</div>
+                         </div>
+                         <div class="data-card-toggle" id="heatingDataToggle">▼</div>
+                     </div>
+                     <div class="data-card-content" id="heatingDataContent">
+                         <!-- Heating data will be populated here -->
+                     </div>
+                 </div>
             </div>
             
             <!-- Error State -->
@@ -1124,6 +1180,11 @@
 
             // Display heating data
             displayHeatingData(data.heating_data);
+            
+            // Auto-expand the first card (General Data) by default
+            setTimeout(() => {
+                toggleAccordion('generalDataCard');
+            }, 100);
         }
 
         // Display general data
@@ -1162,7 +1223,7 @@
             
             // Add any other fields that might exist
             Object.keys(data).forEach(key => {
-                if (!['total_properties', 'average_price', 'min_price', 'max_price', 'country_id', 'city_id', 'county_id', 'district_id'].includes(key)) {
+                if (!['total_properties', 'average_price', 'min_price', 'max_price', 'country_id', 'city_id', 'county_id', 'district_id', 'id', 'created_at', 'source_file'].includes(key)) {
                     const value = data[key];
                     if (value !== null && value !== undefined) {
                         html += `<div class="data-item">
@@ -1376,6 +1437,25 @@
             
             // Load countries
             loadCountries();
+        }
+
+        // Toggle accordion functionality
+        function toggleAccordion(cardId) {
+            const card = document.getElementById(cardId);
+            const content = card.querySelector('.data-card-content');
+            const toggle = card.querySelector('.data-card-toggle');
+            
+            if (content.classList.contains('expanded')) {
+                // Collapse
+                content.classList.remove('expanded');
+                toggle.classList.remove('expanded');
+                toggle.textContent = '▼';
+            } else {
+                // Expand
+                content.classList.add('expanded');
+                toggle.classList.add('expanded');
+                toggle.textContent = '▲';
+            }
         }
 
         // Initialize when page loads
