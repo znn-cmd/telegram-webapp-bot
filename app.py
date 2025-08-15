@@ -200,6 +200,18 @@ def webapp_balance():
     with open('webapp_balance.html', 'r', encoding='utf-8') as f:
         return f.read()
 
+@app.route('/webapp_region_analytics')
+def webapp_region_analytics():
+    """Страница аналитики региона"""
+    with open('webapp_region_analytics.html', 'r', encoding='utf-8') as f:
+        return f.read()
+
+@app.route('/webapp_object_evaluation')
+def webapp_object_evaluation():
+    """Страница оценки объекта"""
+    with open('webapp_object_evaluation.html', 'r', encoding='utf-8') as f:
+        return f.read()
+
 @app.route('/health')
 def health():
     """Эндпоинт для проверки здоровья приложения"""

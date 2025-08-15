@@ -403,6 +403,39 @@
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
+
+        /* Admin section styles */
+        .admin-section {
+            margin-top: 20px;
+            padding: 20px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 12px;
+            border: 2px solid #dee2e6;
+        }
+
+        .admin-section-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #495057;
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 10px;
+            background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
+            border-radius: 8px;
+            color: #222;
+        }
+
+        .admin-btn {
+            background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%) !important;
+            color: #222 !important;
+            border: 2px solid #e0a800;
+        }
+
+        .admin-btn:hover {
+            background: linear-gradient(135deg, #ffb300 0%, #f57c00 100%) !important;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 193, 7, 0.3);
+        }
     </style>
 </head>
 <body>
@@ -449,22 +482,17 @@
         <div class="menu-section hidden" id="menuSection">
             <div class="menu-title" id="menuTitle">Главное меню</div>
             
-            <button class="menu-btn fade-in" onclick="startNewReport()">
-                <span class="menu-btn-icon">📊</span>
-                <span class="menu-btn-text" id="newReportBtn">Получить новый отчет</span>
-                <span class="menu-btn-description" id="newReportDesc">Анализ недвижимости по адресу</span>
+            <!-- Новые кнопки сверху -->
+            <button class="menu-btn fade-in" onclick="showRegionAnalytics()">
+                <span class="menu-btn-icon">🗺️</span>
+                <span class="menu-btn-text" id="regionAnalyticsBtn">Аналитика региона</span>
+                <span class="menu-btn-description" id="regionAnalyticsDesc">Отчет по региону</span>
             </button>
 
-            <button class="menu-btn fade-in" onclick="showMarketStats()">
-                <span class="menu-btn-icon">📈</span>
-                <span class="menu-btn-text" id="marketStatsBtn">Статистика рынка</span>
-                <span class="menu-btn-description" id="marketStatsDesc">Анализ трендов и цен</span>
-            </button>
-
-            <button class="menu-btn fade-in" onclick="showSavedReports()">
-                <span class="menu-btn-icon">💾</span>
-                <span class="menu-btn-text" id="savedReportsBtn">Мои сохраненные отчеты</span>
-                <span class="menu-btn-description" id="savedReportsDesc">История ваших запросов</span>
+            <button class="menu-btn fade-in" onclick="showObjectEvaluation()">
+                <span class="menu-btn-icon">🏠</span>
+                <span class="menu-btn-text" id="objectEvaluationBtn">Оценка объекта</span>
+                <span class="menu-btn-description" id="objectEvaluationDesc">Оценка недвижимости</span>
             </button>
 
             <button class="menu-btn fade-in" onclick="showProfile()">
@@ -473,19 +501,41 @@
                 <span class="menu-btn-description" id="profileDesc">Настройки и баланс</span>
             </button>
 
-            <!-- Кнопка Админ-панель (отображается только для admin) -->
-            <button class="menu-btn fade-in" id="adminPanelBtn" style="display:none;background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);color:#222;" onclick="showAdminPanel()">
-                <span class="menu-btn-icon">🛠️</span>
-                <span class="menu-btn-text">Админ-панель</span>
-                <span class="menu-btn-description">Управление и статистика</span>
-            </button>
-
             <!-- Кнопка Помощь -->
             <button class="menu-btn fade-in" onclick="showHelp()">
                 <span class="menu-btn-icon">❓</span>
                 <span class="menu-btn-text">Помощь</span>
                 <span class="menu-btn-description">Ответы на вопросы и поддержка</span>
             </button>
+
+            <!-- Блок для админа -->
+            <div class="admin-section hidden" id="adminSection">
+                <div class="admin-section-title" id="adminSectionTitle">Для админа</div>
+                
+                <button class="menu-btn fade-in admin-btn" onclick="startNewReport()">
+                    <span class="menu-btn-icon">📊</span>
+                    <span class="menu-btn-text" id="newReportBtn">Получить новый отчет</span>
+                    <span class="menu-btn-description" id="newReportDesc">Анализ недвижимости по адресу</span>
+                </button>
+
+                <button class="menu-btn fade-in admin-btn" onclick="showMarketStats()">
+                    <span class="menu-btn-icon">📈</span>
+                    <span class="menu-btn-text" id="marketStatsBtn">Статистика рынка</span>
+                    <span class="menu-btn-description" id="marketStatsDesc">Анализ трендов и цен</span>
+                </button>
+
+                <button class="menu-btn fade-in admin-btn" onclick="showSavedReports()">
+                    <span class="menu-btn-icon">💾</span>
+                    <span class="menu-btn-text" id="savedReportsBtn">Мои сохраненные отчеты</span>
+                    <span class="menu-btn-description" id="savedReportsDesc">История ваших запросов</span>
+                </button>
+
+                <button class="menu-btn fade-in admin-btn" onclick="showAdminPanel()">
+                    <span class="menu-btn-icon">🛠️</span>
+                    <span class="menu-btn-text">Админ-панель</span>
+                    <span class="menu-btn-description">Управление и статистика</span>
+                </button>
+            </div>
         </div>
 
         <!-- Загрузка -->
@@ -575,6 +625,11 @@
                 'profileDesc': 'Настройки и баланс',
                 'welcome_new': 'Добро пожаловать в Aaadvisor',
                 'welcome_back': 'С возвращением!',
+                'regionAnalyticsBtn': 'Аналитика региона',
+                'regionAnalyticsDesc': 'Отчет по региону',
+                'objectEvaluationBtn': 'Оценка объекта',
+                'objectEvaluationDesc': 'Оценка недвижимости',
+                'adminSectionTitle': 'Для админа',
                 'error_loading': 'Ошибка загрузки данных',
                 'error_network': 'Ошибка сети. Проверьте соединение.',
                 'success_language': 'Язык успешно изменен',
@@ -596,6 +651,11 @@
                 'profileDesc': 'Settings and balance',
                 'welcome_new': 'Welcome to Aaadvisor',
                 'welcome_back': 'Welcome back!',
+                'regionAnalyticsBtn': 'Region Analytics',
+                'regionAnalyticsDesc': 'Region Report',
+                'objectEvaluationBtn': 'Object Evaluation',
+                'objectEvaluationDesc': 'Property Evaluation',
+                'adminSectionTitle': 'For Admin',
                 'error_loading': 'Error loading data',
                 'error_network': 'Network error. Check your connection.',
                 'success_language': 'Language changed successfully',
@@ -617,6 +677,11 @@
                 'profileDesc': 'Einstellungen und Kontostand',
                 'welcome_new': 'Willkommen bei Aaadvisor',
                 'welcome_back': 'Willkommen zurück!',
+                'regionAnalyticsBtn': 'Regionsanalyse',
+                'regionAnalyticsDesc': 'Regionsbericht',
+                'objectEvaluationBtn': 'Objektbewertung',
+                'objectEvaluationDesc': 'Immobilienbewertung',
+                'adminSectionTitle': 'Für Admin',
                 'error_loading': 'Fehler beim Laden der Daten',
                 'error_network': 'Netzwerkfehler. Überprüfen Sie Ihre Verbindung.',
                 'success_language': 'Sprache erfolgreich geändert',
@@ -638,6 +703,11 @@
                 'profileDesc': 'Paramètres et solde',
                 'welcome_new': 'Bienvenue sur Aaadvisor',
                 'welcome_back': 'Bon retour!',
+                'regionAnalyticsBtn': 'Analyse de région',
+                'regionAnalyticsDesc': 'Rapport de région',
+                'objectEvaluationBtn': 'Évaluation d\'objet',
+                'objectEvaluationDesc': 'Évaluation immobilière',
+                'adminSectionTitle': 'Pour Admin',
                 'error_loading': 'Erreur de chargement des données',
                 'error_network': 'Erreur réseau. Vérifiez votre connexion.',
                 'success_language': 'Langue changée avec succès',
@@ -659,6 +729,11 @@
                 'profileDesc': 'Ayarlar ve bakiye',
                 'welcome_new': 'Aaadvisor\'a hoş geldiniz',
                 'welcome_back': 'Tekrar hoş geldiniz!',
+                'regionAnalyticsBtn': 'Bölge Analizi',
+                'regionAnalyticsDesc': 'Bölge Raporu',
+                'objectEvaluationBtn': 'Nesne Değerlendirmesi',
+                'objectEvaluationDesc': 'Gayrimenkul Değerlendirmesi',
+                'adminSectionTitle': 'Admin İçin',
                 'error_loading': 'Veri yükleme hatası',
                 'error_network': 'Ağ hatası. Bağlantınızı kontrol edin.',
                 'success_language': 'Dil başarıyla değiştirildi',
@@ -685,6 +760,11 @@
             document.getElementById('savedReportsDesc').textContent = getText('savedReportsDesc');
             document.getElementById('profileBtn').textContent = getText('profileBtn');
             document.getElementById('profileDesc').textContent = getText('profileDesc');
+            document.getElementById('regionAnalyticsBtn').textContent = getText('regionAnalyticsBtn');
+            document.getElementById('regionAnalyticsDesc').textContent = getText('regionAnalyticsDesc');
+            document.getElementById('objectEvaluationBtn').textContent = getText('objectEvaluationBtn');
+            document.getElementById('objectEvaluationDesc').textContent = getText('objectEvaluationDesc');
+            document.getElementById('adminSectionTitle').textContent = getText('adminSectionTitle');
             document.getElementById('loadingText').textContent = getText('loading');
         }
 
@@ -756,11 +836,11 @@
                 if (response.ok) {
                     const userInfo = await response.json();
 
-                    // Показываем кнопку админ-панели только если user_status === 'admin'
+                    // Показываем блок админа только если user_status === 'admin'
                     if (userInfo.user_status === 'admin') {
-                        document.getElementById('adminPanelBtn').style.display = '';
+                        document.getElementById('adminSection').classList.remove('hidden');
                     } else {
-                        document.getElementById('adminPanelBtn').style.display = 'none';
+                        document.getElementById('adminSection').classList.add('hidden');
                     }
 
                     // Скрыть выбор языка, если уже выбран
@@ -862,6 +942,20 @@
         // Функция перехода в админ-панель
         function showAdminPanel() {
             window.location.href = '/webapp_admin';
+        }
+
+        // Функция перехода к аналитике региона
+        function showRegionAnalytics() {
+            showLoading();
+            showToast('Переход к аналитике региона...', 'info');
+            window.location.href = '/webapp_region_analytics';
+        }
+
+        // Функция перехода к оценке объекта
+        function showObjectEvaluation() {
+            showLoading();
+            showToast('Переход к оценке объекта...', 'info');
+            window.location.href = '/webapp_object_evaluation';
         }
 
         // Инициализация

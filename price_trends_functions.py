@@ -106,6 +106,10 @@ def get_price_trends_data(supabase, location_codes: Dict, area: float) -> Dict:
         # 6. Теперь делаем основной запрос с полными фильтрами
         logger.info("🔍 Выполняем основной запрос с полными фильтрами...")
         
+        # ВРЕМЕННО: используем существующие данные за 2018 год
+        # Позже нужно будет обновить данные в таблице
+        logger.info("🔍 ВРЕМЕННО: используем существующие данные за 2018 год")
+        
         query = supabase.table('property_trends').select('*').eq('country_id', location_codes['country_id'])
         logger.info(f"🔍 Добавляем фильтр: country_id = {location_codes['country_id']}")
         
@@ -187,20 +191,71 @@ def get_price_trends_data(supabase, location_codes: Dict, area: float) -> Dict:
                 'chart_data': []
             }
         
-        # Пока просто возвращаем информацию о найденных данных
-        # Позже доработаем анализ
+        # Теперь обрабатываем данные и возвращаем реальный анализ
+        logger.info(f"🔍 Обрабатываем {len(trends_data)} записей для анализа...")
+        
+        # Обрабатываем данные и вычисляем общие цены объектов
+        processed_data = []
+        for i, record in enumerate(trends_data):
+            try:
+                unit_price = float(record.get('unit_price_for_sale', 0))
+                total_price = unit_price * area
+                
+                processed_record = {
+                    'year': record.get('property_year'),
+                    'month': record.get('property_month'),
+                    'unit_price': unit_price,
+                    'total_price': total_price,
+                    'date_key': f"{record.get('property_year')}-{record.get('property_month'):02d}"
+                }
+                processed_data.append(processed_record)
+                
+                if i < 3:  # Логируем первые 3 записи
+                    logger.info(f"🔍 Запись {i+1}: год={record.get('property_year')}, месяц={record.get('property_month')}, цена/м²={unit_price}, общая цена={total_price}")
+                
+            except (ValueError, TypeError) as e:
+                logger.warning(f"⚠️ Ошибка обработки записи {i+1}: {e}, данные: {record}")
+                continue
+        
+        if not processed_data:
+            logger.warning("⚠️ Нет валидных данных для анализа")
+            return {
+                'error': 'Нет валидных данных о трендах цен',
+                'trend': 'Не определен',
+                'change_3y': 0,
+                'forecast_3m': 0,
+                'analysis': 'Недостаточно данных для анализа',
+                'recommendation': 'Требуется дополнительная информация о локации',
+                'chart_data': []
+            }
+        
+        # Сортируем по дате
+        processed_data.sort(key=lambda x: x['date_key'])
+        
+        # Анализируем тренд
+        trend_analysis = analyze_price_trend(processed_data)
+        
+        # Вычисляем изменение за 3 года (используем доступные данные)
+        change_3y = calculate_3year_change(processed_data)
+        
+        # Вычисляем прогноз на 3 месяца
+        forecast_3m = calculate_3month_forecast(processed_data)
+        
+        # Формируем данные для графика
+        chart_data = format_chart_data(processed_data)
+        
         result = {
-            'trend': 'Данные найдены',
-            'change_3y': 0,
-            'forecast_3m': 0,
-            'analysis': f'Найдено {len(trends_data)} записей о трендах цен',
-            'recommendation': 'Данные получены, анализ в разработке',
-            'chart_data': [],
-            'raw_data_count': len(trends_data),
-            'raw_data': trends_data[:5]  # Первые 5 записей для отладки
+            'trend': trend_analysis['trend'],
+            'change_3y': change_3y,
+            'forecast_3m': forecast_3m,
+            'analysis': trend_analysis['analysis'],
+            'recommendation': trend_analysis['recommendation'],
+            'chart_data': chart_data,
+            'raw_data_count': len(processed_data),
+            'note': 'Внимание: данные за 2018 год. Для актуального анализа требуется обновление данных в таблице property_trends.'
         }
         
-        logger.info(f"✅ Данные получены: {len(trends_data)} записей")
+        logger.info(f"✅ Анализ трендов завершен: {result['trend']}, изменение за 3 года: {change_3y:.1f}%")
         logger.info(f"📊 Финальный результат: {result}")
         return result
         

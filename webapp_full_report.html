@@ -961,6 +961,10 @@
         
         // Загружаем данные о динамике цен
         async function loadPriceTrendsData() {
+            // Объявляем переменные в начале функции
+            let timeoutId = null;
+            let controller = null;
+            
             try {
                 // Проверяем, что reportData существует и содержит необходимые данные
                 if (!reportData || !reportData.location_codes || !reportData.area) {
@@ -980,8 +984,7 @@
                 }
                 
                 // Создаем AbortController для таймаута
-                let timeoutId;
-                const controller = new AbortController();
+                controller = new AbortController();
                 timeoutId = setTimeout(() => {
                     console.log('⏰ Таймаут запроса price_trends (10 секунд)');
                     controller.abort();

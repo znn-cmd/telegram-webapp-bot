@@ -1,7 +1,7 @@
 locales = {
     'ru': {
         'welcome_new': 'Добро пожаловать в Aaadvisor: мгновенные аналитические отчеты по недвижимости с прогнозами цены и рентабельности',
-        'welcome_back': 'С возвращением! Наши последние данные обновлены  — проверьте свежие тренды и персональные рекомендации',
+        'welcome_back': 'С возвращением!',
         'choose_language': 'Пожалуйста, выберите язык для дальнейшего общения:',
         'menu': [
             'Получить новый отчет',
@@ -9,6 +9,17 @@ locales = {
             'Мои сохраненные обзоры',
             'Личный кабинет'
         ],
+        'new_buttons': {
+            'region_analytics': 'Аналитика региона',
+            'object_evaluation': 'Оценка объекта'
+        },
+        'admin_section': {
+            'title': 'Для админа',
+            'new_report': 'Получить новый отчет',
+            'market_stats': 'Статистика рынка',
+            'saved_reports': 'Мои сохраненные отчеты',
+            'admin_panel': 'Админ-панель'
+        },
         'language_names': {
             'en': 'Английский',
             'de': 'Немецкий',
@@ -59,7 +70,7 @@ locales = {
     },
     'en': {
         'welcome_new': 'Welcome to Aaadvisor: instant real estate analytics reports with price and profitability forecasts',
-        'welcome_back': 'Welcome back! Our latest data is updated — check out fresh trends and personalized recommendations',
+        'welcome_back': 'Welcome back!',
         'choose_language': 'Please select your preferred language:',
         'menu': [
             'Get new report',
@@ -67,6 +78,17 @@ locales = {
             'My saved reports',
             'Profile'
         ],
+        'new_buttons': {
+            'region_analytics': 'Region Analytics',
+            'object_evaluation': 'Object Evaluation'
+        },
+        'admin_section': {
+            'title': 'For Admin',
+            'new_report': 'Get new report',
+            'market_stats': 'Market statistics',
+            'saved_reports': 'My saved reports',
+            'admin_panel': 'Admin panel'
+        },
         'language_names': {
             'en': 'English',
             'de': 'German',
@@ -117,7 +139,7 @@ locales = {
     },
     'de': {
         'welcome_new': 'Willkommen bei Aaadvisor: Sofortige Immobilien-Analyseberichte mit Preis- und Rentabilitätsprognosen',
-        'welcome_back': 'Willkommen zurück! Unsere neuesten Daten sind aktualisiert – prüfen Sie aktuelle Trends und persönliche Empfehlungen',
+        'welcome_back': 'Willkommen zurück!',
         'choose_language': 'Bitte wählen Sie Ihre bevorzugte Sprache:',
         'menu': [
             'Neuen Bericht erstellen',
@@ -125,6 +147,17 @@ locales = {
             'Meine gespeicherten Berichte',
             'Profil'
         ],
+        'new_buttons': {
+            'region_analytics': 'Regionsanalyse',
+            'object_evaluation': 'Objektbewertung'
+        },
+        'admin_section': {
+            'title': 'Für Admin',
+            'new_report': 'Neuen Bericht erstellen',
+            'market_stats': 'Marktstatistiken',
+            'saved_reports': 'Meine gespeicherten Berichte',
+            'admin_panel': 'Admin-Panel'
+        },
         'language_names': {
             'en': 'Englisch',
             'de': 'Deutsch',
@@ -175,7 +208,7 @@ locales = {
     },
     'fr': {
         'welcome_new': 'Bienvenue sur Aaadvisor : rapports analytiques immobiliers instantanés avec prévisions de prix et de rentabilité',
-        'welcome_back': 'Bon retour ! Nos dernières données sont à jour — consultez les nouvelles tendances et recommandations personnalisées',
+        'welcome_back': 'Bon retour !',
         'choose_language': 'Veuillez choisir votre langue préférée :',
         'menu': [
             'Obtenir un nouveau rapport',
@@ -183,6 +216,17 @@ locales = {
             'Mes rapports enregistrés',
             'Profil'
         ],
+        'new_buttons': {
+            'region_analytics': 'Analyse de région',
+            'object_evaluation': 'Évaluation d\'objet'
+        },
+        'admin_section': {
+            'title': 'Pour Admin',
+            'new_report': 'Obtenir un nouveau rapport',
+            'market_stats': 'Statistiques du marché',
+            'saved_reports': 'Mes rapports enregistrés',
+            'admin_panel': 'Panneau admin'
+        },
         'language_names': {
             'en': 'Anglais',
             'de': 'Allemand',
@@ -233,7 +277,7 @@ locales = {
     },
     'tr': {
         'welcome_new': 'Aaadvisor\'a hoş geldiniz: Anında gayrimenkul analiz raporları, fiyat ve kârlılık tahminleriyle',
-        'welcome_back': 'Tekrar hoş geldiniz! En son verilerimiz güncellendi — yeni trendleri ve kişisel önerileri kontrol edin',
+        'welcome_back': 'Tekrar hoş geldiniz!',
         'choose_language': 'Lütfen tercih ettiğiniz dili seçin:',
         'menu': [
             'Yeni rapor al',
@@ -241,6 +285,17 @@ locales = {
             'Kayıtlı raporlarım',
             'Profil'
         ],
+        'new_buttons': {
+            'region_analytics': 'Bölge Analizi',
+            'object_evaluation': 'Nesne Değerlendirmesi'
+        },
+        'admin_section': {
+            'title': 'Admin İçin',
+            'new_report': 'Yeni rapor al',
+            'market_stats': 'Piyasa istatistikleri',
+            'saved_reports': 'Kayıtlı raporlarım',
+            'admin_panel': 'Admin paneli'
+        },
         'new_report': {
             'enter_address': 'Mülk adresini girin:',
             'address_not_found': 'Adres tanınmadı, lütfen tekrar girmeyi deneyin.',
