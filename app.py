@@ -364,13 +364,31 @@ def api_menu():
 def api_locations_countries():
     """Получение списка стран из таблицы locations"""
     try:
+        logger.info("🔍 Запрос списка стран")
         result = supabase.table('locations').select('country_id, country_name').execute()
+        
+        logger.info(f"📊 Получено записей: {len(result.data) if result.data else 0}")
+        
         if result.data:
-            # Убираем дубликаты и сортируем
-            countries = list({(item['country_id'], item['country_name']) for item in result.data})
-            countries.sort(key=lambda x: x[1])  # Сортируем по названию
+            # Убираем дубликаты, фильтруем None значения и сортируем
+            countries = []
+            seen = set()
+            for item in result.data:
+                if item['country_id'] is not None and item['country_name'] is not None:
+                    country_tuple = (item['country_id'], item['country_name'])
+                    if country_tuple not in seen:
+                        countries.append(country_tuple)
+                        seen.add(country_tuple)
+                else:
+                    logger.warning(f"⚠️ Пропущена запись с None значениями: {item}")
+            
+            logger.info(f"✅ Отфильтровано стран: {len(countries)}")
+            
+            # Сортируем по названию, игнорируя None
+            countries.sort(key=lambda x: x[1] if x[1] is not None else '')
             return jsonify({'success': True, 'countries': countries})
         else:
+            logger.warning("⚠️ Страны не найдены")
             return jsonify({'success': False, 'error': 'No countries found'})
     except Exception as e:
         logger.error(f"❌ Ошибка при получении стран: {e}")
@@ -386,16 +404,35 @@ def api_locations_cities():
         return jsonify({'error': 'country_id required'}), 400
     
     try:
+        logger.info(f"🔍 Запрос городов для country_id: {country_id}")
         result = supabase.table('locations').select('city_id, city_name').eq('country_id', country_id).execute()
+        
+        logger.info(f"📊 Получено записей: {len(result.data) if result.data else 0}")
+        
         if result.data:
-            # Убираем дубликаты и сортируем
-            cities = list({(item['city_id'], item['city_name']) for item in result.data})
-            cities.sort(key=lambda x: x[1])  # Сортируем по названию
+            # Убираем дубликаты, фильтруем None значения и сортируем
+            cities = []
+            seen = set()
+            for item in result.data:
+                if item['city_id'] is not None and item['city_name'] is not None:
+                    city_tuple = (item['city_id'], item['city_name'])
+                    if city_tuple not in seen:
+                        cities.append(city_tuple)
+                        seen.add(city_tuple)
+                else:
+                    logger.warning(f"⚠️ Пропущена запись с None значениями: {item}")
+            
+            logger.info(f"✅ Отфильтровано городов: {len(cities)}")
+            
+            # Сортируем по названию, игнорируя None
+            cities.sort(key=lambda x: x[1] if x[1] is not None else '')
             return jsonify({'success': True, 'cities': cities})
         else:
+            logger.warning(f"⚠️ Города для country_id {country_id} не найдены")
             return jsonify({'success': False, 'error': 'No cities found'})
     except Exception as e:
         logger.error(f"❌ Ошибка при получении городов: {e}")
+        logger.error(f"📋 Данные запроса: country_id={country_id}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
 @app.route('/api/locations/counties', methods=['POST'])
@@ -408,16 +445,35 @@ def api_locations_counties():
         return jsonify({'error': 'city_id required'}), 400
     
     try:
+        logger.info(f"🔍 Запрос областей для city_id: {city_id}")
         result = supabase.table('locations').select('county_id, county_name').eq('city_id', city_id).execute()
+        
+        logger.info(f"📊 Получено записей: {len(result.data) if result.data else 0}")
+        
         if result.data:
-            # Убираем дубликаты и сортируем
-            counties = list({(item['county_id'], item['county_name']) for item in result.data})
-            counties.sort(key=lambda x: x[1])  # Сортируем по названию
+            # Убираем дубликаты, фильтруем None значения и сортируем
+            counties = []
+            seen = set()
+            for item in result.data:
+                if item['county_id'] is not None and item['county_name'] is not None:
+                    county_tuple = (item['county_id'], item['county_name'])
+                    if county_tuple not in seen:
+                        counties.append(county_tuple)
+                        seen.add(county_tuple)
+                else:
+                    logger.warning(f"⚠️ Пропущена запись с None значениями: {item}")
+            
+            logger.info(f"✅ Отфильтровано областей: {len(counties)}")
+            
+            # Сортируем по названию, игнорируя None
+            counties.sort(key=lambda x: x[1] if x[1] is not None else '')
             return jsonify({'success': True, 'counties': counties})
         else:
+            logger.warning(f"⚠️ Области для city_id {city_id} не найдены")
             return jsonify({'success': False, 'error': 'No counties found'})
     except Exception as e:
         logger.error(f"❌ Ошибка при получении областей: {e}")
+        logger.error(f"📋 Данные запроса: city_id={city_id}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
 @app.route('/api/locations/districts', methods=['POST'])
@@ -430,16 +486,35 @@ def api_locations_districts():
         return jsonify({'error': 'county_id required'}), 400
     
     try:
+        logger.info(f"🔍 Запрос районов для county_id: {county_id}")
         result = supabase.table('locations').select('district_id, district_name').eq('county_id', county_id).execute()
+        
+        logger.info(f"📊 Получено записей: {len(result.data) if result.data else 0}")
+        
         if result.data:
-            # Убираем дубликаты и сортируем
-            districts = list({(item['district_id'], item['district_name']) for item in result.data})
-            districts.sort(key=lambda x: x[1])  # Сортируем по названию
+            # Убираем дубликаты, фильтруем None значения и сортируем
+            districts = []
+            seen = set()
+            for item in result.data:
+                if item['district_id'] is not None and item['district_name'] is not None:
+                    district_tuple = (item['district_id'], item['district_name'])
+                    if district_tuple not in seen:
+                        districts.append(district_tuple)
+                        seen.add(district_tuple)
+                else:
+                    logger.warning(f"⚠️ Пропущена запись с None значениями: {item}")
+            
+            logger.info(f"✅ Отфильтровано районов: {len(districts)}")
+            
+            # Сортируем по названию, игнорируя None
+            districts.sort(key=lambda x: x[1] if x[1] is not None else '')
             return jsonify({'success': True, 'districts': districts})
         else:
+            logger.warning(f"⚠️ Районы для county_id {county_id} не найдены")
             return jsonify({'success': False, 'error': 'No districts found'})
     except Exception as e:
         logger.error(f"❌ Ошибка при получении районов: {e}")
+        logger.error(f"📋 Данные запроса: county_id={county_id}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
 @app.route('/api/check_admin_status', methods=['POST'])
