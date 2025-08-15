@@ -574,6 +574,16 @@ def api_region_data():
 
         logger.info(f"📊 Получено данных: general={len(general_data.data) if general_data.data else 0}, house_type={len(house_type_data.data) if house_type_data.data else 0}, floor_segment={len(floor_segment_data.data) if floor_segment_data.data else 0}, age={len(age_data.data) if age_data.data else 0}, heating={len(heating_data.data) if heating_data.data else 0}")
         
+        # Проверяем и обновляем курсы валют при необходимости
+        try:
+            currency_check_result = check_and_update_currency_rates()
+            if currency_check_result:
+                logger.info("✅ Курсы валют проверены и обновлены при необходимости")
+            else:
+                logger.warning("⚠️ Не удалось проверить/обновить курсы валют")
+        except Exception as e:
+            logger.error(f"❌ Ошибка при проверке курсов валют: {e}")
+        
         return jsonify({
             'success': True,
             'general_data': general_data.data if general_data.data else [],
@@ -587,6 +597,210 @@ def api_region_data():
         logger.error(f"❌ Ошибка при получении данных региона: {e}")
         logger.error(f"📋 Данные запроса: country_id={country_id}, city_id={city_id}, county_id={county_id}, district_id={district_id}")
         return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/currency/rates', methods=['GET'])
+def api_currency_rates():
+    """Получение курсов валют из базы данных"""
+    try:
+        logger.info("🔍 Запрос курсов валют из базы данных")
+        
+        # Получаем последние курсы валют
+        result = supabase.table('currency').select('*').order('created_at', desc=True).limit(1).execute()
+        
+        if result.data and len(result.data) > 0:
+            latest_rates = result.data[0]
+            logger.info(f"✅ Получены курсы валют: {latest_rates}")
+            return jsonify({
+                'success': True,
+                'rates': {
+                    'rub': latest_rates.get('rub'),
+                    'usd': latest_rates.get('usd'),
+                    'euro': latest_rates.get('euro'),
+                    'try': latest_rates.get('try'),
+                    'aed': latest_rates.get('aed'),
+                    'thb': latest_rates.get('thb')
+                },
+                'last_updated': latest_rates.get('created_at')
+            })
+        else:
+            logger.warning("⚠️ Курсы валют в базе данных не найдены")
+            return jsonify({'success': False, 'error': 'No currency rates found'})
+            
+    except Exception as e:
+        logger.error(f"❌ Ошибка при получении курсов валют: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/currency/fetch', methods=['GET'])
+def api_currency_fetch():
+    """Получение курсов валют из внешнего API и сохранение в базу данных"""
+    try:
+        logger.info("🔍 Запрос курсов валют из внешнего API")
+        
+        # API ключ для currencylayer
+        api_key = os.getenv('CURRENCY_API_KEY')
+        if not api_key:
+            logger.error("❌ API ключ для валют не найден в переменных окружения")
+            return jsonify({'success': False, 'error': 'Currency API key not configured'}), 500
+        
+        # URL для API (базовая валюта - EUR)
+        url = f"http://api.currencylayer.com/live?access_key={api_key}&currencies=RUB,USD,TRY,AED,THB&source=EUR"
+        
+        logger.info(f"🌐 Запрос к API: {url}")
+        response = requests.get(url, timeout=30)
+        response.raise_for_status()
+        
+        data = response.json()
+        logger.info(f"📊 Ответ API: {data}")
+        
+        if not data.get('success'):
+            error_info = data.get('error', {})
+            logger.error(f"❌ Ошибка API валют: {error_info}")
+            return jsonify({'success': False, 'error': f"Currency API error: {error_info}"}), 500
+        
+        # Извлекаем курсы валют
+        quotes = data.get('quotes', {})
+        
+        # Конвертируем в формат нашей базы данных
+        # API возвращает курсы относительно EUR (базовая валюта)
+        currency_rates = {
+            'rub': quotes.get('EURRUB'),
+            'usd': quotes.get('EURUSD'),
+            'euro': 1.0,  # Базовая валюта всегда 1.0
+            'try': quotes.get('EURTRY'),
+            'aed': quotes.get('EURAED'),
+            'thb': quotes.get('EURTHB')
+        }
+        
+        # Проверяем, что все курсы получены
+        if not all(currency_rates.values()):
+            logger.error(f"❌ Не все курсы валют получены: {currency_rates}")
+            return jsonify({'success': False, 'error': 'Incomplete currency rates received'}), 500
+        
+        # Сохраняем в базу данных
+        insert_result = supabase.table('currency').insert(currency_rates).execute()
+        
+        if insert_result.data:
+            logger.info(f"✅ Курсы валют сохранены в базу данных: {insert_result.data}")
+            return jsonify({
+                'success': True,
+                'rates': currency_rates,
+                'message': 'Currency rates updated successfully'
+            })
+        else:
+            logger.error("❌ Ошибка при сохранении курсов валют в базу данных")
+            return jsonify({'success': False, 'error': 'Failed to save currency rates'}), 500
+            
+    except requests.exceptions.RequestException as e:
+        logger.error(f"❌ Ошибка сети при запросе к API валют: {e}")
+        return jsonify({'success': False, 'error': f'Network error: {str(e)}'}), 500
+    except Exception as e:
+        logger.error(f"❌ Ошибка при получении курсов валют: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+def check_and_update_currency_rates():
+    """Проверяет наличие актуальных курсов валют и обновляет их при необходимости"""
+    try:
+        logger.info("🔍 Проверка актуальности курсов валют")
+        
+        # Получаем последние курсы валют из базы данных
+        result = supabase.table('currency').select('*').order('created_at', desc=True).limit(1).execute()
+        
+        if result.data and len(result.data) > 0:
+            latest_rates = result.data[0]
+            latest_date = latest_rates.get('created_at')
+            
+            # Проверяем, есть ли курсы за сегодня
+            if latest_date:
+                # Конвертируем в datetime объект
+                if isinstance(latest_date, str):
+                    latest_date = datetime.fromisoformat(latest_date.replace('Z', '+00:00'))
+                elif hasattr(latest_date, 'replace'):
+                    latest_date = latest_date.replace(tzinfo=None)
+                
+                current_date = datetime.utcnow()
+                days_difference = (current_date - latest_date).days
+                
+                logger.info(f"📅 Последние курсы валют: {latest_date}, разница в днях: {days_difference}")
+                
+                # Если курсы старше 1 дня, обновляем их
+                if days_difference >= 1:
+                    logger.info("🔄 Курсы валют устарели, обновляем...")
+                    return update_currency_rates_from_api()
+                else:
+                    logger.info("✅ Курсы валют актуальны")
+                    return True
+            else:
+                logger.warning("⚠️ Не удалось определить дату последних курсов валют")
+                return update_currency_rates_from_api()
+        else:
+            logger.info("📝 Курсы валют в базе данных отсутствуют, загружаем...")
+            return update_currency_rates_from_api()
+            
+    except Exception as e:
+        logger.error(f"❌ Ошибка при проверке курсов валют: {e}")
+        return False
+
+def update_currency_rates_from_api():
+    """Обновляет курсы валют из внешнего API"""
+    try:
+        logger.info("🌐 Обновление курсов валют из внешнего API")
+        
+        # API ключ для currencylayer
+        api_key = os.getenv('CURRENCY_API_KEY')
+        if not api_key:
+            logger.error("❌ API ключ для валют не найден в переменных окружения")
+            return False
+        
+        # URL для API (базовая валюта - EUR)
+        url = f"http://api.currencylayer.com/live?access_key={api_key}&currencies=RUB,USD,TRY,AED,THB&source=EUR"
+        
+        logger.info(f"🌐 Запрос к API: {url}")
+        response = requests.get(url, timeout=30)
+        response.raise_for_status()
+        
+        data = response.json()
+        logger.info(f"📊 Ответ API: {data}")
+        
+        if not data.get('success'):
+            error_info = data.get('error', {})
+            logger.error(f"❌ Ошибка API валют: {error_info}")
+            return False
+        
+        # Извлекаем курсы валют
+        quotes = data.get('quotes', {})
+        
+        # Конвертируем в формат нашей базы данных
+        # API возвращает курсы относительно EUR (базовая валюта)
+        currency_rates = {
+            'rub': quotes.get('EURRUB'),
+            'usd': quotes.get('EURUSD'),
+            'euro': 1.0,  # Базовая валюта всегда 1.0
+            'try': quotes.get('EURTRY'),
+            'aed': quotes.get('EURAED'),
+            'thb': quotes.get('EURTHB')
+        }
+        
+        # Проверяем, что все курсы получены
+        if not all(currency_rates.values()):
+            logger.error(f"❌ Не все курсы валют получены: {currency_rates}")
+            return False
+        
+        # Сохраняем в базу данных
+        insert_result = supabase.table('currency').insert(currency_rates).execute()
+        
+        if insert_result.data:
+            logger.info(f"✅ Курсы валют обновлены в базе данных: {insert_result.data}")
+            return True
+        else:
+            logger.error("❌ Ошибка при сохранении курсов валют в базу данных")
+            return False
+            
+    except requests.exceptions.RequestException as e:
+        logger.error(f"❌ Ошибка сети при запросе к API валют: {e}")
+        return False
+    except Exception as e:
+        logger.error(f"❌ Ошибка при обновлении курсов валют: {e}")
+        return False
 
 @app.route('/api/check_admin_status', methods=['POST'])
 def api_check_admin_status():

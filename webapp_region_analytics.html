@@ -1321,8 +1321,50 @@
         }
 
         // Currency management
-        let currentCurrency = 'TRY';
+        let currentCurrency = 'TRY'; // Default currency
         let currencyRates = null;
+        
+        // Set default currency based on selected country
+        function setDefaultCurrency() {
+            if (selectedLocation && selectedLocation.country_name) {
+                const countryName = selectedLocation.country_name.toLowerCase();
+                if (countryName.includes('turkey') || countryName.includes('турция') || 
+                    countryName.includes('türkiye') || countryName.includes('türkei') || 
+                    countryName.includes('turquie')) {
+                    currentCurrency = 'TRY';
+                    console.log('🇹🇷 Турция выбрана, устанавливаем валюту TRY');
+                } else if (countryName.includes('germany') || countryName.includes('германия') || 
+                           countryName.includes('deutschland') || countryName.includes('allemagne')) {
+                    currentCurrency = 'EUR';
+                    console.log('🇩🇪 Германия выбрана, устанавливаем валюту EUR');
+                } else if (countryName.includes('france') || countryName.includes('франция') || 
+                           countryName.includes('frankreich')) {
+                    currentCurrency = 'EUR';
+                    console.log('🇫🇷 Франция выбрана, устанавливаем валюту EUR');
+                } else if (countryName.includes('russia') || countryName.includes('россия') || 
+                           countryName.includes('russland') || countryName.includes('russie')) {
+                    currentCurrency = 'RUB';
+                    console.log('🇷🇺 Россия выбрана, устанавливаем валюту RUB');
+                } else {
+                    currentCurrency = 'USD';
+                    console.log('🌍 Другая страна, устанавливаем валюту USD');
+                }
+                
+                // Update active button
+                updateCurrencyButton();
+            }
+        }
+        
+        // Update currency button to show active state
+        function updateCurrencyButton() {
+            document.querySelectorAll('.currency-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            const activeBtn = document.querySelector(`[data-currency="${currentCurrency}"]`);
+            if (activeBtn) {
+                activeBtn.classList.add('active');
+            }
+        }
 
         // Switch currency and recalculate all values
         function switchCurrency(currency) {
@@ -1385,25 +1427,30 @@
         function convertCurrency(value, fromCurrency = 'TRY') {
             if (!currencyRates || !value || isNaN(value)) return value;
             
+            const numericValue = parseFloat(value);
+            if (isNaN(numericValue)) return value;
+            
             // If converting from TRY (base currency in our system)
             if (fromCurrency === 'TRY') {
                 switch (currentCurrency) {
                     case 'USD':
-                        return value / currencyRates.usd;
+                        return numericValue / currencyRates.usd;
                     case 'EUR':
-                        return value / currencyRates.euro;
+                        return numericValue / currencyRates.euro;
                     case 'RUB':
-                        return value / currencyRates.rub;
+                        return numericValue / currencyRates.rub;
                     default:
-                        return value; // TRY
+                        return numericValue; // TRY
                 }
             }
             
-            return value;
+            return numericValue;
         }
 
         // Recalculate all displayed values
         function recalculateAllValues() {
+            console.log('🔄 Пересчет всех значений для валюты:', currentCurrency);
+            
             // Update key metrics
             updateKeyMetricsCurrency();
             
@@ -1413,14 +1460,22 @@
 
         // Update key metrics with new currency
         function updateKeyMetricsCurrency() {
-            // This will be called when currency changes
-            // Values will be updated in real-time
+            console.log('💰 Обновление ключевых метрик для валюты:', currentCurrency);
+            
+            // Пересчитываем и обновляем ключевые метрики
+            if (window.lastGeneralData) {
+                fillKeyMetrics(window.lastGeneralData);
+            }
         }
 
         // Update all data tables with new currency
         function updateDataTablesCurrency() {
-            // This will be called when currency changes
-            // All displayed values will be recalculated
+            console.log('📊 Обновление всех таблиц данных для валюты:', currentCurrency);
+            
+            // Пересчитываем и обновляем все таблицы данных
+            if (window.lastRegionData) {
+                displayRegionData(window.lastRegionData);
+            }
         }
 
         // Format currency with proper symbol and formatting
@@ -2118,6 +2173,9 @@
             selectedLocationDiv.classList.add('show');
             adminIdsDiv.style.display = 'block';
             
+            // Set default currency based on selected country
+            setDefaultCurrency();
+            
             // Load region data
             loadRegionData();
         }
@@ -2194,6 +2252,12 @@
                         console.log('Data found in response field:', processedData);
                     }
                     
+                    // Save data to global variables for currency recalculation
+                    window.lastRegionData = processedData;
+                    if (processedData.general_data && processedData.general_data.length > 0) {
+                        window.lastGeneralData = processedData.general_data[0];
+                    }
+                    
                     // Display data
                     displayRegionData(processedData);
                     
@@ -2260,6 +2324,10 @@
             } else if (data.price_sale !== null && data.price_sale !== undefined) {
                 avgSalePrice = formatFieldValue('price_sale', data.price_sale);
             }
+            
+            // Log current currency for debugging
+            console.log('Current currency for key metrics:', currentCurrency);
+            console.log('Currency rates available:', currencyRates);
             
             // Try to find average rent price
             if (data.average_price_for_rent !== null && data.average_price_for_rent !== undefined) {
