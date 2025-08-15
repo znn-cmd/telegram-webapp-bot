@@ -1164,13 +1164,38 @@
                 });
                 
                 const data = await response.json();
+                console.log('Raw API response:', data);
                 
                 if (data.success) {
                     // Hide loading state
                     loadingState.style.display = 'none';
                     
+                    // Check if data is a string that needs parsing
+                    let processedData = data;
+                    if (typeof data.data === 'string') {
+                        try {
+                            processedData = JSON.parse(data.data);
+                            console.log('Parsed data from string:', processedData);
+                        } catch (e) {
+                            console.log('Failed to parse data string:', e);
+                            processedData = data;
+                        }
+                    } else if (data.data && typeof data.data === 'object') {
+                        // If data is in data field
+                        processedData = data.data;
+                        console.log('Data found in data field:', processedData);
+                    } else if (data.result && typeof data.result === 'object') {
+                        // If data is in result field
+                        processedData = data.result;
+                        console.log('Data found in result field:', processedData);
+                    } else if (data.response && typeof data.response === 'object') {
+                        // If data is in response field
+                        processedData = data.response;
+                        console.log('Data found in response field:', processedData);
+                    }
+                    
                     // Display data
-                    displayRegionData(data);
+                    displayRegionData(processedData);
                     
                     // Show data content
                     dataContent.style.display = 'block';
@@ -1195,21 +1220,115 @@
         // Display region data
         function displayRegionData(data) {
             console.log('Received data:', data);
+            console.log('General data:', data.general_data);
+            console.log('House type data:', data.house_type_data);
+            console.log('Floor segment data:', data.floor_segment_data);
+            console.log('Age data:', data.age_data);
+            console.log('Heating data:', data.heating_data);
+            
+            // Try different possible key names for data
+            const generalData = data.general_data || data.generalData || data.general || data.general_data || [];
+            const houseTypeData = data.house_type_data || data.houseTypeData || data.house_types || data.houseTypes || data.house_type_data || [];
+            const floorSegmentData = data.floor_segment_data || data.floorSegmentData || data.floor_segments || data.floorSegments || data.floor_segment_data || [];
+            const ageData = data.age_data || data.ageData || data.ages || data.age_data || [];
+            const heatingData = data.heating_data || data.heatingData || data.heating || data.heating_data || [];
+            
+            // If no data found in specific fields, try to find any data in the object
+            if (!generalData || generalData.length === 0) {
+                console.log('No general data found in specific fields, searching in object...');
+                for (const key in data) {
+                    if (key.includes('general') || key.includes('General')) {
+                        console.log(`Found potential general data in key: ${key}`, data[key]);
+                    }
+                }
+            }
+            
+            if (!houseTypeData || houseTypeData.length === 0) {
+                console.log('No house type data found in specific fields, searching in object...');
+                for (const key in data) {
+                    if (key.includes('house') || key.includes('House') || key.includes('type') || key.includes('Type')) {
+                        console.log(`Found potential house type data in key: ${key}`, data[key]);
+                    }
+                }
+            }
+            
+            if (!floorSegmentData || floorSegmentData.length === 0) {
+                console.log('No floor segment data found in specific fields, searching in object...');
+                for (const key in data) {
+                    if (key.includes('floor') || key.includes('Floor') || key.includes('segment') || key.includes('Segment')) {
+                        console.log(`Found potential floor segment data in key: ${key}`, data[key]);
+                    }
+                }
+            }
+            
+            if (!ageData || ageData.length === 0) {
+                console.log('No age data found in specific fields, searching in object...');
+                for (const key in data) {
+                    if (key.includes('age') || key.includes('Age')) {
+                        console.log(`Found potential age data in key: ${key}`, data[key]);
+                    }
+                }
+            }
+            
+            if (!heatingData || heatingData.length === 0) {
+                console.log('No heating data found in specific fields, searching in object...');
+                for (const key in data) {
+                    if (key.includes('heating') || key.includes('Heating')) {
+                        console.log(`Found potential heating data in key: ${key}`, data[key]);
+                    }
+                }
+            }
+            
+            console.log('Processed general data:', generalData);
+            console.log('Processed house type data:', houseTypeData);
+            console.log('Processed floor segment data:', floorSegmentData);
+            console.log('Processed age data:', ageData);
+            console.log('Processed heating data:', heatingData);
+            
+            // If data is an array, try to categorize it by content
+            if (Array.isArray(data) && data.length > 0) {
+                console.log('Data is an array, attempting to categorize...');
+                const firstItem = data[0];
+                console.log('First item in array:', firstItem);
+                
+                if (firstItem && typeof firstItem === 'object') {
+                    const keys = Object.keys(firstItem);
+                    console.log('Keys in first item:', keys);
+                    
+                    // Try to determine the type of data based on keys
+                    if (keys.some(key => key.includes('house') || key.includes('type'))) {
+                        console.log('Array appears to contain house type data');
+                        houseTypeData = data;
+                    } else if (keys.some(key => key.includes('floor') || key.includes('segment'))) {
+                        console.log('Array appears to contain floor segment data');
+                        floorSegmentData = data;
+                    } else if (keys.some(key => key.includes('age'))) {
+                        console.log('Array appears to contain age data');
+                        ageData = data;
+                    } else if (keys.some(key => key.includes('heating'))) {
+                        console.log('Array appears to contain heating data');
+                        heatingData = data;
+                    } else {
+                        console.log('Array appears to contain general data');
+                        generalData = data;
+                    }
+                }
+            }
             
             // Display general data
-            displayGeneralData(data.general_data);
+            displayGeneralData(generalData);
             
             // Display house type data
-            displayHouseTypeData(data.house_type_data);
+            displayHouseTypeData(houseTypeData);
             
             // Display floor segment data
-            displayFloorSegmentData(data.floor_segment_data);
+            displayFloorSegmentData(floorSegmentData);
             
             // Display age data
-            displayAgeData(data.age_data);
+            displayAgeData(ageData);
 
             // Display heating data
-            displayHeatingData(data.heating_data);
+            displayHeatingData(heatingData);
             
             // Auto-expand the first card (General Data) by default
             setTimeout(() => {
@@ -1287,18 +1406,22 @@
             const content = document.getElementById('houseTypeDataContent');
             
             console.log('House type data:', houseTypeData);
+            console.log('House type data type:', typeof houseTypeData);
+            console.log('House type data length:', houseTypeData ? houseTypeData.length : 'undefined');
             
             if (!houseTypeData || houseTypeData.length === 0) {
+                console.log('No house type data available, showing no data message');
                 content.innerHTML = `<div class="no-data">${getText('noDataAvailable')}</div>`;
                 return;
             }
             
             let html = '';
             
-            houseTypeData.forEach(item => {
-                console.log('House type item:', item);
+            houseTypeData.forEach((item, index) => {
+                console.log(`House type item ${index}:`, item);
                 // Try different possible field names
                 const typeField = item.house_type || item.type || item.house_type_name || item.name;
+                console.log(`Type field for item ${index}:`, typeField);
                 
                 if (typeField) {
                     html += `<div class="sub-card">
@@ -1330,9 +1453,28 @@
                     });
                     
                     html += '</table></div>';
+                } else {
+                    console.log(`No type field found for item ${index}, showing all fields`);
+                    // If no type field found, show all available fields
+                    html += `<div class="sub-card">
+                        <h3>Item ${index + 1}</h3>
+                        <table class="data-table">`;
+                    
+                    Object.keys(item).forEach(key => {
+                        if (!['country_id', 'city_id', 'county_id', 'district_id', 'id', 'created_at', 'source_file'].includes(key)) {
+                            const value = item[key];
+                            if (value !== null && value !== undefined) {
+                                const label = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+                                html += `<tr><td>${label}:</td><td>${value}</td></tr>`;
+                            }
+                        }
+                    });
+                    
+                    html += '</table></div>';
                 }
             });
             
+            console.log('Final HTML for house type data:', html);
             content.innerHTML = html;
         }
 
@@ -1341,18 +1483,22 @@
             const content = document.getElementById('floorSegmentDataContent');
             
             console.log('Floor segment data:', floorSegmentData);
+            console.log('Floor segment data type:', typeof floorSegmentData);
+            console.log('Floor segment data length:', floorSegmentData ? floorSegmentData.length : 'undefined');
             
             if (!floorSegmentData || floorSegmentData.length === 0) {
+                console.log('No floor segment data available, showing no data message');
                 content.innerHTML = `<div class="no-data">${getText('noDataAvailable')}</div>`;
                 return;
             }
             
             let html = '';
             
-            floorSegmentData.forEach(item => {
-                console.log('Floor segment item:', item);
+            floorSegmentData.forEach((item, index) => {
+                console.log(`Floor segment item ${index}:`, item);
                 // Try different possible field names
                 const segmentField = item.floor_segment || item.segment || item.floor_segment_name || item.name;
+                console.log(`Segment field for item ${index}:`, segmentField);
                 
                 if (segmentField) {
                     html += `<div class="sub-card">
@@ -1384,9 +1530,28 @@
                     });
                     
                     html += '</table></div>';
+                } else {
+                    console.log(`No segment field found for item ${index}, showing all fields`);
+                    // If no segment field found, show all available fields
+                    html += `<div class="sub-card">
+                        <h3>Item ${index + 1}</h3>
+                        <table class="data-table">`;
+                    
+                    Object.keys(item).forEach(key => {
+                        if (!['country_id', 'city_id', 'county_id', 'district_id', 'id', 'created_at', 'source_file'].includes(key)) {
+                            const value = item[key];
+                            if (value !== null && value !== undefined) {
+                                const label = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+                                html += `<tr><td>${label}:</td><td>${value}</td></tr>`;
+                            }
+                        }
+                    });
+                    
+                    html += '</table></div>';
                 }
             });
             
+            console.log('Final HTML for floor segment data:', html);
             content.innerHTML = html;
         }
 
@@ -1395,18 +1560,22 @@
             const content = document.getElementById('ageDataContent');
 
             console.log('Age data:', ageData);
+            console.log('Age data type:', typeof ageData);
+            console.log('Age data length:', ageData ? ageData.length : 'undefined');
 
             if (!ageData || ageData.length === 0) {
+                console.log('No age data available, showing no data message');
                 content.innerHTML = `<div class="no-data">${getText('noDataAvailable')}</div>`;
                 return;
             }
 
             let html = '';
 
-            ageData.forEach(item => {
-                console.log('Age item:', item);
+            ageData.forEach((item, index) => {
+                console.log(`Age item ${index}:`, item);
                 // Try different possible field names
                 const ageField = item.age_category || item.age || item.age_category_name || item.name;
+                console.log(`Age field for item ${index}:`, ageField);
                 
                 if (ageField) {
                     html += `<div class="sub-card">
@@ -1438,9 +1607,28 @@
                     });
                     
                     html += '</table></div>';
+                } else {
+                    console.log(`No age field found for item ${index}, showing all fields`);
+                    // If no age field found, show all available fields
+                    html += `<div class="sub-card">
+                        <h3>Item ${index + 1}</h3>
+                        <table class="data-table">`;
+                    
+                    Object.keys(item).forEach(key => {
+                        if (!['country_id', 'city_id', 'county_id', 'district_id', 'id', 'created_at', 'source_file'].includes(key)) {
+                            const value = item[key];
+                            if (value !== null && value !== undefined) {
+                                const label = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+                                html += `<tr><td>${label}:</td><td>${value}</td></tr>`;
+                            }
+                        }
+                    });
+                    
+                    html += '</table></div>';
                 }
             });
 
+            console.log('Final HTML for age data:', html);
             content.innerHTML = html;
         }
 
@@ -1449,18 +1637,22 @@
             const content = document.getElementById('heatingDataContent');
 
             console.log('Heating data:', heatingData);
+            console.log('Heating data type:', typeof heatingData);
+            console.log('Heating data length:', heatingData ? heatingData.length : 'undefined');
 
             if (!heatingData || heatingData.length === 0) {
+                console.log('No heating data available, showing no data message');
                 content.innerHTML = `<div class="no-data">${getText('noDataAvailable')}</div>`;
                 return;
             }
 
             let html = '';
 
-            heatingData.forEach(item => {
-                console.log('Heating item:', item);
+            heatingData.forEach((item, index) => {
+                console.log(`Heating item ${index}:`, item);
                 // Try different possible field names
                 const heatingField = item.heating_type || item.heating || item.heating_type_name || item.name;
+                console.log(`Heating field for item ${index}:`, heatingField);
                 
                 if (heatingField) {
                     html += `<div class="sub-card">
@@ -1492,9 +1684,28 @@
                     });
                     
                     html += '</table></div>';
+                } else {
+                    console.log(`No heating field found for item ${index}, showing all fields`);
+                    // If no heating field found, show all available fields
+                    html += `<div class="sub-card">
+                        <h3>Item ${index + 1}</h3>
+                        <table class="data-table">`;
+                    
+                    Object.keys(item).forEach(key => {
+                        if (!['country_id', 'city_id', 'county_id', 'district_id', 'id', 'created_at', 'source_file'].includes(key)) {
+                            const value = item[key];
+                            if (value !== null && value !== undefined) {
+                                const label = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+                                html += `<tr><td>${value}</td></tr>`;
+                            }
+                        }
+                    });
+                    
+                    html += '</table></div>';
                 }
             });
 
+            console.log('Final HTML for heating data:', html);
             content.innerHTML = html;
         }
 
