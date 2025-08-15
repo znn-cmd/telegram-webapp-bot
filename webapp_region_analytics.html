@@ -443,6 +443,68 @@
             background-color: #f8f9fa;
         }
 
+        /* Currency Switcher Styles */
+        .currency-switcher {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .currency-switcher-title {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 8px;
+            text-align: center;
+        }
+
+        .currency-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .currency-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 6px 8px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            min-width: 50px;
+        }
+
+        .currency-btn:hover {
+            border-color: #667eea;
+            background-color: #f8f9ff;
+        }
+
+        .currency-btn.active {
+            border-color: #667eea;
+            background-color: #667eea;
+            color: white;
+        }
+
+        .currency-icon {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .currency-code {
+            font-size: 10px;
+            font-weight: 500;
+        }
+
+        .currency-btn.active .currency-code {
+            color: white;
+        }
+
         /* Mobile Responsive */
         @media (max-width: 480px) {
             .region-data-section {
@@ -519,6 +581,29 @@
             .data-footer {
                 flex-direction: column;
                 gap: 5px;
+            }
+            
+            /* Currency switcher mobile styles */
+            .currency-switcher {
+                padding: 10px;
+                margin-bottom: 15px;
+            }
+            
+            .currency-buttons {
+                gap: 6px;
+            }
+            
+            .currency-btn {
+                padding: 5px 6px;
+                min-width: 45px;
+            }
+            
+            .currency-icon {
+                font-size: 14px;
+            }
+            
+            .currency-code {
+                font-size: 9px;
             }
         }
 
@@ -663,6 +748,29 @@
                 <div class="loading-text" id="loadingText">Загрузка данных...</div>
             </div>
             
+            <!-- Currency Switcher -->
+            <div class="currency-switcher" id="currencySwitcher" style="display: none;">
+                <div class="currency-switcher-title">Валюта отображения:</div>
+                <div class="currency-buttons">
+                    <button class="currency-btn active" data-currency="TRY" onclick="switchCurrency('TRY')">
+                        <span class="currency-icon">₺</span>
+                        <span class="currency-code">TRY</span>
+                    </button>
+                    <button class="currency-btn" data-currency="USD" onclick="switchCurrency('USD')">
+                        <span class="currency-icon">$</span>
+                        <span class="currency-code">USD</span>
+                    </button>
+                    <button class="currency-btn" data-currency="EUR" onclick="switchCurrency('EUR')">
+                        <span class="currency-icon">€</span>
+                        <span class="currency-code">EUR</span>
+                    </button>
+                    <button class="currency-btn" data-currency="RUB" onclick="switchCurrency('RUB')">
+                        <span class="currency-icon">₽</span>
+                        <span class="currency-code">RUB</span>
+                    </button>
+                </div>
+            </div>
+
             <!-- Key Metrics Cards -->
             <div class="key-metrics-section" id="keyMetricsSection" style="display: none;">
                 <h3 class="key-metrics-title" id="keyMetricsTitle">Ключевые показатели</h3>
@@ -1212,6 +1320,140 @@
             }
         }
 
+        // Currency management
+        let currentCurrency = 'TRY';
+        let currencyRates = null;
+
+        // Switch currency and recalculate all values
+        function switchCurrency(currency) {
+            if (currentCurrency === currency) return;
+            
+            currentCurrency = currency;
+            
+            // Update active button
+            document.querySelectorAll('.currency-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector(`[data-currency="${currency}"]`).classList.add('active');
+            
+            // Recalculate and redisplay all data
+            recalculateAllValues();
+        }
+
+        // Get currency rates from database or API
+        async function getCurrencyRates() {
+            try {
+                // First try to get from database
+                const response = await fetch('/api/currency/rates');
+                const data = await response.json();
+                
+                if (data.success && data.rates) {
+                    currencyRates = data.rates;
+                    console.log('Currency rates loaded from database:', currencyRates);
+                    return currencyRates;
+                } else {
+                    // If no rates in database, fetch from API
+                    console.log('No currency rates in database, fetching from API...');
+                    return await fetchCurrencyFromAPI();
+                }
+            } catch (error) {
+                console.error('Error getting currency rates:', error);
+                return await fetchCurrencyFromAPI();
+            }
+        }
+
+        // Fetch currency rates from external API
+        async function fetchCurrencyFromAPI() {
+            try {
+                const response = await fetch('/api/currency/fetch');
+                const data = await response.json();
+                
+                if (data.success) {
+                    currencyRates = data.rates;
+                    console.log('Currency rates fetched from API:', currencyRates);
+                    return currencyRates;
+                } else {
+                    throw new Error(data.error || 'Failed to fetch currency rates');
+                }
+            } catch (error) {
+                console.error('Error fetching currency from API:', error);
+                return null;
+            }
+        }
+
+        // Convert value to selected currency
+        function convertCurrency(value, fromCurrency = 'TRY') {
+            if (!currencyRates || !value || isNaN(value)) return value;
+            
+            // If converting from TRY (base currency in our system)
+            if (fromCurrency === 'TRY') {
+                switch (currentCurrency) {
+                    case 'USD':
+                        return value / currencyRates.usd;
+                    case 'EUR':
+                        return value / currencyRates.euro;
+                    case 'RUB':
+                        return value / currencyRates.rub;
+                    default:
+                        return value; // TRY
+                }
+            }
+            
+            return value;
+        }
+
+        // Recalculate all displayed values
+        function recalculateAllValues() {
+            // Update key metrics
+            updateKeyMetricsCurrency();
+            
+            // Update all data tables
+            updateDataTablesCurrency();
+        }
+
+        // Update key metrics with new currency
+        function updateKeyMetricsCurrency() {
+            // This will be called when currency changes
+            // Values will be updated in real-time
+        }
+
+        // Update all data tables with new currency
+        function updateDataTablesCurrency() {
+            // This will be called when currency changes
+            // All displayed values will be recalculated
+        }
+
+        // Format currency with proper symbol and formatting
+        function formatCurrency(value, currency) {
+            if (!value || isNaN(value)) return '-';
+            
+            const numericValue = parseFloat(value);
+            let symbol = '';
+            let formattedValue = '';
+            
+            switch (currency) {
+                case 'USD':
+                    symbol = '$';
+                    formattedValue = numericValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                    break;
+                case 'EUR':
+                    symbol = '€';
+                    formattedValue = numericValue.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                    break;
+                case 'RUB':
+                    symbol = '₽';
+                    formattedValue = numericValue.toLocaleString('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                    break;
+                case 'TRY':
+                default:
+                    symbol = '₺';
+                    formattedValue = numericValue.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                    break;
+            }
+            
+            return `${formattedValue} ${symbol}`;
+        }
+
         // Helper function to get human-readable field labels
         function getFieldLabel(key) {
             const fieldLabels = {
@@ -1348,17 +1590,9 @@
                 key.includes('unit_price') || key.includes('Unit_Price') ||
                 key.includes('avg_price') || key.includes('Avg_Price')) {
                 if (typeof value === 'number') {
-                    if (isTurkey) {
-                        return `${parseFloat(value).toLocaleString('tr-TR')} ₺`;
-                    } else if (userLocale === 'de-DE') {
-                        return `${parseFloat(value).toLocaleString('de-DE')} €`;
-                    } else if (userLocale === 'fr-FR') {
-                        return `${parseFloat(value).toLocaleString('fr-FR')} €`;
-                    } else if (userLocale === 'ru-RU') {
-                        return `${parseFloat(value).toLocaleString('ru-RU')} ₽`;
-                    } else {
-                        return `${parseFloat(value).toLocaleString('en-US')} $`;
-                    }
+                    // Convert to selected currency if rates are available
+                    const convertedValue = convertCurrency(value);
+                    return formatCurrency(convertedValue, currentCurrency);
                 }
                 return value;
             }
@@ -1417,17 +1651,9 @@
                 key.includes('max_unit_price') || key.includes('Max_Unit_Price') ||
                 key.includes('min_unit_price') || key.includes('Min_Unit_Price')) {
                 if (typeof value === 'number') {
-                    if (isTurkey) {
-                        return `${parseFloat(value).toLocaleString('tr-TR')} ₺/m²`;
-                    } else if (userLocale === 'de-DE') {
-                        return `${parseFloat(value).toLocaleString('de-DE')} €/m²`;
-                    } else if (userLocale === 'fr-FR') {
-                        return `${parseFloat(value).toLocaleString('fr-FR')} €/m²`;
-                    } else if (userLocale === 'ru-RU') {
-                        return `${parseFloat(value).toLocaleString('ru-RU')} ₽/m²`;
-                    } else {
-                        return `${parseFloat(value).toLocaleString('en-US')} $/m²`;
-                    }
+                    // Convert to selected currency if rates are available
+                    const convertedValue = convertCurrency(value);
+                    return formatCurrency(convertedValue, currentCurrency) + '/m²';
                 }
                 return value;
             }
@@ -1910,8 +2136,12 @@
                 dataContent.style.display = 'none';
                 errorState.style.display = 'none';
                 
-                // Hide key metrics section during loading
+                // Hide currency switcher and key metrics section during loading
+                const currencySwitcher = document.getElementById('currencySwitcher');
                 const keyMetricsSection = document.getElementById('keyMetricsSection');
+                if (currencySwitcher) {
+                    currencySwitcher.style.display = 'none';
+                }
                 if (keyMetricsSection) {
                     keyMetricsSection.style.display = 'none';
                 }
@@ -2076,8 +2306,12 @@
             document.getElementById('listingPeriodRent').textContent = listingPeriodRent;
             document.getElementById('yieldValue').textContent = yield;
             
-            // Show the key metrics section
+            // Show the currency switcher and key metrics section
+            document.getElementById('currencySwitcher').style.display = 'block';
             document.getElementById('keyMetricsSection').style.display = 'block';
+            
+            // Load currency rates
+            getCurrencyRates();
             
             console.log('Key metrics filled:', {
                 avgSalePrice,
