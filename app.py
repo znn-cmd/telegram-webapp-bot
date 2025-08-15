@@ -360,6 +360,88 @@ def api_menu():
         language = 'en'
     return jsonify({'menu': locales[language]['menu']})
 
+@app.route('/api/locations/countries', methods=['GET'])
+def api_locations_countries():
+    """Получение списка стран из таблицы locations"""
+    try:
+        result = supabase.table('locations').select('country_id, country_name').execute()
+        if result.data:
+            # Убираем дубликаты и сортируем
+            countries = list({(item['country_id'], item['country_name']) for item in result.data})
+            countries.sort(key=lambda x: x[1])  # Сортируем по названию
+            return jsonify({'success': True, 'countries': countries})
+        else:
+            return jsonify({'success': False, 'error': 'No countries found'})
+    except Exception as e:
+        logger.error(f"❌ Ошибка при получении стран: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/locations/cities', methods=['POST'])
+def api_locations_cities():
+    """Получение списка городов по country_id"""
+    data = request.json or {}
+    country_id = data.get('country_id')
+    
+    if not country_id:
+        return jsonify({'error': 'country_id required'}), 400
+    
+    try:
+        result = supabase.table('locations').select('city_id, city_name').eq('country_id', country_id).execute()
+        if result.data:
+            # Убираем дубликаты и сортируем
+            cities = list({(item['city_id'], item['city_name']) for item in result.data})
+            cities.sort(key=lambda x: x[1])  # Сортируем по названию
+            return jsonify({'success': True, 'cities': cities})
+        else:
+            return jsonify({'success': False, 'error': 'No cities found'})
+    except Exception as e:
+        logger.error(f"❌ Ошибка при получении городов: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/locations/counties', methods=['POST'])
+def api_locations_counties():
+    """Получение списка областей/регионов по city_id"""
+    data = request.json or {}
+    city_id = data.get('city_id')
+    
+    if not city_id:
+        return jsonify({'error': 'city_id required'}), 400
+    
+    try:
+        result = supabase.table('locations').select('county_id, county_name').eq('city_id', city_id).execute()
+        if result.data:
+            # Убираем дубликаты и сортируем
+            counties = list({(item['county_id'], item['county_name']) for item in result.data})
+            counties.sort(key=lambda x: x[1])  # Сортируем по названию
+            return jsonify({'success': True, 'counties': counties})
+        else:
+            return jsonify({'success': False, 'error': 'No counties found'})
+    except Exception as e:
+        logger.error(f"❌ Ошибка при получении областей: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/locations/districts', methods=['POST'])
+def api_locations_districts():
+    """Получение списка районов по county_id"""
+    data = request.json or {}
+    county_id = data.get('county_id')
+    
+    if not county_id:
+        return jsonify({'error': 'county_id required'}), 400
+    
+    try:
+        result = supabase.table('locations').select('district_id, district_name').eq('county_id', county_id).execute()
+        if result.data:
+            # Убираем дубликаты и сортируем
+            districts = list({(item['district_id'], item['district_name']) for item in result.data})
+            districts.sort(key=lambda x: x[1])  # Сортируем по названию
+            return jsonify({'success': True, 'districts': districts})
+        else:
+            return jsonify({'success': False, 'error': 'No districts found'})
+    except Exception as e:
+        logger.error(f"❌ Ошибка при получении районов: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
 @app.route('/api/check_admin_status', methods=['POST'])
 def api_check_admin_status():
     """Проверка статуса администратора пользователя"""

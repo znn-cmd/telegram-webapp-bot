@@ -66,6 +66,26 @@ locales = {
             'deduction_error': 'Ошибка списания баланса',
             'connection_error': 'Ошибка соединения при формировании отчета',
             'report_generated': 'Полный отчет сформирован!'
+        },
+        'region_analytics': {
+            'title': 'Аналитика региона',
+            'description': 'Получите детальный анализ рынка недвижимости в выбранном регионе с прогнозами цен',
+            'country': 'Страна:',
+            'city': 'Город:',
+            'county': 'Область/Регион:',
+            'district': 'Район:',
+            'select_country': 'Выберите страну',
+            'select_city': 'Сначала выберите страну',
+            'select_county': 'Сначала выберите город',
+            'select_district': 'Сначала выберите область',
+            'no_district': 'Не имеет значения',
+            'confirm_selection': 'Подтвердить выбор',
+            'back_to_menu': '← Вернуться в главное меню',
+            'loading': 'Загрузка...',
+            'error_loading': 'Ошибка загрузки данных',
+            'selected_location': 'Выбранная локация:',
+            'admin_ids': 'ID для админов:',
+            'generating_report': 'Формирование отчета...'
         }
     },
     'en': {
@@ -135,6 +155,26 @@ locales = {
             'deduction_error': 'Balance deduction error',
             'connection_error': 'Connection error during report generation',
             'report_generated': 'Full report generated!'
+        },
+        'region_analytics': {
+            'title': 'Region Analytics',
+            'description': 'Get a detailed analysis of the real estate market in the selected region with price forecasts',
+            'country': 'Country:',
+            'city': 'City:',
+            'county': 'Region/Area:',
+            'district': 'District:',
+            'select_country': 'Select country',
+            'select_city': 'First select country',
+            'select_county': 'First select city',
+            'select_district': 'First select region',
+            'no_district': 'No value',
+            'confirm_selection': 'Confirm selection',
+            'back_to_menu': '← Back to main menu',
+            'loading': 'Loading...',
+            'error_loading': 'Error loading data',
+            'selected_location': 'Selected location:',
+            'admin_ids': 'IDs for admins:',
+            'generating_report': 'Generating report...'
         }
     },
     'de': {
@@ -204,6 +244,26 @@ locales = {
             'deduction_error': 'Kontostand-Abzug-Fehler',
             'connection_error': 'Verbindungsfehler beim Berichtsgenerieren',
             'report_generated': 'Vollständiger Bericht erstellt!'
+        },
+        'region_analytics': {
+            'title': 'Regionsanalyse',
+            'description': 'Erhalten Sie eine detaillierte Analyse des Immobilienmarkts in der ausgewählten Region mit Preisprognosen',
+            'country': 'Land:',
+            'city': 'Stadt:',
+            'county': 'Region/Bereich:',
+            'district': 'Bezirk:',
+            'select_country': 'Land auswählen',
+            'select_city': 'Zuerst Land auswählen',
+            'select_county': 'Zuerst Stadt auswählen',
+            'select_district': 'Zuerst Region auswählen',
+            'no_district': 'Kein Wert',
+            'confirm_selection': 'Auswahl bestätigen',
+            'back_to_menu': '← Zurück zum Hauptmenü',
+            'loading': 'Laden...',
+            'error_loading': 'Fehler beim Laden der Daten',
+            'selected_location': 'Ausgewählte Lage:',
+            'admin_ids': 'IDs für Administratoren:',
+            'generating_report': 'Bericht wird erstellt...'
         }
     },
     'fr': {
@@ -273,6 +333,26 @@ locales = {
             'deduction_error': 'Erreur de déduction du solde',
             'connection_error': 'Erreur de connexion lors de la génération du rapport',
             'report_generated': 'Rapport complet généré !'
+        },
+        'region_analytics': {
+            'title': 'Analyse de région',
+            'description': 'Obtenez une analyse détaillée du marché immobilier dans la région sélectionnée avec des prévisions de prix',
+            'country': 'Pays :',
+            'city': 'Ville :',
+            'county': 'Région/Zone :',
+            'district': 'District :',
+            'select_country': 'Sélectionner un pays',
+            'select_city': 'D\'abord sélectionner un pays',
+            'select_county': 'D\'abord sélectionner une ville',
+            'select_district': 'D\'abord sélectionner une région',
+            'no_district': 'Aucune valeur',
+            'confirm_selection': 'Confirmer la sélection',
+            'back_to_menu': '← Retour au menu principal',
+            'loading': 'Chargement...',
+            'error_loading': 'Erreur de chargement des données',
+            'selected_location': 'Emplacement sélectionné :',
+            'admin_ids': 'IDs pour les administrateurs :',
+            'generating_report': 'Génération du rapport...'
         }
     },
     'tr': {
@@ -336,6 +416,26 @@ locales = {
             'deduction_error': 'Bakiye indirme hatası',
             'connection_error': 'Rapor oluşturma sırasında bağlantı hatası',
             'report_generated': 'Tam rapor oluşturuldu!'
+        },
+        'region_analytics': {
+            'title': 'Bölge Analizi',
+            'description': 'Seçilen bölgede gayrimenkul piyasasının fiyat tahminleriyle detaylı analizini alın',
+            'country': 'Ülke:',
+            'city': 'Şehir:',
+            'county': 'Bölge/Alan:',
+            'district': 'İlçe:',
+            'select_country': 'Ülke seçin',
+            'select_city': 'Önce ülke seçin',
+            'select_county': 'Önce şehir seçin',
+            'select_district': 'Önce bölge seçin',
+            'no_district': 'Değer yok',
+            'confirm_selection': 'Seçimi onayla',
+            'back_to_menu': '← Ana menüye dön',
+            'loading': 'Yükleniyor...',
+            'error_loading': 'Veri yükleme hatası',
+            'selected_location': 'Seçilen konum:',
+            'admin_ids': 'Yöneticiler için ID\'ler:',
+            'generating_report': 'Rapor oluşturuluyor...'
         }
     }
 } 
