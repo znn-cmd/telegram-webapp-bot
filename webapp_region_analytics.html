@@ -210,6 +210,150 @@
             text-align: center;
         }
 
+        /* Region Data Section Styles */
+        .region-data-section {
+            padding: 0 20px 20px 20px;
+        }
+
+        .data-section-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #333;
+            text-align: center;
+            margin: 20px 0;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 8px;
+        }
+
+        .loading-state {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            font-size: 16px;
+            color: #666;
+        }
+
+        .data-content {
+            display: none;
+        }
+
+        .data-card {
+            background: white;
+            border: 1px solid #e1e5e9;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .data-card-header {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 15px 20px;
+            border-bottom: 1px solid #dee2e6;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .data-card-icon {
+            font-size: 24px;
+        }
+
+        .data-card-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .data-card-content {
+            padding: 20px;
+        }
+
+        .data-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #f1f3f4;
+        }
+
+        .data-item:last-child {
+            border-bottom: none;
+        }
+
+        .data-label {
+            font-size: 16px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .data-value {
+            font-size: 16px;
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .data-chart {
+            margin-top: 15px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .chart-placeholder {
+            font-size: 14px;
+            color: #666;
+            font-style: italic;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+            font-style: italic;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .error-state {
+            text-align: center;
+            padding: 40px 20px;
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .error-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        .error-text {
+            font-size: 16px;
+            color: #721c24;
+        }
+
         .fade-in {
             animation: fadeIn 0.5s ease-in;
         }
@@ -286,6 +430,70 @@
             </div>
         </div>
 
+        <!-- Region Data Analysis -->
+        <div class="region-data-section" id="regionDataSection" style="display: none;">
+            <div class="data-section-title" id="dataSectionTitle">Анализ данных региона</div>
+            
+            <!-- Loading State -->
+            <div class="loading-state" id="loadingState">
+                <div class="loading-spinner"></div>
+                <div class="loading-text" id="loadingText">Загрузка данных...</div>
+            </div>
+            
+            <!-- Data Content -->
+            <div class="data-content" id="dataContent" style="display: none;">
+                <!-- General Data -->
+                <div class="data-card" id="generalDataCard">
+                    <div class="data-card-header">
+                        <div class="data-card-icon">📊</div>
+                        <div class="data-card-title" id="generalDataTitle">Общие данные</div>
+                    </div>
+                    <div class="data-card-content" id="generalDataContent">
+                        <!-- General data will be populated here -->
+                    </div>
+                </div>
+                
+                <!-- House Type Data -->
+                <div class="data-card" id="houseTypeDataCard">
+                    <div class="data-card-header">
+                        <div class="data-card-icon">🏠</div>
+                        <div class="data-card-title" id="houseTypeDataTitle">Данные по типам домов</div>
+                    </div>
+                    <div class="data-card-content" id="houseTypeDataContent">
+                        <!-- House type data will be populated here -->
+                    </div>
+                </div>
+                
+                <!-- Floor Segment Data -->
+                <div class="data-card" id="floorSegmentDataCard">
+                    <div class="data-card-header">
+                        <div class="data-card-icon">🏢</div>
+                        <div class="data-card-title" id="floorSegmentDataTitle">Данные по сегментам этажей</div>
+                    </div>
+                    <div class="data-card-content" id="floorSegmentDataContent">
+                        <!-- Floor segment data will be populated here -->
+                    </div>
+                </div>
+                
+                <!-- Age Data -->
+                <div class="data-card" id="ageDataCard">
+                    <div class="data-card-header">
+                        <div class="data-card-icon">📅</div>
+                        <div class="data-card-title" id="ageDataTitle">Данные по возрасту объектов</div>
+                    </div>
+                    <div class="data-card-content" id="ageDataContent">
+                        <!-- Age data will be populated here -->
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Error State -->
+            <div class="error-state" id="errorState" style="display: none;">
+                <div class="error-icon">❌</div>
+                <div class="error-text" id="errorText">Ошибка загрузки данных</div>
+            </div>
+        </div>
+
         <!-- Back Button -->
         <a href="/webapp_main" class="back-button" id="backButton">← Вернуться в главное меню</a>
     </div>
@@ -330,7 +538,18 @@
                 'selectedLocationTitle': 'Выбранная локация:',
                 'adminIdsTitle': 'ID для админов:',
                 'loading': 'Загрузка...',
-                'errorLoading': 'Ошибка загрузки данных'
+                'errorLoading': 'Ошибка загрузки данных',
+                'dataSectionTitle': 'Анализ данных региона',
+                'generalDataTitle': 'Общие данные',
+                'houseTypeDataTitle': 'Данные по типам домов',
+                'floorSegmentDataTitle': 'Данные по сегментам этажей',
+            'ageDataTitle': 'Данные по возрасту объектов',
+                'loadingText': 'Загрузка данных...',
+                'errorText': 'Ошибка загрузки данных',
+                'totalProperties': 'Всего объектов:',
+                'averagePrice': 'Средняя цена:',
+                'priceRange': 'Диапазон цен:',
+                'noDataAvailable': 'Данные недоступны'
             },
             'en': {
                 'slogan': 'Real Estate Market Insights',
@@ -349,7 +568,18 @@
                 'selectedLocationTitle': 'Selected location:',
                 'adminIdsTitle': 'IDs for admins:',
                 'loading': 'Loading...',
-                'errorLoading': 'Error loading data'
+                'errorLoading': 'Error loading data',
+                'dataSectionTitle': 'Regional Data Analysis',
+                'generalDataTitle': 'General Data',
+                'houseTypeDataTitle': 'House Type Data',
+                'floorSegmentDataTitle': 'Floor Segment Data',
+            'ageDataTitle': 'Age Data',
+                'loadingText': 'Loading data...',
+                'errorText': 'Error loading data',
+                'totalProperties': 'Total properties:',
+                'averagePrice': 'Average price:',
+                'priceRange': 'Price range:',
+                'noDataAvailable': 'Data not available'
             },
             'de': {
                 'slogan': 'Immobilienmarkt-Einblicke',
@@ -368,7 +598,18 @@
                 'selectedLocationTitle': 'Ausgewählte Lage:',
                 'adminIdsTitle': 'IDs für Administratoren:',
                 'loading': 'Laden...',
-                'errorLoading': 'Fehler beim Laden der Daten'
+                'errorLoading': 'Fehler beim Laden der Daten',
+                'dataSectionTitle': 'Regionale Datenanalyse',
+                'generalDataTitle': 'Allgemeine Daten',
+                'houseTypeDataTitle': 'Haus-Typ-Daten',
+                'floorSegmentDataTitle': 'Etagen-Segment-Daten',
+            'ageDataTitle': 'Altersdaten',
+                'loadingText': 'Daten werden geladen...',
+                'errorText': 'Fehler beim Laden der Daten',
+                'totalProperties': 'Gesamtobjekte:',
+                'averagePrice': 'Durchschnittspreis:',
+                'priceRange': 'Preisbereich:',
+                'noDataAvailable': 'Daten nicht verfügbar'
             },
             'fr': {
                 'slogan': 'Aperçus du marché immobilier',
@@ -387,7 +628,18 @@
                 'selectedLocationTitle': 'Emplacement sélectionné :',
                 'adminIdsTitle': 'IDs pour les administrateurs :',
                 'loading': 'Chargement...',
-                'errorLoading': 'Erreur de chargement des données'
+                'errorLoading': 'Erreur de chargement des données',
+                'dataSectionTitle': 'Analyse des données régionales',
+                'generalDataTitle': 'Données générales',
+                'houseTypeDataTitle': 'Données des types de maisons',
+                'floorSegmentDataTitle': 'Données des segments d\'étages',
+            'ageDataTitle': 'Données d\'âge',
+                'loadingText': 'Chargement des données...',
+                'errorText': 'Erreur de chargement des données',
+                'totalProperties': 'Total des propriétés :',
+                'averagePrice': 'Prix moyen :',
+                'priceRange': 'Fourchette de prix :',
+                'noDataAvailable': 'Données non disponibles'
             },
             'tr': {
                 'slogan': 'Gayrimenkul Piyasa İçgörüleri',
@@ -406,7 +658,18 @@
                 'selectedLocationTitle': 'Seçilen konum:',
                 'adminIdsTitle': 'Yöneticiler için ID\'ler:',
                 'loading': 'Yükleniyor...',
-                'errorLoading': 'Veri yükleme hatası'
+                'errorLoading': 'Veri yükleme hatası',
+                'dataSectionTitle': 'Bölgesel Veri Analizi',
+                'generalDataTitle': 'Genel Veriler',
+                'houseTypeDataTitle': 'Ev Tipi Verileri',
+                'floorSegmentDataTitle': 'Kat Segmenti Verileri',
+            'ageDataTitle': 'Yaş Verileri',
+                'loadingText': 'Veriler yükleniyor...',
+                'errorText': 'Veri yükleme hatası',
+                'totalProperties': 'Toplam mülk:',
+                'averagePrice': 'Ortalama fiyat:',
+                'priceRange': 'Fiyat aralığı:',
+                'noDataAvailable': 'Veri mevcut değil'
             }
         };
 
@@ -432,6 +695,42 @@
             document.getElementById('backButton').textContent = getText('backButton');
             document.getElementById('selectedLocationTitle').textContent = getText('selectedLocationTitle');
             document.getElementById('adminIdsTitle').textContent = getText('adminIdsTitle');
+            
+            // Update new data section elements
+            const dataSectionTitle = document.getElementById('dataSectionTitle');
+            if (dataSectionTitle) {
+                dataSectionTitle.textContent = getText('dataSectionTitle');
+            }
+            
+            const generalDataTitle = document.getElementById('generalDataTitle');
+            if (generalDataTitle) {
+                generalDataTitle.textContent = getText('generalDataTitle');
+            }
+            
+            const houseTypeDataTitle = document.getElementById('houseTypeDataTitle');
+            if (houseTypeDataTitle) {
+                houseTypeDataTitle.textContent = getText('houseTypeDataTitle');
+            }
+            
+            const floorSegmentDataTitle = document.getElementById('floorSegmentDataTitle');
+            if (floorSegmentDataTitle) {
+                floorSegmentDataTitle.textContent = getText('floorSegmentDataTitle');
+            }
+            
+            const ageDataTitle = document.getElementById('ageDataTitle');
+            if (ageDataTitle) {
+                ageDataTitle.textContent = getText('ageDataTitle');
+            }
+            
+            const loadingText = document.getElementById('loadingText');
+            if (loadingText) {
+                loadingText.textContent = getText('loadingText');
+            }
+            
+            const errorText = document.getElementById('errorText');
+            if (errorText) {
+                errorText.textContent = getText('errorText');
+            }
         }
 
         // Load countries from API
@@ -722,8 +1021,214 @@
             selectedLocationDiv.classList.add('show');
             adminIdsDiv.style.display = 'block';
             
-            // TODO: Here you would proceed to the next step of report generation
-            console.log('Location confirmed:', selectedLocation);
+            // Load region data
+            loadRegionData();
+        }
+
+        // Load region data from API
+        async function loadRegionData() {
+            try {
+                // Show data section and loading state
+                const regionDataSection = document.getElementById('regionDataSection');
+                const loadingState = document.getElementById('loadingState');
+                const dataContent = document.getElementById('dataContent');
+                const errorState = document.getElementById('errorState');
+                
+                regionDataSection.style.display = 'block';
+                loadingState.style.display = 'block';
+                dataContent.style.display = 'none';
+                errorState.style.display = 'none';
+                
+                // Prepare request data
+                const requestData = {
+                    country_id: selectedLocation.country_id,
+                    city_id: selectedLocation.city_id,
+                    county_id: selectedLocation.county_id,
+                    district_id: selectedLocation.district_id
+                };
+                
+                // Make API request
+                const response = await fetch('/api/region_data', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(requestData)
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Hide loading state
+                    loadingState.style.display = 'none';
+                    
+                    // Display data
+                    displayRegionData(data);
+                    
+                    // Show data content
+                    dataContent.style.display = 'block';
+                } else {
+                    throw new Error(data.error || 'Unknown error');
+                }
+                
+            } catch (error) {
+                console.error('Error loading region data:', error);
+                
+                // Hide loading state
+                document.getElementById('loadingState').style.display = 'none';
+                
+                // Show error state
+                const errorState = document.getElementById('errorState');
+                const errorText = document.getElementById('errorText');
+                errorText.textContent = getText('errorText');
+                errorState.style.display = 'block';
+            }
+        }
+
+        // Display region data
+        function displayRegionData(data) {
+            // Display general data
+            displayGeneralData(data.general_data);
+            
+            // Display house type data
+            displayHouseTypeData(data.house_type_data);
+            
+            // Display floor segment data
+            displayFloorSegmentData(data.floor_segment_data);
+            
+            // Display age data
+            displayAgeData(data.age_data);
+        }
+
+        // Display general data
+        function displayGeneralData(generalData) {
+            const content = document.getElementById('generalDataContent');
+            
+            if (!generalData || generalData.length === 0) {
+                content.innerHTML = `<div class="no-data">${getText('noDataAvailable')}</div>`;
+                return;
+            }
+            
+            let html = '';
+            const data = generalData[0]; // Take first record
+            
+            // Add common fields
+            if (data.total_properties !== undefined) {
+                html += `<div class="data-item">
+                    <span class="data-label">${getText('totalProperties')}</span>
+                    <span class="data-value">${data.total_properties}</span>
+                </div>`;
+            }
+            
+            if (data.average_price !== undefined) {
+                html += `<div class="data-item">
+                    <span class="data-label">${getText('averagePrice')}</span>
+                    <span class="data-value">€${data.average_price}</span>
+                </div>`;
+            }
+            
+            if (data.min_price !== undefined && data.max_price !== undefined) {
+                html += `<div class="data-item">
+                    <span class="data-label">${getText('priceRange')}</span>
+                    <span class="data-value">€${data.min_price} - €${data.max_price}</span>
+                </div>`;
+            }
+            
+            // Add any other fields that might exist
+            Object.keys(data).forEach(key => {
+                if (!['total_properties', 'average_price', 'min_price', 'max_price', 'country_id', 'city_id', 'county_id', 'district_id'].includes(key)) {
+                    const value = data[key];
+                    if (value !== null && value !== undefined) {
+                        html += `<div class="data-item">
+                            <span class="data-label">${key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}:</span>
+                            <span class="data-value">${value}</span>
+                        </div>`;
+                    }
+                }
+            });
+            
+            content.innerHTML = html;
+        }
+
+        // Display house type data
+        function displayHouseTypeData(houseTypeData) {
+            const content = document.getElementById('houseTypeDataContent');
+            
+            if (!houseTypeData || houseTypeData.length === 0) {
+                content.innerHTML = `<div class="no-data">${getText('noDataAvailable')}</div>`;
+                return;
+            }
+            
+            let html = '';
+            
+            houseTypeData.forEach(item => {
+                if (item.house_type && item.count !== undefined) {
+                    html += `<div class="data-item">
+                        <span class="data-label">${item.house_type}</span>
+                        <span class="data-value">${item.count}</span>
+                    </div>`;
+                }
+            });
+            
+            if (html === '') {
+                html = `<div class="no-data">${getText('noDataAvailable')}</div>`;
+            }
+            
+            content.innerHTML = html;
+        }
+
+        // Display floor segment data
+        function displayFloorSegmentData(floorSegmentData) {
+            const content = document.getElementById('floorSegmentDataContent');
+            
+            if (!floorSegmentData || floorSegmentData.length === 0) {
+                content.innerHTML = `<div class="no-data">${getText('noDataAvailable')}</div>`;
+                return;
+            }
+            
+            let html = '';
+            
+            floorSegmentData.forEach(item => {
+                if (item.floor_segment && item.count !== undefined) {
+                    html += `<div class="data-item">
+                        <span class="data-label">${item.floor_segment}</span>
+                        <span class="data-value">${item.count}</span>
+                    </div>`;
+                }
+            });
+            
+            if (html === '') {
+                html = `<div class="no-data">${getText('noDataAvailable')}</div>`;
+            }
+            
+            content.innerHTML = html;
+        }
+
+        // Display age data
+        function displayAgeData(ageData) {
+            const content = document.getElementById('ageDataContent');
+            
+            if (!ageData || ageData.length === 0) {
+                content.innerHTML = `<div class="no-data">${getText('noDataAvailable')}</div>`;
+                return;
+            }
+            
+            let html = '';
+            
+            ageData.forEach(item => {
+                if (item.age_category && item.count !== undefined) {
+                    html += `<div class="data-item">
+                        <span class="data-label">${item.age_category}</span>
+                        <span class="data-value">${item.count}</span>
+                    </div>`;
+                }
+            });
+            
+            if (html === '') {
+                html = `<div class="no-data">${getText('noDataAvailable')}</div>`;
+            }
+            
+            content.innerHTML = html;
         }
 
         // Go to main menu

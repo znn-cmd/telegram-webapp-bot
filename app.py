@@ -517,6 +517,70 @@ def api_locations_districts():
         logger.error(f"📋 Данные запроса: county_id={county_id}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
+@app.route('/api/region_data', methods=['POST'])
+def api_region_data():
+    """Получение данных региона из таблиц general_data, house_type_data, floor_segment_data, age_data"""
+    data = request.json or {}
+    country_id = data.get('country_id')
+    city_id = data.get('city_id')
+    county_id = data.get('county_id')
+    district_id = data.get('district_id')
+    
+    if not all([country_id, city_id, county_id]):
+        return jsonify({'error': 'country_id, city_id, county_id required'}), 400
+    
+    try:
+        logger.info(f"🔍 Запрос данных региона: country_id={country_id}, city_id={city_id}, county_id={county_id}, district_id={district_id}")
+        
+        # Формируем условия для запроса
+        conditions = {
+            'country_id': country_id,
+            'city_id': city_id,
+            'county_id': county_id
+        }
+        
+        if district_id and district_id != 'none':
+            conditions['district_id'] = district_id
+        
+        # Получаем общие данные
+        general_result = supabase.table('general_data').select('*').eq('country_id', country_id).eq('city_id', city_id).eq('county_id', county_id)
+        if district_id and district_id != 'none':
+            general_result = general_result.eq('district_id', district_id)
+        general_data = general_result.execute()
+        
+        # Получаем данные по типам домов
+        house_type_result = supabase.table('house_type_data').select('*').eq('country_id', country_id).eq('city_id', city_id).eq('county_id', county_id)
+        if district_id and district_id != 'none':
+            house_type_result = house_type_result.eq('district_id', district_id)
+        house_type_data = house_type_result.execute()
+        
+        # Получаем данные по сегментам этажей
+        floor_segment_result = supabase.table('floor_segment_data').select('*').eq('country_id', country_id).eq('city_id', city_id).eq('county_id', county_id)
+        if district_id and district_id != 'none':
+            floor_segment_result = floor_segment_result.eq('district_id', district_id)
+        floor_segment_data = floor_segment_result.execute()
+        
+        # Получаем данные по возрасту объектов
+        age_result = supabase.table('age_data').select('*').eq('country_id', country_id).eq('city_id', city_id).eq('county_id', county_id)
+        if district_id and district_id != 'none':
+            age_result = age_result.eq('district_id', district_id)
+        age_data = age_result.execute()
+        
+        logger.info(f"📊 Получено данных: general={len(general_data.data) if general_data.data else 0}, house_type={len(house_type_data.data) if house_type_data.data else 0}, floor_segment={len(floor_segment_data.data) if floor_segment_data.data else 0}, age={len(age_data.data) if age_data.data else 0}")
+        
+        return jsonify({
+            'success': True,
+            'general_data': general_data.data if general_data.data else [],
+            'house_type_data': house_type_data.data if house_type_data.data else [],
+            'floor_segment_data': floor_segment_data.data if floor_segment_data.data else [],
+            'age_data': age_data.data if age_data.data else []
+        })
+        
+    except Exception as e:
+        logger.error(f"❌ Ошибка при получении данных региона: {e}")
+        logger.error(f"📋 Данные запроса: country_id={country_id}, city_id={city_id}, county_id={county_id}, district_id={district_id}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
 @app.route('/api/check_admin_status', methods=['POST'])
 def api_check_admin_status():
     """Проверка статуса администратора пользователя"""

@@ -85,7 +85,21 @@ locales = {
             'error_loading': 'Ошибка загрузки данных',
             'selected_location': 'Выбранная локация:',
             'admin_ids': 'ID для админов:',
-            'generating_report': 'Формирование отчета...'
+            'generating_report': 'Формирование отчета...',
+            'data_analysis': 'Анализ данных региона',
+            'general_data': 'Общие данные',
+            'house_type_data': 'Данные по типам домов',
+            'floor_segment_data': 'Данные по сегментам этажей',
+            'age_data': 'Данные по возрасту объектов',
+            'no_data_available': 'Данные недоступны',
+            'total_properties': 'Всего объектов:',
+            'average_price': 'Средняя цена:',
+            'price_range': 'Диапазон цен:',
+            'property_types': 'Типы недвижимости',
+            'floor_segments': 'Сегменты этажей',
+            'loading_data': 'Загрузка данных...',
+            'data_loaded': 'Данные загружены',
+            'error_loading_data': 'Ошибка загрузки данных'
         }
     },
     'en': {
@@ -174,7 +188,21 @@ locales = {
             'error_loading': 'Error loading data',
             'selected_location': 'Selected location:',
             'admin_ids': 'IDs for admins:',
-            'generating_report': 'Generating report...'
+            'generating_report': 'Generating report...',
+            'data_analysis': 'Regional Data Analysis',
+            'general_data': 'General Data',
+            'house_type_data': 'House Type Data',
+            'floor_segment_data': 'Floor Segment Data',
+            'age_data': 'Age Data',
+            'no_data_available': 'Data not available',
+            'total_properties': 'Total properties:',
+            'average_price': 'Average price:',
+            'price_range': 'Price range:',
+            'property_types': 'Property Types',
+            'floor_segments': 'Floor Segments',
+            'loading_data': 'Loading data...',
+            'data_loaded': 'Data loaded',
+            'error_loading_data': 'Error loading data'
         }
     },
     'de': {
@@ -263,7 +291,21 @@ locales = {
             'error_loading': 'Fehler beim Laden der Daten',
             'selected_location': 'Ausgewählte Lage:',
             'admin_ids': 'IDs für Administratoren:',
-            'generating_report': 'Bericht wird erstellt...'
+            'generating_report': 'Bericht wird erstellt...',
+            'data_analysis': 'Regionale Datenanalyse',
+            'general_data': 'Allgemeine Daten',
+            'house_type_data': 'Haus-Typ-Daten',
+            'floor_segment_data': 'Etagen-Segment-Daten',
+            'age_data': 'Altersdaten',
+            'no_data_available': 'Daten nicht verfügbar',
+            'total_properties': 'Gesamtobjekte:',
+            'average_price': 'Durchschnittspreis:',
+            'price_range': 'Preisbereich:',
+            'property_types': 'Immobilientypen',
+            'floor_segments': 'Etagen-Segmente',
+            'loading_data': 'Daten werden geladen...',
+            'data_loaded': 'Daten geladen',
+            'error_loading_data': 'Fehler beim Laden der Daten'
         }
     },
     'fr': {
@@ -352,7 +394,21 @@ locales = {
             'error_loading': 'Erreur de chargement des données',
             'selected_location': 'Emplacement sélectionné :',
             'admin_ids': 'IDs pour les administrateurs :',
-            'generating_report': 'Génération du rapport...'
+            'generating_report': 'Génération du rapport...',
+            'data_analysis': 'Analyse des données régionales',
+            'general_data': 'Données générales',
+            'house_type_data': 'Données des types de maisons',
+            'floor_segment_data': 'Données des segments d\'étages',
+            'age_data': 'Données d\'âge',
+            'no_data_available': 'Données non disponibles',
+            'total_properties': 'Total des propriétés :',
+            'average_price': 'Prix moyen :',
+            'price_range': 'Fourchette de prix :',
+            'property_types': 'Types de propriétés',
+            'floor_segments': 'Segments d\'étages',
+            'loading_data': 'Chargement des données...',
+            'data_loaded': 'Données chargées',
+            'error_loading_data': 'Erreur de chargement des données'
         }
     },
     'tr': {
@@ -435,7 +491,21 @@ locales = {
             'error_loading': 'Veri yükleme hatası',
             'selected_location': 'Seçilen konum:',
             'admin_ids': 'Yöneticiler için ID\'ler:',
-            'generating_report': 'Rapor oluşturuluyor...'
+            'generating_report': 'Rapor oluşturuluyor...',
+            'data_analysis': 'Bölgesel Veri Analizi',
+            'general_data': 'Genel Veriler',
+            'house_type_data': 'Ev Tipi Verileri',
+            'floor_segment_data': 'Kat Segmenti Verileri',
+            'age_data': 'Yaş Verileri',
+            'no_data_available': 'Veri mevcut değil',
+            'total_properties': 'Toplam mülk:',
+            'average_price': 'Ortalama fiyat:',
+            'price_range': 'Fiyat aralığı:',
+            'property_types': 'Mülk Türleri',
+            'floor_segments': 'Kat Segmentleri',
+            'loading_data': 'Veriler yükleniyor...',
+            'data_loaded': 'Veriler yüklendi',
+            'error_loading_data': 'Veri yükleme hatası'
         }
     }
 } 
