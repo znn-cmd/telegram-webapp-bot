@@ -485,6 +485,17 @@
                         <!-- Age data will be populated here -->
                     </div>
                 </div>
+
+                <!-- Heating Data -->
+                <div class="data-card" id="heatingDataCard">
+                    <div class="data-card-header">
+                        <div class="data-card-icon">🔥</div>
+                        <div class="data-card-title" id="heatingDataTitle">Данные по отоплению</div>
+                    </div>
+                    <div class="data-card-content" id="heatingDataContent">
+                        <!-- Heating data will be populated here -->
+                    </div>
+                </div>
             </div>
             
             <!-- Error State -->
@@ -543,7 +554,8 @@
                 'generalDataTitle': 'Общие данные',
                 'houseTypeDataTitle': 'Данные по типам домов',
                 'floorSegmentDataTitle': 'Данные по сегментам этажей',
-            'ageDataTitle': 'Данные по возрасту объектов',
+                            'ageDataTitle': 'Данные по возрасту объектов',
+                'heatingDataTitle': 'Данные по отоплению',
                 'loadingText': 'Загрузка данных...',
                 'errorText': 'Ошибка загрузки данных',
                 'totalProperties': 'Всего объектов:',
@@ -574,6 +586,7 @@
                 'houseTypeDataTitle': 'House Type Data',
                 'floorSegmentDataTitle': 'Floor Segment Data',
             'ageDataTitle': 'Age Data',
+                'heatingDataTitle': 'Heating Data',
                 'loadingText': 'Loading data...',
                 'errorText': 'Error loading data',
                 'totalProperties': 'Total properties:',
@@ -604,6 +617,7 @@
                 'houseTypeDataTitle': 'Haus-Typ-Daten',
                 'floorSegmentDataTitle': 'Etagen-Segment-Daten',
             'ageDataTitle': 'Altersdaten',
+                'heatingDataTitle': 'Heizungsdaten',
                 'loadingText': 'Daten werden geladen...',
                 'errorText': 'Fehler beim Laden der Daten',
                 'totalProperties': 'Gesamtobjekte:',
@@ -634,6 +648,7 @@
                 'houseTypeDataTitle': 'Données des types de maisons',
                 'floorSegmentDataTitle': 'Données des segments d\'étages',
             'ageDataTitle': 'Données d\'âge',
+                'heatingDataTitle': 'Données de chauffage',
                 'loadingText': 'Chargement des données...',
                 'errorText': 'Erreur de chargement des données',
                 'totalProperties': 'Total des propriétés :',
@@ -664,6 +679,7 @@
                 'houseTypeDataTitle': 'Ev Tipi Verileri',
                 'floorSegmentDataTitle': 'Kat Segmenti Verileri',
             'ageDataTitle': 'Yaş Verileri',
+                'heatingDataTitle': 'Isıtma Verileri',
                 'loadingText': 'Veriler yükleniyor...',
                 'errorText': 'Veri yükleme hatası',
                 'totalProperties': 'Toplam mülk:',
@@ -717,11 +733,16 @@
                 floorSegmentDataTitle.textContent = getText('floorSegmentDataTitle');
             }
             
-            const ageDataTitle = document.getElementById('ageDataTitle');
+                        const ageDataTitle = document.getElementById('ageDataTitle');
             if (ageDataTitle) {
                 ageDataTitle.textContent = getText('ageDataTitle');
             }
-            
+
+            const heatingDataTitle = document.getElementById('heatingDataTitle');
+            if (heatingDataTitle) {
+                heatingDataTitle.textContent = getText('heatingDataTitle');
+            }
+
             const loadingText = document.getElementById('loadingText');
             if (loadingText) {
                 loadingText.textContent = getText('loadingText');
@@ -1098,6 +1119,9 @@
             
             // Display age data
             displayAgeData(data.age_data);
+
+            // Display heating data
+            displayHeatingData(data.heating_data);
         }
 
         // Display general data
@@ -1204,17 +1228,17 @@
             content.innerHTML = html;
         }
 
-        // Display age data
+                // Display age data
         function displayAgeData(ageData) {
             const content = document.getElementById('ageDataContent');
-            
+
             if (!ageData || ageData.length === 0) {
                 content.innerHTML = `<div class="no-data">${getText('noDataAvailable')}</div>`;
                 return;
             }
-            
+
             let html = '';
-            
+
             ageData.forEach(item => {
                 if (item.age_category && item.count !== undefined) {
                     html += `<div class="data-item">
@@ -1223,11 +1247,38 @@
                     </div>`;
                 }
             });
-            
+
             if (html === '') {
                 html = `<div class="no-data">${getText('noDataAvailable')}</div>`;
             }
-            
+
+            content.innerHTML = html;
+        }
+
+        // Display heating data
+        function displayHeatingData(heatingData) {
+            const content = document.getElementById('heatingDataContent');
+
+            if (!heatingData || heatingData.length === 0) {
+                content.innerHTML = `<div class="no-data">${getText('noDataAvailable')}</div>`;
+                return;
+            }
+
+            let html = '';
+
+            heatingData.forEach(item => {
+                if (item.heating_type && item.count !== undefined) {
+                    html += `<div class="data-item">
+                        <span class="data-label">${item.heating_type}</span>
+                        <span class="data-value">${item.count}</span>
+                    </div>`;
+                }
+            });
+
+            if (html === '') {
+                html = `<div class="no-data">${getText('noDataAvailable')}</div>`;
+            }
+
             content.innerHTML = html;
         }
 
