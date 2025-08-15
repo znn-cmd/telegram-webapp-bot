@@ -339,74 +339,58 @@
 
         /* Key Metrics Styles */
         .key-metrics-section {
-            margin-bottom: 25px;
+            margin-bottom: 20px;
         }
 
         .key-metrics-title {
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 600;
             color: #333;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             text-align: center;
         }
 
         .key-metrics-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-bottom: 20px;
+            gap: 10px;
+            margin-bottom: 15px;
         }
 
         .key-metric-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 12px;
-            padding: 20px;
-            color: white;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 12px;
+            color: #333;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
 
-        .key-metric-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
-        }
-
-        .metric-icon {
-            font-size: 24px;
-            margin-bottom: 12px;
+        .metric-content {
+            text-align: center;
         }
 
         .metric-label {
-            font-size: 13px;
+            font-size: 11px;
             font-weight: 500;
-            margin-bottom: 8px;
-            opacity: 0.9;
-            line-height: 1.3;
-        }
-
-        .metric-value {
-            font-size: 20px;
-            font-weight: 700;
+            margin-bottom: 6px;
+            color: #666;
             line-height: 1.2;
         }
 
+        .metric-value {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            line-height: 1.1;
+        }
+
         .yield-card {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            border-radius: 12px;
-            padding: 25px;
-            color: white;
-            box-shadow: 0 4px 15px rgba(240, 147, 251, 0.3);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-
-        .yield-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(240, 147, 251, 0.4);
-        }
-
-        .yield-icon {
-            font-size: 28px;
-            margin-bottom: 15px;
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            color: #333;
         }
 
         .yield-content {
@@ -414,16 +398,31 @@
         }
 
         .yield-label {
-            font-size: 16px;
+            font-size: 13px;
             font-weight: 500;
-            margin-bottom: 10px;
-            opacity: 0.9;
+            margin-bottom: 8px;
+            color: #666;
         }
 
         .yield-value {
-            font-size: 32px;
-            font-weight: 800;
+            font-size: 24px;
+            font-weight: 700;
+            color: #333;
             line-height: 1.1;
+        }
+
+        /* Group spacing and styling */
+        .group-spacer {
+            height: 2px !important;
+            background-color: #f0f0f0 !important;
+        }
+
+        .yield-row td {
+            font-weight: 700 !important;
+            color: #333 !important;
+            padding-top: 8px !important;
+            padding-bottom: 8px !important;
+            background-color: #f8f8f8 !important;
         }
 
         /* Mobile Responsive */
@@ -434,31 +433,31 @@
             
             .key-metrics-grid {
                 grid-template-columns: 1fr;
-                gap: 12px;
+                gap: 8px;
             }
             
             .key-metric-card {
-                padding: 16px;
+                padding: 10px;
             }
             
             .metric-label {
-                font-size: 12px;
+                font-size: 10px;
             }
             
             .metric-value {
-                font-size: 18px;
-            }
-            
-            .yield-card {
-                padding: 20px;
-            }
-            
-            .yield-label {
                 font-size: 14px;
             }
             
+            .yield-card {
+                padding: 12px;
+            }
+            
+            .yield-label {
+                font-size: 12px;
+            }
+            
             .yield-value {
-                font-size: 28px;
+                font-size: 20px;
             }
             
             .data-card {
@@ -635,7 +634,6 @@
                 <div class="key-metrics-grid">
                     <!-- Average Sale Price per m² -->
                     <div class="key-metric-card">
-                        <div class="metric-icon">💰</div>
                         <div class="metric-content">
                             <div class="metric-label" id="avgSalePriceLabel">Средняя цена продажи за м²</div>
                             <div class="metric-value" id="avgSalePrice">-</div>
@@ -644,7 +642,6 @@
                     
                     <!-- Average Rent Price per m² -->
                     <div class="key-metric-card">
-                        <div class="metric-icon">🏠</div>
                         <div class="metric-content">
                             <div class="metric-label" id="avgRentPriceLabel">Средняя цена аренды за м²</div>
                             <div class="metric-value" id="avgRentPrice">-</div>
@@ -653,7 +650,6 @@
                     
                     <!-- Listing Period Sale -->
                     <div class="key-metric-card">
-                        <div class="metric-icon">📅</div>
                         <div class="metric-content">
                             <div class="metric-label" id="listingPeriodSaleLabel">Период размещения (продажа)</div>
                             <div class="metric-value" id="listingPeriodSale">-</div>
@@ -662,7 +658,6 @@
                     
                     <!-- Listing Period Rent -->
                     <div class="key-metric-card">
-                        <div class="metric-icon">⏰</div>
                         <div class="metric-content">
                             <div class="metric-label" id="listingPeriodRentLabel">Период размещения (аренда)</div>
                             <div class="metric-value" id="listingPeriodRent">-</div>
@@ -672,7 +667,6 @@
                 
                 <!-- Yield Card - Full Width -->
                 <div class="yield-card">
-                    <div class="yield-icon">📈</div>
                     <div class="yield-content">
                         <div class="yield-label" id="yieldLabel">Yield (Доходность)</div>
                         <div class="yield-value" id="yieldValue">-</div>
@@ -980,57 +974,69 @@
         }
 
         // Sort fields by priority for structured data display
+        // Order: Sale data (prices → areas → age → periods → price ranges) → Rent data (prices → areas → age → periods → price ranges) → Yield → Other fields
         function sortFieldsByPriority(fields) {
             const priorityOrder = {
-                // Priority 1: Key metrics (prices, areas, age, periods, yield)
-                'average_price_for_rent': 1,
-                'average_price_for_sale': 2,
-                'avg_price_rent': 1,
-                'avg_price_sale': 2,
-                'rent_price_avg': 1,
-                'sale_price_avg': 2,
+                // Priority 1: Sale data (prices → areas → age → periods → price ranges)
+                'average_price_for_sale': 1,
+                'avg_price_sale': 1,
+                'sale_price_avg': 1,
+                'price_sale': 1,
                 
-                'average_area_for_rent': 3,
-                'average_area_for_sale': 4,
-                'avg_area_rent': 3,
-                'avg_area_sale': 4,
-                'rent_area_avg': 3,
-                'sale_area_avg': 4,
+                'average_area_for_sale': 2,
+                'avg_area_sale': 2,
+                'sale_area_avg': 2,
+                'area_sale': 2,
                 
-                'average_age_for_rent': 5,
-                'average_age_for_sale': 6,
-                'avg_age_rent': 5,
-                'avg_age_sale': 6,
-                'rent_age_avg': 5,
-                'sale_age_avg': 6,
+                'average_age_for_sale': 3,
+                'avg_age_sale': 3,
+                'sale_age_avg': 3,
+                'age_sale': 3,
                 
-                'listing_period_for_rent': 7,
-                'listing_period_for_sale': 8,
-                'rent_period': 7,
-                'sale_period': 8,
-                'period_rent': 7,
-                'period_sale': 8,
+                'listing_period_for_sale': 4,
+                'sale_period': 4,
+                'period_sale': 4,
                 
-                'yield': 9,
-                'yield_rate': 9,
-                'return_rate': 9,
+                'max_unit_price_for_sale': 5,
+                'min_unit_price_for_sale': 6,
+                'max_price_sale': 5,
+                'min_price_sale': 6,
+                'total_price_for_sale': 7,
+                'sale_total_price': 7,
                 
-                // Priority 2: Price ranges (max/min prices, total prices)
-                'max_unit_price_for_rent': 10,
-                'min_unit_price_for_rent': 11,
-                'max_unit_price_for_sale': 12,
-                'min_unit_price_for_sale': 13,
-                'max_price_rent': 10,
-                'min_price_rent': 11,
-                'max_price_sale': 12,
-                'min_price_sale': 13,
+                // Priority 2: Rent data (prices → areas → age → periods → price ranges)
+                'average_price_for_rent': 8,
+                'avg_price_rent': 8,
+                'rent_price_avg': 8,
+                'price_rent': 8,
                 
+                'average_area_for_rent': 9,
+                'avg_area_rent': 9,
+                'rent_area_avg': 9,
+                'area_rent': 9,
+                
+                'average_age_for_rent': 10,
+                'avg_age_rent': 10,
+                'rent_age_avg': 10,
+                'age_rent': 10,
+                
+                'listing_period_for_rent': 11,
+                'rent_period': 11,
+                'period_rent': 11,
+                
+                'max_unit_price_for_rent': 12,
+                'min_unit_price_for_rent': 13,
+                'max_price_rent': 12,
+                'min_price_rent': 13,
                 'total_price_for_rent': 14,
-                'total_price_for_sale': 15,
                 'rent_total_price': 14,
-                'sale_total_price': 15,
                 
-                // Priority 3: Other fields (everything else)
+                // Priority 3: Yield (highlighted)
+                'yield': 15,
+                'yield_rate': 15,
+                'return_rate': 15,
+                
+                // Priority 4: Other fields (everything else)
                 'default': 999
             };
             
@@ -1039,6 +1045,52 @@
                 const priorityB = priorityOrder[b] || priorityOrder['default'];
                 return priorityA - priorityB;
             });
+        }
+
+        // Display fields with grouping and spacing
+        function displayFieldsWithGrouping(fields, item, html) {
+            let currentGroup = 0;
+            let lastPriority = 0;
+            
+            fields.forEach((key, index) => {
+                const value = item[key];
+                if (value === null || value === undefined) return;
+                
+                const label = getFieldLabel(key);
+                const displayValue = formatFieldValue(key, value);
+                
+                // Determine current group based on priority
+                let groupPriority = 0;
+                if (key.includes('sale') || key.includes('Sale')) {
+                    groupPriority = 1; // Sale group
+                } else if (key.includes('rent') || key.includes('Rent')) {
+                    groupPriority = 2; // Rent group
+                } else if (key.includes('yield') || key.includes('Yield') || key.includes('return')) {
+                    groupPriority = 3; // Yield group
+                } else {
+                    groupPriority = 4; // Other fields group
+                }
+                
+                // Add spacing between groups
+                if (groupPriority !== currentGroup && currentGroup !== 0) {
+                    html += '<tr class="group-spacer"><td colspan="2" style="height: 2px; background-color: #f0f0f0;"></td></tr>';
+                }
+                
+                // Add special styling for Yield
+                if (groupPriority === 3) {
+                    html += `<tr class="yield-row">
+                        <td style="font-weight: 700; color: #333; padding-top: 8px; padding-bottom: 8px;">${label}:</td>
+                        <td style="font-weight: 700; color: #333; padding-top: 8px; padding-bottom: 8px;">${displayValue}</td>
+                    </tr>`;
+                } else {
+                    html += `<tr><td>${label}:</td><td>${displayValue}</td></tr>`;
+                }
+                
+                currentGroup = groupPriority;
+                lastPriority = index;
+            });
+            
+            return html;
         }
 
         // Helper function to get human-readable field labels
@@ -2017,7 +2069,7 @@
             // No auto-expansion needed
         }
 
-        // Display general data
+        // Display general data (structured by priority: sale → rent → yield → other)
         function displayGeneralData(generalData) {
             const content = document.getElementById('generalDataContent');
             
@@ -2028,22 +2080,18 @@
             
             const data = generalData[0]; // Take first record
             
-            // Create table HTML
+            // Get all available fields and sort them by priority
+            const availableFields = Object.keys(data).filter(key => 
+                !['country_id', 'city_id', 'county_id', 'district_id', 'id', 'created_at', 'source_file', 'updated_at'].includes(key) &&
+                data[key] !== null && data[key] !== undefined
+            );
+            
+            const sortedFields = sortFieldsByPriority(availableFields);
+            console.log('Sorted general data fields:', sortedFields);
+            
+            // Create table HTML with structured display
             let tableHtml = '<table class="data-table">';
-            
-            // Add all data fields to table
-            Object.keys(data).forEach(key => {
-                if (!['country_id', 'city_id', 'county_id', 'district_id', 'id', 'created_at', 'source_file', 'updated_at'].includes(key)) {
-                    const value = data[key];
-                    if (value !== null && value !== undefined) {
-                        const label = getFieldLabel(key);
-                        const displayValue = formatFieldValue(key, value);
-                        
-                        tableHtml += `<tr><td>${label}:</td><td>${displayValue}</td></tr>`;
-                    }
-                }
-            });
-            
+            tableHtml = displayFieldsWithGrouping(sortedFields, data, tableHtml);
             tableHtml += '</table>';
             
             // Add footer with trend date if available
@@ -2119,13 +2167,8 @@
                     const sortedFields = sortFieldsByPriority(availableFields);
                     console.log(`Sorted fields for item ${index}:`, sortedFields);
                     
-                    // Add fields in priority order
-                    sortedFields.forEach(key => {
-                        const value = item[key];
-                        const label = getFieldLabel(key);
-                        const displayValue = formatFieldValue(key, value);
-                        html += `<tr><td>${label}:</td><td>${displayValue}</td></tr>`;
-                    });
+                    // Add fields in priority order with grouping and spacing
+                    html = displayFieldsWithGrouping(sortedFields, item, html);
                     
                     html += '</table></div>';
                 } else {
@@ -2145,13 +2188,8 @@
                     const sortedFields = sortFieldsByPriority(availableFields);
                     console.log(`Sorted fields for fallback item ${index}:`, sortedFields);
                     
-                    // Add fields in priority order
-                    sortedFields.forEach(key => {
-                        const value = item[key];
-                        const label = getFieldLabel(key);
-                        const displayValue = formatFieldValue(key, value);
-                        html += `<tr><td>${label}:</td><td>${displayValue}</td></tr>`;
-                    });
+                    // Add fields in priority order with grouping and spacing
+                    html = displayFieldsWithGrouping(sortedFields, item, html);
                     
                     html += '</table></div>';
                 }
@@ -2222,13 +2260,8 @@
                     const sortedFields = sortFieldsByPriority(availableFields);
                     console.log(`Sorted fields for floor segment item ${index}:`, sortedFields);
                     
-                    // Add fields in priority order
-                    sortedFields.forEach(key => {
-                        const value = item[key];
-                        const label = getFieldLabel(key);
-                        const displayValue = formatFieldValue(key, value);
-                        html += `<tr><td>${label}:</td><td>${displayValue}</td></tr>`;
-                    });
+                    // Add fields in priority order with grouping and spacing
+                    html = displayFieldsWithGrouping(sortedFields, item, html);
                     
                     html += '</table></div>';
                 } else {
@@ -2248,13 +2281,8 @@
                     const sortedFields = sortFieldsByPriority(availableFields);
                     console.log(`Sorted fields for floor segment fallback item ${index}:`, sortedFields);
                     
-                    // Add fields in priority order
-                    sortedFields.forEach(key => {
-                        const value = item[key];
-                        const label = getFieldLabel(key);
-                        const displayValue = formatFieldValue(key, value);
-                        html += `<tr><td>${label}:</td><td>${displayValue}</td></tr>`;
-                    });
+                    // Add fields in priority order with grouping and spacing
+                    html = displayFieldsWithGrouping(sortedFields, item, html);
                     
                     html += '</table></div>';
                 }
@@ -2316,13 +2344,8 @@
                     const sortedFields = sortFieldsByPriority(availableFields);
                     console.log(`Sorted fields for age item ${index}:`, sortedFields);
                     
-                    // Add fields in priority order
-                    sortedFields.forEach(key => {
-                        const value = item[key];
-                        const label = getFieldLabel(key);
-                        const displayValue = formatFieldValue(key, value);
-                        html += `<tr><td>${label}:</td><td>${displayValue}</td></tr>`;
-                    });
+                    // Add fields in priority order with grouping and spacing
+                    html = displayFieldsWithGrouping(sortedFields, item, html);
                     
                     html += '</table></div>';
                 } else {
@@ -2342,13 +2365,8 @@
                     const sortedFields = sortFieldsByPriority(availableFields);
                     console.log(`Sorted fields for age fallback item ${index}:`, sortedFields);
                     
-                    // Add fields in priority order
-                    sortedFields.forEach(key => {
-                        const value = item[key];
-                        const label = getFieldLabel(key);
-                        const displayValue = formatFieldValue(key, value);
-                        html += `<tr><td>${label}:</td><td>${displayValue}</td></tr>`;
-                    });
+                    // Add fields in priority order with grouping and spacing
+                    html = displayFieldsWithGrouping(sortedFields, item, html);
                     
                     html += '</table></div>';
                 }
@@ -2414,14 +2432,8 @@
                     const sortedFields = sortFieldsByPriority(availableFields);
                     console.log(`Sorted fields for heating item ${index}:`, sortedFields);
                     
-                    // Add fields in priority order
-                    sortedFields.forEach(key => {
-                        const value = item[key];
-                        const label = getFieldLabel(key);
-                        let displayValue = formatFieldValue(key, value);
-                        
-                        html += `<tr><td>${label}:</td><td>${displayValue}</td></tr>`;
-                    });
+                    // Add fields in priority order with grouping and spacing
+                    html = displayFieldsWithGrouping(sortedFields, item, html);
                     
                     html += '</table></div>';
                 } else {
@@ -2441,13 +2453,8 @@
                     const sortedFields = sortFieldsByPriority(availableFields);
                     console.log(`Sorted fields for heating fallback item ${index}:`, sortedFields);
                     
-                    // Add fields in priority order
-                    sortedFields.forEach(key => {
-                        const value = item[key];
-                        const label = getFieldLabel(key);
-                        const displayValue = formatFieldValue(key, value);
-                        html += `<tr><td>${label}:</td><td>${displayValue}</td></tr>`;
-                    });
+                    // Add fields in priority order with grouping and spacing
+                    html = displayFieldsWithGrouping(sortedFields, item, html);
                     
                     html += '</table></div>';
                 }
