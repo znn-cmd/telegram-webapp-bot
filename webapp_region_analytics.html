@@ -1108,6 +1108,8 @@
 
         // Display region data
         function displayRegionData(data) {
+            console.log('Received data:', data);
+            
             // Display general data
             displayGeneralData(data.general_data);
             
@@ -1178,6 +1180,8 @@
         function displayHouseTypeData(houseTypeData) {
             const content = document.getElementById('houseTypeDataContent');
             
+            console.log('House type data:', houseTypeData);
+            
             if (!houseTypeData || houseTypeData.length === 0) {
                 content.innerHTML = `<div class="no-data">${getText('noDataAvailable')}</div>`;
                 return;
@@ -1186,16 +1190,32 @@
             let html = '';
             
             houseTypeData.forEach(item => {
-                if (item.house_type && item.count !== undefined) {
+                console.log('House type item:', item);
+                // Try different possible field names
+                const typeField = item.house_type || item.type || item.house_type_name || item.name;
+                const countField = item.count || item.quantity || item.total;
+                
+                if (typeField && countField !== undefined) {
                     html += `<div class="data-item">
-                        <span class="data-label">${item.house_type}</span>
-                        <span class="data-value">${item.count}</span>
+                        <span class="data-label">${typeField}</span>
+                        <span class="data-value">${countField}</span>
                     </div>`;
                 }
             });
             
             if (html === '') {
-                html = `<div class="no-data">${getText('noDataAvailable')}</div>`;
+                // If no standard fields found, show all available fields
+                html = '<div class="no-data">Стандартные поля не найдены. Доступные поля:</div>';
+                houseTypeData.forEach(item => {
+                    Object.keys(item).forEach(key => {
+                        if (item[key] !== null && item[key] !== undefined) {
+                            html += `<div class="data-item">
+                                <span class="data-label">${key}:</span>
+                                <span class="data-value">${item[key]}</span>
+                            </div>`;
+                        }
+                    });
+                });
             }
             
             content.innerHTML = html;
@@ -1205,6 +1225,8 @@
         function displayFloorSegmentData(floorSegmentData) {
             const content = document.getElementById('floorSegmentDataContent');
             
+            console.log('Floor segment data:', floorSegmentData);
+            
             if (!floorSegmentData || floorSegmentData.length === 0) {
                 content.innerHTML = `<div class="no-data">${getText('noDataAvailable')}</div>`;
                 return;
@@ -1213,16 +1235,32 @@
             let html = '';
             
             floorSegmentData.forEach(item => {
-                if (item.floor_segment && item.count !== undefined) {
+                console.log('Floor segment item:', item);
+                // Try different possible field names
+                const segmentField = item.floor_segment || item.segment || item.floor_segment_name || item.name;
+                const countField = item.count || item.quantity || item.total;
+                
+                if (segmentField && countField !== undefined) {
                     html += `<div class="data-item">
-                        <span class="data-label">${item.floor_segment}</span>
-                        <span class="data-value">${item.count}</span>
+                        <span class="data-label">${segmentField}</span>
+                        <span class="data-value">${countField}</span>
                     </div>`;
                 }
             });
             
             if (html === '') {
-                html = `<div class="no-data">${getText('noDataAvailable')}</div>`;
+                // If no standard fields found, show all available fields
+                html = '<div class="no-data">Стандартные поля не найдены. Доступные поля:</div>';
+                floorSegmentData.forEach(item => {
+                    Object.keys(item).forEach(key => {
+                        if (item[key] !== null && item[key] !== undefined) {
+                            html += `<div class="data-item">
+                                <span class="data-label">${key}:</span>
+                                <span class="data-value">${item[key]}</span>
+                            </div>`;
+                        }
+                    });
+                });
             }
             
             content.innerHTML = html;
@@ -1232,6 +1270,8 @@
         function displayAgeData(ageData) {
             const content = document.getElementById('ageDataContent');
 
+            console.log('Age data:', ageData);
+
             if (!ageData || ageData.length === 0) {
                 content.innerHTML = `<div class="no-data">${getText('noDataAvailable')}</div>`;
                 return;
@@ -1240,16 +1280,32 @@
             let html = '';
 
             ageData.forEach(item => {
-                if (item.age_category && item.count !== undefined) {
+                console.log('Age item:', item);
+                // Try different possible field names
+                const ageField = item.age_category || item.age || item.age_category_name || item.name;
+                const countField = item.count || item.quantity || item.total;
+                
+                if (ageField && countField !== undefined) {
                     html += `<div class="data-item">
-                        <span class="data-label">${item.age_category}</span>
-                        <span class="data-value">${item.count}</span>
+                        <span class="data-label">${ageField}</span>
+                        <span class="data-value">${countField}</span>
                     </div>`;
                 }
             });
 
             if (html === '') {
-                html = `<div class="no-data">${getText('noDataAvailable')}</div>`;
+                // If no standard fields found, show all available fields
+                html = '<div class="no-data">Стандартные поля не найдены. Доступные поля:</div>';
+                ageData.forEach(item => {
+                    Object.keys(item).forEach(key => {
+                        if (item[key] !== null && item[key] !== undefined) {
+                            html += `<div class="data-item">
+                                <span class="data-label">${key}:</span>
+                                <span class="data-value">${item[key]}</span>
+                            </div>`;
+                        }
+                    });
+                });
             }
 
             content.innerHTML = html;
@@ -1259,6 +1315,8 @@
         function displayHeatingData(heatingData) {
             const content = document.getElementById('heatingDataContent');
 
+            console.log('Heating data:', heatingData);
+
             if (!heatingData || heatingData.length === 0) {
                 content.innerHTML = `<div class="no-data">${getText('noDataAvailable')}</div>`;
                 return;
@@ -1267,16 +1325,32 @@
             let html = '';
 
             heatingData.forEach(item => {
-                if (item.heating_type && item.count !== undefined) {
+                console.log('Heating item:', item);
+                // Try different possible field names
+                const heatingField = item.heating_type || item.heating || item.heating_type_name || item.name;
+                const countField = item.count || item.quantity || item.total;
+                
+                if (heatingField && countField !== undefined) {
                     html += `<div class="data-item">
-                        <span class="data-label">${item.heating_type}</span>
-                        <span class="data-value">${item.count}</span>
+                        <span class="data-label">${heatingField}</span>
+                        <span class="data-value">${countField}</span>
                     </div>`;
                 }
             });
 
             if (html === '') {
-                html = `<div class="no-data">${getText('noDataAvailable')}</div>`;
+                // If no standard fields found, show all available fields
+                html = '<div class="no-data">Стандартные поля не найдены. Доступные поля:</div>';
+                heatingData.forEach(item => {
+                    Object.keys(item).forEach(key => {
+                        if (item[key] !== null && item[key] !== undefined) {
+                            html += `<div class="data-item">
+                                <span class="data-label">${key}:</span>
+                                <span class="data-value">${item[key]}</span>
+                            </div>`;
+                        }
+                    });
+                });
             }
 
             content.innerHTML = html;
