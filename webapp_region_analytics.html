@@ -272,13 +272,13 @@
         }
 
         .data-card-content {
-            max-height: 0;
+            max-height: 0; /* Collapsed by default */
             overflow: hidden;
             transition: max-height 0.3s ease;
         }
 
         .data-card-content.expanded {
-            max-height: 2000px;
+            max-height: 2000px; /* Expanded state */
         }
 
         /* Table Styles */
@@ -523,7 +523,7 @@
                          <div class="data-card-toggle expanded" id="generalDataToggle">▲</div>
                      </div>
                      <div class="data-card-content expanded" id="generalDataContent">
-                         <!-- General data will be populated here -->
+                         <!-- General data will be populated here - expanded by default -->
                      </div>
                  </div>
                 
@@ -537,7 +537,7 @@
                          <div class="data-card-toggle" id="houseTypeDataToggle">▼</div>
                      </div>
                      <div class="data-card-content" id="houseTypeDataContent">
-                         <!-- House type data will be populated here -->
+                         <!-- House type data will be populated here - collapsed by default -->
                      </div>
                  </div>
                 
@@ -551,7 +551,7 @@
                          <div class="data-card-toggle" id="floorSegmentDataToggle">▼</div>
                      </div>
                      <div class="data-card-content" id="floorSegmentDataContent">
-                         <!-- Floor segment data will be populated here -->
+                         <!-- Floor segment data will be populated here - collapsed by default -->
                      </div>
                  </div>
                 
@@ -565,7 +565,7 @@
                          <div class="data-card-toggle" id="ageDataToggle">▼</div>
                      </div>
                      <div class="data-card-content" id="ageDataContent">
-                         <!-- Age data will be populated here -->
+                         <!-- Age data will be populated here - collapsed by default -->
                      </div>
                  </div>
 
@@ -579,7 +579,7 @@
                          <div class="data-card-toggle" id="heatingDataToggle">▼</div>
                      </div>
                      <div class="data-card-content" id="heatingDataContent">
-                         <!-- Heating data will be populated here -->
+                         <!-- Heating data will be populated here - collapsed by default -->
                      </div>
                  </div>
             </div>
