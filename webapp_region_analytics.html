@@ -256,18 +256,25 @@
             display: none;
         }
 
-        .data-card {
+        /* Analytics Cards - New Design */
+        .analytics-card {
             background: white;
             border: 1px solid #e1e5e9;
-            border-radius: 12px;
+            border-radius: 16px;
             margin-bottom: 20px;
             overflow: hidden;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
         }
 
-        .data-card-header {
+        .analytics-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+        }
+
+        .card-header {
             background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-            padding: 15px 20px;
+            padding: 16px 20px;
             border-bottom: 1px solid #dee2e6;
             display: flex;
             align-items: center;
@@ -276,57 +283,347 @@
             transition: background-color 0.3s ease;
         }
 
-        .data-card-header:hover {
+        .card-header:hover {
             background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%);
         }
 
-        .data-card-header-left {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .data-card-icon {
+        .card-icon {
             font-size: 24px;
+            margin-right: 12px;
         }
 
-        .data-card-title {
+        .card-title {
             font-size: 18px;
             font-weight: 600;
             color: #333;
+            flex: 1;
         }
 
-        .data-card-toggle {
-            font-size: 20px;
+        .card-toggle {
+            font-size: 18px;
             color: #667eea;
             transition: transform 0.3s ease;
+            cursor: pointer;
         }
 
-        .data-card-toggle.expanded {
+        .card-toggle.expanded {
             transform: rotate(180deg);
         }
 
-        .data-card-content {
-            padding: 20px;
+        .card-content {
+            padding: 0;
             max-height: 0;
             overflow: hidden;
-            transition: max-height 0.3s ease, padding 0.3s ease;
-        }
-
-        .data-card-content.expanded {
-            max-height: 1000px;
-            padding: 20px;
-        }
-
-        /* Smooth animation for accordion */
-        .data-card-content {
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        /* Hover effect for toggle button */
-        .data-card-toggle:hover {
-            color: #5a6fd8;
-            transform: scale(1.1);
+        .card-content.expanded {
+            max-height: 2000px;
+            padding: 20px;
+        }
+
+        /* General Data Card - Always Visible */
+        .general-data .card-content {
+            max-height: none;
+            padding: 20px;
+        }
+
+        .general-data .card-header {
+            cursor: default;
+        }
+
+        .general-data .card-header:hover {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        }
+
+        /* Block 1: General Data - Two Column Layout */
+        .general-data .card-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .data-column {
+            padding: 16px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .data-column.rent {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+        }
+
+        .data-column.sale {
+            background: linear-gradient(135deg, #e67e22 0%, #d35400 100%);
+            color: white;
+        }
+
+        .data-column h3 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .data-column p {
+            font-size: 14px;
+            margin: 8px 0;
+            opacity: 0.9;
+        }
+
+        .data-footer {
+            grid-column: 1 / -1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            margin-top: 16px;
+        }
+
+        .yield {
+            color: #27ae60;
+            font-weight: 600;
+        }
+
+        .updated {
+            color: #7f8c8d;
+            font-size: 12px;
+        }
+
+        /* Block 2: House Types - Horizontal Scroll */
+        .scroll-container {
+            display: flex;
+            gap: 16px;
+            overflow-x: auto;
+            padding: 8px 0;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .scroll-container::-webkit-scrollbar {
+            display: none;
+        }
+
+        .type-card {
+            min-width: 140px;
+            padding: 16px;
+            background: white;
+            border: 1px solid #e1e5e9;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .type-card:hover {
+            transform: scale(1.02);
+        }
+
+        .type-card h3 {
+            font-size: 18px;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 12px;
+            color: #333;
+        }
+
+        .metrics {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .metrics .rent {
+            color: #3498db;
+            font-weight: 600;
+        }
+
+        .metrics .sale {
+            color: #e67e22;
+            font-weight: 600;
+        }
+
+        .metrics .yield {
+            color: #27ae60;
+            font-weight: 600;
+        }
+
+        .type-card p {
+            font-size: 12px;
+            text-align: center;
+            color: #666;
+            margin: 4px 0;
+        }
+
+        /* Block 3: Floor Segments - Grid Layout */
+        .floor-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 16px;
+        }
+
+        .floor-card {
+            padding: 16px;
+            background: white;
+            border: 1px solid #e1e5e9;
+            border-radius: 12px;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .floor-card:hover {
+            transform: scale(1.02);
+        }
+
+        .floor-card .icon {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 12px;
+        }
+
+        .floor-card .data {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .floor-card .rent {
+            color: #3498db;
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .floor-card .sale {
+            color: #e67e22;
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .floor-card p {
+            font-size: 12px;
+            color: #666;
+            margin: 0;
+        }
+
+        /* Block 4: Age Data - Progress Bars */
+        .progress-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .progress-block {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 16px;
+        }
+
+        .progress-block h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 16px;
+        }
+
+        .progress-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .progress-row span:first-child {
+            min-width: 60px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .progress-bar {
+            flex: 1;
+            height: 8px;
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        .progress-bar.rent {
+            background: #3498db;
+        }
+
+        .progress-bar.sale {
+            background: #e67e22;
+        }
+
+        .progress-row span:last-child {
+            min-width: 40px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+            text-align: right;
+        }
+
+        /* Block 5: Heating Data - Highlight Cards */
+        .highlight-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+        }
+
+        .highlight-card {
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 12px;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .highlight-card:hover {
+            transform: scale(1.02);
+        }
+
+        .heating-type {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .metric {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            opacity: 0.9;
+        }
+
+        .highlight-card p {
+            font-size: 14px;
+            margin: 8px 0;
+            opacity: 0.8;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 480px) {
+            .general-data .card-content {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+
+            .data-footer {
+                flex-direction: column;
+                gap: 12px;
+                text-align: center;
+            }
+
+            .floor-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .highlight-container {
+                grid-template-columns: 1fr;
+            }
         }
 
         .data-item {
@@ -482,76 +779,72 @@
             
             <!-- Data Content -->
             <div class="data-content" id="dataContent" style="display: none;">
-                                 <!-- General Data -->
-                 <div class="data-card" id="generalDataCard">
-                     <div class="data-card-header" onclick="toggleAccordion('generalDataCard')">
-                         <div class="data-card-header-left">
-                             <div class="data-card-icon">📊</div>
-                             <div class="data-card-title" id="generalDataTitle">Общие данные</div>
-                         </div>
-                         <div class="data-card-toggle" id="generalDataToggle">▼</div>
-                     </div>
-                     <div class="data-card-content" id="generalDataContent">
-                         <!-- General data will be populated here -->
-                     </div>
-                 </div>
+                <!-- Block 1: General Data (Always Visible) -->
+                <div class="analytics-card general-data" id="generalDataCard">
+                    <div class="card-header">
+                        <div class="card-icon">📊</div>
+                        <div class="card-title" id="generalDataTitle">Общие данные</div>
+                    </div>
+                    <div class="card-content" id="generalDataContent">
+                        <!-- General data will be populated here -->
+                    </div>
+                </div>
                  
-                 <!-- House Type Data -->
-                 <div class="data-card" id="houseTypeDataCard">
-                     <div class="data-card-header" onclick="toggleAccordion('houseTypeDataCard')">
-                         <div class="data-card-header-left">
-                             <div class="data-card-icon">🏠</div>
-                             <div class="data-card-title" id="houseTypeDataTitle">Данные по типам домов</div>
-                         </div>
-                         <div class="data-card-toggle" id="houseTypeDataToggle">▼</div>
-                     </div>
-                     <div class="data-card-content" id="houseTypeDataContent">
-                         <!-- House type data will be populated here -->
-                     </div>
-                 </div>
+                <!-- Block 2: House Types (Horizontal Scroll) -->
+                <div class="analytics-card accordion" id="houseTypeDataCard">
+                    <div class="card-header" onclick="toggleAccordion('houseTypeDataCard')">
+                        <div class="card-icon">🏠</div>
+                        <div class="card-title" id="houseTypeDataTitle">Типы домов</div>
+                        <div class="card-toggle" id="houseTypeDataToggle">▼</div>
+                    </div>
+                    <div class="card-content" id="houseTypeDataContent">
+                        <div class="scroll-container" id="houseTypeScroll">
+                            <!-- House type cards will be populated here -->
+                        </div>
+                    </div>
+                </div>
                  
-                 <!-- Floor Segment Data -->
-                 <div class="data-card" id="floorSegmentDataCard">
-                     <div class="data-card-header" onclick="toggleAccordion('floorSegmentDataCard')">
-                         <div class="data-card-header-left">
-                             <div class="data-card-icon">🏢</div>
-                             <div class="data-card-title" id="floorSegmentDataTitle">Данные по сегментам этажей</div>
-                         </div>
-                         <div class="data-card-toggle" id="floorSegmentDataToggle">▼</div>
-                     </div>
-                     <div class="data-card-content" id="floorSegmentDataContent">
-                         <!-- Floor segment data will be populated here -->
-                     </div>
-                 </div>
+                <!-- Block 3: Floor Segments (Compact Icons) -->
+                <div class="analytics-card accordion" id="floorSegmentDataCard">
+                    <div class="card-header" onclick="toggleAccordion('floorSegmentDataCard')">
+                        <div class="card-icon">🏢</div>
+                        <div class="card-title" id="floorSegmentDataTitle">Этажи</div>
+                        <div class="card-toggle" id="floorSegmentDataToggle">▼</div>
+                    </div>
+                    <div class="card-content" id="floorSegmentDataContent">
+                        <div class="floor-grid" id="floorGrid">
+                            <!-- Floor cards will be populated here -->
+                        </div>
+                    </div>
+                </div>
                  
-                 <!-- Age Data -->
-                 <div class="data-card" id="ageDataCard">
-                     <div class="data-card-header" onclick="toggleAccordion('ageDataCard')">
-                         <div class="data-card-header-left">
-                             <div class="data-card-icon">📅</div>
-                             <div class="data-card-title" id="ageDataTitle">Данные по возрасту объектов</div>
-                         </div>
-                         <div class="data-card-toggle" id="ageDataToggle">▼</div>
-                         
-                     </div>
-                     <div class="data-card-content" id="ageDataContent">
-                         <!-- Age data will be populated here -->
-                     </div>
-                 </div>
+                <!-- Block 4: Age Data (Progress Bars) -->
+                <div class="analytics-card accordion" id="ageDataCard">
+                    <div class="card-header" onclick="toggleAccordion('ageDataCard')">
+                        <div class="card-icon">📅</div>
+                        <div class="card-title" id="ageDataTitle">Возраст объектов</div>
+                        <div class="card-toggle" id="ageDataToggle">▼</div>
+                    </div>
+                    <div class="card-content" id="ageDataContent">
+                        <div class="progress-container" id="ageProgress">
+                            <!-- Progress bars will be populated here -->
+                        </div>
+                    </div>
+                </div>
 
-                 <!-- Heating Data -->
-                 <div class="data-card" id="heatingDataCard">
-                     <div class="data-card-header" onclick="toggleAccordion('heatingDataCard')">
-                         <div class="data-card-header-left">
-                             <div class="data-card-icon">🔥</div>
-                             <div class="data-card-title" id="heatingDataTitle">Данные по отоплению</div>
-                         </div>
-                         <div class="data-card-toggle" id="heatingDataToggle">▼</div>
-                     </div>
-                     <div class="data-card-content" id="heatingDataContent">
-                         <!-- Heating data will be populated here -->
-                     </div>
-                 </div>
+                <!-- Block 5: Heating Data (Highlight Card) -->
+                <div class="analytics-card accordion" id="heatingDataCard">
+                    <div class="card-header" onclick="toggleAccordion('heatingDataCard')">
+                        <div class="card-icon">🔥</div>
+                        <div class="card-title" id="heatingDataTitle">Отопление</div>
+                        <div class="card-toggle" id="heatingDataToggle">▼</div>
+                    </div>
+                    <div class="card-content" id="heatingDataContent">
+                        <div class="highlight-container" id="heatingHighlight">
+                            <!-- Heating highlight cards will be populated here -->
+                        </div>
+                    </div>
+                </div>
             </div>
             
             <!-- Error State -->
@@ -614,10 +907,20 @@
                 'heatingDataTitle': 'Данные по отоплению',
                 'loadingText': 'Загрузка данных...',
                 'errorText': 'Ошибка загрузки данных',
-                'totalProperties': 'Всего объектов:',
-                'averagePrice': 'Средняя цена:',
-                'priceRange': 'Диапазон цен:',
-                'noDataAvailable': 'Данные недоступны'
+                                 'totalProperties': 'Всего объектов:',
+                 'averagePrice': 'Средняя цена:',
+                 'priceRange': 'Диапазон цен:',
+                 'noDataAvailable': 'Данные недоступны',
+                 'rent': 'Аренда',
+                 'sale': 'Продажа',
+                 'quantity': 'Количество',
+                 'avgPrice': 'Сред.цена',
+                 'area': 'Площадь',
+                 'duration': 'Срок',
+                 'yield': 'Доходность',
+                 'updated': 'Обновлено',
+                 'objects': 'объектов',
+                 'days': 'дней'
             },
             'en': {
                 'slogan': 'Real Estate Market Insights',
@@ -645,10 +948,20 @@
                 'heatingDataTitle': 'Heating Data',
                 'loadingText': 'Loading data...',
                 'errorText': 'Error loading data',
-                'totalProperties': 'Total properties:',
-                'averagePrice': 'Average price:',
-                'priceRange': 'Price range:',
-                'noDataAvailable': 'Data not available'
+                                 'totalProperties': 'Total properties:',
+                 'averagePrice': 'Average price:',
+                 'priceRange': 'Price range:',
+                 'noDataAvailable': 'Data not available',
+                 'rent': 'Rent',
+                 'sale': 'Sale',
+                 'quantity': 'Quantity',
+                 'avgPrice': 'Avg.Price',
+                 'area': 'Area',
+                 'duration': 'Duration',
+                 'yield': 'Yield',
+                 'updated': 'Updated',
+                 'objects': 'objects',
+                 'days': 'days'
             },
             'de': {
                 'slogan': 'Immobilienmarkt-Einblicke',
@@ -676,10 +989,20 @@
                 'heatingDataTitle': 'Heizungsdaten',
                 'loadingText': 'Daten werden geladen...',
                 'errorText': 'Fehler beim Laden der Daten',
-                'totalProperties': 'Gesamtobjekte:',
-                'averagePrice': 'Durchschnittspreis:',
-                'priceRange': 'Preisbereich:',
-                'noDataAvailable': 'Daten nicht verfügbar'
+                                 'totalProperties': 'Gesamtobjekte:',
+                 'averagePrice': 'Durchschnittspreis:',
+                 'priceRange': 'Preisbereich:',
+                 'noDataAvailable': 'Daten nicht verfügbar',
+                 'rent': 'Miete',
+                 'sale': 'Verkauf',
+                 'quantity': 'Menge',
+                 'avgPrice': 'Durchs.Preis',
+                 'area': 'Fläche',
+                 'duration': 'Dauer',
+                 'yield': 'Rendite',
+                 'updated': 'Aktualisiert',
+                 'objects': 'Objekte',
+                 'days': 'Tage'
             },
             'fr': {
                 'slogan': 'Aperçus du marché immobilier',
@@ -707,10 +1030,20 @@
                 'heatingDataTitle': 'Données de chauffage',
                 'loadingText': 'Chargement des données...',
                 'errorText': 'Erreur de chargement des données',
-                'totalProperties': 'Total des propriétés :',
-                'averagePrice': 'Prix moyen :',
-                'priceRange': 'Fourchette de prix :',
-                'noDataAvailable': 'Données non disponibles'
+                                 'totalProperties': 'Total des propriétés :',
+                 'averagePrice': 'Prix moyen :',
+                 'priceRange': 'Fourchette de prix :',
+                 'noDataAvailable': 'Données non disponibles',
+                 'rent': 'Location',
+                 'sale': 'Vente',
+                 'quantity': 'Quantité',
+                 'avgPrice': 'Prix moy.',
+                 'area': 'Surface',
+                 'duration': 'Durée',
+                 'yield': 'Rendement',
+                 'updated': 'Mis à jour',
+                 'objects': 'objets',
+                 'days': 'jours'
             },
             'tr': {
                 'slogan': 'Gayrimenkul Piyasa İçgörüleri',
@@ -738,10 +1071,20 @@
                 'heatingDataTitle': 'Isıtma Verileri',
                 'loadingText': 'Veriler yükleniyor...',
                 'errorText': 'Veri yükleme hatası',
-                'totalProperties': 'Toplam mülk:',
-                'averagePrice': 'Ortalama fiyat:',
-                'priceRange': 'Fiyat aralığı:',
-                'noDataAvailable': 'Veri mevcut değil'
+                                 'totalProperties': 'Toplam mülk:',
+                 'averagePrice': 'Ortalama fiyat:',
+                 'priceRange': 'Fiyat aralığı:',
+                 'noDataAvailable': 'Veri mevcut değil',
+                 'rent': 'Kiralık',
+                 'sale': 'Satılık',
+                 'quantity': 'Miktar',
+                 'avgPrice': 'Ort.Fiyat',
+                 'area': 'Alan',
+                 'duration': 'Süre',
+                 'yield': 'Getiri',
+                 'updated': 'Güncellendi',
+                 'objects': 'nesne',
+                 'days': 'gün'
             }
         };
 
@@ -1183,7 +1526,9 @@
             
             // Auto-expand the first card (General Data) by default
             setTimeout(() => {
-                toggleAccordion('generalDataCard');
+                // General data is always visible, so we don't need to toggle it
+                // But we can expand the second card (House Types) by default
+                toggleAccordion('houseTypeDataCard');
             }, 100);
         }
 
@@ -1196,50 +1541,36 @@
                 return;
             }
             
-            let html = '';
             const data = generalData[0]; // Take first record
             
-            // Add common fields
-            if (data.total_properties !== undefined) {
-                html += `<div class="data-item">
-                    <span class="data-label">${getText('totalProperties')}</span>
-                    <span class="data-value">${data.total_properties}</span>
-                </div>`;
-            }
-            
-            if (data.average_price !== undefined) {
-                html += `<div class="data-item">
-                    <span class="data-label">${getText('averagePrice')}</span>
-                    <span class="data-value">€${data.average_price}</span>
-                </div>`;
-            }
-            
-            if (data.min_price !== undefined && data.max_price !== undefined) {
-                html += `<div class="data-item">
-                    <span class="data-label">${getText('priceRange')}</span>
-                    <span class="data-value">€${data.min_price} - €${data.max_price}</span>
-                </div>`;
-            }
-            
-            // Add any other fields that might exist
-            Object.keys(data).forEach(key => {
-                if (!['total_properties', 'average_price', 'min_price', 'max_price', 'country_id', 'city_id', 'county_id', 'district_id', 'id', 'created_at', 'source_file'].includes(key)) {
-                    const value = data[key];
-                    if (value !== null && value !== undefined) {
-                        html += `<div class="data-item">
-                            <span class="data-label">${key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}:</span>
-                            <span class="data-value">${value}</span>
-                        </div>`;
-                    }
-                }
-            });
+            // Create two-column layout for rent and sale data
+            let html = `
+                <div class="data-column rent">
+                    <h3>${getText('rent')}</h3>
+                    <p>${getText('quantity')}: ${data.rent_count || data.total_rent || 0}</p>
+                    <p>${getText('avgPrice')}: ${formatPrice(data.rent_avg_price || data.avg_rent_price || 0)}/мес</p>
+                    <p>${getText('area')}: ${data.rent_avg_area || data.avg_rent_area || 0}м²</p>
+                    <p>${getText('duration')}: ${data.rent_avg_duration || data.avg_rent_duration || 0} дн.</p>
+                </div>
+                <div class="data-column sale">
+                    <h3>${getText('sale')}</h3>
+                    <p>${getText('quantity')}: ${data.sale_count || data.total_sale || 0}</p>
+                    <p>${getText('avgPrice')}: ${formatPrice(data.sale_avg_price || data.avg_sale_price || 0)}</p>
+                    <p>${getText('area')}: ${data.sale_avg_area || data.avg_sale_area || 0}м²</p>
+                    <p>${getText('duration')}: ${data.sale_avg_duration || data.avg_sale_duration || 0} дн.</p>
+                </div>
+                <div class="data-footer">
+                    <span class="yield">${getText('yield')}: ${data.yield || data.avg_yield || 0}%</span>
+                    <span class="updated">${getText('updated')}: ${formatDate(data.updated_at || data.created_at || new Date())}</span>
+                </div>
+            `;
             
             content.innerHTML = html;
         }
 
         // Display house type data
         function displayHouseTypeData(houseTypeData) {
-            const content = document.getElementById('houseTypeDataContent');
+            const content = document.getElementById('houseTypeScroll');
             
             console.log('House type data:', houseTypeData);
             
@@ -1252,39 +1583,35 @@
             
             houseTypeData.forEach(item => {
                 console.log('House type item:', item);
-                // Try different possible field names
                 const typeField = item.house_type || item.type || item.house_type_name || item.name;
-                const countField = item.count || item.quantity || item.total;
+                const rentCount = item.rent_count || item.count || 0;
+                const saleCount = item.sale_count || item.total || 0;
+                const yield = item.yield || item.avg_yield || 0;
+                const rentPrice = item.rent_avg_price || item.avg_rent_price || 0;
+                const salePrice = item.sale_avg_price || item.avg_sale_price || 0;
+                const rentArea = item.rent_avg_area || item.avg_rent_area || 0;
+                const saleArea = item.sale_avg_area || item.avg_sale_area || 0;
                 
-                if (typeField && countField !== undefined) {
-                    html += `<div class="data-item">
-                        <span class="data-label">${typeField}</span>
-                        <span class="data-value">${countField}</span>
-                    </div>`;
-                }
+                html += `
+                    <div class="type-card">
+                        <h3>${typeField || 'N/A'}</h3>
+                        <div class="metrics">
+                            ${rentCount > 0 ? `<div class="rent">${getText('rent')}: ${rentCount}</div>` : ''}
+                            ${saleCount > 0 ? `<div class="sale">${getText('sale')}: ${saleCount}</div>` : ''}
+                            ${yield > 0 ? `<div class="yield">${yield}%</div>` : ''}
+                        </div>
+                        <p>${rentPrice > 0 ? formatPrice(rentPrice) + '/мес' : ''} ${salePrice > 0 ? '| ' + formatPrice(salePrice) : ''}</p>
+                        <p>${rentArea > 0 ? rentArea + 'м²' : ''} ${saleArea > 0 ? '| ' + saleArea + 'м²' : ''}</p>
+                    </div>
+                `;
             });
-            
-            if (html === '') {
-                // If no standard fields found, show all available fields
-                html = '<div class="no-data">Стандартные поля не найдены. Доступные поля:</div>';
-                houseTypeData.forEach(item => {
-                    Object.keys(item).forEach(key => {
-                        if (item[key] !== null && item[key] !== undefined) {
-                            html += `<div class="data-item">
-                                <span class="data-label">${key}:</span>
-                                <span class="data-value">${item[key]}</span>
-                            </div>`;
-                        }
-                    });
-                });
-            }
             
             content.innerHTML = html;
         }
 
         // Display floor segment data
         function displayFloorSegmentData(floorSegmentData) {
-            const content = document.getElementById('floorSegmentDataContent');
+            const content = document.getElementById('floorGrid');
             
             console.log('Floor segment data:', floorSegmentData);
             
@@ -1297,39 +1624,30 @@
             
             floorSegmentData.forEach(item => {
                 console.log('Floor segment item:', item);
-                // Try different possible field names
                 const segmentField = item.floor_segment || item.segment || item.floor_segment_name || item.name;
-                const countField = item.count || item.quantity || item.total;
+                const rentCount = item.rent_count || item.count || 0;
+                const saleCount = item.sale_count || item.total || 0;
+                const rentPrice = item.rent_avg_price || item.avg_rent_price || 0;
+                const salePrice = item.sale_avg_price || item.avg_sale_price || 0;
                 
-                if (segmentField && countField !== undefined) {
-                    html += `<div class="data-item">
-                        <span class="data-label">${segmentField}</span>
-                        <span class="data-value">${countField}</span>
-                    </div>`;
-                }
+                html += `
+                    <div class="floor-card">
+                        <div class="icon">${segmentField || 'N/A'}</div>
+                        <div class="data">
+                            ${rentCount > 0 ? `<span class="rent">${rentCount}</span>` : ''}
+                            ${saleCount > 0 ? `<span class="sale">${saleCount}</span>` : ''}
+                            <p>${rentPrice > 0 ? formatPrice(rentPrice) : ''} ${salePrice > 0 ? '| ' + formatPrice(salePrice) : ''}</p>
+                        </div>
+                    </div>
+                `;
             });
-            
-            if (html === '') {
-                // If no standard fields found, show all available fields
-                html = '<div class="no-data">Стандартные поля не найдены. Доступные поля:</div>';
-                floorSegmentData.forEach(item => {
-                    Object.keys(item).forEach(key => {
-                        if (item[key] !== null && item[key] !== undefined) {
-                            html += `<div class="data-item">
-                                <span class="data-label">${key}:</span>
-                                <span class="data-value">${item[key]}</span>
-                            </div>`;
-                        }
-                    });
-                });
-            }
             
             content.innerHTML = html;
         }
 
                 // Display age data
         function displayAgeData(ageData) {
-            const content = document.getElementById('ageDataContent');
+            const content = document.getElementById('ageProgress');
 
             console.log('Age data:', ageData);
 
@@ -1342,39 +1660,43 @@
 
             ageData.forEach(item => {
                 console.log('Age item:', item);
-                // Try different possible field names
                 const ageField = item.age_category || item.age || item.age_category_name || item.name;
-                const countField = item.count || item.quantity || item.total;
+                const rentCount = item.rent_count || item.count || 0;
+                const saleCount = item.sale_count || item.total || 0;
+                const totalCount = rentCount + saleCount;
                 
-                if (ageField && countField !== undefined) {
-                    html += `<div class="data-item">
-                        <span class="data-label">${ageField}</span>
-                        <span class="data-value">${countField}</span>
-                    </div>`;
+                if (totalCount > 0) {
+                    const rentPercentage = totalCount > 0 ? Math.round((rentCount / totalCount) * 100) : 0;
+                    const salePercentage = totalCount > 0 ? Math.round((saleCount / totalCount) * 100) : 0;
+                    
+                    html += `
+                        <div class="progress-block">
+                            <h3>${ageField || 'N/A'}</h3>
+                            ${rentCount > 0 ? `
+                                <div class="progress-row">
+                                    <span>${getText('rent')}</span>
+                                    <div class="progress-bar rent" style="width: ${rentPercentage}%"></div>
+                                    <span>${rentPercentage}%</span>
+                                </div>
+                            ` : ''}
+                            ${saleCount > 0 ? `
+                                <div class="progress-row">
+                                    <span>${getText('sale')}</span>
+                                    <div class="progress-bar sale" style="width: ${salePercentage}%"></div>
+                                    <span>${salePercentage}%</span>
+                                </div>
+                            ` : ''}
+                        </div>
+                    `;
                 }
             });
-
-            if (html === '') {
-                // If no standard fields found, show all available fields
-                html = '<div class="no-data">Стандартные поля не найдены. Доступные поля:</div>';
-                ageData.forEach(item => {
-                    Object.keys(item).forEach(key => {
-                        if (item[key] !== null && item[key] !== undefined) {
-                            html += `<div class="data-item">
-                                <span class="data-label">${key}:</span>
-                                <span class="data-value">${item[key]}</span>
-                            </div>`;
-                        }
-                    });
-                });
-            }
 
             content.innerHTML = html;
         }
 
         // Display heating data
         function displayHeatingData(heatingData) {
-            const content = document.getElementById('heatingDataContent');
+            const content = document.getElementById('heatingHighlight');
 
             console.log('Heating data:', heatingData);
 
@@ -1387,32 +1709,20 @@
 
             heatingData.forEach(item => {
                 console.log('Heating item:', item);
-                // Try different possible field names
                 const heatingField = item.heating_type || item.heating || item.heating_type_name || item.name;
                 const countField = item.count || item.quantity || item.total;
+                const avgPrice = item.avg_price || item.average_price || 0;
+                const avgDuration = item.avg_duration || item.average_duration || 0;
                 
-                if (heatingField && countField !== undefined) {
-                    html += `<div class="data-item">
-                        <span class="data-label">${heatingField}</span>
-                        <span class="data-value">${countField}</span>
-                    </div>`;
-                }
+                html += `
+                    <div class="highlight-card">
+                        <div class="heating-type">${heatingField || 'N/A'}</div>
+                        <div class="metric">${countField} ${getText('objects')}</div>
+                        <p>${getText('avgPrice')}: ${formatPrice(avgPrice)}</p>
+                        <p>${getText('duration')}: ${avgDuration} ${getText('days')}</p>
+                    </div>
+                `;
             });
-
-            if (html === '') {
-                // If no standard fields found, show all available fields
-                html = '<div class="no-data">Стандартные поля не найдены. Доступные поля:</div>';
-                heatingData.forEach(item => {
-                    Object.keys(item).forEach(key => {
-                        if (item[key] !== null && item[key] !== undefined) {
-                            html += `<div class="data-item">
-                                <span class="data-label">${key}:</span>
-                                <span class="data-value">${item[key]}</span>
-                            </div>`;
-                        }
-                    });
-                });
-            }
 
             content.innerHTML = html;
         }
@@ -1439,11 +1749,43 @@
             loadCountries();
         }
 
+        // Helper functions for data formatting
+        function formatPrice(price) {
+            if (!price || price === 0) return '0';
+            if (price >= 1000) {
+                return (price / 1000).toFixed(1) + 'K';
+            }
+            return price.toString();
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return 'N/A';
+            const date = new Date(dateString);
+            if (isNaN(date.getTime())) return 'N/A';
+            
+            const now = new Date();
+            const diffTime = Math.abs(now - date);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            
+            if (diffDays === 1) {
+                return 'вчера';
+            } else if (diffDays < 7) {
+                return `${diffDays} дн. назад`;
+            } else {
+                return date.toLocaleDateString('ru-RU', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+            }
+        }
+
         // Toggle accordion functionality
         function toggleAccordion(cardId) {
             const card = document.getElementById(cardId);
-            const content = card.querySelector('.data-card-content');
-            const toggle = card.querySelector('.data-card-toggle');
+            const content = card.querySelector('.card-content');
+            const toggle = card.querySelector('.card-toggle');
             
             if (content.classList.contains('expanded')) {
                 // Collapse
