@@ -215,33 +215,16 @@
             padding: 0 20px 20px 20px;
         }
 
-        .loading-state {
+        .data-section-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #333;
             text-align: center;
-            padding: 40px 20px;
-        }
-
-        .loading-spinner {
-            width: 40px;
-            height: 40px;
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #667eea;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .loading-text {
-            font-size: 16px;
-            color: #666;
-        }
-
-        .data-content {
-            display: none;
+            margin: 20px 0;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 8px;
         }
 
         /* Mobile-First Card Styles */
@@ -387,10 +370,7 @@
             }
         }
 
-
-
-
-
+        /* Additional Styles */
         .no-data {
             text-align: center;
             padding: 15px;
@@ -419,6 +399,39 @@
             font-size: 14px;
             color: #721c24;
         }
+
+        .loading-state {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            font-size: 16px;
+            color: #666;
+        }
+
+        .data-content {
+            display: none;
+        }
+
+
+
+
 
 
     </style>
@@ -1320,21 +1333,6 @@
                 }
             });
             
-            if (html === '') {
-                // If no standard fields found, show all available fields
-                html = '<div class="no-data">Стандартные поля не найдены. Доступные поля:</div>';
-                houseTypeData.forEach(item => {
-                    Object.keys(item).forEach(key => {
-                        if (item[key] !== null && item[key] !== undefined) {
-                            html += `<div class="data-item">
-                                <span class="data-label">${key}:</span>
-                                <span class="data-value">${item[key]}</span>
-                            </div>`;
-                        }
-                    });
-                });
-            }
-            
             content.innerHTML = html;
         }
 
@@ -1388,21 +1386,6 @@
                     html += '</table></div>';
                 }
             });
-            
-            if (html === '') {
-                // If no standard fields found, show all available fields
-                html = '<div class="no-data">Стандартные поля не найдены. Доступные поля:</div>';
-                floorSegmentData.forEach(item => {
-                    Object.keys(item).forEach(key => {
-                        if (item[key] !== null && item[key] !== undefined) {
-                            html += `<div class="data-item">
-                                <span class="data-label">${key}:</span>
-                                <span class="data-value">${item[key]}</span>
-                            </div>`;
-                        }
-                    });
-                });
-            }
             
             content.innerHTML = html;
         }
@@ -1458,21 +1441,6 @@
                 }
             });
 
-            if (html === '') {
-                // If no standard fields found, show all available fields
-                html = '<div class="no-data">Стандартные поля не найдены. Доступные поля:</div>';
-                ageData.forEach(item => {
-                    Object.keys(item).forEach(key => {
-                        if (item[key] !== null && item[key] !== undefined) {
-                            html += `<div class="data-item">
-                                <span class="data-label">${key}:</span>
-                                <span class="data-value">${item[key]}</span>
-                            </div>`;
-                        }
-                    });
-                });
-            }
-
             content.innerHTML = html;
         }
 
@@ -1526,21 +1494,6 @@
                     html += '</table></div>';
                 }
             });
-
-            if (html === '') {
-                // If no standard fields found, show all available fields
-                html = '<div class="no-data">Стандартные поля не найдены. Доступные поля:</div>';
-                heatingData.forEach(item => {
-                    Object.keys(item).forEach(key => {
-                        if (item[key] !== null && item[key] !== undefined) {
-                            html += `<div class="data-item">
-                                <span class="data-label">${key}:</span>
-                                <span class="data-value">${item[key]}</span>
-                            </div>`;
-                        }
-                    });
-                });
-            }
 
             content.innerHTML = html;
         }
