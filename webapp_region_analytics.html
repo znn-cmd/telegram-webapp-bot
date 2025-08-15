@@ -337,10 +337,128 @@
             border-top: 1px solid #f0f0f0;
         }
 
+        /* Key Metrics Styles */
+        .key-metrics-section {
+            margin-bottom: 25px;
+        }
+
+        .key-metrics-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .key-metrics-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .key-metric-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            padding: 20px;
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .key-metric-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .metric-icon {
+            font-size: 24px;
+            margin-bottom: 12px;
+        }
+
+        .metric-label {
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 8px;
+            opacity: 0.9;
+            line-height: 1.3;
+        }
+
+        .metric-value {
+            font-size: 20px;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+
+        .yield-card {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 12px;
+            padding: 25px;
+            color: white;
+            box-shadow: 0 4px 15px rgba(240, 147, 251, 0.3);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .yield-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(240, 147, 251, 0.4);
+        }
+
+        .yield-icon {
+            font-size: 28px;
+            margin-bottom: 15px;
+        }
+
+        .yield-content {
+            text-align: center;
+        }
+
+        .yield-label {
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 10px;
+            opacity: 0.9;
+        }
+
+        .yield-value {
+            font-size: 32px;
+            font-weight: 800;
+            line-height: 1.1;
+        }
+
         /* Mobile Responsive */
         @media (max-width: 480px) {
             .region-data-section {
                 padding: 0 15px 15px 15px;
+            }
+            
+            .key-metrics-grid {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+            
+            .key-metric-card {
+                padding: 16px;
+            }
+            
+            .metric-label {
+                font-size: 12px;
+            }
+            
+            .metric-value {
+                font-size: 18px;
+            }
+            
+            .yield-card {
+                padding: 20px;
+            }
+            
+            .yield-label {
+                font-size: 14px;
+            }
+            
+            .yield-value {
+                font-size: 28px;
             }
             
             .data-card {
@@ -511,6 +629,57 @@
                 <div class="loading-text" id="loadingText">Загрузка данных...</div>
             </div>
             
+            <!-- Key Metrics Cards -->
+            <div class="key-metrics-section" id="keyMetricsSection" style="display: none;">
+                <h3 class="key-metrics-title" id="keyMetricsTitle">Ключевые показатели</h3>
+                <div class="key-metrics-grid">
+                    <!-- Average Sale Price per m² -->
+                    <div class="key-metric-card">
+                        <div class="metric-icon">💰</div>
+                        <div class="metric-content">
+                            <div class="metric-label" id="avgSalePriceLabel">Средняя цена продажи за м²</div>
+                            <div class="metric-value" id="avgSalePrice">-</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Average Rent Price per m² -->
+                    <div class="key-metric-card">
+                        <div class="metric-icon">🏠</div>
+                        <div class="metric-content">
+                            <div class="metric-label" id="avgRentPriceLabel">Средняя цена аренды за м²</div>
+                            <div class="metric-value" id="avgRentPrice">-</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Listing Period Sale -->
+                    <div class="key-metric-card">
+                        <div class="metric-icon">📅</div>
+                        <div class="metric-content">
+                            <div class="metric-label" id="listingPeriodSaleLabel">Период размещения (продажа)</div>
+                            <div class="metric-value" id="listingPeriodSale">-</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Listing Period Rent -->
+                    <div class="key-metric-card">
+                        <div class="metric-icon">⏰</div>
+                        <div class="metric-content">
+                            <div class="metric-label" id="listingPeriodRentLabel">Период размещения (аренда)</div>
+                            <div class="metric-value" id="listingPeriodRent">-</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Yield Card - Full Width -->
+                <div class="yield-card">
+                    <div class="yield-icon">📈</div>
+                    <div class="yield-content">
+                        <div class="yield-label" id="yieldLabel">Yield (Доходность)</div>
+                        <div class="yield-value" id="yieldValue">-</div>
+                    </div>
+                </div>
+            </div>
+            
             <!-- Data Content -->
             <div class="data-content" id="dataContent" style="display: none;">
                                  <!-- General Data -->
@@ -647,7 +816,13 @@
                 'totalProperties': 'Всего объектов:',
                 'averagePrice': 'Средняя цена:',
                 'priceRange': 'Диапазон цен:',
-                'noDataAvailable': 'Данные недоступны'
+                'noDataAvailable': 'Данные недоступны',
+                'keyMetricsTitle': 'Ключевые показатели',
+                'avgSalePriceLabel': 'Средняя цена продажи за м²',
+                'avgRentPriceLabel': 'Средняя цена аренды за м²',
+                'listingPeriodSaleLabel': 'Период размещения (продажа)',
+                'listingPeriodRentLabel': 'Период размещения (аренда)',
+                'yieldLabel': 'Yield (Доходность)'
             },
             'en': {
                 'slogan': 'Real Estate Market Insights',
@@ -678,7 +853,13 @@
                 'totalProperties': 'Total properties:',
                 'averagePrice': 'Average price:',
                 'priceRange': 'Price range:',
-                'noDataAvailable': 'Data not available'
+                'noDataAvailable': 'Data not available',
+                'keyMetricsTitle': 'Key Metrics',
+                'avgSalePriceLabel': 'Average Sale Price per m²',
+                'avgRentPriceLabel': 'Average Rent Price per m²',
+                'listingPeriodSaleLabel': 'Listing Period (Sale)',
+                'listingPeriodRentLabel': 'Listing Period (Rent)',
+                'yieldLabel': 'Yield (Return)'
             },
             'de': {
                 'slogan': 'Immobilienmarkt-Einblicke',
@@ -709,7 +890,13 @@
                 'totalProperties': 'Gesamtobjekte:',
                 'averagePrice': 'Durchschnittspreis:',
                 'priceRange': 'Preisbereich:',
-                'noDataAvailable': 'Daten nicht verfügbar'
+                'noDataAvailable': 'Daten nicht verfügbar',
+                'keyMetricsTitle': 'Wichtige Kennzahlen',
+                'avgSalePriceLabel': 'Durchschnittlicher Verkaufspreis pro m²',
+                'avgRentPriceLabel': 'Durchschnittlicher Mietpreis pro m²',
+                'listingPeriodSaleLabel': 'Angebotsdauer (Verkauf)',
+                'listingPeriodRentLabel': 'Angebotsdauer (Vermietung)',
+                'yieldLabel': 'Yield (Rendite)'
             },
             'fr': {
                 'slogan': 'Aperçus du marché immobilier',
@@ -740,7 +927,13 @@
                 'totalProperties': 'Total des propriétés :',
                 'averagePrice': 'Prix moyen :',
                 'priceRange': 'Fourchette de prix :',
-                'noDataAvailable': 'Données non disponibles'
+                'noDataAvailable': 'Données non disponibles',
+                'keyMetricsTitle': 'Métriques clés',
+                'avgSalePriceLabel': 'Prix de vente moyen par m²',
+                'avgRentPriceLabel': 'Prix de location moyen par m²',
+                'listingPeriodSaleLabel': 'Période d\'inscription (vente)',
+                'listingPeriodRentLabel': 'Période d\'inscription (location)',
+                'yieldLabel': 'Yield (Rendement)'
             },
             'tr': {
                 'slogan': 'Gayrimenkul Piyasa İçgörüleri',
@@ -771,13 +964,81 @@
                 'totalProperties': 'Toplam mülk:',
                 'averagePrice': 'Ortalama fiyat:',
                 'priceRange': 'Fiyat aralığı:',
-                'noDataAvailable': 'Veri mevcut değil'
+                'noDataAvailable': 'Veri mevcut değil',
+                'keyMetricsTitle': 'Ana Metrikler',
+                'avgSalePriceLabel': 'm² başına ortalama satış fiyatı',
+                'avgRentPriceLabel': 'm² başına ortalama kiralama fiyatı',
+                'listingPeriodSaleLabel': 'İlan süresi (satış)',
+                'listingPeriodRentLabel': 'İlan süresi (kiralama)',
+                'yieldLabel': 'Yield (Getiri)'
             }
         };
 
         // Get localized text
         function getText(key) {
             return locales[currentLanguage][key] || key;
+        }
+
+        // Sort fields by priority for structured data display
+        function sortFieldsByPriority(fields) {
+            const priorityOrder = {
+                // Priority 1: Key metrics (prices, areas, age, periods, yield)
+                'average_price_for_rent': 1,
+                'average_price_for_sale': 2,
+                'avg_price_rent': 1,
+                'avg_price_sale': 2,
+                'rent_price_avg': 1,
+                'sale_price_avg': 2,
+                
+                'average_area_for_rent': 3,
+                'average_area_for_sale': 4,
+                'avg_area_rent': 3,
+                'avg_area_sale': 4,
+                'rent_area_avg': 3,
+                'sale_area_avg': 4,
+                
+                'average_age_for_rent': 5,
+                'average_age_for_sale': 6,
+                'avg_age_rent': 5,
+                'avg_age_sale': 6,
+                'rent_age_avg': 5,
+                'sale_age_avg': 6,
+                
+                'listing_period_for_rent': 7,
+                'listing_period_for_sale': 8,
+                'rent_period': 7,
+                'sale_period': 8,
+                'period_rent': 7,
+                'period_sale': 8,
+                
+                'yield': 9,
+                'yield_rate': 9,
+                'return_rate': 9,
+                
+                // Priority 2: Price ranges (max/min prices, total prices)
+                'max_unit_price_for_rent': 10,
+                'min_unit_price_for_rent': 11,
+                'max_unit_price_for_sale': 12,
+                'min_unit_price_for_sale': 13,
+                'max_price_rent': 10,
+                'min_price_rent': 11,
+                'max_price_sale': 12,
+                'min_price_sale': 13,
+                
+                'total_price_for_rent': 14,
+                'total_price_for_sale': 15,
+                'rent_total_price': 14,
+                'sale_total_price': 15,
+                
+                // Priority 3: Other fields (everything else)
+                'default': 999
+            };
+            
+            return fields.sort((a, b) => {
+                const priorityA = priorityOrder[a] || priorityOrder['default'];
+                const priorityB = priorityOrder[b] || priorityOrder['default'];
+                return priorityA - priorityB;
+            });
         }
 
         // Helper function to get human-readable field labels
@@ -1139,6 +1400,37 @@
             if (errorText) {
                 errorText.textContent = getText('errorText');
             }
+            
+            // Update key metrics labels
+            const keyMetricsTitle = document.getElementById('keyMetricsTitle');
+            if (keyMetricsTitle) {
+                keyMetricsTitle.textContent = getText('keyMetricsTitle');
+            }
+            
+            const avgSalePriceLabel = document.getElementById('avgSalePriceLabel');
+            if (avgSalePriceLabel) {
+                avgSalePriceLabel.textContent = getText('avgSalePriceLabel');
+            }
+            
+            const avgRentPriceLabel = document.getElementById('avgRentPriceLabel');
+            if (avgRentPriceLabel) {
+                avgRentPriceLabel.textContent = getText('avgRentPriceLabel');
+            }
+            
+            const listingPeriodSaleLabel = document.getElementById('listingPeriodSaleLabel');
+            if (listingPeriodSaleLabel) {
+                listingPeriodSaleLabel.textContent = getText('listingPeriodSaleLabel');
+            }
+            
+            const listingPeriodRentLabel = document.getElementById('listingPeriodRentLabel');
+            if (listingPeriodRentLabel) {
+                listingPeriodRentLabel.textContent = getText('listingPeriodRentLabel');
+            }
+            
+            const yieldLabel = document.getElementById('yieldLabel');
+            if (yieldLabel) {
+                yieldLabel.textContent = getText('yieldLabel');
+            }
         }
 
         // Load countries from API
@@ -1447,6 +1739,12 @@
                 dataContent.style.display = 'none';
                 errorState.style.display = 'none';
                 
+                // Hide key metrics section during loading
+                const keyMetricsSection = document.getElementById('keyMetricsSection');
+                if (keyMetricsSection) {
+                    keyMetricsSection.style.display = 'none';
+                }
+                
                 // Prepare request data
                 const requestData = {
                     country_id: selectedLocation.country_id,
@@ -1518,7 +1816,88 @@
             }
         }
 
-        // Display region data
+        // Fill key metrics with data from general data
+        function fillKeyMetrics(generalData) {
+            console.log('Filling key metrics with data:', generalData);
+            
+            if (!generalData || generalData.length === 0) {
+                console.log('No general data available for key metrics');
+                return;
+            }
+            
+            // Get the first (and usually only) general data record
+            const data = generalData[0];
+            console.log('Using general data record for key metrics:', data);
+            
+            // Extract and display key metrics
+            let avgSalePrice = '-';
+            let avgRentPrice = '-';
+            let listingPeriodSale = '-';
+            let listingPeriodRent = '-';
+            let yield = '-';
+            
+            // Try to find average sale price (look for various possible field names)
+            if (data.average_price_for_sale !== null && data.average_price_for_sale !== undefined) {
+                avgSalePrice = formatFieldValue('average_price_for_sale', data.average_price_for_sale);
+            } else if (data.avg_price_sale !== null && data.avg_price_sale !== undefined) {
+                avgSalePrice = formatFieldValue('avg_price_sale', data.avg_price_sale);
+            } else if (data.sale_price_avg !== null && data.sale_price_avg !== undefined) {
+                avgSalePrice = formatFieldValue('sale_price_avg', data.sale_price_avg);
+            }
+            
+            // Try to find average rent price
+            if (data.average_price_for_rent !== null && data.average_price_for_rent !== undefined) {
+                avgRentPrice = formatFieldValue('average_price_for_rent', data.average_price_for_rent);
+            } else if (data.avg_price_rent !== null && data.avg_price_rent !== undefined) {
+                avgRentPrice = formatFieldValue('avg_price_rent', data.avg_price_rent);
+            } else if (data.rent_price_avg !== null && data.rent_price_avg !== undefined) {
+                avgRentPrice = formatFieldValue('rent_price_avg', data.rent_price_avg);
+            }
+            
+            // Try to find listing period for sale
+            if (data.listing_period_for_sale !== null && data.listing_period_for_sale !== undefined) {
+                listingPeriodSale = formatFieldValue('listing_period_for_sale', data.listing_period_for_sale);
+            } else if (data.sale_period !== null && data.sale_period !== undefined) {
+                listingPeriodSale = formatFieldValue('sale_period', data.sale_period);
+            }
+            
+            // Try to find listing period for rent
+            if (data.listing_period_for_rent !== null && data.listing_period_for_rent !== undefined) {
+                listingPeriodRent = formatFieldValue('listing_period_for_rent', data.listing_period_for_rent);
+            } else if (data.rent_period !== null && data.rent_period !== undefined) {
+                listingPeriodRent = formatFieldValue('rent_period', data.rent_period);
+            }
+            
+            // Try to find yield
+            if (data.yield !== null && data.yield !== undefined) {
+                yield = formatFieldValue('yield', data.yield);
+            } else if (data.yield_rate !== null && data.yield_rate !== undefined) {
+                yield = formatFieldValue('yield_rate', data.yield_rate);
+            } else if (data.return_rate !== null && data.return_rate !== undefined) {
+                yield = formatFieldValue('return_rate', data.return_rate);
+            }
+            
+            // Update the DOM elements
+            document.getElementById('avgSalePrice').textContent = avgSalePrice;
+            document.getElementById('avgRentPrice').textContent = avgRentPrice;
+            document.getElementById('listingPeriodSale').textContent = listingPeriodSale;
+            document.getElementById('listingPeriodRent').textContent = listingPeriodRent;
+            document.getElementById('yieldValue').textContent = yield;
+            
+            // Show the key metrics section
+            document.getElementById('keyMetricsSection').style.display = 'block';
+            
+            console.log('Key metrics filled:', {
+                avgSalePrice,
+                avgRentPrice,
+                listingPeriodSale,
+                listingPeriodRent,
+                yield
+            });
+        }
+
+        // Display region data (all data blocks are automatically sorted for logical display order)
+        // Data within each block is structured by priority: key metrics → price ranges → other fields
         function displayRegionData(data) {
             console.log('Received data:', data);
             console.log('General data:', data.general_data);
@@ -1585,6 +1964,9 @@
             console.log('Processed floor segment data:', floorSegmentData);
             console.log('Processed age data:', ageData);
             console.log('Processed heating data:', heatingData);
+            
+            // Fill key metrics with data
+            fillKeyMetrics(generalData);
             
             // If data is an array, try to categorize it by content
             if (Array.isArray(data) && data.length > 0) {
@@ -1676,7 +2058,7 @@
             content.innerHTML = tableHtml + footerHtml;
         }
 
-        // Display bedroom count data
+        // Display bedroom count data (sorted by bedroom count: 1+1, 2+1, 3+1, etc.)
         function displayHouseTypeData(houseTypeData) {
             const content = document.getElementById('houseTypeDataContent');
             
@@ -1690,9 +2072,34 @@
                 return;
             }
             
+            // Sort house type data by bedroom count in logical order: 1+1, 2+1, 3+1, 4+1, etc.
+            const sortedHouseTypeData = [...houseTypeData].sort((a, b) => {
+                // Extract bedroom count from listing_type or type field
+                const getBedroomCount = (item) => {
+                    const typeField = item.listing_type || item.type || item.house_type || item.house_type_name || item.name || '';
+                    // Extract number from strings like "1+1", "2+1", "3+1", etc.
+                    const match = typeField.match(/(\d+)\+(\d+)/);
+                    if (match) {
+                        const bedrooms = parseInt(match[1]);
+                        const livingRooms = parseInt(match[2]);
+                        return bedrooms * 10 + livingRooms; // Sort by bedrooms first, then living rooms
+                    }
+                    // For other formats, try to extract just the first number
+                    const singleMatch = typeField.match(/(\d+)/);
+                    if (singleMatch) {
+                        return parseInt(singleMatch[1]);
+                    }
+                    return 999; // Put unknown formats at the end
+                };
+                
+                return getBedroomCount(a) - getBedroomCount(b);
+            });
+
+            console.log('Sorted house type data:', sortedHouseTypeData);
+
             let html = '';
             
-            houseTypeData.forEach((item, index) => {
+            sortedHouseTypeData.forEach((item, index) => {
                 console.log(`House type item ${index}:`, item);
                 // Try different possible field names
                 const typeField = item.house_type || item.type || item.house_type_name || item.name;
@@ -1703,17 +2110,21 @@
                         <h3>${typeField}</h3>
                         <table class="data-table">`;
                     
-                    // Add all available fields to table
-                    Object.keys(item).forEach(key => {
-                        if (!['house_type', 'type', 'house_type_name', 'name', 'country_id', 'city_id', 'county_id', 'district_id', 'id', 'created_at', 'source_file', 'updated_at'].includes(key)) {
-                            const value = item[key];
-                            if (value !== null && value !== undefined) {
-                                const label = getFieldLabel(key);
-                                const displayValue = formatFieldValue(key, value);
-                                
-                                html += `<tr><td>${label}:</td><td>${displayValue}</td></tr>`;
-                            }
-                        }
+                    // Get all available fields and sort them by priority
+                    const availableFields = Object.keys(item).filter(key => 
+                        !['house_type', 'type', 'house_type_name', 'name', 'country_id', 'city_id', 'county_id', 'district_id', 'id', 'created_at', 'source_file', 'updated_at'].includes(key) &&
+                        item[key] !== null && item[key] !== undefined
+                    );
+                    
+                    const sortedFields = sortFieldsByPriority(availableFields);
+                    console.log(`Sorted fields for item ${index}:`, sortedFields);
+                    
+                    // Add fields in priority order
+                    sortedFields.forEach(key => {
+                        const value = item[key];
+                        const label = getFieldLabel(key);
+                        const displayValue = formatFieldValue(key, value);
+                        html += `<tr><td>${label}:</td><td>${displayValue}</td></tr>`;
                     });
                     
                     html += '</table></div>';
@@ -1725,15 +2136,21 @@
                         <h3>${fallbackTitle}</h3>
                         <table class="data-table">`;
                     
-                    Object.keys(item).forEach(key => {
-                        if (!['country_id', 'city_id', 'county_id', 'district_id', 'id', 'created_at', 'source_file', 'updated_at'].includes(key)) {
-                            const value = item[key];
-                            if (value !== null && value !== undefined) {
-                                const label = getFieldLabel(key);
-                                const displayValue = formatFieldValue(key, value);
-                                html += `<tr><td>${label}:</td><td>${displayValue}</td></tr>`;
-                            }
-                        }
+                    // Get all available fields and sort them by priority
+                    const availableFields = Object.keys(item).filter(key => 
+                        !['country_id', 'city_id', 'county_id', 'district_id', 'id', 'created_at', 'source_file', 'updated_at'].includes(key) &&
+                        item[key] !== null && item[key] !== undefined
+                    );
+                    
+                    const sortedFields = sortFieldsByPriority(availableFields);
+                    console.log(`Sorted fields for fallback item ${index}:`, sortedFields);
+                    
+                    // Add fields in priority order
+                    sortedFields.forEach(key => {
+                        const value = item[key];
+                        const label = getFieldLabel(key);
+                        const displayValue = formatFieldValue(key, value);
+                        html += `<tr><td>${label}:</td><td>${displayValue}</td></tr>`;
                     });
                     
                     html += '</table></div>';
@@ -1744,7 +2161,7 @@
             content.innerHTML = html;
         }
 
-        // Display floor data
+        // Display floor data (sorted by floor range: Ground, 1-5, 6-10, 11-15, etc.)
         function displayFloorSegmentData(floorSegmentData) {
             const content = document.getElementById('floorSegmentDataContent');
             
@@ -1758,9 +2175,34 @@
                 return;
             }
             
+            // Sort floor segment data by floor range in logical order: Ground, 1-5, 6-10, 11-15, etc.
+            const sortedFloorSegmentData = [...floorSegmentData].sort((a, b) => {
+                // Extract floor range from listing_type or type field
+                const getFloorRange = (item) => {
+                    const segmentField = item.listing_type || item.type || item.floor_segment || item.segment || item.floor_segment_name || item.name || '';
+                    if (segmentField.toLowerCase().includes('ground') || segmentField.toLowerCase().includes('земля')) return 1;
+                    if (segmentField.includes('1-5')) return 2;
+                    if (segmentField.includes('6-10')) return 3;
+                    if (segmentField.includes('11-15')) return 4;
+                    if (segmentField.includes('16-20')) return 5;
+                    if (segmentField.includes('21-25')) return 6;
+                    if (segmentField.includes('26-30')) return 7;
+                    // For other formats, try to extract just the first number
+                    const singleMatch = segmentField.match(/(\d+)/);
+                    if (singleMatch) {
+                        return parseInt(singleMatch[1]) + 10; // Add offset to put after predefined ranges
+                    }
+                    return 999; // Put unknown formats at the end
+                };
+                
+                return getFloorRange(a) - getFloorRange(b);
+            });
+
+            console.log('Sorted floor segment data:', sortedFloorSegmentData);
+
             let html = '';
             
-            floorSegmentData.forEach((item, index) => {
+            sortedFloorSegmentData.forEach((item, index) => {
                 console.log(`Floor segment item ${index}:`, item);
                 // Try different possible field names
                 const segmentField = item.floor_segment || item.segment || item.floor_segment_name || item.name;
@@ -1771,17 +2213,21 @@
                         <h3>${segmentField}</h3>
                         <table class="data-table">`;
                     
-                    // Add all available fields to table
-                    Object.keys(item).forEach(key => {
-                        if (!['floor_segment', 'segment', 'floor_segment_name', 'name', 'country_id', 'city_id', 'county_id', 'district_id', 'id', 'created_at', 'source_file', 'updated_at'].includes(key)) {
-                            const value = item[key];
-                            if (value !== null && value !== undefined) {
-                                const label = getFieldLabel(key);
-                                const displayValue = formatFieldValue(key, value);
-                                
-                                html += `<tr><td>${label}:</td><td>${displayValue}</td></tr>`;
-                            }
-                        }
+                    // Get all available fields and sort them by priority
+                    const availableFields = Object.keys(item).filter(key => 
+                        !['floor_segment', 'segment', 'floor_segment_name', 'name', 'country_id', 'city_id', 'county_id', 'district_id', 'id', 'created_at', 'source_file', 'updated_at'].includes(key) &&
+                        item[key] !== null && item[key] !== undefined
+                    );
+                    
+                    const sortedFields = sortFieldsByPriority(availableFields);
+                    console.log(`Sorted fields for floor segment item ${index}:`, sortedFields);
+                    
+                    // Add fields in priority order
+                    sortedFields.forEach(key => {
+                        const value = item[key];
+                        const label = getFieldLabel(key);
+                        const displayValue = formatFieldValue(key, value);
+                        html += `<tr><td>${label}:</td><td>${displayValue}</td></tr>`;
                     });
                     
                     html += '</table></div>';
@@ -1793,15 +2239,21 @@
                         <h3>${fallbackTitle}</h3>
                         <table class="data-table">`;
                     
-                    Object.keys(item).forEach(key => {
-                        if (!['country_id', 'city_id', 'county_id', 'district_id', 'id', 'created_at', 'source_file', 'updated_at'].includes(key)) {
-                            const value = item[key];
-                            if (value !== null && value !== undefined) {
-                                const label = getFieldLabel(key);
-                                const displayValue = formatFieldValue(key, value);
-                                html += `<tr><td>${label}:</td><td>${displayValue}</td></tr>`;
-                            }
-                        }
+                    // Get all available fields and sort them by priority
+                    const availableFields = Object.keys(item).filter(key => 
+                        !['country_id', 'city_id', 'county_id', 'district_id', 'id', 'created_at', 'source_file', 'updated_at'].includes(key) &&
+                        item[key] !== null && item[key] !== undefined
+                    );
+                    
+                    const sortedFields = sortFieldsByPriority(availableFields);
+                    console.log(`Sorted fields for floor segment fallback item ${index}:`, sortedFields);
+                    
+                    // Add fields in priority order
+                    sortedFields.forEach(key => {
+                        const value = item[key];
+                        const label = getFieldLabel(key);
+                        const displayValue = formatFieldValue(key, value);
+                        html += `<tr><td>${label}:</td><td>${displayValue}</td></tr>`;
                     });
                     
                     html += '</table></div>';
@@ -1812,7 +2264,7 @@
             content.innerHTML = html;
         }
 
-                // Display age data
+                // Display age data (sorted by age range: 0-4, 5-10, 11-15)
         function displayAgeData(ageData) {
             const content = document.getElementById('ageDataContent');
 
@@ -1826,9 +2278,25 @@
                 return;
             }
 
+            // Sort age data by age range in correct order: 0-4, 5-10, 11-15
+            const sortedAgeData = [...ageData].sort((a, b) => {
+                // Extract age range from listing_type or type field
+                const getAgeRange = (item) => {
+                    const ageField = item.listing_type || item.type || item.age_category || item.age || item.age_category_name || item.name || '';
+                    if (ageField.includes('0-4')) return 1;
+                    if (ageField.includes('5-10')) return 2;
+                    if (ageField.includes('11-15')) return 3;
+                    return 4; // For any other values
+                };
+                
+                return getAgeRange(a) - getAgeRange(b);
+            });
+
+            console.log('Sorted age data:', sortedAgeData);
+
             let html = '';
 
-            ageData.forEach((item, index) => {
+            sortedAgeData.forEach((item, index) => {
                 console.log(`Age item ${index}:`, item);
                 // Try different possible field names
                 const ageField = item.age_category || item.age || item.age_category_name || item.name;
@@ -1839,17 +2307,21 @@
                         <h3>${ageField}</h3>
                         <table class="data-table">`;
                     
-                    // Add all available fields to table
-                    Object.keys(item).forEach(key => {
-                        if (!['age_category', 'age', 'age_category_name', 'name', 'country_id', 'city_id', 'county_id', 'district_id', 'id', 'created_at', 'source_file'].includes(key)) {
-                            const value = item[key];
-                            if (value !== null && value !== undefined) {
-                                const label = getFieldLabel(key);
-                                const displayValue = formatFieldValue(key, value);
-                                
-                                html += `<tr><td>${label}:</td><td>${displayValue}</td></tr>`;
-                            }
-                        }
+                    // Get all available fields and sort them by priority
+                    const availableFields = Object.keys(item).filter(key => 
+                        !['age_category', 'age', 'age_category_name', 'name', 'country_id', 'city_id', 'county_id', 'district_id', 'id', 'created_at', 'source_file'].includes(key) &&
+                        item[key] !== null && item[key] !== undefined
+                    );
+                    
+                    const sortedFields = sortFieldsByPriority(availableFields);
+                    console.log(`Sorted fields for age item ${index}:`, sortedFields);
+                    
+                    // Add fields in priority order
+                    sortedFields.forEach(key => {
+                        const value = item[key];
+                        const label = getFieldLabel(key);
+                        const displayValue = formatFieldValue(key, value);
+                        html += `<tr><td>${label}:</td><td>${displayValue}</td></tr>`;
                     });
                     
                     html += '</table></div>';
@@ -1861,15 +2333,21 @@
                         <h3>${fallbackTitle}</h3>
                         <table class="data-table">`;
                     
-                    Object.keys(item).forEach(key => {
-                        if (!['country_id', 'city_id', 'county_id', 'district_id', 'id', 'created_at', 'source_file', 'updated_at'].includes(key)) {
-                            const value = item[key];
-                            if (value !== null && value !== undefined) {
-                                const label = getFieldLabel(key);
-                                const displayValue = formatFieldValue(key, value);
-                                html += `<tr><td>${label}:</td><td>${displayValue}</td></tr>`;
-                            }
-                        }
+                    // Get all available fields and sort them by priority
+                    const availableFields = Object.keys(item).filter(key => 
+                        !['country_id', 'city_id', 'county_id', 'district_id', 'id', 'created_at', 'source_file', 'updated_at'].includes(key) &&
+                        item[key] !== null && item[key] !== undefined
+                    );
+                    
+                    const sortedFields = sortFieldsByPriority(availableFields);
+                    console.log(`Sorted fields for age fallback item ${index}:`, sortedFields);
+                    
+                    // Add fields in priority order
+                    sortedFields.forEach(key => {
+                        const value = item[key];
+                        const label = getFieldLabel(key);
+                        const displayValue = formatFieldValue(key, value);
+                        html += `<tr><td>${label}:</td><td>${displayValue}</td></tr>`;
                     });
                     
                     html += '</table></div>';
@@ -1880,7 +2358,7 @@
             content.innerHTML = html;
         }
 
-        // Display heating type data
+        // Display heating type data (sorted by priority: Central, Individual, Natural Gas, etc.)
         function displayHeatingData(heatingData) {
             const content = document.getElementById('heatingDataContent');
 
@@ -1894,9 +2372,29 @@
                 return;
             }
 
+            // Sort heating data by type in logical order: Central, Individual, Natural Gas, etc.
+            const sortedHeatingData = [...heatingData].sort((a, b) => {
+                // Extract heating type from listing_type or type field
+                const getHeatingPriority = (item) => {
+                    const heatingField = item.listing_type || item.type || item.heating_type || item.heating || item.heating_type_name || item.name || '';
+                    const fieldLower = heatingField.toLowerCase();
+                    if (fieldLower.includes('central') || fieldLower.includes('центральное')) return 1;
+                    if (fieldLower.includes('individual') || fieldLower.includes('индивидуальное')) return 2;
+                    if (fieldLower.includes('natural gas') || fieldLower.includes('газ') || fieldLower.includes('газовое')) return 3;
+                    if (fieldLower.includes('electric') || fieldLower.includes('электрическое')) return 4;
+                    if (fieldLower.includes('solar') || fieldLower.includes('солнечное')) return 5;
+                    if (fieldLower.includes('wood') || fieldLower.includes('дровяное')) return 6;
+                    return 999; // Put unknown types at the end
+                };
+                
+                return getHeatingPriority(a) - getHeatingPriority(b);
+            });
+
+            console.log('Sorted heating data:', sortedHeatingData);
+
             let html = '';
 
-            heatingData.forEach((item, index) => {
+            sortedHeatingData.forEach((item, index) => {
                 console.log(`Heating item ${index}:`, item);
                 // Try different possible field names
                 const heatingField = item.heating_type || item.heating || item.heating_type_name || item.name;
@@ -1907,17 +2405,22 @@
                         <h3>${heatingField}</h3>
                         <table class="data-table">`;
                     
-                    // Add all available fields to table
-                    Object.keys(item).forEach(key => {
-                        if (!['heating_type', 'heating', 'heating_type_name', 'name', 'country_id', 'city_id', 'county_id', 'district_id', 'id', 'created_at', 'source_file', 'updated_at'].includes(key)) {
-                            const value = item[key];
-                            if (value !== null && value !== undefined) {
-                                const label = getFieldLabel(key);
-                                let displayValue = formatFieldValue(key, value);
-                                
-                                html += `<tr><td>${label}:</td><td>${displayValue}</td></tr>`;
-                            }
-                        }
+                    // Get all available fields and sort them by priority
+                    const availableFields = Object.keys(item).filter(key => 
+                        !['heating_type', 'heating', 'heating_type_name', 'name', 'country_id', 'city_id', 'county_id', 'district_id', 'id', 'created_at', 'source_file', 'updated_at'].includes(key) &&
+                        item[key] !== null && item[key] !== undefined
+                    );
+                    
+                    const sortedFields = sortFieldsByPriority(availableFields);
+                    console.log(`Sorted fields for heating item ${index}:`, sortedFields);
+                    
+                    // Add fields in priority order
+                    sortedFields.forEach(key => {
+                        const value = item[key];
+                        const label = getFieldLabel(key);
+                        let displayValue = formatFieldValue(key, value);
+                        
+                        html += `<tr><td>${label}:</td><td>${displayValue}</td></tr>`;
                     });
                     
                     html += '</table></div>';
@@ -1929,15 +2432,21 @@
                         <h3>${fallbackTitle}</h3>
                         <table class="data-table">`;
                     
-                    Object.keys(item).forEach(key => {
-                        if (!['country_id', 'city_id', 'county_id', 'district_id', 'id', 'created_at', 'source_file', 'updated_at'].includes(key)) {
-                            const value = item[key];
-                            if (value !== null && value !== undefined) {
-                                const label = getFieldLabel(key);
-                                const displayValue = formatFieldValue(key, value);
-                                html += `<tr><td>${label}:</td><td>${displayValue}</td></tr>`;
-                            }
-                        }
+                    // Get all available fields and sort them by priority
+                    const availableFields = Object.keys(item).filter(key => 
+                        !['country_id', 'city_id', 'county_id', 'district_id', 'id', 'created_at', 'source_file', 'updated_at'].includes(key) &&
+                        item[key] !== null && item[key] !== undefined
+                    );
+                    
+                    const sortedFields = sortFieldsByPriority(availableFields);
+                    console.log(`Sorted fields for heating fallback item ${index}:`, sortedFields);
+                    
+                    // Add fields in priority order
+                    sortedFields.forEach(key => {
+                        const value = item[key];
+                        const label = getFieldLabel(key);
+                        const displayValue = formatFieldValue(key, value);
+                        html += `<tr><td>${label}:</td><td>${displayValue}</td></tr>`;
                     });
                     
                     html += '</table></div>';
