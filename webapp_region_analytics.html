@@ -1199,19 +1199,19 @@
             });
         }
 
-        // Display fields with structured headers and sections
+                // Display fields with structured headers and sections
         function displayFieldsWithStructuredHeaders(fields, item, html) {
             let currentSection = '';
             let saleFields = [];
             let rentFields = [];
             let yieldFields = [];
             let additionalFields = [];
-            
+
             // Categorize fields by type
             fields.forEach(key => {
                 const value = item[key];
                 if (value === null || value === undefined) return;
-                
+
                 if (key.includes('sale') || key.includes('Sale')) {
                     saleFields.push({ key, value });
                 } else if (key.includes('rent') || key.includes('Rent')) {
@@ -1222,40 +1222,71 @@
                     additionalFields.push({ key, value });
                 }
             });
-            
+
             // Sort each category by priority
             saleFields.sort((a, b) => {
                 const priorityA = getFieldPriority(a.key);
                 const priorityB = getFieldPriority(b.key);
                 return priorityA - priorityB;
             });
-            
+
             rentFields.sort((a, b) => {
                 const priorityA = getFieldPriority(a.key);
                 const priorityB = getFieldPriority(b.key);
                 return priorityA - priorityB;
             });
-            
+
+            // Get localized headers based on user language
+            const headers = {
+                'ru': {
+                    'sale': 'Данные по продаже',
+                    'rent': 'Данные по аренде',
+                    'additional': 'Дополнительно'
+                },
+                'en': {
+                    'sale': 'Sale Data',
+                    'rent': 'Rent Data',
+                    'additional': 'Additional'
+                },
+                'de': {
+                    'sale': 'Verkaufsdaten',
+                    'rent': 'Vermietungsdaten',
+                    'additional': 'Zusätzlich'
+                },
+                'fr': {
+                    'sale': 'Données de vente',
+                    'rent': 'Données de location',
+                    'additional': 'Supplémentaire'
+                },
+                'tr': {
+                    'sale': 'Satış Verileri',
+                    'rent': 'Kiralama Verileri',
+                    'additional': 'Ek'
+                }
+            };
+
+            const currentHeaders = headers[userLanguage] || headers['ru'];
+
             // Display Sale section
             if (saleFields.length > 0) {
-                html += '<tr class="section-header"><td colspan="2"><strong>Данные по продаже</strong></td></tr>';
+                html += `<tr class="section-header"><td colspan="2"><strong>${currentHeaders.sale}</strong></td></tr>`;
                 saleFields.forEach(({ key, value }) => {
                     const label = getFieldLabel(key);
                     const displayValue = formatFieldValue(key, value);
                     html += `<tr><td>${label}:</td><td>${displayValue}</td></tr>`;
                 });
             }
-            
+
             // Display Rent section
             if (rentFields.length > 0) {
-                html += '<tr class="section-header"><td colspan="2"><strong>Данные по аренде</strong></td></tr>';
+                html += `<tr class="section-header"><td colspan="2"><strong>${currentHeaders.rent}</strong></td></tr>`;
                 rentFields.forEach(({ key, value }) => {
                     const label = getFieldLabel(key);
                     const displayValue = formatFieldValue(key, value);
                     html += `<tr><td>${label}:</td><td>${displayValue}</td></tr>`;
                 });
             }
-            
+
             // Display Yield (highlighted)
             if (yieldFields.length > 0) {
                 yieldFields.forEach(({ key, value }) => {
@@ -1264,10 +1295,10 @@
                     html += `<tr class="yield-row"><td><strong>${label}:</strong></td><td><strong>${displayValue}</strong></td></tr>`;
                 });
             }
-            
+
             // Display Additional section (collapsible)
             if (additionalFields.length > 0) {
-                html += '<tr class="section-header collapsible" onclick="toggleAdditionalSection(this)"><td colspan="2"><strong>Дополнительно ▼</strong></td></tr>';
+                html += `<tr class="section-header collapsible" onclick="toggleAdditionalSection(this)"><td colspan="2"><strong>${currentHeaders.additional} ▼</strong></td></tr>`;
                 html += '<tbody class="additional-section" style="display: none;">';
                 additionalFields.forEach(({ key, value }) => {
                     const label = getFieldLabel(key);
@@ -1276,7 +1307,7 @@
                 });
                 html += '</tbody>';
             }
-            
+
             return html;
         }
         
@@ -1311,18 +1342,63 @@
             const additionalSection = headerRow.nextElementSibling;
             const isVisible = additionalSection.style.display !== 'none';
             
+            // Get localized text for additional section
+            const additionalText = {
+                'ru': 'Дополнительно',
+                'en': 'Additional',
+                'de': 'Zusätzlich',
+                'fr': 'Supplémentaire',
+                'tr': 'Ek'
+            };
+            
+            const currentText = additionalText[userLanguage] || additionalText['ru'];
+            
             if (isVisible) {
                 additionalSection.style.display = 'none';
-                headerRow.querySelector('strong').innerHTML = 'Дополнительно ▼';
+                headerRow.querySelector('strong').innerHTML = `${currentText} ▼`;
             } else {
                 additionalSection.style.display = 'table-row-group';
-                headerRow.querySelector('strong').innerHTML = 'Дополнительно ▲';
+                headerRow.querySelector('strong').innerHTML = `${currentText} ▲`;
             }
         }
 
-        // Currency management
+        // User language and currency management
+        let userLanguage = 'ru'; // Default language
         let currentCurrency = 'TRY'; // Default currency
         let currencyRates = null;
+        
+        // Get user language from database
+        async function getUserLanguage() {
+            try {
+                // Get telegram_id from Telegram WebApp
+                const telegramId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id;
+                if (!telegramId) {
+                    console.log('No telegram_id available, using default language: ru');
+                    return 'ru';
+                }
+                
+                const response = await fetch('/api/user/language', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ telegram_id: telegramId })
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    userLanguage = data.language;
+                    console.log('User language loaded:', userLanguage);
+                    return userLanguage;
+                } else {
+                    console.log('Failed to get user language, using default: ru');
+                    return 'ru';
+                }
+            } catch (error) {
+                console.error('Error getting user language:', error);
+                return 'ru';
+            }
+        }
         
         // Set default currency based on selected country
         function setDefaultCurrency() {
@@ -1385,21 +1461,24 @@
         // Get currency rates from database or API
         async function getCurrencyRates() {
             try {
+                console.log('🔄 Fetching currency rates...');
                 // First try to get from database
                 const response = await fetch('/api/currency/rates');
+                console.log('📡 Response status:', response.status);
                 const data = await response.json();
+                console.log('📊 Response data:', data);
                 
                 if (data.success && data.rates) {
                     currencyRates = data.rates;
-                    console.log('Currency rates loaded from database:', currencyRates);
+                    console.log('✅ Currency rates loaded from database:', currencyRates);
                     return currencyRates;
                 } else {
                     // If no rates in database, fetch from API
-                    console.log('No currency rates in database, fetching from API...');
+                    console.log('⚠️ No currency rates in database, fetching from API...');
                     return await fetchCurrencyFromAPI();
                 }
             } catch (error) {
-                console.error('Error getting currency rates:', error);
+                console.error('❌ Error getting currency rates:', error);
                 return await fetchCurrencyFromAPI();
             }
         }
@@ -1425,25 +1504,45 @@
 
         // Convert value to selected currency
         function convertCurrency(value, fromCurrency = 'TRY') {
-            if (!currencyRates || !value || isNaN(value)) return value;
+            console.log('🔄 Converting currency:', { value, fromCurrency, currentCurrency, currencyRates });
+            
+            if (!currencyRates || !value || isNaN(value)) {
+                console.log('⚠️ Cannot convert: missing rates, value, or invalid value');
+                return value;
+            }
             
             const numericValue = parseFloat(value);
-            if (isNaN(numericValue)) return value;
+            if (isNaN(numericValue)) {
+                console.log('⚠️ Cannot convert: value is not a valid number');
+                return value;
+            }
             
             // If converting from TRY (base currency in our system)
             if (fromCurrency === 'TRY') {
+                let convertedValue;
                 switch (currentCurrency) {
                     case 'USD':
-                        return numericValue / currencyRates.usd;
+                        // TRY -> EUR -> USD: TRY / TRY_EUR_rate * USD_EUR_rate
+                        convertedValue = numericValue / currencyRates.try * currencyRates.usd;
+                        console.log(`💰 TRY ${numericValue} -> USD ${convertedValue} (via EUR)`);
+                        return convertedValue;
                     case 'EUR':
-                        return numericValue / currencyRates.euro;
+                        // TRY -> EUR: TRY / TRY_EUR_rate
+                        convertedValue = numericValue / currencyRates.try;
+                        console.log(`💰 TRY ${numericValue} -> EUR ${convertedValue}`);
+                        return convertedValue;
                     case 'RUB':
-                        return numericValue / currencyRates.rub;
+                        // TRY -> EUR -> RUB: TRY / TRY_EUR_rate * RUB_EUR_rate
+                        convertedValue = numericValue / currencyRates.try * currencyRates.rub;
+                        console.log(`💰 TRY ${numericValue} -> RUB ${convertedValue} (via EUR)`);
+                        return convertedValue;
                     default:
+                        console.log(`💰 Keeping in TRY: ${numericValue}`);
                         return numericValue; // TRY
                 }
             }
             
+            console.log(`💰 No conversion needed for ${fromCurrency}`);
             return numericValue;
         }
 
@@ -1464,7 +1563,10 @@
             
             // Пересчитываем и обновляем ключевые метрики
             if (window.lastGeneralData) {
+                console.log('Updating key metrics with lastGeneralData:', window.lastGeneralData);
                 fillKeyMetrics(window.lastGeneralData);
+            } else {
+                console.log('No lastGeneralData available for currency update');
             }
         }
 
@@ -1511,59 +1613,133 @@
 
         // Helper function to get human-readable field labels
         function getFieldLabel(key) {
-            const fieldLabels = {
-                // Heating data fields
-                'heating_type': 'Тип отопления',
-                'heating_type_name': 'Название типа отопления',
-                'count_for_rent': 'Количество для аренды',
-                'count_for_sale': 'Количество для продажи',
-                'unit_price_for_rent': 'Цена за м² для аренды',
-                'unit_price_for_sale': 'Цена за м² для продажи',
-                'max_unit_price_for_rent': 'Максимальная цена за м² для аренды',
-                'max_unit_price_for_sale': 'Максимальная цена за м² для продажи',
-                'min_unit_price_for_rent': 'Минимальная цена за м² для аренды',
-                'min_unit_price_for_sale': 'Минимальная цена за м² для продажи',
-                'price_for_rent': 'Общая цена для аренды',
-                'price_for_sale': 'Общая цена для продажи',
-                'listing_period_for_rent': 'Период размещения для аренды (дни)',
-                'listing_period_for_sale': 'Период размещения для продажи (дни)',
-                'avg_price_for_rent': 'Средняя цена для аренды',
-                'avg_price_for_sale': 'Средняя цена для продажи',
-                'avg_area_for_rent': 'Средняя площадь для аренды',
-                'avg_area_for_sale': 'Средняя площадь для продажи',
-                'avg_duration_for_rent': 'Средняя продолжительность для аренды',
-                'avg_duration_for_sale': 'Средняя продолжительность для продажи',
-                'average_age_for_rent': 'Средний возраст для аренды (годы)',
-                'average_age_for_sale': 'Средний возраст для продажи (годы)',
-                'yield_for_rent': 'Доходность для аренды',
-                'yield_for_sale': 'Доходность для продажи',
-                'stock_ratio_rent': 'Коэффициент запаса для аренды',
-                'stock_ratio_sale': 'Коэффициент запаса для продажи',
-                'trend_date': 'Дата тренда',
-                
-                // House type data fields (bedroom count)
-                'house_type': 'Количество спален',
-                'house_type_name': 'Название количества спален',
-                
-                // Floor segment data fields
-                'floor_segment': 'Этаж',
-                'floor_segment_name': 'Название этажа',
-                
-                // Age data fields
-                'age_category': 'Возрастная категория',
-                'age_category_name': 'Название возрастной категории',
-                
-                // General fields
-                'total_properties': 'Всего объектов',
-                'average_price': 'Средняя цена',
-                'min_price': 'Минимальная цена',
-                'max_price': 'Максимальная цена',
-                'total_count': 'Общее количество',
-                'rent_count': 'Количество для аренды',
-                'sale_count': 'Количество для продажи'
+            // Define field labels based on user's language
+            const labels = {
+                'ru': {
+                    'average_age_for_sale': 'Средний возраст для продажи (годы)',
+                    'average_age_for_rent': 'Средний возраст для аренды (годы)',
+                    'listing_period_for_sale': 'Период размещения для продажи (дни)',
+                    'listing_period_for_rent': 'Период размещения для аренды (дни)',
+                    'max_unit_price_for_sale': 'Максимальная цена за м² для продажи',
+                    'min_unit_price_for_sale': 'Минимальная цена за м² для продажи',
+                    'max_unit_price_for_rent': 'Максимальная цена за м² для аренды',
+                    'min_unit_price_for_rent': 'Минимальная цена за м² для аренды',
+                    'comparable_area_for_sale': 'Сопоставимая площадь для продажи',
+                    'comparable_area_for_rent': 'Сопоставимая площадь для аренды',
+                    'quantity_for_sale': 'Количество для продажи',
+                    'quantity_for_rent': 'Количество для аренды',
+                    'total_price_for_sale': 'Общая цена для продажи',
+                    'total_price_for_rent': 'Общая цена для аренды',
+                    'inventory_coefficient_for_sale': 'Коэффициент запаса для продажи',
+                    'inventory_coefficient_for_rent': 'Коэффициент запаса для аренды',
+                    'yield': 'Доходность',
+                    'trend_date': 'Дата тренда',
+                    'heating_type': 'Тип отопления',
+                    'house_type': 'Количество спален',
+                    'floor_segment': 'Этаж',
+                    'age_category': 'Возрастная категория'
+                },
+                'en': {
+                    'average_age_for_sale': 'Average age for sale (years)',
+                    'average_age_for_rent': 'Average age for rent (years)',
+                    'listing_period_for_sale': 'Listing period for sale (days)',
+                    'listing_period_for_rent': 'Listing period for rent (days)',
+                    'max_unit_price_for_sale': 'Maximum price per m² for sale',
+                    'min_unit_price_for_sale': 'Minimum price per m² for sale',
+                    'max_unit_price_for_rent': 'Maximum price per m² for rent',
+                    'min_unit_price_for_rent': 'Minimum price per m² for rent',
+                    'comparable_area_for_sale': 'Comparable area for sale',
+                    'comparable_area_for_rent': 'Comparable area for rent',
+                    'quantity_for_sale': 'Quantity for sale',
+                    'quantity_for_rent': 'Quantity for rent',
+                    'total_price_for_sale': 'Total price for sale',
+                    'total_price_for_rent': 'Total price for rent',
+                    'inventory_coefficient_for_sale': 'Inventory coefficient for sale',
+                    'inventory_coefficient_for_rent': 'Inventory coefficient for rent',
+                    'yield': 'Yield',
+                    'trend_date': 'Trend date',
+                    'heating_type': 'Heating type',
+                    'house_type': 'Bedroom count',
+                    'floor_segment': 'Floor',
+                    'age_category': 'Age category'
+                },
+                'de': {
+                    'average_age_for_sale': 'Durchschnittsalter für Verkauf (Jahre)',
+                    'average_age_for_rent': 'Durchschnittsalter für Vermietung (Jahre)',
+                    'listing_period_for_sale': 'Einstellungszeitraum für Verkauf (Tage)',
+                    'listing_period_for_rent': 'Einstellungszeitraum für Vermietung (Tage)',
+                    'max_unit_price_for_sale': 'Maximaler Preis pro m² für Verkauf',
+                    'min_unit_price_for_sale': 'Minimaler Preis pro m² für Verkauf',
+                    'max_unit_price_for_rent': 'Maximaler Preis pro m² für Vermietung',
+                    'min_unit_price_for_rent': 'Minimaler Preis pro m² für Vermietung',
+                    'comparable_area_for_sale': 'Vergleichbare Fläche für Verkauf',
+                    'comparable_area_for_rent': 'Vergleichbare Fläche für Vermietung',
+                    'quantity_for_sale': 'Menge für Verkauf',
+                    'quantity_for_rent': 'Menge für Vermietung',
+                    'total_price_for_sale': 'Gesamtpreis für Verkauf',
+                    'total_price_for_rent': 'Gesamtpreis für Vermietung',
+                    'inventory_coefficient_for_sale': 'Lagerkoeffizient für Verkauf',
+                    'inventory_coefficient_for_rent': 'Lagerkoeffizient für Vermietung',
+                    'yield': 'Rendite',
+                    'trend_date': 'Trenddatum',
+                    'heating_type': 'Heizungstyp',
+                    'house_type': 'Schlafzimmer-Anzahl',
+                    'floor_segment': 'Etage',
+                    'age_category': 'Alterskategorie'
+                },
+                'fr': {
+                    'average_age_for_sale': 'Âge moyen pour la vente (années)',
+                    'average_age_for_rent': 'Âge moyen pour la location (années)',
+                    'listing_period_for_sale': 'Période d\'inscription pour la vente (jours)',
+                    'listing_period_for_rent': 'Période d\'inscription pour la location (jours)',
+                    'max_unit_price_for_sale': 'Prix maximum par m² pour la vente',
+                    'min_unit_price_for_sale': 'Prix minimum par m² pour la vente',
+                    'max_unit_price_for_rent': 'Prix maximum par m² pour la location',
+                    'min_unit_price_for_rent': 'Prix minimum par m² pour la location',
+                    'comparable_area_for_sale': 'Zone comparable pour la vente',
+                    'comparable_area_for_rent': 'Zone comparable pour la location',
+                    'quantity_for_sale': 'Quantité pour la vente',
+                    'quantity_for_rent': 'Quantité pour la location',
+                    'total_price_for_sale': 'Prix total pour la vente',
+                    'total_price_for_rent': 'Prix total pour la location',
+                    'inventory_coefficient_for_sale': 'Coefficient d\'inventaire pour la vente',
+                    'inventory_coefficient_for_rent': 'Coefficient d\'inventaire pour la location',
+                    'yield': 'Rendement',
+                    'trend_date': 'Date de tendance',
+                    'heating_type': 'Type de chauffage',
+                    'house_type': 'Nombre de chambres',
+                    'floor_segment': 'Étage',
+                    'age_category': 'Catégorie d\'âge'
+                },
+                'tr': {
+                    'average_age_for_sale': 'Satış için ortalama yaş (yıl)',
+                    'average_age_for_rent': 'Kiralama için ortalama yaş (yıl)',
+                    'listing_period_for_sale': 'Satış için ilan süresi (gün)',
+                    'listing_period_for_rent': 'Kiralama için ilan süresi (gün)',
+                    'max_unit_price_for_sale': 'Satış için m² başına maksimum fiyat',
+                    'min_unit_price_for_sale': 'Satış için m² başına minimum fiyat',
+                    'max_unit_price_for_rent': 'Kiralama için m² başına maksimum fiyat',
+                    'min_unit_price_for_rent': 'Kiralama için m² başına minimum fiyat',
+                    'comparable_area_for_sale': 'Satış için karşılaştırılabilir alan',
+                    'comparable_area_for_rent': 'Kiralama için karşılaştırılabilir alan',
+                    'quantity_for_sale': 'Satış için miktar',
+                    'quantity_for_rent': 'Kiralama için miktar',
+                    'total_price_for_sale': 'Satış için toplam fiyat',
+                    'total_price_for_rent': 'Kiralama için toplam fiyat',
+                    'inventory_coefficient_for_sale': 'Satış için envanter katsayısı',
+                    'inventory_coefficient_for_rent': 'Kiralama için envanter katsayısı',
+                    'yield': 'Getiri',
+                    'trend_date': 'Trend tarihi',
+                    'heating_type': 'Isıtma tipi',
+                    'house_type': 'Yatak odası sayısı',
+                    'floor_segment': 'Kat',
+                    'age_category': 'Yaş kategorisi'
+                }
             };
             
-            return fieldLabels[key] || key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+            // Get label for current language
+            const currentLabels = labels[userLanguage] || labels['ru'];
+            return currentLabels[key] || key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
         }
 
         // Helper function to get locale based on selected country
@@ -2176,8 +2352,10 @@
             // Set default currency based on selected country
             setDefaultCurrency();
             
-            // Load region data
-            loadRegionData();
+            // Get user language and load region data
+            getUserLanguage().then(() => {
+                loadRegionData();
+            });
         }
 
         // Load region data from API
@@ -2255,7 +2433,10 @@
                     // Save data to global variables for currency recalculation
                     window.lastRegionData = processedData;
                     if (processedData.general_data && processedData.general_data.length > 0) {
-                        window.lastGeneralData = processedData.general_data[0];
+                        window.lastGeneralData = processedData.general_data;
+                        console.log('Saved general data to window.lastGeneralData:', window.lastGeneralData);
+                    } else {
+                        console.log('No general data found in processedData:', processedData);
                     }
                     
                     // Display data
@@ -2284,14 +2465,26 @@
         // Fill key metrics with data from general data
         function fillKeyMetrics(generalData) {
             console.log('Filling key metrics with data:', generalData);
+            console.log('Type of generalData:', typeof generalData);
+            console.log('Is Array:', Array.isArray(generalData));
             
-            if (!generalData || generalData.length === 0) {
+            if (!generalData) {
                 console.log('No general data available for key metrics');
                 return;
             }
             
-            // Get the first (and usually only) general data record
-            const data = generalData[0];
+            let data;
+            if (Array.isArray(generalData)) {
+                if (generalData.length === 0) {
+                    console.log('General data array is empty');
+                    return;
+                }
+                data = generalData[0];
+                console.log('Using first element from array:', data);
+            } else {
+                data = generalData;
+                console.log('Using generalData directly as object:', data);
+            }
             console.log('Using general data record for key metrics:', data);
             console.log('Available fields in general data:', Object.keys(data));
             console.log('Looking for price fields...');
@@ -2303,6 +2496,13 @@
                 }
             });
             
+            // Log specific fields we're looking for
+            console.log('🔍 Looking for correct price per m² fields from general_data table:');
+            console.log('unit_price_for_sale:', data.unit_price_for_sale);
+            console.log('unit_price_for_rent:', data.unit_price_for_rent);
+            console.log('listing_period_for_sale:', data.listing_period_for_sale);
+            console.log('listing_period_for_rent:', data.listing_period_for_rent);
+            
             // Extract and display key metrics
             let avgSalePrice = '-';
             let avgRentPrice = '-';
@@ -2310,52 +2510,43 @@
             let listingPeriodRent = '-';
             let yield = '-';
             
-            // Try to find average sale price (look for various possible field names)
-            if (data.average_price_for_sale !== null && data.average_price_for_sale !== undefined) {
-                avgSalePrice = formatFieldValue('average_price_for_sale', data.average_price_for_sale);
-            } else if (data.avg_price_sale !== null && data.avg_price_sale !== undefined) {
-                avgSalePrice = formatFieldValue('avg_price_sale', data.avg_price_sale);
-            } else if (data.sale_price_avg !== null && data.sale_price_avg !== undefined) {
-                avgSalePrice = formatFieldValue('sale_price_avg', data.sale_price_avg);
-            } else if (data.price_for_sale !== null && data.price_for_sale !== undefined) {
-                avgSalePrice = formatFieldValue('price_for_sale', data.price_for_sale);
-            } else if (data.sale_price !== null && data.sale_price !== undefined) {
-                avgSalePrice = formatFieldValue('sale_price', data.sale_price);
-            } else if (data.price_sale !== null && data.price_sale !== undefined) {
-                avgSalePrice = formatFieldValue('price_sale', data.price_sale);
+            // Use the correct field names from general_data table (Цена за м² для продажи)
+            if (data.unit_price_for_sale !== null && data.unit_price_for_sale !== undefined) {
+                avgSalePrice = formatFieldValue('unit_price_for_sale', data.unit_price_for_sale);
             }
             
             // Log current currency for debugging
             console.log('Current currency for key metrics:', currentCurrency);
             console.log('Currency rates available:', currencyRates);
             
-            // Try to find average rent price
-            if (data.average_price_for_rent !== null && data.average_price_for_rent !== undefined) {
-                avgRentPrice = formatFieldValue('average_price_for_rent', data.average_price_for_rent);
-            } else if (data.avg_price_rent !== null && data.avg_price_rent !== undefined) {
-                avgRentPrice = formatFieldValue('avg_price_rent', data.avg_price_rent);
-            } else if (data.rent_price_avg !== null && data.rent_price_avg !== undefined) {
-                avgRentPrice = formatFieldValue('rent_price_avg', data.rent_price_avg);
-            } else if (data.price_for_rent !== null && data.price_for_rent !== undefined) {
-                avgRentPrice = formatFieldValue('price_for_rent', data.price_for_rent);
-            } else if (data.rent_price !== null && data.rent_price !== undefined) {
-                avgRentPrice = formatFieldValue('rent_price', data.rent_price);
-            } else if (data.price_rent !== null && data.price_rent !== undefined) {
-                avgRentPrice = formatFieldValue('price_rent', data.price_rent);
+            // Use the correct field names from general_data table (Цена за м² для аренды)
+            if (data.unit_price_for_rent !== null && data.unit_price_for_rent !== undefined) {
+                avgRentPrice = formatFieldValue('unit_price_for_rent', data.unit_price_for_rent);
             }
             
-            // Try to find listing period for sale
+            // Log extracted values for debugging
+            console.log('📊 Extracted key metrics values:');
+            console.log('avgSalePrice:', avgSalePrice);
+            console.log('avgRentPrice:', avgRentPrice);
+            
+            // If we still don't have the right values, try to find them in the data
+            if (avgSalePrice === '-' || avgRentPrice === '-') {
+                console.log('🔍 Still missing values, searching for price per m² fields...');
+                Object.keys(data).forEach(key => {
+                    if (key.toLowerCase().includes('m2') || key.toLowerCase().includes('m²') || key.toLowerCase().includes('per_m2')) {
+                        console.log(`Found m² field: ${key} = ${data[key]}`);
+                    }
+                });
+            }
+            
+            // Use the correct field names from general_data table
             if (data.listing_period_for_sale !== null && data.listing_period_for_sale !== undefined) {
                 listingPeriodSale = formatFieldValue('listing_period_for_sale', data.listing_period_for_sale);
-            } else if (data.sale_period !== null && data.sale_period !== undefined) {
-                listingPeriodSale = formatFieldValue('sale_period', data.sale_period);
             }
             
-            // Try to find listing period for rent
+            // Use the correct field names from general_data table
             if (data.listing_period_for_rent !== null && data.listing_period_for_rent !== undefined) {
                 listingPeriodRent = formatFieldValue('listing_period_for_rent', data.listing_period_for_rent);
-            } else if (data.rent_period !== null && data.rent_period !== undefined) {
-                listingPeriodRent = formatFieldValue('rent_period', data.rent_period);
             }
             
             // Try to find yield
@@ -2460,7 +2651,11 @@
             console.log('Processed heating data:', heatingData);
             
             // Fill key metrics with data
-            fillKeyMetrics(generalData);
+            if (generalData && generalData.length > 0) {
+                fillKeyMetrics(generalData);
+            } else {
+                console.log('No general data available for key metrics');
+            }
             
             // If data is an array, try to categorize it by content
             if (Array.isArray(data) && data.length > 0) {
