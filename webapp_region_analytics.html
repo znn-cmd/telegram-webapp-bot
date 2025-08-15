@@ -532,7 +532,7 @@
                      <div class="data-card-header" onclick="toggleAccordion('houseTypeDataCard')">
                          <div style="display: flex; align-items: center; gap: 12px;">
                              <div class="data-card-icon">🏠</div>
-                             <div class="data-card-title" id="houseTypeDataTitle">Данные по типам домов</div>
+                             <div class="data-card-title" id="houseTypeDataTitle">Данные по количеству спален</div>
                          </div>
                          <div class="data-card-toggle" id="houseTypeDataToggle">▼</div>
                      </div>
@@ -546,7 +546,7 @@
                      <div class="data-card-header" onclick="toggleAccordion('floorSegmentDataCard')">
                          <div style="display: flex; align-items: center; gap: 12px;">
                              <div class="data-card-icon">🏢</div>
-                             <div class="data-card-title" id="floorSegmentDataTitle">Данные по сегментам этажей</div>
+                             <div class="data-card-title" id="floorSegmentDataTitle">Данные по этажу</div>
                          </div>
                          <div class="data-card-toggle" id="floorSegmentDataToggle">▼</div>
                      </div>
@@ -574,7 +574,7 @@
                      <div class="data-card-header" onclick="toggleAccordion('heatingDataCard')">
                          <div style="display: flex; align-items: center; gap: 12px;">
                              <div class="data-card-icon">🔥</div>
-                             <div class="data-card-title" id="heatingDataTitle">Данные по отоплению</div>
+                             <div class="data-card-title" id="heatingDataTitle">Данные по типу отопления</div>
                          </div>
                          <div class="data-card-toggle" id="heatingDataToggle">▼</div>
                      </div>
@@ -638,10 +638,10 @@
                 'errorLoading': 'Ошибка загрузки данных',
                 'dataSectionTitle': 'Анализ данных региона',
                 'generalDataTitle': 'Общие данные',
-                'houseTypeDataTitle': 'Данные по типам домов',
-                'floorSegmentDataTitle': 'Данные по сегментам этажей',
-                            'ageDataTitle': 'Данные по возрасту объектов',
-                'heatingDataTitle': 'Данные по отоплению',
+                                'houseTypeDataTitle': 'Данные по количеству спален',
+                'floorSegmentDataTitle': 'Данные по этажу',
+                'ageDataTitle': 'Данные по возрасту объектов',
+                'heatingDataTitle': 'Данные по типу отопления',
                 'loadingText': 'Загрузка данных...',
                 'errorText': 'Ошибка загрузки данных',
                 'totalProperties': 'Всего объектов:',
@@ -669,10 +669,10 @@
                 'errorLoading': 'Error loading data',
                 'dataSectionTitle': 'Regional Data Analysis',
                 'generalDataTitle': 'General Data',
-                'houseTypeDataTitle': 'House Type Data',
-                'floorSegmentDataTitle': 'Floor Segment Data',
-            'ageDataTitle': 'Age Data',
-                'heatingDataTitle': 'Heating Data',
+                                'houseTypeDataTitle': 'Bedroom Count Data',
+                'floorSegmentDataTitle': 'Floor Data',
+                'ageDataTitle': 'Age Data',
+                'heatingDataTitle': 'Heating Type Data',
                 'loadingText': 'Loading data...',
                 'errorText': 'Error loading data',
                 'totalProperties': 'Total properties:',
@@ -700,10 +700,10 @@
                 'errorLoading': 'Fehler beim Laden der Daten',
                 'dataSectionTitle': 'Regionale Datenanalyse',
                 'generalDataTitle': 'Allgemeine Daten',
-                'houseTypeDataTitle': 'Haus-Typ-Daten',
-                'floorSegmentDataTitle': 'Etagen-Segment-Daten',
-            'ageDataTitle': 'Altersdaten',
-                'heatingDataTitle': 'Heizungsdaten',
+                                'houseTypeDataTitle': 'Schlafzimmer-Anzahl-Daten',
+                'floorSegmentDataTitle': 'Etagen-Daten',
+                'ageDataTitle': 'Altersdaten',
+                'heatingDataTitle': 'Heizungstyp-Daten',
                 'loadingText': 'Daten werden geladen...',
                 'errorText': 'Fehler beim Laden der Daten',
                 'totalProperties': 'Gesamtobjekte:',
@@ -731,10 +731,10 @@
                 'errorLoading': 'Erreur de chargement des données',
                 'dataSectionTitle': 'Analyse des données régionales',
                 'generalDataTitle': 'Données générales',
-                'houseTypeDataTitle': 'Données des types de maisons',
-                'floorSegmentDataTitle': 'Données des segments d\'étages',
-            'ageDataTitle': 'Données d\'âge',
-                'heatingDataTitle': 'Données de chauffage',
+                                'houseTypeDataTitle': 'Données du nombre de chambres',
+                'floorSegmentDataTitle': 'Données d\'étage',
+                'ageDataTitle': 'Données d\'âge',
+                'heatingDataTitle': 'Données du type de chauffage',
                 'loadingText': 'Chargement des données...',
                 'errorText': 'Erreur de chargement des données',
                 'totalProperties': 'Total des propriétés :',
@@ -762,10 +762,10 @@
                 'errorLoading': 'Veri yükleme hatası',
                 'dataSectionTitle': 'Bölgesel Veri Analizi',
                 'generalDataTitle': 'Genel Veriler',
-                'houseTypeDataTitle': 'Ev Tipi Verileri',
-                'floorSegmentDataTitle': 'Kat Segmenti Verileri',
-            'ageDataTitle': 'Yaş Verileri',
-                'heatingDataTitle': 'Isıtma Verileri',
+                                'houseTypeDataTitle': 'Yatak Odası Sayısı Verileri',
+                'floorSegmentDataTitle': 'Kat Verileri',
+                'ageDataTitle': 'Yaş Verileri',
+                'heatingDataTitle': 'Isıtma Tipi Verileri',
                 'loadingText': 'Veriler yükleniyor...',
                 'errorText': 'Veri yükleme hatası',
                 'totalProperties': 'Toplam mülk:',
@@ -778,6 +778,307 @@
         // Get localized text
         function getText(key) {
             return locales[currentLanguage][key] || key;
+        }
+
+        // Helper function to get human-readable field labels
+        function getFieldLabel(key) {
+            const fieldLabels = {
+                // Heating data fields
+                'heating_type': 'Тип отопления',
+                'heating_type_name': 'Название типа отопления',
+                'count_for_rent': 'Количество для аренды',
+                'count_for_sale': 'Количество для продажи',
+                'unit_price_for_rent': 'Цена за м² для аренды',
+                'unit_price_for_sale': 'Цена за м² для продажи',
+                'max_unit_price_for_rent': 'Максимальная цена за м² для аренды',
+                'max_unit_price_for_sale': 'Максимальная цена за м² для продажи',
+                'min_unit_price_for_rent': 'Минимальная цена за м² для аренды',
+                'min_unit_price_for_sale': 'Минимальная цена за м² для продажи',
+                'price_for_rent': 'Общая цена для аренды',
+                'price_for_sale': 'Общая цена для продажи',
+                'listing_period_for_rent': 'Период размещения для аренды (дни)',
+                'listing_period_for_sale': 'Период размещения для продажи (дни)',
+                'avg_price_for_rent': 'Средняя цена для аренды',
+                'avg_price_for_sale': 'Средняя цена для продажи',
+                'avg_area_for_rent': 'Средняя площадь для аренды',
+                'avg_area_for_sale': 'Средняя площадь для продажи',
+                'avg_duration_for_rent': 'Средняя продолжительность для аренды',
+                'avg_duration_for_sale': 'Средняя продолжительность для продажи',
+                'average_age_for_rent': 'Средний возраст для аренды (годы)',
+                'average_age_for_sale': 'Средний возраст для продажи (годы)',
+                'yield_for_rent': 'Доходность для аренды',
+                'yield_for_sale': 'Доходность для продажи',
+                'stock_ratio_rent': 'Коэффициент запаса для аренды',
+                'stock_ratio_sale': 'Коэффициент запаса для продажи',
+                'trend_date': 'Дата тренда',
+                
+                // House type data fields (bedroom count)
+                'house_type': 'Количество спален',
+                'house_type_name': 'Название количества спален',
+                
+                // Floor segment data fields
+                'floor_segment': 'Этаж',
+                'floor_segment_name': 'Название этажа',
+                
+                // Age data fields
+                'age_category': 'Возрастная категория',
+                'age_category_name': 'Название возрастной категории',
+                
+                // General fields
+                'total_properties': 'Всего объектов',
+                'average_price': 'Средняя цена',
+                'min_price': 'Минимальная цена',
+                'max_price': 'Максимальная цена',
+                'total_count': 'Общее количество',
+                'rent_count': 'Количество для аренды',
+                'sale_count': 'Количество для продажи'
+            };
+            
+            return fieldLabels[key] || key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+        }
+
+        // Helper function to get locale based on selected country
+        function getLocaleByCountry() {
+            const userCountry = selectedLocation.country_name || '';
+            const countryLower = userCountry.toLowerCase();
+            
+            if (countryLower.includes('turkey') || countryLower.includes('турция') || 
+                countryLower.includes('türkiye') || countryLower.includes('türkei') || 
+                countryLower.includes('turquie')) {
+                return 'tr-TR';
+            } else if (countryLower.includes('germany') || countryLower.includes('германия') || 
+                       countryLower.includes('deutschland') || countryLower.includes('allemagne')) {
+                return 'de-DE';
+            } else if (countryLower.includes('france') || countryLower.includes('франция') || 
+                       countryLower.includes('frankreich')) {
+                return 'fr-FR';
+            } else if (countryLower.includes('russia') || countryLower.includes('россия') || 
+                       countryLower.includes('russland') || countryLower.includes('russie')) {
+                return 'ru-RU';
+            } else {
+                return 'en-US'; // Default to English
+            }
+        }
+
+        // Helper function to get listing type title
+        function getListingTypeTitle(item, dataType, index) {
+            // Try different possible field names for listing type
+            const listingType = item.listing_type || item.listingType || item.type || item.name;
+            
+            if (listingType) {
+                return listingType;
+            }
+            
+            // If no listing type found, try to get it from the data structure
+            if (dataType === 'house_type') {
+                return item.house_type || item.house_type_name || getText('houseTypeDataTitle');
+            } else if (dataType === 'floor_segment') {
+                return item.floor_segment || item.floor_segment_name || getText('floorSegmentDataTitle');
+            } else if (dataType === 'age') {
+                return item.age_category || item.age_category_name || getText('ageDataTitle');
+            } else if (dataType === 'heating') {
+                return item.heating_type || item.heating_type_name || getText('heatingDataTitle');
+            }
+            
+            // Fallback to localized index if nothing found
+            const userLocale = getLocaleByCountry();
+            if (userLocale === 'tr-TR') {
+                return `Kayıt ${index + 1}`;
+            } else if (userLocale === 'de-DE') {
+                return `Eintrag ${index + 1}`;
+            } else if (userLocale === 'fr-FR') {
+                return `Enregistrement ${index + 1}`;
+            } else if (userLocale === 'ru-RU') {
+                return `Запись ${index + 1}`;
+            } else {
+                return `Record ${index + 1}`;
+            }
+        }
+
+        // Helper function to format field values
+        function formatFieldValue(key, value) {
+            if (value === null || value === undefined) {
+                return 'N/A';
+            }
+            
+            // Get user's selected country for currency and locale formatting
+            const userCountry = selectedLocation.country_name || '';
+            const isTurkey = userCountry.toLowerCase().includes('turkey') || 
+                           userCountry.toLowerCase().includes('турция') || 
+                           userCountry.toLowerCase().includes('türkiye') ||
+                           userCountry.toLowerCase().includes('türkei') ||
+                           userCountry.toLowerCase().includes('turquie');
+            
+            const userLocale = getLocaleByCountry();
+            
+            // Format currency values
+            if (key.includes('price') || key.includes('Price') || 
+                key.includes('unit_price') || key.includes('Unit_Price') ||
+                key.includes('avg_price') || key.includes('Avg_Price')) {
+                if (typeof value === 'number') {
+                    if (isTurkey) {
+                        return `${parseFloat(value).toLocaleString('tr-TR')} ₺`;
+                    } else if (userLocale === 'de-DE') {
+                        return `${parseFloat(value).toLocaleString('de-DE')} €`;
+                    } else if (userLocale === 'fr-FR') {
+                        return `${parseFloat(value).toLocaleString('fr-FR')} €`;
+                    } else if (userLocale === 'ru-RU') {
+                        return `${parseFloat(value).toLocaleString('ru-RU')} ₽`;
+                    } else {
+                        return `${parseFloat(value).toLocaleString('en-US')} $`;
+                    }
+                }
+                return value;
+            }
+            
+            // Format percentage values
+            if (key.includes('ratio') || key.includes('Ratio') || 
+                key.includes('yield') || key.includes('Yield') ||
+                key.includes('stock_ratio') || key.includes('Stock_Ratio')) {
+                if (typeof value === 'number') {
+                    return `${parseFloat(value).toFixed(2)}%`;
+                }
+                return value;
+            }
+            
+            // Format period values (days)
+            if (key.includes('period') || key.includes('Period') || 
+                key.includes('duration') || key.includes('Duration') ||
+                key.includes('listing_period') || key.includes('Listing_Period')) {
+                if (typeof value === 'number') {
+                    if (isTurkey) {
+                        return `${value} gün`;
+                    } else if (userLocale === 'de-DE') {
+                        return `${value} Tage`;
+                    } else if (userLocale === 'fr-FR') {
+                        return `${value} jours`;
+                    } else if (userLocale === 'ru-RU') {
+                        return `${value} дней`;
+                    } else {
+                        return `${value} days`;
+                    }
+                }
+                return value;
+            }
+            
+            // Format age values (years)
+            if (key.includes('age') || key.includes('Age') ||
+                key.includes('average_age') || key.includes('Average_Age')) {
+                if (typeof value === 'number') {
+                    if (isTurkey) {
+                        return `${value} yıl`;
+                    } else if (userLocale === 'de-DE') {
+                        return `${value} Jahre`;
+                    } else if (userLocale === 'fr-FR') {
+                        return `${value} ans`;
+                    } else if (userLocale === 'ru-RU') {
+                        return `${value} лет`;
+                    } else {
+                        return `${value} years`;
+                    }
+                }
+                return value;
+            }
+            
+            // Format unit price values (price per m²)
+            if (key.includes('unit_price') || key.includes('Unit_Price') ||
+                key.includes('max_unit_price') || key.includes('Max_Unit_Price') ||
+                key.includes('min_unit_price') || key.includes('Min_Unit_Price')) {
+                if (typeof value === 'number') {
+                    if (isTurkey) {
+                        return `${parseFloat(value).toLocaleString('tr-TR')} ₺/m²`;
+                    } else if (userLocale === 'de-DE') {
+                        return `${parseFloat(value).toLocaleString('de-DE')} €/m²`;
+                    } else if (userLocale === 'fr-FR') {
+                        return `${parseFloat(value).toLocaleString('fr-FR')} €/m²`;
+                    } else if (userLocale === 'ru-RU') {
+                        return `${parseFloat(value).toLocaleString('ru-RU')} ₽/m²`;
+                    } else {
+                        return `${parseFloat(value).toLocaleString('en-US')} $/m²`;
+                    }
+                }
+                return value;
+            }
+            
+            // Format area values (square meters)
+            if (key.includes('area') || key.includes('Area') ||
+                key.includes('comparable_area') || key.includes('Comparable_Area')) {
+                if (typeof value === 'number') {
+                    return `${value.toLocaleString(userLocale)} m²`;
+                }
+                return value;
+            }
+            
+            // Format count values
+            if (key.includes('count') || key.includes('Count') ||
+                key.includes('count_for_rent') || key.includes('Count_For_Rent') ||
+                key.includes('count_for_sale') || key.includes('Count_For_Sale')) {
+                if (typeof value === 'number') {
+                    return value.toLocaleString(userLocale);
+                }
+                return value.toString();
+            }
+            
+
+            
+            // Format date values
+            if (key.includes('date') || key.includes('Date') || 
+                key.includes('trend_date') || key.includes('Trend_Date')) {
+                if (key.includes('trend_date') || key.includes('Trend_Date')) {
+                    // For trend date, show current date minus 4 days
+                    const currentDate = new Date();
+                    currentDate.setDate(currentDate.getDate() - 4);
+                    
+                    if (userLocale === 'tr-TR') {
+                        return currentDate.toLocaleDateString('tr-TR', {
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric'
+                        });
+                    } else if (userLocale === 'de-DE') {
+                        return currentDate.toLocaleDateString('de-DE', {
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric'
+                        });
+                    } else if (userLocale === 'fr-FR') {
+                        return currentDate.toLocaleDateString('fr-FR', {
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric'
+                        });
+                    } else if (userLocale === 'ru-RU') {
+                        return currentDate.toLocaleDateString('ru-RU', {
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric'
+                        });
+                    } else {
+                        return currentDate.toLocaleDateString('en-US', {
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric'
+                        });
+                    }
+                } else if (value && typeof value === 'string') {
+                    try {
+                        const date = new Date(value);
+                        if (!isNaN(date.getTime())) {
+                            return date.toLocaleDateString(userLocale, {
+                                day: 'numeric',
+                                month: 'short',
+                                hour: '2-digit',
+                                minute: '2-digit'
+                            });
+                        }
+                    } catch (e) {
+                        // If date parsing fails, return original value
+                    }
+                }
+                return value;
+            }
+            
+            return value.toString();
         }
 
         // Update page text based on current language
@@ -1318,24 +1619,20 @@
             // Display general data
             displayGeneralData(generalData);
             
-            // Display house type data
+            // Display bedroom count data
             displayHouseTypeData(houseTypeData);
             
-            // Display floor segment data
+            // Display floor data
             displayFloorSegmentData(floorSegmentData);
             
             // Display age data
             displayAgeData(ageData);
 
-            // Display heating data
+            // Display heating type data
             displayHeatingData(heatingData);
             
-            // Auto-expand the first card (General Data) by default
-            setTimeout(() => {
-                // General data is always visible, so we don't need to toggle it
-                // But we can expand the second card (House Types) by default
-                toggleAccordion('houseTypeDataCard');
-            }, 100);
+            // All accordions are collapsed by default after data formation
+            // No auto-expansion needed
         }
 
         // Display general data
@@ -1354,22 +1651,11 @@
             
             // Add all data fields to table
             Object.keys(data).forEach(key => {
-                if (!['country_id', 'city_id', 'county_id', 'district_id', 'id', 'created_at', 'source_file'].includes(key)) {
+                if (!['country_id', 'city_id', 'county_id', 'district_id', 'id', 'created_at', 'source_file', 'updated_at'].includes(key)) {
                     const value = data[key];
                     if (value !== null && value !== undefined) {
-                        const label = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-                        let displayValue = value;
-                        
-                        // Format currency values
-                        if (key.includes('price') || key.includes('Price')) {
-                            displayValue = `${parseFloat(value).toLocaleString('tr-TR')} ₺`;
-                        } else if (key.includes('ratio') || key.includes('Ratio') || key.includes('yield') || key.includes('Yield')) {
-                            displayValue = `${parseFloat(value).toFixed(2)}%`;
-                        } else if (key.includes('period') || key.includes('Period') || key.includes('age') || key.includes('Age')) {
-                            displayValue = `${value} gün`;
-                        } else if (key.includes('area') || key.includes('Area')) {
-                            displayValue = `${value} m²`;
-                        }
+                        const label = getFieldLabel(key);
+                        const displayValue = formatFieldValue(key, value);
                         
                         tableHtml += `<tr><td>${label}:</td><td>${displayValue}</td></tr>`;
                     }
@@ -1378,30 +1664,19 @@
             
             tableHtml += '</table>';
             
-            // Add footer with dates if available
+            // Add footer with trend date if available
             let footerHtml = '';
-            if (data.trend_date || data.updated_at) {
+            if (data.trend_date) {
                 footerHtml = '<div class="data-footer">';
-                if (data.trend_date) {
-                    footerHtml += `<span>Trend Date: ${data.trend_date}</span>`;
-                }
-                if (data.updated_at) {
-                    const date = new Date(data.updated_at);
-                    const formattedDate = date.toLocaleDateString('tr-TR', {
-                        day: 'numeric',
-                        month: 'short',
-                        hour: '2-digit',
-                        minute: '2-digit'
-                    });
-                    footerHtml += `<span>Updated At: ${formattedDate}</span>`;
-                }
+                const trendDate = formatFieldValue('trend_date', data.trend_date);
+                footerHtml += `<span>Trend Date: ${trendDate}</span>`;
                 footerHtml += '</div>';
             }
             
             content.innerHTML = tableHtml + footerHtml;
         }
 
-        // Display house type data
+        // Display bedroom count data
         function displayHouseTypeData(houseTypeData) {
             const content = document.getElementById('houseTypeDataContent');
             
@@ -1430,22 +1705,11 @@
                     
                     // Add all available fields to table
                     Object.keys(item).forEach(key => {
-                        if (!['house_type', 'type', 'house_type_name', 'name', 'country_id', 'city_id', 'county_id', 'district_id', 'id', 'created_at', 'source_file'].includes(key)) {
+                        if (!['house_type', 'type', 'house_type_name', 'name', 'country_id', 'city_id', 'county_id', 'district_id', 'id', 'created_at', 'source_file', 'updated_at'].includes(key)) {
                             const value = item[key];
                             if (value !== null && value !== undefined) {
-                                const label = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-                                let displayValue = value;
-                                
-                                // Format currency values
-                                if (key.includes('price') || key.includes('Price')) {
-                                    displayValue = `${parseFloat(value).toLocaleString('tr-TR')} ₺`;
-                                } else if (key.includes('count') || key.includes('Count')) {
-                                    displayValue = value;
-                                } else if (key.includes('area') || key.includes('Area')) {
-                                    displayValue = `${value} m²`;
-                                } else if (key.includes('period') || key.includes('Period')) {
-                                    displayValue = `${value} gün`;
-                                }
+                                const label = getFieldLabel(key);
+                                const displayValue = formatFieldValue(key, value);
                                 
                                 html += `<tr><td>${label}:</td><td>${displayValue}</td></tr>`;
                             }
@@ -1456,16 +1720,18 @@
                 } else {
                     console.log(`No type field found for item ${index}, showing all fields`);
                     // If no type field found, show all available fields
+                    const fallbackTitle = getListingTypeTitle(item, 'house_type', index);
                     html += `<div class="sub-card">
-                        <h3>Item ${index + 1}</h3>
+                        <h3>${fallbackTitle}</h3>
                         <table class="data-table">`;
                     
                     Object.keys(item).forEach(key => {
-                        if (!['country_id', 'city_id', 'county_id', 'district_id', 'id', 'created_at', 'source_file'].includes(key)) {
+                        if (!['country_id', 'city_id', 'county_id', 'district_id', 'id', 'created_at', 'source_file', 'updated_at'].includes(key)) {
                             const value = item[key];
                             if (value !== null && value !== undefined) {
-                                const label = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-                                html += `<tr><td>${label}:</td><td>${value}</td></tr>`;
+                                const label = getFieldLabel(key);
+                                const displayValue = formatFieldValue(key, value);
+                                html += `<tr><td>${label}:</td><td>${displayValue}</td></tr>`;
                             }
                         }
                     });
@@ -1478,7 +1744,7 @@
             content.innerHTML = html;
         }
 
-        // Display floor segment data
+        // Display floor data
         function displayFloorSegmentData(floorSegmentData) {
             const content = document.getElementById('floorSegmentDataContent');
             
@@ -1507,22 +1773,11 @@
                     
                     // Add all available fields to table
                     Object.keys(item).forEach(key => {
-                        if (!['floor_segment', 'segment', 'floor_segment_name', 'name', 'country_id', 'city_id', 'county_id', 'district_id', 'id', 'created_at', 'source_file'].includes(key)) {
+                        if (!['floor_segment', 'segment', 'floor_segment_name', 'name', 'country_id', 'city_id', 'county_id', 'district_id', 'id', 'created_at', 'source_file', 'updated_at'].includes(key)) {
                             const value = item[key];
                             if (value !== null && value !== undefined) {
-                                const label = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-                                let displayValue = value;
-                                
-                                // Format currency values
-                                if (key.includes('price') || key.includes('Price')) {
-                                    displayValue = `${parseFloat(value).toLocaleString('tr-TR')} ₺`;
-                                } else if (key.includes('count') || key.includes('Count')) {
-                                    displayValue = value;
-                                } else if (key.includes('area') || key.includes('Area')) {
-                                    displayValue = `${value} m²`;
-                                } else if (key.includes('period') || key.includes('Period')) {
-                                    displayValue = `${value} gün`;
-                                }
+                                const label = getFieldLabel(key);
+                                const displayValue = formatFieldValue(key, value);
                                 
                                 html += `<tr><td>${label}:</td><td>${displayValue}</td></tr>`;
                             }
@@ -1533,16 +1788,18 @@
                 } else {
                     console.log(`No segment field found for item ${index}, showing all fields`);
                     // If no segment field found, show all available fields
+                    const fallbackTitle = getListingTypeTitle(item, 'floor_segment', index);
                     html += `<div class="sub-card">
-                        <h3>Item ${index + 1}</h3>
+                        <h3>${fallbackTitle}</h3>
                         <table class="data-table">`;
                     
                     Object.keys(item).forEach(key => {
-                        if (!['country_id', 'city_id', 'county_id', 'district_id', 'id', 'created_at', 'source_file'].includes(key)) {
+                        if (!['country_id', 'city_id', 'county_id', 'district_id', 'id', 'created_at', 'source_file', 'updated_at'].includes(key)) {
                             const value = item[key];
                             if (value !== null && value !== undefined) {
-                                const label = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-                                html += `<tr><td>${label}:</td><td>${value}</td></tr>`;
+                                const label = getFieldLabel(key);
+                                const displayValue = formatFieldValue(key, value);
+                                html += `<tr><td>${label}:</td><td>${displayValue}</td></tr>`;
                             }
                         }
                     });
@@ -1587,19 +1844,8 @@
                         if (!['age_category', 'age', 'age_category_name', 'name', 'country_id', 'city_id', 'county_id', 'district_id', 'id', 'created_at', 'source_file'].includes(key)) {
                             const value = item[key];
                             if (value !== null && value !== undefined) {
-                                const label = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-                                let displayValue = value;
-                                
-                                // Format currency values
-                                if (key.includes('price') || key.includes('Price')) {
-                                    displayValue = `${parseFloat(value).toLocaleString('tr-TR')} ₺`;
-                                } else if (key.includes('count') || key.includes('Count')) {
-                                    displayValue = value;
-                                } else if (key.includes('area') || key.includes('Area')) {
-                                    displayValue = `${value} m²`;
-                                } else if (key.includes('period') || key.includes('Period')) {
-                                    displayValue = `${value} gün`;
-                                }
+                                const label = getFieldLabel(key);
+                                const displayValue = formatFieldValue(key, value);
                                 
                                 html += `<tr><td>${label}:</td><td>${displayValue}</td></tr>`;
                             }
@@ -1610,16 +1856,18 @@
                 } else {
                     console.log(`No age field found for item ${index}, showing all fields`);
                     // If no age field found, show all available fields
+                    const fallbackTitle = getListingTypeTitle(item, 'age', index);
                     html += `<div class="sub-card">
-                        <h3>Item ${index + 1}</h3>
+                        <h3>${fallbackTitle}</h3>
                         <table class="data-table">`;
                     
                     Object.keys(item).forEach(key => {
-                        if (!['country_id', 'city_id', 'county_id', 'district_id', 'id', 'created_at', 'source_file'].includes(key)) {
+                        if (!['country_id', 'city_id', 'county_id', 'district_id', 'id', 'created_at', 'source_file', 'updated_at'].includes(key)) {
                             const value = item[key];
                             if (value !== null && value !== undefined) {
-                                const label = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-                                html += `<tr><td>${label}:</td><td>${value}</td></tr>`;
+                                const label = getFieldLabel(key);
+                                const displayValue = formatFieldValue(key, value);
+                                html += `<tr><td>${label}:</td><td>${displayValue}</td></tr>`;
                             }
                         }
                     });
@@ -1632,7 +1880,7 @@
             content.innerHTML = html;
         }
 
-        // Display heating data
+        // Display heating type data
         function displayHeatingData(heatingData) {
             const content = document.getElementById('heatingDataContent');
 
@@ -1661,22 +1909,11 @@
                     
                     // Add all available fields to table
                     Object.keys(item).forEach(key => {
-                        if (!['heating_type', 'heating', 'heating_type_name', 'name', 'country_id', 'city_id', 'county_id', 'district_id', 'id', 'created_at', 'source_file'].includes(key)) {
+                        if (!['heating_type', 'heating', 'heating_type_name', 'name', 'country_id', 'city_id', 'county_id', 'district_id', 'id', 'created_at', 'source_file', 'updated_at'].includes(key)) {
                             const value = item[key];
                             if (value !== null && value !== undefined) {
-                                const label = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-                                let displayValue = value;
-                                
-                                // Format currency values
-                                if (key.includes('price') || key.includes('Price')) {
-                                    displayValue = `${parseFloat(value).toLocaleString('tr-TR')} ₺`;
-                                } else if (key.includes('count') || key.includes('Count')) {
-                                    displayValue = value;
-                                } else if (key.includes('area') || key.includes('Area')) {
-                                    displayValue = `${value} m²`;
-                                } else if (key.includes('period') || key.includes('Period')) {
-                                    displayValue = `${value} gün`;
-                                }
+                                const label = getFieldLabel(key);
+                                let displayValue = formatFieldValue(key, value);
                                 
                                 html += `<tr><td>${label}:</td><td>${displayValue}</td></tr>`;
                             }
@@ -1687,16 +1924,18 @@
                 } else {
                     console.log(`No heating field found for item ${index}, showing all fields`);
                     // If no heating field found, show all available fields
+                    const fallbackTitle = getListingTypeTitle(item, 'heating', index);
                     html += `<div class="sub-card">
-                        <h3>Item ${index + 1}</h3>
+                        <h3>${fallbackTitle}</h3>
                         <table class="data-table">`;
                     
                     Object.keys(item).forEach(key => {
-                        if (!['country_id', 'city_id', 'county_id', 'district_id', 'id', 'created_at', 'source_file'].includes(key)) {
+                        if (!['country_id', 'city_id', 'county_id', 'district_id', 'id', 'created_at', 'source_file', 'updated_at'].includes(key)) {
                             const value = item[key];
                             if (value !== null && value !== undefined) {
-                                const label = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-                                html += `<tr><td>${value}</td></tr>`;
+                                const label = getFieldLabel(key);
+                                const displayValue = formatFieldValue(key, value);
+                                html += `<tr><td>${label}:</td><td>${displayValue}</td></tr>`;
                             }
                         }
                     });
