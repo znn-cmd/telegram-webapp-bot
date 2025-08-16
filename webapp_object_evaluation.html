@@ -179,6 +179,47 @@
             line-height: 1.4;
         }
 
+        .selected-property-types {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #4caf50;
+        }
+
+        .property-types-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #2e7d32;
+            margin-bottom: 8px;
+        }
+
+        .property-types-details {
+            font-size: 13px;
+            color: #333;
+            line-height: 1.4;
+        }
+
+        .property-type-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 4px 0;
+            border-bottom: 1px solid #e8f5e8;
+        }
+
+        .property-type-item:last-child {
+            border-bottom: none;
+        }
+
+        .property-type-label {
+            font-weight: 500;
+            color: #2e7d32;
+        }
+
+        .property-type-value {
+            color: #333;
+            font-weight: 600;
+        }
+
         .admin-ids {
             margin-top: 10px;
             padding-top: 10px;
@@ -576,6 +617,24 @@
                 padding: 8px 10px;
                 font-size: 13px;
             }
+            
+            .selected-property-types {
+                margin-top: 12px;
+                padding-top: 12px;
+            }
+            
+            .property-types-title {
+                font-size: 13px;
+                margin-bottom: 6px;
+            }
+            
+            .property-types-details {
+                font-size: 12px;
+            }
+            
+            .property-type-item {
+                padding: 3px 0;
+            }
         }
     </style>
 </head>
@@ -667,6 +726,13 @@
         <div class="selected-location" id="selectedLocation" style="display: none;">
             <div class="location-title" id="selectedLocationTitle">Выбранная локация:</div>
             <div class="location-details" id="locationDetails"></div>
+            
+            <!-- Выбранные характеристики недвижимости -->
+            <div class="selected-property-types" id="selectedPropertyTypes" style="display: none;">
+                <div class="property-types-title" id="propertyTypesTitle">Выбранные характеристики недвижимости:</div>
+                <div class="property-types-details" id="propertyTypesDetails"></div>
+            </div>
+            
             <div class="admin-ids" id="adminIds" style="display: none;">
                 <div class="admin-title" id="adminIdsTitle">ID для админов:</div>
                 <div class="admin-details" id="adminDetails"></div>
@@ -884,7 +950,12 @@
                 'selectBedrooms': 'Выберите количество спален',
                 'selectFloor': 'Выберите этаж',
                 'selectAge': 'Выберите возраст объекта',
-                'selectHeating': 'Выберите тип отопления'
+                'selectHeating': 'Выберите тип отопления',
+                'propertyTypesTitle': 'Выбранные характеристики недвижимости:',
+                'bedroomsLabel': 'Количество спален',
+                'floorLabel': 'Этаж',
+                'ageLabel': 'Возраст объекта',
+                'heatingLabel': 'Тип отопления'
             },
             'en': {
                 'slogan': 'Real Estate Market Insights',
@@ -933,7 +1004,12 @@
                 'selectBedrooms': 'Select bedroom count',
                 'selectFloor': 'Select floor',
                 'selectAge': 'Select property age',
-                'selectHeating': 'Select heating type'
+                'selectHeating': 'Select heating type',
+                'propertyTypesTitle': 'Selected property characteristics:',
+                'bedroomsLabel': 'Bedroom count',
+                'floorLabel': 'Floor',
+                'ageLabel': 'Property age',
+                'heatingLabel': 'Heating type'
             },
             'de': {
                 'slogan': 'Immobilienmarkt-Einblicke',
@@ -1306,6 +1382,10 @@
             const heatingDataPlaceholder = document.getElementById('heatingDataPlaceholder');
             if (heatingDataPlaceholder) { heatingDataPlaceholder.textContent = getText('selectHeating'); }
             
+            // Update property types section
+            const propertyTypesTitle = document.getElementById('propertyTypesTitle');
+            if (propertyTypesTitle) { propertyTypesTitle.textContent = getText('propertyTypesTitle'); }
+            
             const insightsErrorText = document.getElementById('insightsErrorText');
             if (insightsErrorText) {
                 insightsErrorText.textContent = getText('insightsError');
@@ -1558,6 +1638,12 @@
                     select.value = '';
                 }
             });
+            
+            // Hide selected property types section
+            const selectedPropertyTypes = document.getElementById('selectedPropertyTypes');
+            if (selectedPropertyTypes) {
+                selectedPropertyTypes.style.display = 'none';
+            }
         }
 
         // Handle listing type selection
@@ -1571,6 +1657,9 @@
                 selectedListingTypes[category] = null;
                 console.log(`❌ Deselected: ${category}`);
             }
+            
+            // Update the display of selected property types
+            updateSelectedPropertyTypesDisplay();
             
             updateConfirmButton();
         }
@@ -1719,6 +1808,66 @@
             }
         }
 
+        // Update selected property types display
+        function updateSelectedPropertyTypesDisplay() {
+            const selectedPropertyTypes = document.getElementById('selectedPropertyTypes');
+            const propertyTypesDetails = document.getElementById('propertyTypesDetails');
+            
+            if (!selectedPropertyTypes || !propertyTypesDetails) return;
+            
+            // Check if any property types are selected
+            const hasSelectedTypes = selectedListingTypes.house_type || 
+                                   selectedListingTypes.floor_segment || 
+                                   selectedListingTypes.age || 
+                                   selectedListingTypes.heating;
+            
+            if (hasSelectedTypes) {
+                selectedPropertyTypes.style.display = 'block';
+                
+                let html = '';
+                
+                if (selectedListingTypes.house_type) {
+                    html += `
+                        <div class="property-type-item">
+                            <span class="property-type-label">${getText('bedroomsLabel')}:</span>
+                            <span class="property-type-value">${selectedListingTypes.house_type}</span>
+                        </div>
+                    `;
+                }
+                
+                if (selectedListingTypes.floor_segment) {
+                    html += `
+                        <div class="property-type-item">
+                            <span class="property-type-label">${getText('floorLabel')}:</span>
+                            <span class="property-type-value">${selectedListingTypes.floor_segment}</span>
+                        </div>
+                    `;
+                }
+                
+                if (selectedListingTypes.age) {
+                    html += `
+                        <div class="property-type-item">
+                            <span class="property-type-label">${getText('ageLabel')}:</span>
+                            <span class="property-type-value">${selectedListingTypes.age}</span>
+                        </div>
+                    `;
+                }
+                
+                if (selectedListingTypes.heating) {
+                    html += `
+                        <div class="property-type-item">
+                            <span class="property-type-label">${getText('heatingLabel')}:</span>
+                            <span class="property-type-value">${selectedListingTypes.heating}</span>
+                        </div>
+                    `;
+                }
+                
+                propertyTypesDetails.innerHTML = html;
+            } else {
+                selectedPropertyTypes.style.display = 'none';
+            }
+        }
+
         // Update confirm button state
         function updateConfirmButton() {
             const countrySelect = document.getElementById('countrySelect');
@@ -1821,6 +1970,9 @@
             }
             
             locationDetails.textContent = locationString;
+            
+            // Update selected property types display
+            updateSelectedPropertyTypesDisplay();
             
             // Show admin IDs if user is admin
             if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe && window.Telegram.WebApp.initDataUnsafe.user) {
