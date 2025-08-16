@@ -6885,6 +6885,73 @@ def get_market_comparison_data(age_id, floor_id, heating_id, area, price, locati
         return {}
 
 
+@app.route('/api/property_trends', methods=['POST'])
+def api_property_trends():
+    """
+    API endpoint для получения данных о трендах недвижимости из таблицы property_trends
+    """
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({'error': 'Missing request data'}), 400
+        
+        country_id = data.get('country_id')
+        city_id = data.get('city_id')
+        county_id = data.get('county_id')
+        district_id = data.get('district_id')
+        
+        if not all([country_id, city_id, county_id, district_id]):
+            return jsonify({'error': 'Missing required location parameters'}), 400
+        
+        logger.info(f"📊 Запрос трендов недвижимости для локации: country_id={country_id}, city_id={city_id}, county_id={county_id}, district_id={district_id}")
+        
+        # Запрос к таблице property_trends
+        query = supabase.table('property_trends').select('*').eq('country_id', country_id).eq('city_id', city_id).eq('county_id', county_id).eq('district_id', district_id).order('property_date', desc=True).limit(20)
+        
+        response = query.execute()
+        
+        if response.data:
+            logger.info(f"✅ Найдено {len(response.data)} записей трендов недвижимости")
+            
+            # Формируем тренды для отображения
+            trends = []
+            for record in response.data:
+                trend = {
+                    'trend_type': 'price_trend',
+                    'trend_value': record.get('unit_price_for_sale') or record.get('unit_price_for_rent'),
+                    'period': 'monthly',
+                    'date': record.get('property_date'),
+                    'year': record.get('property_year'),
+                    'month': record.get('property_month'),
+                    'price_change_sale': record.get('price_change_sale'),
+                    'price_change_rent': record.get('price_change_rent'),
+                    'annual_price_change_sale': record.get('annual_price_change_sale'),
+                    'annual_price_change_rent': record.get('annual_price_change_rent'),
+                    'yield': record.get('yield'),
+                    'count_for_sale': record.get('count_for_sale'),
+                    'count_for_rent': record.get('count_for_rent')
+                }
+                trends.append(trend)
+            
+            return jsonify({
+                'success': True,
+                'trends': trends,
+                'total_count': len(trends)
+            })
+        else:
+            logger.info(f"⚠️ Тренды недвижимости не найдены для указанной локации")
+            return jsonify({
+                'success': True,
+                'trends': [],
+                'total_count': 0,
+                'message': 'No trends found for this location'
+            })
+            
+    except Exception as e:
+        logger.error(f"❌ Ошибка получения трендов недвижимости: {e}")
+        return jsonify({'error': str(e)}), 500
+
+
 @app.route('/api/price_trends', methods=['POST'])
 def api_price_trends():
     """
