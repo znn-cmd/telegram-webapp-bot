@@ -7064,11 +7064,11 @@ def api_region_insights():
             response = client.chat.completions.create(
                 model="gpt-3.5-turbo",
                 messages=[
-                    {"role": "system", "content": "You are a professional real estate analyst. Provide extremely concise, actionable insights. Focus on market trends and investment opportunities. Write in a direct, professional tone without any unnecessary words or explanations."},
+                    {"role": "system", "content": "You are a professional real estate analyst. Write exactly like the example: 'The Kepez, Baraj market in Antalya shows steady demand with properties selling or renting within about two months and rental yields averaging 7–8% annually. The most attractive investment segment is 2+1 apartments aged 5–10 years, offering the best balance between price and rental return. Newer 1+1 units are better suited for capital appreciation rather than high rental income, while mid-floor apartments with air-conditioning provide the strongest liquidity and rental appeal.' Be specific, mention actual property types, ages, and features. Maximum 3 sentences. No general statements."},
                     {"role": "user", "content": analysis_text}
                 ],
-                max_tokens=250,
-                temperature=0.6
+                max_tokens=150,
+                temperature=0.4
             )
             
             insights = response.choices[0].message.content.strip()
