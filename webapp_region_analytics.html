@@ -251,10 +251,22 @@
             margin-bottom: 10px;
             border: 1px solid #e0e0e0;
         }
+        
+        /* Уменьшаем отступы для всех аккордионов кроме "Общие данные" */
+        .data-card-header:not([onclick*="generalDataCard"]) {
+            padding: 8px 12px;
+            margin-bottom: 6px;
+        }
 
         .data-card-icon {
             font-size: 20px;
             margin-right: 8px;
+        }
+        
+        /* Уменьшаем иконки для всех аккордионов кроме "Общие данные" */
+        .data-card-header:not([onclick*="generalDataCard"]) .data-card-icon {
+            font-size: 16px;
+            margin-right: 6px;
         }
 
         .data-card-title {
@@ -262,6 +274,11 @@
             font-weight: 600;
             color: #333;
             flex: 1;
+        }
+        
+        /* Уменьшаем заголовки для всех аккордионов кроме "Общие данные" */
+        .data-card-header:not([onclick*="generalDataCard"]) .data-card-title {
+            font-size: 14px;
         }
 
         .data-card-toggle {
@@ -690,6 +707,10 @@
             color: #333;
             text-align: justify;
             padding: 8px 0;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            white-space: normal;
+            max-width: 100%;
         }
         
         .insights-error {
@@ -722,10 +743,29 @@
             
             .insights-text {
                 font-size: 14px;
+                word-wrap: break-word;
+                overflow-wrap: break-word;
+                white-space: normal;
+                max-width: 100%;
             }
             
             .insights-section {
                 margin: 15px 0;
+            }
+            
+            /* Уменьшаем отступы для всех аккордионов кроме "Общие данные" на мобильных */
+            .data-card-header:not([onclick*="generalDataCard"]) {
+                padding: 6px 10px;
+                margin-bottom: 4px;
+            }
+            
+            .data-card-header:not([onclick*="generalDataCard"]) .data-card-title {
+                font-size: 13px;
+            }
+            
+            .data-card-header:not([onclick*="generalDataCard"]) .data-card-icon {
+                font-size: 14px;
+                margin-right: 4px;
             }
         }
 
@@ -808,7 +848,7 @@
 
         <!-- Page Description -->
         <div class="page-description" id="pageDescription">
-            Получите детальный анализ рынка недвижимости в выбранном регионе с прогнозами цен
+                            Получите детальный анализ рынка недвижимости в выбранном регионе
         </div>
 
         <!-- Location Selection Section -->
@@ -943,17 +983,17 @@
             <div class="insights-section" id="insightsSection" style="display: none;">
                 <div class="insights-card">
                     <div class="insights-header">
-                        <div class="insights-title" id="insightsTitle">Вывод</div>
+                        <div class="insights-title" id="insightsTitle">Саммари</div>
                     </div>
                     <div class="insights-content" id="insightsContent">
                         <div class="insights-loading" id="insightsLoading">
                             <div class="loading-spinner"></div>
-                            <div class="loading-text" id="insightsLoadingText">Анализируем данные...</div>
+                            <div class="loading-text" id="insightsLoadingText"></div>
                         </div>
                         <div class="insights-text" id="insightsText" style="display: none;"></div>
                         <div class="insights-error" id="insightsError" style="display: none;">
                             <div class="error-icon">⚠️</div>
-                            <div class="error-text" id="insightsErrorText">Ошибка при анализе данных</div>
+                            <div class="error-text" id="insightsErrorText"></div>
                         </div>
                     </div>
                 </div>
@@ -965,7 +1005,7 @@
                  <div class="data-card" id="generalDataCard">
                      <div class="data-card-header" onclick="toggleAccordion('generalDataCard')">
                          <div style="display: flex; align-items: center;">
-                             <div class="data-card-icon">📊</div>
+                             <div class="data-card-icon"></div>
                              <div class="data-card-title" id="generalDataTitle">Общие данные</div>
                          </div>
                          <div class="data-card-toggle expanded" id="generalDataToggle">▲</div>
@@ -979,7 +1019,7 @@
                  <div class="data-card" id="houseTypeDataCard">
                      <div class="data-card-header" onclick="toggleAccordion('houseTypeDataCard')">
                          <div style="display: flex; align-items: center; gap: 12px;">
-                             <div class="data-card-icon">🏠</div>
+                             <div class="data-card-icon"></div>
                              <div class="data-card-title" id="houseTypeDataTitle">Данные по количеству спален</div>
                          </div>
                          <div class="data-card-toggle" id="houseTypeDataToggle">▼</div>
@@ -993,7 +1033,7 @@
                  <div class="data-card" id="floorSegmentDataCard">
                      <div class="data-card-header" onclick="toggleAccordion('floorSegmentDataCard')">
                          <div style="display: flex; align-items: center; gap: 12px;">
-                             <div class="data-card-icon">🏢</div>
+                             <div class="data-card-icon"></div>
                              <div class="data-card-title" id="floorSegmentDataTitle">Данные по этажу</div>
                          </div>
                          <div class="data-card-toggle" id="floorSegmentDataToggle">▼</div>
@@ -1007,7 +1047,7 @@
                  <div class="data-card" id="ageDataCard">
                      <div class="data-card-header" onclick="toggleAccordion('ageDataCard')">
                          <div style="display: flex; align-items: center; gap: 12px;">
-                             <div class="data-card-icon">📅</div>
+                             <div class="data-card-icon"></div>
                              <div class="data-card-title" id="ageDataTitle">Данные по возрасту объектов</div>
                          </div>
                          <div class="data-card-toggle" id="ageDataToggle">▼</div>
@@ -1021,7 +1061,7 @@
                  <div class="data-card" id="heatingDataCard">
                      <div class="data-card-header" onclick="toggleAccordion('heatingDataCard')">
                          <div style="display: flex; align-items: center; gap: 12px;">
-                             <div class="data-card-icon">🔥</div>
+                             <div class="data-card-icon"></div>
                              <div class="data-card-title" id="heatingDataTitle">Данные по типу отопления</div>
                          </div>
                          <div class="data-card-toggle" id="heatingDataToggle">▼</div>
@@ -1071,7 +1111,7 @@
             'ru': {
                 'slogan': 'Инсайты рынка недвижимости',
                 'pageTitle': 'Аналитика региона',
-                'pageDescription': 'Получите детальный анализ рынка недвижимости в выбранном регионе с прогнозами цен',
+                'pageDescription': 'Получите детальный анализ рынка недвижимости в выбранном регионе',
                 'countryLabel': 'Страна:',
                 'cityLabel': 'Город:',
                 'countyLabel': 'Область/Регион:',
@@ -1103,12 +1143,15 @@
                 'avgRentPriceLabel': 'Средняя цена аренды за м²',
                 'listingPeriodSaleLabel': 'Период размещения (продажа)',
                 'listingPeriodRentLabel': 'Период размещения (аренда)',
-                'yieldLabel': 'Yield (Доходность)'
+                'yieldLabel': 'Yield (Доходность)',
+                'insightsTitle': 'Саммари',
+                'insightsLoading': 'Анализируем данные...',
+                'insightsError': 'Ошибка при анализе данных'
             },
             'en': {
                 'slogan': 'Real Estate Market Insights',
                 'pageTitle': 'Region Analytics',
-                'pageDescription': 'Get a detailed analysis of the real estate market in the selected region with price forecasts',
+                'pageDescription': 'Get a detailed analysis of the real estate market in the selected region',
                 'countryLabel': 'Country:',
                 'cityLabel': 'City:',
                 'countyLabel': 'Region/Area:',
@@ -1140,12 +1183,15 @@
                 'avgRentPriceLabel': 'Average Rent Price per m²',
                 'listingPeriodSaleLabel': 'Listing Period (Sale)',
                 'listingPeriodRentLabel': 'Listing Period (Rent)',
-                'yieldLabel': 'Yield (Return)'
+                'yieldLabel': 'Yield (Return)',
+                'insightsTitle': 'Summary',
+                'insightsLoading': 'Analyzing data...',
+                'insightsError': 'Error analyzing data'
             },
             'de': {
                 'slogan': 'Immobilienmarkt-Einblicke',
                 'pageTitle': 'Regionsanalyse',
-                'pageDescription': 'Erhalten Sie eine detaillierte Analyse des Immobilienmarkts in der ausgewählten Region mit Preisprognosen',
+                'pageDescription': 'Erhalten Sie eine detaillierte Analyse des Immobilienmarkts in der ausgewählten Region',
                 'countryLabel': 'Land:',
                 'cityLabel': 'Stadt:',
                 'countyLabel': 'Region/Bereich:',
@@ -1177,12 +1223,15 @@
                 'avgRentPriceLabel': 'Durchschnittlicher Mietpreis pro m²',
                 'listingPeriodSaleLabel': 'Angebotsdauer (Verkauf)',
                 'listingPeriodRentLabel': 'Angebotsdauer (Vermietung)',
-                'yieldLabel': 'Yield (Rendite)'
+                'yieldLabel': 'Yield (Rendite)',
+                'insightsTitle': 'Zusammenfassung',
+                'insightsLoading': 'Daten werden analysiert...',
+                'insightsError': 'Fehler bei der Datenanalyse'
             },
             'fr': {
                 'slogan': 'Aperçus du marché immobilier',
                 'pageTitle': 'Analyse de région',
-                'pageDescription': 'Obtenez une analyse détaillée du marché immobilier dans la région sélectionnée avec des prévisions de prix',
+                'pageDescription': 'Obtenez une analyse détaillée du marché immobilier dans la région sélectionnée',
                 'countryLabel': 'Pays :',
                 'cityLabel': 'Ville :',
                 'countyLabel': 'Région/Zone :',
@@ -1214,12 +1263,15 @@
                 'avgRentPriceLabel': 'Prix de location moyen par m²',
                 'listingPeriodSaleLabel': 'Période d\'inscription (vente)',
                 'listingPeriodRentLabel': 'Période d\'inscription (location)',
-                'yieldLabel': 'Yield (Rendement)'
+                'yieldLabel': 'Yield (Rendement)',
+                'insightsTitle': 'Résumé',
+                'insightsLoading': 'Analyse des données...',
+                'insightsError': 'Erreur lors de l\'analyse des données'
             },
             'tr': {
                 'slogan': 'Gayrimenkul Piyasa İçgörüleri',
                 'pageTitle': 'Bölge Analizi',
-                'pageDescription': 'Seçilen bölgede gayrimenkul piyasasının fiyat tahminleriyle detaylı analizini alın',
+                'pageDescription': 'Seçilen bölgede gayrimenkul piyasasının detaylı analizini alın',
                 'countryLabel': 'Ülke:',
                 'cityLabel': 'Şehir:',
                 'countyLabel': 'Bölge/Alan:',
@@ -1251,7 +1303,10 @@
                 'avgRentPriceLabel': 'm² başına ortalama kiralama fiyatı',
                 'listingPeriodSaleLabel': 'İlan süresi (satış)',
                 'listingPeriodRentLabel': 'İlan süresi (kiralama)',
-                'yieldLabel': 'Yield (Getiri)'
+                'yieldLabel': 'Yield (Getiri)',
+                'insightsTitle': 'Özet',
+                'insightsLoading': 'Veriler analiz ediliyor...',
+                'insightsError': 'Veri analizi hatası'
             }
         };
 
@@ -2187,6 +2242,17 @@
             const insightsTitle = document.getElementById('insightsTitle');
             if (insightsTitle) {
                 insightsTitle.textContent = getText('insightsTitle');
+            }
+            
+            // Update insights loading and error text
+            const insightsLoadingText = document.getElementById('insightsLoadingText');
+            if (insightsLoadingText) {
+                insightsLoadingText.textContent = getText('insightsLoading');
+            }
+            
+            const insightsErrorText = document.getElementById('insightsErrorText');
+            if (insightsErrorText) {
+                insightsErrorText.textContent = getText('insightsError');
             }
         }
 

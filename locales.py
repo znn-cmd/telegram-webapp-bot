@@ -69,7 +69,7 @@ locales = {
         },
         'region_analytics': {
             'title': 'Аналитика региона',
-            'description': 'Получите детальный анализ рынка недвижимости в выбранном регионе с прогнозами цен',
+            'description': 'Получите детальный анализ рынка недвижимости в выбранном регионе',
             'country': 'Страна:',
             'city': 'Город:',
             'county': 'Область/Регион:',
@@ -104,7 +104,7 @@ locales = {
             'listingPeriodSaleLabel': 'Период размещения (продажа)',
             'listingPeriodRentLabel': 'Период размещения (аренда)',
             'yieldLabel': 'Доходность',
-        'insightsTitle': 'Вывод',
+        'insightsTitle': 'Саммари',
         'insightsLoading': 'Анализируем данные...',
         'insightsError': 'Ошибка при анализе данных',
     
@@ -205,7 +205,7 @@ locales = {
         },
         'region_analytics': {
             'title': 'Region Analytics',
-            'description': 'Get a detailed analysis of the real estate market in the selected region with price forecasts',
+            'description': 'Get a detailed analysis of the real estate market in the selected region',
             'country': 'Country:',
             'city': 'City:',
             'county': 'Region/Area:',
@@ -240,7 +240,7 @@ locales = {
             'listingPeriodSaleLabel': 'Listing period (sale)',
             'listingPeriodRentLabel': 'Listing period (rent)',
             'yieldLabel': 'Yield',
-        'insightsTitle': 'Insights',
+        'insightsTitle': 'Summary',
         'insightsLoading': 'Analyzing data...',
         'insightsError': 'Error analyzing data',
     
@@ -341,7 +341,7 @@ locales = {
         },
         'region_analytics': {
             'title': 'Regionsanalyse',
-            'description': 'Erhalten Sie eine detaillierte Analyse des Immobilienmarkts in der ausgewählten Region mit Preisprognosen',
+            'description': 'Erhalten Sie eine detaillierte Analyse des Immobilienmarkts in der ausgewählten Region',
             'country': 'Land:',
             'city': 'Stadt:',
             'county': 'Region/Bereich:',
@@ -376,7 +376,7 @@ locales = {
             'listingPeriodSaleLabel': 'Einstellungszeitraum (Verkauf)',
             'listingPeriodRentLabel': 'Einstellungszeitraum (Vermietung)',
             'yieldLabel': 'Rendite',
-        'insightsTitle': 'Einblicke',
+        'insightsTitle': 'Zusammenfassung',
         'insightsLoading': 'Daten werden analysiert...',
         'insightsError': 'Fehler bei der Datenanalyse',
     
@@ -477,7 +477,7 @@ locales = {
         },
         'region_analytics': {
             'title': 'Analyse de région',
-            'description': 'Obtenez une analyse détaillée du marché immobilier dans la région sélectionnée avec des prévisions de prix',
+            'description': 'Obtenez une analyse détaillée du marché immobilier dans la région sélectionnée',
             'country': 'Pays :',
             'city': 'Ville :',
             'county': 'Région/Zone :',
@@ -512,7 +512,7 @@ locales = {
             'listingPeriodSaleLabel': 'Période d\'inscription (vente)',
             'listingPeriodRentLabel': 'Période d\'inscription (location)',
             'yieldLabel': 'Rendement',
-        'insightsTitle': 'Aperçus',
+        'insightsTitle': 'Résumé',
         'insightsLoading': 'Analyse des données...',
         'insightsError': 'Erreur lors de l\'analyse des données',
     
@@ -607,7 +607,7 @@ locales = {
         },
         'region_analytics': {
             'title': 'Bölge Analizi',
-            'description': 'Seçilen bölgede gayrimenkul piyasasının fiyat tahminleriyle detaylı analizini alın',
+            'description': 'Seçilen bölgede gayrimenkul piyasasının detaylı analizini alın',
             'country': 'Ülke:',
             'city': 'Şehir:',
             'county': 'Bölge/Alan:',
@@ -642,7 +642,7 @@ locales = {
             'listingPeriodSaleLabel': 'İlan süresi (satış)',
             'listingPeriodRentLabel': 'İlan süresi (kiralama)',
             'yieldLabel': 'Getiri',
-        'insightsTitle': 'Görüşler',
+        'insightsTitle': 'Özet',
         'insightsLoading': 'Veriler analiz ediliyor...',
         'insightsError': 'Veri analizi hatası',
     
