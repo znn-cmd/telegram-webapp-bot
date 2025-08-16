@@ -19,9 +19,6 @@ import string
 import json
 import math
 import re
-import matplotlib.pyplot as plt
-import matplotlib
-matplotlib.use('Agg')  # Используем неинтерактивный бэкенд
 import io
 import base64
 from PIL import Image
@@ -5222,152 +5219,17 @@ def api_economic_data():
 
 def create_economic_chart_image(economic_charts_data):
     """
-    Создает изображение графика экономических данных
+    Создает изображение графика экономических данных (заглушка)
     """
-    try:
-        # Настройка для русского языка
-        plt.rcParams['font.family'] = ['DejaVu Sans', 'sans-serif']
-        
-        # Создаем фигуру
-        fig, ax = plt.subplots(figsize=(10, 6))
-        
-        # Получаем данные
-        gdp_chart = economic_charts_data.get('gdp_chart', {})
-        inflation_chart = economic_charts_data.get('inflation_chart', {})
-        
-        if not gdp_chart.get('labels') or not inflation_chart.get('labels'):
-            return None
-        
-        # Данные для графиков
-        years = gdp_chart['labels']
-        # Конвертируем годы в целые числа для правильного отображения
-        years = [int(year) for year in years]
-        gdp_data = gdp_chart['datasets'][0]['data']
-        inflation_data = inflation_chart['datasets'][0]['data']
-        
-        # Создаем график
-        ax.plot(years, gdp_data, 'o-', color='#00bcd4', linewidth=2, 
-                markersize=6, label='Рост ВВП (%)', alpha=0.8)
-        ax.plot(years, inflation_data, 's-', color='#dc3545', linewidth=2, 
-                markersize=6, label='Инфляция (%)', alpha=0.8)
-        
-        # Настройка графика с явным указанием шрифта
-        ax.set_xlabel('Год', fontsize=12, fontname='DejaVu Sans')
-        ax.set_ylabel('Процент (%)', fontsize=12, fontname='DejaVu Sans')
-        ax.set_title('Динамика экономических показателей', fontsize=14, fontweight='bold', fontname='DejaVu Sans')
-        ax.grid(True, alpha=0.3)
-        
-        # Настройка легенды с явным указанием шрифта
-        legend = ax.legend(fontsize=10)
-        for text in legend.get_texts():
-            text.set_fontname('DejaVu Sans')
-        
-        # Поворот подписей оси X для лучшей читаемости
-        plt.xticks(rotation=45)
-        # Устанавливаем шрифт для меток осей
-        for label in ax.get_xticklabels() + ax.get_yticklabels():
-            label.set_fontname('DejaVu Sans')
-        
-        # Настройка отступов
-        plt.tight_layout()
-        
-        # Сохраняем в буфер
-        buffer = io.BytesIO()
-        plt.savefig(buffer, format='png', dpi=150, bbox_inches='tight')
-        buffer.seek(0)
-        
-        # Закрываем фигуру для освобождения памяти
-        plt.close()
-        
-        return buffer
-        
-    except Exception as e:
-        logger.error(f"Ошибка создания графика: {e}")
-        return None
+    logger.info("Функция создания графиков отключена для упрощения")
+    return None
 
 def create_chart_image_for_pdf(chart_data, title, width=180, height=100):
     """
-    Создает изображение графика для вставки в PDF
+    Создает изображение графика для вставки в PDF (заглушка)
     """
-    try:
-        logger.info(f"Создание графика для PDF: {title}")
-        
-        # Настройка для русского языка
-        plt.rcParams['font.family'] = ['DejaVu Sans', 'sans-serif']
-        plt.rcParams['font.size'] = 8
-        
-        # Создаем фигуру с заданными размерами (в дюймах)
-        fig, ax = plt.subplots(figsize=(width/25.4, height/25.4))  # Конвертируем мм в дюймы
-        
-        # Получаем данные
-        years = chart_data.get('labels', [])
-        # Конвертируем годы в целые числа для правильного отображения
-        years = [int(year) for year in years if year.isdigit()]
-        gdp_data = chart_data.get('gdp_chart', {}).get('datasets', [{}])[0].get('data', [])
-        inflation_data = chart_data.get('inflation_chart', {}).get('datasets', [{}])[0].get('data', [])
-        
-        logger.info(f"Данные для графика: {len(years)} лет, ВВП: {len(gdp_data)} точек, Инфляция: {len(inflation_data)} точек")
-        
-        # Проверяем минимальное количество данных
-        if len(years) < 2 or len(gdp_data) < 2 or len(inflation_data) < 2:
-            logger.warning("Недостаточно данных для создания графика")
-            # Создаем placeholder график с сообщением
-            ax.text(0.5, 0.5, 'Нет данных', ha='center', va='center', 
-                   transform=ax.transAxes, fontsize=10, fontname='DejaVu Sans')
-            ax.set_title(title, fontsize=8, fontname='DejaVu Sans', pad=10)
-            ax.set_xlim(0, 1)
-            ax.set_ylim(0, 1)
-            ax.axis('off')
-            
-            # Сохраняем в буфер
-            buffer = io.BytesIO()
-            plt.savefig(buffer, format='png', dpi=150, bbox_inches='tight')
-            buffer.seek(0)
-            plt.close()
-            
-            return buffer
-        
-        # Создаем график
-        ax.plot(years, gdp_data, 'o-', color='#00bcd4', linewidth=1.5, 
-                markersize=3, label='ВВП', alpha=0.8)
-        ax.plot(years, inflation_data, 's-', color='#dc3545', linewidth=1.5, 
-                markersize=3, label='Инфляция', alpha=0.8)
-        
-        # Настройка графика с явным указанием шрифта
-        ax.set_xlabel('Год', fontsize=6, fontname='DejaVu Sans')
-        ax.set_ylabel('%', fontsize=6, fontname='DejaVu Sans')
-        ax.set_title(title, fontsize=8, fontweight='bold', fontname='DejaVu Sans')
-        ax.grid(True, alpha=0.2)
-        
-        # Настройка легенды с явным указанием шрифта
-        legend = ax.legend(fontsize=6, loc='upper right')
-        for text in legend.get_texts():
-            text.set_fontname('DejaVu Sans')
-        
-        # Поворот подписей оси X
-        plt.xticks(rotation=45, fontsize=6)
-        plt.yticks(fontsize=6)
-        
-        # Устанавливаем шрифт для меток осей
-        for label in ax.get_xticklabels() + ax.get_yticklabels():
-            label.set_fontname('DejaVu Sans')
-        
-        # Настройка отступов
-        plt.tight_layout()
-        
-        # Сохраняем в буфер
-        buffer = io.BytesIO()
-        plt.savefig(buffer, format='png', dpi=200, bbox_inches='tight')
-        buffer.seek(0)
-        
-        # Закрываем фигуру
-        plt.close()
-        
-        return buffer
-        
-    except Exception as e:
-        logger.error(f"Ошибка создания графика для PDF: {e}")
-        return None
+    logger.info(f"Функция создания графиков отключена для упрощения: {title}")
+    return None
 
 def get_market_data_by_location_ids(location_codes, target_year=None, target_month=None):
     """
@@ -6375,102 +6237,10 @@ def get_cascading_historical_data(location_codes, target_year):
 
 def create_property_trends_chart(historical_data, chart_type='sale', width=180, height=100):
     """
-    Создает график трендов недвижимости для PDF
-    
-    Args:
-        historical_data (dict): Исторические данные трендов
-        chart_type (str): Тип графика ('sale' или 'rent')
-        width (int): Ширина графика в мм
-        height (int): Высота графика в мм
-    
-    Returns:
-        BytesIO: Буфер с изображением графика или None при ошибке
+    Создает график трендов недвижимости для PDF (заглушка)
     """
-    try:
-        import matplotlib.pyplot as plt
-        import matplotlib.font_manager as fm
-        from io import BytesIO
-        
-        # Настройка шрифта для русского языка
-        plt.rcParams['font.family'] = 'DejaVu Sans'
-        
-        # Создаем фигуру
-        fig, ax = plt.subplots(figsize=(width/25.4, height/25.4), dpi=200)
-        
-        years = historical_data['years']
-        if chart_type == 'sale':
-            prices = historical_data['sale_prices']
-            title = 'Динамика цен на продажу (€/м²)'
-            color = '#667eea'
-        else:
-            prices = historical_data['rent_prices']
-            title = 'Динамика цен на аренду (€/м²)'
-            color = '#dc3545'
-        
-        # Фильтруем None значения
-        valid_data = [(year, price) for year, price in zip(years, prices) if price is not None]
-        
-        if valid_data:
-            valid_years, valid_prices = zip(*valid_data)
-            
-            # Создаем график
-            ax.plot(valid_years, valid_prices, marker='o', linewidth=2, markersize=4, 
-                   color=color, alpha=0.8)
-            
-            # Настройка осей
-            ax.set_title(title, fontsize=10, fontname='DejaVu Sans', pad=10)
-            ax.set_xlabel('Год', fontsize=8, fontname='DejaVu Sans')
-            ax.set_ylabel('Цена (€/м²)', fontsize=8, fontname='DejaVu Sans')
-            
-            # Настройка сетки
-            ax.grid(True, alpha=0.3)
-            
-            # Настройка тиков
-            ax.tick_params(axis='both', which='major', labelsize=7)
-            
-            # Поворот подписей оси X для лучшей читаемости
-            plt.setp(ax.get_xticklabels(), rotation=45, ha='right')
-            
-            # Убираем лишние отступы
-            plt.tight_layout()
-        else:
-            # Если нет данных, показываем пустой график с сообщением
-            ax.text(0.5, 0.5, 'Нет данных', ha='center', va='center', 
-                   transform=ax.transAxes, fontsize=10, fontname='DejaVu Sans')
-            ax.set_title(title, fontsize=10, fontname='DejaVu Sans', pad=10)
-            ax.set_xlim(0, 1)
-            ax.set_ylim(0, 1)
-            ax.axis('off')
-        
-        # Сохраняем в буфер
-        buffer = BytesIO()
-        plt.savefig(buffer, format='png', dpi=200, bbox_inches='tight')
-        buffer.seek(0)
-        plt.close()
-        
-        logger.info(f"Создан график трендов {chart_type}: {len(valid_data) if valid_data else 0} точек данных")
-        return buffer
-        
-    except Exception as e:
-        logger.error(f"Ошибка создания графика трендов {chart_type}: {e}")
-        # Создаем placeholder график при ошибке
-        try:
-            fig, ax = plt.subplots(figsize=(width/25.4, height/25.4), dpi=200)
-            ax.text(0.5, 0.5, 'Ошибка графика', ha='center', va='center', 
-                   transform=ax.transAxes, fontsize=8, fontname='DejaVu Sans')
-            ax.set_title(f'Тренды {chart_type}', fontsize=8, fontname='DejaVu Sans', pad=10)
-            ax.set_xlim(0, 1)
-            ax.set_ylim(0, 1)
-            ax.axis('off')
-            
-            buffer = BytesIO()
-            plt.savefig(buffer, format='png', dpi=200, bbox_inches='tight')
-            buffer.seek(0)
-            plt.close()
-            
-            return buffer
-        except:
-            return None
+    logger.info(f"Функция создания графиков отключена для упрощения: {chart_type}")
+    return None
 
 def get_openai_api_key():
     """
@@ -7260,11 +7030,11 @@ def api_region_insights():
         
         # Формируем промпт на соответствующем языке
         language_prompts = {
-            'ru': 'Проанализируй эти данные по недвижимости и напиши один краткий параграф с выводами риелтора. Сосредоточься на трендах рынка, спросе и лучших инвестиционных сегментах. НЕ перечисляй цифры - дай только практические рекомендации. Пиши как для потенциального покупателя, используй сокращения (м2), указывай валюту в ценах.',
-            'en': 'Analyze this real estate data and write one concise realtor insight paragraph. Focus on market trends, demand, and best investment segments. Do NOT list numbers—give actionable insights only. Write as for a potential buyer, use abbreviations (sqm), include currency in prices.',
-            'de': 'Analysiere diese Immobiliendaten und schreibe einen kurzen Absatz mit Makler-Einblicken. Konzentriere dich auf Markttrends, Nachfrage und beste Investitionssegmente. Zähle KEINE Zahlen auf - gib nur praktische Empfehlungen. Schreibe wie für einen potenziellen Käufer, verwende Abkürzungen (qm), gib Währung in Preisen an.',
-            'fr': 'Analysez ces données immobilières et écrivez un paragraphe concis avec des insights d\'agent immobilier. Concentrez-vous sur les tendances du marché, la demande et les meilleurs segments d\'investissement. NE listez PAS les chiffres - donnez seulement des recommandations pratiques. Écrivez comme pour un acheteur potentiel, utilisez des abréviations (m2), incluez la devise dans les prix.',
-            'tr': 'Bu gayrimenkul verilerini analiz edin ve bir emlakçı içgörü paragrafı yazın. Pazar trendlerine, talebe ve en iyi yatırım segmentlerine odaklanın. Sayıları listeleme - sadece uygulanabilir içgörüler verin. Potansiyel bir alıcı için yazın, kısaltmalar kullanın (m2), fiyatlarda para birimini belirtin.'
+            'ru': 'Проанализируй данные по недвижимости и напиши один сжатый абзац как вывод профессионального риэлтора. Сфокусируйся на трендах рынка, спросе и наиболее выгодных инвестиционных сегментах. Не указывай числа, только инсайты.',
+            'en': 'Analyze this real estate data and write one concise realtor insight paragraph. Focus on market trends, demand, and best investment segments. Do NOT list numbers—give actionable insights only.',
+            'de': 'Analysiere diese Immobiliendaten und erstelle einen kurzen Absatz mit professioneller Makler-Einschätzung. Konzentriere dich auf Markttrends, Nachfrage und die besten Investitionssegmente. Keine Zahlen nennen, nur aussagekräftige Erkenntnisse.',
+            'fr': 'Analysez ces données immobilières et rédigez un paragraphe concis comme un avis de professionnel de l\'immobilier. Concentrez-vous sur les tendances du marché, la demande et les meilleurs segments d\'investissement. Ne donnez pas de chiffres, uniquement des insights exploitables.',
+            'tr': 'Bu gayrimenkul verilerini analiz edin ve profesyonel bir emlak danışmanı gibi kısa bir paragraf yazın. Piyasa trendleri, talep ve en iyi yatırım segmentlerine odaklanın. Sayı vermeyin, sadece uygulanabilir içgörüler sunun.'
         }
         
         prompt = language_prompts.get(user_language, language_prompts['en'])
@@ -7294,7 +7064,7 @@ def api_region_insights():
             response = client.chat.completions.create(
                 model="gpt-3.5-turbo",
                 messages=[
-                    {"role": "system", "content": "You are a professional real estate analyst. Provide concise, actionable insights for potential buyers. Focus on market trends, investment opportunities, and practical recommendations. Use abbreviations (sqm/m2), include currency in prices, and write in a direct, professional tone without unnecessary words."},
+                    {"role": "system", "content": "You are a professional real estate analyst. Provide extremely concise, actionable insights. Focus on market trends and investment opportunities. Write in a direct, professional tone without any unnecessary words or explanations."},
                     {"role": "user", "content": analysis_text}
                 ],
                 max_tokens=250,
