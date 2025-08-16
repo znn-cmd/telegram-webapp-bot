@@ -439,9 +439,7 @@
             padding: 6px 4px !important;
         }
         
-        .additional-section {
-            background-color: #f8f9fa;
-        }
+        /* Additional section styles removed as requested */
 
         /* Currency Switcher Styles */
         .currency-switcher {
@@ -1177,10 +1175,7 @@
                 'yield_rate': 15,
                 'return_rate': 15,
                 
-                // Priority 4: Additional data (hidden by default)
-                'inventory_coefficient_for_rent': 16,
-                'inventory_coefficient_for_sale': 17,
-                'trend_date': 18,
+                // Additional data section removed as requested
                 
                 // Priority 5: Hidden price fields (not shown)
                 'price_per_m2_for_rent': 999,
@@ -1205,12 +1200,16 @@
             let saleFields = [];
             let rentFields = [];
             let yieldFields = [];
-            let additionalFields = [];
 
             // Categorize fields by type
             fields.forEach(key => {
                 const value = item[key];
                 if (value === null || value === undefined) return;
+
+                // Skip Stock Ratio fields
+                if (key.includes('stock_ratio') || key.includes('Stock_Ratio')) {
+                    return;
+                }
 
                 if (key.includes('sale') || key.includes('Sale')) {
                     saleFields.push({ key, value });
@@ -1218,9 +1217,8 @@
                     rentFields.push({ key, value });
                 } else if (key.includes('yield') || key.includes('Yield') || key.includes('return')) {
                     yieldFields.push({ key, value });
-                } else {
-                    additionalFields.push({ key, value });
                 }
+                // Additional fields are no longer displayed
             });
 
             // Sort each category by priority
@@ -1240,28 +1238,23 @@
             const headers = {
                 'ru': {
                     'sale': 'Данные по продаже',
-                    'rent': 'Данные по аренде',
-                    'additional': 'Дополнительно'
+                    'rent': 'Данные по аренде'
                 },
                 'en': {
                     'sale': 'Sale Data',
-                    'rent': 'Rent Data',
-                    'additional': 'Additional'
+                    'rent': 'Rent Data'
                 },
                 'de': {
                     'sale': 'Verkaufsdaten',
-                    'rent': 'Vermietungsdaten',
-                    'additional': 'Zusätzlich'
+                    'rent': 'Vermietungsdaten'
                 },
                 'fr': {
                     'sale': 'Données de vente',
-                    'rent': 'Données de location',
-                    'additional': 'Supplémentaire'
+                    'rent': 'Données de location'
                 },
                 'tr': {
                     'sale': 'Satış Verileri',
-                    'rent': 'Kiralama Verileri',
-                    'additional': 'Ek'
+                    'rent': 'Kiralama Verileri'
                 }
             };
 
@@ -1296,17 +1289,7 @@
                 });
             }
 
-            // Display Additional section (collapsible)
-            if (additionalFields.length > 0) {
-                html += `<tr class="section-header collapsible" onclick="toggleAdditionalSection(this)"><td colspan="2"><strong>${currentHeaders.additional} ▼</strong></td></tr>`;
-                html += '<tbody class="additional-section" style="display: none;">';
-                additionalFields.forEach(({ key, value }) => {
-                    const label = getFieldLabel(key);
-                    const displayValue = formatFieldValue(key, value);
-                    html += `<tr><td>${label}:</td><td>${displayValue}</td></tr>`;
-                });
-                html += '</tbody>';
-            }
+            // Additional section removed as requested
 
             return html;
         }
@@ -1337,30 +1320,7 @@
             return priorityMap[fieldName] || priorityMap['default'];
         }
         
-        // Toggle additional section visibility
-        function toggleAdditionalSection(headerRow) {
-            const additionalSection = headerRow.nextElementSibling;
-            const isVisible = additionalSection.style.display !== 'none';
-            
-            // Get localized text for additional section
-            const additionalText = {
-                'ru': 'Дополнительно',
-                'en': 'Additional',
-                'de': 'Zusätzlich',
-                'fr': 'Supplémentaire',
-                'tr': 'Ek'
-            };
-            
-            const currentText = additionalText[userLanguage] || additionalText['ru'];
-            
-            if (isVisible) {
-                additionalSection.style.display = 'none';
-                headerRow.querySelector('strong').innerHTML = `${currentText} ▼`;
-            } else {
-                additionalSection.style.display = 'table-row-group';
-                headerRow.querySelector('strong').innerHTML = `${currentText} ▲`;
-            }
-        }
+        // Additional section toggle function removed as requested
 
         // User language and currency management
         let userLanguage = 'ru'; // Default language
@@ -1829,9 +1789,7 @@
             }
             
             // Format percentage values
-            if (key.includes('ratio') || key.includes('Ratio') || 
-                key.includes('yield') || key.includes('Yield') ||
-                key.includes('stock_ratio') || key.includes('Stock_Ratio')) {
+            if (key.includes('yield') || key.includes('Yield')) {
                 if (typeof value === 'number') {
                     return `${parseFloat(value).toFixed(2)}%`;
                 }

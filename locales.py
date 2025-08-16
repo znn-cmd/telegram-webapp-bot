@@ -104,10 +104,9 @@ locales = {
             'listingPeriodSaleLabel': 'Период размещения (продажа)',
             'listingPeriodRentLabel': 'Период размещения (аренда)',
             'yieldLabel': 'Доходность',
-            'currencyDisplay': 'Валюта отображения:',
-            'saleDataHeader': 'Данные по продаже',
-            'rentDataHeader': 'Данные по аренде',
-            'additionalDataHeader': 'Дополнительно',
+    
+            
+    
             'fieldLabels': {
                 'average_age_for_sale': 'Средний возраст для продажи (годы)',
                 'average_age_for_rent': 'Средний возраст для аренды (годы)',
@@ -238,10 +237,9 @@ locales = {
             'listingPeriodSaleLabel': 'Listing period (sale)',
             'listingPeriodRentLabel': 'Listing period (rent)',
             'yieldLabel': 'Yield',
-            'currencyDisplay': 'Display currency:',
-            'saleDataHeader': 'Sale Data',
-            'rentDataHeader': 'Rent Data',
-            'additionalDataHeader': 'Additional',
+    
+            
+    
             'fieldLabels': {
                 'average_age_for_sale': 'Average age for sale (years)',
                 'average_age_for_rent': 'Average age for rent (years)',
@@ -372,10 +370,9 @@ locales = {
             'listingPeriodSaleLabel': 'Einstellungszeitraum (Verkauf)',
             'listingPeriodRentLabel': 'Einstellungszeitraum (Vermietung)',
             'yieldLabel': 'Rendite',
-            'currencyDisplay': 'Anzeigewährung:',
-            'saleDataHeader': 'Verkaufsdaten',
-            'rentDataHeader': 'Vermietungsdaten',
-            'additionalDataHeader': 'Zusätzlich',
+    
+            
+    
             'fieldLabels': {
                 'average_age_for_sale': 'Durchschnittsalter für Verkauf (Jahre)',
                 'average_age_for_rent': 'Durchschnittsalter für Vermietung (Jahre)',
@@ -506,10 +503,9 @@ locales = {
             'listingPeriodSaleLabel': 'Période d\'inscription (vente)',
             'listingPeriodRentLabel': 'Période d\'inscription (location)',
             'yieldLabel': 'Rendement',
-            'currencyDisplay': 'Devise d\'affichage :',
-            'saleDataHeader': 'Données de vente',
-            'rentDataHeader': 'Données de location',
-            'additionalDataHeader': 'Supplémentaire',
+    
+            
+    
             'fieldLabels': {
                 'average_age_for_sale': 'Âge moyen pour la vente (années)',
                 'average_age_for_rent': 'Âge moyen pour la location (années)',
@@ -634,10 +630,9 @@ locales = {
             'listingPeriodSaleLabel': 'İlan süresi (satış)',
             'listingPeriodRentLabel': 'İlan süresi (kiralama)',
             'yieldLabel': 'Getiri',
-            'currencyDisplay': 'Görüntüleme para birimi:',
-            'saleDataHeader': 'Satış Verileri',
-            'rentDataHeader': 'Kiralama Verileri',
-            'additionalDataHeader': 'Ek',
+    
+            
+    
             'fieldLabels': {
                 'average_age_for_sale': 'Satış için ortalama yaş (yıl)',
                 'average_age_for_rent': 'Kiralama için ortalama yaş (yıl)',
