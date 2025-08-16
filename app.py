@@ -528,12 +528,15 @@ def api_region_data():
     city_id = data.get('city_id')
     county_id = data.get('county_id')
     district_id = data.get('district_id')
+    listing_types = data.get('listing_types', {})
     
     if not all([country_id, city_id, county_id]):
         return jsonify({'error': 'country_id, city_id, county_id required'}), 400
     
     try:
         logger.info(f"🔍 Запрос данных региона: country_id={country_id}, city_id={city_id}, county_id={county_id}, district_id={district_id}")
+        if listing_types:
+            logger.info(f"🎯 Выбранные listing_type: {listing_types}")
         
         # Формируем условия для запроса
         conditions = {
@@ -555,24 +558,32 @@ def api_region_data():
         house_type_result = supabase.table('house_type_data').select('*').eq('country_id', country_id).eq('city_id', city_id).eq('county_id', county_id)
         if district_id and district_id != 'none':
             house_type_result = house_type_result.eq('district_id', district_id)
+        if listing_types.get('house_type'):
+            house_type_result = house_type_result.eq('listing_type', listing_types['house_type'])
         house_type_data = house_type_result.execute()
         
         # Получаем данные по сегментам этажей
         floor_segment_result = supabase.table('floor_segment_data').select('*').eq('country_id', country_id).eq('city_id', city_id).eq('county_id', county_id)
         if district_id and district_id != 'none':
             floor_segment_result = floor_segment_result.eq('district_id', district_id)
+        if listing_types.get('floor_segment'):
+            floor_segment_result = floor_segment_result.eq('listing_type', listing_types['floor_segment'])
         floor_segment_data = floor_segment_result.execute()
         
-                # Получаем данные по возрасту объектов
+        # Получаем данные по возрасту объектов
         age_result = supabase.table('age_data').select('*').eq('country_id', country_id).eq('city_id', city_id).eq('county_id', county_id)
         if district_id and district_id != 'none':
             age_result = age_result.eq('district_id', district_id)
+        if listing_types.get('age'):
+            age_result = age_result.eq('listing_type', listing_types['age'])
         age_data = age_result.execute()
 
         # Получаем данные по отоплению
         heating_result = supabase.table('heating_data').select('*').eq('country_id', country_id).eq('city_id', city_id).eq('county_id', county_id)
         if district_id and district_id != 'none':
             heating_result = heating_result.eq('district_id', district_id)
+        if listing_types.get('heating'):
+            heating_result = heating_result.eq('listing_type', listing_types['heating'])
         heating_data = heating_result.execute()
 
         logger.info(f"📊 Получено данных: general={len(general_data.data) if general_data.data else 0}, house_type={len(house_type_data.data) if house_type_data.data else 0}, floor_segment={len(floor_segment_data.data) if floor_segment_data.data else 0}, age={len(age_data.data) if age_data.data else 0}, heating={len(heating_data.data) if heating_data.data else 0}")
@@ -601,6 +612,41 @@ def api_region_data():
     except Exception as e:
         logger.error(f"❌ Ошибка при получении данных региона: {e}")
         logger.error(f"📋 Данные запроса: country_id={country_id}, city_id={city_id}, county_id={county_id}, district_id={district_id}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/listing_types/<table_name>', methods=['GET'])
+def api_listing_types(table_name):
+    """Получение доступных listing_type из указанной таблицы"""
+    try:
+        logger.info(f"🔍 Запрос доступных listing_type из таблицы: {table_name}")
+        
+        # Проверяем, что таблица поддерживается
+        supported_tables = ['house_type_data', 'floor_segment_data', 'age_data', 'heating_data']
+        if table_name not in supported_tables:
+            return jsonify({'success': False, 'error': f'Table {table_name} not supported'}), 400
+        
+        # Получаем уникальные listing_type из таблицы
+        result = supabase.table(table_name).select('listing_type').not_.is_('listing_type', 'null').execute()
+        
+        if result.data:
+            # Извлекаем уникальные значения listing_type
+            listing_types = list(set([item['listing_type'] for item in result.data if item.get('listing_type')]))
+            listing_types.sort()  # Сортируем для удобства
+            
+            logger.info(f"✅ Получено {len(listing_types)} уникальных listing_type из таблицы {table_name}: {listing_types}")
+            return jsonify({
+                'success': True,
+                'listing_types': listing_types
+            })
+        else:
+            logger.warning(f"⚠️ В таблице {table_name} не найдено данных с listing_type")
+            return jsonify({
+                'success': True,
+                'listing_types': []
+            })
+            
+    except Exception as e:
+        logger.error(f"❌ Ошибка при получении listing_type из таблицы {table_name}: {e}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
 @app.route('/api/currency/rates', methods=['GET'])
