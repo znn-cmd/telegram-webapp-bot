@@ -104,6 +104,9 @@ locales = {
             'listingPeriodSaleLabel': 'Период размещения (продажа)',
             'listingPeriodRentLabel': 'Период размещения (аренда)',
             'yieldLabel': 'Доходность',
+        'insightsTitle': 'Вывод',
+        'insightsLoading': 'Анализируем данные...',
+        'insightsError': 'Ошибка при анализе данных',
     
             
     
@@ -237,6 +240,9 @@ locales = {
             'listingPeriodSaleLabel': 'Listing period (sale)',
             'listingPeriodRentLabel': 'Listing period (rent)',
             'yieldLabel': 'Yield',
+        'insightsTitle': 'Insights',
+        'insightsLoading': 'Analyzing data...',
+        'insightsError': 'Error analyzing data',
     
             
     
@@ -370,6 +376,9 @@ locales = {
             'listingPeriodSaleLabel': 'Einstellungszeitraum (Verkauf)',
             'listingPeriodRentLabel': 'Einstellungszeitraum (Vermietung)',
             'yieldLabel': 'Rendite',
+        'insightsTitle': 'Einblicke',
+        'insightsLoading': 'Daten werden analysiert...',
+        'insightsError': 'Fehler bei der Datenanalyse',
     
             
     
@@ -503,6 +512,9 @@ locales = {
             'listingPeriodSaleLabel': 'Période d\'inscription (vente)',
             'listingPeriodRentLabel': 'Période d\'inscription (location)',
             'yieldLabel': 'Rendement',
+        'insightsTitle': 'Aperçus',
+        'insightsLoading': 'Analyse des données...',
+        'insightsError': 'Erreur lors de l\'analyse des données',
     
             
     
@@ -630,6 +642,9 @@ locales = {
             'listingPeriodSaleLabel': 'İlan süresi (satış)',
             'listingPeriodRentLabel': 'İlan süresi (kiralama)',
             'yieldLabel': 'Getiri',
+        'insightsTitle': 'Görüşler',
+        'insightsLoading': 'Veriler analiz ediliyor...',
+        'insightsError': 'Veri analizi hatası',
     
             
     

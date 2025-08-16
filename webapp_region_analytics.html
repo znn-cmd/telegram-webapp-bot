@@ -235,6 +235,9 @@
             padding: 12px;
             margin-bottom: 10px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            overflow: hidden;
         }
 
         .data-card-header {
@@ -287,18 +290,25 @@
             border-collapse: collapse;
             font-size: 14px;
             margin-top: 10px;
+            table-layout: fixed;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
         }
 
         .data-table td {
-            padding: 6px 4px;
+            padding: 6px 8px;
             border-bottom: 1px solid #f0f0f0;
             vertical-align: top;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            max-width: 0;
         }
 
         .data-table td:first-child {
             font-weight: 500;
             color: #555;
             width: 60%;
+            text-align: left;
         }
 
         .data-table td:last-child {
@@ -315,6 +325,9 @@
             border-radius: 6px;
             padding: 10px;
             margin-bottom: 8px;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            overflow: hidden;
         }
 
         .sub-card h3 {
@@ -398,14 +411,14 @@
         }
 
         .yield-label {
-            font-size: 13px;
+            font-size: 14px;
             font-weight: 500;
             margin-bottom: 8px;
             color: #666;
         }
 
         .yield-value {
-            font-size: 25px;
+            font-size: 26px;
             font-weight: 700;
             color: #333;
             line-height: 1.1;
@@ -436,7 +449,10 @@
         .yield-row td {
             font-weight: 700 !important;
             color: #333 !important;
-            padding: 6px 4px !important;
+            padding: 6px 8px !important;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            max-width: 0;
         }
         
         /* Additional section styles removed as requested */
@@ -566,14 +582,23 @@
             
             .data-table {
                 font-size: 13px;
+                table-layout: fixed;
+                word-wrap: break-word;
+                overflow-wrap: break-word;
             }
             
             .data-table td {
-                padding: 5px 3px;
+                padding: 5px 6px;
+                word-wrap: break-word;
+                overflow-wrap: break-word;
+                max-width: 0;
             }
             
             .sub-card {
                 padding: 8px;
+                word-wrap: break-word;
+                overflow-wrap: break-word;
+                overflow: hidden;
             }
             
             .data-footer {
@@ -602,6 +627,106 @@
             
             .currency-code {
                 font-size: 9px;
+            }
+        }
+
+        /* AI Insights Styles */
+        .insights-section {
+            margin: 20px 0;
+        }
+        
+        .insights-card {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 16px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .insights-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .insights-icon {
+            font-size: 24px;
+        }
+        
+        .insights-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .insights-content {
+            min-height: 60px;
+        }
+        
+        .insights-loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            padding: 20px;
+        }
+        
+        .insights-loading .loading-spinner {
+            width: 32px;
+            height: 32px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        .loading-text {
+            font-size: 14px;
+            color: #666;
+            text-align: center;
+        }
+        
+        .insights-text {
+            font-size: 15px;
+            line-height: 1.6;
+            color: #333;
+            text-align: justify;
+            padding: 8px 0;
+        }
+        
+        .insights-error {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            padding: 20px;
+            color: #721c24;
+        }
+        
+        .insights-error .error-icon {
+            font-size: 24px;
+        }
+        
+        .insights-error .error-text {
+            font-size: 14px;
+            text-align: center;
+        }
+        
+        /* Mobile responsive for insights */
+        @media (max-width: 480px) {
+            .insights-card {
+                padding: 12px;
+            }
+            
+            .insights-title {
+                font-size: 16px;
+            }
+            
+            .insights-text {
+                font-size: 14px;
             }
         }
 
@@ -886,6 +1011,27 @@
                          <!-- Heating data will be populated here - collapsed by default -->
                      </div>
                  </div>
+            </div>
+            
+            <!-- AI Insights Section -->
+            <div class="insights-section" id="insightsSection" style="display: none;">
+                <div class="insights-card">
+                    <div class="insights-header">
+                        <div class="insights-icon">🧠</div>
+                        <div class="insights-title" id="insightsTitle">Вывод</div>
+                    </div>
+                    <div class="insights-content" id="insightsContent">
+                        <div class="insights-loading" id="insightsLoading">
+                            <div class="loading-spinner"></div>
+                            <div class="loading-text" id="insightsLoadingText">Анализируем данные...</div>
+                        </div>
+                        <div class="insights-text" id="insightsText" style="display: none;"></div>
+                        <div class="insights-error" id="insightsError" style="display: none;">
+                            <div class="error-icon">⚠️</div>
+                            <div class="error-text" id="insightsErrorText">Ошибка при анализе данных</div>
+                        </div>
+                    </div>
+                </div>
             </div>
             
             <!-- Error State -->
@@ -1206,8 +1352,10 @@
                 const value = item[key];
                 if (value === null || value === undefined) return;
 
-                // Skip Stock Ratio fields
-                if (key.includes('stock_ratio') || key.includes('Stock_Ratio')) {
+                // Skip Stock Ratio fields and Unit Price fields
+                if (key.includes('stock_ratio') || key.includes('Stock_Ratio') ||
+                    key.includes('unit_price_for_sale') || key.includes('unit_price_for_rent') ||
+                    key.includes('Unit_Price_For_Sale') || key.includes('Unit_Price_For_Rent')) {
                     return;
                 }
 
@@ -2017,6 +2165,12 @@
             if (yieldLabel) {
                 yieldLabel.textContent = getText('yieldLabel');
             }
+            
+            // Update insights title
+            const insightsTitle = document.getElementById('insightsTitle');
+            if (insightsTitle) {
+                insightsTitle.textContent = getText('insightsTitle');
+            }
         }
 
         // Load countries from API
@@ -2539,6 +2693,71 @@
             });
         }
 
+        // Get AI insights for the region data
+        async function getRegionInsights(regionData) {
+            try {
+                console.log('🧠 Запрашиваем AI-вывод для данных региона');
+                
+                // Show insights section
+                const insightsSection = document.getElementById('insightsSection');
+                const insightsLoading = document.getElementById('insightsLoading');
+                const insightsText = document.getElementById('insightsText');
+                const insightsError = document.getElementById('insightsError');
+                
+                insightsSection.style.display = 'block';
+                insightsLoading.style.display = 'flex';
+                insightsText.style.display = 'none';
+                insightsError.style.display = 'none';
+                
+                // Update loading text based on user language
+                const loadingText = document.getElementById('insightsLoadingText');
+                loadingText.textContent = getText('insightsLoading');
+                
+                // Prepare data for AI analysis
+                const analysisData = {
+                    region_data: regionData,
+                    language: userLanguage
+                };
+                
+                // Make API request to get AI insights
+                const response = await fetch('/api/region_insights', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(analysisData)
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Hide loading and show insights
+                    insightsLoading.style.display = 'none';
+                    insightsText.style.display = 'block';
+                    
+                    // Update insights text
+                    const insightsTextElement = document.getElementById('insightsText');
+                    insightsTextElement.textContent = data.insights;
+                    
+                    console.log('✅ AI-вывод получен:', data.insights);
+                } else {
+                    throw new Error(data.error || 'Unknown error');
+                }
+                
+            } catch (error) {
+                console.error('❌ Ошибка получения AI-вывода:', error);
+                
+                // Hide loading and show error
+                const insightsLoading = document.getElementById('insightsLoading');
+                const insightsError = document.getElementById('insightsError');
+                const insightsErrorText = document.getElementById('insightsErrorText');
+                
+                insightsLoading.style.display = 'none';
+                insightsError.style.display = 'flex';
+                insightsErrorText.textContent = getText('insightsError');
+            }
+        }
+
         // Display region data (all data blocks are automatically sorted for logical display order)
         // Data within each block is structured by priority: key metrics → price ranges → other fields
         function displayRegionData(data) {
@@ -2614,6 +2833,9 @@
             } else {
                 console.log('No general data available for key metrics');
             }
+            
+            // Get AI insights for the region data
+            getRegionInsights(data);
             
             // If data is an array, try to categorize it by content
             if (Array.isArray(data) && data.length > 0) {

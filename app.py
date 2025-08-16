@@ -163,6 +163,12 @@ def webapp():
     with open('webapp_main.html', 'r', encoding='utf-8') as f:
         return f.read()
 
+@app.route('/webapp_main')
+def webapp_main():
+    """Главное меню WebApp (альтернативный маршрут)"""
+    with open('webapp_main.html', 'r', encoding='utf-8') as f:
+        return f.read()
+
 @app.route('/webapp_report')
 def webapp_report():
     """Страница создания отчета"""
@@ -7165,6 +7171,94 @@ def api_price_trends():
             'recommendation': 'Попробуйте позже',
             'chart_data': []
         }), 500
+
+
+@app.route('/api/region_insights', methods=['POST'])
+def api_region_insights():
+    """Получение AI-вывода по данным региона"""
+    try:
+        data = request.json or {}
+        region_data = data.get('region_data', {})
+        user_language = data.get('language', 'ru')
+        
+        logger.info(f"🧠 Запрос AI-вывода для языка: {user_language}")
+        
+        # Получаем OpenAI API ключ из базы данных
+        try:
+            api_key_result = supabase.table('api_keys').select('key_value').eq('key_name', 'OPENAI_API').execute()
+            if not api_key_result.data:
+                logger.error("❌ OpenAI API ключ не найден в базе данных")
+                return jsonify({'success': False, 'error': 'OpenAI API key not found'}), 500
+                
+            openai_api_key = api_key_result.data[0]['key_value']
+            logger.info("✅ OpenAI API ключ получен из базы данных")
+            
+        except Exception as e:
+            logger.error(f"❌ Ошибка получения OpenAI API ключа: {e}")
+            return jsonify({'success': False, 'error': 'Failed to get OpenAI API key'}), 500
+        
+        # Формируем промпт на соответствующем языке
+        language_prompts = {
+            'ru': 'Обобщи эти данные по недвижимости в одном кратком параграфе для риелтора.',
+            'en': 'Summarize these real estate data in one concise realtor insight paragraph.',
+            'de': 'Fasse diese Immobiliendaten in einem kurzen Absatz für einen Makler zusammen.',
+            'fr': 'Résumez ces données immobilières en un paragraphe concis pour un agent immobilier.',
+            'tr': 'Bu gayrimenkul verilerini bir emlakçı için kısa bir paragrafta özetleyin.'
+        }
+        
+        prompt = language_prompts.get(user_language, language_prompts['en'])
+        
+        # Подготавливаем данные для отправки в OpenAI
+        data_summary = {
+            'location': region_data.get('location', {}),
+            'general_data': region_data.get('general_data', []),
+            'house_type_data': region_data.get('house_type_data', []),
+            'floor_segment_data': region_data.get('floor_segment_data', []),
+            'age_data': region_data.get('age_data', []),
+            'heating_data': region_data.get('heating_data', [])
+        }
+        
+        # Формируем текст для анализа
+        analysis_text = f"""
+        Данные по региону:
+        {data_summary}
+        
+        {prompt}
+        """
+        
+        try:
+            import openai
+            openai.api_key = openai_api_key
+            
+            response = openai.ChatCompletion.create(
+                model="gpt-3.5-turbo",
+                messages=[
+                    {"role": "system", "content": "You are a professional real estate analyst. Provide concise, actionable insights based on the data provided."},
+                    {"role": "user", "content": analysis_text}
+                ],
+                max_tokens=300,
+                temperature=0.7
+            )
+            
+            insights = response.choices[0].message.content.strip()
+            logger.info(f"✅ AI-вывод получен: {insights[:100]}...")
+            
+            return jsonify({
+                'success': True,
+                'insights': insights,
+                'language': user_language
+            })
+            
+        except ImportError:
+            logger.error("❌ Модуль openai не установлен")
+            return jsonify({'success': False, 'error': 'OpenAI module not available'}), 500
+        except Exception as e:
+            logger.error(f"❌ Ошибка OpenAI API: {e}")
+            return jsonify({'success': False, 'error': f'OpenAI API error: {str(e)}'}), 500
+            
+    except Exception as e:
+        logger.error(f"❌ Ошибка API region_insights: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 
 if __name__ == '__main__':
