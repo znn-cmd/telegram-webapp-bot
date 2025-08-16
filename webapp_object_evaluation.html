@@ -378,73 +378,62 @@
             margin-bottom: 20px;
         }
 
-        .data-card {
+        .data-section {
             background: white;
             border: 1px solid #e0e0e0;
             border-radius: 8px;
-            margin-bottom: 15px;
-            overflow: hidden;
+            margin-bottom: 20px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
-        .data-card-header {
-            background: #f5f5f5;
-            padding: 12px;
+        .data-section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin: 0 0 15px 0;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #667eea;
+        }
+
+        .data-section-content {
+            padding: 0;
+        }
+        
+        .data-item {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f8f9fa;
             border-radius: 6px;
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-            border: 1px solid #e0e0e0;
+            border-left: 4px solid #667eea;
         }
         
-        /* Уменьшаем отступы для всех аккордионов кроме "Общие данные" */
-        .data-card-header:not([onclick*="generalDataCard"]) {
-            padding: 8px 12px;
-            margin-bottom: 6px;
-        }
-
-        .data-card-icon {
-            font-size: 20px;
-            margin-right: 8px;
-        }
-        
-        /* Уменьшаем иконки для всех аккордионов кроме "Общие данные" */
-        .data-card-header:not([onclick*="generalDataCard"]) .data-card-icon {
-            font-size: 16px;
-            margin-right: 6px;
-        }
-
-        .data-card-title {
+        .data-item-title {
             font-size: 16px;
             font-weight: 600;
             color: #333;
-            flex: 1;
+            margin: 0 0 12px 0;
         }
         
-        /* Уменьшаем заголовки для всех аккордионов кроме "Общие данные" */
-        .data-card-header:not([onclick*="generalDataCard"]) .data-card-title {
-            font-size: 14px;
+        .summary-table {
+            margin-top: 20px;
         }
-
-        .data-card-toggle {
-            font-size: 16px;
-            color: #666;
-            transition: transform 0.3s ease;
+        
+        .summary-table th {
+            background: #667eea;
+            color: white;
+            padding: 12px 8px;
+            font-weight: 600;
+            text-align: center;
         }
-
-        .data-card-toggle.expanded {
-            transform: rotate(180deg);
+        
+        .summary-table td {
+            padding: 10px 8px;
+            text-align: center;
         }
-
-        .data-card-content {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.3s ease;
-        }
-
-        .data-card-content.expanded {
-            max-height: 2000px;
+        
+        .summary-table tr:nth-child(even) {
+            background: #f8f9fa;
         }
 
         /* Table Styles */
@@ -580,19 +569,32 @@
                 margin: 15px 0;
             }
             
-            /* Уменьшаем отступы для всех аккордионов кроме "Общие данные" на мобильных */
-            .data-card-header:not([onclick*="generalDataCard"]) {
-                padding: 6px 10px;
-                margin-bottom: 4px;
+            /* Мобильные стили для секций данных */
+            .data-section {
+                padding: 15px;
+                margin-bottom: 15px;
             }
             
-            .data-card-header:not([onclick*="generalDataCard"]) .data-card-title {
-                font-size: 13px;
+            .data-section-title {
+                font-size: 16px;
+                margin-bottom: 12px;
+                padding-bottom: 8px;
             }
             
-            .data-card-header:not([onclick*="generalDataCard"]) .data-card-icon {
+            .data-item {
+                padding: 12px;
+                margin-bottom: 15px;
+            }
+            
+            .data-item-title {
                 font-size: 14px;
-                margin-right: 4px;
+                margin-bottom: 10px;
+            }
+            
+            .summary-table th,
+            .summary-table td {
+                padding: 8px 6px;
+                font-size: 12px;
             }
         }
 
@@ -789,72 +791,50 @@
         <!-- Data Content -->
         <div class="data-content" id="dataContent" style="display: none;">
             <!-- General Data -->
-            <div class="data-card" id="generalDataCard">
-                <div class="data-card-header" onclick="toggleAccordion('generalDataCard')">
-                    <div style="display: flex; align-items: center;">
-                        <div class="data-card-icon"></div>
-                        <div class="data-card-title" id="generalDataTitle">Общие данные</div>
-                    </div>
-                    <div class="data-card-toggle expanded" id="generalDataToggle">▲</div>
-                </div>
-                <div class="data-card-content expanded" id="generalDataContent">
-                    <!-- General data will be populated here - expanded by default -->
+            <div class="data-section" id="generalDataSection">
+                <h3 class="data-section-title" id="generalDataTitle">Общие данные</h3>
+                <div class="data-section-content" id="generalDataContent">
+                    <!-- General data will be populated here -->
                 </div>
             </div>
             
             <!-- House Type Data -->
-            <div class="data-card" id="houseTypeDataCard">
-                <div class="data-card-header" onclick="toggleAccordion('houseTypeDataCard')">
-                    <div style="display: flex; align-items: center; gap: 12px;">
-                        <div class="data-card-icon"></div>
-                        <div class="data-card-title" id="houseTypeDataTitle">Данные по количеству спален</div>
-                    </div>
-                    <div class="data-card-toggle" id="houseTypeDataToggle">▼</div>
-                </div>
-                <div class="data-card-content" id="houseTypeDataContent">
-                    <!-- House type data will be populated here - collapsed by default -->
+            <div class="data-section" id="houseTypeDataSection">
+                <h3 class="data-section-title" id="houseTypeDataTitle">Данные по количеству спален</h3>
+                <div class="data-section-content" id="houseTypeDataContent">
+                    <!-- House type data will be populated here -->
                 </div>
             </div>
             
             <!-- Floor Segment Data -->
-            <div class="data-card" id="floorSegmentDataCard">
-                <div class="data-card-header" onclick="toggleAccordion('floorSegmentDataCard')">
-                    <div style="display: flex; align-items: center; gap: 12px;">
-                        <div class="data-card-icon"></div>
-                        <div class="data-card-title" id="floorSegmentDataTitle">Данные по этажу</div>
-                    </div>
-                    <div class="data-card-toggle" id="floorSegmentDataToggle">▼</div>
-                </div>
-                <div class="data-card-content" id="floorSegmentDataContent">
-                    <!-- Floor segment data will be populated here - collapsed by default -->
+            <div class="data-section" id="floorSegmentDataSection">
+                <h3 class="data-section-title" id="floorSegmentDataTitle">Данные по этажу</h3>
+                <div class="data-section-content" id="floorSegmentDataContent">
+                    <!-- Floor segment data will be populated here -->
                 </div>
             </div>
             
             <!-- Age Data -->
-            <div class="data-card" id="ageDataCard">
-                <div class="data-card-header" onclick="toggleAccordion('ageDataCard')">
-                    <div style="display: flex; align-items: center; gap: 12px;">
-                        <div class="data-card-icon"></div>
-                        <div class="data-card-title" id="ageDataTitle">Данные по возрасту объектов</div>
-                    </div>
-                    <div class="data-card-toggle" id="ageDataToggle">▼</div>
-                </div>
-                <div class="data-card-content" id="ageDataContent">
-                    <!-- Age data will be populated here - collapsed by default -->
+            <div class="data-section" id="ageDataSection">
+                <h3 class="data-section-title" id="ageDataTitle">Данные по возрасту объектов</h3>
+                <div class="data-section-content" id="ageDataContent">
+                    <!-- Age data will be populated here -->
                 </div>
             </div>
 
             <!-- Heating Data -->
-            <div class="data-card" id="heatingDataCard">
-                <div class="data-card-header" onclick="toggleAccordion('heatingDataCard')">
-                    <div style="display: flex; align-items: center; gap: 12px;">
-                        <div class="data-card-icon"></div>
-                        <div class="data-card-title" id="heatingDataTitle">Данные по типу отопления</div>
-                    </div>
-                    <div class="data-card-toggle" id="heatingDataToggle">▼</div>
+            <div class="data-section" id="heatingDataSection">
+                <h3 class="data-section-title" id="heatingDataTitle">Данные по типу отопления</h3>
+                <div class="data-section-content" id="heatingDataContent">
+                    <!-- Heating data will be populated here -->
                 </div>
-                <div class="data-card-content" id="heatingDataContent">
-                    <!-- Heating data will be populated here - collapsed by default -->
+            </div>
+            
+            <!-- Summary Table -->
+            <div class="data-section" id="summaryDataSection">
+                <h3 class="data-section-title" id="summaryDataTitle">Средние значения</h3>
+                <div class="data-section-content" id="summaryDataContent">
+                    <!-- Summary data will be populated here -->
                 </div>
             </div>
         </div>
@@ -2136,12 +2116,15 @@
             // Fill key metrics
             fillKeyMetrics(generalData);
             
-            // Display data in accordions
-            displayDataInAccordion('generalDataContent', generalData, 'general');
-            displayDataInAccordion('houseTypeDataContent', houseTypeData, 'house_type');
-            displayDataInAccordion('floorSegmentDataContent', floorSegmentData, 'floor_segment');
-            displayDataInAccordion('ageDataContent', ageData, 'age');
-            displayDataInAccordion('heatingDataContent', heatingData, 'heating');
+            // Display data in sections
+            displayDataInSection('generalDataContent', generalData, 'general');
+            displayDataInSection('houseTypeDataContent', houseTypeData, 'house_type');
+            displayDataInSection('floorSegmentDataContent', floorSegmentData, 'floor_segment');
+            displayDataInSection('ageDataContent', ageData, 'age');
+            displayDataInSection('heatingDataContent', heatingData, 'heating');
+            
+            // Generate and display summary table
+            generateSummaryTable(data);
             
             // Show data content
             document.getElementById('dataContent').style.display = 'block';
@@ -2180,8 +2163,8 @@
             document.getElementById('keyMetricsSection').style.display = 'block';
         }
 
-        // Display data in accordion
-        function displayDataInAccordion(containerId, data, dataType) {
+        // Display data in section
+        function displayDataInSection(containerId, data, dataType) {
             const container = document.getElementById(containerId);
             if (!container) return;
             
@@ -2199,9 +2182,9 @@
                 const subCardTitle = getSubCardTitle(item, dataType);
                 
                 html += `
-                    <div class="sub-card">
-                        <h3>${subCardTitle}</h3>
-                        ${generateDataTable(item, dataType)}
+                    <div class="data-item">
+                        <h4 class="data-item-title">${subCardTitle}</h4>
+                        ${generateFilteredDataTable(item, dataType)}
                     </div>
                 `;
             });
@@ -2225,28 +2208,31 @@
             }
         }
 
-        // Generate data table
-        function generateDataTable(item, dataType) {
-            const fields = Object.keys(item).filter(key => 
-                !['id', 'created_at', 'source_file', 'country_id', 'city_id', 'county_id', 'district_id'].includes(key)
-            );
+        // Generate filtered data table for a specific item (only specified fields)
+        function generateFilteredDataTable(item, dataType) {
+            // Define the fields to show for each data type
+            const fieldsToShow = [
+                'average_age_for_rent', 'average_age_for_sale', 'comparable_area_for_rent', 'comparable_area_for_sale',
+                'count_for_rent', 'count_for_sale', 'listing_period_for_rent', 'listing_period_for_sale',
+                'max_unit_price_for_rent', 'max_unit_price_for_sale', 'min_unit_price_for_rent', 'min_unit_price_for_sale', 'yield'
+            ];
             
-            if (fields.length === 0) {
+            const availableFields = fieldsToShow.filter(field => item.hasOwnProperty(field) && item[field] !== null && item[field] !== undefined);
+            
+            if (availableFields.length === 0) {
                 return `<div class="no-data">${getText('noDataAvailable')}</div>`;
             }
             
             let html = '<table class="data-table">';
             
-            fields.forEach(field => {
+            availableFields.forEach(field => {
                 const value = item[field];
-                if (value !== null && value !== undefined) {
-                    html += `
-                        <tr>
-                            <td>${formatFieldName(field)}</td>
-                            <td>${formatFieldValue(value, field)}</td>
-                        </tr>
-                    `;
-                }
+                html += `
+                    <tr>
+                        <td>${formatFieldName(field)}</td>
+                        <td>${formatFieldValue(value, field)}</td>
+                    </tr>
+                `;
             });
             
             html += '</table>';
@@ -2297,6 +2283,69 @@
                 default:
                     return value.toString();
             }
+        }
+
+        // Generate summary table with min/max values from all data
+        function generateSummaryTable(data) {
+            const summaryContainer = document.getElementById('summaryDataContent');
+            if (!summaryContainer) return;
+            
+            // Collect all data from all tables
+            const allData = [];
+            const tables = ['general_data', 'house_type_data', 'floor_segment_data', 'age_data', 'heating_data'];
+            
+            tables.forEach(tableName => {
+                const tableData = data[tableName] || [];
+                if (Array.isArray(tableData)) {
+                    allData.push(...tableData);
+                }
+            });
+            
+            if (allData.length === 0) {
+                summaryContainer.innerHTML = `<div class="no-data">${getText('noDataAvailable')}</div>`;
+                return;
+            }
+            
+            // Define fields for summary
+            const summaryFields = [
+                'average_age_for_rent', 'average_age_for_sale', 'comparable_area_for_rent', 'comparable_area_for_sale',
+                'count_for_rent', 'count_for_sale', 'listing_period_for_rent', 'listing_period_for_sale',
+                'min_unit_price_for_rent', 'min_unit_price_for_sale', 'yield'
+            ];
+            
+            // Calculate min/max values
+            const summary = {};
+            summaryFields.forEach(field => {
+                const values = allData
+                    .map(item => item[field])
+                    .filter(val => val !== null && val !== undefined && !isNaN(parseFloat(val)));
+                
+                if (values.length > 0) {
+                    summary[field] = {
+                        min: Math.min(...values),
+                        max: Math.max(...values)
+                    };
+                }
+            });
+            
+            // Generate summary table
+            let html = '<table class="data-table summary-table">';
+            html += '<thead><tr><th>Показатель</th><th>Минимальное значение</th><th>Максимальное значение</th></tr></thead><tbody>';
+            
+            summaryFields.forEach(field => {
+                if (summary[field]) {
+                    html += `
+                        <tr>
+                            <td>${formatFieldName(field)}</td>
+                            <td>${formatFieldValue(summary[field].min, field)}</td>
+                            <td>${formatFieldValue(summary[field].max, field)}</td>
+                        </tr>
+                    `;
+                }
+            });
+            
+            html += '</tbody></table>';
+            summaryContainer.innerHTML = html;
         }
 
         // Get AI insights for the region data
@@ -2364,22 +2413,7 @@
             }
         }
 
-        // Toggle accordion
-        function toggleAccordion(cardId) {
-            const card = document.getElementById(cardId);
-            const content = card.querySelector('.data-card-content');
-            const toggle = card.querySelector('.data-card-toggle');
-            
-            if (content.classList.contains('expanded')) {
-                content.classList.remove('expanded');
-                toggle.textContent = '▼';
-                toggle.classList.remove('expanded');
-            } else {
-                content.classList.add('expanded');
-                toggle.textContent = '▲';
-                toggle.classList.add('expanded');
-            }
-        }
+
 
         // Show error
         function showError(message) {
