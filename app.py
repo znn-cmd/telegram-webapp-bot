@@ -7260,11 +7260,11 @@ def api_region_insights():
         
         # Формируем промпт на соответствующем языке
         language_prompts = {
-            'ru': 'Обобщи эти данные по недвижимости в одном кратком параграфе для риелтора.',
-            'en': 'Summarize these real estate data in one concise realtor insight paragraph.',
-            'de': 'Fasse diese Immobiliendaten in einem kurzen Absatz für einen Makler zusammen.',
-            'fr': 'Résumez ces données immobilières en un paragraphe concis pour un agent immobilier.',
-            'tr': 'Bu gayrimenkul verilerini bir emlakçı için kısa bir paragrafta özetleyin.'
+            'ru': 'Проанализируй эти данные по недвижимости и напиши один краткий параграф с выводами риелтора. Сосредоточься на трендах рынка, спросе и лучших инвестиционных сегментах. НЕ перечисляй цифры - дай только практические рекомендации. Пиши как для потенциального покупателя, используй сокращения (м2), указывай валюту в ценах.',
+            'en': 'Analyze this real estate data and write one concise realtor insight paragraph. Focus on market trends, demand, and best investment segments. Do NOT list numbers—give actionable insights only. Write as for a potential buyer, use abbreviations (sqm), include currency in prices.',
+            'de': 'Analysiere diese Immobiliendaten und schreibe einen kurzen Absatz mit Makler-Einblicken. Konzentriere dich auf Markttrends, Nachfrage und beste Investitionssegmente. Zähle KEINE Zahlen auf - gib nur praktische Empfehlungen. Schreibe wie für einen potenziellen Käufer, verwende Abkürzungen (qm), gib Währung in Preisen an.',
+            'fr': 'Analysez ces données immobilières et écrivez un paragraphe concis avec des insights d\'agent immobilier. Concentrez-vous sur les tendances du marché, la demande et les meilleurs segments d\'investissement. NE listez PAS les chiffres - donnez seulement des recommandations pratiques. Écrivez comme pour un acheteur potentiel, utilisez des abréviations (m2), incluez la devise dans les prix.',
+            'tr': 'Bu gayrimenkul verilerini analiz edin ve bir emlakçı içgörü paragrafı yazın. Pazar trendlerine, talebe ve en iyi yatırım segmentlerine odaklanın. Sayıları listeleme - sadece uygulanabilir içgörüler verin. Potansiyel bir alıcı için yazın, kısaltmalar kullanın (m2), fiyatlarda para birimini belirtin.'
         }
         
         prompt = language_prompts.get(user_language, language_prompts['en'])
@@ -7294,11 +7294,11 @@ def api_region_insights():
             response = client.chat.completions.create(
                 model="gpt-3.5-turbo",
                 messages=[
-                    {"role": "system", "content": "You are a professional real estate analyst. Provide concise, actionable insights based on the data provided."},
+                    {"role": "system", "content": "You are a professional real estate analyst. Provide concise, actionable insights for potential buyers. Focus on market trends, investment opportunities, and practical recommendations. Use abbreviations (sqm/m2), include currency in prices, and write in a direct, professional tone without unnecessary words."},
                     {"role": "user", "content": analysis_text}
                 ],
-                max_tokens=300,
-                temperature=0.7
+                max_tokens=250,
+                temperature=0.6
             )
             
             insights = response.choices[0].message.content.strip()
