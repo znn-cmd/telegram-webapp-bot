@@ -892,46 +892,6 @@
 
         <!-- Data Content -->
         <div class="data-content" id="dataContent" style="display: none;">
-            <!-- General Data -->
-            <div class="data-section" id="generalDataSection">
-                <h3 class="data-section-title" id="generalDataTitle">Общие данные</h3>
-                <div class="data-section-content" id="generalDataContent">
-                    <!-- General data will be populated here -->
-                </div>
-            </div>
-            
-            <!-- House Type Data -->
-            <div class="data-section" id="houseTypeDataSection">
-                <h3 class="data-section-title" id="houseTypeDataTitle">Данные по количеству спален</h3>
-                <div class="data-section-content" id="houseTypeDataContent">
-                    <!-- House type data will be populated here -->
-                </div>
-            </div>
-            
-            <!-- Floor Segment Data -->
-            <div class="data-section" id="floorSegmentDataSection">
-                <h3 class="data-section-title" id="floorSegmentDataTitle">Данные по этажу</h3>
-                <div class="data-section-content" id="floorSegmentDataContent">
-                    <!-- Floor segment data will be populated here -->
-                </div>
-            </div>
-            
-            <!-- Age Data -->
-            <div class="data-section" id="ageDataSection">
-                <h3 class="data-section-title" id="ageDataTitle">Данные по возрасту объектов</h3>
-                <div class="data-section-content" id="ageDataContent">
-                    <!-- Age data will be populated here -->
-                </div>
-            </div>
-
-            <!-- Heating Data -->
-            <div class="data-section" id="heatingDataSection">
-                <h3 class="data-section-title" id="heatingDataTitle">Данные по типу отопления</h3>
-                <div class="data-section-content" id="heatingDataContent">
-                    <!-- Heating data will be populated here -->
-                </div>
-            </div>
-            
             <!-- Market Indicators Table -->
             <div class="data-section" id="summaryDataSection">
                 <h3 class="data-section-title" id="summaryDataTitle"></h3>
@@ -1004,11 +964,6 @@
                 'loading': 'Загрузка...',
                 'errorLoading': 'Ошибка загрузки данных',
                 'dataSectionTitle': 'Анализ данных региона',
-                'generalDataTitle': 'Общие данные',
-                'houseTypeDataTitle': 'Данные по количеству спален',
-                'floorSegmentDataTitle': 'Данные по этажу',
-                'ageDataTitle': 'Данные по возрасту объектов',
-                'heatingDataTitle': 'Данные по типу отопления',
                 'loadingText': 'Загрузка данных...',
                 'errorText': 'Ошибка загрузки данных',
                 'totalProperties': 'Всего объектов:',
@@ -1062,11 +1017,6 @@
                 'loading': 'Loading...',
                 'errorLoading': 'Error loading data',
                 'dataSectionTitle': 'Regional Data Analysis',
-                'generalDataTitle': 'General Data',
-                'houseTypeDataTitle': 'Bedroom Count Data',
-                'floorSegmentDataTitle': 'Floor Data',
-                'ageDataTitle': 'Age Data',
-                'heatingDataTitle': 'Heating Type Data',
                 'loadingText': 'Loading data...',
                 'errorText': 'Error loading data',
                 'totalProperties': 'Total properties:',
@@ -1370,31 +1320,6 @@
             const dataSectionTitle = document.getElementById('dataSectionTitle');
             if (dataSectionTitle) {
                 dataSectionTitle.textContent = getText('dataSectionTitle');
-            }
-            
-            const generalDataTitle = document.getElementById('generalDataTitle');
-            if (generalDataTitle) {
-                generalDataTitle.textContent = getText('generalDataTitle');
-            }
-            
-            const houseTypeDataTitle = document.getElementById('houseTypeDataTitle');
-            if (houseTypeDataTitle) {
-                houseTypeDataTitle.textContent = getText('houseTypeDataTitle');
-            }
-            
-            const floorSegmentDataTitle = document.getElementById('floorSegmentDataTitle');
-            if (floorSegmentDataTitle) {
-                floorSegmentDataTitle.textContent = getText('floorSegmentDataTitle');
-            }
-            
-            const ageDataTitle = document.getElementById('ageDataTitle');
-            if (ageDataTitle) {
-                ageDataTitle.textContent = getText('ageDataTitle');
-            }
-
-            const heatingDataTitle = document.getElementById('heatingDataTitle');
-            if (heatingDataTitle) {
-                heatingDataTitle.textContent = getText('heatingDataTitle');
             }
             
             const summaryDataTitle = document.getElementById('summaryDataTitle');
@@ -2228,12 +2153,7 @@
                 heating: heatingData.length
             });
             
-            // Display data in sections (only show availability status)
-            displayDataInSection('generalDataContent', generalData, 'general');
-            displayDataInSection('houseTypeDataContent', houseTypeData, 'house_type');
-            displayDataInSection('floorSegmentDataContent', floorSegmentData, 'floor_segment');
-            displayDataInSection('ageDataContent', ageData, 'age');
-            displayDataInSection('heatingDataContent', heatingData, 'heating');
+            // Data sections removed - only market indicators table is shown
             
             // Generate and display summary table
             generateSummaryTable(data);
@@ -2247,67 +2167,11 @@
 
 
 
-        // Display data in section (only show section title, no data)
-        function displayDataInSection(containerId, data, dataType) {
-            const container = document.getElementById(containerId);
-            if (!container) return;
-            
-            console.log(`📋 Displaying ${dataType} section:`, { containerId, dataLength: data?.length });
-            
-            // Don't show data, just indicate that data is available
-            if (data && data.length > 0) {
-                container.innerHTML = `<div class="data-available">Данные загружены (${data.length} записей)</div>`;
-            } else {
-                container.innerHTML = `<div class="no-data">${getText('noDataAvailable')}</div>`;
-            }
-        }
 
-        // Get sub-card title
-        function getSubCardTitle(item, dataType) {
-            switch (dataType) {
-                case 'house_type':
-                    return item.house_type || item.house_type_name || getText('houseTypeDataTitle');
-                case 'floor_segment':
-                    return item.floor_segment || item.floor_segment_name || getText('floorSegmentDataTitle');
-                case 'age':
-                    return item.age_category || item.age_category_name || getText('ageDataTitle');
-                case 'heating':
-                    return item.heating_type || item.heating_type_name || getText('heatingDataTitle');
-                default:
-                    return getText('generalDataTitle');
-            }
-        }
 
-        // Generate filtered data table for a specific item (only specified fields)
-        function generateFilteredDataTable(item, dataType) {
-            // Define the fields to show for each data type
-            const fieldsToShow = [
-                'average_age_for_rent', 'average_age_for_sale', 'comparable_area_for_rent', 'comparable_area_for_sale',
-                'count_for_rent', 'count_for_sale', 'listing_period_for_rent', 'listing_period_for_sale',
-                'max_unit_price_for_rent', 'max_unit_price_for_sale', 'min_unit_price_for_rent', 'min_unit_price_for_sale', 'yield'
-            ];
-            
-            const availableFields = fieldsToShow.filter(field => item.hasOwnProperty(field) && item[field] !== null && item[field] !== undefined);
-            
-            if (availableFields.length === 0) {
-                return `<div class="no-data">${getText('noDataAvailable')}</div>`;
-            }
-            
-            let html = '<table class="data-table">';
-            
-            availableFields.forEach(field => {
-                const value = item[field];
-                html += `
-                    <tr>
-                        <td>${formatFieldName(field)}</td>
-                        <td>${formatFieldValue(value, field)}</td>
-                    </tr>
-                `;
-            });
-            
-            html += '</table>';
-            return html;
-        }
+
+
+
 
         // Format field name
         function formatFieldName(field) {
@@ -2464,28 +2328,19 @@
         // Load property trends data for selected location
         async function loadPropertyTrends(data) {
             try {
-                // Get location IDs from the first available data record
-                let locationIds = null;
-                const tables = ['general_data', 'house_type_data', 'floor_segment_data', 'age_data', 'heating_data'];
-                
-                for (const tableName of tables) {
-                    const tableData = data[tableName] || [];
-                    if (tableData.length > 0) {
-                        const firstRecord = tableData[0];
-                        locationIds = {
-                            country_id: firstRecord.country_id,
-                            city_id: firstRecord.city_id,
-                            county_id: firstRecord.county_id,
-                            district_id: firstRecord.district_id
-                        };
-                        break;
-                    }
-                }
-                
-                if (!locationIds) {
-                    console.log('⚠️ No location IDs found for property trends');
+                // Use selected location data instead of searching through tables
+                if (!selectedLocation.country_id || !selectedLocation.city_id || 
+                    !selectedLocation.county_id || !selectedLocation.district_id) {
+                    console.log('⚠️ No location selected for property trends');
                     return;
                 }
+                
+                const locationIds = {
+                    country_id: selectedLocation.country_id,
+                    city_id: selectedLocation.city_id,
+                    county_id: selectedLocation.county_id,
+                    district_id: selectedLocation.district_id
+                };
                 
                 console.log('🔄 Loading property trends for location:', locationIds);
                 
