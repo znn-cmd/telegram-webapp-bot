@@ -1666,6 +1666,8 @@
 
         // Load districts based on selected county
         async function loadDistricts(countyId) {
+            console.log('🔄 Loading districts for county_id:', countyId);
+            
             try {
                 const response = await fetch('/api/locations/districts', {
                     method: 'POST',
@@ -1676,6 +1678,7 @@
                 });
                 
                 const data = await response.json();
+                console.log('📊 Districts API response:', data);
                 
                 if (data.success) {
                     const districtSelect = document.getElementById('districtSelect');
@@ -1687,6 +1690,7 @@
                     noDistrictOption.textContent = 'Не имеет значения';
                     districtSelect.appendChild(noDistrictOption);
                     
+                    console.log('📍 Adding districts:', data.districts);
                     data.districts.forEach(([id, name]) => {
                         const option = document.createElement('option');
                         option.value = id;
@@ -1695,11 +1699,12 @@
                     });
                     
                     districtSelect.disabled = false;
+                    console.log('✅ Districts loaded, district select enabled');
                 } else {
-                    console.error('Failed to load districts:', data.error);
+                    console.error('❌ Failed to load districts:', data.error);
                 }
             } catch (error) {
-                console.error('Error loading districts:', error);
+                console.error('❌ Error loading districts:', error);
             }
         }
 
@@ -1762,14 +1767,18 @@
         }
 
         function onCountyChange() {
+            console.log('🔄 County changed, starting onCountyChange function...');
+            
             const countySelect = document.getElementById('countySelect');
             const districtSelect = document.getElementById('districtSelect');
             
             const countyId = countySelect.value;
+            console.log('📍 Selected county_id:', countyId);
             
             // Reset dependent selects
             districtSelect.innerHTML = `<option value="">${getText('districtPlaceholder')}</option>`;
             districtSelect.disabled = true;
+            console.log('🔄 Reset district select');
             
             // Reset listing type selection and hide section
             resetListingTypeSelection();
@@ -1779,7 +1788,10 @@
             }
             
             if (countyId) {
+                console.log('✅ County selected, loading districts for county_id:', countyId);
                 loadDistricts(countyId);
+            } else {
+                console.log('❌ No county selected');
             }
             
             updateConfirmButton();
@@ -1879,9 +1891,9 @@
             const hasCountry = countrySelect.value;
             const hasCity = citySelect.value;
             const hasCounty = countySelect.value;
-            const hasDistrict = districtSelect.value || districtSelect.value === 'none';
+            const hasDistrict = districtSelect.value && districtSelect.value !== '';
             
-            // Check if all listing types are selected (only if district is selected)
+            // Check if all listing types are selected (only if district is selected and not "none")
             let hasAllListingTypes = true;
             if (hasDistrict && districtSelect.value !== 'none') {
                 hasAllListingTypes = selectedListingTypes.house_type && 
@@ -1898,6 +1910,9 @@
                 });
             }
             
+            // Button is enabled if all location fields are filled
+            // For listing types: if district is "none", no listing types required
+            // If district is selected, all listing types are required
             const isDisabled = !(hasCountry && hasCity && hasCounty && hasDistrict) || 
                               (hasDistrict && districtSelect.value !== 'none' && !hasAllListingTypes);
             
@@ -1905,6 +1920,7 @@
             
             console.log('🔘 Confirm button state:', {
                 hasCountry, hasCity, hasCounty, hasDistrict,
+                districtValue: districtSelect.value,
                 hasAllListingTypes,
                 isDisabled
             });
