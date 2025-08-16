@@ -1914,7 +1914,7 @@
         async function confirmLocation() {
             const countrySelect = document.getElementById('countrySelect');
             const citySelect = document.getElementById('citySelect');
-            const countySelect = document.getElementById('citySelect');
+            const countySelect = document.getElementById('countySelect');
             const districtSelect = document.getElementById('districtSelect');
             
             const countryId = countrySelect.value;
@@ -1939,6 +1939,17 @@
                 county_name: countyName,
                 district_name: districtName
             };
+            
+            console.log('📍 Selected location for data loading:', {
+                country_id: countryId,
+                city_id: cityId,
+                county_id: countyId,
+                district_id: districtId,
+                country_name: countryName,
+                city_name: cityName,
+                county_name: countyName,
+                district_name: districtName
+            });
             
             // Display selected location
             displaySelectedLocation();
@@ -2026,21 +2037,27 @@
         // Load region data
         async function loadRegionData() {
             try {
+                const requestBody = {
+                    country_id: selectedLocation.country_id,
+                    city_id: selectedLocation.city_id,
+                    county_id: selectedLocation.county_id,
+                    district_id: selectedLocation.district_id,
+                    listing_types: selectedListingTypes
+                };
+                
+                console.log('🔄 Loading region data with request:', requestBody);
+                
                 const response = await fetch('/api/region_data', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({
-                        country_id: selectedLocation.country_id,
-                        city_id: selectedLocation.city_id,
-                        county_id: selectedLocation.county_id,
-                        district_id: selectedLocation.district_id,
-                        listing_types: selectedListingTypes
-                    })
+                    body: JSON.stringify(requestBody)
                 });
                 
                 const data = await response.json();
+                
+                console.log('📊 API response:', data);
                 
                 if (data.success) {
                     displayRegionData(data);
@@ -2055,7 +2072,7 @@
 
         // Display region data
         function displayRegionData(data) {
-            console.log('Received data:', data);
+            console.log('📊 Processing received data:', data);
             
             // Try different possible key names for data
             const generalData = data.general_data || data.generalData || data.general || [];
@@ -2063,6 +2080,14 @@
             const floorSegmentData = data.floor_segment_data || data.floorSegmentData || data.floor_segments || data.floorSegments || [];
             const ageData = data.age_data || data.ageData || data.ages || [];
             const heatingData = data.heating_data || data.heatingData || data.heating || [];
+            
+            console.log('🔍 Extracted data arrays:', {
+                general: generalData.length,
+                houseType: houseTypeData.length,
+                floorSegment: floorSegmentData.length,
+                age: ageData.length,
+                heating: heatingData.length
+            });
             
             // Fill key metrics
             fillKeyMetrics(generalData);
@@ -2116,7 +2141,10 @@
             const container = document.getElementById(containerId);
             if (!container) return;
             
+            console.log(`📋 Displaying ${dataType} data:`, { containerId, dataLength: data?.length, data });
+            
             if (!data || data.length === 0) {
+                console.log(`⚠️ No data for ${dataType}, showing 'no data' message`);
                 container.innerHTML = `<div class="no-data">${getText('noDataAvailable')}</div>`;
                 return;
             }
