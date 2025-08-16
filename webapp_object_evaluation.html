@@ -1435,43 +1435,64 @@
         // Load available listing types for each data category
         async function loadListingTypes() {
             try {
+                console.log('🔄 Загружаем доступные listing_type...');
+                
                 // Load house type listing types
-                const houseTypeResponse = await fetch('/api/listing_types/house_type');
+                const houseTypeResponse = await fetch('/api/listing_types/house_type_data');
                 const houseTypeData = await houseTypeResponse.json();
                 if (houseTypeData.success) {
+                    console.log('✅ House type listing types loaded:', houseTypeData.listing_types);
                     populateListingTypeGrid('houseTypeGrid', houseTypeData.listing_types, 'house_type');
+                } else {
+                    console.error('❌ Failed to load house type listing types:', houseTypeData.error);
                 }
 
                 // Load floor segment listing types
-                const floorSegmentResponse = await fetch('/api/listing_types/floor_segment');
+                const floorSegmentResponse = await fetch('/api/listing_types/floor_segment_data');
                 const floorSegmentData = await floorSegmentResponse.json();
                 if (floorSegmentData.success) {
+                    console.log('✅ Floor segment listing types loaded:', floorSegmentData.listing_types);
                     populateListingTypeGrid('floorSegmentGrid', floorSegmentData.listing_types, 'floor_segment');
+                } else {
+                    console.error('❌ Failed to load floor segment listing types:', floorSegmentData.error);
                 }
 
                 // Load age data listing types
-                const ageDataResponse = await fetch('/api/listing_types/age');
+                const ageDataResponse = await fetch('/api/listing_types/age_data');
                 const ageDataData = await ageDataResponse.json();
                 if (ageDataData.success) {
+                    console.log('✅ Age data listing types loaded:', ageDataData.listing_types);
                     populateListingTypeGrid('ageDataGrid', ageDataData.listing_types, 'age');
+                } else {
+                    console.error('❌ Failed to load age data listing types:', ageDataData.error);
                 }
 
                 // Load heating data listing types
-                const heatingDataResponse = await fetch('/api/listing_types/heating');
+                const heatingDataResponse = await fetch('/api/listing_types/heating_data');
                 const heatingDataData = await heatingDataResponse.json();
                 if (heatingDataData.success) {
+                    console.log('✅ Heating data listing types loaded:', heatingDataData.listing_types);
                     populateListingTypeGrid('heatingDataGrid', heatingDataData.listing_types, 'heating');
+                } else {
+                    console.error('❌ Failed to load heating data listing types:', heatingDataData.error);
                 }
+                
+                console.log('✅ Все listing_type загружены');
             } catch (error) {
-                console.error('Error loading listing types:', error);
+                console.error('❌ Error loading listing types:', error);
             }
         }
 
         // Populate listing type grid with checkboxes
         function populateListingTypeGrid(gridId, listingTypes, category) {
             const grid = document.getElementById(gridId);
-            if (!grid) return;
+            if (!grid) {
+                console.error(`❌ Grid element not found: ${gridId}`);
+                return;
+            }
 
+            console.log(`🔄 Populating grid ${gridId} with ${listingTypes.length} types for category ${category}:`, listingTypes);
+            
             grid.innerHTML = '';
             
             listingTypes.forEach(type => {
@@ -1494,6 +1515,8 @@
                 item.appendChild(label);
                 grid.appendChild(item);
             });
+            
+            console.log(`✅ Grid ${gridId} populated with ${listingTypes.length} items`);
         }
 
         // Reset listing type selection
@@ -1524,6 +1547,8 @@
 
         // Handle listing type selection
         function selectListingType(category, type) {
+            console.log(`🎯 Selecting listing type: ${category} = ${type}`);
+            
             // Deselect previous selection in this category
             selectedListingTypes[category] = null;
             
@@ -1547,6 +1572,7 @@
                 if (checkbox) {
                     checkbox.checked = true;
                     selectedListingTypes[category] = type;
+                    console.log(`✅ Selected: ${category} = ${type}`);
                 }
             }
             
@@ -1663,17 +1689,22 @@
         }
 
         function onDistrictChange() {
+            console.log('🔄 District changed, updating confirm button...');
             updateConfirmButton();
             
             // Show listing type selection section when district is selected
             const districtSelect = document.getElementById('districtSelect');
             const listingTypeSection = document.getElementById('listingTypeSection');
             
+            console.log('📍 District value:', districtSelect.value);
+            
             if (districtSelect.value && districtSelect.value !== 'none') {
+                console.log('✅ District selected, showing listing type section and loading types...');
                 listingTypeSection.style.display = 'block';
                 // Load available listing types
                 loadListingTypes();
             } else {
+                console.log('❌ No district selected, hiding listing type section...');
                 listingTypeSection.style.display = 'none';
             }
         }
@@ -1698,10 +1729,26 @@
                                    selectedListingTypes.floor_segment && 
                                    selectedListingTypes.age && 
                                    selectedListingTypes.heating;
+                
+                console.log('🔍 Checking listing types:', {
+                    house_type: selectedListingTypes.house_type,
+                    floor_segment: selectedListingTypes.floor_segment,
+                    age: selectedListingTypes.age,
+                    heating: selectedListingTypes.heating,
+                    hasAllListingTypes: hasAllListingTypes
+                });
             }
             
-            confirmButton.disabled = !(hasCountry && hasCity && hasCounty && hasDistrict) || 
-                                   (hasDistrict && districtSelect.value !== 'none' && !hasAllListingTypes);
+            const isDisabled = !(hasCountry && hasCity && hasCounty && hasDistrict) || 
+                              (hasDistrict && districtSelect.value !== 'none' && !hasAllListingTypes);
+            
+            confirmButton.disabled = isDisabled;
+            
+            console.log('🔘 Confirm button state:', {
+                hasCountry, hasCity, hasCounty, hasDistrict,
+                hasAllListingTypes,
+                isDisabled
+            });
         }
 
         // Confirm location selection
