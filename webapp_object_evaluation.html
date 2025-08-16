@@ -1662,6 +1662,23 @@
             updateSelectedPropertyTypesDisplay();
             
             updateConfirmButton();
+            
+            // Check if all listing types are selected
+            const allTypesSelected = selectedListingTypes.house_type && 
+                                   selectedListingTypes.floor_segment && 
+                                   selectedListingTypes.age && 
+                                   selectedListingTypes.heating;
+            
+            console.log('🔍 All listing types selected:', allTypesSelected, selectedListingTypes);
+            
+            // If all types are selected, automatically load region data
+            if (allTypesSelected) {
+                console.log('🚀 All listing types selected, automatically loading region data...');
+                // Small delay to ensure UI updates are complete
+                setTimeout(() => {
+                    confirmLocation();
+                }, 100);
+            }
         }
 
         // Load districts based on selected county
@@ -1928,6 +1945,8 @@
 
         // Confirm location selection
         async function confirmLocation() {
+            console.log('🎯 confirmLocation function called');
+            
             const countrySelect = document.getElementById('countrySelect');
             const citySelect = document.getElementById('citySelect');
             const countySelect = document.getElementById('countySelect');
@@ -2052,6 +2071,8 @@
 
         // Load region data
         async function loadRegionData() {
+            console.log('🚀 loadRegionData function called');
+            
             try {
                 const requestBody = {
                     country_id: selectedLocation.country_id,
@@ -2089,6 +2110,13 @@
         // Display region data
         function displayRegionData(data) {
             console.log('📊 Processing received data:', data);
+            console.log('🔍 Data structure:', {
+                hasGeneralData: !!data.general_data,
+                hasHouseTypeData: !!data.house_type_data,
+                hasFloorSegmentData: !!data.floor_segment_data,
+                hasAgeData: !!data.age_data,
+                hasHeatingData: !!data.heating_data
+            });
             
             // Try different possible key names for data
             const generalData = data.general_data || data.generalData || data.general || [];
