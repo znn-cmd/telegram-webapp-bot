@@ -553,6 +553,55 @@
         .trend-card-count_trend {
             border-left: 4px solid #17a2b8;
         }
+        
+        /* Trends Table Styles */
+        .trends-table-section {
+            margin-top: 25px;
+        }
+        
+        .trends-table-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .trends-table-container {
+            overflow-x: auto;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .trends-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            font-size: 13px;
+        }
+        
+        .trends-table th {
+            background: #667eea;
+            color: white;
+            padding: 10px 8px;
+            text-align: center;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        
+        .trends-table td {
+            padding: 8px 6px;
+            text-align: center;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .trends-table tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+        
+        .trends-table tr:hover {
+            background: #e9ecef;
+        }
 
         /* Table Styles */
         .data-table {
@@ -756,6 +805,20 @@
             
             .trend-date {
                 font-size: 9px;
+            }
+            
+            .trends-table-title {
+                font-size: 14px;
+                margin-bottom: 12px;
+            }
+            
+            .trends-table {
+                font-size: 11px;
+            }
+            
+            .trends-table th,
+            .trends-table td {
+                padding: 6px 4px;
             }
             
             .data-available {
@@ -2412,6 +2475,12 @@
         
         // Add property trends section to the page
         function addPropertyTrendsSection(trends) {
+            // Проверяем, не существует ли уже секция трендов
+            if (document.getElementById('propertyTrendsSection')) {
+                console.log('⚠️ Property trends section already exists, skipping...');
+                return;
+            }
+            
             const summarySection = document.getElementById('summaryDataSection');
             if (!summarySection) return;
             
@@ -2440,6 +2509,14 @@
                                 </div>
                             </div>
                         `).join('')}
+                    </div>
+                    
+                    <!-- Таблица со всеми записями трендов -->
+                    <div class="trends-table-section">
+                        <h4 class="trends-table-title">Детальные данные трендов</h4>
+                        <div class="trends-table-container">
+                            ${generateTrendsTable(trends)}
+                        </div>
                     </div>
                 </div>
             `;
@@ -2495,6 +2572,45 @@
             }
         }
         
+        // Generate detailed trends table
+        function generateTrendsTable(trends) {
+            if (!trends || trends.length === 0) {
+                return '<div class="no-data">Нет данных для отображения</div>';
+            }
+            
+            let html = '<table class="trends-table">';
+            html += '<thead><tr>';
+            html += '<th>Дата</th>';
+            html += '<th>Цена продажи (₺/м²)</th>';
+            html += '<th>Цена аренды (₺/м²)</th>';
+            html += '<th>Изменение цен продажи</th>';
+            html += '<th>Изменение цен аренды</th>';
+            html += '<th>Годовое изменение продажи</th>';
+            html += '<th>Годовое изменение аренды</th>';
+            html += '<th>Доходность</th>';
+            html += '<th>Количество продаж</th>';
+            html += '<th>Количество аренд</th>';
+            html += '</tr></thead><tbody>';
+            
+            trends.forEach(trend => {
+                html += '<tr>';
+                html += `<td>${formatTrendDate(trend.date)}</td>`;
+                html += `<td>${formatTrendValue(trend.trend_value, 'price')}</td>`;
+                html += `<td>${formatTrendValue(trend.unit_price_for_rent || trend.trend_value, 'price')}</td>`;
+                html += `<td>${formatPercentage(trend.price_change_sale)}</td>`;
+                html += `<td>${formatPercentage(trend.price_change_rent)}</td>`;
+                html += `<td>${formatPercentage(trend.annual_price_change_sale)}</td>`;
+                html += `<td>${formatPercentage(trend.annual_price_change_rent)}</td>`;
+                html += `<td>${formatPercentage(trend.yield)}</td>`;
+                html += `<td>${trend.count_for_sale || '-'}</td>`;
+                html += `<td>${trend.count_for_rent || '-'}</td>`;
+                html += '</tr>';
+            });
+            
+            html += '</tbody></table>';
+            return html;
+        }
+        
         // Format trend value based on type
         function formatTrendValue(value, type) {
             if (value === null || value === undefined) return '-';
@@ -2513,6 +2629,25 @@
             } else {
                 return value.toString();
             }
+        }
+        
+        // Helper function to format values consistently
+        function formatValue(value, type) {
+            if (value === null || value === undefined) return '-';
+            
+            if (type === 'price') {
+                if (typeof value === 'number') {
+                    return `₺${value.toLocaleString('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+                }
+                return value.toString();
+            } else if (type === 'percentage') {
+                if (typeof value === 'number') {
+                    return `${(value * 100).toFixed(2)}%`;
+                }
+                return value.toString();
+            }
+            
+            return value.toString();
         }
         
         // Format trend period
