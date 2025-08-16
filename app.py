@@ -6954,8 +6954,6 @@ def api_region_insights():
         user_language = data.get('language', 'ru')
         
         logger.info(f"🧠 Запрос AI-вывода для языка: {user_language}")
-        logger.info(f"🔍 Выбранный промпт: {prompt}")
-        logger.info(f"🔍 Выбранное системное сообщение для языка {user_language}")
         
         # Получаем OpenAI API ключ из базы данных
         try:
@@ -7041,6 +7039,8 @@ def api_region_insights():
         
         prompt = language_prompts.get(user_language, language_prompts['en'])
         
+        logger.info(f"🔍 Выбранный промпт: {prompt}")
+        
         # Подготавливаем данные для отправки в OpenAI
         data_summary = {
             'location': region_data.get('location', {}),
@@ -7073,6 +7073,8 @@ def api_region_insights():
             }
             
             system_message = system_messages.get(user_language, system_messages['en'])
+            
+            logger.info(f"🔍 Выбранное системное сообщение для языка {user_language}")
             
             response = client.chat.completions.create(
                 model="gpt-3.5-turbo",
