@@ -123,47 +123,26 @@
             text-align: center;
         }
 
-        .listing-type-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
-        }
-
-        .listing-type-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 10px;
-            background: white;
+        .listing-type-select {
+            width: 100%;
+            padding: 10px 12px;
             border: 1px solid #ddd;
             border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .listing-type-item:hover {
-            border-color: #667eea;
-            background: #f8f9ff;
-        }
-
-        .listing-type-item.selected {
-            border-color: #667eea;
-            background: #e8f0ff;
-        }
-
-        .listing-type-checkbox {
-            width: 16px;
-            height: 16px;
-            accent-color: #667eea;
-            cursor: pointer;
-        }
-
-        .listing-type-label {
-            font-size: 13px;
+            font-size: 14px;
+            background: white;
             color: #333;
             cursor: pointer;
-            flex: 1;
-            user-select: none;
+            transition: all 0.3s ease;
+        }
+        
+        .listing-type-select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
+        }
+        
+        .listing-type-select:hover {
+            border-color: #667eea;
         }
 
         .listing-type-group {
@@ -593,22 +572,9 @@
                 margin-bottom: 6px;
             }
             
-            .listing-type-grid {
-                grid-template-columns: 1fr;
-                gap: 6px;
-            }
-            
-            .listing-type-item {
-                padding: 6px 8px;
-            }
-            
-            .listing-type-checkbox {
-                width: 14px;
-                height: 14px;
-            }
-            
-            .listing-type-label {
-                font-size: 12px;
+            .listing-type-select {
+                padding: 8px 10px;
+                font-size: 13px;
             }
         }
     </style>
@@ -655,42 +621,42 @@
                 </select>
             </div>
 
-            <!-- Listing Type Selection -->
-            <div class="listing-type-section" id="listingTypeSection" style="display: none;">
-                <div class="listing-type-title" id="listingTypeTitle">Выберите тип недвижимости для анализа:</div>
-                
-                <!-- House Type Listing Types -->
-                <div class="listing-type-group">
-                    <div class="listing-type-subtitle" id="houseTypeSubtitle">Количество спален:</div>
-                    <div class="listing-type-grid" id="houseTypeGrid">
-                        <!-- Will be populated dynamically -->
+                            <!-- Listing Type Selection -->
+                <div class="listing-type-section" id="listingTypeSection" style="display: none;">
+                    <div class="listing-type-title" id="listingTypeTitle">Выберите тип недвижимости для анализа:</div>
+                    
+                    <!-- House Type Listing Types -->
+                    <div class="listing-type-group">
+                        <div class="listing-type-subtitle" id="houseTypeSubtitle">Количество спален:</div>
+                        <select class="listing-type-select" id="houseTypeSelect">
+                            <option value="" id="houseTypePlaceholder">Выберите количество спален</option>
+                        </select>
                     </div>
-                </div>
 
-                <!-- Floor Segment Listing Types -->
-                <div class="listing-type-group">
-                    <div class="listing-type-subtitle" id="floorSegmentSubtitle">Этаж:</div>
-                    <div class="listing-type-grid" id="floorSegmentGrid">
-                        <!-- Will be populated dynamically -->
+                    <!-- Floor Segment Listing Types -->
+                    <div class="listing-type-group">
+                        <div class="listing-type-subtitle" id="floorSegmentSubtitle">Этаж:</div>
+                        <select class="listing-type-select" id="floorSegmentSelect">
+                            <option value="" id="floorSegmentPlaceholder">Выберите этаж</option>
+                        </select>
                     </div>
-                </div>
 
-                <!-- Age Data Listing Types -->
-                <div class="listing-type-group">
-                    <div class="listing-type-subtitle" id="ageDataSubtitle">Возраст объекта:</div>
-                    <div class="listing-type-grid" id="ageDataGrid">
-                        <!-- Will be populated dynamically -->
+                    <!-- Age Data Listing Types -->
+                    <div class="listing-type-group">
+                        <div class="listing-type-subtitle" id="ageDataSubtitle">Возраст объекта:</div>
+                        <select class="listing-type-select" id="ageDataSelect">
+                            <option value="" id="ageDataPlaceholder">Выберите возраст объекта</option>
+                        </select>
                     </div>
-                </div>
 
-                <!-- Heating Data Listing Types -->
-                <div class="listing-type-group">
-                    <div class="listing-type-subtitle" id="heatingDataSubtitle">Тип отопления:</div>
-                    <div class="listing-type-grid" id="heatingDataGrid">
-                        <!-- Will be populated dynamically -->
+                    <!-- Heating Data Listing Types -->
+                    <div class="listing-type-group">
+                        <div class="listing-type-subtitle" id="heatingDataSubtitle">Тип отопления:</div>
+                        <select class="listing-type-select" id="heatingDataSelect">
+                            <option value="" id="heatingDataPlaceholder">Выберите тип отопления</option>
+                        </select>
                     </div>
                 </div>
-            </div>
 
             <button class="confirm-button" id="confirmButton" onclick="confirmLocation()" disabled>
                 <span id="confirmButtonText">Подтвердить выбор</span>
@@ -914,7 +880,11 @@
                 'houseTypeSubtitle': 'Количество спален:',
                 'floorSegmentSubtitle': 'Этаж:',
                 'ageDataSubtitle': 'Возраст объекта:',
-                'heatingDataSubtitle': 'Тип отопления:'
+                'heatingDataSubtitle': 'Тип отопления:',
+                'selectBedrooms': 'Выберите количество спален',
+                'selectFloor': 'Выберите этаж',
+                'selectAge': 'Выберите возраст объекта',
+                'selectHeating': 'Выберите тип отопления'
             },
             'en': {
                 'slogan': 'Real Estate Market Insights',
@@ -959,7 +929,11 @@
                 'houseTypeSubtitle': 'Bedroom count:',
                 'floorSegmentSubtitle': 'Floor:',
                 'ageDataSubtitle': 'Property age:',
-                'heatingDataSubtitle': 'Heating type:'
+                'heatingDataSubtitle': 'Heating type:',
+                'selectBedrooms': 'Select bedroom count',
+                'selectFloor': 'Select floor',
+                'selectAge': 'Select property age',
+                'selectHeating': 'Select heating type'
             },
             'de': {
                 'slogan': 'Immobilienmarkt-Einblicke',
@@ -1310,35 +1284,31 @@
                 insightsLoadingText.textContent = getText('insightsLoading');
             }
             
+            // Update listing type selection elements
+            const listingTypeTitle = document.getElementById('listingTypeTitle');
+            if (listingTypeTitle) { listingTypeTitle.textContent = getText('listingTypeTitle'); }
+            const houseTypeSubtitle = document.getElementById('houseTypeSubtitle');
+            if (houseTypeSubtitle) { houseTypeSubtitle.textContent = getText('houseTypeSubtitle'); }
+            const floorSegmentSubtitle = document.getElementById('floorSegmentSubtitle');
+            if (floorSegmentSubtitle) { floorSegmentSubtitle.textContent = getText('floorSegmentSubtitle'); }
+            const ageDataSubtitle = document.getElementById('ageDataSubtitle');
+            if (ageDataSubtitle) { ageDataSubtitle.textContent = getText('ageDataSubtitle'); }
+            const heatingDataSubtitle = document.getElementById('heatingDataSubtitle');
+            if (heatingDataSubtitle) { heatingDataSubtitle.textContent = getText('heatingDataSubtitle'); }
+            
+            // Update placeholder texts
+            const houseTypePlaceholder = document.getElementById('houseTypePlaceholder');
+            if (houseTypePlaceholder) { houseTypePlaceholder.textContent = getText('selectBedrooms'); }
+            const floorSegmentPlaceholder = document.getElementById('floorSegmentPlaceholder');
+            if (floorSegmentPlaceholder) { floorSegmentPlaceholder.textContent = getText('selectFloor'); }
+            const ageDataPlaceholder = document.getElementById('ageDataPlaceholder');
+            if (ageDataPlaceholder) { ageDataPlaceholder.textContent = getText('selectAge'); }
+            const heatingDataPlaceholder = document.getElementById('heatingDataPlaceholder');
+            if (heatingDataPlaceholder) { heatingDataPlaceholder.textContent = getText('selectHeating'); }
+            
             const insightsErrorText = document.getElementById('insightsErrorText');
             if (insightsErrorText) {
                 insightsErrorText.textContent = getText('insightsError');
-            }
-            
-            // Update listing type selection elements
-            const listingTypeTitle = document.getElementById('listingTypeTitle');
-            if (listingTypeTitle) {
-                listingTypeTitle.textContent = getText('listingTypeTitle');
-            }
-            
-            const houseTypeSubtitle = document.getElementById('houseTypeSubtitle');
-            if (houseTypeSubtitle) {
-                houseTypeSubtitle.textContent = getText('houseTypeSubtitle');
-            }
-            
-            const floorSegmentSubtitle = document.getElementById('floorSegmentSubtitle');
-            if (floorSegmentSubtitle) {
-                floorSegmentSubtitle.textContent = getText('floorSegmentSubtitle');
-            }
-            
-            const ageDataSubtitle = document.getElementById('ageDataSubtitle');
-            if (ageDataSubtitle) {
-                ageDataSubtitle.textContent = getText('ageDataSubtitle');
-            }
-            
-            const heatingDataSubtitle = document.getElementById('heatingDataSubtitle');
-            if (heatingDataSubtitle) {
-                heatingDataSubtitle.textContent = getText('heatingDataSubtitle');
             }
         }
 
@@ -1442,7 +1412,7 @@
                 const houseTypeData = await houseTypeResponse.json();
                 if (houseTypeData.success) {
                     console.log('✅ House type listing types loaded:', houseTypeData.listing_types);
-                    populateListingTypeGrid('houseTypeGrid', houseTypeData.listing_types, 'house_type');
+                    populateListingTypeSelect('houseTypeSelect', houseTypeData.listing_types, 'house_type');
                 } else {
                     console.error('❌ Failed to load house type listing types:', houseTypeData.error);
                 }
@@ -1452,7 +1422,7 @@
                 const floorSegmentData = await floorSegmentResponse.json();
                 if (floorSegmentData.success) {
                     console.log('✅ Floor segment listing types loaded:', floorSegmentData.listing_types);
-                    populateListingTypeGrid('floorSegmentGrid', floorSegmentData.listing_types, 'floor_segment');
+                    populateListingTypeSelect('floorSegmentSelect', floorSegmentData.listing_types, 'floor_segment');
                 } else {
                     console.error('❌ Failed to load floor segment listing types:', floorSegmentData.error);
                 }
@@ -1462,7 +1432,7 @@
                 const ageDataData = await ageDataResponse.json();
                 if (ageDataData.success) {
                     console.log('✅ Age data listing types loaded:', ageDataData.listing_types);
-                    populateListingTypeGrid('ageDataGrid', ageDataData.listing_types, 'age');
+                    populateListingTypeSelect('ageDataSelect', ageDataData.listing_types, 'age');
                 } else {
                     console.error('❌ Failed to load age data listing types:', ageDataData.error);
                 }
@@ -1472,7 +1442,7 @@
                 const heatingDataData = await heatingDataResponse.json();
                 if (heatingDataData.success) {
                     console.log('✅ Heating data listing types loaded:', heatingDataData.listing_types);
-                    populateListingTypeGrid('heatingDataGrid', heatingDataData.listing_types, 'heating');
+                    populateListingTypeSelect('heatingDataSelect', heatingDataData.listing_types, 'heating');
                 } else {
                     console.error('❌ Failed to load heating data listing types:', heatingDataData.error);
                 }
@@ -1483,40 +1453,41 @@
             }
         }
 
-        // Populate listing type grid with checkboxes
-        function populateListingTypeGrid(gridId, listingTypes, category) {
-            const grid = document.getElementById(gridId);
-            if (!grid) {
-                console.error(`❌ Grid element not found: ${gridId}`);
+        // Populate listing type select with options
+        function populateListingTypeSelect(selectId, listingTypes, category) {
+            const select = document.getElementById(selectId);
+            if (!select) {
+                console.error(`❌ Select element not found: ${selectId}`);
                 return;
             }
 
-            console.log(`🔄 Populating grid ${gridId} with ${listingTypes.length} types for category ${category}:`, listingTypes);
+            console.log(`🔄 Populating select ${selectId} with ${listingTypes.length} types for category ${category}:`, listingTypes);
             
-            grid.innerHTML = '';
+            // Clear existing options except the first placeholder
+            select.innerHTML = '<option value="">Выберите ' + getSelectPlaceholder(category) + '</option>';
             
             listingTypes.forEach(type => {
-                const item = document.createElement('div');
-                item.className = 'listing-type-item';
-                item.onclick = () => selectListingType(category, type);
-                
-                const checkbox = document.createElement('input');
-                checkbox.type = 'radio';
-                checkbox.className = 'listing-type-checkbox';
-                checkbox.name = category;
-                checkbox.value = type;
-                checkbox.onclick = (e) => e.stopPropagation();
-                
-                const label = document.createElement('span');
-                label.className = 'listing-type-label';
-                label.textContent = type;
-                
-                item.appendChild(checkbox);
-                item.appendChild(label);
-                grid.appendChild(item);
+                const option = document.createElement('option');
+                option.value = type;
+                option.textContent = type;
+                select.appendChild(option);
             });
             
-            console.log(`✅ Grid ${gridId} populated with ${listingTypes.length} items`);
+            // Add change event listener
+            select.onchange = () => selectListingType(category, select.value);
+            
+            console.log(`✅ Select ${selectId} populated with ${listingTypes.length} items`);
+        }
+        
+        // Get placeholder text for select dropdowns
+        function getSelectPlaceholder(category) {
+            const placeholders = {
+                'house_type': getText('selectBedrooms'),
+                'floor_segment': getText('selectFloor'),
+                'age': getText('selectAge'),
+                'heating': getText('selectHeating')
+            };
+            return placeholders[category] || getText('listingTypeTitle');
         }
 
         // Reset listing type selection
@@ -1534,14 +1505,13 @@
                 listingTypeSection.style.display = 'none';
             }
             
-            // Reset all checkboxes
-            document.querySelectorAll('.listing-type-checkbox').forEach(checkbox => {
-                checkbox.checked = false;
-            });
-            
-            // Reset visual state
-            document.querySelectorAll('.listing-type-item').forEach(item => {
-                item.classList.remove('selected');
+            // Reset all select dropdowns
+            const selects = ['houseTypeSelect', 'floorSegmentSelect', 'ageDataSelect', 'heatingDataSelect'];
+            selects.forEach(selectId => {
+                const select = document.getElementById(selectId);
+                if (select) {
+                    select.value = '';
+                }
             });
         }
 
@@ -1549,31 +1519,12 @@
         function selectListingType(category, type) {
             console.log(`🎯 Selecting listing type: ${category} = ${type}`);
             
-            // Deselect previous selection in this category
-            selectedListingTypes[category] = null;
-            
-            // Update visual state
-            const grid = document.getElementById(category + 'Grid');
-            if (grid) {
-                grid.querySelectorAll('.listing-type-item').forEach(item => {
-                    item.classList.remove('selected');
-                    const checkbox = item.querySelector('input[type="radio"]');
-                    if (checkbox) {
-                        checkbox.checked = false;
-                    }
-                });
-            }
-            
-            // Select new item
-            const selectedItem = event.target.closest('.listing-type-item');
-            if (selectedItem) {
-                selectedItem.classList.add('selected');
-                const checkbox = selectedItem.querySelector('input[type="radio"]');
-                if (checkbox) {
-                    checkbox.checked = true;
-                    selectedListingTypes[category] = type;
-                    console.log(`✅ Selected: ${category} = ${type}`);
-                }
+            if (type && type !== '') {
+                selectedListingTypes[category] = type;
+                console.log(`✅ Selected: ${category} = ${type}`);
+            } else {
+                selectedListingTypes[category] = null;
+                console.log(`❌ Deselected: ${category}`);
             }
             
             updateConfirmButton();
