@@ -28,44 +28,416 @@
             box-shadow: 0 0 20px rgba(0,0,0,0.1);
         }
 
-        .header {
-            text-align: center;
-            margin-bottom: 30px;
-            padding: 20px 0;
-            border-bottom: 2px solid #f0f0f0;
-        }
-
-        .logo {
-            font-size: 24px;
-            font-weight: bold;
-            color: #667eea;
-            margin-bottom: 8px;
-            cursor: pointer;
-            transition: transform 0.2s ease;
-        }
-
-        .logo:hover {
-            transform: scale(1.05);
-        }
-
-        .slogan {
-            font-size: 14px;
-            color: #666;
-            font-style: italic;
-        }
-
+        /* Header Styles */
         .page-title {
             font-size: 24px;
             font-weight: bold;
             color: #333;
             text-align: center;
-            margin: 20px 0;
-            padding: 15px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border-radius: 12px;
+            margin: 20px 0 10px 0;
         }
 
+        .page-description {
+            font-size: 14px;
+            color: #666;
+            text-align: center;
+            margin-bottom: 25px;
+            line-height: 1.4;
+        }
+
+        /* Form Styles */
+        .location-form {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 6px;
+        }
+
+        .form-group select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            background: white;
+            color: #333;
+        }
+
+        .form-group select:disabled {
+            background: #f5f5f5;
+            color: #999;
+            cursor: not-allowed;
+        }
+
+        .confirm-button {
+            width: 100%;
+            padding: 12px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .confirm-button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .confirm-button:not(:disabled):hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        /* Selected Location Styles */
+        .selected-location {
+            background: #e8f5e8;
+            border: 1px solid #4caf50;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .location-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #2e7d32;
+            margin-bottom: 10px;
+        }
+
+        .location-details {
+            font-size: 14px;
+            color: #333;
+            line-height: 1.4;
+        }
+
+        .admin-ids {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #4caf50;
+        }
+
+        .admin-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #2e7d32;
+            margin-bottom: 5px;
+        }
+
+        .admin-details {
+            font-size: 12px;
+            color: #666;
+            font-family: monospace;
+        }
+
+        /* Key Metrics Styles */
+        .key-metrics-section {
+            margin-bottom: 20px;
+        }
+
+        .key-metrics-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .metric-card {
+            background: #f8f9fa;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .metric-card.yield-card {
+            grid-column: 1 / -1;
+            background: #f0f0f0;
+        }
+
+        .metric-label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 5px;
+            line-height: 1.2;
+        }
+
+        .metric-value {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .yield-label {
+            font-size: 17px;
+        }
+
+        .yield-value {
+            font-size: 17px;
+        }
+
+        /* Insights Styles */
+        .insights-section {
+            margin: 20px 0;
+        }
+
+        .insights-card {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .insights-header {
+            background: #f8f9fa;
+            padding: 12px 15px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .insights-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .insights-content {
+            padding: 15px;
+        }
+
+        .insights-loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            padding: 20px;
+        }
+
+        .loading-spinner {
+            width: 30px;
+            height: 30px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        .loading-text {
+            font-size: 14px;
+            color: #666;
+            text-align: center;
+        }
+
+        .insights-text {
+            font-size: 15px;
+            line-height: 1.6;
+            color: #333;
+            text-align: justify;
+            padding: 8px 0;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            white-space: normal;
+            max-width: 100%;
+        }
+
+        .insights-error {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            padding: 20px;
+            color: #721c24;
+        }
+
+        .insights-error .error-icon {
+            font-size: 24px;
+        }
+
+        .insights-error .error-text {
+            font-size: 14px;
+            text-align: center;
+        }
+
+        /* Data Card Styles */
+        .data-content {
+            margin-bottom: 20px;
+        }
+
+        .data-card {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            overflow: hidden;
+        }
+
+        .data-card-header {
+            background: #f5f5f5;
+            padding: 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            border: 1px solid #e0e0e0;
+        }
+        
+        /* Уменьшаем отступы для всех аккордионов кроме "Общие данные" */
+        .data-card-header:not([onclick*="generalDataCard"]) {
+            padding: 8px 12px;
+            margin-bottom: 6px;
+        }
+
+        .data-card-icon {
+            font-size: 20px;
+            margin-right: 8px;
+        }
+        
+        /* Уменьшаем иконки для всех аккордионов кроме "Общие данные" */
+        .data-card-header:not([onclick*="generalDataCard"]) .data-card-icon {
+            font-size: 16px;
+            margin-right: 6px;
+        }
+
+        .data-card-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            flex: 1;
+        }
+        
+        /* Уменьшаем заголовки для всех аккордионов кроме "Общие данные" */
+        .data-card-header:not([onclick*="generalDataCard"]) .data-card-title {
+            font-size: 14px;
+        }
+
+        .data-card-toggle {
+            font-size: 16px;
+            color: #666;
+            transition: transform 0.3s ease;
+        }
+
+        .data-card-toggle.expanded {
+            transform: rotate(180deg);
+        }
+
+        .data-card-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .data-card-content.expanded {
+            max-height: 2000px;
+        }
+
+        /* Table Styles */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+            margin-top: 10px;
+            table-layout: fixed;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .data-table td {
+            padding: 6px 8px;
+            border-bottom: 1px solid #f0f0f0;
+            vertical-align: top;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            max-width: 0;
+        }
+
+        .data-table td:first-child {
+            font-weight: 500;
+            color: #555;
+            width: 60%;
+            text-align: left;
+        }
+
+        .data-table td:last-child {
+            text-align: right;
+            font-weight: 600;
+            color: #333;
+            width: 40%;
+        }
+
+        /* Sub-card Styles */
+        .sub-card {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            padding: 10px;
+            margin-bottom: 8px;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            overflow: hidden;
+        }
+
+        .sub-card h3 {
+            font-size: 15px;
+            font-weight: 600;
+            color: #333;
+            margin: 0 0 8px 0;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .sub-card h4 {
+            font-size: 14px;
+            font-weight: 600;
+            color: #555;
+            margin: 8px 0 6px 0;
+        }
+
+        /* Error State Styles */
+        .error-state {
+            text-align: center;
+            padding: 20px 15px;
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            border-radius: 6px;
+            margin: 15px 0;
+        }
+
+        .error-icon {
+            font-size: 32px;
+            margin-bottom: 12px;
+        }
+
+        .error-text {
+            font-size: 14px;
+            color: #721c24;
+        }
+
+        /* Back Button Styles */
         .back-button {
             display: block;
             width: 100%;
@@ -88,92 +460,48 @@
             box-shadow: 0 6px 20px rgba(40, 167, 69, 0.3);
         }
 
-        .content-section {
-            background: #f8f9fa;
-            border-radius: 12px;
-            padding: 20px;
-            margin: 20px 0;
-            border-left: 4px solid #667eea;
+        /* Animations */
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
-        .content-title {
-            font-size: 18px;
-            font-weight: bold;
-            color: #333;
-            margin-bottom: 15px;
-            text-align: center;
-        }
-
-        .content-description {
-            font-size: 14px;
-            color: #666;
-            line-height: 1.6;
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        .feature-list {
-            list-style: none;
-            padding: 0;
-        }
-
-        .feature-item {
-            background: white;
-            padding: 15px;
-            margin: 10px 0;
-            border-radius: 8px;
-            border-left: 3px solid #667eea;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .feature-icon {
-            font-size: 20px;
-            color: #667eea;
-        }
-
-        .feature-text {
-            font-size: 14px;
-            color: #333;
-        }
-
-        .coming-soon {
-            text-align: center;
-            padding: 40px 20px;
-            color: #666;
-        }
-
-        .coming-soon-icon {
-            font-size: 48px;
-            margin-bottom: 16px;
-            opacity: 0.5;
-        }
-
-        .coming-soon-title {
-            font-size: 18px;
-            font-weight: bold;
-            margin-bottom: 8px;
-            color: #333;
-        }
-
-        .coming-soon-description {
-            font-size: 14px;
-            margin-bottom: 20px;
-            line-height: 1.4;
-        }
-
-        .hidden {
-            display: none;
-        }
-
-        .fade-in {
-            animation: fadeIn 0.5s ease;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+        /* Mobile responsive for insights */
+        @media (max-width: 480px) {
+            .insights-card {
+                padding: 12px;
+            }
+            
+            .insights-title {
+                font-size: 16px;
+            }
+            
+            .insights-text {
+                font-size: 14px;
+                word-wrap: break-word;
+                overflow-wrap: break-word;
+                white-space: normal;
+                max-width: 100%;
+            }
+            
+            .insights-section {
+                margin: 15px 0;
+            }
+            
+            /* Уменьшаем отступы для всех аккордионов кроме "Общие данные" на мобильных */
+            .data-card-header:not([onclick*="generalDataCard"]) {
+                padding: 6px 10px;
+                margin-bottom: 4px;
+            }
+            
+            .data-card-header:not([onclick*="generalDataCard"]) .data-card-title {
+                font-size: 13px;
+            }
+            
+            .data-card-header:not([onclick*="generalDataCard"]) .data-card-icon {
+                font-size: 14px;
+                margin-right: 4px;
+            }
         }
     </style>
 </head>
@@ -187,114 +515,1271 @@
 
         <!-- Заголовок страницы -->
         <div class="page-title" id="pageTitle">Оценка объекта</div>
+        <div class="page-description" id="pageDescription">Получите профессиональную оценку стоимости недвижимости в выбранном регионе</div>
 
-        <!-- Кнопка возврата -->
-        <a href="/webapp_main" class="back-button" id="backButton">← Вернуться в главное меню</a>
+        <!-- Форма выбора локации -->
+        <div class="location-form" id="locationForm">
+            <div class="form-group">
+                <label for="countrySelect" id="countryLabel">Страна:</label>
+                <select id="countrySelect" onchange="onCountryChange()">
+                    <option value="" id="countryPlaceholder">Выберите страну</option>
+                </select>
+            </div>
 
-        <!-- Основной контент -->
-        <div class="content-section fade-in">
-            <div class="content-title" id="contentTitle">Оценка недвижимости</div>
-            <div class="content-description" id="contentDescription">
-                Получите профессиональную оценку стоимости недвижимости с учетом всех факторов рынка и характеристик объекта.
+            <div class="form-group">
+                <label for="citySelect" id="cityLabel">Город:</label>
+                <select id="citySelect" disabled onchange="onCityChange()">
+                    <option value="" id="cityPlaceholder">Сначала выберите страну</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="countySelect" id="countyLabel">Область/Регион:</label>
+                <select id="countySelect" disabled onchange="onCountyChange()">
+                    <option value="" id="countyPlaceholder">Сначала выберите город</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="districtSelect" id="districtLabel">Район:</label>
+                <select id="districtSelect" disabled onchange="onDistrictChange()">
+                    <option value="" id="districtPlaceholder">Сначала выберите область</option>
+                </select>
+            </div>
+
+            <button class="confirm-button" id="confirmButton" onclick="confirmLocation()" disabled>
+                <span id="confirmButtonText">Подтвердить выбор</span>
+            </button>
+        </div>
+
+        <!-- Выбранная локация -->
+        <div class="selected-location" id="selectedLocation" style="display: none;">
+            <div class="location-title" id="selectedLocationTitle">Выбранная локация:</div>
+            <div class="location-details" id="locationDetails"></div>
+            <div class="admin-ids" id="adminIds" style="display: none;">
+                <div class="admin-title" id="adminIdsTitle">ID для админов:</div>
+                <div class="admin-details" id="adminDetails"></div>
+            </div>
+        </div>
+
+        <!-- Ключевые метрики -->
+        <div class="key-metrics-section" id="keyMetricsSection" style="display: none;">
+            <div class="key-metrics-title" id="keyMetricsTitle">Ключевые показатели</div>
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-label" id="avgSalePriceLabel">Средняя цена продажи за м²</div>
+                    <div class="metric-value" id="avgSalePriceValue">-</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label" id="avgRentPriceLabel">Средняя цена аренды за м²</div>
+                    <div class="metric-value" id="avgRentPriceValue">-</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label" id="listingPeriodSaleLabel">Период размещения (продажа)</div>
+                    <div class="metric-value" id="listingPeriodSaleValue">-</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label" id="listingPeriodRentLabel">Период размещения (аренда)</div>
+                    <div class="metric-value" id="listingPeriodRentValue">-</div>
+                </div>
+                <div class="metric-card yield-card">
+                    <div class="metric-label yield-label" id="yieldLabel">Доходность</div>
+                    <div class="metric-value yield-value" id="yieldValue">-</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- AI Insights Section -->
+        <div class="insights-section" id="insightsSection" style="display: none;">
+            <div class="insights-card">
+                <div class="insights-header">
+                    <div class="insights-title" id="insightsTitle">Саммари</div>
+                </div>
+                <div class="insights-content" id="insightsContent">
+                    <div class="insights-loading" id="insightsLoading">
+                        <div class="loading-spinner"></div>
+                        <div class="loading-text" id="insightsLoadingText"></div>
+                    </div>
+                    <div class="insights-text" id="insightsText" style="display: none;"></div>
+                    <div class="insights-error" id="insightsError" style="display: none;">
+                        <div class="error-icon">⚠️</div>
+                        <div class="error-text" id="insightsErrorText"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Data Content -->
+        <div class="data-content" id="dataContent" style="display: none;">
+            <!-- General Data -->
+            <div class="data-card" id="generalDataCard">
+                <div class="data-card-header" onclick="toggleAccordion('generalDataCard')">
+                    <div style="display: flex; align-items: center;">
+                        <div class="data-card-icon"></div>
+                        <div class="data-card-title" id="generalDataTitle">Общие данные</div>
+                    </div>
+                    <div class="data-card-toggle expanded" id="generalDataToggle">▲</div>
+                </div>
+                <div class="data-card-content expanded" id="generalDataContent">
+                    <!-- General data will be populated here - expanded by default -->
+                </div>
             </div>
             
-            <ul class="feature-list">
-                <li class="feature-item">
-                    <span class="feature-icon">🏠</span>
-                    <span class="feature-text">Анализ характеристик объекта</span>
-                </li>
-                <li class="feature-item">
-                    <span class="feature-icon">📊</span>
-                    <span class="feature-text">Сравнительный анализ цен</span>
-                </li>
-                <li class="feature-item">
-                    <span class="feature-icon">📍</span>
-                    <span class="feature-text">Оценка местоположения</span>
-                </li>
-                <li class="feature-item">
-                    <span class="feature-icon">💰</span>
-                    <span class="feature-text">Расчет рыночной стоимости</span>
-                </li>
-                <li class="feature-item">
-                    <span class="feature-icon">📈</span>
-                    <span class="feature-text">Прогноз изменения цены</span>
-                </li>
-                <li class="feature-item">
-                    <span class="feature-icon">📋</span>
-                    <span class="feature-text">Детальный отчет с рекомендациями</span>
-                </li>
-            </ul>
-        </div>
+            <!-- House Type Data -->
+            <div class="data-card" id="houseTypeDataCard">
+                <div class="data-card-header" onclick="toggleAccordion('houseTypeDataCard')">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <div class="data-card-icon"></div>
+                        <div class="data-card-title" id="houseTypeDataTitle">Данные по количеству спален</div>
+                    </div>
+                    <div class="data-card-toggle" id="houseTypeDataToggle">▼</div>
+                </div>
+                <div class="data-card-content" id="houseTypeDataContent">
+                    <!-- House type data will be populated here - collapsed by default -->
+                </div>
+            </div>
+            
+            <!-- Floor Segment Data -->
+            <div class="data-card" id="floorSegmentDataCard">
+                <div class="data-card-header" onclick="toggleAccordion('floorSegmentDataCard')">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <div class="data-card-icon"></div>
+                        <div class="data-card-title" id="floorSegmentDataTitle">Данные по этажу</div>
+                    </div>
+                    <div class="data-card-toggle" id="floorSegmentDataToggle">▼</div>
+                </div>
+                <div class="data-card-content" id="floorSegmentDataContent">
+                    <!-- Floor segment data will be populated here - collapsed by default -->
+                </div>
+            </div>
+            
+            <!-- Age Data -->
+            <div class="data-card" id="ageDataCard">
+                <div class="data-card-header" onclick="toggleAccordion('ageDataCard')">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <div class="data-card-icon"></div>
+                        <div class="data-card-title" id="ageDataTitle">Данные по возрасту объектов</div>
+                    </div>
+                    <div class="data-card-toggle" id="ageDataToggle">▼</div>
+                </div>
+                <div class="data-card-content" id="ageDataContent">
+                    <!-- Age data will be populated here - collapsed by default -->
+                </div>
+            </div>
 
-        <!-- Заглушка "Скоро" -->
-        <div class="coming-soon fade-in">
-            <div class="coming-soon-icon">🚧</div>
-            <div class="coming-soon-title" id="comingSoonTitle">Функция в разработке</div>
-            <div class="coming-soon-description" id="comingSoonDescription">
-                Мы работаем над созданием точного инструмента для оценки недвижимости. 
-                Скоро вы сможете получать профессиональные оценки с учетом всех рыночных факторов!
+            <!-- Heating Data -->
+            <div class="data-card" id="heatingDataCard">
+                <div class="data-card-header" onclick="toggleAccordion('heatingDataCard')">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <div class="data-card-icon"></div>
+                        <div class="data-card-title" id="heatingDataTitle">Данные по типу отопления</div>
+                    </div>
+                    <div class="data-card-toggle" id="heatingDataToggle">▼</div>
+                </div>
+                <div class="data-card-content" id="heatingDataContent">
+                    <!-- Heating data will be populated here - collapsed by default -->
+                </div>
             </div>
         </div>
+
+        <!-- Error State -->
+        <div class="error-state" id="errorState" style="display: none;">
+            <div class="error-icon">❌</div>
+            <div class="error-text" id="errorText">Ошибка загрузки данных</div>
+        </div>
+
+        <!-- Back Button -->
+        <a href="/webapp_main" class="back-button" id="backButton">← Вернуться в главное меню</a>
     </div>
 
     <script>
+        // Telegram WebApp initialization
         let tg = window.Telegram.WebApp;
-        tg.expand();
         tg.ready();
+        tg.expand();
 
+        // Current language
         let currentLanguage = 'ru';
 
-        // Локализации
+        // Selected location data
+        let selectedLocation = {
+            country_id: null,
+            city_id: null,
+            county_id: null,
+            district_id: null,
+            country_name: '',
+            city_name: '',
+            county_name: '',
+            district_name: ''
+        };
+
+        // User language
+        let userLanguage = 'ru';
+
+        // Localization data
         const locales = {
             'ru': {
                 'slogan': 'Инсайты рынка недвижимости',
                 'pageTitle': 'Оценка объекта',
+                'pageDescription': 'Получите профессиональную оценку стоимости недвижимости в выбранном регионе',
+                'countryLabel': 'Страна:',
+                'cityLabel': 'Город:',
+                'countyLabel': 'Область/Регион:',
+                'districtLabel': 'Район:',
+                'countryPlaceholder': 'Выберите страну',
+                'cityPlaceholder': 'Сначала выберите страну',
+                'countyPlaceholder': 'Сначала выберите город',
+                'districtPlaceholder': 'Сначала выберите область',
+                'confirmButtonText': 'Подтвердить выбор',
                 'backButton': '← Вернуться в главное меню',
-                'contentTitle': 'Оценка недвижимости',
-                'contentDescription': 'Получите профессиональную оценку стоимости недвижимости с учетом всех факторов рынка и характеристик объекта.',
-                'comingSoonTitle': 'Функция в разработке',
-                'comingSoonDescription': 'Мы работаем над созданием точного инструмента для оценки недвижимости. Скоро вы сможете получать профессиональные оценки с учетом всех рыночных факторов!'
+                'selectedLocationTitle': 'Выбранная локация:',
+                'adminIdsTitle': 'ID для админов:',
+                'loading': 'Загрузка...',
+                'errorLoading': 'Ошибка загрузки данных',
+                'dataSectionTitle': 'Анализ данных региона',
+                'generalDataTitle': 'Общие данные',
+                'houseTypeDataTitle': 'Данные по количеству спален',
+                'floorSegmentDataTitle': 'Данные по этажу',
+                'ageDataTitle': 'Данные по возрасту объектов',
+                'heatingDataTitle': 'Данные по типу отопления',
+                'loadingText': 'Загрузка данных...',
+                'errorText': 'Ошибка загрузки данных',
+                'totalProperties': 'Всего объектов:',
+                'averagePrice': 'Средняя цена:',
+                'priceRange': 'Диапазон цен:',
+                'noDataAvailable': 'Данные недоступны',
+                'keyMetricsTitle': 'Ключевые показатели',
+                'avgSalePriceLabel': 'Средняя цена продажи за м²',
+                'avgRentPriceLabel': 'Средняя цена аренды за м²',
+                'listingPeriodSaleLabel': 'Период размещения (продажа)',
+                'listingPeriodRentLabel': 'Период размещения (аренда)',
+                'yieldLabel': 'Доходность',
+                'insightsTitle': 'Саммари',
+                'insightsLoading': 'Анализируем данные...',
+                'insightsError': 'Ошибка при анализе данных'
             },
             'en': {
                 'slogan': 'Real Estate Market Insights',
                 'pageTitle': 'Object Evaluation',
-                'backButton': '← Back to Main Menu',
-                'contentTitle': 'Property Evaluation',
-                'contentDescription': 'Get a professional property valuation considering all market factors and object characteristics.',
-                'comingSoonTitle': 'Feature in Development',
-                'comingSoonDescription': 'We are working on creating an accurate tool for property valuation. Soon you will be able to get professional valuations considering all market factors!'
+                'pageDescription': 'Get a professional property valuation in the selected region',
+                'countryLabel': 'Country:',
+                'cityLabel': 'City:',
+                'countyLabel': 'Region/Area:',
+                'districtLabel': 'District:',
+                'countryPlaceholder': 'Select country',
+                'cityPlaceholder': 'First select country',
+                'countyPlaceholder': 'First select city',
+                'districtPlaceholder': 'First select region',
+                'confirmButtonText': 'Confirm selection',
+                'backButton': '← Back to main menu',
+                'selectedLocationTitle': 'Selected location:',
+                'adminIdsTitle': 'IDs for admins:',
+                'loading': 'Loading...',
+                'errorLoading': 'Error loading data',
+                'dataSectionTitle': 'Regional Data Analysis',
+                'generalDataTitle': 'General Data',
+                'houseTypeDataTitle': 'Bedroom Count Data',
+                'floorSegmentDataTitle': 'Floor Data',
+                'ageDataTitle': 'Age Data',
+                'heatingDataTitle': 'Heating Type Data',
+                'loadingText': 'Loading data...',
+                'errorText': 'Error loading data',
+                'totalProperties': 'Total properties:',
+                'averagePrice': 'Average price:',
+                'priceRange': 'Price range:',
+                'noDataAvailable': 'Data not available',
+                'keyMetricsTitle': 'Key Metrics',
+                'avgSalePriceLabel': 'Average Sale Price per m²',
+                'avgRentPriceLabel': 'Average Rent Price per m²',
+                'listingPeriodSaleLabel': 'Listing Period (Sale)',
+                'listingPeriodRentLabel': 'Listing Period (Rent)',
+                'yieldLabel': 'Yield',
+                'insightsTitle': 'Summary',
+                'insightsLoading': 'Analyzing data...',
+                'insightsError': 'Error analyzing data'
+            },
+            'de': {
+                'slogan': 'Immobilienmarkt-Einblicke',
+                'pageTitle': 'Objektbewertung',
+                'pageDescription': 'Erhalten Sie eine professionelle Immobilienbewertung in der ausgewählten Region',
+                'countryLabel': 'Land:',
+                'cityLabel': 'Stadt:',
+                'countyLabel': 'Region/Bereich:',
+                'districtLabel': 'Bezirk:',
+                'countryPlaceholder': 'Land auswählen',
+                'cityPlaceholder': 'Zuerst Land auswählen',
+                'countyPlaceholder': 'Zuerst Stadt auswählen',
+                'districtPlaceholder': 'Zuerst Region auswählen',
+                'confirmButtonText': 'Auswahl bestätigen',
+                'backButton': '← Zurück zum Hauptmenü',
+                'selectedLocationTitle': 'Ausgewählte Lage:',
+                'adminIdsTitle': 'IDs für Administratoren:',
+                'loading': 'Laden...',
+                'errorLoading': 'Fehler beim Laden der Daten',
+                'dataSectionTitle': 'Regionale Datenanalyse',
+                'generalDataTitle': 'Allgemeine Daten',
+                'houseTypeDataTitle': 'Schlafzimmer-Anzahl-Daten',
+                'floorSegmentDataTitle': 'Etagen-Daten',
+                'ageDataTitle': 'Altersdaten',
+                'heatingDataTitle': 'Heizungstyp-Daten',
+                'loadingText': 'Daten werden geladen...',
+                'errorText': 'Fehler beim Laden der Daten',
+                'totalProperties': 'Gesamtobjekte:',
+                'averagePrice': 'Durchschnittspreis:',
+                'priceRange': 'Preisbereich:',
+                'noDataAvailable': 'Daten nicht verfügbar',
+                'keyMetricsTitle': 'Wichtige Kennzahlen',
+                'avgSalePriceLabel': 'Durchschnittlicher Verkaufspreis pro m²',
+                'avgRentPriceLabel': 'Durchschnittlicher Mietpreis pro m²',
+                'listingPeriodSaleLabel': 'Angebotsdauer (Verkauf)',
+                'listingPeriodRentLabel': 'Angebotsdauer (Vermietung)',
+                'yieldLabel': 'Rendite',
+                'insightsTitle': 'Zusammenfassung',
+                'insightsLoading': 'Daten werden analysiert...',
+                'insightsError': 'Fehler bei der Datenanalyse'
+            },
+            'fr': {
+                'slogan': 'Aperçus du marché immobilier',
+                'pageTitle': 'Évaluation d\'objet',
+                'pageDescription': 'Obtenez une évaluation professionnelle de propriété dans la région sélectionnée',
+                'countryLabel': 'Pays :',
+                'cityLabel': 'Ville :',
+                'countyLabel': 'Région/Zone :',
+                'districtLabel': 'District :',
+                'countryPlaceholder': 'Sélectionner un pays',
+                'cityPlaceholder': 'D\'abord sélectionner un pays',
+                'countyPlaceholder': 'D\'abord sélectionner une ville',
+                'districtPlaceholder': 'D\'abord sélectionner une région',
+                'confirmButtonText': 'Confirmer la sélection',
+                'backButton': '← Retour au menu principal',
+                'selectedLocationTitle': 'Emplacement sélectionné :',
+                'adminIdsTitle': 'IDs pour les administrateurs :',
+                'loading': 'Chargement...',
+                'errorLoading': 'Erreur de chargement des données',
+                'dataSectionTitle': 'Analyse des données régionales',
+                'generalDataTitle': 'Données générales',
+                'houseTypeDataTitle': 'Données du nombre de chambres',
+                'floorSegmentDataTitle': 'Données d\'étage',
+                'ageDataTitle': 'Données d\'âge',
+                'heatingDataTitle': 'Données du type de chauffage',
+                'loadingText': 'Chargement des données...',
+                'errorText': 'Erreur de chargement des données',
+                'totalProperties': 'Total des propriétés :',
+                'averagePrice': 'Prix moyen :',
+                'priceRange': 'Fourchette de prix :',
+                'noDataAvailable': 'Données non disponibles',
+                'keyMetricsTitle': 'Métriques clés',
+                'avgSalePriceLabel': 'Prix de vente moyen par m²',
+                'avgRentPriceLabel': 'Prix de location moyen par m²',
+                'listingPeriodSaleLabel': 'Période d\'inscription (vente)',
+                'listingPeriodRentLabel': 'Période d\'inscription (location)',
+                'yieldLabel': 'Rendement',
+                'insightsTitle': 'Résumé',
+                'insightsLoading': 'Analyse des données...',
+                'insightsError': 'Erreur lors de l\'analyse des données'
+            },
+            'tr': {
+                'slogan': 'Gayrimenkul Piyasa İçgörüleri',
+                'pageTitle': 'Nesne Değerlendirmesi',
+                'pageDescription': 'Seçilen bölgede profesyonel gayrimenkul değerlendirmesi alın',
+                'countryLabel': 'Ülke:',
+                'cityLabel': 'Şehir:',
+                'countyLabel': 'Bölge/Alan:',
+                'districtLabel': 'İlçe:',
+                'countryPlaceholder': 'Ülke seçin',
+                'cityPlaceholder': 'Önce ülke seçin',
+                'countyPlaceholder': 'Önce şehir seçin',
+                'districtPlaceholder': 'Önce bölge seçin',
+                'confirmButtonText': 'Seçimi onayla',
+                'backButton': '← Ana menüye dön',
+                'selectedLocationTitle': 'Seçilen konum:',
+                'adminIdsTitle': 'Yöneticiler için ID\'ler:',
+                'loading': 'Yükleniyor...',
+                'errorLoading': 'Veri yükleme hatası',
+                'dataSectionTitle': 'Bölgesel Veri Analizi',
+                'generalDataTitle': 'Genel Veriler',
+                'houseTypeDataTitle': 'Yatak Odası Sayısı Verileri',
+                'floorSegmentDataTitle': 'Kat Verileri',
+                'ageDataTitle': 'Yaş Verileri',
+                'heatingDataTitle': 'Isıtma Tipi Verileri',
+                'loadingText': 'Veriler yükleniyor...',
+                'errorText': 'Veri yükleme hatası',
+                'totalProperties': 'Toplam mülk:',
+                'averagePrice': 'Ortalama fiyat:',
+                'priceRange': 'Fiyat aralığı:',
+                'noDataAvailable': 'Veri mevcut değil',
+                'keyMetricsTitle': 'Ana Metrikler',
+                'avgSalePriceLabel': 'm² başına ortalama satış fiyatı',
+                'avgRentPriceLabel': 'm² başına ortalama kiralama fiyatı',
+                'listingPeriodSaleLabel': 'İlan süresi (satış)',
+                'listingPeriodRentLabel': 'İlan süresi (kiralama)',
+                'yieldLabel': 'Getiri',
+                'insightsTitle': 'Özet',
+                'insightsLoading': 'Veriler analiz ediliyor...',
+                'insightsError': 'Veri analizi hatası'
+            },
+            'de': {
+                'slogan': 'Immobilienmarkt-Einblicke',
+                'pageTitle': 'Objektbewertung',
+                'pageDescription': 'Erhalten Sie eine professionelle Immobilienbewertung in der ausgewählten Region',
+                'countryLabel': 'Land:',
+                'cityLabel': 'Stadt:',
+                'countyLabel': 'Region/Bereich:',
+                'districtLabel': 'Bezirk:',
+                'countryPlaceholder': 'Land auswählen',
+                'cityPlaceholder': 'Zuerst Land auswählen',
+                'countyPlaceholder': 'Zuerst Stadt auswählen',
+                'districtPlaceholder': 'Zuerst Region auswählen',
+                'confirmButtonText': 'Auswahl bestätigen',
+                'backButton': '← Zurück zum Hauptmenü',
+                'selectedLocationTitle': 'Ausgewählte Lage:',
+                'adminIdsTitle': 'IDs für Administratoren:',
+                'loading': 'Laden...',
+                'errorLoading': 'Fehler beim Laden der Daten',
+                'dataSectionTitle': 'Regionale Datenanalyse',
+                'generalDataTitle': 'Allgemeine Daten',
+                'houseTypeDataTitle': 'Schlafzimmer-Anzahl-Daten',
+                'floorSegmentDataTitle': 'Etagen-Daten',
+                'ageDataTitle': 'Altersdaten',
+                'heatingDataTitle': 'Heizungstyp-Daten',
+                'loadingText': 'Daten werden geladen...',
+                'errorText': 'Fehler beim Laden der Daten',
+                'totalProperties': 'Gesamtobjekte:',
+                'averagePrice': 'Durchschnittspreis:',
+                'priceRange': 'Preisbereich:',
+                'noDataAvailable': 'Daten nicht verfügbar',
+                'keyMetricsTitle': 'Wichtige Kennzahlen',
+                'avgSalePriceLabel': 'Durchschnittlicher Verkaufspreis pro m²',
+                'avgRentPriceLabel': 'Durchschnittlicher Mietpreis pro m²',
+                'listingPeriodSaleLabel': 'Angebotsdauer (Verkauf)',
+                'listingPeriodRentLabel': 'Angebotsdauer (Vermietung)',
+                'yieldLabel': 'Rendite',
+                'insightsTitle': 'Zusammenfassung',
+                'insightsLoading': 'Daten werden analysiert...',
+                'insightsError': 'Fehler bei der Datenanalyse'
+            },
+            'fr': {
+                'slogan': 'Aperçus du marché immobilier',
+                'pageTitle': 'Évaluation d\'objet',
+                'pageDescription': 'Obtenez une évaluation professionnelle de propriété dans la région sélectionnée',
+                'countryLabel': 'Pays :',
+                'cityLabel': 'Ville :',
+                'countyLabel': 'Région/Zone :',
+                'districtLabel': 'District :',
+                'countryPlaceholder': 'Sélectionner un pays',
+                'cityPlaceholder': 'D\'abord sélectionner un pays',
+                'countyPlaceholder': 'D\'abord sélectionner une ville',
+                'districtPlaceholder': 'D\'abord sélectionner une région',
+                'confirmButtonText': 'Confirmer la sélection',
+                'backButton': '← Retour au menu principal',
+                'selectedLocationTitle': 'Emplacement sélectionné :',
+                'adminIdsTitle': 'IDs pour les administrateurs :',
+                'loading': 'Chargement...',
+                'errorLoading': 'Erreur de chargement des données',
+                'dataSectionTitle': 'Analyse des données régionales',
+                'generalDataTitle': 'Données générales',
+                'houseTypeDataTitle': 'Données du nombre de chambres',
+                'floorSegmentDataTitle': 'Données d\'étage',
+                'ageDataTitle': 'Données d\'âge',
+                'heatingDataTitle': 'Données du type de chauffage',
+                'loadingText': 'Chargement des données...',
+                'errorText': 'Erreur de chargement des données',
+                'totalProperties': 'Total des propriétés :',
+                'averagePrice': 'Prix moyen :',
+                'priceRange': 'Fourchette de prix :',
+                'noDataAvailable': 'Données non disponibles',
+                'keyMetricsTitle': 'Métriques clés',
+                'avgSalePriceLabel': 'Prix de vente moyen par m²',
+                'avgRentPriceLabel': 'Prix de location moyen par m²',
+                'listingPeriodSaleLabel': 'Période d\'inscription (vente)',
+                'listingPeriodRentLabel': 'Période d\'inscription (location)',
+                'yieldLabel': 'Rendement',
+                'insightsTitle': 'Résumé',
+                'insightsLoading': 'Analyse des données...',
+                'insightsError': 'Erreur lors de l\'analyse des données'
+            },
+            'tr': {
+                'slogan': 'Gayrimenkul Piyasa İçgörüleri',
+                'pageTitle': 'Nesne Değerlendirmesi',
+                'pageDescription': 'Seçilen bölgede profesyonel gayrimenkul değerlendirmesi alın',
+                'countryLabel': 'Ülke:',
+                'cityLabel': 'Şehir:',
+                'countyLabel': 'Bölge/Alan:',
+                'districtLabel': 'İlçe:',
+                'countryPlaceholder': 'Ülke seçin',
+                'cityPlaceholder': 'Önce ülke seçin',
+                'countyPlaceholder': 'Önce şehir seçin',
+                'districtPlaceholder': 'Önce bölge seçin',
+                'confirmButtonText': 'Seçimi onayla',
+                'backButton': '← Ana menüye dön',
+                'selectedLocationTitle': 'Seçilen konum:',
+                'adminIdsTitle': 'Yöneticiler için ID\'ler:',
+                'loading': 'Yükleniyor...',
+                'errorLoading': 'Veri yükleme hatası',
+                'dataSectionTitle': 'Bölgesel Veri Analizi',
+                'generalDataTitle': 'Genel Veriler',
+                'houseTypeDataTitle': 'Yatak Odası Sayısı Verileri',
+                'floorSegmentDataTitle': 'Kat Verileri',
+                'ageDataTitle': 'Yaş Verileri',
+                'heatingDataTitle': 'Isıtma Tipi Verileri',
+                'loadingText': 'Veriler yükleniyor...',
+                'errorText': 'Veri yükleme hatası',
+                'totalProperties': 'Toplam mülk:',
+                'averagePrice': 'Ortalama fiyat:',
+                'priceRange': 'Fiyat aralığı:',
+                'noDataAvailable': 'Veri mevcut değil',
+                'keyMetricsTitle': 'Ana Metrikler',
+                'avgSalePriceLabel': 'm² başına ortalama satış fiyatı',
+                'avgRentPriceLabel': 'm² başına ortalama kiralama fiyatı',
+                'listingPeriodSaleLabel': 'İlan süresi (satış)',
+                'listingPeriodRentLabel': 'İlan süresi (kiralama)',
+                'yieldLabel': 'Getiri',
+                'insightsTitle': 'Özet',
+                'insightsLoading': 'Veriler analiz ediliyor...',
+                'insightsError': 'Veri analizi hatası'
             }
         };
 
-        // Функция для получения локализованного текста
+        // Get localized text
         function getText(key) {
-            const locale = locales[currentLanguage] || locales['ru'];
-            return locale[key] || key;
+            return locales[currentLanguage][key] || key;
         }
 
-        // Обновление текста на странице
+        // Update page text based on current language
         function updatePageText() {
             document.getElementById('slogan').textContent = getText('slogan');
             document.getElementById('pageTitle').textContent = getText('pageTitle');
+            document.getElementById('pageDescription').textContent = getText('pageDescription');
+            document.getElementById('countryLabel').textContent = getText('countryLabel');
+            document.getElementById('cityLabel').textContent = getText('cityLabel');
+            document.getElementById('countyLabel').textContent = getText('countyLabel');
+            document.getElementById('districtLabel').textContent = getText('districtLabel');
+            document.getElementById('countryPlaceholder').textContent = getText('countryPlaceholder');
+            document.getElementById('cityPlaceholder').textContent = getText('cityPlaceholder');
+            document.getElementById('countyPlaceholder').textContent = getText('countyPlaceholder');
+            document.getElementById('districtPlaceholder').textContent = getText('districtPlaceholder');
+            document.getElementById('confirmButtonText').textContent = getText('confirmButtonText');
             document.getElementById('backButton').textContent = getText('backButton');
-            document.getElementById('contentTitle').textContent = getText('contentTitle');
-            document.getElementById('contentDescription').textContent = getText('contentDescription');
-            document.getElementById('comingSoonTitle').textContent = getText('comingSoonTitle');
-            document.getElementById('comingSoonDescription').textContent = getText('comingSoonDescription');
+            document.getElementById('selectedLocationTitle').textContent = getText('selectedLocationTitle');
+            document.getElementById('adminIdsTitle').textContent = getText('adminIdsTitle');
+            
+            // Update new data section elements
+            const dataSectionTitle = document.getElementById('dataSectionTitle');
+            if (dataSectionTitle) {
+                dataSectionTitle.textContent = getText('dataSectionTitle');
+            }
+            
+            const generalDataTitle = document.getElementById('generalDataTitle');
+            if (generalDataTitle) {
+                generalDataTitle.textContent = getText('generalDataTitle');
+            }
+            
+            const houseTypeDataTitle = document.getElementById('houseTypeDataTitle');
+            if (houseTypeDataTitle) {
+                houseTypeDataTitle.textContent = getText('houseTypeDataTitle');
+            }
+            
+            const floorSegmentDataTitle = document.getElementById('floorSegmentDataTitle');
+            if (floorSegmentDataTitle) {
+                floorSegmentDataTitle.textContent = getText('floorSegmentDataTitle');
+            }
+            
+            const ageDataTitle = document.getElementById('ageDataTitle');
+            if (ageDataTitle) {
+                ageDataTitle.textContent = getText('ageDataTitle');
+            }
+
+            const heatingDataTitle = document.getElementById('heatingDataTitle');
+            if (heatingDataTitle) {
+                heatingDataTitle.textContent = getText('heatingDataTitle');
+            }
+
+            const loadingText = document.getElementById('loadingText');
+            if (loadingText) {
+                loadingText.textContent = getText('loadingText');
+            }
+            
+            const errorText = document.getElementById('errorText');
+            if (errorText) {
+                errorText.textContent = getText('errorText');
+            }
+            
+            // Update key metrics labels
+            const keyMetricsTitle = document.getElementById('keyMetricsTitle');
+            if (keyMetricsTitle) {
+                keyMetricsTitle.textContent = getText('keyMetricsTitle');
+            }
+            
+            const avgSalePriceLabel = document.getElementById('avgSalePriceLabel');
+            if (avgSalePriceLabel) {
+                avgSalePriceLabel.textContent = getText('avgSalePriceLabel');
+            }
+            
+            const avgRentPriceLabel = document.getElementById('avgRentPriceLabel');
+            if (avgRentPriceLabel) {
+                avgRentPriceLabel.textContent = getText('avgRentPriceLabel');
+            }
+            
+            const listingPeriodSaleLabel = document.getElementById('listingPeriodSaleLabel');
+            if (listingPeriodSaleLabel) {
+                listingPeriodSaleLabel.textContent = getText('listingPeriodSaleLabel');
+            }
+            
+            const listingPeriodRentLabel = document.getElementById('listingPeriodRentLabel');
+            if (listingPeriodRentLabel) {
+                listingPeriodRentLabel.textContent = getText('listingPeriodRentLabel');
+            }
+            
+            const yieldLabel = document.getElementById('yieldLabel');
+            if (yieldLabel) {
+                yieldLabel.textContent = getText('yieldLabel');
+            }
+            
+            // Update insights title
+            const insightsTitle = document.getElementById('insightsTitle');
+            if (insightsTitle) {
+                insightsTitle.textContent = getText('insightsTitle');
+            }
+            
+            // Update insights loading and error text
+            const insightsLoadingText = document.getElementById('insightsLoadingText');
+            if (insightsLoadingText) {
+                insightsLoadingText.textContent = getText('insightsLoading');
+            }
+            
+            const insightsErrorText = document.getElementById('insightsErrorText');
+            if (insightsErrorText) {
+                insightsErrorText.textContent = getText('insightsError');
+            }
         }
 
-        // Функция возврата в главное меню
+        // Load countries from API
+        async function loadCountries() {
+            try {
+                const response = await fetch('/api/locations/countries');
+                const data = await response.json();
+                
+                if (data.success) {
+                    const countrySelect = document.getElementById('countrySelect');
+                    countrySelect.innerHTML = `<option value="">${getText('countryPlaceholder')}</option>`;
+                    
+                    data.countries.forEach(([id, name]) => {
+                        const option = document.createElement('option');
+                        option.value = id;
+                        option.textContent = name;
+                        countrySelect.appendChild(option);
+                    });
+                } else {
+                    console.error('Failed to load countries:', data.error);
+                }
+            } catch (error) {
+                console.error('Error loading countries:', error);
+            }
+        }
+
+        // Load cities based on selected country
+        async function loadCities(countryId) {
+            try {
+                const response = await fetch('/api/locations/cities', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ country_id: countryId })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    const citySelect = document.getElementById('citySelect');
+                    citySelect.innerHTML = `<option value="">${getText('cityPlaceholder')}</option>`;
+                    
+                    data.cities.forEach(([id, name]) => {
+                        const option = document.createElement('option');
+                        option.value = id;
+                        option.textContent = name;
+                        citySelect.appendChild(option);
+                    });
+                    
+                    citySelect.disabled = false;
+                } else {
+                    console.error('Failed to load cities:', data.error);
+                }
+            } catch (error) {
+                console.error('Error loading cities:', error);
+            }
+        }
+
+        // Load counties based on selected city
+        async function loadCounties(cityId) {
+            try {
+                const response = await fetch('/api/locations/counties', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ city_id: cityId })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    const countySelect = document.getElementById('countySelect');
+                    countySelect.innerHTML = `<option value="">${getText('countyPlaceholder')}</option>`;
+                    
+                    data.counties.forEach(([id, name]) => {
+                        const option = document.createElement('option');
+                        option.value = id;
+                        option.textContent = name;
+                        countySelect.appendChild(option);
+                    });
+                    
+                    countySelect.disabled = false;
+                } else {
+                    console.error('Failed to load cities:', data.error);
+                }
+            } catch (error) {
+                console.error('Error loading cities:', error);
+            }
+        }
+
+        // Load districts based on selected county
+        async function loadDistricts(countyId) {
+            try {
+                const response = await fetch('/api/locations/districts', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ county_id: countyId })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    const districtSelect = document.getElementById('districtSelect');
+                    districtSelect.innerHTML = `<option value="">${getText('districtPlaceholder')}</option>`;
+                    
+                    // Add "не имеет значения" option
+                    const noDistrictOption = document.createElement('option');
+                    noDistrictOption.value = 'none';
+                    noDistrictOption.textContent = 'Не имеет значения';
+                    districtSelect.appendChild(noDistrictOption);
+                    
+                    data.districts.forEach(([id, name]) => {
+                        const option = document.createElement('option');
+                        option.value = id;
+                        option.textContent = name;
+                        districtSelect.appendChild(option);
+                    });
+                    
+                    districtSelect.disabled = false;
+                } else {
+                    console.error('Failed to load districts:', data.error);
+                }
+            } catch (error) {
+                console.error('Error loading districts:', error);
+            }
+        }
+
+        // Event handlers for location changes
+        function onCountryChange() {
+            const countrySelect = document.getElementById('countrySelect');
+            const citySelect = document.getElementById('citySelect');
+            const countySelect = document.getElementById('countySelect');
+            const districtSelect = document.getElementById('districtSelect');
+            
+            const countryId = countrySelect.value;
+            
+            // Reset dependent selects
+            citySelect.innerHTML = `<option value="">${getText('cityPlaceholder')}</option>`;
+            citySelect.disabled = true;
+            countySelect.innerHTML = `<option value="">${getText('countyPlaceholder')}</option>`;
+            countySelect.disabled = true;
+            districtSelect.innerHTML = `<option value="">${getText('districtPlaceholder')}</option>`;
+            districtSelect.disabled = true;
+            
+            if (countryId) {
+                loadCities(countryId);
+            }
+            
+            updateConfirmButton();
+        }
+
+        function onCityChange() {
+            const citySelect = document.getElementById('citySelect');
+            const countySelect = document.getElementById('countySelect');
+            const districtSelect = document.getElementById('districtSelect');
+            
+            const cityId = citySelect.value;
+            
+            // Reset dependent selects
+            countySelect.innerHTML = `<option value="">${getText('countyPlaceholder')}</option>`;
+            countySelect.disabled = true;
+            districtSelect.innerHTML = `<option value="">${getText('districtPlaceholder')}</option>`;
+            districtSelect.disabled = true;
+            
+            if (cityId) {
+                loadCounties(cityId);
+            }
+            
+            updateConfirmButton();
+        }
+
+        function onCountyChange() {
+            const countySelect = document.getElementById('countySelect');
+            const districtSelect = document.getElementById('districtSelect');
+            
+            const countyId = countySelect.value;
+            
+            // Reset dependent selects
+            districtSelect.innerHTML = `<option value="">${getText('districtPlaceholder')}</option>`;
+            districtSelect.disabled = true;
+            
+            if (countyId) {
+                loadDistricts(countyId);
+            }
+            
+            updateConfirmButton();
+        }
+
+        function onDistrictChange() {
+            updateConfirmButton();
+        }
+
+        // Update confirm button state
+        function updateConfirmButton() {
+            const countrySelect = document.getElementById('countrySelect');
+            const citySelect = document.getElementById('citySelect');
+            const countySelect = document.getElementById('countySelect');
+            const districtSelect = document.getElementById('districtSelect');
+            const confirmButton = document.getElementById('confirmButton');
+            
+            const hasCountry = countrySelect.value;
+            const hasCity = citySelect.value;
+            const hasCounty = countySelect.value;
+            const hasDistrict = districtSelect.value || districtSelect.value === 'none';
+            
+            confirmButton.disabled = !(hasCountry && hasCity && hasCounty && hasDistrict);
+        }
+
+        // Confirm location selection
+        async function confirmLocation() {
+            const countrySelect = document.getElementById('countrySelect');
+            const citySelect = document.getElementById('citySelect');
+            const countySelect = document.getElementById('countySelect');
+            const districtSelect = document.getElementById('districtSelect');
+            
+            const countryId = countrySelect.value;
+            const cityId = citySelect.value;
+            const countyId = countySelect.value;
+            const districtId = districtSelect.value === 'none' ? null : districtSelect.value;
+            
+            // Get names for display
+            const countryName = countrySelect.options[countrySelect.selectedIndex].text;
+            const cityName = citySelect.options[citySelect.selectedIndex].text;
+            const countyName = countySelect.options[countySelect.selectedIndex].text;
+            const districtName = districtSelect.value === 'none' ? 'Не имеет значения' : districtSelect.options[districtSelect.selectedIndex].text;
+            
+            // Update selected location
+            selectedLocation = {
+                country_id: countryId,
+                city_id: cityId,
+                county_id: countyId,
+                district_id: districtId,
+                country_name: countryName,
+                city_name: cityName,
+                county_name: countyName,
+                district_name: districtName
+            };
+            
+            // Display selected location
+            displaySelectedLocation();
+            
+            // Get user language
+            await getUserLanguage();
+            
+            // Load region data
+            await loadRegionData();
+        }
+
+        // Display selected location
+        function displaySelectedLocation() {
+            const selectedLocationDiv = document.getElementById('selectedLocation');
+            const locationDetails = document.getElementById('locationDetails');
+            const adminIds = document.getElementById('adminIds');
+            const adminDetails = document.getElementById('adminDetails');
+            
+            // Build location string
+            let locationString = selectedLocation.country_name;
+            if (selectedLocation.city_name) {
+                locationString += `, ${selectedLocation.city_name}`;
+            }
+            if (selectedLocation.county_name) {
+                locationString += `, ${selectedLocation.county_name}`;
+            }
+            if (selectedLocation.district_name && selectedLocation.district_name !== 'Не имеет значения') {
+                locationString += `, ${selectedLocation.district_name}`;
+            }
+            
+            locationDetails.textContent = locationString;
+            
+            // Show admin IDs if user is admin
+            if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe && window.Telegram.WebApp.initDataUnsafe.user) {
+                const user = window.Telegram.WebApp.initDataUnsafe.user;
+                if (user && user.id) {
+                    // Check if user is admin (you can implement your own admin check logic)
+                    const isAdmin = true; // Placeholder - implement your admin check
+                    
+                    if (isAdmin) {
+                        adminDetails.innerHTML = `
+                            country_id: ${selectedLocation.country_id}<br>
+                            city_id: ${selectedLocation.city_id}<br>
+                            county_id: ${selectedLocation.county_id}<br>
+                            district_id: ${selectedLocation.district_id || 'null'}
+                        `;
+                        adminIds.style.display = 'block';
+                    }
+                }
+            }
+            
+            selectedLocationDiv.style.display = 'block';
+        }
+
+        // Get user language
+        async function getUserLanguage() {
+            try {
+                if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe && window.Telegram.WebApp.initDataUnsafe.user) {
+                    const user = window.Telegram.WebApp.initDataUnsafe.user;
+                    if (user && user.id) {
+                        const response = await fetch('/api/user/language', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({ telegram_id: user.id })
+                        });
+                        
+                        const data = await response.json();
+                        if (data.success) {
+                            userLanguage = data.language;
+                            currentLanguage = data.language;
+                            updatePageText();
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('Error getting user language:', error);
+            }
+        }
+
+        // Load region data
+        async function loadRegionData() {
+            try {
+                const response = await fetch('/api/region_data', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        country_id: selectedLocation.country_id,
+                        city_id: selectedLocation.city_id,
+                        county_id: selectedLocation.county_id,
+                        district_id: selectedLocation.district_id
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    displayRegionData(data);
+                } else {
+                    throw new Error(data.error || 'Failed to load region data');
+                }
+            } catch (error) {
+                console.error('Error loading region data:', error);
+                showError('Ошибка загрузки данных региона');
+            }
+        }
+
+        // Display region data
+        function displayRegionData(data) {
+            console.log('Received data:', data);
+            
+            // Try different possible key names for data
+            const generalData = data.general_data || data.generalData || data.general || [];
+            const houseTypeData = data.house_type_data || data.houseTypeData || data.house_types || data.houseTypes || [];
+            const floorSegmentData = data.floor_segment_data || data.floorSegmentData || data.floor_segments || data.floorSegments || [];
+            const ageData = data.age_data || data.ageData || data.ages || [];
+            const heatingData = data.heating_data || data.heatingData || data.heating || [];
+            
+            // Fill key metrics
+            fillKeyMetrics(generalData);
+            
+            // Display data in accordions
+            displayDataInAccordion('generalDataContent', generalData, 'general');
+            displayDataInAccordion('houseTypeDataContent', houseTypeData, 'house_type');
+            displayDataInAccordion('floorSegmentDataContent', floorSegmentData, 'floor_segment');
+            displayDataInAccordion('ageDataContent', ageData, 'age');
+            displayDataInAccordion('heatingDataContent', heatingData, 'heating');
+            
+            // Show data content
+            document.getElementById('dataContent').style.display = 'block';
+            
+            // Get AI insights
+            getRegionInsights(data);
+        }
+
+        // Fill key metrics
+        function fillKeyMetrics(generalData) {
+            if (!generalData || generalData.length === 0) return;
+            
+            const data = generalData[0]; // Take first record
+            
+            // Average sale price per m²
+            const avgSalePrice = data.unit_price_for_sale || data.price_per_m2_for_sale || data.average_price_for_sale || '-';
+            document.getElementById('avgSalePriceValue').textContent = formatValue(avgSalePrice, 'price');
+            
+            // Average rent price per m²
+            const avgRentPrice = data.unit_price_for_rent || data.price_per_m2_for_rent || data.average_price_for_rent || '-';
+            document.getElementById('avgRentPriceValue').textContent = formatValue(avgRentPrice, 'price');
+            
+            // Listing period for sale
+            const listingPeriodSale = data.listing_period_for_sale || data.sale_period || data.period_for_sale || '-';
+            document.getElementById('listingPeriodSaleValue').textContent = formatValue(listingPeriodSale, 'days');
+            
+            // Listing period for rent
+            const listingPeriodRent = data.listing_period_for_rent || data.rent_period || data.period_for_rent || '-';
+            document.getElementById('listingPeriodRentValue').textContent = formatValue(listingPeriodRent, 'days');
+            
+            // Yield
+            const yield = data.yield || data.yield_rate || data.return_rate || '-';
+            document.getElementById('yieldValue').textContent = formatValue(yield, 'percentage');
+            
+            // Show key metrics section
+            document.getElementById('keyMetricsSection').style.display = 'block';
+        }
+
+        // Display data in accordion
+        function displayDataInAccordion(containerId, data, dataType) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            
+            if (!data || data.length === 0) {
+                container.innerHTML = `<div class="no-data">${getText('noDataAvailable')}</div>`;
+                return;
+            }
+            
+            let html = '';
+            
+            data.forEach((item, index) => {
+                const subCardTitle = getSubCardTitle(item, dataType);
+                
+                html += `
+                    <div class="sub-card">
+                        <h3>${subCardTitle}</h3>
+                        ${generateDataTable(item, dataType)}
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+
+        // Get sub-card title
+        function getSubCardTitle(item, dataType) {
+            switch (dataType) {
+                case 'house_type':
+                    return item.house_type || item.house_type_name || getText('houseTypeDataTitle');
+                case 'floor_segment':
+                    return item.floor_segment || item.floor_segment_name || getText('floorSegmentDataTitle');
+                case 'age':
+                    return item.age_category || item.age_category_name || getText('ageDataTitle');
+                case 'heating':
+                    return item.heating_type || item.heating_type_name || getText('heatingDataTitle');
+                default:
+                    return getText('generalDataTitle');
+            }
+        }
+
+        // Generate data table
+        function generateDataTable(item, dataType) {
+            const fields = Object.keys(item).filter(key => 
+                !['id', 'created_at', 'source_file', 'country_id', 'city_id', 'county_id', 'district_id'].includes(key)
+            );
+            
+            if (fields.length === 0) {
+                return `<div class="no-data">${getText('noDataAvailable')}</div>`;
+            }
+            
+            let html = '<table class="data-table">';
+            
+            fields.forEach(field => {
+                const value = item[field];
+                if (value !== null && value !== undefined) {
+                    html += `
+                        <tr>
+                            <td>${formatFieldName(field)}</td>
+                            <td>${formatFieldValue(value, field)}</td>
+                        </tr>
+                    `;
+                }
+            });
+            
+            html += '</table>';
+            return html;
+        }
+
+        // Format field name
+        function formatFieldName(field) {
+            // Convert snake_case to readable text
+            return field.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+        }
+
+        // Format field value
+        function formatFieldValue(value, field) {
+            if (value === null || value === undefined) return '-';
+            
+            // Format based on field type
+            if (typeof value === 'number') {
+                if (field.includes('price') || field.includes('Price')) {
+                    return formatValue(value, 'price');
+                } else if (field.includes('yield') || field.includes('Yield') || field.includes('rate')) {
+                    return formatValue(value, 'percentage');
+                } else if (field.includes('age') || field.includes('Age')) {
+                    return formatValue(value, 'years');
+                } else if (field.includes('period') || field.includes('Period')) {
+                    return formatValue(value, 'days');
+                } else {
+                    return value.toLocaleString();
+                }
+            }
+            
+            return value.toString();
+        }
+
+        // Format value based on type
+        function formatValue(value, type) {
+            if (value === null || value === undefined || value === '-') return '-';
+            
+            switch (type) {
+                case 'price':
+                    return `₺${parseFloat(value).toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+                case 'percentage':
+                    return `${parseFloat(value).toFixed(2)}%`;
+                case 'years':
+                    return `${value} лет`;
+                case 'days':
+                    return `${value} дней`;
+                default:
+                    return value.toString();
+            }
+        }
+
+        // Get AI insights for the region data
+        async function getRegionInsights(regionData) {
+            try {
+                console.log('🧠 Запрашиваем AI-вывод для данных региона');
+                
+                // Show insights section
+                const insightsSection = document.getElementById('insightsSection');
+                const insightsLoading = document.getElementById('insightsLoading');
+                const insightsText = document.getElementById('insightsText');
+                const insightsError = document.getElementById('insightsError');
+                
+                insightsSection.style.display = 'block';
+                insightsLoading.style.display = 'flex';
+                insightsText.style.display = 'none';
+                insightsError.style.display = 'none';
+                
+                // Update loading text based on user language
+                const loadingText = document.getElementById('insightsLoadingText');
+                loadingText.textContent = getText('insightsLoading');
+                
+                // Prepare data for AI analysis
+                const analysisData = {
+                    region_data: regionData,
+                    language: userLanguage
+                };
+                
+                // Make API request to get AI insights
+                const response = await fetch('/api/region_insights', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(analysisData)
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Hide loading and show insights
+                    insightsLoading.style.display = 'none';
+                    insightsText.style.display = 'block';
+                    
+                    // Update insights text
+                    const insightsTextElement = document.getElementById('insightsText');
+                    insightsTextElement.textContent = data.insights;
+                    
+                    console.log('✅ AI-вывод получен:', data.insights);
+                } else {
+                    throw new Error(data.error || 'Unknown error');
+                }
+                
+            } catch (error) {
+                console.error('❌ Ошибка получения AI-вывода:', error);
+                
+                // Hide loading and show error
+                const insightsLoading = document.getElementById('insightsLoading');
+                const insightsError = document.getElementById('insightsError');
+                const insightsErrorText = document.getElementById('insightsErrorText');
+                
+                insightsLoading.style.display = 'none';
+                insightsError.style.display = 'flex';
+                insightsErrorText.textContent = getText('insightsError');
+            }
+        }
+
+        // Toggle accordion
+        function toggleAccordion(cardId) {
+            const card = document.getElementById(cardId);
+            const content = card.querySelector('.data-card-content');
+            const toggle = card.querySelector('.data-card-toggle');
+            
+            if (content.classList.contains('expanded')) {
+                content.classList.remove('expanded');
+                toggle.textContent = '▼';
+                toggle.classList.remove('expanded');
+            } else {
+                content.classList.add('expanded');
+                toggle.textContent = '▲';
+                toggle.classList.add('expanded');
+            }
+        }
+
+        // Show error
+        function showError(message) {
+            const errorState = document.getElementById('errorState');
+            const errorText = document.getElementById('errorText');
+            
+            errorText.textContent = message;
+            errorState.style.display = 'block';
+        }
+
+        // Function to go to main menu
         function goToMainMenu() {
             window.location.href = '/webapp_main';
         }
 
-        // Инициализация
+        // Initialize page
         function init() {
             updatePageText();
+            loadCountries();
         }
 
-        // Запускаем инициализацию
-        init();
+        // Start initialization when page loads
+        document.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
 </html>
