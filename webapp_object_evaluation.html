@@ -415,6 +415,17 @@
             margin: 0 0 12px 0;
         }
         
+        .data-available {
+            padding: 15px;
+            background: #e8f5e8;
+            border: 1px solid #4caf50;
+            border-radius: 6px;
+            color: #2e7d32;
+            font-size: 14px;
+            text-align: center;
+            font-weight: 500;
+        }
+        
         .summary-table {
             margin-top: 20px;
         }
@@ -434,6 +445,84 @@
         
         .summary-table tr:nth-child(even) {
             background: #f8f9fa;
+        }
+        
+        .section-header {
+            background: #667eea !important;
+            color: white;
+            font-weight: 700;
+            text-align: center;
+        }
+        
+        .sale-header {
+            background: #28a745 !important;
+        }
+        
+        .rent-header {
+            background: #17a2b8 !important;
+        }
+        
+        .yield-header {
+            background: #ffc107 !important;
+            color: #212529;
+            font-weight: 800;
+            font-size: 18px;
+        }
+        
+        .yield-data {
+            background: #fff3cd !important;
+        }
+        
+        .yield-label {
+            font-weight: 700;
+            color: #856404;
+        }
+        
+        .yield-value {
+            font-weight: 700;
+            color: #856404;
+        }
+        
+        /* Property Trends Styles */
+        .trends-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .trend-card {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .trend-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .trend-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 8px;
+        }
+        
+        .trend-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: #28a745;
+            margin-bottom: 5px;
+        }
+        
+        .trend-period {
+            font-size: 12px;
+            color: #6c757d;
+            font-style: italic;
         }
 
         /* Table Styles */
@@ -596,6 +685,41 @@
                 padding: 8px 6px;
                 font-size: 12px;
             }
+            
+            .section-header td {
+                font-size: 13px;
+                padding: 10px 6px;
+            }
+            
+            .yield-header {
+                font-size: 16px;
+            }
+            
+            .trends-grid {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            
+            .trend-card {
+                padding: 12px;
+            }
+            
+            .trend-title {
+                font-size: 13px;
+            }
+            
+            .trend-value {
+                font-size: 16px;
+            }
+            
+            .trend-period {
+                font-size: 11px;
+            }
+            
+            .data-available {
+                padding: 12px;
+                font-size: 13px;
+            }
         }
 
         /* Mobile responsive for listing type selection */
@@ -741,31 +865,9 @@
             </div>
         </div>
 
-        <!-- Ключевые метрики -->
+        <!-- Ключевые метрики - скрыты -->
         <div class="key-metrics-section" id="keyMetricsSection" style="display: none;">
-            <div class="key-metrics-title" id="keyMetricsTitle">Ключевые показатели</div>
-            <div class="metrics-grid">
-                <div class="metric-card">
-                    <div class="metric-label" id="avgSalePriceLabel">Средняя цена продажи за м²</div>
-                    <div class="metric-value" id="avgSalePriceValue">-</div>
-                </div>
-                <div class="metric-card">
-                    <div class="metric-label" id="avgRentPriceLabel">Средняя цена аренды за м²</div>
-                    <div class="metric-value" id="avgRentPriceValue">-</div>
-                </div>
-                <div class="metric-card">
-                    <div class="metric-label" id="listingPeriodSaleLabel">Период размещения (продажа)</div>
-                    <div class="metric-value" id="listingPeriodSaleValue">-</div>
-                </div>
-                <div class="metric-card">
-                    <div class="metric-label" id="listingPeriodRentLabel">Период размещения (аренда)</div>
-                    <div class="metric-value" id="listingPeriodRentValue">-</div>
-                </div>
-                <div class="metric-card yield-card">
-                    <div class="metric-label yield-label" id="yieldLabel">Доходность</div>
-                    <div class="metric-value yield-value" id="yieldValue">-</div>
-                </div>
-            </div>
+            <!-- Ключевые метрики скрыты, показывается только таблица "Средние значения" -->
         </div>
 
         <!-- AI Insights Section -->
@@ -830,11 +932,11 @@
                 </div>
             </div>
             
-            <!-- Summary Table -->
+            <!-- Market Indicators Table -->
             <div class="data-section" id="summaryDataSection">
-                <h3 class="data-section-title" id="summaryDataTitle">Средние значения</h3>
+                <h3 class="data-section-title" id="summaryDataTitle"></h3>
                 <div class="data-section-content" id="summaryDataContent">
-                    <!-- Summary data will be populated here -->
+                    <!-- Market indicators data will be populated here -->
                 </div>
             </div>
         </div>
@@ -935,7 +1037,11 @@
                 'bedroomsLabel': 'Количество спален',
                 'floorLabel': 'Этаж',
                 'ageLabel': 'Возраст объекта',
-                'heatingLabel': 'Тип отопления'
+                'heatingLabel': 'Тип отопления',
+                'marketIndicatorsTitle': 'Показатели рынка',
+                'marketTrendsTitle': 'Тренды рынка',
+                'saleHeader': 'Продажа',
+                'rentHeader': 'Аренда'
             },
             'en': {
                 'slogan': 'Real Estate Market Insights',
@@ -989,7 +1095,11 @@
                 'bedroomsLabel': 'Bedroom count',
                 'floorLabel': 'Floor',
                 'ageLabel': 'Property age',
-                'heatingLabel': 'Heating type'
+                'heatingLabel': 'Heating type',
+                'marketIndicatorsTitle': 'Market Indicators',
+                'marketTrendsTitle': 'Market Trends',
+                'saleHeader': 'Sale',
+                'rentHeader': 'Rent'
             },
             'de': {
                 'slogan': 'Immobilienmarkt-Einblicke',
@@ -1285,6 +1395,11 @@
             const heatingDataTitle = document.getElementById('heatingDataTitle');
             if (heatingDataTitle) {
                 heatingDataTitle.textContent = getText('heatingDataTitle');
+            }
+            
+            const summaryDataTitle = document.getElementById('summaryDataTitle');
+            if (summaryDataTitle) {
+                summaryDataTitle.textContent = getText('marketIndicatorsTitle');
             }
 
             const loadingText = document.getElementById('loadingText');
@@ -2113,10 +2228,7 @@
                 heating: heatingData.length
             });
             
-            // Fill key metrics
-            fillKeyMetrics(generalData);
-            
-            // Display data in sections
+            // Display data in sections (only show availability status)
             displayDataInSection('generalDataContent', generalData, 'general');
             displayDataInSection('houseTypeDataContent', houseTypeData, 'house_type');
             displayDataInSection('floorSegmentDataContent', floorSegmentData, 'floor_segment');
@@ -2133,63 +2245,21 @@
             getRegionInsights(data);
         }
 
-        // Fill key metrics
-        function fillKeyMetrics(generalData) {
-            if (!generalData || generalData.length === 0) return;
-            
-            const data = generalData[0]; // Take first record
-            
-            // Average sale price per m²
-            const avgSalePrice = data.unit_price_for_sale || data.price_per_m2_for_sale || data.average_price_for_sale || '-';
-            document.getElementById('avgSalePriceValue').textContent = formatValue(avgSalePrice, 'price');
-            
-            // Average rent price per m²
-            const avgRentPrice = data.unit_price_for_rent || data.price_per_m2_for_rent || data.average_price_for_rent || '-';
-            document.getElementById('avgRentPriceValue').textContent = formatValue(avgRentPrice, 'price');
-            
-            // Listing period for sale
-            const listingPeriodSale = data.listing_period_for_sale || data.sale_period || data.period_for_sale || '-';
-            document.getElementById('listingPeriodSaleValue').textContent = formatValue(listingPeriodSale, 'days');
-            
-            // Listing period for rent
-            const listingPeriodRent = data.listing_period_for_rent || data.rent_period || data.period_for_rent || '-';
-            document.getElementById('listingPeriodRentValue').textContent = formatValue(listingPeriodRent, 'days');
-            
-            // Yield
-            const yield = data.yield || data.yield_rate || data.return_rate || '-';
-            document.getElementById('yieldValue').textContent = formatValue(yield, 'percentage');
-            
-            // Show key metrics section
-            document.getElementById('keyMetricsSection').style.display = 'block';
-        }
 
-        // Display data in section
+
+        // Display data in section (only show section title, no data)
         function displayDataInSection(containerId, data, dataType) {
             const container = document.getElementById(containerId);
             if (!container) return;
             
-            console.log(`📋 Displaying ${dataType} data:`, { containerId, dataLength: data?.length, data });
+            console.log(`📋 Displaying ${dataType} section:`, { containerId, dataLength: data?.length });
             
-            if (!data || data.length === 0) {
-                console.log(`⚠️ No data for ${dataType}, showing 'no data' message`);
+            // Don't show data, just indicate that data is available
+            if (data && data.length > 0) {
+                container.innerHTML = `<div class="data-available">Данные загружены (${data.length} записей)</div>`;
+            } else {
                 container.innerHTML = `<div class="no-data">${getText('noDataAvailable')}</div>`;
-                return;
             }
-            
-            let html = '';
-            
-            data.forEach((item, index) => {
-                const subCardTitle = getSubCardTitle(item, dataType);
-                
-                html += `
-                    <div class="data-item">
-                        <h4 class="data-item-title">${subCardTitle}</h4>
-                        ${generateFilteredDataTable(item, dataType)}
-                    </div>
-                `;
-            });
-            
-            container.innerHTML = html;
         }
 
         // Get sub-card title
@@ -2285,7 +2355,7 @@
             }
         }
 
-        // Generate summary table with min/max values from all data
+        // Generate market indicators table with organized structure
         function generateSummaryTable(data) {
             const summaryContainer = document.getElementById('summaryDataContent');
             if (!summaryContainer) return;
@@ -2306,16 +2376,22 @@
                 return;
             }
             
-            // Define fields for summary
-            const summaryFields = [
-                'average_age_for_rent', 'average_age_for_sale', 'comparable_area_for_rent', 'comparable_area_for_sale',
-                'count_for_rent', 'count_for_sale', 'listing_period_for_rent', 'listing_period_for_sale',
-                'min_unit_price_for_rent', 'min_unit_price_for_sale', 'yield'
+            // Define fields for summary with new structure
+            const saleFields = [
+                'average_age_for_sale', 'comparable_area_for_sale', 'count_for_sale', 
+                'listing_period_for_sale', 'min_unit_price_for_sale'
             ];
             
-            // Calculate min/max values
+            const rentFields = [
+                'average_age_for_rent', 'comparable_area_for_rent', 'count_for_rent', 
+                'listing_period_for_rent', 'min_unit_price_for_rent'
+            ];
+            
+            // Calculate min/max values for all fields
             const summary = {};
-            summaryFields.forEach(field => {
+            const allFields = [...saleFields, ...rentFields, 'yield'];
+            
+            allFields.forEach(field => {
                 const values = allData
                     .map(item => item[field])
                     .filter(val => val !== null && val !== undefined && !isNaN(parseFloat(val)));
@@ -2328,15 +2404,20 @@
                 }
             });
             
-            // Generate summary table
+            // Generate market indicators table
             let html = '<table class="data-table summary-table">';
             html += '<thead><tr><th>Показатель</th><th>Минимальное значение</th><th>Максимальное значение</th></tr></thead><tbody>';
             
-            summaryFields.forEach(field => {
+            // Add Sale section header
+            html += `<tr class="section-header"><td colspan="3" class="sale-header">${getText('saleHeader')}</td></tr>`;
+            
+            // Add Sale fields
+            saleFields.forEach(field => {
                 if (summary[field]) {
+                    const fieldName = field === 'min_unit_price_for_sale' ? 'Unit Price For Sale' : formatFieldName(field);
                     html += `
                         <tr>
-                            <td>${formatFieldName(field)}</td>
+                            <td>${fieldName}</td>
                             <td>${formatFieldValue(summary[field].min, field)}</td>
                             <td>${formatFieldValue(summary[field].max, field)}</td>
                         </tr>
@@ -2344,8 +2425,149 @@
                 }
             });
             
+            // Add Rent section header
+            html += `<tr class="section-header"><td colspan="3" class="rent-header">${getText('rentHeader')}</td></tr>`;
+            
+            // Add Rent fields
+            rentFields.forEach(field => {
+                if (summary[field]) {
+                    const fieldName = field === 'min_unit_price_for_rent' ? 'Unit Price For Rent' : formatFieldName(field);
+                    html += `
+                        <tr>
+                            <td>${fieldName}</td>
+                            <td>${formatFieldValue(summary[field].min, field)}</td>
+                            <td>${formatFieldValue(summary[field].max, field)}</td>
+                        </tr>
+                    `;
+                }
+            });
+            
+            // Add Yield with bold styling
+            if (summary.yield) {
+                html += '<tr class="yield-row"><td colspan="3" class="yield-header">Yield</td></tr>';
+                html += `
+                    <tr class="yield-data">
+                        <td class="yield-label">Yield</td>
+                        <td class="yield-value">${formatFieldValue(summary.yield.min, 'yield')}</td>
+                        <td class="yield-value">${formatFieldValue(summary.yield.max, 'yield')}</td>
+                    </tr>
+                `;
+            }
+            
             html += '</tbody></table>';
             summaryContainer.innerHTML = html;
+            
+            // Load property trends data
+            loadPropertyTrends(data);
+        }
+
+        // Load property trends data for selected location
+        async function loadPropertyTrends(data) {
+            try {
+                // Get location IDs from the first available data record
+                let locationIds = null;
+                const tables = ['general_data', 'house_type_data', 'floor_segment_data', 'age_data', 'heating_data'];
+                
+                for (const tableName of tables) {
+                    const tableData = data[tableName] || [];
+                    if (tableData.length > 0) {
+                        const firstRecord = tableData[0];
+                        locationIds = {
+                            country_id: firstRecord.country_id,
+                            city_id: firstRecord.city_id,
+                            county_id: firstRecord.county_id,
+                            district_id: firstRecord.district_id
+                        };
+                        break;
+                    }
+                }
+                
+                if (!locationIds) {
+                    console.log('⚠️ No location IDs found for property trends');
+                    return;
+                }
+                
+                console.log('🔄 Loading property trends for location:', locationIds);
+                
+                // Make API request to get property trends
+                const response = await fetch('/api/property_trends', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(locationIds)
+                });
+                
+                const trendsData = await response.json();
+                console.log('📊 Property trends response:', trendsData);
+                
+                if (trendsData.success && trendsData.trends && trendsData.trends.length > 0) {
+                    // Add property trends section below the summary table
+                    addPropertyTrendsSection(trendsData.trends);
+                } else {
+                    console.log('⚠️ No property trends data available');
+                }
+                
+            } catch (error) {
+                console.error('❌ Error loading property trends:', error);
+            }
+        }
+        
+        // Add property trends section to the page
+        function addPropertyTrendsSection(trends) {
+            const summarySection = document.getElementById('summaryDataSection');
+            if (!summarySection) return;
+            
+            // Create property trends section
+            const trendsSection = document.createElement('div');
+            trendsSection.className = 'data-section';
+            trendsSection.id = 'propertyTrendsSection';
+            
+            trendsSection.innerHTML = `
+                <h3 class="data-section-title">${getText('marketTrendsTitle')}</h3>
+                <div class="data-section-content">
+                    <div class="trends-grid">
+                        ${trends.map(trend => `
+                            <div class="trend-card">
+                                <div class="trend-title">${formatFieldName(trend.trend_type || 'unknown')}</div>
+                                <div class="trend-value">${formatTrendValue(trend.trend_value, trend.trend_type)}</div>
+                                <div class="trend-period">${formatTrendPeriod(trend.period)}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+            
+            // Insert after summary section
+            summarySection.parentNode.insertBefore(trendsSection, summarySection.nextSibling);
+        }
+        
+        // Format trend value based on type
+        function formatTrendValue(value, type) {
+            if (value === null || value === undefined) return '-';
+            
+            if (type && type.includes('price')) {
+                return formatValue(value, 'price');
+            } else if (type && type.includes('percentage')) {
+                return formatValue(value, 'percentage');
+            } else {
+                return value.toString();
+            }
+        }
+        
+        // Format trend period
+        function formatTrendPeriod(period) {
+            if (!period) return '';
+            
+            // Convert period to readable format
+            const periodMap = {
+                'monthly': 'Месячный',
+                'quarterly': 'Квартальный',
+                'yearly': 'Годовой',
+                'weekly': 'Недельный'
+            };
+            
+            return periodMap[period] || period;
         }
 
         // Get AI insights for the region data
