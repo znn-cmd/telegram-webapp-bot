@@ -614,32 +614,52 @@ def api_region_data():
         logger.error(f"📋 Данные запроса: country_id={country_id}, city_id={city_id}, county_id={county_id}, district_id={district_id}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
-@app.route('/api/listing_types/<table_name>', methods=['GET'])
+@app.route('/api/listing_types/<table_name>', methods=['POST'])
 def api_listing_types(table_name):
-    """Получение доступных listing_type из указанной таблицы"""
+    """Получение доступных listing_type из указанной таблицы для выбранной локации"""
     try:
-        logger.info(f"🔍 Запрос доступных listing_type из таблицы: {table_name}")
+        data = request.json or {}
+        country_id = data.get('country_id')
+        city_id = data.get('city_id')
+        county_id = data.get('county_id')
+        district_id = data.get('district_id')
+        
+        logger.info(f"🔍 Запрос доступных listing_type из таблицы: {table_name} для локации: country_id={country_id}, city_id={city_id}, county_id={county_id}, district_id={district_id}")
         
         # Проверяем, что таблица поддерживается
         supported_tables = ['house_type_data', 'floor_segment_data', 'age_data', 'heating_data']
         if table_name not in supported_tables:
             return jsonify({'success': False, 'error': f'Table {table_name} not supported'}), 400
         
-        # Получаем уникальные listing_type из таблицы
-        result = supabase.table(table_name).select('listing_type').not_.is_('listing_type', 'null').execute()
+        # Проверяем обязательные параметры локации
+        if not all([country_id, city_id, county_id]):
+            return jsonify({'success': False, 'error': 'country_id, city_id, county_id required'}), 400
+        
+        # Строим запрос с фильтрацией по локации
+        query = supabase.table(table_name).select('listing_type').not_.is_('listing_type', 'null')
+        
+        # Добавляем фильтры по локации
+        query = query.eq('country_id', country_id).eq('city_id', city_id).eq('county_id', county_id)
+        
+        # Добавляем фильтр по району, если он выбран
+        if district_id and district_id != 'none':
+            query = query.eq('district_id', district_id)
+        
+        # Выполняем запрос
+        result = query.execute()
         
         if result.data:
             # Извлекаем уникальные значения listing_type
             listing_types = list(set([item['listing_type'] for item in result.data if item.get('listing_type')]))
             listing_types.sort()  # Сортируем для удобства
             
-            logger.info(f"✅ Получено {len(listing_types)} уникальных listing_type из таблицы {table_name}: {listing_types}")
+            logger.info(f"✅ Получено {len(listing_types)} уникальных listing_type из таблицы {table_name} для выбранной локации: {listing_types}")
             return jsonify({
                 'success': True,
                 'listing_types': listing_types
             })
         else:
-            logger.warning(f"⚠️ В таблице {table_name} не найдено данных с listing_type")
+            logger.warning(f"⚠️ В таблице {table_name} не найдено данных с listing_type для выбранной локации")
             return jsonify({
                 'success': True,
                 'listing_types': []

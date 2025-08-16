@@ -1405,10 +1405,37 @@
         // Load available listing types for each data category
         async function loadListingTypes() {
             try {
-                console.log('🔄 Загружаем доступные listing_type...');
+                console.log('🔄 Загружаем доступные listing_type для выбранной локации...');
+                
+                // Get current location values
+                const countrySelect = document.getElementById('countrySelect');
+                const citySelect = document.getElementById('citySelect');
+                const countySelect = document.getElementById('countySelect');
+                const districtSelect = document.getElementById('districtSelect');
+                
+                // Check if all required location fields are filled
+                if (!countrySelect.value || !citySelect.value || !countySelect.value) {
+                    console.log('❌ Не все обязательные поля локации заполнены, пропускаем загрузку listing_type');
+                    return;
+                }
+                
+                const locationData = {
+                    country_id: countrySelect.value,
+                    city_id: citySelect.value,
+                    county_id: countySelect.value,
+                    district_id: districtSelect.value || 'none'
+                };
+                
+                console.log('📍 Location data for listing types:', locationData);
                 
                 // Load house type listing types
-                const houseTypeResponse = await fetch('/api/listing_types/house_type_data');
+                const houseTypeResponse = await fetch('/api/listing_types/house_type_data', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(locationData)
+                });
                 const houseTypeData = await houseTypeResponse.json();
                 if (houseTypeData.success) {
                     console.log('✅ House type listing types loaded:', houseTypeData.listing_types);
@@ -1418,7 +1445,13 @@
                 }
 
                 // Load floor segment listing types
-                const floorSegmentResponse = await fetch('/api/listing_types/floor_segment_data');
+                const floorSegmentResponse = await fetch('/api/listing_types/floor_segment_data', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(locationData)
+                });
                 const floorSegmentData = await floorSegmentResponse.json();
                 if (floorSegmentData.success) {
                     console.log('✅ Floor segment listing types loaded:', floorSegmentData.listing_types);
@@ -1428,7 +1461,13 @@
                 }
 
                 // Load age data listing types
-                const ageDataResponse = await fetch('/api/listing_types/age_data');
+                const ageDataResponse = await fetch('/api/listing_types/age_data', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(locationData)
+                });
                 const ageDataData = await ageDataResponse.json();
                 if (ageDataData.success) {
                     console.log('✅ Age data listing types loaded:', ageDataData.listing_types);
@@ -1438,7 +1477,13 @@
                 }
 
                 // Load heating data listing types
-                const heatingDataResponse = await fetch('/api/listing_types/heating_data');
+                const heatingDataResponse = await fetch('/api/listing_types/heating_data', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(locationData)
+                });
                 const heatingDataData = await heatingDataResponse.json();
                 if (heatingDataData.success) {
                     console.log('✅ Heating data listing types loaded:', heatingDataData.listing_types);
@@ -1447,7 +1492,7 @@
                     console.error('❌ Failed to load heating data listing types:', heatingDataData.error);
                 }
                 
-                console.log('✅ Все listing_type загружены');
+                console.log('✅ Все listing_type загружены для выбранной локации');
             } catch (error) {
                 console.error('❌ Error loading listing types:', error);
             }
@@ -1586,8 +1631,12 @@
             districtSelect.innerHTML = `<option value="">${getText('districtPlaceholder')}</option>`;
             districtSelect.disabled = true;
             
-            // Reset listing type selection
+            // Reset listing type selection and hide section
             resetListingTypeSelection();
+            const listingTypeSection = document.getElementById('listingTypeSection');
+            if (listingTypeSection) {
+                listingTypeSection.style.display = 'none';
+            }
             
             if (countryId) {
                 loadCities(countryId);
@@ -1609,8 +1658,12 @@
             districtSelect.innerHTML = `<option value="">${getText('districtPlaceholder')}</option>`;
             districtSelect.disabled = true;
             
-            // Reset listing type selection
+            // Reset listing type selection and hide section
             resetListingTypeSelection();
+            const listingTypeSection = document.getElementById('listingTypeSection');
+            if (listingTypeSection) {
+                listingTypeSection.style.display = 'none';
+            }
             
             if (cityId) {
                 loadCounties(cityId);
@@ -1629,8 +1682,12 @@
             districtSelect.innerHTML = `<option value="">${getText('districtPlaceholder')}</option>`;
             districtSelect.disabled = true;
             
-            // Reset listing type selection
+            // Reset listing type selection and hide section
             resetListingTypeSelection();
+            const listingTypeSection = document.getElementById('listingTypeSection');
+            if (listingTypeSection) {
+                listingTypeSection.style.display = 'none';
+            }
             
             if (countyId) {
                 loadDistricts(countyId);
@@ -1652,11 +1709,13 @@
             if (districtSelect.value && districtSelect.value !== 'none') {
                 console.log('✅ District selected, showing listing type section and loading types...');
                 listingTypeSection.style.display = 'block';
-                // Load available listing types
+                // Load available listing types for the selected location
                 loadListingTypes();
             } else {
                 console.log('❌ No district selected, hiding listing type section...');
                 listingTypeSection.style.display = 'none';
+                // Reset listing type selection when district is cleared
+                resetListingTypeSelection();
             }
         }
 
