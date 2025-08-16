@@ -755,10 +755,10 @@ def check_and_update_currency_rates():
                 # Конвертируем в datetime объект
                 if isinstance(latest_date, str):
                     latest_date = datetime.fromisoformat(latest_date.replace('Z', '+00:00'))
-                elif hasattr(latest_date, 'replace'):
-                    # Если это datetime с timezone, убираем timezone
-                    if latest_date.tzinfo is not None:
-                        latest_date = latest_date.replace(tzinfo=None)
+                
+                # Проверяем, есть ли timezone и убираем его для сравнения
+                if hasattr(latest_date, 'tzinfo') and latest_date.tzinfo is not None:
+                    latest_date = latest_date.replace(tzinfo=None)
                 
                 current_date = datetime.utcnow()
                 days_difference = (current_date - latest_date).days
@@ -7188,20 +7188,74 @@ def api_region_insights():
         # Получаем OpenAI API ключ из базы данных
         try:
             logger.info("🔍 Ищем OpenAI API ключ в таблице api_keys...")
+            
+            # Сначала проверим, какие таблицы доступны
+            logger.info("🔍 Проверяем доступные таблицы...")
+            try:
+                # Попробуем получить информацию о таблице
+                test_result = supabase.table('api_keys').select('id').limit(1).execute()
+                logger.info(f"📊 Тест таблицы api_keys: {test_result}")
+            except Exception as table_error:
+                logger.error(f"❌ Ошибка доступа к таблице api_keys: {table_error}")
+                # Попробуем другие возможные названия таблиц
+                possible_tables = ['api_keys', 'apikeys', 'api_keys_table', 'keys', 'api_keys_v1']
+                for table_name in possible_tables:
+                    try:
+                        logger.info(f"🔍 Пробуем таблицу: {table_name}")
+                        test_result = supabase.table(table_name).select('id').limit(1).execute()
+                        logger.info(f"✅ Таблица {table_name} доступна")
+                        break
+                    except Exception as e:
+                        logger.info(f"❌ Таблица {table_name} недоступна: {e}")
+                        continue
+            
+            # Попробуем разные варианты запроса
+            logger.info("🔍 Вариант 1: Запрос с select='*'")
             api_key_result = supabase.table('api_keys').select('*').eq('key_name', 'OPENAI_API').execute()
             logger.info(f"📊 Результат запроса API ключа: {api_key_result}")
+            logger.info(f"📊 Тип результата: {type(api_key_result)}")
             logger.info(f"📊 Данные: {api_key_result.data}")
+            logger.info(f"📊 Тип данных: {type(api_key_result.data)}")
             logger.info(f"📊 Количество записей: {len(api_key_result.data) if api_key_result.data else 0}")
             
+            # Проверим, есть ли данные
             if not api_key_result.data or len(api_key_result.data) == 0:
+                logger.warning("⚠️ Первый запрос не дал результатов, пробуем альтернативный...")
+                
+                # Попробуем альтернативный запрос
+                logger.info("🔍 Вариант 2: Запрос с select='key_value'")
+                api_key_result2 = supabase.table('api_keys').select('key_value').eq('key_name', 'OPENAI_API').execute()
+                logger.info(f"📊 Результат альтернативного запроса: {api_key_result2}")
+                logger.info(f"📊 Данные альтернативного запроса: {api_key_result2.data}")
+                
+                if api_key_result2.data and len(api_key_result2.data) > 0:
+                    api_key_result = api_key_result2
+                    logger.info("✅ Альтернативный запрос дал результаты")
+                else:
+                    logger.error("❌ OpenAI API ключ не найден в базе данных")
+                    return jsonify({'success': False, 'error': 'OpenAI API key not found'}), 500
+            
+            # Получаем ключ
+            if api_key_result.data and len(api_key_result.data) > 0:
+                first_record = api_key_result.data[0]
+                logger.info(f"📊 Первая запись: {first_record}")
+                logger.info(f"📊 Ключи записи: {list(first_record.keys()) if first_record else 'None'}")
+                
+                if 'key_value' in first_record:
+                    openai_api_key = first_record['key_value']
+                    logger.info(f"✅ OpenAI API ключ получен из базы данных: {openai_api_key[:20]}...")
+                else:
+                    logger.error(f"❌ Поле 'key_value' не найдено в записи: {first_record}")
+                    return jsonify({'success': False, 'error': 'key_value field not found in record'}), 500
+            else:
                 logger.error("❌ OpenAI API ключ не найден в базе данных")
                 return jsonify({'success': False, 'error': 'OpenAI API key not found'}), 500
-                
-            openai_api_key = api_key_result.data[0]['key_value']
-            logger.info(f"✅ OpenAI API ключ получен из базы данных: {openai_api_key[:20]}...")
             
         except Exception as e:
             logger.error(f"❌ Ошибка получения OpenAI API ключа: {e}")
+            logger.error(f"❌ Тип ошибки: {type(e)}")
+            import traceback
+            logger.error(f"❌ Traceback: {traceback.format_exc()}")
             return jsonify({'success': False, 'error': 'Failed to get OpenAI API key'}), 500
         
         # Формируем промпт на соответствующем языке
@@ -7235,9 +7289,9 @@ def api_region_insights():
         
         try:
             import openai
-            openai.api_key = openai_api_key
+            client = openai.OpenAI(api_key=openai_api_key)
             
-            response = openai.ChatCompletion.create(
+            response = client.chat.completions.create(
                 model="gpt-3.5-turbo",
                 messages=[
                     {"role": "system", "content": "You are a professional real estate analyst. Provide concise, actionable insights based on the data provided."},
@@ -7265,6 +7319,81 @@ def api_region_insights():
             
     except Exception as e:
         logger.error(f"❌ Ошибка API region_insights: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@app.route('/api/test_api_keys', methods=['GET'])
+def api_test_api_keys():
+    """Тестовый endpoint для проверки таблицы api_keys"""
+    try:
+        logger.info("🧪 Тестирование таблицы api_keys")
+        
+        # Проверяем подключение к Supabase
+        logger.info("🔍 Проверяем подключение к Supabase...")
+        try:
+            # Простой тест подключения
+            test_connection = supabase.table('users').select('id').limit(1).execute()
+            logger.info(f"✅ Подключение к Supabase работает: {test_connection}")
+        except Exception as conn_error:
+            logger.error(f"❌ Ошибка подключения к Supabase: {conn_error}")
+            return jsonify({'success': False, 'error': f'Supabase connection failed: {str(conn_error)}'}), 500
+        
+        # Проверяем всю таблицу
+        logger.info("🔍 Проверяем таблицу api_keys...")
+        try:
+            result = supabase.table('api_keys').select('*').execute()
+            logger.info(f"📊 Результат запроса всей таблицы: {result}")
+            logger.info(f"📊 Данные: {result.data}")
+            logger.info(f"📊 Количество записей: {len(result.data) if result.data else 0}")
+            
+            if result.data:
+                logger.info("📋 Все записи в таблице api_keys:")
+                for i, record in enumerate(result.data):
+                    logger.info(f"  Запись {i+1}: {record}")
+            else:
+                logger.warning("⚠️ Таблица api_keys пуста или недоступна")
+                
+        except Exception as table_error:
+            logger.error(f"❌ Ошибка доступа к таблице api_keys: {table_error}")
+            return jsonify({'success': False, 'error': f'Table access failed: {str(table_error)}'}), 500
+        
+        # Проверяем конкретно OPENAI_API
+        logger.info("🔍 Ищем запись с key_name='OPENAI_API'...")
+        try:
+            openai_result = supabase.table('api_keys').select('*').eq('key_name', 'OPENAI_API').execute()
+            logger.info(f"🔍 Результат поиска OPENAI_API: {openai_result}")
+            logger.info(f"🔍 Данные OPENAI_API: {openai_result.data}")
+            
+            if openai_result.data and len(openai_result.data) > 0:
+                logger.info("✅ Запись OPENAI_API найдена")
+                openai_record = openai_result.data[0]
+                logger.info(f"📊 Запись: {openai_record}")
+                logger.info(f"📊 Доступные поля: {list(openai_record.keys())}")
+                
+                if 'key_value' in openai_record:
+                    key_value = openai_record['key_value']
+                    logger.info(f"✅ Поле key_value найдено: {key_value[:20]}...")
+                else:
+                    logger.warning("⚠️ Поле key_value не найдено в записи")
+            else:
+                logger.warning("⚠️ Запись OPENAI_API не найдена")
+                
+        except Exception as search_error:
+            logger.error(f"❌ Ошибка поиска OPENAI_API: {search_error}")
+            return jsonify({'success': False, 'error': f'Search failed: {str(search_error)}'}), 500
+        
+        return jsonify({
+            'success': True,
+            'total_records': len(result.data) if result.data else 0,
+            'all_records': result.data,
+            'openai_records': openai_result.data if 'openai_result' in locals() else [],
+            'message': 'Table api_keys checked successfully'
+        })
+        
+    except Exception as e:
+        logger.error(f"❌ Ошибка тестирования api_keys: {e}")
+        import traceback
+        logger.error(f"❌ Traceback: {traceback.format_exc()}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
 

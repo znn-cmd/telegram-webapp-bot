@@ -1562,7 +1562,7 @@
             });
             document.querySelector(`[data-currency="${currency}"]`).classList.add('active');
             
-            // Recalculate and redisplay all data
+            // Recalculate and redisplay all data (but don't re-fetch insights)
             recalculateAllValues();
         }
 
@@ -1661,7 +1661,7 @@
             // Update key metrics
             updateKeyMetricsCurrency();
             
-            // Update all data tables
+            // Update all data tables (but preserve insights)
             updateDataTablesCurrency();
         }
 
@@ -1682,9 +1682,26 @@
         function updateDataTablesCurrency() {
             console.log('📊 Обновление всех таблиц данных для валюты:', currentCurrency);
             
-            // Пересчитываем и обновляем все таблицы данных
+            // Пересчитываем и обновляем все таблицы данных (но не перезагружаем insights)
             if (window.lastRegionData) {
-                displayRegionData(window.lastRegionData);
+                // Store current insights before updating data
+                const currentInsights = document.getElementById('insightsText')?.textContent || '';
+                const insightsSection = document.getElementById('insightsSection');
+                const wasInsightsVisible = insightsSection.style.display !== 'none';
+                
+                // Update data display without re-fetching insights
+                displayRegionDataWithoutInsights(window.lastRegionData);
+                
+                // Restore insights if they were visible
+                if (wasInsightsVisible && currentInsights) {
+                    const insightsText = document.getElementById('insightsText');
+                    if (insightsText) {
+                        insightsText.textContent = currentInsights;
+                        insightsSection.style.display = 'block';
+                        document.getElementById('insightsLoading').style.display = 'none';
+                        document.getElementById('insightsError').style.display = 'none';
+                    }
+                }
             }
         }
 
@@ -2884,6 +2901,32 @@
             
             // All accordions are collapsed by default after data formation
             // No auto-expansion needed
+        }
+
+        // Display region data without re-fetching insights (for currency changes)
+        function displayRegionDataWithoutInsights(data) {
+            console.log('Displaying region data without re-fetching insights:', data);
+            
+            // Try different possible key names for data
+            const generalData = data.general_data || data.generalData || data.general || data.general_data || [];
+            const houseTypeData = data.house_type_data || data.houseTypeData || data.house_types || data.houseTypes || data.house_type_data || [];
+            const floorSegmentData = data.floor_segment_data || data.floorSegmentData || data.floor_segments || data.floorSegments || data.floor_segment_data || [];
+            const ageData = data.age_data || data.ageData || data.ages || data.age_data || [];
+            const heatingData = data.heating_data || data.heatingData || data.heating || data.heating_data || [];
+            
+            // Fill key metrics with data
+            if (generalData && generalData.length > 0) {
+                fillKeyMetrics(generalData);
+            } else {
+                console.log('No general data available for key metrics');
+            }
+            
+            // Display all data blocks (but don't call getRegionInsights)
+            displayGeneralData(generalData);
+            displayHouseTypeData(houseTypeData);
+            displayFloorSegmentData(floorSegmentData);
+            displayAgeData(ageData);
+            displayHeatingData(heatingData);
         }
 
         // Display general data (structured by priority: sale → rent → yield → other)
