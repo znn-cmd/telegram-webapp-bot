@@ -646,14 +646,9 @@
         .insights-header {
             display: flex;
             align-items: center;
-            gap: 12px;
             margin-bottom: 16px;
             padding-bottom: 12px;
             border-bottom: 1px solid #f0f0f0;
-        }
-        
-        .insights-icon {
-            font-size: 24px;
         }
         
         .insights-title {
@@ -727,6 +722,10 @@
             
             .insights-text {
                 font-size: 14px;
+            }
+            
+            .insights-section {
+                margin: 15px 0;
             }
         }
 
@@ -940,6 +939,26 @@
                 </div>
             </div>
             
+            <!-- AI Insights Section -->
+            <div class="insights-section" id="insightsSection" style="display: none;">
+                <div class="insights-card">
+                    <div class="insights-header">
+                        <div class="insights-title" id="insightsTitle">Вывод</div>
+                    </div>
+                    <div class="insights-content" id="insightsContent">
+                        <div class="insights-loading" id="insightsLoading">
+                            <div class="loading-spinner"></div>
+                            <div class="loading-text" id="insightsLoadingText">Анализируем данные...</div>
+                        </div>
+                        <div class="insights-text" id="insightsText" style="display: none;"></div>
+                        <div class="insights-error" id="insightsError" style="display: none;">
+                            <div class="error-icon">⚠️</div>
+                            <div class="error-text" id="insightsErrorText">Ошибка при анализе данных</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
             <!-- Data Content -->
             <div class="data-content" id="dataContent" style="display: none;">
                                  <!-- General Data -->
@@ -1013,26 +1032,7 @@
                  </div>
             </div>
             
-            <!-- AI Insights Section -->
-            <div class="insights-section" id="insightsSection" style="display: none;">
-                <div class="insights-card">
-                    <div class="insights-header">
-                        <div class="insights-icon">🧠</div>
-                        <div class="insights-title" id="insightsTitle">Вывод</div>
-                    </div>
-                    <div class="insights-content" id="insightsContent">
-                        <div class="insights-loading" id="insightsLoading">
-                            <div class="loading-spinner"></div>
-                            <div class="loading-text" id="insightsLoadingText">Анализируем данные...</div>
-                        </div>
-                        <div class="insights-text" id="insightsText" style="display: none;"></div>
-                        <div class="insights-error" id="insightsError" style="display: none;">
-                            <div class="error-icon">⚠️</div>
-                            <div class="error-text" id="insightsErrorText">Ошибка при анализе данных</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+
             
             <!-- Error State -->
             <div class="error-state" id="errorState" style="display: none;">

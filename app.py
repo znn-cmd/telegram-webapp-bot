@@ -756,7 +756,9 @@ def check_and_update_currency_rates():
                 if isinstance(latest_date, str):
                     latest_date = datetime.fromisoformat(latest_date.replace('Z', '+00:00'))
                 elif hasattr(latest_date, 'replace'):
-                    latest_date = latest_date.replace(tzinfo=None)
+                    # Если это datetime с timezone, убираем timezone
+                    if latest_date.tzinfo is not None:
+                        latest_date = latest_date.replace(tzinfo=None)
                 
                 current_date = datetime.utcnow()
                 days_difference = (current_date - latest_date).days
@@ -7185,13 +7187,18 @@ def api_region_insights():
         
         # Получаем OpenAI API ключ из базы данных
         try:
-            api_key_result = supabase.table('api_keys').select('key_value').eq('key_name', 'OPENAI_API').execute()
-            if not api_key_result.data:
+            logger.info("🔍 Ищем OpenAI API ключ в таблице api_keys...")
+            api_key_result = supabase.table('api_keys').select('*').eq('key_name', 'OPENAI_API').execute()
+            logger.info(f"📊 Результат запроса API ключа: {api_key_result}")
+            logger.info(f"📊 Данные: {api_key_result.data}")
+            logger.info(f"📊 Количество записей: {len(api_key_result.data) if api_key_result.data else 0}")
+            
+            if not api_key_result.data or len(api_key_result.data) == 0:
                 logger.error("❌ OpenAI API ключ не найден в базе данных")
                 return jsonify({'success': False, 'error': 'OpenAI API key not found'}), 500
                 
             openai_api_key = api_key_result.data[0]['key_value']
-            logger.info("✅ OpenAI API ключ получен из базы данных")
+            logger.info(f"✅ OpenAI API ключ получен из базы данных: {openai_api_key[:20]}...")
             
         except Exception as e:
             logger.error(f"❌ Ошибка получения OpenAI API ключа: {e}")
