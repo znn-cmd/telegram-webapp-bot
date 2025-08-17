@@ -3069,80 +3069,25 @@
             filteredTrends.forEach((trend, index) => {
                 console.log(`📊 Processing trend ${index + 1}:`, trend);
                 
-                // Parse prices correctly (handle both dot and comma separators)
-                let salePricePerM2 = 0;
-                let rentPricePerM2 = 0;
+                // TEMPORARILY: Show raw values without calculations
+                const rawSalePrice = trend.unit_price_for_sale || 'N/A';
+                const rawRentPrice = trend.unit_price_for_rent || 'N/A';
                 
-                if (trend.unit_price_for_sale) {
-                    salePricePerM2 = parseFloat(String(trend.unit_price_for_sale).replace(',', '.'));
-                    console.log(`💰 salePricePerM2 parsed:`, { 
-                        original: trend.unit_price_for_sale, 
-                        parsed: salePricePerM2 
-                    });
-                }
-                if (trend.unit_price_for_rent) {
-                    rentPricePerM2 = parseFloat(String(trend.unit_price_for_rent).replace(',', '.'));
-                    console.log(`💰 rentPricePerM2 parsed:`, { 
-                        original: trend.unit_price_for_rent, 
-                        parsed: rentPricePerM2 
-                    });
-                }
-                
-                const totalSalePrice = salePricePerM2 * userArea;
-                const totalRentPrice = rentPricePerM2 * userArea;
-                
-                console.log(`📐 Area calculation:`, { 
-                    salePricePerM2, 
-                    rentPricePerM2, 
-                    userArea, 
-                    totalSalePrice, 
-                    totalRentPrice 
+                console.log(`💰 Raw prices from database:`, { 
+                    salePrice: rawSalePrice,
+                    rentPrice: rawRentPrice,
+                    trend: trend
                 });
-                
-                // Convert prices to user's selected currency if needed
-                let displaySalePrice = totalSalePrice;
-                let displayRentPrice = totalRentPrice;
-                
-                if (exchangeRates && userCurrency !== 'EUR') {
-                    // Convert from EUR (base currency) to user's currency
-                    const rate = exchangeRates[userCurrency];
-                    if (rate) {
-                        displaySalePrice = totalSalePrice * rate;
-                        displayRentPrice = totalRentPrice * rate;
-                        console.log('💱 Currency conversion:', {
-                            from: 'EUR',
-                            to: userCurrency,
-                            rate,
-                            originalSale: totalSalePrice,
-                            convertedSale: displaySalePrice,
-                            originalRent: totalRentPrice,
-                            convertedRent: displayRentPrice
-                        });
-                    }
-                }
                 
                 // For now, don't check current month to avoid errors
                 const rowClass = '';
                 const fontWeight = '';
                 
-                console.log('💰 Price calculation:', {
-                    trend: trend.date,
-                    salePricePerM2,
-                    rentPricePerM2,
-                    userArea,
-                    totalSalePrice,
-                    totalRentPrice,
-                    displaySalePrice,
-                    displayRentPrice,
-                    userCurrency,
-                    trendData: trend
-                });
-                
                 html += `<tr class="${rowClass}" style="${fontWeight}">`;
                 html += `<td>${formatTrendDate(trend.date)}</td>`;
-                html += `<td>${currencySymbol}${formatNumber(displaySalePrice)}</td>`;
+                html += `<td>${rawSalePrice}</td>`; // Raw value
                 html += `<td>${formatPercentage(trend.price_change_sale)}</td>`;
-                html += `<td>${currencySymbol}${formatNumber(displayRentPrice)}</td>`;
+                html += `<td>${rawRentPrice}</td>`; // Raw value
                 html += `<td>${formatPercentage(trend.price_change_rent)}</td>`;
                 html += `<td>${formatPercentage(trend.yield)}</td>`;
                 html += '</tr>';
