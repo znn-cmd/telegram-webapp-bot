@@ -827,6 +827,87 @@
             }
         }
 
+        /* Price and Area Input Styles */
+        .price-area-inputs {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .price-area-inputs input[type="number"] {
+            flex: 1;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            background: white;
+            color: #333;
+        }
+
+        .price-area-inputs input[type="number"]:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
+        }
+
+        .price-area-inputs select {
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            background: white;
+            min-width: 80px;
+            color: #333;
+        }
+
+        .price-area-inputs select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
+        }
+
+        .area-slider-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .area-slider-container input[type="range"] {
+            flex: 1;
+            height: 6px;
+            border-radius: 3px;
+            background: #ddd;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .area-slider-container input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+        }
+
+        .area-slider-container input[type="range"]::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+            border: none;
+        }
+
+        .area-value-display {
+            min-width: 50px;
+            text-align: center;
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+        }
+
         /* Mobile responsive for listing type selection */
         @media (max-width: 480px) {
             .listing-type-section {
@@ -847,6 +928,45 @@
             .listing-type-select {
                 padding: 8px 10px;
                 font-size: 13px;
+            }
+            
+            .price-area-inputs {
+                flex-direction: column;
+                gap: 8px;
+            }
+            
+            .price-area-inputs input[type="number"] {
+                padding: 8px 10px;
+                font-size: 13px;
+            }
+            
+            .price-area-inputs select {
+                padding: 8px 10px;
+                font-size: 13px;
+                min-width: auto;
+            }
+            
+            .area-slider-container {
+                gap: 8px;
+            }
+            
+            .area-slider-container input[type="range"] {
+                height: 5px;
+            }
+            
+            .area-slider-container input[type="range"]::-webkit-slider-thumb {
+                width: 16px;
+                height: 16px;
+            }
+            
+            .area-slider-container input[type="range"]::-moz-range-thumb {
+                width: 16px;
+                height: 16px;
+            }
+            
+            .area-value-display {
+                font-size: 12px;
+                min-width: 45px;
             }
             
             .selected-property-types {
@@ -945,6 +1065,28 @@
                         <select class="listing-type-select" id="heatingDataSelect">
                             <option value="" id="heatingDataPlaceholder">Выберите тип отопления</option>
                         </select>
+                    </div>
+
+                    <!-- Price Object -->
+                    <div class="listing-type-group">
+                        <div class="listing-type-subtitle" id="priceObjectSubtitle">Цена объекта:</div>
+                        <div class="price-area-inputs">
+                            <input type="number" id="priceObjectInput" placeholder="Введите цену">
+                            <select id="currencySelect">
+                                <option value="TRY">🇹🇷 TRY</option>
+                                <option value="EUR">🇪🇺 EUR</option>
+                                <option value="USD">🇺🇸 USD</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Area Object -->
+                    <div class="listing-type-group">
+                        <div class="listing-type-subtitle" id="areaObjectSubtitle">Площадь объекта (м²):</div>
+                        <div class="area-slider-container">
+                            <input type="range" id="areaObjectSlider" min="10" max="1000" value="50">
+                            <span id="areaObjectValue" class="area-value-display">50 м²</span>
+                        </div>
                     </div>
                 </div>
 
@@ -1089,10 +1231,12 @@
                 'floorSegmentSubtitle': 'Этаж:',
                 'ageDataSubtitle': 'Возраст объекта:',
                 'heatingDataSubtitle': 'Тип отопления:',
-                'selectBedrooms': 'Выберите количество спален',
-                'selectFloor': 'Выберите этаж',
-                'selectAge': 'Выберите возраст объекта',
-                'selectHeating': 'Выберите тип отопления',
+                'priceObjectSubtitle': 'Цена объекта:',
+                'areaObjectSubtitle': 'Площадь объекта (м²):',
+                'selectBedrooms': 'количество спален',
+                'selectFloor': 'этаж',
+                'selectAge': 'возраст объекта',
+                'selectHeating': 'тип отопления',
                 'propertyTypesTitle': 'Выбранные характеристики недвижимости:',
                 'bedroomsLabel': 'Количество спален',
                 'floorLabel': 'Этаж',
@@ -1142,10 +1286,12 @@
                 'floorSegmentSubtitle': 'Floor:',
                 'ageDataSubtitle': 'Property age:',
                 'heatingDataSubtitle': 'Heating type:',
-                'selectBedrooms': 'Select bedroom count',
-                'selectFloor': 'Select floor',
-                'selectAge': 'Select property age',
-                'selectHeating': 'Select heating type',
+                'priceObjectSubtitle': 'Property price:',
+                'areaObjectSubtitle': 'Property area (m²):',
+                'selectBedrooms': 'bedroom count',
+                'selectFloor': 'floor',
+                'selectAge': 'property age',
+                'selectHeating': 'heating type',
                 'propertyTypesTitle': 'Selected property characteristics:',
                 'bedroomsLabel': 'Bedroom count',
                 'floorLabel': 'Floor',
@@ -1497,6 +1643,12 @@
             const heatingDataSubtitle = document.getElementById('heatingDataSubtitle');
             if (heatingDataSubtitle) { heatingDataSubtitle.textContent = getText('heatingDataSubtitle'); }
             
+            // Update new fields
+            const priceObjectSubtitle = document.getElementById('priceObjectSubtitle');
+            if (priceObjectSubtitle) { priceObjectSubtitle.textContent = getText('priceObjectSubtitle'); }
+            const areaObjectSubtitle = document.getElementById('areaObjectSubtitle');
+            if (areaObjectSubtitle) { areaObjectSubtitle.textContent = getText('areaObjectSubtitle'); }
+            
             // Update placeholder texts
             const houseTypePlaceholder = document.getElementById('houseTypePlaceholder');
             if (houseTypePlaceholder) { houseTypePlaceholder.textContent = getText('selectBedrooms'); }
@@ -1714,7 +1866,7 @@
             console.log(`🔄 Populating select ${selectId} with ${listingTypes.length} types for category ${category}:`, listingTypes);
             
             // Clear existing options except the first placeholder
-            select.innerHTML = '<option value="">Выберите ' + getSelectPlaceholder(category) + '</option>';
+            select.innerHTML = '<option value="">' + getSelectPlaceholder(category) + '</option>';
             
             listingTypes.forEach(type => {
                 const option = document.createElement('option');
@@ -1732,12 +1884,12 @@
         // Get placeholder text for select dropdowns
         function getSelectPlaceholder(category) {
             const placeholders = {
-                'house_type': getText('selectBedrooms'),
-                'floor_segment': getText('selectFloor'),
-                'age': getText('selectAge'),
-                'heating': getText('selectHeating')
+                'house_type': 'количество спален',
+                'floor_segment': 'этаж',
+                'age': 'возраст объекта',
+                'heating': 'тип отопления'
             };
-            return placeholders[category] || getText('listingTypeTitle');
+            return placeholders[category] || 'тип недвижимости';
         }
 
         // Reset listing type selection
@@ -1746,7 +1898,10 @@
                 house_type: null,
                 floor_segment: null,
                 age: null,
-                heating: null
+                heating: null,
+                price: null,
+                currency: 'EUR',
+                area: 50
             };
             
             // Hide listing type section
@@ -1763,6 +1918,19 @@
                     select.value = '';
                 }
             });
+            
+            // Reset price and area fields
+            const priceInput = document.getElementById('priceObjectInput');
+            const areaSlider = document.getElementById('areaObjectSlider');
+            const areaValue = document.getElementById('areaObjectValue');
+            const currencySelect = document.getElementById('currencySelect');
+            
+            if (priceInput) priceInput.value = '';
+            if (areaSlider) {
+                areaSlider.value = 50;
+                if (areaValue) areaValue.textContent = '50 м²';
+            }
+            if (currencySelect) currencySelect.value = 'EUR';
             
             // Hide selected property types section
             const selectedPropertyTypes = document.getElementById('selectedPropertyTypes');
@@ -1792,7 +1960,9 @@
             const allTypesSelected = selectedListingTypes.house_type && 
                                    selectedListingTypes.floor_segment && 
                                    selectedListingTypes.age && 
-                                   selectedListingTypes.heating;
+                                   selectedListingTypes.heating &&
+                                   selectedListingTypes.price &&
+                                   selectedListingTypes.area;
             
             console.log('🔍 All listing types selected:', allTypesSelected, selectedListingTypes);
             
@@ -1973,7 +2143,9 @@
             const hasSelectedTypes = selectedListingTypes.house_type || 
                                    selectedListingTypes.floor_segment || 
                                    selectedListingTypes.age || 
-                                   selectedListingTypes.heating;
+                                   selectedListingTypes.heating ||
+                                   selectedListingTypes.price ||
+                                   selectedListingTypes.area;
             
             if (hasSelectedTypes) {
                 selectedPropertyTypes.style.display = 'block';
@@ -2016,6 +2188,29 @@
                     `;
                 }
                 
+                if (selectedListingTypes.price) {
+                    const currencySymbols = {
+                        'TRY': '🇹🇷',
+                        'EUR': '🇪🇺',
+                        'USD': '🇺🇸'
+                    };
+                    const currencySymbol = currencySymbols[selectedListingTypes.currency] || '';
+                    html += `
+                        <div class="property-type-item">
+                            <span class="property-type-label">Цена объекта:</span>
+                            <span class="property-type-value">${selectedListingTypes.price} ${currencySymbol} ${selectedListingTypes.currency}</span>
+                        </div>
+                    `;
+                }
+                
+                if (selectedListingTypes.area) {
+                    html += `
+                        <div class="property-type-item">
+                            <span class="property-type-value">Площадь объекта: ${selectedListingTypes.area} м²</span>
+                        </div>
+                    `;
+                }
+                
                 propertyTypesDetails.innerHTML = html;
             } else {
                 selectedPropertyTypes.style.display = 'none';
@@ -2041,13 +2236,17 @@
                 hasAllListingTypes = selectedListingTypes.house_type && 
                                    selectedListingTypes.floor_segment && 
                                    selectedListingTypes.age && 
-                                   selectedListingTypes.heating;
+                                   selectedListingTypes.heating &&
+                                   selectedListingTypes.price &&
+                                   selectedListingTypes.area;
                 
                 console.log('🔍 Checking listing types:', {
                     house_type: selectedListingTypes.house_type,
                     floor_segment: selectedListingTypes.floor_segment,
                     age: selectedListingTypes.age,
                     heating: selectedListingTypes.heating,
+                    price: selectedListingTypes.price,
+                    area: selectedListingTypes.area,
                     hasAllListingTypes: hasAllListingTypes
                 });
             }
@@ -2088,6 +2287,15 @@
             const countyName = countySelect.options[countySelect.selectedIndex].text;
             const districtName = districtSelect.value === 'none' ? 'Не имеет значения' : districtSelect.options[districtSelect.selectedIndex].text;
             
+            // Convert price to EUR if needed
+            let priceInEUR = null;
+            if (selectedListingTypes.price && selectedListingTypes.currency !== 'EUR') {
+                priceInEUR = await convertToEUR(selectedListingTypes.price, selectedListingTypes.currency);
+                console.log(`💰 Price converted: ${selectedListingTypes.price} ${selectedListingTypes.currency} → ${priceInEUR} EUR`);
+            } else if (selectedListingTypes.price) {
+                priceInEUR = selectedListingTypes.price;
+            }
+            
             // Update selected location
             selectedLocation = {
                 country_id: countryId,
@@ -2097,7 +2305,12 @@
                 country_name: countryName,
                 city_name: cityName,
                 county_name: countyName,
-                district_name: districtName
+                district_name: districtName,
+                // Add property details
+                property_price: selectedListingTypes.price,
+                property_price_currency: selectedListingTypes.currency,
+                property_price_eur: priceInEUR,
+                property_area: selectedListingTypes.area
             };
             
             console.log('📍 Selected location for data loading:', {
@@ -2108,7 +2321,11 @@
                 country_name: countryName,
                 city_name: cityName,
                 county_name: countyName,
-                district_name: districtName
+                district_name: districtName,
+                property_price: selectedListingTypes.price,
+                property_price_currency: selectedListingTypes.currency,
+                property_price_eur: priceInEUR,
+                property_area: selectedListingTypes.area
             });
             
             // Display selected location
@@ -2746,10 +2963,73 @@
             window.location.href = '/webapp_main';
         }
 
+        // Function to convert currency to EUR (base currency)
+        async function convertToEUR(amount, fromCurrency) {
+            if (fromCurrency === 'EUR') {
+                return amount;
+            }
+            
+            try {
+                // Get current exchange rates from currency table
+                const response = await fetch('/api/currency/convert', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        amount: amount,
+                        from_currency: fromCurrency,
+                        to_currency: 'EUR'
+                    })
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    return data.converted_amount;
+                } else {
+                    console.error('Currency conversion error:', data.error);
+                    return amount; // Return original amount if conversion fails
+                }
+            } catch (error) {
+                console.error('Error converting currency:', error);
+                return amount; // Return original amount if conversion fails
+            }
+        }
+
         // Initialize page
         function init() {
             updatePageText();
             loadCountries();
+            
+            // Initialize area slider
+            const areaSlider = document.getElementById('areaObjectSlider');
+            const areaValue = document.getElementById('areaObjectValue');
+            
+            if (areaSlider && areaValue) {
+                areaSlider.addEventListener('input', function() {
+                    const value = this.value;
+                    areaValue.textContent = value + ' м²';
+                    selectedListingTypes.area = parseInt(value);
+                    updateConfirmButton();
+                });
+            }
+            
+            // Initialize price input
+            const priceInput = document.getElementById('priceObjectInput');
+            if (priceInput) {
+                priceInput.addEventListener('input', function() {
+                    selectedListingTypes.price = this.value ? parseFloat(this.value) : null;
+                    updateConfirmButton();
+                });
+            }
+            
+            // Initialize currency select
+            const currencySelect = document.getElementById('currencySelect');
+            if (currencySelect) {
+                currencySelect.addEventListener('change', function() {
+                    selectedListingTypes.currency = this.value;
+                });
+            }
         }
 
         // Start initialization when page loads
