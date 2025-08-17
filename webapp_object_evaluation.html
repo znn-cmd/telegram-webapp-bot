@@ -1221,6 +1221,9 @@
         console.log('📜 Script tag loaded');
         console.log('🔍 Document ready state:', document.readyState);
         
+        // Simple test to check if JavaScript is working
+        console.log('🧪 JavaScript test - this should appear in console');
+        
         // Telegram WebApp initialization
         let tg = window.Telegram.WebApp;
         tg.ready();
@@ -1810,52 +1813,33 @@
 
         // Load countries from API
         async function loadCountries() {
-            console.log('🚀 loadCountries() function called');
-            console.log('🔍 Looking for countrySelect element...');
-            
-            const countrySelect = document.getElementById('countrySelect');
-            if (!countrySelect) {
-                console.error('❌ Country select element not found!');
-                console.log('🔍 Available elements with "country" in ID:');
-                document.querySelectorAll('[id*="country"]').forEach(el => {
-                    console.log('  -', el.id, ':', el.tagName, el);
-                });
-                return;
-            }
-            
-            console.log('✅ Country select element found:', countrySelect);
-            
             try {
-                console.log('🔄 Making API request to /api/locations/countries...');
+                console.log('🔄 Loading countries...');
                 const response = await fetch('/api/locations/countries');
-                console.log('📡 Response received:', response);
-                console.log('📊 Response status:', response.status);
-                console.log('📊 Response headers:', response.headers);
-                
                 const data = await response.json();
-                console.log('📊 Countries response data:', data);
+                console.log('📊 Countries response:', data);
                 
-                if (data.success && data.countries) {
-                    console.log('✅ API call successful, processing countries...');
-                    countrySelect.innerHTML = `<option value="">${getText('countryPlaceholder')}</option>`;
-                    
-                    console.log('📍 Adding country options...');
-                    data.countries.forEach((country, index) => {
-                        console.log(`  ${index + 1}. ${country.country_name} (ID: ${country.country_id})`);
-                        const option = document.createElement('option');
-                        option.value = country.country_id;
-                        option.textContent = country.country_name;
-                        countrySelect.appendChild(option);
-                    });
-                    
-                    console.log(`✅ Successfully loaded ${data.countries.length} countries`);
-                    console.log('🔍 Final country select options:', countrySelect.options.length);
+                if (data.success) {
+                    const countrySelect = document.getElementById('countrySelect');
+                    if (countrySelect) {
+                        countrySelect.innerHTML = `<option value="">${getText('countryPlaceholder')}</option>`;
+                        
+                        data.countries.forEach(([id, name]) => {
+                            const option = document.createElement('option');
+                            option.value = id;
+                            option.textContent = name;
+                            countrySelect.appendChild(option);
+                        });
+                        
+                        console.log(`✅ Loaded ${data.countries.length} countries`);
+                    } else {
+                        console.error('❌ Country select element not found');
+                    }
                 } else {
-                    console.error('❌ API call failed or no countries data:', data);
+                    console.error('❌ Failed to load countries:', data.error);
                 }
             } catch (error) {
                 console.error('❌ Error loading countries:', error);
-                console.error('❌ Error stack:', error.stack);
             }
         }
 
@@ -3328,121 +3312,50 @@
 
         // Initialize page
         function init() {
-            console.log('🚀 ========================================');
-            console.log('🚀 INIT FUNCTION CALLED!');
-            console.log('🚀 ========================================');
-            console.log('📍 Current URL:', window.location.href);
-            console.log('🌐 User Agent:', navigator.userAgent);
-            
-            // Check if required elements exist
-            const requiredElements = [
-                'countrySelect', 'citySelect', 'countySelect', 'districtSelect',
-                'areaObjectSlider', 'areaObjectValue', 'priceObjectInput', 'currencySelect'
-            ];
-            
-            console.log('🔍 Checking required elements...');
-            const missingElements = requiredElements.filter(id => !document.getElementById(id));
-            if (missingElements.length > 0) {
-                console.warn('⚠️ Missing elements:', missingElements);
-            } else {
-                console.log('✅ All required elements found');
-            }
+            console.log('🚀 Initializing page...');
             
             try {
-                console.log('🔄 Calling updatePageText()...');
                 updatePageText();
-                console.log('✅ updatePageText() completed');
-                
-                console.log('🔄 Calling loadCountries()...');
                 loadCountries();
-                console.log('✅ loadCountries() called');
+                
+                // Initialize area slider
+                const areaSlider = document.getElementById('areaObjectSlider');
+                const areaValue = document.getElementById('areaObjectValue');
+                
+                if (areaSlider && areaValue) {
+                    areaSlider.addEventListener('input', function() {
+                        const value = this.value;
+                        areaValue.textContent = value + ' м²';
+                        selectedListingTypes.area = parseInt(value);
+                        updateConfirmButton();
+                    });
+                }
+                
+                // Initialize price input
+                const priceInput = document.getElementById('priceObjectInput');
+                if (priceInput) {
+                    priceInput.addEventListener('input', function() {
+                        selectedListingTypes.price = this.value ? parseFloat(this.value) : null;
+                        updateConfirmButton();
+                    });
+                }
+                
+                // Initialize currency select
+                const currencySelect = document.getElementById('currencySelect');
+                if (currencySelect) {
+                    currencySelect.addEventListener('change', function() {
+                        selectedListingTypes.currency = this.value;
+                    });
+                }
+                
+                console.log('✅ Page initialization complete');
             } catch (error) {
                 console.error('❌ Error during initialization:', error);
             }
-            
-            // Initialize area slider
-            const areaSlider = document.getElementById('areaObjectSlider');
-            const areaValue = document.getElementById('areaObjectValue');
-            
-            if (areaSlider && areaValue) {
-                areaSlider.addEventListener('input', function() {
-                    const value = this.value;
-                    areaValue.textContent = value + ' м²';
-                    selectedListingTypes.area = parseInt(value);
-                    updateConfirmButton();
-                });
-                console.log('✅ Area slider initialized');
-            } else {
-                console.warn('⚠️ Area slider elements not found');
-            }
-            
-            // Initialize price input
-            const priceInput = document.getElementById('priceObjectInput');
-            if (priceInput) {
-                priceInput.addEventListener('input', function() {
-                    selectedListingTypes.price = this.value ? parseFloat(this.value) : null;
-                    updateConfirmButton();
-                });
-                console.log('✅ Price input initialized');
-            } else {
-                console.warn('⚠️ Price input element not found');
-            }
-            
-            // Initialize currency select
-            const currencySelect = document.getElementById('currencySelect');
-            if (currencySelect) {
-                currencySelect.addEventListener('change', function() {
-                    selectedListingTypes.currency = this.value;
-                });
-                console.log('✅ Currency select initialized');
-            } else {
-                console.warn('⚠️ Currency select element not found');
-            }
-            
-            console.log('✅ ========================================');
-            console.log('✅ PAGE INITIALIZATION COMPLETE!');
-            console.log('✅ ========================================');
         }
 
         // Start initialization when page loads
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('📄 DOMContentLoaded event fired');
-            try {
-                init();
-            } catch (error) {
-                console.error('❌ Error in DOMContentLoaded handler:', error);
-                console.error('❌ Error stack:', error.stack);
-            }
-        });
-        
-        // Also try to initialize when window loads
-        window.addEventListener('load', function() {
-            console.log('🌐 Window load event fired');
-            if (document.readyState === 'complete') {
-                console.log('📄 Document is complete, calling init()');
-                try {
-                    init();
-                } catch (error) {
-                    console.error('❌ Error in window load handler:', error);
-                    console.error('❌ Error stack:', error.stack);
-                }
-            }
-        });
-        
-        // Test function to check if JavaScript is working
-        function testJavaScript() {
-            console.log('🧪 Test function called - JavaScript is working!');
-            const countrySelect = document.getElementById('countrySelect');
-            if (countrySelect) {
-                console.log('✅ countrySelect element found:', countrySelect);
-                console.log('📍 Current options:', countrySelect.options.length);
-            } else {
-                console.error('❌ countrySelect element NOT found!');
-            }
-        }
-        
-        // Call test function immediately
-        testJavaScript();
+        document.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
 </html>
