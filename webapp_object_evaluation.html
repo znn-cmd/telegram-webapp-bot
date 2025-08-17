@@ -2997,7 +2997,10 @@
 
         // Generate detailed trends table
         async function generateTrendsTable(trends) {
+            console.log('🚀 generateTrendsTable START - trends:', trends);
+            
             if (!trends || trends.length === 0) {
+                console.log('❌ No trends provided to generateTrendsTable');
                 return '<div class="no-data">' + getText('noDataMessage') + '</div>';
             }
             
@@ -3006,6 +3009,7 @@
             const userCurrency = selectedListingTypes.currency || 'EUR';
             
             console.log('🔍 generateTrendsTable called with:', { userArea, userCurrency, trendsCount: trends.length });
+            console.log('📊 selectedListingTypes:', selectedListingTypes);
             
             // Currency symbols
             const currencySymbols = {
@@ -3062,20 +3066,38 @@
             html += '<th>' + getText('tableYieldHeader') + '</th>';
             html += '</tr></thead><tbody>';
             
-            filteredTrends.forEach(trend => {
+            filteredTrends.forEach((trend, index) => {
+                console.log(`📊 Processing trend ${index + 1}:`, trend);
+                
                 // Parse prices correctly (handle both dot and comma separators)
                 let salePricePerM2 = 0;
                 let rentPricePerM2 = 0;
                 
                 if (trend.unit_price_for_sale) {
                     salePricePerM2 = parseFloat(String(trend.unit_price_for_sale).replace(',', '.'));
+                    console.log(`💰 salePricePerM2 parsed:`, { 
+                        original: trend.unit_price_for_sale, 
+                        parsed: salePricePerM2 
+                    });
                 }
                 if (trend.unit_price_for_rent) {
                     rentPricePerM2 = parseFloat(String(trend.unit_price_for_rent).replace(',', '.'));
+                    console.log(`💰 rentPricePerM2 parsed:`, { 
+                        original: trend.unit_price_for_rent, 
+                        parsed: rentPricePerM2 
+                    });
                 }
                 
                 const totalSalePrice = salePricePerM2 * userArea;
                 const totalRentPrice = rentPricePerM2 * userArea;
+                
+                console.log(`📐 Area calculation:`, { 
+                    salePricePerM2, 
+                    rentPricePerM2, 
+                    userArea, 
+                    totalSalePrice, 
+                    totalRentPrice 
+                });
                 
                 // Convert prices to user's selected currency if needed
                 let displaySalePrice = totalSalePrice;
@@ -3127,6 +3149,7 @@
             });
             
             html += '</tbody></table>';
+            console.log('✅ generateTrendsTable completed, returning HTML');
             return html;
         }
         
