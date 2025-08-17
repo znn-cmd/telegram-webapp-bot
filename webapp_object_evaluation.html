@@ -1659,26 +1659,43 @@
 
         // Get localized text
         function getText(key) {
-            return locales[currentLanguage][key] || key;
+            const text = locales[currentLanguage][key] || key;
+            console.log(`🌐 getText('${key}') = '${text}' (language: ${currentLanguage})`);
+            return text;
         }
 
         // Update page text based on current language
         function updatePageText() {
-            document.getElementById('slogan').textContent = getText('slogan');
-            document.getElementById('pageTitle').textContent = getText('pageTitle');
-            document.getElementById('pageDescription').textContent = getText('pageDescription');
-            document.getElementById('countryLabel').textContent = getText('countryLabel');
-            document.getElementById('cityLabel').textContent = getText('cityLabel');
-            document.getElementById('countyLabel').textContent = getText('countyLabel');
-            document.getElementById('districtLabel').textContent = getText('districtLabel');
-            document.getElementById('countryPlaceholder').textContent = getText('countryPlaceholder');
-            document.getElementById('cityPlaceholder').textContent = getText('cityPlaceholder');
-            document.getElementById('countyPlaceholder').textContent = getText('countyPlaceholder');
-            document.getElementById('districtPlaceholder').textContent = getText('districtPlaceholder');
-            document.getElementById('confirmButtonText').textContent = getText('confirmButtonText');
-            document.getElementById('backButton').textContent = getText('backButton');
-            document.getElementById('selectedLocationTitle').textContent = getText('selectedLocationTitle');
-            document.getElementById('adminIdsTitle').textContent = getText('adminIdsTitle');
+            console.log('🔄 Updating page text...');
+            
+            // Check if elements exist before updating
+            const elements = {
+                'slogan': document.getElementById('slogan'),
+                'pageTitle': document.getElementById('pageTitle'),
+                'pageDescription': document.getElementById('pageDescription'),
+                'countryLabel': document.getElementById('countryLabel'),
+                'cityLabel': document.getElementById('cityLabel'),
+                'countyLabel': document.getElementById('countyLabel'),
+                'districtLabel': document.getElementById('districtLabel'),
+                'countryPlaceholder': document.getElementById('countryPlaceholder'),
+                'cityPlaceholder': document.getElementById('cityPlaceholder'),
+                'countyPlaceholder': document.getElementById('countyPlaceholder'),
+                'districtPlaceholder': document.getElementById('districtPlaceholder'),
+                'confirmButtonText': document.getElementById('confirmButtonText'),
+                'backButton': document.getElementById('backButton'),
+                'selectedLocationTitle': document.getElementById('selectedLocationTitle'),
+                'adminIdsTitle': document.getElementById('adminIdsTitle')
+            };
+            
+            // Update text for existing elements
+            Object.entries(elements).forEach(([key, element]) => {
+                if (element) {
+                    element.textContent = getText(key);
+                    console.log(`✅ Updated ${key}: ${element.textContent}`);
+                } else {
+                    console.error(`❌ Element not found: ${key}`);
+                }
+            });
             
             // Update new data section elements
             const dataSectionTitle = document.getElementById('dataSectionTitle');
@@ -1810,30 +1827,72 @@
         // Load countries from API
         async function loadCountries() {
             try {
+                console.log('🔄 Loading countries from API...');
                 const response = await fetch('/api/locations/countries');
                 const data = await response.json();
+                console.log('📊 Countries API response:', data);
                 
-                if (data.success) {
+                if (data.success && data.countries) {
                     const countrySelect = document.getElementById('countrySelect');
-                    countrySelect.innerHTML = `<option value="">${getText('countryPlaceholder')}</option>`;
+                    if (!countrySelect) {
+                        console.error('❌ Country select element not found');
+                        return;
+                    }
                     
-                    data.countries.forEach(([id, name]) => {
-                        const option = document.createElement('option');
-                        option.value = id;
-                        option.textContent = name;
-                        countrySelect.appendChild(option);
+                    console.log('📍 Found country select, populating with', data.countries.length, 'countries');
+                    console.log('📍 Countries data structure:', data.countries);
+                    
+                    // Clear existing options
+                    countrySelect.innerHTML = '';
+                    
+                    // Add placeholder
+                    const placeholderOption = document.createElement('option');
+                    placeholderOption.value = '';
+                    placeholderOption.textContent = getText('countryPlaceholder');
+                    countrySelect.appendChild(placeholderOption);
+                    console.log(`✅ Added placeholder: ${getText('countryPlaceholder')}`);
+                    
+                    // Add countries
+                    data.countries.forEach((country, index) => {
+                        console.log(`📍 Processing country ${index}:`, country);
+                        
+                        let id, name;
+                        if (Array.isArray(country)) {
+                            [id, name] = country;
+                        } else if (typeof country === 'object') {
+                            id = country.country_id || country.id;
+                            name = country.country_name || country.name;
+                        } else {
+                            console.error(`❌ Invalid country format:`, country);
+                            return;
+                        }
+                        
+                        if (id && name) {
+                            const option = document.createElement('option');
+                            option.value = id;
+                            option.textContent = name;
+                            countrySelect.appendChild(option);
+                            console.log(`✅ Added country: ${id} - ${name}`);
+                        } else {
+                            console.error(`❌ Invalid country data: id=${id}, name=${name}`);
+                        }
                     });
+                    
+                    console.log('✅ Countries loaded successfully');
+                    console.log('📍 Final country select options:', countrySelect.options.length);
                 } else {
-                    console.error('Failed to load countries:', data.error);
+                    console.error('❌ Failed to load countries:', data.error || 'No countries data');
+                    console.log('📍 Full API response:', data);
                 }
             } catch (error) {
-                console.error('Error loading countries:', error);
+                console.error('❌ Error loading countries:', error);
             }
         }
 
         // Load cities based on selected country
         async function loadCities(countryId) {
             try {
+                console.log('🔄 Loading cities for country_id:', countryId);
                 const response = await fetch('/api/locations/cities', {
                     method: 'POST',
                     headers: {
@@ -1843,30 +1902,57 @@
                 });
                 
                 const data = await response.json();
+                console.log('📊 Cities API response:', data);
                 
-                if (data.success) {
+                if (data.success && data.cities) {
                     const citySelect = document.getElementById('citySelect');
+                    if (!citySelect) {
+                        console.error('❌ City select element not found');
+                        return;
+                    }
+                    
+                    console.log('📍 Found city select, populating with', data.cities.length, 'cities');
                     citySelect.innerHTML = `<option value="">${getText('cityPlaceholder')}</option>`;
                     
-                    data.cities.forEach(([id, name]) => {
-                        const option = document.createElement('option');
-                        option.value = id;
-                        option.textContent = name;
-                        citySelect.appendChild(option);
+                    data.cities.forEach((city, index) => {
+                        console.log(`📍 Processing city ${index}:`, city);
+                        
+                        let id, name;
+                        if (Array.isArray(city)) {
+                            [id, name] = city;
+                        } else if (typeof city === 'object') {
+                            id = city.city_id || city.id;
+                            name = city.city_name || city.name;
+                        } else {
+                            console.error(`❌ Invalid city format:`, city);
+                            return;
+                        }
+                        
+                        if (id && name) {
+                            const option = document.createElement('option');
+                            option.value = id;
+                            option.textContent = name;
+                            citySelect.appendChild(option);
+                            console.log(`✅ Added city: ${id} - ${name}`);
+                        } else {
+                            console.error(`❌ Invalid city data: id=${id}, name=${name}`);
+                        }
                     });
                     
                     citySelect.disabled = false;
+                    console.log('✅ Cities loaded, city select enabled');
                 } else {
-                    console.error('Failed to load cities:', data.error);
+                    console.error('❌ Failed to load cities:', data.error || 'No cities data');
                 }
             } catch (error) {
-                console.error('Error loading cities:', error);
+                console.error('❌ Error loading cities:', error);
             }
         }
 
         // Load counties based on selected city
         async function loadCounties(cityId) {
             try {
+                console.log('🔄 Loading counties for city_id:', cityId);
                 const response = await fetch('/api/locations/counties', {
                     method: 'POST',
                     headers: {
@@ -1876,24 +1962,50 @@
                 });
                 
                 const data = await response.json();
+                console.log('📊 Counties API response:', data);
                 
-                if (data.success) {
+                if (data.success && data.counties) {
                     const countySelect = document.getElementById('countySelect');
+                    if (!countySelect) {
+                        console.error('❌ County select element not found');
+                        return;
+                    }
+                    
+                    console.log('📍 Found county select, populating with', data.counties.length, 'counties');
                     countySelect.innerHTML = `<option value="">${getText('countyPlaceholder')}</option>`;
                     
-                    data.counties.forEach(([id, name]) => {
-                        const option = document.createElement('option');
-                        option.value = id;
-                        option.textContent = name;
-                        countySelect.appendChild(option);
+                    data.counties.forEach((county, index) => {
+                        console.log(`📍 Processing county ${index}:`, county);
+                        
+                        let id, name;
+                        if (Array.isArray(county)) {
+                            [id, name] = county;
+                        } else if (typeof county === 'object') {
+                            id = county.county_id || county.id;
+                            name = county.county_name || county.name;
+                        } else {
+                            console.error(`❌ Invalid county format:`, county);
+                            return;
+                        }
+                        
+                        if (id && name) {
+                            const option = document.createElement('option');
+                            option.value = id;
+                            option.textContent = name;
+                            countySelect.appendChild(option);
+                            console.log(`✅ Added county: ${id} - ${name}`);
+                        } else {
+                            console.error(`❌ Invalid county data: id=${id}, name=${name}`);
+                        }
                     });
                     
                     countySelect.disabled = false;
+                    console.log('✅ Counties loaded, county select enabled');
                 } else {
-                    console.error('Failed to load cities:', data.error);
+                    console.error('❌ Failed to load counties:', data.error || 'No counties data');
                 }
             } catch (error) {
-                console.error('Error loading cities:', error);
+                console.error('❌ Error loading counties:', error);
             }
         }
 
@@ -2141,11 +2253,29 @@
                     districtSelect.appendChild(noDistrictOption);
                     
                     console.log('📍 Adding districts:', data.districts);
-                    data.districts.forEach(([id, name]) => {
-                        const option = document.createElement('option');
-                        option.value = id;
-                        option.textContent = name;
-                        districtSelect.appendChild(option);
+                    data.districts.forEach((district, index) => {
+                        console.log(`📍 Processing district ${index}:`, district);
+                        
+                        let id, name;
+                        if (Array.isArray(district)) {
+                            [id, name] = district;
+                        } else if (typeof district === 'object') {
+                            id = district.district_id || district.id;
+                            name = district.district_name || district.name;
+                        } else {
+                            console.error(`❌ Invalid district format:`, district);
+                            return;
+                        }
+                        
+                        if (id && name) {
+                            const option = document.createElement('option');
+                            option.value = id;
+                            option.textContent = name;
+                            districtSelect.appendChild(option);
+                            console.log(`✅ Added district: ${id} - ${name}`);
+                        } else {
+                            console.error(`❌ Invalid district data: id=${id}, name=${name}`);
+                        }
                     });
                     
                     districtSelect.disabled = false;
@@ -3273,7 +3403,32 @@
 
         // Initialize page
         function init() {
+            console.log('🚀 Initializing page...');
+            
+            // Check if all required elements exist
+            const requiredElements = [
+                'countrySelect', 'citySelect', 'countySelect', 'districtSelect',
+                'slogan', 'pageTitle', 'pageDescription'
+            ];
+            
+            const missingElements = [];
+            requiredElements.forEach(id => {
+                const element = document.getElementById(id);
+                if (!element) {
+                    missingElements.push(id);
+                } else {
+                    console.log(`✅ Found element: ${id}`);
+                }
+            });
+            
+            if (missingElements.length > 0) {
+                console.error('❌ Missing elements:', missingElements);
+                return;
+            }
+            
+            console.log('✅ All required elements found, proceeding with initialization...');
             updatePageText();
+            console.log('🔄 Loading countries...');
             loadCountries();
             
             // Initialize area slider
