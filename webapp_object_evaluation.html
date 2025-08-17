@@ -2908,7 +2908,18 @@
             }
             
             // Calculate market price for user's property
-            const marketPricePerM2 = currentTrend.unit_price_for_sale || 0;
+            // Try different possible field names for sale price
+            const possibleSaleFields = ['unit_price_for_sale', 'sale_price', 'price_for_sale', 'unit_price_sale', 'price_sale', 'trend_value'];
+            let marketPricePerM2 = 0;
+            
+            for (const field of possibleSaleFields) {
+                if (currentTrend[field] !== undefined && currentTrend[field] !== null && currentTrend[field] !== 0) {
+                    marketPricePerM2 = parseFloat(currentTrend[field]);
+                    console.log(`✅ Found market price in field '${field}':`, marketPricePerM2);
+                    break;
+                }
+            }
+            
             const userArea = selectedListingTypes.area || 0;
             const marketPriceTotal = marketPricePerM2 * userArea;
             
@@ -2969,13 +2980,19 @@
 
         // Generate detailed trends table
         function generateTrendsTable(trends) {
+            console.log('🚀 generateTrendsTable START - trends:', trends);
+            
             if (!trends || trends.length === 0) {
+                console.log('❌ No trends provided to generateTrendsTable');
                 return '<div class="no-data">' + getText('noDataMessage') + '</div>';
             }
             
             // Get user's area and currency
             const userArea = selectedListingTypes.area || 0;
             const userCurrency = selectedListingTypes.currency || 'EUR';
+            
+            console.log('🔍 generateTrendsTable called with:', { userArea, userCurrency, trendsCount: trends.length });
+            console.log('📊 selectedListingTypes:', selectedListingTypes);
             
             // Currency symbols
             const currencySymbols = {
@@ -2997,20 +3014,45 @@
             
             trends.forEach(trend => {
                 // Calculate total prices for user's property
-                // Use specific fields for sale and rent prices
-                const salePricePerM2 = trend.unit_price_for_sale || 0;
-                const rentPricePerM2 = trend.unit_price_for_rent || 0;
+                // Debug: Log all available fields in the trend object
+                console.log('🔍 All available fields in trend:', Object.keys(trend));
+                console.log('🔍 All field values:', trend);
+                
+                // Try different possible field names for sale and rent prices
+                const possibleSaleFields = ['unit_price_for_sale'];
+                const possibleRentFields = ['unit_price_for_rent'];
+                
+                let salePricePerM2 = 0;
+                let rentPricePerM2 = 0;
+                
+                // Find sale price field
+                for (const field of possibleSaleFields) {
+                    if (trend[field] !== undefined && trend[field] !== null && trend[field] !== 0) {
+                        salePricePerM2 = parseFloat(trend[field]);
+                        console.log(`✅ Found sale price in field '${field}':`, salePricePerM2);
+                        break;
+                    }
+                }
+                
+                // Find rent price field
+                for (const field of possibleRentFields) {
+                    if (trend[field] !== undefined && trend[field] !== null && trend[field] !== 0) {
+                        rentPricePerM2 = parseFloat(trend[field]);
+                        console.log(`✅ Found rent price in field '${field}':`, rentPricePerM2);
+                        break;
+                    }
+                }
+                
                 const totalSalePrice = salePricePerM2 * userArea;
                 const totalRentPrice = rentPricePerM2 * userArea;
                 
-                console.log('💰 Price calculation:', {
+                console.log('💰 Final price calculation:', {
                     trend: trend.date,
                     salePricePerM2,
                     rentPricePerM2,
                     userArea,
                     totalSalePrice,
-                    totalRentPrice,
-                    trendData: trend
+                    totalRentPrice
                 });
                 
                 html += '<tr>';
