@@ -978,7 +978,7 @@
             }
         }
 
-        /* Mobile responsive for listing type selection */
+        /* Mobile responsive for currency selector */
         @media (max-width: 480px) {
             .currency-selector {
                 padding: 15px;
@@ -1008,6 +1008,10 @@
             .currency-code {
                 font-size: 11px;
             }
+        }
+
+        /* Mobile responsive for listing type selection */
+        @media (max-width: 480px) {
             .listing-type-section {
                 padding: 12px;
                 margin: 12px 0;
@@ -1326,7 +1330,6 @@
                 'tableSaleCountHeader': 'Количество продаж',
                 'tableRentCountHeader': 'Количество аренд',
                 'noDataMessage': 'Нет данных для отображения',
-                'noDistrictOption': 'Не имеет значения',
                 'displayCurrencyTitle': 'Валюта отображения:',
                 'currencyTRY': 'Лира',
                 'currencyUSD': 'Доллар',
@@ -1404,7 +1407,6 @@
                 'tableSaleCountHeader': 'Sale Count',
                 'tableRentCountHeader': 'Rent Count',
                 'noDataMessage': 'No data to display',
-                'noDistrictOption': 'No value',
                 'displayCurrencyTitle': 'Display currency:',
                 'currencyTRY': 'Lira',
                 'currencyUSD': 'Dollar',
@@ -1888,10 +1890,10 @@
                     
                     countySelect.disabled = false;
                 } else {
-                    console.error('Failed to load counties:', data.error);
+                    console.error('Failed to load cities:', data.error);
                 }
             } catch (error) {
-                console.error('Error loading counties:', error);
+                console.error('Error loading cities:', error);
             }
         }
 
@@ -2114,6 +2116,8 @@
 
         // Load districts based on selected county
         async function loadDistricts(countyId) {
+            console.log('🔄 Loading districts for county_id:', countyId);
+            
             try {
                 const response = await fetch('/api/locations/districts', {
                     method: 'POST',
@@ -2124,17 +2128,19 @@
                 });
                 
                 const data = await response.json();
+                console.log('📊 Districts API response:', data);
                 
                 if (data.success) {
                     const districtSelect = document.getElementById('districtSelect');
                     districtSelect.innerHTML = `<option value="">${getText('districtPlaceholder')}</option>`;
                     
-                    // Add "No value" option
-                    const noValueOption = document.createElement('option');
-                    noValueOption.value = 'none';
-                    noValueOption.textContent = 'Не имеет значения';
-                    districtSelect.appendChild(noValueOption);
+                    // Add "не имеет значения" option
+                    const noDistrictOption = document.createElement('option');
+                    noDistrictOption.value = 'none';
+                    noDistrictOption.textContent = 'Не имеет значения';
+                    districtSelect.appendChild(noDistrictOption);
                     
+                    console.log('📍 Adding districts:', data.districts);
                     data.districts.forEach(([id, name]) => {
                         const option = document.createElement('option');
                         option.value = id;
@@ -2143,15 +2149,16 @@
                     });
                     
                     districtSelect.disabled = false;
+                    console.log('✅ Districts loaded, district select enabled');
                 } else {
-                    console.error('Failed to load districts:', data.error);
+                    console.error('❌ Failed to load districts:', data.error);
                 }
             } catch (error) {
-                console.error('Error loading districts:', error);
+                console.error('❌ Error loading districts:', error);
             }
         }
 
-        // Handle country selection change
+        // Event handlers for location changes
         function onCountryChange() {
             const countrySelect = document.getElementById('countrySelect');
             const citySelect = document.getElementById('citySelect');
@@ -2159,7 +2166,6 @@
             const districtSelect = document.getElementById('districtSelect');
             
             const countryId = countrySelect.value;
-            const countryName = countrySelect.options[countrySelect.selectedIndex].text;
             
             // Reset dependent selects
             citySelect.innerHTML = `<option value="">${getText('cityPlaceholder')}</option>`;
@@ -2169,17 +2175,13 @@
             districtSelect.innerHTML = `<option value="">${getText('districtPlaceholder')}</option>`;
             districtSelect.disabled = true;
             
-            // Update selected location
-            selectedLocation.country_id = countryId;
-            selectedLocation.country_name = countryName;
-            selectedLocation.city_id = null;
-            selectedLocation.city_name = '';
-            selectedLocation.county_id = null;
-            selectedLocation.county_name = '';
-            selectedLocation.district_id = null;
-            selectedLocation.district_name = '';
+            // Reset listing type selection and hide section
+            resetListingTypeSelection();
+            const listingTypeSection = document.getElementById('listingTypeSection');
+            if (listingTypeSection) {
+                listingTypeSection.style.display = 'none';
+            }
             
-            // Load cities if country is selected
             if (countryId) {
                 loadCities(countryId);
             }
@@ -2187,14 +2189,12 @@
             updateConfirmButton();
         }
 
-        // Handle city selection change
         function onCityChange() {
             const citySelect = document.getElementById('citySelect');
             const countySelect = document.getElementById('countySelect');
             const districtSelect = document.getElementById('districtSelect');
             
             const cityId = citySelect.value;
-            const cityName = citySelect.options[citySelect.selectedIndex].text;
             
             // Reset dependent selects
             countySelect.innerHTML = `<option value="">${getText('countyPlaceholder')}</option>`;
@@ -2202,15 +2202,13 @@
             districtSelect.innerHTML = `<option value="">${getText('districtPlaceholder')}</option>`;
             districtSelect.disabled = true;
             
-            // Update selected location
-            selectedLocation.city_id = cityId;
-            selectedLocation.city_name = cityName;
-            selectedLocation.county_id = null;
-            selectedLocation.county_name = '';
-            selectedLocation.district_id = null;
-            selectedLocation.district_name = '';
+            // Reset listing type selection and hide section
+            resetListingTypeSelection();
+            const listingTypeSection = document.getElementById('listingTypeSection');
+            if (listingTypeSection) {
+                listingTypeSection.style.display = 'none';
+            }
             
-            // Load counties if city is selected
             if (cityId) {
                 loadCounties(cityId);
             }
@@ -2218,43 +2216,58 @@
             updateConfirmButton();
         }
 
-        // Handle county selection change
         function onCountyChange() {
+            console.log('🔄 County changed, starting onCountyChange function...');
+            
             const countySelect = document.getElementById('countySelect');
             const districtSelect = document.getElementById('districtSelect');
             
             const countyId = countySelect.value;
-            const countyName = countySelect.options[countySelect.selectedIndex].text;
+            console.log('📍 Selected county_id:', countyId);
             
             // Reset dependent selects
             districtSelect.innerHTML = `<option value="">${getText('districtPlaceholder')}</option>`;
             districtSelect.disabled = true;
+            console.log('🔄 Reset district select');
             
-            // Update selected location
-            selectedLocation.county_id = countyId;
-            selectedLocation.county_name = countyName;
-            selectedLocation.district_id = null;
-            selectedLocation.district_name = '';
+            // Reset listing type selection and hide section
+            resetListingTypeSelection();
+            const listingTypeSection = document.getElementById('listingTypeSection');
+            if (listingTypeSection) {
+                listingTypeSection.style.display = 'none';
+            }
             
-            // Load districts if county is selected
             if (countyId) {
+                console.log('✅ County selected, loading districts for county_id:', countyId);
                 loadDistricts(countyId);
+            } else {
+                console.log('❌ No county selected');
             }
             
             updateConfirmButton();
         }
 
-        // Handle district selection change
         function onDistrictChange() {
-            const districtSelect = document.getElementById('districtSelect');
-            const districtId = districtSelect.value;
-            const districtName = districtSelect.options[districtSelect.selectedIndex].text;
-            
-            // Update selected location
-            selectedLocation.district_id = districtId === 'none' ? null : districtId;
-            selectedLocation.district_name = districtId === 'none' ? 'Не имеет значения' : districtName;
-            
+            console.log('🔄 District changed, updating confirm button...');
             updateConfirmButton();
+            
+            // Show listing type selection section when district is selected
+            const districtSelect = document.getElementById('districtSelect');
+            const listingTypeSection = document.getElementById('listingTypeSection');
+            
+            console.log('📍 District value:', districtSelect.value);
+            
+            if (districtSelect.value && districtSelect.value !== 'none') {
+                console.log('✅ District selected, showing listing type section and loading types...');
+                listingTypeSection.style.display = 'block';
+                // Load available listing types for the selected location
+                loadListingTypes();
+            } else {
+                console.log('❌ No district selected, hiding listing type section...');
+                listingTypeSection.style.display = 'none';
+                // Reset listing type selection when district is cleared
+                resetListingTypeSelection();
+            }
         }
 
         // Update selected property types display
@@ -2356,20 +2369,120 @@
             const hasCounty = countySelect.value;
             const hasDistrict = districtSelect.value && districtSelect.value !== '';
             
+            // Check if all listing types are selected (only if district is selected and not "none")
+            let hasAllListingTypes = true;
+            if (hasDistrict && districtSelect.value !== 'none') {
+                hasAllListingTypes = selectedListingTypes.house_type && 
+                                   selectedListingTypes.floor_segment && 
+                                   selectedListingTypes.age && 
+                                   selectedListingTypes.heating &&
+                                   selectedListingTypes.price &&
+                                   selectedListingTypes.area;
+                
+                console.log('🔍 Checking listing types:', {
+                    house_type: selectedListingTypes.house_type,
+                    floor_segment: selectedListingTypes.floor_segment,
+                    age: selectedListingTypes.age,
+                    heating: selectedListingTypes.heating,
+                    price: selectedListingTypes.price,
+                    area: selectedListingTypes.area,
+                    hasAllListingTypes: hasAllListingTypes
+                });
+            }
+            
             // Button is enabled if all location fields are filled
-            confirmButton.disabled = !(hasCountry && hasCity && hasCounty && hasDistrict);
+            // For listing types: if district is "none", no listing types required
+            // If district is selected, all listing types are required
+            const isDisabled = !(hasCountry && hasCity && hasCounty && hasDistrict) || 
+                              (hasDistrict && districtSelect.value !== 'none' && !hasAllListingTypes);
+            
+            confirmButton.disabled = isDisabled;
+            
+            console.log('🔘 Confirm button state:', {
+                hasCountry, hasCity, hasCounty, hasDistrict,
+                districtValue: districtSelect.value,
+                hasAllListingTypes,
+                isDisabled
+            });
         }
 
         // Confirm location selection
-        function confirmLocation() {
+        async function confirmLocation() {
+            console.log('🎯 confirmLocation function called');
+            
+            const countrySelect = document.getElementById('countrySelect');
+            const citySelect = document.getElementById('citySelect');
+            const countySelect = document.getElementById('countySelect');
+            const districtSelect = document.getElementById('districtSelect');
+            
+            const countryId = countrySelect.value;
+            const cityId = citySelect.value;
+            const countyId = countySelect.value;
+            const districtId = districtSelect.value === 'none' ? null : districtSelect.value;
+            
+            // Get names for display
+            const countryName = countrySelect.options[countrySelect.selectedIndex].text;
+            const cityName = citySelect.options[citySelect.selectedIndex].text;
+            const countyName = countySelect.options[countySelect.selectedIndex].text;
+            const districtName = districtSelect.value === 'none' ? 'Не имеет значения' : districtSelect.options[districtSelect.selectedIndex].text;
+            
+            // Convert price to EUR if needed
+            let priceInEUR = null;
+            if (selectedListingTypes.price && selectedListingTypes.currency !== 'EUR') {
+                priceInEUR = await convertToEUR(selectedListingTypes.price, selectedListingTypes.currency);
+                console.log(`💰 Price converted: ${selectedListingTypes.price} ${selectedListingTypes.currency} → ${priceInEUR} EUR`);
+            } else if (selectedListingTypes.price) {
+                priceInEUR = selectedListingTypes.price;
+            }
+            
+            // Update selected location
+            selectedLocation = {
+                country_id: countryId,
+                city_id: cityId,
+                county_id: countyId,
+                district_id: districtId,
+                country_name: countryName,
+                city_name: cityName,
+                county_name: countyName,
+                district_name: districtName,
+                // Add property details
+                property_price: selectedListingTypes.price,
+                property_price_currency: selectedListingTypes.currency,
+                property_price_eur: priceInEUR,
+                property_area: selectedListingTypes.area
+            };
+            
+            console.log('📍 Selected location for data loading:', {
+                country_id: countryId,
+                city_id: cityId,
+                county_id: countyId,
+                district_id: districtId,
+                country_name: countryName,
+                city_name: cityName,
+                county_name: countyName,
+                district_name: districtName,
+                property_price: selectedListingTypes.price,
+                property_price_currency: selectedListingTypes.currency,
+                property_price_eur: priceInEUR,
+                property_area: selectedListingTypes.area
+            });
+            
             // Display selected location
             displaySelectedLocation();
+            
+            // Get user language
+            await getUserLanguage();
+            
+            // Load region data with selected listing types
+            await loadRegionData();
         }
 
         // Display selected location
         function displaySelectedLocation() {
             const selectedLocationDiv = document.getElementById('selectedLocation');
             const locationDetails = document.getElementById('locationDetails');
+            const adminIds = document.getElementById('adminIds');
+            const adminDetails = document.getElementById('adminDetails');
             
             // Build location string
             let locationString = selectedLocation.country_name;
@@ -2384,6 +2497,29 @@
             }
             
             locationDetails.textContent = locationString;
+            
+            // Update selected property types display
+            updateSelectedPropertyTypesDisplay();
+            
+            // Show admin IDs if user is admin
+            if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe && window.Telegram.WebApp.initDataUnsafe.user) {
+                const user = window.Telegram.WebApp.initDataUnsafe.user;
+                if (user && user.id) {
+                    // Check if user is admin (you can implement your own admin check logic)
+                    const isAdmin = true; // Placeholder - implement your admin check
+                    
+                    if (isAdmin) {
+                        adminDetails.innerHTML = `
+                            country_id: ${selectedLocation.country_id}<br>
+                            city_id: ${selectedLocation.city_id}<br>
+                            county_id: ${selectedLocation.county_id}<br>
+                            district_id: ${selectedLocation.district_id || 'null'}
+                        `;
+                        adminIds.style.display = 'block';
+                    }
+                }
+            }
+            
             selectedLocationDiv.style.display = 'block';
         }
 
@@ -2505,13 +2641,13 @@
         }
 
         // Format field value
-        async function formatFieldValue(value, field) {
+        function formatFieldValue(value, field) {
             if (value === null || value === undefined) return '-';
             
             // Format based on field type
             if (typeof value === 'number') {
                 if (field.includes('price') || field.includes('Price')) {
-                    return await formatValue(value, 'price');
+                    return formatValue(value, 'price');
                 } else if (field.includes('yield') || field.includes('Yield') || field.includes('rate')) {
                     return formatValue(value, 'percentage');
                 } else if (field.includes('age') || field.includes('Age')) {
@@ -2564,7 +2700,7 @@
             }
         }
 
-                // Generate market indicators table with organized structure
+        // Generate market indicators table with organized structure
         async function generateSummaryTable(data) {
             const summaryContainer = document.getElementById('summaryDataContent');
             if (!summaryContainer) return;
@@ -2586,10 +2722,7 @@
             });
             
             if (allData.length === 0) {
-                const noDataDiv = document.createElement('div');
-                noDataDiv.className = 'no-data';
-                noDataDiv.textContent = getText('noDataAvailable');
-                summaryContainer.appendChild(noDataDiv);
+                summaryContainer.innerHTML = `<div class="no-data">${getText('noDataAvailable')}</div>`;
                 return;
             }
             
@@ -2665,7 +2798,7 @@
             
             // Add Yield with bold styling
             if (summary.yield) {
-                html += '<tr class="yield-row"><td colspan="3" class="rent-header">Yield</td></tr>';
+                html += '<tr class="yield-row"><td colspan="3" class="yield-header">Yield</td></tr>';
                 const minYield = await formatFieldValue(summary.yield.min, 'yield');
                 const maxYield = await formatFieldValue(summary.yield.max, 'yield');
                 html += `
@@ -2678,11 +2811,7 @@
             }
             
             html += '</tbody></table>';
-            
-            // Create table element and add it to container
-            const tableElement = document.createElement('div');
-            tableElement.innerHTML = html;
-            summaryContainer.appendChild(tableElement);
+            summaryContainer.innerHTML = html;
             
             // Load property trends data
             loadPropertyTrends(data);
@@ -2996,7 +3125,11 @@
 
         // Show error
         function showError(message) {
-            console.error('Error:', message);
+            const errorState = document.getElementById('errorState');
+            const errorText = document.getElementById('errorText');
+            
+            errorText.textContent = message;
+            errorState.style.display = 'block';
         }
 
         // Function to go to main menu
@@ -3034,7 +3167,7 @@
             } catch (error) {
                 console.error('Error converting currency:', error);
                 return amount; // Return original amount if conversion fails
-                }
+            }
         }
         
         // Function to convert from EUR to display currency
@@ -3067,9 +3200,9 @@
             } catch (error) {
                 console.error('Error converting currency:', error);
                 return amount; // Return original amount if conversion fails
+                }
             }
-        }
-        
+
         // Function to create currency selector
         function createCurrencySelector() {
             const currencySelector = document.createElement('div');
@@ -3138,21 +3271,40 @@
             }
         }
 
-        // Initialize the page
+        // Initialize page
         function init() {
-            // Set language based on Telegram WebApp
-            if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
-                const userLang = tg.initDataUnsafe.user.language_code;
-                if (userLang && locales[userLang]) {
-                    currentLanguage = userLang;
-                }
+            updatePageText();
+            loadCountries();
+            
+            // Initialize area slider
+            const areaSlider = document.getElementById('areaObjectSlider');
+            const areaValue = document.getElementById('areaObjectValue');
+            
+            if (areaSlider && areaValue) {
+                areaSlider.addEventListener('input', function() {
+                    const value = this.value;
+                    areaValue.textContent = value + ' м²';
+                    selectedListingTypes.area = parseInt(value);
+                    updateConfirmButton();
+                });
             }
             
-            // Update page text
-            updatePageText();
+            // Initialize price input
+            const priceInput = document.getElementById('priceObjectInput');
+            if (priceInput) {
+                priceInput.addEventListener('input', function() {
+                    selectedListingTypes.price = this.value ? parseFloat(this.value) : null;
+                    updateConfirmButton();
+                });
+            }
             
-            // Load countries
-            loadCountries();
+            // Initialize currency select
+            const currencySelect = document.getElementById('currencySelect');
+            if (currencySelect) {
+                currencySelect.addEventListener('change', function() {
+                    selectedListingTypes.currency = this.value;
+                });
+            }
         }
 
         // Start initialization when page loads
