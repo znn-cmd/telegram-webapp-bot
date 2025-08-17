@@ -157,6 +157,87 @@
             padding-left: 4px;
         }
 
+        /* Price and Area Input Styles */
+        .price-area-inputs {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .price-area-inputs input[type="number"] {
+            flex: 1;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            background: white;
+            color: #333;
+        }
+
+        .price-area-inputs input[type="number"]:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
+        }
+
+        .price-area-inputs select {
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            background: white;
+            min-width: 80px;
+            color: #333;
+        }
+
+        .price-area-inputs select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
+        }
+
+        .area-slider-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .area-slider-container input[type="range"] {
+            flex: 1;
+            height: 6px;
+            border-radius: 3px;
+            background: #ddd;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .area-slider-container input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+        }
+
+        .area-slider-container input[type="range"]::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+            border: none;
+        }
+
+        .area-value-display {
+            min-width: 50px;
+            text-align: center;
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+        }
+
         /* Selected Location Styles */
         .selected-location {
             background: #e8f5e8;
@@ -398,6 +479,76 @@
 
         .data-section-content {
             padding: 0;
+        }
+        
+        /* Currency Selector Styles */
+        .currency-selector {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .currency-selector-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .currency-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .currency-button {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 80px;
+            height: 80px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            padding: 10px;
+        }
+        
+        .currency-button:hover {
+            border-color: #667eea;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+        }
+        
+        .currency-button.active {
+            border-color: #667eea;
+            background: #667eea;
+            color: white;
+        }
+        
+        .currency-button.active .currency-symbol,
+        .currency-button.active .currency-code {
+            color: white;
+        }
+        
+        .currency-symbol {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .currency-code {
+            font-size: 12px;
+            font-weight: 600;
+            color: #666;
+            text-transform: uppercase;
         }
         
         .data-item {
@@ -829,6 +980,34 @@
 
         /* Mobile responsive for listing type selection */
         @media (max-width: 480px) {
+            .currency-selector {
+                padding: 15px;
+                margin-bottom: 15px;
+            }
+            
+            .currency-selector-title {
+                font-size: 14px;
+                margin-bottom: 12px;
+            }
+            
+            .currency-buttons {
+                gap: 8px;
+            }
+            
+            .currency-button {
+                width: 70px;
+                height: 70px;
+                padding: 8px;
+            }
+            
+            .currency-symbol {
+                font-size: 20px;
+                margin-bottom: 4px;
+            }
+            
+            .currency-code {
+                font-size: 11px;
+            }
             .listing-type-section {
                 padding: 12px;
                 margin: 12px 0;
@@ -873,7 +1052,7 @@
     <div class="container">
         <!-- Логотип -->
         <div style="display:flex;flex-direction:column;align-items:center;margin-top:18px;margin-bottom:10px;">
-            <img src="logo-sqv.png" alt="Aaadviser Logo" style="width:110px;height:auto;display:block;margin-bottom:8px;cursor:pointer;" onclick="goToMainMenu()" />
+            <img src="logo-flt.png" alt="Aaadviser Logo" style="width:110px;height:auto;display:block;margin-bottom:8px;cursor:pointer;" onclick="goToMainMenu()" />
             <div style="font-size:15px;color:#888;font-style:italic;" id="slogan">Инсайты рынка недвижимости</div>
         </div>
 
@@ -945,6 +1124,28 @@
                         <select class="listing-type-select" id="heatingDataSelect">
                             <option value="" id="heatingDataPlaceholder">Выберите тип отопления</option>
                         </select>
+                    </div>
+
+                    <!-- Price Object -->
+                    <div class="listing-type-group">
+                        <div class="listing-type-subtitle" id="priceObjectSubtitle">Цена объекта:</div>
+                        <div class="price-area-inputs">
+                            <input type="number" id="priceObjectInput" placeholder="Введите цену">
+                            <select id="currencySelect">
+                                <option value="TRY">🇹🇷 TRY</option>
+                                <option value="EUR">🇪🇺 EUR</option>
+                                <option value="USD">🇺🇸 USD</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Area Object -->
+                    <div class="listing-type-group">
+                        <div class="listing-type-subtitle" id="areaObjectSubtitle">Площадь объекта (м²):</div>
+                        <div class="area-slider-container">
+                            <input type="range" id="areaObjectSlider" min="10" max="1000" value="50">
+                            <span id="areaObjectValue" class="area-value-display">50 м²</span>
+                        </div>
                     </div>
                 </div>
 
@@ -1039,13 +1240,19 @@
 
         // User language
         let userLanguage = 'ru';
+        
+        // Display currency (default: TRY)
+        let displayCurrency = 'TRY';
 
         // Selected listing types
         let selectedListingTypes = {
             house_type: null,
             floor_segment: null,
             age: null,
-            heating: null
+            heating: null,
+            price: null,
+            currency: 'EUR',
+            area: 50
         };
 
         // Localization data
@@ -1089,17 +1296,41 @@
                 'floorSegmentSubtitle': 'Этаж:',
                 'ageDataSubtitle': 'Возраст объекта:',
                 'heatingDataSubtitle': 'Тип отопления:',
+                'priceObjectSubtitle': 'Цена объекта:',
+                'areaObjectSubtitle': 'Площадь объекта (м²):',
                 'selectBedrooms': 'Выберите количество спален',
                 'selectFloor': 'Выберите этаж',
                 'selectAge': 'Выберите возраст объекта',
                 'selectHeating': 'Выберите тип отопления',
-                'propertyTypesTitle': 'Выбранные характеристики недвижимости:',
+                'propertyTypesTitle': 'Характеристики объекта:',
                 'bedroomsLabel': 'Количество спален',
                 'floorLabel': 'Этаж',
                 'ageLabel': 'Возраст объекта',
                 'heatingLabel': 'Тип отопления',
+                'priceLabel': 'Цена объекта',
+                'areaLabel': 'Площадь объекта',
                 'marketIndicatorsTitle': 'Показатели рынка',
                 'marketTrendsTitle': 'Тренды рынка',
+                'priceTrendTitle': 'Тренд цены',
+                'saleTrendLabel': 'Продажа',
+                'rentTrendLabel': 'Аренда',
+                'detailedTrendsTitle': 'Детальные данные трендов',
+                'tableDateHeader': 'Дата',
+                'tableSalePriceHeader': 'Цена продажи (₺/м²)',
+                'tableRentPriceHeader': 'Цена аренды (₺/м²)',
+                'tableSaleChangeHeader': 'Изменение цен продажи',
+                'tableRentChangeHeader': 'Изменение цен аренды',
+                'tableAnnualSaleChangeHeader': 'Годовое изменение продажи',
+                'tableAnnualRentChangeHeader': 'Годовое изменение аренды',
+                'tableYieldHeader': 'Доходность',
+                'tableSaleCountHeader': 'Количество продаж',
+                'tableRentCountHeader': 'Количество аренд',
+                'noDataMessage': 'Нет данных для отображения',
+                'displayCurrencyTitle': 'Валюта отображения:',
+                'currencyTRY': 'Лира',
+                'currencyUSD': 'Доллар',
+                'currencyEUR': 'Евро',
+                'currencyRUB': 'Рубль',
                 'saleHeader': 'Продажа',
                 'rentHeader': 'Аренда'
             },
@@ -1142,17 +1373,41 @@
                 'floorSegmentSubtitle': 'Floor:',
                 'ageDataSubtitle': 'Property age:',
                 'heatingDataSubtitle': 'Heating type:',
+                'priceObjectSubtitle': 'Property price:',
+                'areaObjectSubtitle': 'Property area (m²):',
                 'selectBedrooms': 'Select bedroom count',
                 'selectFloor': 'Select floor',
                 'selectAge': 'Select property age',
                 'selectHeating': 'Select heating type',
-                'propertyTypesTitle': 'Selected property characteristics:',
+                'propertyTypesTitle': 'Object characteristics:',
                 'bedroomsLabel': 'Bedroom count',
                 'floorLabel': 'Floor',
                 'ageLabel': 'Property age',
                 'heatingLabel': 'Heating type',
+                'priceLabel': 'Property price',
+                'areaLabel': 'Property area',
                 'marketIndicatorsTitle': 'Market Indicators',
                 'marketTrendsTitle': 'Market Trends',
+                'priceTrendTitle': 'Price Trend',
+                'saleTrendLabel': 'Sale',
+                'rentTrendLabel': 'Rent',
+                'detailedTrendsTitle': 'Detailed Trend Data',
+                'tableDateHeader': 'Date',
+                'tableSalePriceHeader': 'Sale Price (₺/m²)',
+                'tableRentPriceHeader': 'Rent Price (₺/m²)',
+                'tableSaleChangeHeader': 'Sale Price Change',
+                'tableRentChangeHeader': 'Rent Price Change',
+                'tableAnnualSaleChangeHeader': 'Annual Sale Change',
+                'tableAnnualRentChangeHeader': 'Annual Rent Change',
+                'tableYieldHeader': 'Yield',
+                'tableSaleCountHeader': 'Sale Count',
+                'tableRentCountHeader': 'Rent Count',
+                'noDataMessage': 'No data to display',
+                'displayCurrencyTitle': 'Display currency:',
+                'currencyTRY': 'Lira',
+                'currencyUSD': 'Dollar',
+                'currencyEUR': 'Euro',
+                'currencyRUB': 'Ruble',
                 'saleHeader': 'Sale',
                 'rentHeader': 'Rent'
             },
@@ -1497,6 +1752,22 @@
             const heatingDataSubtitle = document.getElementById('heatingDataSubtitle');
             if (heatingDataSubtitle) { heatingDataSubtitle.textContent = getText('heatingDataSubtitle'); }
             
+            // Update new fields
+            const priceObjectSubtitle = document.getElementById('priceObjectSubtitle');
+            if (priceObjectSubtitle) { priceObjectSubtitle.textContent = getText('priceObjectSubtitle'); }
+            const areaObjectSubtitle = document.getElementById('areaObjectSubtitle');
+            if (areaObjectSubtitle) { areaObjectSubtitle.textContent = getText('areaObjectSubtitle'); }
+            
+            // Update trends section if it exists
+            const propertyTrendsSection = document.getElementById('propertyTrendsSection');
+            if (propertyTrendsSection) {
+                // Re-render trends section with new language
+                const trendsTableTitle = propertyTrendsSection.querySelector('.trends-table-title');
+                if (trendsTableTitle) {
+                    trendsTableTitle.textContent = getText('detailedTrendsTitle');
+                }
+            }
+            
             // Update placeholder texts
             const houseTypePlaceholder = document.getElementById('houseTypePlaceholder');
             if (houseTypePlaceholder) { houseTypePlaceholder.textContent = getText('selectBedrooms'); }
@@ -1510,6 +1781,12 @@
             // Update property types section
             const propertyTypesTitle = document.getElementById('propertyTypesTitle');
             if (propertyTypesTitle) { propertyTypesTitle.textContent = getText('propertyTypesTitle'); }
+            
+            // Update property type labels if they exist
+            const priceLabel = document.getElementById('priceLabel');
+            if (priceLabel) { priceLabel.textContent = getText('priceLabel'); }
+            const areaLabel = document.getElementById('areaLabel');
+            if (areaLabel) { areaLabel.textContent = getText('areaLabel'); }
             
             const insightsErrorText = document.getElementById('insightsErrorText');
             if (insightsErrorText) {
@@ -1714,7 +1991,7 @@
             console.log(`🔄 Populating select ${selectId} with ${listingTypes.length} types for category ${category}:`, listingTypes);
             
             // Clear existing options except the first placeholder
-            select.innerHTML = '<option value="">Выберите ' + getSelectPlaceholder(category) + '</option>';
+            select.innerHTML = '<option value="">' + getSelectPlaceholder(category) + '</option>';
             
             listingTypes.forEach(type => {
                 const option = document.createElement('option');
@@ -1746,7 +2023,10 @@
                 house_type: null,
                 floor_segment: null,
                 age: null,
-                heating: null
+                heating: null,
+                price: null,
+                currency: 'EUR',
+                area: 50
             };
             
             // Hide listing type section
@@ -1763,6 +2043,19 @@
                     select.value = '';
                 }
             });
+            
+            // Reset price and area fields
+            const priceInput = document.getElementById('priceObjectInput');
+            const areaSlider = document.getElementById('areaObjectSlider');
+            const areaValue = document.getElementById('areaObjectValue');
+            const currencySelect = document.getElementById('currencySelect');
+            
+            if (priceInput) priceInput.value = '';
+            if (areaSlider) {
+                areaSlider.value = 50;
+                if (areaValue) areaValue.textContent = '50 м²';
+            }
+            if (currencySelect) currencySelect.value = 'EUR';
             
             // Hide selected property types section
             const selectedPropertyTypes = document.getElementById('selectedPropertyTypes');
@@ -1792,7 +2085,9 @@
             const allTypesSelected = selectedListingTypes.house_type && 
                                    selectedListingTypes.floor_segment && 
                                    selectedListingTypes.age && 
-                                   selectedListingTypes.heating;
+                                   selectedListingTypes.heating &&
+                                   selectedListingTypes.price &&
+                                   selectedListingTypes.area;
             
             console.log('🔍 All listing types selected:', allTypesSelected, selectedListingTypes);
             
@@ -1973,7 +2268,9 @@
             const hasSelectedTypes = selectedListingTypes.house_type || 
                                    selectedListingTypes.floor_segment || 
                                    selectedListingTypes.age || 
-                                   selectedListingTypes.heating;
+                                   selectedListingTypes.heating ||
+                                   selectedListingTypes.price ||
+                                   selectedListingTypes.area;
             
             if (hasSelectedTypes) {
                 selectedPropertyTypes.style.display = 'block';
@@ -2016,6 +2313,30 @@
                     `;
                 }
                 
+                if (selectedListingTypes.price) {
+                    const currencySymbols = {
+                        'TRY': '🇹🇷',
+                        'EUR': '🇪🇺',
+                        'USD': '🇺🇸'
+                    };
+                    const currencySymbol = currencySymbols[selectedListingTypes.currency] || '';
+                    html += `
+                        <div class="property-type-item">
+                            <span class="property-type-label">${getText('priceLabel')}:</span>
+                            <span class="property-type-value">${selectedListingTypes.price} ${currencySymbol} ${selectedListingTypes.currency}</span>
+                        </div>
+                    `;
+                }
+                
+                if (selectedListingTypes.area) {
+                    html += `
+                        <div class="property-type-item">
+                            <span class="property-type-label">${getText('areaLabel')}:</span>
+                            <span class="property-type-value">${selectedListingTypes.area} м²</span>
+                        </div>
+                    `;
+                }
+                
                 propertyTypesDetails.innerHTML = html;
             } else {
                 selectedPropertyTypes.style.display = 'none';
@@ -2041,13 +2362,17 @@
                 hasAllListingTypes = selectedListingTypes.house_type && 
                                    selectedListingTypes.floor_segment && 
                                    selectedListingTypes.age && 
-                                   selectedListingTypes.heating;
+                                   selectedListingTypes.heating &&
+                                   selectedListingTypes.price &&
+                                   selectedListingTypes.area;
                 
                 console.log('🔍 Checking listing types:', {
                     house_type: selectedListingTypes.house_type,
                     floor_segment: selectedListingTypes.floor_segment,
                     age: selectedListingTypes.age,
                     heating: selectedListingTypes.heating,
+                    price: selectedListingTypes.price,
+                    area: selectedListingTypes.area,
                     hasAllListingTypes: hasAllListingTypes
                 });
             }
@@ -2088,6 +2413,15 @@
             const countyName = countySelect.options[countySelect.selectedIndex].text;
             const districtName = districtSelect.value === 'none' ? 'Не имеет значения' : districtSelect.options[districtSelect.selectedIndex].text;
             
+            // Convert price to EUR if needed
+            let priceInEUR = null;
+            if (selectedListingTypes.price && selectedListingTypes.currency !== 'EUR') {
+                priceInEUR = await convertToEUR(selectedListingTypes.price, selectedListingTypes.currency);
+                console.log(`💰 Price converted: ${selectedListingTypes.price} ${selectedListingTypes.currency} → ${priceInEUR} EUR`);
+            } else if (selectedListingTypes.price) {
+                priceInEUR = selectedListingTypes.price;
+            }
+            
             // Update selected location
             selectedLocation = {
                 country_id: countryId,
@@ -2097,7 +2431,12 @@
                 country_name: countryName,
                 city_name: cityName,
                 county_name: countyName,
-                district_name: districtName
+                district_name: districtName,
+                // Add property details
+                property_price: selectedListingTypes.price,
+                property_price_currency: selectedListingTypes.currency,
+                property_price_eur: priceInEUR,
+                property_area: selectedListingTypes.area
             };
             
             console.log('📍 Selected location for data loading:', {
@@ -2108,7 +2447,11 @@
                 country_name: countryName,
                 city_name: cityName,
                 county_name: countyName,
-                district_name: districtName
+                district_name: districtName,
+                property_price: selectedListingTypes.price,
+                property_price_currency: selectedListingTypes.currency,
+                property_price_eur: priceInEUR,
+                property_area: selectedListingTypes.area
             });
             
             // Display selected location
@@ -2261,7 +2604,7 @@
             // Data sections removed - only market indicators table is shown
             
             // Generate and display summary table
-            generateSummaryTable(data);
+            await generateSummaryTable(data);
             
             // Show data content
             document.getElementById('dataContent').style.display = 'block';
@@ -2285,13 +2628,13 @@
         }
 
         // Format field value
-        function formatFieldValue(value, field) {
+        async function formatFieldValue(value, field) {
             if (value === null || value === undefined) return '-';
             
             // Format based on field type
             if (typeof value === 'number') {
                 if (field.includes('price') || field.includes('Price')) {
-                    return formatValue(value, 'price');
+                    return await formatValue(value, 'price');
                 } else if (field.includes('yield') || field.includes('Yield') || field.includes('rate')) {
                     return formatValue(value, 'percentage');
                 } else if (field.includes('age') || field.includes('Age')) {
@@ -2307,12 +2650,32 @@
         }
 
         // Format value based on type
-        function formatValue(value, type) {
+        async function formatValue(value, type) {
             if (value === null || value === undefined || value === '-') return '-';
             
             switch (type) {
                 case 'price':
-                    return `₺${parseFloat(value).toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+                    // Convert price to display currency
+                    let convertedValue = value;
+                    if (displayCurrency !== 'TRY') {
+                        try {
+                            // First convert TRY to EUR, then to display currency
+                            const valueInEUR = await convertToEUR(value, 'TRY');
+                            convertedValue = await convertFromEUR(valueInEUR, displayCurrency);
+                        } catch (error) {
+                            console.error('Error converting currency:', error);
+                            convertedValue = value; // Fallback to original value
+                        }
+                    }
+                    
+                    const currencySymbols = {
+                        'TRY': '₺',
+                        'USD': '$',
+                        'EUR': '€',
+                        'RUB': '₽'
+                    };
+                    const symbol = currencySymbols[displayCurrency] || '₺';
+                    return `${symbol}${parseFloat(convertedValue).toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
                 case 'percentage':
                     return `${parseFloat(value).toFixed(2)}%`;
                 case 'years':
@@ -2324,10 +2687,15 @@
             }
         }
 
-        // Generate market indicators table with organized structure
-        function generateSummaryTable(data) {
+                // Generate market indicators table with organized structure
+        async function generateSummaryTable(data) {
             const summaryContainer = document.getElementById('summaryDataContent');
             if (!summaryContainer) return;
+            
+            // Create currency selector and add it before the table
+            const currencySelector = createCurrencySelector();
+            summaryContainer.innerHTML = '';
+            summaryContainer.appendChild(currencySelector);
             
             // Collect all data from all tables
             const allData = [];
@@ -2341,7 +2709,10 @@
             });
             
             if (allData.length === 0) {
-                summaryContainer.innerHTML = `<div class="no-data">${getText('noDataAvailable')}</div>`;
+                const noDataDiv = document.createElement('div');
+                noDataDiv.className = 'no-data';
+                noDataDiv.textContent = getText('noDataAvailable');
+                summaryContainer.appendChild(noDataDiv);
                 return;
             }
             
@@ -2381,50 +2752,60 @@
             html += `<tr class="section-header"><td colspan="3" class="sale-header">${getText('saleHeader')}</td></tr>`;
             
             // Add Sale fields
-            saleFields.forEach(field => {
+            for (const field of saleFields) {
                 if (summary[field]) {
                     const fieldName = field === 'min_unit_price_for_sale' ? 'Unit Price For Sale' : formatFieldName(field);
+                    const minValue = await formatFieldValue(summary[field].min, field);
+                    const maxValue = await formatFieldValue(summary[field].max, field);
                     html += `
                         <tr>
                             <td>${fieldName}</td>
-                            <td>${formatFieldValue(summary[field].min, field)}</td>
-                            <td>${formatFieldValue(summary[field].max, field)}</td>
+                            <td>${minValue}</td>
+                            <td>${maxValue}</td>
                         </tr>
                     `;
                 }
-            });
+            }
             
             // Add Rent section header
             html += `<tr class="section-header"><td colspan="3" class="rent-header">${getText('rentHeader')}</td></tr>`;
             
             // Add Rent fields
-            rentFields.forEach(field => {
+            for (const field of rentFields) {
                 if (summary[field]) {
                     const fieldName = field === 'min_unit_price_for_rent' ? 'Unit Price For Rent' : formatFieldName(field);
+                    const minValue = await formatFieldValue(summary[field].min, field);
+                    const maxValue = await formatFieldValue(summary[field].max, field);
                     html += `
                         <tr>
                             <td>${fieldName}</td>
-                            <td>${formatFieldValue(summary[field].min, field)}</td>
-                            <td>${formatFieldValue(summary[field].max, field)}</td>
+                            <td>${minValue}</td>
+                            <td>${maxValue}</td>
                         </tr>
                     `;
                 }
-            });
+            }
             
             // Add Yield with bold styling
             if (summary.yield) {
-                html += '<tr class="yield-row"><td colspan="3" class="yield-header">Yield</td></tr>';
+                html += '<tr class="yield-row"><td colspan="3" class="rent-header">Yield</td></tr>';
+                const minYield = await formatFieldValue(summary.yield.min, 'yield');
+                const maxYield = await formatFieldValue(summary.yield.max, 'yield');
                 html += `
                     <tr class="yield-data">
                         <td class="yield-label">Yield</td>
-                        <td class="yield-value">${formatFieldValue(summary.yield.min, 'yield')}</td>
-                        <td class="yield-value">${formatFieldValue(summary.yield.max, 'yield')}</td>
+                        <td class="yield-value">${minYield}</td>
+                        <td class="yield-value">${maxYield}</td>
                     </tr>
                 `;
             }
             
             html += '</tbody></table>';
-            summaryContainer.innerHTML = html;
+            
+            // Create table element and add it to container
+            const tableElement = document.createElement('div');
+            tableElement.innerHTML = html;
+            summaryContainer.appendChild(tableElement);
             
             // Load property trends data
             loadPropertyTrends(data);
@@ -2493,17 +2874,16 @@
             const groupedTrends = groupTrendsByType(trends);
             
             trendsSection.innerHTML = `
-                <h3 class="data-section-title">${getText('marketTrendsTitle')}</h3>
                 <div class="data-section-content">
                     <div class="trends-grid">
                         ${Object.entries(groupedTrends).map(([type, typeTrends]) => `
                             <div class="trend-card trend-card-${type}">
                                 <div class="trend-title">${formatTrendType(type)}</div>
-                                <div class="trend-value">${formatTrendValue(typeTrends[0].trend_value, type)}</div>
+                                <div class="trend-value">${formatTrendValue(typeTrends[0].trend_value, type, typeTrends[0])}</div>
                                 <div class="trend-details">
                                     <div class="trend-change">
-                                        ${typeTrends[0].price_change_sale ? `Продажа: ${formatPercentage(typeTrends[0].price_change_sale)}` : ''}
-                                        ${typeTrends[0].price_change_rent ? `Аренда: ${formatPercentage(typeTrends[0].price_change_rent)}` : ''}
+                                        ${typeTrends[0].price_change_sale ? `${getText('saleTrendLabel')}: ${formatPercentage(typeTrends[0].price_change_sale)}` : ''}
+                                        ${typeTrends[0].price_change_rent ? `${getText('rentTrendLabel')}: ${formatPercentage(typeTrends[0].price_change_rent)}` : ''}
                                     </div>
                                     <div class="trend-date">${formatTrendDate(typeTrends[0].date)}</div>
                                 </div>
@@ -2513,7 +2893,7 @@
                     
                     <!-- Таблица со всеми записями трендов -->
                     <div class="trends-table-section">
-                        <h4 class="trends-table-title">Детальные данные трендов</h4>
+                        <h4 class="trends-table-title">${getText('detailedTrendsTitle')}</h4>
                         <div class="trends-table-container">
                             ${generateTrendsTable(trends)}
                         </div>
@@ -2541,7 +2921,7 @@
         // Format trend type for display
         function formatTrendType(type) {
             const typeMap = {
-                'price_trend': 'Тренд цен',
+                'price_trend': getText('priceTrendTitle'),
                 'yield_trend': 'Тренд доходности',
                 'count_trend': 'Тренд количества',
                 'general': 'Общий тренд'
@@ -2575,28 +2955,28 @@
         // Generate detailed trends table
         function generateTrendsTable(trends) {
             if (!trends || trends.length === 0) {
-                return '<div class="no-data">Нет данных для отображения</div>';
+                return `<div class="no-data">${getText('noDataMessage')}</div>`;
             }
             
             let html = '<table class="trends-table">';
             html += '<thead><tr>';
-            html += '<th>Дата</th>';
-            html += '<th>Цена продажи (₺/м²)</th>';
-            html += '<th>Цена аренды (₺/м²)</th>';
-            html += '<th>Изменение цен продажи</th>';
-            html += '<th>Изменение цен аренды</th>';
-            html += '<th>Годовое изменение продажи</th>';
-            html += '<th>Годовое изменение аренды</th>';
-            html += '<th>Доходность</th>';
-            html += '<th>Количество продаж</th>';
-            html += '<th>Количество аренд</th>';
+            html += `<th>${getText('tableDateHeader')}</th>`;
+            html += `<th>${getText('tableSalePriceHeader')}</th>`;
+            html += `<th>${getText('tableRentPriceHeader')}</th>`;
+            html += `<th>${getText('tableSaleChangeHeader')}</th>`;
+            html += `<th>${getText('tableRentChangeHeader')}</th>`;
+            html += `<th>${getText('tableAnnualSaleChangeHeader')}</th>`;
+            html += `<th>${getText('tableAnnualRentChangeHeader')}</th>`;
+            html += `<th>${getText('tableYieldHeader')}</th>`;
+            html += `<th>${getText('tableSaleCountHeader')}</th>`;
+            html += `<th>${getText('tableRentCountHeader')}</th>`;
             html += '</tr></thead><tbody>';
             
             trends.forEach(trend => {
                 html += '<tr>';
                 html += `<td>${formatTrendDate(trend.date)}</td>`;
-                html += `<td>${formatTrendValue(trend.trend_value, 'price')}</td>`;
-                html += `<td>${formatTrendValue(trend.unit_price_for_rent || trend.trend_value, 'price')}</td>`;
+                html += `<td>${formatTrendValue(trend.trend_value, 'price', trend)}</td>`;
+                html += `<td>${formatTrendValue(trend.unit_price_for_rent || trend.trend_value, 'price', trend)}</td>`;
                 html += `<td>${formatPercentage(trend.price_change_sale)}</td>`;
                 html += `<td>${formatPercentage(trend.price_change_rent)}</td>`;
                 html += `<td>${formatPercentage(trend.annual_price_change_sale)}</td>`;
@@ -2612,10 +2992,15 @@
         }
         
         // Format trend value based on type
-        function formatTrendValue(value, type) {
+        function formatTrendValue(value, type, trendData) {
             if (value === null || value === undefined) return '-';
             
             if (type && type.includes('price')) {
+                // Для ценовых трендов учитываем площадь объекта
+                if (trendData && trendData.unit_price_for_sale && selectedListingTypes.area) {
+                    const totalPrice = trendData.unit_price_for_sale * selectedListingTypes.area;
+                    return formatValue(totalPrice, 'price');
+                }
                 return formatValue(value, 'price');
             } else if (type && type.includes('percentage')) {
                 return formatValue(value, 'percentage');
@@ -2746,10 +3131,174 @@
             window.location.href = '/webapp_main';
         }
 
+        // Function to convert currency to EUR (base currency)
+        async function convertToEUR(amount, fromCurrency) {
+            if (fromCurrency === 'EUR') {
+                return amount;
+            }
+            
+            try {
+                // Get current exchange rates from currency table
+                const response = await fetch('/api/currency/convert', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        amount: amount,
+                        from_currency: fromCurrency,
+                        to_currency: 'EUR'
+                    })
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    return data.converted_amount;
+                } else {
+                    console.error('Currency conversion error:', data.error);
+                    return amount; // Return original amount if conversion fails
+                }
+            } catch (error) {
+                console.error('Error converting currency:', error);
+                return amount; // Return original amount if conversion fails
+                }
+        }
+        
+        // Function to convert from EUR to display currency
+        async function convertFromEUR(amount, toCurrency) {
+            if (toCurrency === 'EUR') {
+                return amount;
+            }
+            
+            try {
+                // Get current exchange rates from currency table
+                const response = await fetch('/api/currency/convert', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        amount: amount,
+                        from_currency: 'EUR',
+                        to_currency: toCurrency
+                    })
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    return data.converted_amount;
+                } else {
+                    console.error('Currency conversion error:', data.error);
+                    return amount; // Return original amount if conversion fails
+                }
+            } catch (error) {
+                console.error('Error converting currency:', error);
+                return amount; // Return original amount if conversion fails
+            }
+        }
+        
+        // Function to create currency selector
+        function createCurrencySelector() {
+            const currencySelector = document.createElement('div');
+            currencySelector.className = 'currency-selector';
+            currencySelector.innerHTML = `
+                <div class="currency-selector-title">${getText('displayCurrencyTitle')}</div>
+                <div class="currency-buttons">
+                    <button class="currency-button ${displayCurrency === 'TRY' ? 'active' : ''}" data-currency="TRY">
+                        <span class="currency-symbol">₺</span>
+                        <span class="currency-code">TRY</span>
+                    </button>
+                    <button class="currency-button ${displayCurrency === 'USD' ? 'active' : ''}" data-currency="USD">
+                        <span class="currency-symbol">$</span>
+                        <span class="currency-code">USD</span>
+                    </button>
+                    <button class="currency-button ${displayCurrency === 'EUR' ? 'active' : ''}" data-currency="EUR">
+                        <span class="currency-symbol">€</span>
+                        <span class="currency-code">EUR</span>
+                    </button>
+                    <button class="currency-button ${displayCurrency === 'RUB' ? 'active' : ''}" data-currency="RUB">
+                        <span class="currency-symbol">₽</span>
+                        <span class="currency-code">RUB</span>
+                    </button>
+                </div>
+            `;
+            
+            // Add event listeners to currency buttons
+            const currencyButtons = currencySelector.querySelectorAll('.currency-button');
+            currencyButtons.forEach(button => {
+                button.addEventListener('click', async function() {
+                    const selectedCurrency = this.dataset.currency;
+                    if (selectedCurrency !== displayCurrency) {
+                        displayCurrency = selectedCurrency;
+                        
+                        // Update active state
+                        currencyButtons.forEach(btn => btn.classList.remove('active'));
+                        this.classList.add('active');
+                        
+                        // Refresh market indicators with new currency
+                        await refreshMarketIndicators();
+                    }
+                });
+            });
+            
+            return currencySelector;
+        }
+        
+        // Function to refresh market indicators with new currency
+        async function refreshMarketIndicators() {
+            // This function will be called when currency changes
+            // It should refresh all price-related data with the new currency
+            console.log(`🔄 Refreshing market indicators with currency: ${displayCurrency}`);
+            
+            // Refresh key metrics section if it exists
+            const keyMetricsSection = document.getElementById('keyMetricsSection');
+            if (keyMetricsSection) {
+                // Re-render key metrics with new currency
+                await loadRegionData();
+            }
+            
+            // Refresh trends section if it exists
+            const propertyTrendsSection = document.getElementById('propertyTrendsSection');
+            if (propertyTrendsSection) {
+                // Re-render trends with new currency
+                await loadPropertyTrends();
+            }
+        }
+
         // Initialize page
         function init() {
             updatePageText();
             loadCountries();
+            
+            // Initialize area slider
+            const areaSlider = document.getElementById('areaObjectSlider');
+            const areaValue = document.getElementById('areaObjectValue');
+            
+            if (areaSlider && areaValue) {
+                areaSlider.addEventListener('input', function() {
+                    const value = this.value;
+                    areaValue.textContent = value + ' м²';
+                    selectedListingTypes.area = parseInt(value);
+                    updateConfirmButton();
+                });
+            }
+            
+            // Initialize price input
+            const priceInput = document.getElementById('priceObjectInput');
+            if (priceInput) {
+                priceInput.addEventListener('input', function() {
+                    selectedListingTypes.price = this.value ? parseFloat(this.value) : null;
+                    updateConfirmButton();
+                });
+            }
+            
+            // Initialize currency select
+            const currencySelect = document.getElementById('currencySelect');
+            if (currencySelect) {
+                currencySelect.addEventListener('change', function() {
+                    selectedListingTypes.currency = this.value;
+                });
+            }
         }
 
         // Start initialization when page loads
