@@ -1839,8 +1839,11 @@
                         return;
                     }
                     
-                    console.log('📍 Found country select, populating with', data.countries.length, 'countries');
-                    console.log('📍 Countries data structure:', data.countries);
+                                    console.log('📍 Found country select, populating with', data.countries.length, 'countries');
+                console.log('📍 Countries data structure:', data.countries);
+                console.log('📍 First country example:', data.countries[0]);
+                console.log('📍 First country type:', typeof data.countries[0]);
+                console.log('📍 First country is array:', Array.isArray(data.countries[0]));
                     
                     // Clear existing options
                     countrySelect.innerHTML = '';
@@ -1852,29 +1855,24 @@
                     countrySelect.appendChild(placeholderOption);
                     console.log(`✅ Added placeholder: ${getText('countryPlaceholder')}`);
                     
-                    // Add countries
+                    // Add countries - API returns tuples (id, name)
                     data.countries.forEach((country, index) => {
                         console.log(`📍 Processing country ${index}:`, country);
                         
-                        let id, name;
-                        if (Array.isArray(country)) {
-                            [id, name] = country;
-                        } else if (typeof country === 'object') {
-                            id = country.country_id || country.id;
-                            name = country.country_name || country.name;
+                        // API returns tuples like [id, name]
+                        if (Array.isArray(country) && country.length === 2) {
+                            const [id, name] = country;
+                            if (id && name) {
+                                const option = document.createElement('option');
+                                option.value = id;
+                                option.textContent = name;
+                                countrySelect.appendChild(option);
+                                console.log(`✅ Added country: ${id} - ${name}`);
+                            } else {
+                                console.error(`❌ Invalid country data: id=${id}, name=${name}`);
+                            }
                         } else {
                             console.error(`❌ Invalid country format:`, country);
-                            return;
-                        }
-                        
-                        if (id && name) {
-                            const option = document.createElement('option');
-                            option.value = id;
-                            option.textContent = name;
-                            countrySelect.appendChild(option);
-                            console.log(`✅ Added country: ${id} - ${name}`);
-                        } else {
-                            console.error(`❌ Invalid country data: id=${id}, name=${name}`);
                         }
                     });
                     
@@ -1914,28 +1912,24 @@
                     console.log('📍 Found city select, populating with', data.cities.length, 'cities');
                     citySelect.innerHTML = `<option value="">${getText('cityPlaceholder')}</option>`;
                     
+                    // Add cities - API returns tuples (id, name)
                     data.cities.forEach((city, index) => {
                         console.log(`📍 Processing city ${index}:`, city);
                         
-                        let id, name;
-                        if (Array.isArray(city)) {
-                            [id, name] = city;
-                        } else if (typeof city === 'object') {
-                            id = city.city_id || city.id;
-                            name = city.city_name || city.name;
+                        // API returns tuples like [id, name]
+                        if (Array.isArray(city) && city.length === 2) {
+                            const [id, name] = city;
+                            if (id && name) {
+                                const option = document.createElement('option');
+                                option.value = id;
+                                option.textContent = name;
+                                citySelect.appendChild(option);
+                                console.log(`✅ Added city: ${id} - ${name}`);
+                            } else {
+                                console.error(`❌ Invalid city data: id=${id}, name=${name}`);
+                            }
                         } else {
                             console.error(`❌ Invalid city format:`, city);
-                            return;
-                        }
-                        
-                        if (id && name) {
-                            const option = document.createElement('option');
-                            option.value = id;
-                            option.textContent = name;
-                            citySelect.appendChild(option);
-                            console.log(`✅ Added city: ${id} - ${name}`);
-                        } else {
-                            console.error(`❌ Invalid city data: id=${id}, name=${name}`);
                         }
                     });
                     
@@ -1974,28 +1968,24 @@
                     console.log('📍 Found county select, populating with', data.counties.length, 'counties');
                     countySelect.innerHTML = `<option value="">${getText('countyPlaceholder')}</option>`;
                     
+                    // Add counties - API returns tuples (id, name)
                     data.counties.forEach((county, index) => {
                         console.log(`📍 Processing county ${index}:`, county);
                         
-                        let id, name;
-                        if (Array.isArray(county)) {
-                            [id, name] = county;
-                        } else if (typeof county === 'object') {
-                            id = county.county_id || county.id;
-                            name = county.county_name || county.name;
+                        // API returns tuples like [id, name]
+                        if (Array.isArray(county) && county.length === 2) {
+                            const [id, name] = county;
+                            if (id && name) {
+                                const option = document.createElement('option');
+                                option.value = id;
+                                option.textContent = name;
+                                countySelect.appendChild(option);
+                                console.log(`✅ Added county: ${id} - ${name}`);
+                            } else {
+                                console.error(`❌ Invalid county data: id=${id}, name=${name}`);
+                            }
                         } else {
                             console.error(`❌ Invalid county format:`, county);
-                            return;
-                        }
-                        
-                        if (id && name) {
-                            const option = document.createElement('option');
-                            option.value = id;
-                            option.textContent = name;
-                            countySelect.appendChild(option);
-                            console.log(`✅ Added county: ${id} - ${name}`);
-                        } else {
-                            console.error(`❌ Invalid county data: id=${id}, name=${name}`);
                         }
                     });
                     
@@ -2253,28 +2243,24 @@
                     districtSelect.appendChild(noDistrictOption);
                     
                     console.log('📍 Adding districts:', data.districts);
+                    // Add districts - API returns tuples (id, name)
                     data.districts.forEach((district, index) => {
                         console.log(`📍 Processing district ${index}:`, district);
                         
-                        let id, name;
-                        if (Array.isArray(district)) {
-                            [id, name] = district;
-                        } else if (typeof district === 'object') {
-                            id = district.district_id || district.id;
-                            name = district.district_name || district.name;
+                        // API returns tuples like [id, name]
+                        if (Array.isArray(district) && district.length === 2) {
+                            const [id, name] = district;
+                            if (id && name) {
+                                const option = document.createElement('option');
+                                option.value = id;
+                                option.textContent = name;
+                                districtSelect.appendChild(option);
+                                console.log(`✅ Added district: ${id} - ${name}`);
+                            } else {
+                                console.error(`❌ Invalid district data: id=${id}, name=${name}`);
+                            }
                         } else {
                             console.error(`❌ Invalid district format:`, district);
-                            return;
-                        }
-                        
-                        if (id && name) {
-                            const option = document.createElement('option');
-                            option.value = id;
-                            option.textContent = name;
-                            districtSelect.appendChild(option);
-                            console.log(`✅ Added district: ${id} - ${name}`);
-                        } else {
-                            console.error(`❌ Invalid district data: id=${id}, name=${name}`);
                         }
                     });
                     
@@ -3463,7 +3449,18 @@
         }
 
         // Start initialization when page loads
-        document.addEventListener('DOMContentLoaded', init);
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('📄 DOM Content Loaded event fired');
+            init();
+        });
+        
+        // Also try to initialize immediately if DOM is already ready
+        if (document.readyState === 'loading') {
+            console.log('📄 DOM is still loading, waiting for DOMContentLoaded...');
+        } else {
+            console.log('📄 DOM is already ready, initializing immediately...');
+            init();
+        }
     </script>
 </body>
 </html>
