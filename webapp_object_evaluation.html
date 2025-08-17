@@ -828,84 +828,81 @@
         }
 
         /* Price and Area Input Styles */
-        .price-area-inputs {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .price-area-inputs input[type="number"] {
-            flex: 1;
+        .listing-type-input {
+            width: 100%;
             padding: 10px 12px;
             border: 1px solid #ddd;
             border-radius: 6px;
             font-size: 14px;
             background: white;
             color: #333;
+            margin-bottom: 10px;
         }
 
-        .price-area-inputs input[type="number"]:focus {
+        .listing-type-input:focus {
             outline: none;
             border-color: #667eea;
             box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
         }
 
-        .price-area-inputs select {
-            padding: 10px 12px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            font-size: 14px;
-            background: white;
-            min-width: 80px;
-            color: #333;
+        /* Currency Buttons Styles */
+        .currency-buttons-container {
+            margin-bottom: 15px;
         }
 
-        .price-area-inputs select:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
+        .currency-buttons-title {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 8px;
+            font-weight: 500;
         }
 
-        .area-slider-container {
+        .currency-buttons {
             display: flex;
+            gap: 8px;
+            justify-content: center;
+        }
+
+        .currency-button {
+            display: flex;
+            flex-direction: column;
             align-items: center;
-            gap: 10px;
-        }
-
-        .area-slider-container input[type="range"] {
-            flex: 1;
-            height: 6px;
-            border-radius: 3px;
-            background: #ddd;
-            outline: none;
-            -webkit-appearance: none;
-        }
-
-        .area-slider-container input[type="range"]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 18px;
-            height: 18px;
-            border-radius: 50%;
-            background: #667eea;
+            justify-content: center;
+            width: 70px;
+            height: 60px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            background: white;
             cursor: pointer;
+            transition: all 0.3s ease;
+            padding: 8px;
         }
 
-        .area-slider-container input[type="range"]::-moz-range-thumb {
-            width: 18px;
-            height: 18px;
-            border-radius: 50%;
+        .currency-button:hover {
+            border-color: #667eea;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+        }
+
+        .currency-button.active {
+            border-color: #667eea;
             background: #667eea;
-            cursor: pointer;
-            border: none;
+            color: white;
         }
 
-        .area-value-display {
-            min-width: 50px;
-            text-align: center;
+        .currency-button.active .currency-flag,
+        .currency-button.active .currency-code {
+            color: white;
+        }
+
+        .currency-flag {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+
+        .currency-code {
+            font-size: 11px;
             font-weight: 600;
-            color: #333;
-            font-size: 14px;
+            color: #666;
         }
 
         /* Mobile responsive for listing type selection */
@@ -930,43 +927,29 @@
                 font-size: 13px;
             }
             
-            .price-area-inputs {
-                flex-direction: column;
-                gap: 8px;
-            }
-            
-            .price-area-inputs input[type="number"] {
+            .listing-type-input {
                 padding: 8px 10px;
                 font-size: 13px;
+                margin-bottom: 8px;
             }
             
-            .price-area-inputs select {
-                padding: 8px 10px;
-                font-size: 13px;
-                min-width: auto;
+            .currency-buttons {
+                gap: 6px;
             }
             
-            .area-slider-container {
-                gap: 8px;
+            .currency-button {
+                width: 60px;
+                height: 50px;
+                padding: 6px;
             }
             
-            .area-slider-container input[type="range"] {
-                height: 5px;
+            .currency-flag {
+                font-size: 18px;
+                margin-bottom: 3px;
             }
             
-            .area-slider-container input[type="range"]::-webkit-slider-thumb {
-                width: 16px;
-                height: 16px;
-            }
-            
-            .area-slider-container input[type="range"]::-moz-range-thumb {
-                width: 16px;
-                height: 16px;
-            }
-            
-            .area-value-display {
-                font-size: 12px;
-                min-width: 45px;
+            .currency-code {
+                font-size: 10px;
             }
             
             .selected-property-types {
@@ -1070,23 +1053,32 @@
                     <!-- Price Object -->
                     <div class="listing-type-group">
                         <div class="listing-type-subtitle" id="priceObjectSubtitle">Цена объекта:</div>
-                        <div class="price-area-inputs">
-                            <input type="number" id="priceObjectInput" placeholder="Введите цену">
-                            <select id="currencySelect">
-                                <option value="TRY">🇹🇷 TRY</option>
-                                <option value="EUR">🇪🇺 EUR</option>
-                                <option value="USD">🇺🇸 USD</option>
-                            </select>
+                        <input type="number" id="priceObjectInput" class="listing-type-input" placeholder="Введите цену">
+                        
+                        <!-- Currency Selection -->
+                        <div class="currency-buttons-container">
+                            <div class="currency-buttons-title" id="currencyTitle">Выберите валюту:</div>
+                            <div class="currency-buttons">
+                                <button type="button" class="currency-button" data-currency="TRY">
+                                    <span class="currency-flag">🇹🇷</span>
+                                    <span class="currency-code">TRY</span>
+                                </button>
+                                <button type="button" class="currency-button" data-currency="EUR">
+                                    <span class="currency-flag">🇪🇺</span>
+                                    <span class="currency-code">EUR</span>
+                                </button>
+                                <button type="button" class="currency-button" data-currency="USD">
+                                    <span class="currency-flag">🇺🇸</span>
+                                    <span class="currency-code">USD</span>
+                                </button>
+                            </div>
                         </div>
                     </div>
 
                     <!-- Area Object -->
                     <div class="listing-type-group">
                         <div class="listing-type-subtitle" id="areaObjectSubtitle">Площадь объекта (м²):</div>
-                        <div class="area-slider-container">
-                            <input type="range" id="areaObjectSlider" min="10" max="1000" value="50">
-                            <span id="areaObjectValue" class="area-value-display">50 м²</span>
-                        </div>
+                        <input type="number" id="areaObjectInput" class="listing-type-input" placeholder="Введите площадь" min="10" max="1000">
                     </div>
                 </div>
 
@@ -1245,7 +1237,10 @@
                 'marketIndicatorsTitle': 'Показатели рынка',
                 'marketTrendsTitle': 'Тренды рынка',
                 'saleHeader': 'Продажа',
-                'rentHeader': 'Аренда'
+                'rentHeader': 'Аренда',
+                'currencyTitle': 'Выберите валюту:',
+                'pricePlaceholder': 'Введите цену',
+                'areaPlaceholder': 'Введите площадь'
             },
             'en': {
                 'slogan': 'Real Estate Market Insights',
@@ -1300,7 +1295,10 @@
                 'marketIndicatorsTitle': 'Market Indicators',
                 'marketTrendsTitle': 'Market Trends',
                 'saleHeader': 'Sale',
-                'rentHeader': 'Rent'
+                'rentHeader': 'Rent',
+                'currencyTitle': 'Select currency:',
+                'pricePlaceholder': 'Enter price',
+                'areaPlaceholder': 'Enter area'
             },
             'de': {
                 'slogan': 'Immobilienmarkt-Einblicke',
@@ -1649,6 +1647,16 @@
             const areaObjectSubtitle = document.getElementById('areaObjectSubtitle');
             if (areaObjectSubtitle) { areaObjectSubtitle.textContent = getText('areaObjectSubtitle'); }
             
+            // Update currency title
+            const currencyTitle = document.getElementById('currencyTitle');
+            if (currencyTitle) { currencyTitle.textContent = getText('currencyTitle'); }
+            
+            // Update placeholders
+            const priceObjectInput = document.getElementById('priceObjectInput');
+            if (priceObjectInput) { priceObjectInput.placeholder = getText('pricePlaceholder'); }
+            const areaObjectInput = document.getElementById('areaObjectInput');
+            if (areaObjectInput) { areaObjectInput.placeholder = getText('areaPlaceholder'); }
+            
             // Update placeholder texts
             const houseTypePlaceholder = document.getElementById('houseTypePlaceholder');
             if (houseTypePlaceholder) { houseTypePlaceholder.textContent = getText('selectBedrooms'); }
@@ -1921,16 +1929,19 @@
             
             // Reset price and area fields
             const priceInput = document.getElementById('priceObjectInput');
-            const areaSlider = document.getElementById('areaObjectSlider');
-            const areaValue = document.getElementById('areaObjectValue');
-            const currencySelect = document.getElementById('currencySelect');
+            const areaInput = document.getElementById('areaObjectInput');
             
             if (priceInput) priceInput.value = '';
-            if (areaSlider) {
-                areaSlider.value = 50;
-                if (areaValue) areaValue.textContent = '50 м²';
-            }
-            if (currencySelect) currencySelect.value = 'EUR';
+            if (areaInput) areaInput.value = '';
+            
+            // Reset currency buttons
+            const currencyButtons = document.querySelectorAll('.currency-button');
+            currencyButtons.forEach(button => {
+                button.classList.remove('active');
+            });
+            // Set EUR as default active
+            const eurButton = document.querySelector('.currency-button[data-currency="EUR"]');
+            if (eurButton) eurButton.classList.add('active');
             
             // Hide selected property types section
             const selectedPropertyTypes = document.getElementById('selectedPropertyTypes');
@@ -2206,7 +2217,8 @@
                 if (selectedListingTypes.area) {
                     html += `
                         <div class="property-type-item">
-                            <span class="property-type-value">Площадь объекта: ${selectedListingTypes.area} м²</span>
+                            <span class="property-type-label">Площадь объекта:</span>
+                            <span class="property-type-value">${selectedListingTypes.area} м²</span>
                         </div>
                     `;
                 }
@@ -3001,19 +3013,6 @@
             updatePageText();
             loadCountries();
             
-            // Initialize area slider
-            const areaSlider = document.getElementById('areaObjectSlider');
-            const areaValue = document.getElementById('areaObjectValue');
-            
-            if (areaSlider && areaValue) {
-                areaSlider.addEventListener('input', function() {
-                    const value = this.value;
-                    areaValue.textContent = value + ' м²';
-                    selectedListingTypes.area = parseInt(value);
-                    updateConfirmButton();
-                });
-            }
-            
             // Initialize price input
             const priceInput = document.getElementById('priceObjectInput');
             if (priceInput) {
@@ -3023,12 +3022,37 @@
                 });
             }
             
-            // Initialize currency select
-            const currencySelect = document.getElementById('currencySelect');
-            if (currencySelect) {
-                currencySelect.addEventListener('change', function() {
-                    selectedListingTypes.currency = this.value;
+            // Initialize area input
+            const areaInput = document.getElementById('areaObjectInput');
+            if (areaInput) {
+                areaInput.addEventListener('input', function() {
+                    selectedListingTypes.area = this.value ? parseInt(this.value) : null;
+                    updateConfirmButton();
                 });
+            }
+            
+            // Initialize currency buttons
+            const currencyButtons = document.querySelectorAll('.currency-button');
+            currencyButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const selectedCurrency = this.dataset.currency;
+                    
+                    // Remove active class from all buttons
+                    currencyButtons.forEach(btn => btn.classList.remove('active'));
+                    
+                    // Add active class to clicked button
+                    this.classList.add('active');
+                    
+                    // Update selected currency
+                    selectedListingTypes.currency = selectedCurrency;
+                });
+            });
+            
+            // Set EUR as default active currency
+            const eurButton = document.querySelector('.currency-button[data-currency="EUR"]');
+            if (eurButton) {
+                eurButton.classList.add('active');
+                selectedListingTypes.currency = 'EUR';
             }
         }
 
