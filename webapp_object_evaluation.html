@@ -1219,10 +1219,9 @@
 
     <script>
         console.log('📜 Script tag loaded');
-        console.log('🔍 Document ready state:', document.readyState);
         
         // Simple test to check if JavaScript is working
-        console.log('🧪 JavaScript test - this should appear in console');
+        alert('JavaScript is working!');
         
         // Telegram WebApp initialization
         let tg = window.Telegram.WebApp;
@@ -1813,6 +1812,7 @@
 
         // Load countries from API
         async function loadCountries() {
+            alert('LOADCOUNTRIES FUNCTION CALLED!');
             try {
                 console.log('🔄 Loading countries...');
                 const response = await fetch('/api/locations/countries');
@@ -1831,15 +1831,15 @@
                             countrySelect.appendChild(option);
                         });
                         
-                        console.log(`✅ Loaded ${data.countries.length} countries`);
+                        alert(`✅ Loaded ${data.countries.length} countries`);
                     } else {
-                        console.error('❌ Country select element not found');
+                        alert('❌ Country select element not found');
                     }
                 } else {
-                    console.error('❌ Failed to load countries:', data.error);
+                    alert('❌ Failed to load countries: ' + data.error);
                 }
             } catch (error) {
-                console.error('❌ Error loading countries:', error);
+                alert('❌ Error loading countries: ' + error.message);
             }
         }
 
@@ -3312,45 +3312,16 @@
 
         // Initialize page
         function init() {
+            alert('INIT FUNCTION CALLED!');
             console.log('🚀 Initializing page...');
             
             try {
                 updatePageText();
                 loadCountries();
-                
-                // Initialize area slider
-                const areaSlider = document.getElementById('areaObjectSlider');
-                const areaValue = document.getElementById('areaObjectValue');
-                
-                if (areaSlider && areaValue) {
-                    areaSlider.addEventListener('input', function() {
-                        const value = this.value;
-                        areaValue.textContent = value + ' м²';
-                        selectedListingTypes.area = parseInt(value);
-                        updateConfirmButton();
-                    });
-                }
-                
-                // Initialize price input
-                const priceInput = document.getElementById('priceObjectInput');
-                if (priceInput) {
-                    priceInput.addEventListener('input', function() {
-                        selectedListingTypes.price = this.value ? parseFloat(this.value) : null;
-                        updateConfirmButton();
-                    });
-                }
-                
-                // Initialize currency select
-                const currencySelect = document.getElementById('currencySelect');
-                if (currencySelect) {
-                    currencySelect.addEventListener('change', function() {
-                        selectedListingTypes.currency = this.value;
-                    });
-                }
-                
                 console.log('✅ Page initialization complete');
             } catch (error) {
                 console.error('❌ Error during initialization:', error);
+                alert('ERROR: ' + error.message);
             }
         }
 
