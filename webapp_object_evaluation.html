@@ -1808,32 +1808,24 @@
         // Load countries from API
         async function loadCountries() {
             try {
-                console.log('🔄 Loading countries...');
                 const response = await fetch('/api/locations/countries');
                 const data = await response.json();
-                console.log('📊 Countries response:', data);
                 
                 if (data.success) {
                     const countrySelect = document.getElementById('countrySelect');
-                    if (countrySelect) {
-                        countrySelect.innerHTML = `<option value="">${getText('countryPlaceholder')}</option>`;
-                        
-                        data.countries.forEach(([id, name]) => {
-                            const option = document.createElement('option');
-                            option.value = id;
-                            option.textContent = name;
-                            countrySelect.appendChild(option);
-                        });
-                        
-                        console.log(`✅ Loaded ${data.countries.length} countries`);
-                    } else {
-                        console.error('❌ Country select element not found');
-                    }
+                    countrySelect.innerHTML = `<option value="">${getText('countryPlaceholder')}</option>`;
+                    
+                    data.countries.forEach(([id, name]) => {
+                        const option = document.createElement('option');
+                        option.value = id;
+                        option.textContent = name;
+                        countrySelect.appendChild(option);
+                    });
                 } else {
-                    console.error('❌ Failed to load countries:', data.error);
+                    console.error('Failed to load countries:', data.error);
                 }
             } catch (error) {
-                console.error('❌ Error loading countries:', error);
+                console.error('Error loading countries:', error);
             }
         }
 
@@ -2137,11 +2129,11 @@
                     const districtSelect = document.getElementById('districtSelect');
                     districtSelect.innerHTML = `<option value="">${getText('districtPlaceholder')}</option>`;
                     
-                    // Add "не имеет значения" option
-                    const noDistrictOption = document.createElement('option');
-                    noDistrictOption.value = 'none';
-                    noDistrictOption.textContent = 'Не имеет значения';
-                    districtSelect.appendChild(noDistrictOption);
+                    // Add "No value" option
+                    const noValueOption = document.createElement('option');
+                    noValueOption.value = 'none';
+                    noValueOption.textContent = 'Не имеет значения';
+                    districtSelect.appendChild(noValueOption);
                     
                     data.districts.forEach(([id, name]) => {
                         const option = document.createElement('option');
@@ -2159,7 +2151,7 @@
             }
         }
 
-        // Event handlers for location changes
+        // Handle country selection change
         function onCountryChange() {
             const countrySelect = document.getElementById('countrySelect');
             const citySelect = document.getElementById('citySelect');
@@ -2167,6 +2159,7 @@
             const districtSelect = document.getElementById('districtSelect');
             
             const countryId = countrySelect.value;
+            const countryName = countrySelect.options[countrySelect.selectedIndex].text;
             
             // Reset dependent selects
             citySelect.innerHTML = `<option value="">${getText('cityPlaceholder')}</option>`;
@@ -2176,6 +2169,17 @@
             districtSelect.innerHTML = `<option value="">${getText('districtPlaceholder')}</option>`;
             districtSelect.disabled = true;
             
+            // Update selected location
+            selectedLocation.country_id = countryId;
+            selectedLocation.country_name = countryName;
+            selectedLocation.city_id = null;
+            selectedLocation.city_name = '';
+            selectedLocation.county_id = null;
+            selectedLocation.county_name = '';
+            selectedLocation.district_id = null;
+            selectedLocation.district_name = '';
+            
+            // Load cities if country is selected
             if (countryId) {
                 loadCities(countryId);
             }
@@ -2183,12 +2187,14 @@
             updateConfirmButton();
         }
 
+        // Handle city selection change
         function onCityChange() {
             const citySelect = document.getElementById('citySelect');
             const countySelect = document.getElementById('countySelect');
             const districtSelect = document.getElementById('districtSelect');
             
             const cityId = citySelect.value;
+            const cityName = citySelect.options[citySelect.selectedIndex].text;
             
             // Reset dependent selects
             countySelect.innerHTML = `<option value="">${getText('countyPlaceholder')}</option>`;
@@ -2196,6 +2202,15 @@
             districtSelect.innerHTML = `<option value="">${getText('districtPlaceholder')}</option>`;
             districtSelect.disabled = true;
             
+            // Update selected location
+            selectedLocation.city_id = cityId;
+            selectedLocation.city_name = cityName;
+            selectedLocation.county_id = null;
+            selectedLocation.county_name = '';
+            selectedLocation.district_id = null;
+            selectedLocation.district_name = '';
+            
+            // Load counties if city is selected
             if (cityId) {
                 loadCounties(cityId);
             }
@@ -2203,16 +2218,25 @@
             updateConfirmButton();
         }
 
+        // Handle county selection change
         function onCountyChange() {
             const countySelect = document.getElementById('countySelect');
             const districtSelect = document.getElementById('districtSelect');
             
             const countyId = countySelect.value;
+            const countyName = countySelect.options[countySelect.selectedIndex].text;
             
             // Reset dependent selects
             districtSelect.innerHTML = `<option value="">${getText('districtPlaceholder')}</option>`;
             districtSelect.disabled = true;
             
+            // Update selected location
+            selectedLocation.county_id = countyId;
+            selectedLocation.county_name = countyName;
+            selectedLocation.district_id = null;
+            selectedLocation.district_name = '';
+            
+            // Load districts if county is selected
             if (countyId) {
                 loadDistricts(countyId);
             }
@@ -2220,9 +2244,16 @@
             updateConfirmButton();
         }
 
+        // Handle district selection change
         function onDistrictChange() {
-            // This function can be expanded later
-            console.log('District changed:', document.getElementById('districtSelect').value);
+            const districtSelect = document.getElementById('districtSelect');
+            const districtId = districtSelect.value;
+            const districtName = districtSelect.options[districtSelect.selectedIndex].text;
+            
+            // Update selected location
+            selectedLocation.district_id = districtId === 'none' ? null : districtId;
+            selectedLocation.district_name = districtId === 'none' ? 'Не имеет значения' : districtName;
+            
             updateConfirmButton();
         }
 
@@ -2331,34 +2362,6 @@
 
         // Confirm location selection
         function confirmLocation() {
-            const countrySelect = document.getElementById('countrySelect');
-            const citySelect = document.getElementById('citySelect');
-            const countySelect = document.getElementById('countySelect');
-            const districtSelect = document.getElementById('districtSelect');
-            
-            const countryId = countrySelect.value;
-            const cityId = citySelect.value;
-            const countyId = countySelect.value;
-            const districtId = districtSelect.value === 'none' ? null : districtSelect.value;
-            
-            // Get names for display
-            const countryName = countrySelect.options[countrySelect.selectedIndex].text;
-            const cityName = citySelect.options[citySelect.selectedIndex].text;
-            const countyName = countySelect.options[countySelect.selectedIndex].text;
-            const districtName = districtSelect.value === 'none' ? 'Не имеет значения' : districtSelect.options[districtSelect.selectedIndex].text;
-            
-            // Update selected location
-            selectedLocation = {
-                country_id: countryId,
-                city_id: cityId,
-                county_id: countyId,
-                district_id: districtId,
-                country_name: countryName,
-                city_name: cityName,
-                county_name: countyName,
-                district_name: districtName
-            };
-            
             // Display selected location
             displaySelectedLocation();
         }
@@ -3135,18 +3138,21 @@
             }
         }
 
-        // Initialize page
+        // Initialize the page
         function init() {
-            console.log('🚀 Initializing page...');
-            
-            try {
-                updatePageText();
-                loadCountries();
-                updateConfirmButton();
-                console.log('✅ Page initialization complete');
-            } catch (error) {
-                console.error('❌ Error during initialization:', error);
+            // Set language based on Telegram WebApp
+            if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
+                const userLang = tg.initDataUnsafe.user.language_code;
+                if (userLang && locales[userLang]) {
+                    currentLanguage = userLang;
+                }
             }
+            
+            // Update page text
+            updatePageText();
+            
+            // Load countries
+            loadCountries();
         }
 
         // Start initialization when page loads
