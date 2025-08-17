@@ -542,16 +542,31 @@
             font-style: italic;
         }
         
-        .trend-card-price_trend {
+                .trend-card-price_trend {
             border-left: 4px solid #28a745;
         }
-        
+
+        .trend-card-price {
+            border-left: 4px solid #28a745;
+        }
+
         .trend-card-yield_trend {
             border-left: 4px solid #ffc107;
         }
-        
+
         .trend-card-count_trend {
             border-left: 4px solid #17a2b8;
+        }
+
+        .price-comparison {
+            font-size: 12px;
+            color: #495057;
+            margin-top: 6px;
+            line-height: 1.3;
+            padding: 4px 8px;
+            background: #f8f9fa;
+            border-radius: 4px;
+            border-left: 3px solid #28a745;
         }
         
         /* Trends Table Styles */
@@ -847,35 +862,34 @@
 
         /* Currency Buttons Styles */
         .currency-buttons-container {
-            margin-bottom: 15px;
+            margin-bottom: 12px;
         }
 
         .currency-buttons-title {
             font-size: 12px;
             color: #666;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             font-weight: 500;
         }
 
         .currency-buttons {
             display: flex;
-            gap: 8px;
+            gap: 6px;
             justify-content: center;
         }
 
         .currency-button {
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
-            width: 70px;
-            height: 60px;
+            width: 50px;
+            height: 40px;
             border: 2px solid #e0e0e0;
-            border-radius: 8px;
+            border-radius: 6px;
             background: white;
             cursor: pointer;
             transition: all 0.3s ease;
-            padding: 8px;
+            padding: 4px;
         }
 
         .currency-button:hover {
@@ -895,12 +909,12 @@
         }
 
         .currency-flag {
-            font-size: 20px;
-            margin-bottom: 4px;
+            font-size: 18px;
+            margin-right: 4px;
         }
 
         .currency-code {
-            font-size: 11px;
+            font-size: 12px;
             font-weight: 600;
             color: #666;
         }
@@ -934,18 +948,18 @@
             }
             
             .currency-buttons {
-                gap: 6px;
+                gap: 4px;
             }
             
             .currency-button {
-                width: 60px;
-                height: 50px;
-                padding: 6px;
+                width: 45px;
+                height: 35px;
+                padding: 3px;
             }
             
             .currency-flag {
-                font-size: 18px;
-                margin-bottom: 3px;
+                font-size: 16px;
+                margin-right: 3px;
             }
             
             .currency-code {
@@ -1094,7 +1108,7 @@
             
             <!-- Выбранные характеристики недвижимости -->
             <div class="selected-property-types" id="selectedPropertyTypes" style="display: none;">
-                <div class="property-types-title" id="propertyTypesTitle">Выбранные характеристики недвижимости:</div>
+                <div class="property-types-title" id="propertyTypesTitle">Характеристики объекта:</div>
                 <div class="property-types-details" id="propertyTypesDetails"></div>
             </div>
             
@@ -1229,7 +1243,7 @@
                 'selectFloor': 'этаж',
                 'selectAge': 'возраст объекта',
                 'selectHeating': 'тип отопления',
-                'propertyTypesTitle': 'Выбранные характеристики недвижимости:',
+                'propertyTypesTitle': 'Характеристики объекта:',
                 'bedroomsLabel': 'Количество спален',
                 'floorLabel': 'Этаж',
                 'ageLabel': 'Возраст объекта',
@@ -1240,7 +1254,21 @@
                 'rentHeader': 'Аренда',
                 'currencyTitle': 'Выберите валюту:',
                 'pricePlaceholder': 'Введите цену',
-                'areaPlaceholder': 'Введите площадь'
+                'areaPlaceholder': 'Введите площадь',
+                'marketPriceTrendTitle': 'Рыночный тренд цены по вашему объекту:',
+                'saleTrendLabel': 'Продажа',
+                'rentTrendLabel': 'Аренда',
+                'yourPriceAbove': 'Ваша цена выше трендовой на',
+                'yourPriceBelow': 'Ваша цена ниже трендовой на',
+                'yourPriceEqual': 'Ваша цена равна трендовой',
+                'trendBy': 'на',
+                'noDataMessage': 'Нет данных для отображения',
+                'tableDateHeader': 'Дата',
+                'tableSalePriceHeader': 'Цена продажи',
+                'tableSaleChangeHeader': 'Изменение продажи',
+                'tableRentPriceHeader': 'Цена аренды',
+                'tableRentChangeHeader': 'Изменение аренды',
+                'tableYieldHeader': 'Доходность'
             },
             'en': {
                 'slogan': 'Real Estate Market Insights',
@@ -1287,7 +1315,7 @@
                 'selectFloor': 'floor',
                 'selectAge': 'property age',
                 'selectHeating': 'heating type',
-                'propertyTypesTitle': 'Selected property characteristics:',
+                'propertyTypesTitle': 'Property characteristics:',
                 'bedroomsLabel': 'Bedroom count',
                 'floorLabel': 'Floor',
                 'ageLabel': 'Property age',
@@ -1298,7 +1326,21 @@
                 'rentHeader': 'Rent',
                 'currencyTitle': 'Select currency:',
                 'pricePlaceholder': 'Enter price',
-                'areaPlaceholder': 'Enter area'
+                'areaPlaceholder': 'Enter area',
+                'marketPriceTrendTitle': 'Market price trend for your property:',
+                'saleTrendLabel': 'Sale',
+                'rentTrendLabel': 'Rent',
+                'yourPriceAbove': 'Your price is above the trend by',
+                'yourPriceBelow': 'Your price is below the trend by',
+                'yourPriceEqual': 'Your price equals the trend',
+                'trendBy': 'by',
+                'noDataMessage': 'No data to display',
+                'tableDateHeader': 'Date',
+                'tableSalePriceHeader': 'Sale Price',
+                'tableSaleChangeHeader': 'Sale Change',
+                'tableRentPriceHeader': 'Rent Price',
+                'tableRentChangeHeader': 'Rent Change',
+                'tableYieldHeader': 'Yield'
             },
             'de': {
                 'slogan': 'Immobilienmarkt-Einblicke',
@@ -1418,7 +1460,15 @@
                 'yieldLabel': 'Getiri',
                 'insightsTitle': 'Özet',
                 'insightsLoading': 'Veriler analiz ediliyor...',
-                'insightsError': 'Veri analizi hatası'
+                'insightsError': 'Veri analizi hatası',
+                'propertyTypesTitle': 'Gayrimenkul özellikleri:',
+                'noDataMessage': 'Görüntülenecek veri yok',
+                'tableDateHeader': 'Tarih',
+                'tableSalePriceHeader': 'Satış Fiyatı',
+                'tableSaleChangeHeader': 'Satış Değişimi',
+                'tableRentPriceHeader': 'Kiralama Fiyatı',
+                'tableRentChangeHeader': 'Kiralama Değişimi',
+                'tableYieldHeader': 'Getiri'
             },
             'de': {
                 'slogan': 'Immobilienmarkt-Einblicke',
@@ -2722,22 +2772,9 @@
             const groupedTrends = groupTrendsByType(trends);
             
             trendsSection.innerHTML = `
-                <h3 class="data-section-title">${getText('marketTrendsTitle')}</h3>
                 <div class="data-section-content">
                     <div class="trends-grid">
-                        ${Object.entries(groupedTrends).map(([type, typeTrends]) => `
-                            <div class="trend-card trend-card-${type}">
-                                <div class="trend-title">${formatTrendType(type)}</div>
-                                <div class="trend-value">${formatTrendValue(typeTrends[0].trend_value, type)}</div>
-                                <div class="trend-details">
-                                    <div class="trend-change">
-                                        ${typeTrends[0].price_change_sale ? `Продажа: ${formatPercentage(typeTrends[0].price_change_sale)}` : ''}
-                                        ${typeTrends[0].price_change_rent ? `Аренда: ${formatPercentage(typeTrends[0].price_change_rent)}` : ''}
-                                    </div>
-                                    <div class="trend-date">${formatTrendDate(typeTrends[0].date)}</div>
-                                </div>
-                            </div>
-                        `).join('')}
+                        ${generateMarketPriceTrendCard(trends)}
                     </div>
                     
                     <!-- Таблица со всеми записями трендов -->
@@ -2786,6 +2823,17 @@
             const sign = numValue >= 0 ? '+' : '';
             return `${sign}${(numValue * 100).toFixed(2)}%`;
         }
+
+        // Format number with thousand separators
+        function formatNumber(value) {
+            if (value === null || value === undefined) return '0';
+            const numValue = parseFloat(value);
+            if (isNaN(numValue)) return '0';
+            return numValue.toLocaleString('tr-TR', { 
+                minimumFractionDigits: 2, 
+                maximumFractionDigits: 2 
+            });
+        }
         
         // Format trend date
         function formatTrendDate(dateStr) {
@@ -2801,38 +2849,122 @@
             }
         }
         
-        // Generate detailed trends table
-        function generateTrendsTable(trends) {
+        // Generate market price trend card for user's property
+        function generateMarketPriceTrendCard(trends) {
             if (!trends || trends.length === 0) {
                 return '<div class="no-data">Нет данных для отображения</div>';
             }
             
+            // Find current month and year trends
+            const currentDate = new Date();
+            const currentYear = currentDate.getFullYear();
+            const currentMonth = currentDate.getMonth() + 1; // January is 0
+            
+            // Find trend for current month and year
+            const currentTrend = trends.find(trend => {
+                if (!trend.property_year || !trend.property_month) return false;
+                return trend.property_year === currentYear && trend.property_month === currentMonth;
+            });
+            
+            if (!currentTrend) {
+                return '<div class="no-data">Нет данных для текущего месяца</div>';
+            }
+            
+            // Calculate market price for user's property
+            const marketPricePerM2 = currentTrend.unit_price_for_sale || 0;
+            const userArea = selectedListingTypes.area || 0;
+            const marketPriceTotal = marketPricePerM2 * userArea;
+            
+            // Calculate price difference with user's price
+            const userPrice = selectedListingTypes.price || 0;
+            let priceDifference = 0;
+            let priceDifferencePercent = 0;
+            let priceComparisonText = '';
+            
+            if (userPrice > 0) {
+                priceDifference = userPrice - marketPriceTotal;
+                priceDifferencePercent = (priceDifference / marketPriceTotal) * 100;
+                
+                if (priceDifference > 0) {
+                    priceComparisonText = getText('yourPriceAbove');
+                } else if (priceDifference < 0) {
+                    priceComparisonText = getText('yourPriceBelow');
+                } else {
+                    priceComparisonText = getText('yourPriceEqual');
+                }
+            }
+            
+            // Format currency based on user's selection
+            const currencySymbols = {
+                'TRY': '₺',
+                'EUR': '€',
+                'USD': '$'
+            };
+            const currencySymbol = currencySymbols[selectedListingTypes.currency] || '₺';
+            
+            return `
+                <div class="trend-card trend-card-price">
+                    <div class="trend-title">${getText('marketPriceTrendTitle')}</div>
+                    <div class="trend-value">${currencySymbol}${formatNumber(marketPriceTotal)}</div>
+                    <div class="trend-details">
+                        <div class="trend-change">
+                            ${currentTrend.price_change_sale ? `${getText('saleTrendLabel')}: ${formatPercentage(currentTrend.price_change_sale)}` : ''}
+                            ${currentTrend.price_change_rent ? `${getText('rentTrendLabel')}: ${formatPercentage(currentTrend.price_change_rent)}` : ''}
+                        </div>
+                        ${userPrice > 0 ? `
+                            <div class="price-comparison">
+                                ${priceComparisonText} ${getText('trendBy')} ${formatNumber(Math.abs(priceDifference))} ${selectedListingTypes.currency} 
+                                (${formatPercentage(Math.abs(priceDifferencePercent))})
+                            </div>
+                        ` : ''}
+                        <div class="trend-date">${formatTrendDate(currentTrend.date)}</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Generate detailed trends table
+        function generateTrendsTable(trends) {
+            if (!trends || trends.length === 0) {
+                return '<div class="no-data">' + getText('noDataMessage') + '</div>';
+            }
+            
+            // Get user's area and currency
+            const userArea = selectedListingTypes.area || 0;
+            const userCurrency = selectedListingTypes.currency || 'EUR';
+            
+            // Currency symbols
+            const currencySymbols = {
+                'TRY': '₺',
+                'EUR': '€',
+                'USD': '$'
+            };
+            const currencySymbol = currencySymbols[userCurrency] || '€';
+            
             let html = '<table class="trends-table">';
             html += '<thead><tr>';
-            html += '<th>Дата</th>';
-            html += '<th>Цена продажи (₺/м²)</th>';
-            html += '<th>Цена аренды (₺/м²)</th>';
-            html += '<th>Изменение цен продажи</th>';
-            html += '<th>Изменение цен аренды</th>';
-            html += '<th>Годовое изменение продажи</th>';
-            html += '<th>Годовое изменение аренды</th>';
-            html += '<th>Доходность</th>';
-            html += '<th>Количество продаж</th>';
-            html += '<th>Количество аренд</th>';
+            html += '<th>' + getText('tableDateHeader') + '</th>';
+            html += '<th>' + getText('tableSalePriceHeader') + '</th>';
+            html += '<th>' + getText('tableSaleChangeHeader') + '</th>';
+            html += '<th>' + getText('tableRentPriceHeader') + '</th>';
+            html += '<th>' + getText('tableRentChangeHeader') + '</th>';
+            html += '<th>' + getText('tableYieldHeader') + '</th>';
             html += '</tr></thead><tbody>';
             
             trends.forEach(trend => {
+                // Calculate total prices for user's property
+                const salePricePerM2 = trend.unit_price_for_sale || 0;
+                const rentPricePerM2 = trend.unit_price_for_rent || 0;
+                const totalSalePrice = salePricePerM2 * userArea;
+                const totalRentPrice = rentPricePerM2 * userArea;
+                
                 html += '<tr>';
                 html += `<td>${formatTrendDate(trend.date)}</td>`;
-                html += `<td>${formatTrendValue(trend.trend_value, 'price')}</td>`;
-                html += `<td>${formatTrendValue(trend.unit_price_for_rent || trend.trend_value, 'price')}</td>`;
+                html += `<td>${currencySymbol}${formatNumber(totalSalePrice)}</td>`;
                 html += `<td>${formatPercentage(trend.price_change_sale)}</td>`;
+                html += `<td>${currencySymbol}${formatNumber(totalRentPrice)}</td>`;
                 html += `<td>${formatPercentage(trend.price_change_rent)}</td>`;
-                html += `<td>${formatPercentage(trend.annual_price_change_sale)}</td>`;
-                html += `<td>${formatPercentage(trend.annual_price_change_rent)}</td>`;
                 html += `<td>${formatPercentage(trend.yield)}</td>`;
-                html += `<td>${trend.count_for_sale || '-'}</td>`;
-                html += `<td>${trend.count_for_rent || '-'}</td>`;
                 html += '</tr>';
             });
             
