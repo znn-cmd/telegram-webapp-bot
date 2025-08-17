@@ -157,87 +157,6 @@
             padding-left: 4px;
         }
 
-        /* Price and Area Input Styles */
-        .price-area-inputs {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .price-area-inputs input[type="number"] {
-            flex: 1;
-            padding: 10px 12px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            font-size: 14px;
-            background: white;
-            color: #333;
-        }
-
-        .price-area-inputs input[type="number"]:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
-        }
-
-        .price-area-inputs select {
-            padding: 10px 12px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            font-size: 14px;
-            background: white;
-            min-width: 80px;
-            color: #333;
-        }
-
-        .price-area-inputs select:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
-        }
-
-        .area-slider-container {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .area-slider-container input[type="range"] {
-            flex: 1;
-            height: 6px;
-            border-radius: 3px;
-            background: #ddd;
-            outline: none;
-            -webkit-appearance: none;
-        }
-
-        .area-slider-container input[type="range"]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 18px;
-            height: 18px;
-            border-radius: 50%;
-            background: #667eea;
-            cursor: pointer;
-        }
-
-        .area-slider-container input[type="range"]::-moz-range-thumb {
-            width: 18px;
-            height: 18px;
-            border-radius: 50%;
-            background: #667eea;
-            cursor: pointer;
-            border: none;
-        }
-
-        .area-value-display {
-            min-width: 50px;
-            text-align: center;
-            font-weight: 600;
-            color: #333;
-            font-size: 14px;
-        }
-
         /* Selected Location Styles */
         .selected-location {
             background: #e8f5e8;
@@ -479,76 +398,6 @@
 
         .data-section-content {
             padding: 0;
-        }
-        
-        /* Currency Selector Styles */
-        .currency-selector {
-            background: white;
-            border: 1px solid #e0e0e0;
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        
-        .currency-selector-title {
-            font-size: 16px;
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 15px;
-            text-align: center;
-        }
-        
-        .currency-buttons {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-        
-        .currency-button {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            width: 80px;
-            height: 80px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            background: white;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            padding: 10px;
-        }
-        
-        .currency-button:hover {
-            border-color: #667eea;
-            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
-        }
-        
-        .currency-button.active {
-            border-color: #667eea;
-            background: #667eea;
-            color: white;
-        }
-        
-        .currency-button.active .currency-symbol,
-        .currency-button.active .currency-code {
-            color: white;
-        }
-        
-        .currency-symbol {
-            font-size: 24px;
-            font-weight: bold;
-            color: #333;
-            margin-bottom: 5px;
-        }
-        
-        .currency-code {
-            font-size: 12px;
-            font-weight: 600;
-            color: #666;
-            text-transform: uppercase;
         }
         
         .data-item {
@@ -978,38 +827,6 @@
             }
         }
 
-        /* Mobile responsive for currency selector */
-        @media (max-width: 480px) {
-            .currency-selector {
-                padding: 15px;
-                margin-bottom: 15px;
-            }
-            
-            .currency-selector-title {
-                font-size: 14px;
-                margin-bottom: 12px;
-            }
-            
-            .currency-buttons {
-                gap: 8px;
-            }
-            
-            .currency-button {
-                width: 70px;
-                height: 70px;
-                padding: 8px;
-            }
-            
-            .currency-symbol {
-                font-size: 20px;
-                margin-bottom: 4px;
-            }
-            
-            .currency-code {
-                font-size: 11px;
-            }
-        }
-
         /* Mobile responsive for listing type selection */
         @media (max-width: 480px) {
             .listing-type-section {
@@ -1129,28 +946,6 @@
                             <option value="" id="heatingDataPlaceholder">Выберите тип отопления</option>
                         </select>
                     </div>
-
-                    <!-- Price Object -->
-                    <div class="listing-type-group">
-                        <div class="listing-type-subtitle" id="priceObjectSubtitle">Цена объекта:</div>
-                        <div class="price-area-inputs">
-                            <input type="number" id="priceObjectInput" placeholder="Введите цену">
-                            <select id="currencySelect">
-                                <option value="TRY">🇹🇷 TRY</option>
-                                <option value="EUR">🇪🇺 EUR</option>
-                                <option value="USD">🇺🇸 USD</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <!-- Area Object -->
-                    <div class="listing-type-group">
-                        <div class="listing-type-subtitle" id="areaObjectSubtitle">Площадь объекта (м²):</div>
-                        <div class="area-slider-container">
-                            <input type="range" id="areaObjectSlider" min="10" max="1000" value="50">
-                            <span id="areaObjectValue" class="area-value-display">50 м²</span>
-                        </div>
-                    </div>
                 </div>
 
             <button class="confirm-button" id="confirmButton" onclick="confirmLocation()" disabled>
@@ -1244,19 +1039,13 @@
 
         // User language
         let userLanguage = 'ru';
-        
-        // Display currency (default: TRY)
-        let displayCurrency = 'TRY';
 
         // Selected listing types
         let selectedListingTypes = {
             house_type: null,
             floor_segment: null,
             age: null,
-            heating: null,
-            price: null,
-            currency: 'EUR',
-            area: 50
+            heating: null
         };
 
         // Localization data
@@ -1300,41 +1089,17 @@
                 'floorSegmentSubtitle': 'Этаж:',
                 'ageDataSubtitle': 'Возраст объекта:',
                 'heatingDataSubtitle': 'Тип отопления:',
-                'priceObjectSubtitle': 'Цена объекта:',
-                'areaObjectSubtitle': 'Площадь объекта (м²):',
                 'selectBedrooms': 'Выберите количество спален',
                 'selectFloor': 'Выберите этаж',
                 'selectAge': 'Выберите возраст объекта',
                 'selectHeating': 'Выберите тип отопления',
-                'propertyTypesTitle': 'Характеристики объекта:',
+                'propertyTypesTitle': 'Выбранные характеристики недвижимости:',
                 'bedroomsLabel': 'Количество спален',
                 'floorLabel': 'Этаж',
                 'ageLabel': 'Возраст объекта',
                 'heatingLabel': 'Тип отопления',
-                'priceLabel': 'Цена объекта',
-                'areaLabel': 'Площадь объекта',
                 'marketIndicatorsTitle': 'Показатели рынка',
                 'marketTrendsTitle': 'Тренды рынка',
-                'priceTrendTitle': 'Тренд цены',
-                'saleTrendLabel': 'Продажа',
-                'rentTrendLabel': 'Аренда',
-                'detailedTrendsTitle': 'Детальные данные трендов',
-                'tableDateHeader': 'Дата',
-                'tableSalePriceHeader': 'Цена продажи (₺/м²)',
-                'tableRentPriceHeader': 'Цена аренды (₺/м²)',
-                'tableSaleChangeHeader': 'Изменение цен продажи',
-                'tableRentChangeHeader': 'Изменение цен аренды',
-                'tableAnnualSaleChangeHeader': 'Годовое изменение продажи',
-                'tableAnnualRentChangeHeader': 'Годовое изменение аренды',
-                'tableYieldHeader': 'Доходность',
-                'tableSaleCountHeader': 'Количество продаж',
-                'tableRentCountHeader': 'Количество аренд',
-                'noDataMessage': 'Нет данных для отображения',
-                'displayCurrencyTitle': 'Валюта отображения:',
-                'currencyTRY': 'Лира',
-                'currencyUSD': 'Доллар',
-                'currencyEUR': 'Евро',
-                'currencyRUB': 'Рубль',
                 'saleHeader': 'Продажа',
                 'rentHeader': 'Аренда'
             },
@@ -1377,41 +1142,17 @@
                 'floorSegmentSubtitle': 'Floor:',
                 'ageDataSubtitle': 'Property age:',
                 'heatingDataSubtitle': 'Heating type:',
-                'priceObjectSubtitle': 'Property price:',
-                'areaObjectSubtitle': 'Property area (m²):',
                 'selectBedrooms': 'Select bedroom count',
                 'selectFloor': 'Select floor',
                 'selectAge': 'Select property age',
                 'selectHeating': 'Select heating type',
-                'propertyTypesTitle': 'Object characteristics:',
+                'propertyTypesTitle': 'Selected property characteristics:',
                 'bedroomsLabel': 'Bedroom count',
                 'floorLabel': 'Floor',
                 'ageLabel': 'Property age',
                 'heatingLabel': 'Heating type',
-                'priceLabel': 'Property price',
-                'areaLabel': 'Property area',
                 'marketIndicatorsTitle': 'Market Indicators',
                 'marketTrendsTitle': 'Market Trends',
-                'priceTrendTitle': 'Price Trend',
-                'saleTrendLabel': 'Sale',
-                'rentTrendLabel': 'Rent',
-                'detailedTrendsTitle': 'Detailed Trend Data',
-                'tableDateHeader': 'Date',
-                'tableSalePriceHeader': 'Sale Price (₺/m²)',
-                'tableRentPriceHeader': 'Rent Price (₺/m²)',
-                'tableSaleChangeHeader': 'Sale Price Change',
-                'tableRentChangeHeader': 'Rent Price Change',
-                'tableAnnualSaleChangeHeader': 'Annual Sale Change',
-                'tableAnnualRentChangeHeader': 'Annual Rent Change',
-                'tableYieldHeader': 'Yield',
-                'tableSaleCountHeader': 'Sale Count',
-                'tableRentCountHeader': 'Rent Count',
-                'noDataMessage': 'No data to display',
-                'displayCurrencyTitle': 'Display currency:',
-                'currencyTRY': 'Lira',
-                'currencyUSD': 'Dollar',
-                'currencyEUR': 'Euro',
-                'currencyRUB': 'Ruble',
                 'saleHeader': 'Sale',
                 'rentHeader': 'Rent'
             },
@@ -1659,43 +1400,26 @@
 
         // Get localized text
         function getText(key) {
-            const text = locales[currentLanguage][key] || key;
-            console.log(`🌐 getText('${key}') = '${text}' (language: ${currentLanguage})`);
-            return text;
+            return locales[currentLanguage][key] || key;
         }
 
         // Update page text based on current language
         function updatePageText() {
-            console.log('🔄 Updating page text...');
-            
-            // Check if elements exist before updating
-            const elements = {
-                'slogan': document.getElementById('slogan'),
-                'pageTitle': document.getElementById('pageTitle'),
-                'pageDescription': document.getElementById('pageDescription'),
-                'countryLabel': document.getElementById('countryLabel'),
-                'cityLabel': document.getElementById('cityLabel'),
-                'countyLabel': document.getElementById('countyLabel'),
-                'districtLabel': document.getElementById('districtLabel'),
-                'countryPlaceholder': document.getElementById('countryPlaceholder'),
-                'cityPlaceholder': document.getElementById('cityPlaceholder'),
-                'countyPlaceholder': document.getElementById('countyPlaceholder'),
-                'districtPlaceholder': document.getElementById('districtPlaceholder'),
-                'confirmButtonText': document.getElementById('confirmButtonText'),
-                'backButton': document.getElementById('backButton'),
-                'selectedLocationTitle': document.getElementById('selectedLocationTitle'),
-                'adminIdsTitle': document.getElementById('adminIdsTitle')
-            };
-            
-            // Update text for existing elements
-            Object.entries(elements).forEach(([key, element]) => {
-                if (element) {
-                    element.textContent = getText(key);
-                    console.log(`✅ Updated ${key}: ${element.textContent}`);
-                } else {
-                    console.error(`❌ Element not found: ${key}`);
-                }
-            });
+            document.getElementById('slogan').textContent = getText('slogan');
+            document.getElementById('pageTitle').textContent = getText('pageTitle');
+            document.getElementById('pageDescription').textContent = getText('pageDescription');
+            document.getElementById('countryLabel').textContent = getText('countryLabel');
+            document.getElementById('cityLabel').textContent = getText('cityLabel');
+            document.getElementById('countyLabel').textContent = getText('countyLabel');
+            document.getElementById('districtLabel').textContent = getText('districtLabel');
+            document.getElementById('countryPlaceholder').textContent = getText('countryPlaceholder');
+            document.getElementById('cityPlaceholder').textContent = getText('cityPlaceholder');
+            document.getElementById('countyPlaceholder').textContent = getText('countyPlaceholder');
+            document.getElementById('districtPlaceholder').textContent = getText('districtPlaceholder');
+            document.getElementById('confirmButtonText').textContent = getText('confirmButtonText');
+            document.getElementById('backButton').textContent = getText('backButton');
+            document.getElementById('selectedLocationTitle').textContent = getText('selectedLocationTitle');
+            document.getElementById('adminIdsTitle').textContent = getText('adminIdsTitle');
             
             // Update new data section elements
             const dataSectionTitle = document.getElementById('dataSectionTitle');
@@ -1773,31 +1497,6 @@
             const heatingDataSubtitle = document.getElementById('heatingDataSubtitle');
             if (heatingDataSubtitle) { heatingDataSubtitle.textContent = getText('heatingDataSubtitle'); }
             
-            // Update new fields
-            const priceObjectSubtitle = document.getElementById('priceObjectSubtitle');
-            if (priceObjectSubtitle) { priceObjectSubtitle.textContent = getText('priceObjectSubtitle'); }
-            const areaObjectSubtitle = document.getElementById('areaObjectSubtitle');
-            if (areaObjectSubtitle) { areaObjectSubtitle.textContent = getText('areaObjectSubtitle'); }
-            
-            // Update trends section if it exists
-            const propertyTrendsSection = document.getElementById('propertyTrendsSection');
-            if (propertyTrendsSection) {
-                // Re-render trends section with new language
-                const trendsTableTitle = propertyTrendsSection.querySelector('.trends-table-title');
-                if (trendsTableTitle) {
-                    trendsTableTitle.textContent = getText('detailedTrendsTitle');
-                }
-            }
-            
-            // Update currency selector if it exists
-            const currencySelector = document.querySelector('.currency-selector');
-            if (currencySelector) {
-                const currencyTitle = currencySelector.querySelector('.currency-selector-title');
-                if (currencyTitle) {
-                    currencyTitle.textContent = getText('displayCurrencyTitle');
-                }
-            }
-            
             // Update placeholder texts
             const houseTypePlaceholder = document.getElementById('houseTypePlaceholder');
             if (houseTypePlaceholder) { houseTypePlaceholder.textContent = getText('selectBedrooms'); }
@@ -1812,280 +1511,101 @@
             const propertyTypesTitle = document.getElementById('propertyTypesTitle');
             if (propertyTypesTitle) { propertyTypesTitle.textContent = getText('propertyTypesTitle'); }
             
-            // Update property type labels if they exist
-            const priceLabel = document.getElementById('priceLabel');
-            if (priceLabel) { priceLabel.textContent = getText('priceLabel'); }
-            const areaLabel = document.getElementById('areaLabel');
-            if (areaLabel) { areaLabel.textContent = getText('areaLabel'); }
-            
             const insightsErrorText = document.getElementById('insightsErrorText');
             if (insightsErrorText) {
                 insightsErrorText.textContent = getText('insightsError');
             }
         }
 
-                // Новая система загрузки локаций
-        class LocationManager {
-            constructor() {
-                this.countrySelect = document.getElementById('countrySelect');
-                this.citySelect = document.getElementById('citySelect');
-                this.countySelect = document.getElementById('countySelect');
-                this.districtSelect = document.getElementById('districtSelect');
+        // Load countries from API
+        async function loadCountries() {
+            try {
+                const response = await fetch('/api/locations/countries');
+                const data = await response.json();
                 
-                this.init();
-            }
-            
-            init() {
-                console.log('🚀 Initializing LocationManager...');
-                this.loadCountries();
-                this.bindEvents();
-            }
-            
-            bindEvents() {
-                this.countrySelect.addEventListener('change', () => this.onCountryChange());
-                this.citySelect.addEventListener('change', () => this.onCityChange());
-                this.countySelect.addEventListener('change', () => this.onCountyChange());
-                this.districtSelect.addEventListener('change', () => this.onDistrictChange());
-            }
-            
-            async loadCountries() {
-                try {
-                    console.log('🔄 Загружаем страны...');
-                    const response = await fetch('/api/locations/countries');
-                    const data = await response.json();
-                    console.log('📊 Ответ API стран:', data);
+                if (data.success) {
+                    const countrySelect = document.getElementById('countrySelect');
+                    countrySelect.innerHTML = `<option value="">${getText('countryPlaceholder')}</option>`;
                     
-                    if (data.success && data.countries && data.countries.length > 0) {
-                        this.populateSelect(this.countrySelect, data.countries, 'Выберите страну');
-                        console.log('✅ Страны загружены:', data.countries.length);
-                    } else {
-                        console.error('❌ Ошибка загрузки стран:', data.error || 'Нет данных');
-                    }
-                } catch (error) {
-                    console.error('❌ Ошибка при загрузке стран:', error);
-                }
-            }
-            
-            async loadCities(countryId) {
-                try {
-                    console.log('🔄 Загружаем города для страны:', countryId);
-                    const response = await fetch('/api/locations/cities', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ country_id: countryId })
+                    data.countries.forEach(([id, name]) => {
+                        const option = document.createElement('option');
+                        option.value = id;
+                        option.textContent = name;
+                        countrySelect.appendChild(option);
                     });
-                    const data = await response.json();
-                    console.log('📊 Ответ API городов:', data);
-                    
-                    if (data.success && data.cities && data.cities.length > 0) {
-                        this.populateSelect(this.citySelect, data.cities, 'Выберите город');
-                        this.citySelect.disabled = false;
-                        console.log('✅ Города загружены:', data.cities.length);
-                    } else {
-                        console.error('❌ Ошибка загрузки городов:', data.error || 'Нет данных');
-                    }
-                } catch (error) {
-                    console.error('❌ Ошибка при загрузке городов:', error);
+                } else {
+                    console.error('Failed to load countries:', data.error);
                 }
-            }
-            
-            async loadCounties(cityId) {
-                try {
-                    console.log('🔄 Загружаем области для города:', cityId);
-                    const response = await fetch('/api/locations/counties', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ city_id: cityId })
-                    });
-                    const data = await response.json();
-                    console.log('📊 Ответ API областей:', data);
-                    
-                    if (data.success && data.counties && data.counties.length > 0) {
-                        this.populateSelect(this.countySelect, data.counties, 'Выберите область');
-                        this.countySelect.disabled = false;
-                        console.log('✅ Области загружены:', data.counties.length);
-                    } else {
-                        console.error('❌ Ошибка загрузки областей:', data.error || 'Нет данных');
-                    }
-                } catch (error) {
-                    console.error('❌ Ошибка при загрузке областей:', error);
-                }
-            }
-            
-            async loadDistricts(countyId) {
-                try {
-                    console.log('🔄 Загружаем районы для области:', countyId);
-                    const response = await fetch('/api/locations/districts', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ county_id: countyId })
-                    });
-                    const data = await response.json();
-                    console.log('📊 Ответ API районов:', data);
-                    
-                    if (data.success && data.districts && data.districts.length > 0) {
-                        this.populateSelect(this.districtSelect, data.districts, 'Выберите район');
-                        
-                        // Добавляем опцию "не имеет значения"
-                        const noDistrictOption = document.createElement('option');
-                        noDistrictOption.value = 'none';
-                        noDistrictOption.textContent = 'Не имеет значения';
-                        this.districtSelect.appendChild(noDistrictOption);
-                        
-                        this.districtSelect.disabled = false;
-                        console.log('✅ Районы загружены:', data.districts.length);
-                    } else {
-                        console.error('❌ Ошибка загрузки районов:', data.error || 'Нет данных');
-                    }
-                } catch (error) {
-                    console.error('❌ Ошибка при загрузке районов:', error);
-                }
-            }
-            
-            populateSelect(selectElement, data, placeholderText) {
-                if (!selectElement) {
-                    console.error('❌ Select элемент не найден');
-                    return;
-                }
-                
-                // Очищаем существующие опции
-                selectElement.innerHTML = '';
-                
-                // Добавляем placeholder
-                const placeholder = document.createElement('option');
-                placeholder.value = '';
-                placeholder.textContent = placeholderText;
-                selectElement.appendChild(placeholder);
-                
-                // Добавляем данные
-                data.forEach((item, index) => {
-                    console.log(`📍 Обрабатываем элемент ${index}:`, item);
-                    
-                    if (Array.isArray(item) && item.length === 2) {
-                        const [id, name] = item;
-                        if (id && name) {
-                            const option = document.createElement('option');
-                            option.value = id;
-                            option.textContent = name;
-                            selectElement.appendChild(option);
-                            console.log(`✅ Добавлено: ${id} - ${name}`);
-                        }
-                    } else {
-                        console.error(`❌ Неверный формат данных:`, item);
-                    }
-                });
-                
-                console.log(`✅ Select заполнен: ${selectElement.options.length} опций`);
-            }
-            
-            onCountryChange() {
-                const countryId = this.countrySelect.value;
-                console.log('🔄 Страна изменена:', countryId);
-                
-                // Сбрасываем зависимые поля
-                this.resetSelect(this.citySelect, 'Сначала выберите страну');
-                this.resetSelect(this.countySelect, 'Сначала выберите город');
-                this.resetSelect(this.districtSelect, 'Сначала выберите область');
-                
-                if (countryId) {
-                    this.loadCities(countryId);
-                }
-                
-                this.updateConfirmButton();
-            }
-            
-            onCityChange() {
-                const cityId = this.citySelect.value;
-                console.log('🔄 Город изменен:', cityId);
-                
-                // Сбрасываем зависимые поля
-                this.resetSelect(this.countySelect, 'Сначала выберите город');
-                this.resetSelect(this.districtSelect, 'Сначала выберите область');
-                
-                if (cityId) {
-                    this.loadCounties(cityId);
-                }
-                
-                this.updateConfirmButton();
-            }
-            
-            onCountyChange() {
-                const countyId = this.countySelect.value;
-                console.log('🔄 Область изменена:', countyId);
-                
-                // Сбрасываем зависимые поля
-                this.resetSelect(this.districtSelect, 'Сначала выберите область');
-                
-                if (countyId) {
-                    this.loadDistricts(countyId);
-                }
-                
-                this.updateConfirmButton();
-            }
-            
-            onDistrictChange() {
-                const districtId = this.districtSelect.value;
-                console.log('🔄 Район изменен:', districtId);
-                
-                this.updateConfirmButton();
-                
-                // Показываем секцию выбора характеристик
-                const listingTypeSection = document.getElementById('listingTypeSection');
-                if (listingTypeSection) {
-                    if (districtId && districtId !== 'none') {
-                        listingTypeSection.style.display = 'block';
-                        this.loadListingTypes();
-                    } else {
-                        listingTypeSection.style.display = 'none';
-                        this.resetListingTypeSelection();
-                    }
-                }
-            }
-            
-            resetSelect(selectElement, placeholderText) {
-                if (selectElement) {
-                    selectElement.innerHTML = `<option value="">${placeholderText}</option>`;
-                    selectElement.disabled = true;
-                }
-            }
-            
-            updateConfirmButton() {
-                const confirmButton = document.getElementById('confirmButton');
-                if (confirmButton) {
-                    const hasCountry = this.countrySelect.value;
-                    const hasCity = this.citySelect.value;
-                    const hasCounty = this.countySelect.value;
-                    const hasDistrict = this.districtSelect.value && this.districtSelect.value !== '';
-                    
-                    // Проверяем, что все обязательные поля локации заполнены
-                    const hasAllRequiredFields = hasCountry && hasCity && hasCounty && hasDistrict;
-                    
-                    confirmButton.disabled = !hasAllRequiredFields;
-                    
-                    console.log('🔘 Confirm button state (LocationManager):', {
-                        hasCountry, hasCity, hasCounty, hasDistrict,
-                        hasAllRequiredFields,
-                        isDisabled: !hasAllRequiredFields
-                    });
-                }
-            }
-            
-            async loadListingTypes() {
-                // Загрузка типов недвижимости
-                console.log('🔄 Загружаем типы недвижимости...');
-                // Здесь будет логика загрузки типов недвижимости
-            }
-            
-            resetListingTypeSelection() {
-                // Сброс выбора типов недвижимости
-                console.log('🔄 Сбрасываем выбор типов недвижимости...');
-                // Здесь будет логика сброса
+            } catch (error) {
+                console.error('Error loading countries:', error);
             }
         }
 
+        // Load cities based on selected country
+        async function loadCities(countryId) {
+            try {
+                const response = await fetch('/api/locations/cities', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ country_id: countryId })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    const citySelect = document.getElementById('citySelect');
+                    citySelect.innerHTML = `<option value="">${getText('cityPlaceholder')}</option>`;
+                    
+                    data.cities.forEach(([id, name]) => {
+                        const option = document.createElement('option');
+                        option.value = id;
+                        option.textContent = name;
+                        citySelect.appendChild(option);
+                    });
+                    
+                    citySelect.disabled = false;
+                } else {
+                    console.error('Failed to load cities:', data.error);
+                }
+            } catch (error) {
+                console.error('Error loading cities:', error);
+            }
+        }
 
-
-
+        // Load counties based on selected city
+        async function loadCounties(cityId) {
+            try {
+                const response = await fetch('/api/locations/counties', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ city_id: cityId })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    const countySelect = document.getElementById('countySelect');
+                    countySelect.innerHTML = `<option value="">${getText('countyPlaceholder')}</option>`;
+                    
+                    data.counties.forEach(([id, name]) => {
+                        const option = document.createElement('option');
+                        option.value = id;
+                        option.textContent = name;
+                        countySelect.appendChild(option);
+                    });
+                    
+                    countySelect.disabled = false;
+                } else {
+                    console.error('Failed to load cities:', data.error);
+                }
+            } catch (error) {
+                console.error('Error loading cities:', error);
+            }
+        }
 
         // Load available listing types for each data category
         async function loadListingTypes() {
@@ -2194,7 +1714,7 @@
             console.log(`🔄 Populating select ${selectId} with ${listingTypes.length} types for category ${category}:`, listingTypes);
             
             // Clear existing options except the first placeholder
-            select.innerHTML = '<option value="">' + getSelectPlaceholder(category) + '</option>';
+            select.innerHTML = '<option value="">Выберите ' + getSelectPlaceholder(category) + '</option>';
             
             listingTypes.forEach(type => {
                 const option = document.createElement('option');
@@ -2226,10 +1746,7 @@
                 house_type: null,
                 floor_segment: null,
                 age: null,
-                heating: null,
-                price: null,
-                currency: 'EUR',
-                area: 50
+                heating: null
             };
             
             // Hide listing type section
@@ -2246,19 +1763,6 @@
                     select.value = '';
                 }
             });
-            
-            // Reset price and area fields
-            const priceInput = document.getElementById('priceObjectInput');
-            const areaSlider = document.getElementById('areaObjectSlider');
-            const areaValue = document.getElementById('areaObjectValue');
-            const currencySelect = document.getElementById('currencySelect');
-            
-            if (priceInput) priceInput.value = '';
-            if (areaSlider) {
-                areaSlider.value = 50;
-                if (areaValue) areaValue.textContent = '50 м²';
-            }
-            if (currencySelect) currencySelect.value = 'EUR';
             
             // Hide selected property types section
             const selectedPropertyTypes = document.getElementById('selectedPropertyTypes');
@@ -2288,9 +1792,7 @@
             const allTypesSelected = selectedListingTypes.house_type && 
                                    selectedListingTypes.floor_segment && 
                                    selectedListingTypes.age && 
-                                   selectedListingTypes.heating &&
-                                   selectedListingTypes.price &&
-                                   selectedListingTypes.area;
+                                   selectedListingTypes.heating;
             
             console.log('🔍 All listing types selected:', allTypesSelected, selectedListingTypes);
             
@@ -2304,9 +1806,161 @@
             }
         }
 
+        // Load districts based on selected county
+        async function loadDistricts(countyId) {
+            console.log('🔄 Loading districts for county_id:', countyId);
+            
+            try {
+                const response = await fetch('/api/locations/districts', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ county_id: countyId })
+                });
+                
+                const data = await response.json();
+                console.log('📊 Districts API response:', data);
+                
+                if (data.success) {
+                    const districtSelect = document.getElementById('districtSelect');
+                    districtSelect.innerHTML = `<option value="">${getText('districtPlaceholder')}</option>`;
+                    
+                    // Add "не имеет значения" option
+                    const noDistrictOption = document.createElement('option');
+                    noDistrictOption.value = 'none';
+                    noDistrictOption.textContent = 'Не имеет значения';
+                    districtSelect.appendChild(noDistrictOption);
+                    
+                    console.log('📍 Adding districts:', data.districts);
+                    data.districts.forEach(([id, name]) => {
+                        const option = document.createElement('option');
+                        option.value = id;
+                        option.textContent = name;
+                        districtSelect.appendChild(option);
+                    });
+                    
+                    districtSelect.disabled = false;
+                    console.log('✅ Districts loaded, district select enabled');
+                } else {
+                    console.error('❌ Failed to load districts:', data.error);
+                }
+            } catch (error) {
+                console.error('❌ Error loading districts:', error);
+            }
+        }
 
+        // Event handlers for location changes
+        function onCountryChange() {
+            const countrySelect = document.getElementById('countrySelect');
+            const citySelect = document.getElementById('citySelect');
+            const countySelect = document.getElementById('countySelect');
+            const districtSelect = document.getElementById('districtSelect');
+            
+            const countryId = countrySelect.value;
+            
+            // Reset dependent selects
+            citySelect.innerHTML = `<option value="">${getText('cityPlaceholder')}</option>`;
+            citySelect.disabled = true;
+            countySelect.innerHTML = `<option value="">${getText('countyPlaceholder')}</option>`;
+            countySelect.disabled = true;
+            districtSelect.innerHTML = `<option value="">${getText('districtPlaceholder')}</option>`;
+            districtSelect.disabled = true;
+            
+            // Reset listing type selection and hide section
+            resetListingTypeSelection();
+            const listingTypeSection = document.getElementById('listingTypeSection');
+            if (listingTypeSection) {
+                listingTypeSection.style.display = 'none';
+            }
+            
+            if (countryId) {
+                loadCities(countryId);
+            }
+            
+            updateConfirmButton();
+        }
 
+        function onCityChange() {
+            const citySelect = document.getElementById('citySelect');
+            const countySelect = document.getElementById('countySelect');
+            const districtSelect = document.getElementById('districtSelect');
+            
+            const cityId = citySelect.value;
+            
+            // Reset dependent selects
+            countySelect.innerHTML = `<option value="">${getText('countyPlaceholder')}</option>`;
+            countySelect.disabled = true;
+            districtSelect.innerHTML = `<option value="">${getText('districtPlaceholder')}</option>`;
+            districtSelect.disabled = true;
+            
+            // Reset listing type selection and hide section
+            resetListingTypeSelection();
+            const listingTypeSection = document.getElementById('listingTypeSection');
+            if (listingTypeSection) {
+                listingTypeSection.style.display = 'none';
+            }
+            
+            if (cityId) {
+                loadCounties(cityId);
+            }
+            
+            updateConfirmButton();
+        }
 
+        function onCountyChange() {
+            console.log('🔄 County changed, starting onCountyChange function...');
+            
+            const countySelect = document.getElementById('countySelect');
+            const districtSelect = document.getElementById('districtSelect');
+            
+            const countyId = countySelect.value;
+            console.log('📍 Selected county_id:', countyId);
+            
+            // Reset dependent selects
+            districtSelect.innerHTML = `<option value="">${getText('districtPlaceholder')}</option>`;
+            districtSelect.disabled = true;
+            console.log('🔄 Reset district select');
+            
+            // Reset listing type selection and hide section
+            resetListingTypeSelection();
+            const listingTypeSection = document.getElementById('listingTypeSection');
+            if (listingTypeSection) {
+                listingTypeSection.style.display = 'none';
+            }
+            
+            if (countyId) {
+                console.log('✅ County selected, loading districts for county_id:', countyId);
+                loadDistricts(countyId);
+            } else {
+                console.log('❌ No county selected');
+            }
+            
+            updateConfirmButton();
+        }
+
+        function onDistrictChange() {
+            console.log('🔄 District changed, updating confirm button...');
+            updateConfirmButton();
+            
+            // Show listing type selection section when district is selected
+            const districtSelect = document.getElementById('districtSelect');
+            const listingTypeSection = document.getElementById('listingTypeSection');
+            
+            console.log('📍 District value:', districtSelect.value);
+            
+            if (districtSelect.value && districtSelect.value !== 'none') {
+                console.log('✅ District selected, showing listing type section and loading types...');
+                listingTypeSection.style.display = 'block';
+                // Load available listing types for the selected location
+                loadListingTypes();
+            } else {
+                console.log('❌ No district selected, hiding listing type section...');
+                listingTypeSection.style.display = 'none';
+                // Reset listing type selection when district is cleared
+                resetListingTypeSelection();
+            }
+        }
 
         // Update selected property types display
         function updateSelectedPropertyTypesDisplay() {
@@ -2319,9 +1973,7 @@
             const hasSelectedTypes = selectedListingTypes.house_type || 
                                    selectedListingTypes.floor_segment || 
                                    selectedListingTypes.age || 
-                                   selectedListingTypes.heating ||
-                                   selectedListingTypes.price ||
-                                   selectedListingTypes.area;
+                                   selectedListingTypes.heating;
             
             if (hasSelectedTypes) {
                 selectedPropertyTypes.style.display = 'block';
@@ -2364,30 +2016,6 @@
                     `;
                 }
                 
-                if (selectedListingTypes.price) {
-                    const currencySymbols = {
-                        'TRY': '🇹🇷',
-                        'EUR': '🇪🇺',
-                        'USD': '🇺🇸'
-                    };
-                    const currencySymbol = currencySymbols[selectedListingTypes.currency] || '';
-                    html += `
-                        <div class="property-type-item">
-                            <span class="property-type-label">${getText('priceLabel')}:</span>
-                            <span class="property-type-value">${selectedListingTypes.price} ${currencySymbol} ${selectedListingTypes.currency}</span>
-                        </div>
-                    `;
-                }
-                
-                if (selectedListingTypes.area) {
-                    html += `
-                        <div class="property-type-item">
-                            <span class="property-type-label">${getText('areaLabel')}:</span>
-                            <span class="property-type-value">${selectedListingTypes.area} м²</span>
-                        </div>
-                    `;
-                }
-                
                 propertyTypesDetails.innerHTML = html;
             } else {
                 selectedPropertyTypes.style.display = 'none';
@@ -2396,13 +2024,6 @@
 
         // Update confirm button state
         function updateConfirmButton() {
-            // Используем LocationManager если он доступен
-            if (window.locationManager) {
-                window.locationManager.updateConfirmButton();
-                return;
-            }
-            
-            // Fallback для старой логики
             const countrySelect = document.getElementById('countrySelect');
             const citySelect = document.getElementById('citySelect');
             const countySelect = document.getElementById('countySelect');
@@ -2420,17 +2041,13 @@
                 hasAllListingTypes = selectedListingTypes.house_type && 
                                    selectedListingTypes.floor_segment && 
                                    selectedListingTypes.age && 
-                                   selectedListingTypes.heating &&
-                                   selectedListingTypes.price &&
-                                   selectedListingTypes.area;
+                                   selectedListingTypes.heating;
                 
                 console.log('🔍 Checking listing types:', {
                     house_type: selectedListingTypes.house_type,
                     floor_segment: selectedListingTypes.floor_segment,
                     age: selectedListingTypes.age,
                     heating: selectedListingTypes.heating,
-                    price: selectedListingTypes.price,
-                    area: selectedListingTypes.area,
                     hasAllListingTypes: hasAllListingTypes
                 });
             }
@@ -2455,19 +2072,10 @@
         async function confirmLocation() {
             console.log('🎯 confirmLocation function called');
             
-            // Используем LocationManager если он доступен
-            if (window.locationManager) {
-                const countrySelect = window.locationManager.countrySelect;
-                const citySelect = window.locationManager.citySelect;
-                const countySelect = window.locationManager.countySelect;
-                const districtSelect = window.locationManager.districtSelect;
-            } else {
-                // Fallback для старой логики
-                const countrySelect = document.getElementById('countrySelect');
-                const citySelect = document.getElementById('citySelect');
-                const countySelect = document.getElementById('countySelect');
-                const districtSelect = document.getElementById('districtSelect');
-            }
+            const countrySelect = document.getElementById('countrySelect');
+            const citySelect = document.getElementById('citySelect');
+            const countySelect = document.getElementById('countySelect');
+            const districtSelect = document.getElementById('districtSelect');
             
             const countryId = countrySelect.value;
             const cityId = citySelect.value;
@@ -2480,15 +2088,6 @@
             const countyName = countySelect.options[countySelect.selectedIndex].text;
             const districtName = districtSelect.value === 'none' ? 'Не имеет значения' : districtSelect.options[districtSelect.selectedIndex].text;
             
-            // Convert price to EUR if needed
-            let priceInEUR = null;
-            if (selectedListingTypes.price && selectedListingTypes.currency !== 'EUR') {
-                priceInEUR = await convertToEUR(selectedListingTypes.price, selectedListingTypes.currency);
-                console.log(`💰 Price converted: ${selectedListingTypes.price} ${selectedListingTypes.currency} → ${priceInEUR} EUR`);
-            } else if (selectedListingTypes.price) {
-                priceInEUR = selectedListingTypes.price;
-            }
-            
             // Update selected location
             selectedLocation = {
                 country_id: countryId,
@@ -2498,12 +2097,7 @@
                 country_name: countryName,
                 city_name: cityName,
                 county_name: countyName,
-                district_name: districtName,
-                // Add property details
-                property_price: selectedListingTypes.price,
-                property_price_currency: selectedListingTypes.currency,
-                property_price_eur: priceInEUR,
-                property_area: selectedListingTypes.area
+                district_name: districtName
             };
             
             console.log('📍 Selected location for data loading:', {
@@ -2514,11 +2108,7 @@
                 country_name: countryName,
                 city_name: cityName,
                 county_name: countyName,
-                district_name: districtName,
-                property_price: selectedListingTypes.price,
-                property_price_currency: selectedListingTypes.currency,
-                property_price_eur: priceInEUR,
-                property_area: selectedListingTypes.area
+                district_name: districtName
             });
             
             // Display selected location
@@ -2671,7 +2261,7 @@
             // Data sections removed - only market indicators table is shown
             
             // Generate and display summary table
-            await generateSummaryTable(data);
+            generateSummaryTable(data);
             
             // Show data content
             document.getElementById('dataContent').style.display = 'block';
@@ -2717,32 +2307,12 @@
         }
 
         // Format value based on type
-        async function formatValue(value, type) {
+        function formatValue(value, type) {
             if (value === null || value === undefined || value === '-') return '-';
             
             switch (type) {
                 case 'price':
-                    // Convert price to display currency
-                    let convertedValue = value;
-                    if (displayCurrency !== 'TRY') {
-                        try {
-                            // First convert TRY to EUR, then to display currency
-                            const valueInEUR = await convertToEUR(value, 'TRY');
-                            convertedValue = await convertFromEUR(valueInEUR, displayCurrency);
-                        } catch (error) {
-                            console.error('Error converting currency:', error);
-                            convertedValue = value; // Fallback to original value
-                        }
-                    }
-                    
-                    const currencySymbols = {
-                        'TRY': '₺',
-                        'USD': '$',
-                        'EUR': '€',
-                        'RUB': '₽'
-                    };
-                    const symbol = currencySymbols[displayCurrency] || '₺';
-                    return `${symbol}${parseFloat(convertedValue).toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+                    return `₺${parseFloat(value).toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
                 case 'percentage':
                     return `${parseFloat(value).toFixed(2)}%`;
                 case 'years':
@@ -2755,14 +2325,9 @@
         }
 
         // Generate market indicators table with organized structure
-        async function generateSummaryTable(data) {
+        function generateSummaryTable(data) {
             const summaryContainer = document.getElementById('summaryDataContent');
             if (!summaryContainer) return;
-            
-            // Create currency selector and add it before the table
-            const currencySelector = createCurrencySelector();
-            summaryContainer.innerHTML = '';
-            summaryContainer.appendChild(currencySelector);
             
             // Collect all data from all tables
             const allData = [];
@@ -2816,50 +2381,44 @@
             html += `<tr class="section-header"><td colspan="3" class="sale-header">${getText('saleHeader')}</td></tr>`;
             
             // Add Sale fields
-            for (const field of saleFields) {
+            saleFields.forEach(field => {
                 if (summary[field]) {
                     const fieldName = field === 'min_unit_price_for_sale' ? 'Unit Price For Sale' : formatFieldName(field);
-                    const minValue = await formatFieldValue(summary[field].min, field);
-                    const maxValue = await formatFieldValue(summary[field].max, field);
                     html += `
                         <tr>
                             <td>${fieldName}</td>
-                            <td>${minValue}</td>
-                            <td>${maxValue}</td>
+                            <td>${formatFieldValue(summary[field].min, field)}</td>
+                            <td>${formatFieldValue(summary[field].max, field)}</td>
                         </tr>
                     `;
                 }
-            }
+            });
             
             // Add Rent section header
             html += `<tr class="section-header"><td colspan="3" class="rent-header">${getText('rentHeader')}</td></tr>`;
             
             // Add Rent fields
-            for (const field of rentFields) {
+            rentFields.forEach(field => {
                 if (summary[field]) {
                     const fieldName = field === 'min_unit_price_for_rent' ? 'Unit Price For Rent' : formatFieldName(field);
-                    const minValue = await formatFieldValue(summary[field].min, field);
-                    const maxValue = await formatFieldValue(summary[field].max, field);
                     html += `
                         <tr>
                             <td>${fieldName}</td>
-                            <td>${minValue}</td>
-                            <td>${maxValue}</td>
+                            <td>${formatFieldValue(summary[field].min, field)}</td>
+                            <td>${formatFieldValue(summary[field].max, field)}</td>
                         </tr>
                     `;
                 }
-            }
+            });
             
             // Add Yield with bold styling
             if (summary.yield) {
                 html += '<tr class="yield-row"><td colspan="3" class="yield-header">Yield</td></tr>';
-                const minYield = await formatFieldValue(summary.yield.min, 'yield');
-                const maxYield = await formatFieldValue(summary.yield.max, 'yield');
                 html += `
                     <tr class="yield-data">
                         <td class="yield-label">Yield</td>
-                        <td class="yield-value">${minYield}</td>
-                        <td class="yield-value">${maxYield}</td>
+                        <td class="yield-value">${formatFieldValue(summary.yield.min, 'yield')}</td>
+                        <td class="yield-value">${formatFieldValue(summary.yield.max, 'yield')}</td>
                     </tr>
                 `;
             }
@@ -2934,16 +2493,17 @@
             const groupedTrends = groupTrendsByType(trends);
             
             trendsSection.innerHTML = `
+                <h3 class="data-section-title">${getText('marketTrendsTitle')}</h3>
                 <div class="data-section-content">
                     <div class="trends-grid">
                         ${Object.entries(groupedTrends).map(([type, typeTrends]) => `
                             <div class="trend-card trend-card-${type}">
                                 <div class="trend-title">${formatTrendType(type)}</div>
-                                <div class="trend-value">${formatTrendValue(typeTrends[0].trend_value, type, typeTrends[0])}</div>
+                                <div class="trend-value">${formatTrendValue(typeTrends[0].trend_value, type)}</div>
                                 <div class="trend-details">
                                     <div class="trend-change">
-                                        ${typeTrends[0].price_change_sale ? `${getText('saleTrendLabel')}: ${formatPercentage(typeTrends[0].price_change_sale)}` : ''}
-                                        ${typeTrends[0].price_change_rent ? `${getText('rentTrendLabel')}: ${formatPercentage(typeTrends[0].price_change_rent)}` : ''}
+                                        ${typeTrends[0].price_change_sale ? `Продажа: ${formatPercentage(typeTrends[0].price_change_sale)}` : ''}
+                                        ${typeTrends[0].price_change_rent ? `Аренда: ${formatPercentage(typeTrends[0].price_change_rent)}` : ''}
                                     </div>
                                     <div class="trend-date">${formatTrendDate(typeTrends[0].date)}</div>
                                 </div>
@@ -2953,7 +2513,7 @@
                     
                     <!-- Таблица со всеми записями трендов -->
                     <div class="trends-table-section">
-                        <h4 class="trends-table-title">${getText('detailedTrendsTitle')}</h4>
+                        <h4 class="trends-table-title">Детальные данные трендов</h4>
                         <div class="trends-table-container">
                             ${generateTrendsTable(trends)}
                         </div>
@@ -2981,7 +2541,7 @@
         // Format trend type for display
         function formatTrendType(type) {
             const typeMap = {
-                'price_trend': getText('priceTrendTitle'),
+                'price_trend': 'Тренд цен',
                 'yield_trend': 'Тренд доходности',
                 'count_trend': 'Тренд количества',
                 'general': 'Общий тренд'
@@ -3015,28 +2575,28 @@
         // Generate detailed trends table
         function generateTrendsTable(trends) {
             if (!trends || trends.length === 0) {
-                return `<div class="no-data">${getText('noDataMessage')}</div>`;
+                return '<div class="no-data">Нет данных для отображения</div>';
             }
             
             let html = '<table class="trends-table">';
             html += '<thead><tr>';
-            html += `<th>${getText('tableDateHeader')}</th>`;
-            html += `<th>${getText('tableSalePriceHeader')}</th>`;
-            html += `<th>${getText('tableRentPriceHeader')}</th>`;
-            html += `<th>${getText('tableSaleChangeHeader')}</th>`;
-            html += `<th>${getText('tableRentChangeHeader')}</th>`;
-            html += `<th>${getText('tableAnnualSaleChangeHeader')}</th>`;
-            html += `<th>${getText('tableAnnualRentChangeHeader')}</th>`;
-            html += `<th>${getText('tableYieldHeader')}</th>`;
-            html += `<th>${getText('tableSaleCountHeader')}</th>`;
-            html += `<th>${getText('tableRentCountHeader')}</th>`;
+            html += '<th>Дата</th>';
+            html += '<th>Цена продажи (₺/м²)</th>';
+            html += '<th>Цена аренды (₺/м²)</th>';
+            html += '<th>Изменение цен продажи</th>';
+            html += '<th>Изменение цен аренды</th>';
+            html += '<th>Годовое изменение продажи</th>';
+            html += '<th>Годовое изменение аренды</th>';
+            html += '<th>Доходность</th>';
+            html += '<th>Количество продаж</th>';
+            html += '<th>Количество аренд</th>';
             html += '</tr></thead><tbody>';
             
             trends.forEach(trend => {
                 html += '<tr>';
                 html += `<td>${formatTrendDate(trend.date)}</td>`;
-                html += `<td>${formatTrendValue(trend.trend_value, 'price', trend)}</td>`;
-                html += `<td>${formatTrendValue(trend.unit_price_for_rent || trend.trend_value, 'price', trend)}</td>`;
+                html += `<td>${formatTrendValue(trend.trend_value, 'price')}</td>`;
+                html += `<td>${formatTrendValue(trend.unit_price_for_rent || trend.trend_value, 'price')}</td>`;
                 html += `<td>${formatPercentage(trend.price_change_sale)}</td>`;
                 html += `<td>${formatPercentage(trend.price_change_rent)}</td>`;
                 html += `<td>${formatPercentage(trend.annual_price_change_sale)}</td>`;
@@ -3052,15 +2612,10 @@
         }
         
         // Format trend value based on type
-        function formatTrendValue(value, type, trendData) {
+        function formatTrendValue(value, type) {
             if (value === null || value === undefined) return '-';
             
             if (type && type.includes('price')) {
-                // Для ценовых трендов учитываем площадь объекта
-                if (trendData && trendData.unit_price_for_sale && selectedListingTypes.area) {
-                    const totalPrice = trendData.unit_price_for_sale * selectedListingTypes.area;
-                    return formatValue(totalPrice, 'price');
-                }
                 return formatValue(value, 'price');
             } else if (type && type.includes('percentage')) {
                 return formatValue(value, 'percentage');
@@ -3191,216 +2746,14 @@
             window.location.href = '/webapp_main';
         }
 
-        // Function to convert currency to EUR (base currency)
-        async function convertToEUR(amount, fromCurrency) {
-            if (fromCurrency === 'EUR') {
-                return amount;
-            }
-            
-            try {
-                // Get current exchange rates from currency table
-                const response = await fetch('/api/currency/convert', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        amount: amount,
-                        from_currency: fromCurrency,
-                        to_currency: 'EUR'
-                    })
-                });
-                
-                const data = await response.json();
-                if (data.success) {
-                    return data.converted_amount;
-                } else {
-                    console.error('Currency conversion error:', data.error);
-                    return amount; // Return original amount if conversion fails
-                }
-            } catch (error) {
-                console.error('Error converting currency:', error);
-                return amount; // Return original amount if conversion fails
-            }
-        }
-        
-        // Function to convert from EUR to display currency
-        async function convertFromEUR(amount, toCurrency) {
-            if (toCurrency === 'EUR') {
-                return amount;
-            }
-            
-            try {
-                // Get current exchange rates from currency table
-                const response = await fetch('/api/currency/convert', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        amount: amount,
-                        from_currency: 'EUR',
-                        to_currency: toCurrency
-                    })
-                });
-                
-                const data = await response.json();
-                if (data.success) {
-                    return data.converted_amount;
-                } else {
-                    console.error('Currency conversion error:', data.error);
-                    return amount; // Return original amount if conversion fails
-                }
-            } catch (error) {
-                console.error('Error converting currency:', error);
-                return amount; // Return original amount if conversion fails
-                }
-            }
-
-        // Function to create currency selector
-        function createCurrencySelector() {
-            const currencySelector = document.createElement('div');
-            currencySelector.className = 'currency-selector';
-            currencySelector.innerHTML = `
-                <div class="currency-selector-title">${getText('displayCurrencyTitle')}</div>
-                <div class="currency-buttons">
-                    <button class="currency-button ${displayCurrency === 'TRY' ? 'active' : ''}" data-currency="TRY">
-                        <span class="currency-symbol">₺</span>
-                        <span class="currency-code">TRY</span>
-                    </button>
-                    <button class="currency-button ${displayCurrency === 'USD' ? 'active' : ''}" data-currency="USD">
-                        <span class="currency-symbol">$</span>
-                        <span class="currency-code">USD</span>
-                    </button>
-                    <button class="currency-button ${displayCurrency === 'EUR' ? 'active' : ''}" data-currency="EUR">
-                        <span class="currency-symbol">€</span>
-                        <span class="currency-code">EUR</span>
-                    </button>
-                    <button class="currency-button ${displayCurrency === 'RUB' ? 'active' : ''}" data-currency="RUB">
-                        <span class="currency-symbol">₽</span>
-                        <span class="currency-code">RUB</span>
-                    </button>
-                </div>
-            `;
-            
-            // Add event listeners to currency buttons
-            const currencyButtons = currencySelector.querySelectorAll('.currency-button');
-            currencyButtons.forEach(button => {
-                button.addEventListener('click', async function() {
-                    const selectedCurrency = this.dataset.currency;
-                    if (selectedCurrency !== displayCurrency) {
-                        displayCurrency = selectedCurrency;
-                        
-                        // Update active state
-                        currencyButtons.forEach(btn => btn.classList.remove('active'));
-                        this.classList.add('active');
-                        
-                        // Refresh market indicators with new currency
-                        await refreshMarketIndicators();
-                    }
-                });
-            });
-            
-            return currencySelector;
-        }
-        
-        // Function to refresh market indicators with new currency
-        async function refreshMarketIndicators() {
-            // This function will be called when currency changes
-            // It should refresh all price-related data with the new currency
-            console.log(`🔄 Refreshing market indicators with currency: ${displayCurrency}`);
-            
-            // Refresh key metrics section if it exists
-            const keyMetricsSection = document.getElementById('keyMetricsSection');
-            if (keyMetricsSection) {
-                // Re-render key metrics with new currency
-                await loadRegionData();
-            }
-            
-            // Refresh trends section if it exists
-            const propertyTrendsSection = document.getElementById('propertyTrendsSection');
-            if (propertyTrendsSection) {
-                // Re-render trends with new currency
-                await loadPropertyTrends();
-            }
-        }
-
         // Initialize page
         function init() {
-            console.log('🚀 Initializing page...');
-            
-            // Check if all required elements exist
-            const requiredElements = [
-                'countrySelect', 'citySelect', 'countySelect', 'districtSelect',
-                'slogan', 'pageTitle', 'pageDescription'
-            ];
-            
-            const missingElements = [];
-            requiredElements.forEach(id => {
-                const element = document.getElementById(id);
-                if (!element) {
-                    missingElements.push(id);
-                } else {
-                    console.log(`✅ Found element: ${id}`);
-                }
-            });
-            
-            if (missingElements.length > 0) {
-                console.error('❌ Missing elements:', missingElements);
-                return;
-            }
-            
-            console.log('✅ All required elements found, proceeding with initialization...');
             updatePageText();
-            
-            // Инициализируем новый LocationManager
-            console.log('🔄 Initializing LocationManager...');
-            window.locationManager = new LocationManager();
-            
-            // Initialize area slider
-            const areaSlider = document.getElementById('areaObjectSlider');
-            const areaValue = document.getElementById('areaObjectValue');
-            
-            if (areaSlider && areaValue) {
-                areaSlider.addEventListener('input', function() {
-                    const value = this.value;
-                    areaValue.textContent = value + ' м²';
-                    selectedListingTypes.area = parseInt(value);
-                    updateConfirmButton();
-                });
-            }
-            
-            // Initialize price input
-            const priceInput = document.getElementById('priceObjectInput');
-            if (priceInput) {
-                priceInput.addEventListener('input', function() {
-                    selectedListingTypes.price = this.value ? parseFloat(this.value) : null;
-                    updateConfirmButton();
-                });
-            }
-            
-            // Initialize currency select
-            const currencySelect = document.getElementById('currencySelect');
-            if (currencySelect) {
-                currencySelect.addEventListener('change', function() {
-                    selectedListingTypes.currency = this.value;
-                });
-            }
+            loadCountries();
         }
 
         // Start initialization when page loads
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('📄 DOM Content Loaded event fired');
-            init();
-        });
-        
-        // Also try to initialize immediately if DOM is already ready
-        if (document.readyState === 'loading') {
-            console.log('📄 DOM is still loading, waiting for DOMContentLoaded...');
-        } else {
-            console.log('📄 DOM is already ready, initializing immediately...');
-            init();
-        }
+        document.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
 </html>
