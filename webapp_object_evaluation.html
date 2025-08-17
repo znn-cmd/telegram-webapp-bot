@@ -1824,180 +1824,268 @@
             }
         }
 
-        // Load countries from API
-        async function loadCountries() {
-            try {
-                console.log('🔄 Loading countries from API...');
-                const response = await fetch('/api/locations/countries');
-                const data = await response.json();
-                console.log('📊 Countries API response:', data);
+                // Новая система загрузки локаций
+        class LocationManager {
+            constructor() {
+                this.countrySelect = document.getElementById('countrySelect');
+                this.citySelect = document.getElementById('citySelect');
+                this.countySelect = document.getElementById('countySelect');
+                this.districtSelect = document.getElementById('districtSelect');
                 
-                if (data.success && data.countries) {
-                    const countrySelect = document.getElementById('countrySelect');
-                    if (!countrySelect) {
-                        console.error('❌ Country select element not found');
-                        return;
+                this.init();
+            }
+            
+            init() {
+                console.log('🚀 Initializing LocationManager...');
+                this.loadCountries();
+                this.bindEvents();
+            }
+            
+            bindEvents() {
+                this.countrySelect.addEventListener('change', () => this.onCountryChange());
+                this.citySelect.addEventListener('change', () => this.onCityChange());
+                this.countySelect.addEventListener('change', () => this.onCountyChange());
+                this.districtSelect.addEventListener('change', () => this.onDistrictChange());
+            }
+            
+            async loadCountries() {
+                try {
+                    console.log('🔄 Загружаем страны...');
+                    const response = await fetch('/api/locations/countries');
+                    const data = await response.json();
+                    console.log('📊 Ответ API стран:', data);
+                    
+                    if (data.success && data.countries && data.countries.length > 0) {
+                        this.populateSelect(this.countrySelect, data.countries, 'Выберите страну');
+                        console.log('✅ Страны загружены:', data.countries.length);
+                    } else {
+                        console.error('❌ Ошибка загрузки стран:', data.error || 'Нет данных');
                     }
-                    
-                                    console.log('📍 Found country select, populating with', data.countries.length, 'countries');
-                console.log('📍 Countries data structure:', data.countries);
-                console.log('📍 First country example:', data.countries[0]);
-                console.log('📍 First country type:', typeof data.countries[0]);
-                console.log('📍 First country is array:', Array.isArray(data.countries[0]));
-                    
-                    // Clear existing options
-                    countrySelect.innerHTML = '';
-                    
-                    // Add placeholder
-                    const placeholderOption = document.createElement('option');
-                    placeholderOption.value = '';
-                    placeholderOption.textContent = getText('countryPlaceholder');
-                    countrySelect.appendChild(placeholderOption);
-                    console.log(`✅ Added placeholder: ${getText('countryPlaceholder')}`);
-                    
-                    // Add countries - API returns tuples (id, name)
-                    data.countries.forEach((country, index) => {
-                        console.log(`📍 Processing country ${index}:`, country);
-                        
-                        // API returns tuples like [id, name]
-                        if (Array.isArray(country) && country.length === 2) {
-                            const [id, name] = country;
-                            if (id && name) {
-                                const option = document.createElement('option');
-                                option.value = id;
-                                option.textContent = name;
-                                countrySelect.appendChild(option);
-                                console.log(`✅ Added country: ${id} - ${name}`);
-                            } else {
-                                console.error(`❌ Invalid country data: id=${id}, name=${name}`);
-                            }
-                        } else {
-                            console.error(`❌ Invalid country format:`, country);
-                        }
-                    });
-                    
-                    console.log('✅ Countries loaded successfully');
-                    console.log('📍 Final country select options:', countrySelect.options.length);
-                } else {
-                    console.error('❌ Failed to load countries:', data.error || 'No countries data');
-                    console.log('📍 Full API response:', data);
+                } catch (error) {
+                    console.error('❌ Ошибка при загрузке стран:', error);
                 }
-            } catch (error) {
-                console.error('❌ Error loading countries:', error);
+            }
+            
+            async loadCities(countryId) {
+                try {
+                    console.log('🔄 Загружаем города для страны:', countryId);
+                    const response = await fetch('/api/locations/cities', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ country_id: countryId })
+                    });
+                    const data = await response.json();
+                    console.log('📊 Ответ API городов:', data);
+                    
+                    if (data.success && data.cities && data.cities.length > 0) {
+                        this.populateSelect(this.citySelect, data.cities, 'Выберите город');
+                        this.citySelect.disabled = false;
+                        console.log('✅ Города загружены:', data.cities.length);
+                    } else {
+                        console.error('❌ Ошибка загрузки городов:', data.error || 'Нет данных');
+                    }
+                } catch (error) {
+                    console.error('❌ Ошибка при загрузке городов:', error);
+                }
+            }
+            
+            async loadCounties(cityId) {
+                try {
+                    console.log('🔄 Загружаем области для города:', cityId);
+                    const response = await fetch('/api/locations/counties', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ city_id: cityId })
+                    });
+                    const data = await response.json();
+                    console.log('📊 Ответ API областей:', data);
+                    
+                    if (data.success && data.counties && data.counties.length > 0) {
+                        this.populateSelect(this.countySelect, data.counties, 'Выберите область');
+                        this.countySelect.disabled = false;
+                        console.log('✅ Области загружены:', data.counties.length);
+                    } else {
+                        console.error('❌ Ошибка загрузки областей:', data.error || 'Нет данных');
+                    }
+                } catch (error) {
+                    console.error('❌ Ошибка при загрузке областей:', error);
+                }
+            }
+            
+            async loadDistricts(countyId) {
+                try {
+                    console.log('🔄 Загружаем районы для области:', countyId);
+                    const response = await fetch('/api/locations/districts', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ county_id: countyId })
+                    });
+                    const data = await response.json();
+                    console.log('📊 Ответ API районов:', data);
+                    
+                    if (data.success && data.districts && data.districts.length > 0) {
+                        this.populateSelect(this.districtSelect, data.districts, 'Выберите район');
+                        
+                        // Добавляем опцию "не имеет значения"
+                        const noDistrictOption = document.createElement('option');
+                        noDistrictOption.value = 'none';
+                        noDistrictOption.textContent = 'Не имеет значения';
+                        this.districtSelect.appendChild(noDistrictOption);
+                        
+                        this.districtSelect.disabled = false;
+                        console.log('✅ Районы загружены:', data.districts.length);
+                    } else {
+                        console.error('❌ Ошибка загрузки районов:', data.error || 'Нет данных');
+                    }
+                } catch (error) {
+                    console.error('❌ Ошибка при загрузке районов:', error);
+                }
+            }
+            
+            populateSelect(selectElement, data, placeholderText) {
+                if (!selectElement) {
+                    console.error('❌ Select элемент не найден');
+                    return;
+                }
+                
+                // Очищаем существующие опции
+                selectElement.innerHTML = '';
+                
+                // Добавляем placeholder
+                const placeholder = document.createElement('option');
+                placeholder.value = '';
+                placeholder.textContent = placeholderText;
+                selectElement.appendChild(placeholder);
+                
+                // Добавляем данные
+                data.forEach((item, index) => {
+                    console.log(`📍 Обрабатываем элемент ${index}:`, item);
+                    
+                    if (Array.isArray(item) && item.length === 2) {
+                        const [id, name] = item;
+                        if (id && name) {
+                            const option = document.createElement('option');
+                            option.value = id;
+                            option.textContent = name;
+                            selectElement.appendChild(option);
+                            console.log(`✅ Добавлено: ${id} - ${name}`);
+                        }
+                    } else {
+                        console.error(`❌ Неверный формат данных:`, item);
+                    }
+                });
+                
+                console.log(`✅ Select заполнен: ${selectElement.options.length} опций`);
+            }
+            
+            onCountryChange() {
+                const countryId = this.countrySelect.value;
+                console.log('🔄 Страна изменена:', countryId);
+                
+                // Сбрасываем зависимые поля
+                this.resetSelect(this.citySelect, 'Сначала выберите страну');
+                this.resetSelect(this.countySelect, 'Сначала выберите город');
+                this.resetSelect(this.districtSelect, 'Сначала выберите область');
+                
+                if (countryId) {
+                    this.loadCities(countryId);
+                }
+                
+                this.updateConfirmButton();
+            }
+            
+            onCityChange() {
+                const cityId = this.citySelect.value;
+                console.log('🔄 Город изменен:', cityId);
+                
+                // Сбрасываем зависимые поля
+                this.resetSelect(this.countySelect, 'Сначала выберите город');
+                this.resetSelect(this.districtSelect, 'Сначала выберите область');
+                
+                if (cityId) {
+                    this.loadCounties(cityId);
+                }
+                
+                this.updateConfirmButton();
+            }
+            
+            onCountyChange() {
+                const countyId = this.countySelect.value;
+                console.log('🔄 Область изменена:', countyId);
+                
+                // Сбрасываем зависимые поля
+                this.resetSelect(this.districtSelect, 'Сначала выберите область');
+                
+                if (countyId) {
+                    this.loadDistricts(countyId);
+                }
+                
+                this.updateConfirmButton();
+            }
+            
+            onDistrictChange() {
+                const districtId = this.districtSelect.value;
+                console.log('🔄 Район изменен:', districtId);
+                
+                this.updateConfirmButton();
+                
+                // Показываем секцию выбора характеристик
+                const listingTypeSection = document.getElementById('listingTypeSection');
+                if (listingTypeSection) {
+                    if (districtId && districtId !== 'none') {
+                        listingTypeSection.style.display = 'block';
+                        this.loadListingTypes();
+                    } else {
+                        listingTypeSection.style.display = 'none';
+                        this.resetListingTypeSelection();
+                    }
+                }
+            }
+            
+            resetSelect(selectElement, placeholderText) {
+                if (selectElement) {
+                    selectElement.innerHTML = `<option value="">${placeholderText}</option>`;
+                    selectElement.disabled = true;
+                }
+            }
+            
+            updateConfirmButton() {
+                const confirmButton = document.getElementById('confirmButton');
+                if (confirmButton) {
+                    const hasCountry = this.countrySelect.value;
+                    const hasCity = this.citySelect.value;
+                    const hasCounty = this.countySelect.value;
+                    const hasDistrict = this.districtSelect.value && this.districtSelect.value !== '';
+                    
+                    // Проверяем, что все обязательные поля локации заполнены
+                    const hasAllRequiredFields = hasCountry && hasCity && hasCounty && hasDistrict;
+                    
+                    confirmButton.disabled = !hasAllRequiredFields;
+                    
+                    console.log('🔘 Confirm button state (LocationManager):', {
+                        hasCountry, hasCity, hasCounty, hasDistrict,
+                        hasAllRequiredFields,
+                        isDisabled: !hasAllRequiredFields
+                    });
+                }
+            }
+            
+            async loadListingTypes() {
+                // Загрузка типов недвижимости
+                console.log('🔄 Загружаем типы недвижимости...');
+                // Здесь будет логика загрузки типов недвижимости
+            }
+            
+            resetListingTypeSelection() {
+                // Сброс выбора типов недвижимости
+                console.log('🔄 Сбрасываем выбор типов недвижимости...');
+                // Здесь будет логика сброса
             }
         }
 
-        // Load cities based on selected country
-        async function loadCities(countryId) {
-            try {
-                console.log('🔄 Loading cities for country_id:', countryId);
-                const response = await fetch('/api/locations/cities', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ country_id: countryId })
-                });
-                
-                const data = await response.json();
-                console.log('📊 Cities API response:', data);
-                
-                if (data.success && data.cities) {
-                    const citySelect = document.getElementById('citySelect');
-                    if (!citySelect) {
-                        console.error('❌ City select element not found');
-                        return;
-                    }
-                    
-                    console.log('📍 Found city select, populating with', data.cities.length, 'cities');
-                    citySelect.innerHTML = `<option value="">${getText('cityPlaceholder')}</option>`;
-                    
-                    // Add cities - API returns tuples (id, name)
-                    data.cities.forEach((city, index) => {
-                        console.log(`📍 Processing city ${index}:`, city);
-                        
-                        // API returns tuples like [id, name]
-                        if (Array.isArray(city) && city.length === 2) {
-                            const [id, name] = city;
-                            if (id && name) {
-                                const option = document.createElement('option');
-                                option.value = id;
-                                option.textContent = name;
-                                citySelect.appendChild(option);
-                                console.log(`✅ Added city: ${id} - ${name}`);
-                            } else {
-                                console.error(`❌ Invalid city data: id=${id}, name=${name}`);
-                            }
-                        } else {
-                            console.error(`❌ Invalid city format:`, city);
-                        }
-                    });
-                    
-                    citySelect.disabled = false;
-                    console.log('✅ Cities loaded, city select enabled');
-                } else {
-                    console.error('❌ Failed to load cities:', data.error || 'No cities data');
-                }
-            } catch (error) {
-                console.error('❌ Error loading cities:', error);
-            }
-        }
 
-        // Load counties based on selected city
-        async function loadCounties(cityId) {
-            try {
-                console.log('🔄 Loading counties for city_id:', cityId);
-                const response = await fetch('/api/locations/counties', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ city_id: cityId })
-                });
-                
-                const data = await response.json();
-                console.log('📊 Counties API response:', data);
-                
-                if (data.success && data.counties) {
-                    const countySelect = document.getElementById('countySelect');
-                    if (!countySelect) {
-                        console.error('❌ County select element not found');
-                        return;
-                    }
-                    
-                    console.log('📍 Found county select, populating with', data.counties.length, 'counties');
-                    countySelect.innerHTML = `<option value="">${getText('countyPlaceholder')}</option>`;
-                    
-                    // Add counties - API returns tuples (id, name)
-                    data.counties.forEach((county, index) => {
-                        console.log(`📍 Processing county ${index}:`, county);
-                        
-                        // API returns tuples like [id, name]
-                        if (Array.isArray(county) && county.length === 2) {
-                            const [id, name] = county;
-                            if (id && name) {
-                                const option = document.createElement('option');
-                                option.value = id;
-                                option.textContent = name;
-                                countySelect.appendChild(option);
-                                console.log(`✅ Added county: ${id} - ${name}`);
-                            } else {
-                                console.error(`❌ Invalid county data: id=${id}, name=${name}`);
-                            }
-                        } else {
-                            console.error(`❌ Invalid county format:`, county);
-                        }
-                    });
-                    
-                    countySelect.disabled = false;
-                    console.log('✅ Counties loaded, county select enabled');
-                } else {
-                    console.error('❌ Failed to load counties:', data.error || 'No counties data');
-                }
-            } catch (error) {
-                console.error('❌ Error loading counties:', error);
-            }
-        }
+
+
 
         // Load available listing types for each data category
         async function loadListingTypes() {
@@ -2216,175 +2304,9 @@
             }
         }
 
-        // Load districts based on selected county
-        async function loadDistricts(countyId) {
-            console.log('🔄 Loading districts for county_id:', countyId);
-            
-            try {
-                const response = await fetch('/api/locations/districts', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ county_id: countyId })
-                });
-                
-                const data = await response.json();
-                console.log('📊 Districts API response:', data);
-                
-                if (data.success) {
-                    const districtSelect = document.getElementById('districtSelect');
-                    districtSelect.innerHTML = `<option value="">${getText('districtPlaceholder')}</option>`;
-                    
-                    // Add "не имеет значения" option
-                    const noDistrictOption = document.createElement('option');
-                    noDistrictOption.value = 'none';
-                    noDistrictOption.textContent = 'Не имеет значения';
-                    districtSelect.appendChild(noDistrictOption);
-                    
-                    console.log('📍 Adding districts:', data.districts);
-                    // Add districts - API returns tuples (id, name)
-                    data.districts.forEach((district, index) => {
-                        console.log(`📍 Processing district ${index}:`, district);
-                        
-                        // API returns tuples like [id, name]
-                        if (Array.isArray(district) && district.length === 2) {
-                            const [id, name] = district;
-                            if (id && name) {
-                                const option = document.createElement('option');
-                                option.value = id;
-                                option.textContent = name;
-                                districtSelect.appendChild(option);
-                                console.log(`✅ Added district: ${id} - ${name}`);
-                            } else {
-                                console.error(`❌ Invalid district data: id=${id}, name=${name}`);
-                            }
-                        } else {
-                            console.error(`❌ Invalid district format:`, district);
-                        }
-                    });
-                    
-                    districtSelect.disabled = false;
-                    console.log('✅ Districts loaded, district select enabled');
-                } else {
-                    console.error('❌ Failed to load districts:', data.error);
-                }
-            } catch (error) {
-                console.error('❌ Error loading districts:', error);
-            }
-        }
 
-        // Event handlers for location changes
-        function onCountryChange() {
-            const countrySelect = document.getElementById('countrySelect');
-            const citySelect = document.getElementById('citySelect');
-            const countySelect = document.getElementById('countySelect');
-            const districtSelect = document.getElementById('districtSelect');
-            
-            const countryId = countrySelect.value;
-            
-            // Reset dependent selects
-            citySelect.innerHTML = `<option value="">${getText('cityPlaceholder')}</option>`;
-            citySelect.disabled = true;
-            countySelect.innerHTML = `<option value="">${getText('countyPlaceholder')}</option>`;
-            countySelect.disabled = true;
-            districtSelect.innerHTML = `<option value="">${getText('districtPlaceholder')}</option>`;
-            districtSelect.disabled = true;
-            
-            // Reset listing type selection and hide section
-            resetListingTypeSelection();
-            const listingTypeSection = document.getElementById('listingTypeSection');
-            if (listingTypeSection) {
-                listingTypeSection.style.display = 'none';
-            }
-            
-            if (countryId) {
-                loadCities(countryId);
-            }
-            
-            updateConfirmButton();
-        }
 
-        function onCityChange() {
-            const citySelect = document.getElementById('citySelect');
-            const countySelect = document.getElementById('countySelect');
-            const districtSelect = document.getElementById('districtSelect');
-            
-            const cityId = citySelect.value;
-            
-            // Reset dependent selects
-            countySelect.innerHTML = `<option value="">${getText('countyPlaceholder')}</option>`;
-            countySelect.disabled = true;
-            districtSelect.innerHTML = `<option value="">${getText('districtPlaceholder')}</option>`;
-            districtSelect.disabled = true;
-            
-            // Reset listing type selection and hide section
-            resetListingTypeSelection();
-            const listingTypeSection = document.getElementById('listingTypeSection');
-            if (listingTypeSection) {
-                listingTypeSection.style.display = 'none';
-            }
-            
-            if (cityId) {
-                loadCounties(cityId);
-            }
-            
-            updateConfirmButton();
-        }
 
-        function onCountyChange() {
-            console.log('🔄 County changed, starting onCountyChange function...');
-            
-            const countySelect = document.getElementById('countySelect');
-            const districtSelect = document.getElementById('districtSelect');
-            
-            const countyId = countySelect.value;
-            console.log('📍 Selected county_id:', countyId);
-            
-            // Reset dependent selects
-            districtSelect.innerHTML = `<option value="">${getText('districtPlaceholder')}</option>`;
-            districtSelect.disabled = true;
-            console.log('🔄 Reset district select');
-            
-            // Reset listing type selection and hide section
-            resetListingTypeSelection();
-            const listingTypeSection = document.getElementById('listingTypeSection');
-            if (listingTypeSection) {
-                listingTypeSection.style.display = 'none';
-            }
-            
-            if (countyId) {
-                console.log('✅ County selected, loading districts for county_id:', countyId);
-                loadDistricts(countyId);
-            } else {
-                console.log('❌ No county selected');
-            }
-            
-            updateConfirmButton();
-        }
-
-        function onDistrictChange() {
-            console.log('🔄 District changed, updating confirm button...');
-            updateConfirmButton();
-            
-            // Show listing type selection section when district is selected
-            const districtSelect = document.getElementById('districtSelect');
-            const listingTypeSection = document.getElementById('listingTypeSection');
-            
-            console.log('📍 District value:', districtSelect.value);
-            
-            if (districtSelect.value && districtSelect.value !== 'none') {
-                console.log('✅ District selected, showing listing type section and loading types...');
-                listingTypeSection.style.display = 'block';
-                // Load available listing types for the selected location
-                loadListingTypes();
-            } else {
-                console.log('❌ No district selected, hiding listing type section...');
-                listingTypeSection.style.display = 'none';
-                // Reset listing type selection when district is cleared
-                resetListingTypeSelection();
-            }
-        }
 
         // Update selected property types display
         function updateSelectedPropertyTypesDisplay() {
@@ -2474,6 +2396,13 @@
 
         // Update confirm button state
         function updateConfirmButton() {
+            // Используем LocationManager если он доступен
+            if (window.locationManager) {
+                window.locationManager.updateConfirmButton();
+                return;
+            }
+            
+            // Fallback для старой логики
             const countrySelect = document.getElementById('countrySelect');
             const citySelect = document.getElementById('citySelect');
             const countySelect = document.getElementById('countySelect');
@@ -2526,10 +2455,19 @@
         async function confirmLocation() {
             console.log('🎯 confirmLocation function called');
             
-            const countrySelect = document.getElementById('countrySelect');
-            const citySelect = document.getElementById('citySelect');
-            const countySelect = document.getElementById('countySelect');
-            const districtSelect = document.getElementById('districtSelect');
+            // Используем LocationManager если он доступен
+            if (window.locationManager) {
+                const countrySelect = window.locationManager.countrySelect;
+                const citySelect = window.locationManager.citySelect;
+                const countySelect = window.locationManager.countySelect;
+                const districtSelect = window.locationManager.districtSelect;
+            } else {
+                // Fallback для старой логики
+                const countrySelect = document.getElementById('countrySelect');
+                const citySelect = document.getElementById('citySelect');
+                const countySelect = document.getElementById('countySelect');
+                const districtSelect = document.getElementById('districtSelect');
+            }
             
             const countryId = countrySelect.value;
             const cityId = citySelect.value;
@@ -3414,8 +3352,10 @@
             
             console.log('✅ All required elements found, proceeding with initialization...');
             updatePageText();
-            console.log('🔄 Loading countries...');
-            loadCountries();
+            
+            // Инициализируем новый LocationManager
+            console.log('🔄 Initializing LocationManager...');
+            window.locationManager = new LocationManager();
             
             // Initialize area slider
             const areaSlider = document.getElementById('areaObjectSlider');
