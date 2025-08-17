@@ -617,16 +617,6 @@
         .trends-table tr:hover {
             background: #e9ecef;
         }
-        
-        .trends-table .current-month-row {
-            background-color: #f0f8ff !important;
-            font-weight: bold;
-        }
-        
-        .trends-table .current-month-row td {
-            font-weight: bold;
-            color: #2c3e50;
-        }
 
         /* Table Styles */
         .data-table {
@@ -927,22 +917,6 @@
             font-size: 12px;
             font-weight: 600;
             color: #666;
-        }
-        
-        /* Hide data-currency attribute display */
-        .currency-button::before,
-        .currency-button::after {
-            content: none !important;
-        }
-        
-        /* Ensure only span content is visible */
-        .currency-button {
-            position: relative;
-        }
-        
-        .currency-button * {
-            position: relative;
-            z-index: 1;
         }
 
         /* Mobile responsive for listing type selection */
@@ -2768,7 +2742,7 @@
                 
                 if (trendsData.success && trendsData.trends && trendsData.trends.length > 0) {
                     // Add property trends section below the summary table
-                    await addPropertyTrendsSection(trendsData.trends);
+                    addPropertyTrendsSection(trendsData.trends);
                 } else {
                     console.log('⚠️ No property trends data available');
                 }
@@ -2779,7 +2753,7 @@
         }
         
         // Add property trends section to the page
-        async function addPropertyTrendsSection(trends) {
+        function addPropertyTrendsSection(trends) {
             // Проверяем, не существует ли уже секция трендов
             if (document.getElementById('propertyTrendsSection')) {
                 console.log('⚠️ Property trends section already exists, skipping...');
@@ -2807,7 +2781,7 @@
                     <div class="trends-table-section">
                         <h4 class="trends-table-title">Детальные данные трендов</h4>
                         <div class="trends-table-container">
-                            ${await generateTrendsTable(trends)}
+                            ${generateTrendsTable(trends)}
                         </div>
                     </div>
                 </div>
@@ -2863,9 +2837,7 @@
             if (value === null || value === undefined) return '0';
             const numValue = parseFloat(value);
             if (isNaN(numValue)) return '0';
-            
-            // Use European locale for proper formatting
-            return numValue.toLocaleString('de-DE', { 
+            return numValue.toLocaleString('tr-TR', { 
                 minimumFractionDigits: 2, 
                 maximumFractionDigits: 2 
             });
@@ -2877,8 +2849,8 @@
             try {
                 const date = new Date(dateStr);
                 const monthNames = [
-                    'янв.', 'фев.', 'мар.', 'апр.', 'май', 'июн.',
-                    'июл.', 'авг.', 'сен.', 'окт.', 'нояб.', 'дек.'
+                    'янв', 'фев', 'мар', 'апр', 'май', 'июн',
+                    'июл', 'авг', 'сен', 'окт', 'нояб', 'дек'
                 ];
                 
                 const month = monthNames[date.getMonth()];
@@ -2936,7 +2908,7 @@
             }
             
             // Calculate market price for user's property
-            const marketPricePerM2 = currentTrend.unit_price_for_sale || currentTrend.trend_value || 0;
+            const marketPricePerM2 = currentTrend.unit_price_for_sale || 0;
             const userArea = selectedListingTypes.area || 0;
             const marketPriceTotal = marketPricePerM2 * userArea;
             
@@ -2996,20 +2968,14 @@
         }
 
         // Generate detailed trends table
-        async function generateTrendsTable(trends) {
-            console.log('🚀 generateTrendsTable START - trends:', trends);
-            
+        function generateTrendsTable(trends) {
             if (!trends || trends.length === 0) {
-                console.log('❌ No trends provided to generateTrendsTable');
                 return '<div class="no-data">' + getText('noDataMessage') + '</div>';
             }
             
             // Get user's area and currency
             const userArea = selectedListingTypes.area || 0;
             const userCurrency = selectedListingTypes.currency || 'EUR';
-            
-            console.log('🔍 generateTrendsTable called with:', { userArea, userCurrency, trendsCount: trends.length });
-            console.log('📊 selectedListingTypes:', selectedListingTypes);
             
             // Currency symbols
             const currencySymbols = {
@@ -3018,43 +2984,6 @@
                 'USD': '$'
             };
             const currencySymbol = currencySymbols[userCurrency] || '€';
-            
-            // Get current exchange rates for currency conversion
-            let exchangeRates = null;
-            try {
-                const response = await fetch('/api/currency/rates');
-                if (response.ok) {
-                    exchangeRates = await response.json();
-                    console.log('💱 Exchange rates loaded:', exchangeRates);
-                }
-            } catch (error) {
-                console.error('❌ Error loading exchange rates:', error);
-            }
-            
-            // For now, show all available trends without filtering
-            console.log('🔍 Current date info:', { currentYear: new Date().getFullYear(), currentMonth: new Date().getMonth() + 1 });
-            console.log('📊 All trends received:', trends.map(t => ({ 
-                year: t.property_year, 
-                month: t.property_month, 
-                date: t.date,
-                salePrice: t.unit_price_for_sale,
-                rentPrice: t.unit_price_for_rent,
-                fullTrend: t
-            })));
-            
-            // Simply use all trends for now
-            let filteredTrends = trends.filter(trend => {
-                // Basic validation - just check if trend exists
-                return trend && (trend.property_year || trend.property_month || trend.date);
-            });
-            
-            console.log('📅 Filtered trends (basic filter):', filteredTrends.length);
-            
-            // If no trends, return no data message
-            if (filteredTrends.length === 0) {
-                console.log('❌ No trends available after basic filtering');
-                return '<div class="no-data">' + getText('noDataMessage') + '</div>';
-            }
             
             let html = '<table class="trends-table">';
             html += '<thead><tr>';
@@ -3066,35 +2995,35 @@
             html += '<th>' + getText('tableYieldHeader') + '</th>';
             html += '</tr></thead><tbody>';
             
-            filteredTrends.forEach((trend, index) => {
-                console.log(`📊 Processing trend ${index + 1}:`, trend);
+            trends.forEach(trend => {
+                // Calculate total prices for user's property
+                // Use specific fields for sale and rent prices
+                const salePricePerM2 = trend.unit_price_for_sale || 0;
+                const rentPricePerM2 = trend.unit_price_for_rent || 0;
+                const totalSalePrice = salePricePerM2 * userArea;
+                const totalRentPrice = rentPricePerM2 * userArea;
                 
-                // TEMPORARILY: Show raw values without calculations
-                const rawSalePrice = trend.unit_price_for_sale || 'N/A';
-                const rawRentPrice = trend.unit_price_for_rent || 'N/A';
-                
-                console.log(`💰 Raw prices from database:`, { 
-                    salePrice: rawSalePrice,
-                    rentPrice: rawRentPrice,
-                    trend: trend
+                console.log('💰 Price calculation:', {
+                    trend: trend.date,
+                    salePricePerM2,
+                    rentPricePerM2,
+                    userArea,
+                    totalSalePrice,
+                    totalRentPrice,
+                    trendData: trend
                 });
                 
-                // For now, don't check current month to avoid errors
-                const rowClass = '';
-                const fontWeight = '';
-                
-                html += `<tr class="${rowClass}" style="${fontWeight}">`;
+                html += '<tr>';
                 html += `<td>${formatTrendDate(trend.date)}</td>`;
-                html += `<td>${rawSalePrice}</td>`; // Raw value
+                html += `<td>${currencySymbol}${formatNumber(totalSalePrice)}</td>`;
                 html += `<td>${formatPercentage(trend.price_change_sale)}</td>`;
-                html += `<td>${rawRentPrice}</td>`; // Raw value
+                html += `<td>${currencySymbol}${formatNumber(totalRentPrice)}</td>`;
                 html += `<td>${formatPercentage(trend.price_change_rent)}</td>`;
                 html += `<td>${formatPercentage(trend.yield)}</td>`;
                 html += '</tr>';
             });
             
             html += '</tbody></table>';
-            console.log('✅ generateTrendsTable completed, returning HTML');
             return html;
         }
         
