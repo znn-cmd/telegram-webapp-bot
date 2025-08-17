@@ -1075,15 +1075,15 @@
                             <div class="currency-buttons">
                                 <button type="button" class="currency-button" data-currency="TRY">
                                     <span class="currency-flag">🇹🇷</span>
-                                    <span class="currency-code">TRY</span>
+                                    <span class="currency-code">₺</span>
                                 </button>
                                 <button type="button" class="currency-button" data-currency="EUR">
                                     <span class="currency-flag">🇪🇺</span>
-                                    <span class="currency-code">EUR</span>
+                                    <span class="currency-code">€</span>
                                 </button>
                                 <button type="button" class="currency-button" data-currency="USD">
                                     <span class="currency-flag">🇺🇸</span>
-                                    <span class="currency-code">USD</span>
+                                    <span class="currency-code">$</span>
                                 </button>
                             </div>
                         </div>
@@ -2742,7 +2742,7 @@
                 
                 if (trendsData.success && trendsData.trends && trendsData.trends.length > 0) {
                     // Add property trends section below the summary table
-                    addPropertyTrendsSection(trendsData.trends);
+                    await addPropertyTrendsSection(trendsData.trends);
                 } else {
                     console.log('⚠️ No property trends data available');
                 }
@@ -2753,7 +2753,7 @@
         }
         
         // Add property trends section to the page
-        function addPropertyTrendsSection(trends) {
+        async function addPropertyTrendsSection(trends) {
             // Проверяем, не существует ли уже секция трендов
             if (document.getElementById('propertyTrendsSection')) {
                 console.log('⚠️ Property trends section already exists, skipping...');
@@ -2781,7 +2781,7 @@
                     <div class="trends-table-section">
                         <h4 class="trends-table-title">Детальные данные трендов</h4>
                         <div class="trends-table-container">
-                            ${generateTrendsTable(trends)}
+                            ${await generateTrendsTable(trends)}
                         </div>
                     </div>
                 </div>
@@ -2848,10 +2848,14 @@
             if (!dateStr) return '';
             try {
                 const date = new Date(dateStr);
-                return date.toLocaleDateString('ru-RU', { 
-                    year: 'numeric', 
-                    month: 'short' 
-                });
+                const monthNames = [
+                    'янв.', 'фев.', 'мар.', 'апр.', 'май', 'июн.',
+                    'июл.', 'авг.', 'сен.', 'окт.', 'нояб.', 'дек.'
+                ];
+                
+                const month = monthNames[date.getMonth()];
+                const year = date.getFullYear();
+                return `${month} ${year}`;
             } catch (e) {
                 return dateStr;
             }
@@ -2964,7 +2968,7 @@
         }
 
         // Generate detailed trends table
-        function generateTrendsTable(trends) {
+        async function generateTrendsTable(trends) {
             if (!trends || trends.length === 0) {
                 return '<div class="no-data">' + getText('noDataMessage') + '</div>';
             }
@@ -2981,6 +2985,18 @@
             };
             const currencySymbol = currencySymbols[userCurrency] || '€';
             
+            // Get current exchange rates for currency conversion
+            let exchangeRates = null;
+            try {
+                const response = await fetch('/api/currency/rates');
+                if (response.ok) {
+                    exchangeRates = await response.json();
+                    console.log('💱 Exchange rates loaded:', exchangeRates);
+                }
+            } catch (error) {
+                console.error('❌ Error loading exchange rates:', error);
+            }
+            
             let html = '<table class="trends-table">';
             html += '<thead><tr>';
             html += '<th>' + getText('tableDateHeader') + '</th>';
@@ -2993,11 +3009,33 @@
             
             trends.forEach(trend => {
                 // Calculate total prices for user's property
-                // Try different field names that might contain the price data
-                const salePricePerM2 = trend.unit_price_for_sale || trend.trend_value || 0;
-                const rentPricePerM2 = trend.unit_price_for_rent || trend.trend_value || 0;
+                // Use correct field names for sale and rent prices
+                const salePricePerM2 = trend.unit_price_for_sale || 0;
+                const rentPricePerM2 = trend.unit_price_for_rent || 0;
                 const totalSalePrice = salePricePerM2 * userArea;
                 const totalRentPrice = rentPricePerM2 * userArea;
+                
+                // Convert prices to user's selected currency if needed
+                let displaySalePrice = totalSalePrice;
+                let displayRentPrice = totalRentPrice;
+                
+                if (exchangeRates && userCurrency !== 'EUR') {
+                    // Convert from EUR (base currency) to user's currency
+                    const rate = exchangeRates[userCurrency];
+                    if (rate) {
+                        displaySalePrice = totalSalePrice * rate;
+                        displayRentPrice = totalRentPrice * rate;
+                        console.log('💱 Currency conversion:', {
+                            from: 'EUR',
+                            to: userCurrency,
+                            rate,
+                            originalSale: totalSalePrice,
+                            convertedSale: displaySalePrice,
+                            originalRent: totalRentPrice,
+                            convertedRent: displayRentPrice
+                        });
+                    }
+                }
                 
                 console.log('💰 Price calculation:', {
                     trend: trend.date,
@@ -3006,14 +3044,17 @@
                     userArea,
                     totalSalePrice,
                     totalRentPrice,
+                    displaySalePrice,
+                    displayRentPrice,
+                    userCurrency,
                     trendData: trend
                 });
                 
                 html += '<tr>';
                 html += `<td>${formatTrendDate(trend.date)}</td>`;
-                html += `<td>${currencySymbol}${formatNumber(totalSalePrice)}</td>`;
+                html += `<td>${currencySymbol}${formatNumber(displaySalePrice)}</td>`;
                 html += `<td>${formatPercentage(trend.price_change_sale)}</td>`;
-                html += `<td>${currencySymbol}${formatNumber(totalRentPrice)}</td>`;
+                html += `<td>${currencySymbol}${formatNumber(displayRentPrice)}</td>`;
                 html += `<td>${formatPercentage(trend.price_change_rent)}</td>`;
                 html += `<td>${formatPercentage(trend.yield)}</td>`;
                 html += '</tr>';
