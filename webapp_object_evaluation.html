@@ -3032,28 +3032,80 @@
             const currentYear = currentDate.getFullYear();
             const currentMonth = currentDate.getMonth() + 1; // January is 0
             
-            const filteredTrends = trends.filter(trend => {
-                if (!trend.property_year || !trend.property_month) return false;
-                
-                const trendDate = new Date(trend.property_year, trend.property_month - 1);
-                const sixMonthsAgo = new Date(currentYear, currentMonth - 7); // 6 months back
-                const sixMonthsForward = new Date(currentYear, currentMonth + 5); // 6 months forward
-                
-                return trendDate >= sixMonthsAgo && trendDate <= sixMonthsForward;
-            }).sort((a, b) => {
-                // Sort by date descending (newest first)
-                const dateA = new Date(a.property_year, a.property_month - 1);
-                const dateB = new Date(b.property_year, b.property_month - 1);
-                return dateB - dateA;
-            });
-            
-            console.log('📅 Filtered trends:', filteredTrends.map(t => ({ 
+            console.log('🔍 Current date info:', { currentYear, currentMonth, currentDate });
+            console.log('📊 All trends before filtering:', trends.map(t => ({ 
                 year: t.property_year, 
                 month: t.property_month, 
                 date: t.date,
                 salePrice: t.unit_price_for_sale,
                 rentPrice: t.unit_price_for_rent
             })));
+            
+            // First, try to filter by date range
+            let filteredTrends = trends.filter(trend => {
+                if (!trend.property_year || !trend.property_month) return false;
+                
+                // Ensure we have valid numbers
+                const year = parseInt(trend.property_year);
+                const month = parseInt(trend.property_month);
+                
+                if (isNaN(year) || isNaN(month)) {
+                    console.log('⚠️ Invalid year/month:', { year, month, trend });
+                    return false;
+                }
+                
+                const trendDate = new Date(year, month - 1);
+                const sixMonthsAgo = new Date(currentYear, currentMonth - 7); // 6 months back
+                const sixMonthsForward = new Date(currentYear, currentMonth + 5); // 6 months forward
+                
+                const isInRange = trendDate >= sixMonthsAgo && trendDate <= sixMonthsForward;
+                console.log('📅 Trend date check:', {
+                    trendYear: year,
+                    trendMonth: month,
+                    trendDate,
+                    sixMonthsAgo,
+                    sixMonthsForward,
+                    isInRange
+                });
+                
+                return isInRange;
+            });
+            
+            // If no trends in range, show all available trends
+            if (filteredTrends.length === 0) {
+                console.log('⚠️ No trends in date range, showing all available trends');
+                filteredTrends = trends.filter(trend => {
+                    const year = parseInt(trend.property_year);
+                    const month = parseInt(trend.property_month);
+                    return !isNaN(year) && !isNaN(month);
+                });
+            }
+            
+            // Sort by date descending (newest first)
+            filteredTrends.sort((a, b) => {
+                const yearA = parseInt(a.property_year);
+                const monthA = parseInt(a.property_month);
+                const yearB = parseInt(b.property_year);
+                const monthB = parseInt(b.property_month);
+                
+                const dateA = new Date(yearA, monthA - 1);
+                const dateB = new Date(yearB, monthB - 1);
+                return dateB - dateA;
+            });
+            
+            console.log('📅 Final filtered trends:', filteredTrends.map(t => ({ 
+                year: t.property_year, 
+                month: t.property_month, 
+                date: t.date,
+                salePrice: t.unit_price_for_sale,
+                rentPrice: t.unit_price_for_rent
+            })));
+            
+            // If still no trends, return no data message
+            if (filteredTrends.length === 0) {
+                console.log('❌ No trends available after filtering');
+                return '<div class="no-data">' + getText('noDataMessage') + '</div>';
+            }
             
             let html = '<table class="trends-table">';
             html += '<thead><tr>';
