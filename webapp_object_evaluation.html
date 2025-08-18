@@ -695,6 +695,103 @@
             border: 1px solid #e9ecef;
         }
         
+        /* Forecast Table Styles */
+        .forecast-table-section {
+            margin-top: 20px;
+        }
+        
+        .forecast-table-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .forecast-table-container {
+            overflow-x: hidden;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .forecast-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            font-size: 11px;
+            table-layout: fixed;
+        }
+        
+        .forecast-table th {
+            background: #28a745;
+            color: white;
+            padding: 8px 6px;
+            text-align: center;
+            font-weight: 600;
+            line-height: 1.2;
+            word-wrap: break-word;
+        }
+        
+        .forecast-table td {
+            padding: 6px 4px;
+            text-align: center;
+            border-bottom: 1px solid #dee2e6;
+            word-wrap: break-word;
+        }
+        
+        .forecast-table tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+        
+        .forecast-table tr:hover {
+            background: #e9ecef;
+        }
+        
+        /* Специальные стили для ширины столбцов прогноза */
+        .forecast-table th:nth-child(1) { width: 20%; } /* Дата */
+        .forecast-table th:nth-child(2) { width: 30%; } /* Прогноз продажи */
+        .forecast-table th:nth-child(3) { width: 30%; } /* Прогноз аренды */
+        .forecast-table th:nth-child(4) { width: 20%; } /* Прогноз доходности */
+        
+        /* Стили для информационной строки о прогнозе */
+        .forecast-table .forecast-info td {
+            border: none;
+            font-style: italic;
+        }
+        
+        /* Стили для выделения текущего месяца в прогнозе */
+        .forecast-table .current-month-row {
+            background-color: #e8f4fd !important;
+            font-weight: 500;
+        }
+        
+        .forecast-table .current-month-row td {
+            border-top: 2px solid #007bff;
+            border-bottom: 2px solid #007bff;
+        }
+        
+        /* Стили для строк прогноза */
+        .forecast-table .forecast-row {
+            background-color: #f0f8ff;
+        }
+        
+        /* Мобильные устройства для таблицы прогноза */
+        @media (max-width: 768px) {
+            .forecast-table {
+                font-size: 10px;
+            }
+            
+            .forecast-table th,
+            .forecast-table td {
+                padding: 4px 2px;
+            }
+            
+            .forecast-table th:nth-child(1) { width: 22%; }
+            .forecast-table th:nth-child(2) { width: 28%; }
+            .forecast-table th:nth-child(3) { width: 28%; }
+            .forecast-table th:nth-child(4) { width: 22%; }
+        }
+        
         .trends-analysis-title {
             font-size: 16px;
             font-weight: 600;
@@ -3307,7 +3404,79 @@
             
             analysis += '</div></div>';
             
+            // Добавляем таблицу "Прогноз цены и аренды"
+            analysis += generateForecastTable(trends);
+            
             return analysis;
+        }
+        
+        // Generate forecast table for current and future months
+        function generateForecastTable(trends) {
+            if (!trends || trends.length === 0) {
+                return '';
+            }
+            
+            // Получаем текущую дату
+            const currentDate = new Date();
+            const currentYear = currentDate.getFullYear();
+            const currentMonth = currentDate.getMonth() + 1; // getMonth() returns 0-11
+            
+            // Фильтруем тренды: текущий месяц и все последующие
+            const forecastTrends = trends.filter(trend => {
+                if (trend.property_year > currentYear) {
+                    return true; // Будущие годы
+                } else if (trend.property_year === currentYear) {
+                    return trend.property_month >= currentMonth; // Текущий месяц и будущие
+                }
+                return false;
+            });
+            
+            if (forecastTrends.length === 0) {
+                return '';
+            }
+            
+            // Сортируем по дате (от текущего к будущему)
+            forecastTrends.sort((a, b) => {
+                if (a.property_year !== b.property_year) {
+                    return a.property_year - b.property_year;
+                }
+                return a.property_month - b.property_month;
+            });
+            
+            // Формируем таблицу прогноза
+            let forecastHtml = '<div class="forecast-table-section">';
+            forecastHtml += '<h4 class="forecast-table-title">Прогноз цены и аренды</h4>';
+            forecastHtml += '<div class="forecast-table-container">';
+            forecastHtml += '<table class="forecast-table">';
+            forecastHtml += '<thead><tr>';
+            forecastHtml += '<th>Дата</th>';
+            forecastHtml += '<th>Прогноз продажи<br>(₺/м²)</th>';
+            forecastHtml += '<th>Прогноз аренды<br>(₺/м²)</th>';
+            forecastHtml += '<th>Прогноз доходности</th>';
+            forecastHtml += '</tr></thead><tbody>';
+            
+            // Добавляем информацию о прогнозе
+            forecastHtml += `<tr class="forecast-info"><td colspan="4" style="text-align: center; font-size: 11px; color: #666; background: #f8f9fa; padding: 4px;">
+                Прогноз на основе ${forecastTrends.length} месяцев (текущий и будущие)
+            </td></tr>`;
+            
+            forecastTrends.forEach((trend, index) => {
+                const isCurrentMonth = trend.property_year === currentYear && trend.property_month === currentMonth;
+                const rowClass = isCurrentMonth ? 'current-month-row' : 'forecast-row';
+                const rowStyle = isCurrentMonth ? 'background-color: #e8f4fd;' : '';
+                
+                forecastHtml += `<tr class="${rowClass}" style="${rowStyle}">`;
+                forecastHtml += `<td>${formatTrendDateShort(trend.date)}</td>`;
+                forecastHtml += `<td>${formatTrendValue(trend.unit_price_for_sale, 'price')}</td>`;
+                forecastHtml += `<td>${formatTrendValue(trend.unit_price_for_rent, 'price')}</td>`;
+                forecastHtml += `<td>${formatTrendValue(trend.yield, 'percentage')}</td>`;
+                forecastHtml += '</tr>';
+            });
+            
+            forecastHtml += '</tbody></table>';
+            forecastHtml += '</div></div>';
+            
+            return forecastHtml;
         }
         
         // Format trend value based on type
