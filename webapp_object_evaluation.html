@@ -1350,7 +1350,8 @@
                 'rentHeader': 'Аренда',
                 'currencyTitle': 'Выберите валюту:',
                 'pricePlaceholder': 'Введите цену',
-                'areaPlaceholder': 'Введите площадь'
+                'areaPlaceholder': 'Введите площадь',
+                'trendsFilterInfo': 'Показано ${filteredCount} из ${totalCount} трендов'
             },
             'en': {
                 'slogan': 'Real Estate Market Insights',
@@ -1408,7 +1409,8 @@
                 'rentHeader': 'Rent',
                 'currencyTitle': 'Select currency:',
                 'pricePlaceholder': 'Enter price',
-                'areaPlaceholder': 'Enter area'
+                'areaPlaceholder': 'Enter area',
+                'trendsFilterInfo': 'Showing ${filteredCount} of ${totalCount} trends'
             },
             'de': {
                 'slogan': 'Immobilienmarkt-Einblicke',
@@ -3178,7 +3180,7 @@
             const currentMonth = currentDate.getMonth() + 1;
             
             html += `<tr class="filter-info"><td colspan="6" style="text-align: center; font-size: 11px; color: #666; background: #f8f9fa; padding: 4px;">
-                Показано ${filteredTrends.length} из ${trends.length} трендов (приоритет трендам за ${currentYear} год и ближайшие месяцы)
+                Показано ${filteredTrends.length} из ${trends.length} трендов
             </td></tr>`;
             
             filteredTrends.forEach((trend, index) => {
