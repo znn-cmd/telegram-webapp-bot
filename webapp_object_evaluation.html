@@ -448,29 +448,36 @@
         }
         
         .section-header {
-            background: #667eea !important;
-            color: white;
+            background: #f8f9fa !important;
+            color: #495057;
             font-weight: 700;
             text-align: center;
+            border: 1px solid #dee2e6;
         }
         
         .sale-header {
-            background: #28a745 !important;
+            background: #f8f9fa !important;
+            color: #495057;
+            border: 1px solid #dee2e6;
         }
         
         .rent-header {
-            background: #17a2b8 !important;
+            background: #f8f9fa !important;
+            color: #495057;
+            border: 1px solid #dee2e6;
         }
         
         .yield-header {
-            background: #ffc107 !important;
-            color: #212529;
+            background: #f8f9fa !important;
+            color: #495057;
             font-weight: 800;
             font-size: 18px;
+            border: 1px solid #dee2e6;
         }
         
         .yield-data {
-            background: #fff3cd !important;
+            background: #f8f9fa !important;
+            border: 1px solid #dee2e6;
         }
         
         .yield-label {
@@ -481,6 +488,35 @@
         .yield-value {
             font-weight: 700;
             color: #856404;
+        }
+        
+        /* Analytical Summary Styles */
+        .analytical-summary {
+            margin-top: 25px;
+            padding: 20px;
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+        }
+        
+        .summary-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .analytical-summary p {
+            font-size: 14px;
+            line-height: 1.6;
+            color: #495057;
+            margin-bottom: 12px;
+        }
+        
+        .analytical-summary strong {
+            color: #333;
+            font-weight: 600;
         }
         
         /* Property Trends Styles */
@@ -2506,7 +2542,10 @@
             if (typeof value === 'number') {
                 if (field.includes('price') || field.includes('Price')) {
                     return formatValue(value, 'price');
-                } else if (field.includes('yield') || field.includes('Yield') || field.includes('rate')) {
+                } else if (field.includes('yield') || field.includes('Yield')) {
+                    // For yield, don't multiply by 100, just add % symbol
+                    return `${parseFloat(value).toFixed(2)}%`;
+                } else if (field.includes('rate')) {
                     return formatValue(value, 'percentage');
                 } else if (field.includes('age') || field.includes('Age')) {
                     return formatValue(value, 'years');
@@ -2536,6 +2575,62 @@
                 default:
                     return value.toString();
             }
+        }
+
+        // Generate analytical summary based on market data
+        function generateAnalyticalSummary(summary) {
+            let analysis = '<div class="analytical-summary">';
+            analysis += '<h4 class="summary-title">Анализ рынка</h4>';
+            
+            // Age analysis
+            if (summary.average_age_for_sale || summary.average_age_for_rent) {
+                const saleAge = summary.average_age_for_sale;
+                const rentAge = summary.average_age_for_rent;
+                
+                if (saleAge && rentAge) {
+                    const minAge = Math.min(saleAge.min, rentAge.min);
+                    const maxAge = Math.max(saleAge.max, rentAge.max);
+                    analysis += `<p>В локации преобладают объекты (${minAge}–${maxAge} года).</p>`;
+                } else if (saleAge) {
+                    analysis += `<p>В локации преобладают объекты (${saleAge.min}–${saleAge.max} года).</p>`;
+                } else if (rentAge) {
+                    analysis += `<p>В локации преобладают объекты (${rentAge.min}–${rentAge.max} года).</p>`;
+                }
+            }
+            
+            // Sale analysis
+            if (summary.comparable_area_for_sale && summary.listing_period_for_sale && summary.min_unit_price_for_sale) {
+                const area = summary.comparable_area_for_sale;
+                const period = summary.listing_period_for_sale;
+                const price = summary.min_unit_price_for_sale;
+                
+                analysis += `<p><strong>Продажа:</strong> востребованная площадь ${area.min}–${area.max} м², `;
+                analysis += `срок экспозиции ${period.min}–${period.max} дней, `;
+                analysis += `цена за м² ${formatValue(price.min, 'price')} – ${formatValue(price.max, 'price')}.</p>`;
+            }
+            
+            // Rent analysis
+            if (summary.comparable_area_for_rent && summary.listing_period_for_rent && summary.min_unit_price_for_rent) {
+                const area = summary.comparable_area_for_rent;
+                const period = summary.listing_period_for_rent;
+                const price = summary.min_unit_price_for_rent;
+                
+                analysis += `<p><strong>Аренда:</strong> самая востребованная площадь ${area.min}–${area.max} м², `;
+                analysis += `срок экспозиции ${period.min}–${period.max} дней, `;
+                analysis += `ставка ${formatValue(price.min, 'price')} – ${formatValue(price.max, 'price')} за м².</p>`;
+            }
+            
+            // Yield analysis
+            if (summary.yield) {
+                const yieldMin = summary.yield.min;
+                const yieldMax = summary.yield.max;
+                
+                analysis += `<p><strong>Доходность</strong> составляет ${yieldMin.toFixed(2)}% – ${yieldMax.toFixed(2)}%, `;
+                analysis += `что делает рынок привлекательным для инвесторов благодаря сочетанию доступных цен и стабильного спроса на аренду.</p>`;
+            }
+            
+            analysis += '</div>';
+            return analysis;
         }
 
         // Generate market indicators table with organized structure
@@ -2638,6 +2733,12 @@
             }
             
             html += '</tbody></table>';
+            
+            // Add analytical summary below the table
+            if (Object.keys(summary).length > 0) {
+                html += generateAnalyticalSummary(summary);
+            }
+            
             summaryContainer.innerHTML = html;
             
             // Load property trends data
