@@ -2933,6 +2933,20 @@
             }
         }
         
+        // Format trend date without "г." for shorter display
+        function formatTrendDateShort(dateStr) {
+            if (!dateStr) return '';
+            try {
+                const date = new Date(dateStr);
+                return date.toLocaleDateString('ru-RU', { 
+                    year: 'numeric', 
+                    month: 'short' 
+                });
+            } catch (e) {
+                return dateStr;
+            }
+        }
+
         // Generate detailed trends table
         function generateTrendsTable(trends) {
             if (!trends || trends.length === 0) {
@@ -2943,28 +2957,20 @@
             html += '<thead><tr>';
             html += '<th>Дата</th>';
             html += '<th>Цена продажи (₺/м²)</th>';
-            html += '<th>Цена аренды (₺/м²)</th>';
             html += '<th>Изменение цен продажи</th>';
+            html += '<th>Цена аренды (₺/м²)</th>';
             html += '<th>Изменение цен аренды</th>';
-            html += '<th>Годовое изменение продажи</th>';
-            html += '<th>Годовое изменение аренды</th>';
             html += '<th>Доходность</th>';
-            html += '<th>Количество продаж</th>';
-            html += '<th>Количество аренд</th>';
             html += '</tr></thead><tbody>';
             
             trends.forEach(trend => {
                 html += '<tr>';
-                html += `<td>${formatTrendDate(trend.date)}</td>`;
-                html += `<td>${formatTrendValue(trend.trend_value, 'price')}</td>`;
-                html += `<td>${formatTrendValue(trend.unit_price_for_rent || trend.trend_value, 'price')}</td>`;
+                html += `<td>${formatTrendDateShort(trend.date)}</td>`;
+                html += `<td>${formatTrendValue(trend.unit_price_for_sale || trend.trend_value, 'price')}</td>`;
                 html += `<td>${formatPercentage(trend.price_change_sale)}</td>`;
+                html += `<td>${formatTrendValue(trend.unit_price_for_rent || trend.trend_value, 'price')}</td>`;
                 html += `<td>${formatPercentage(trend.price_change_rent)}</td>`;
-                html += `<td>${formatPercentage(trend.annual_price_change_sale)}</td>`;
-                html += `<td>${formatPercentage(trend.annual_price_change_rent)}</td>`;
                 html += `<td>${formatPercentage(trend.yield)}</td>`;
-                html += `<td>${trend.count_for_sale || '-'}</td>`;
-                html += `<td>${trend.count_for_rent || '-'}</td>`;
                 html += '</tr>';
             });
             
