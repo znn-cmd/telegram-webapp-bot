@@ -618,7 +618,7 @@
         }
         
         .trends-table th {
-            background: #667eea;
+            background: #28a745;
             color: white;
             padding: 8px 6px;
             text-align: center;
@@ -665,6 +665,11 @@
         .trends-table .current-month-row td {
             border-top: 2px solid #007bff;
             border-bottom: 2px solid #007bff;
+        }
+        
+        /* Стили для строк прогноза в таблице трендов */
+        .trends-table .forecast-row {
+            background-color: #f0f8ff;
         }
         
         /* Мобильные устройства */
@@ -820,6 +825,56 @@
             }
             
             .trends-analysis-content {
+                font-size: 13px;
+                line-height: 1.5;
+            }
+        }
+        
+        /* Forecast Analysis Styles */
+        .forecast-analysis-section {
+            margin-top: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            border: 1px solid #e9ecef;
+        }
+        
+        .forecast-analysis-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .forecast-analysis-content {
+            font-size: 14px;
+            line-height: 1.6;
+            color: #333;
+            text-align: justify;
+        }
+        
+        .forecast-analysis-content p {
+            margin-bottom: 12px;
+        }
+        
+        .forecast-analysis-content p:last-child {
+            margin-bottom: 0;
+        }
+        
+        /* Мобильные устройства для блока анализа прогноза */
+        @media (max-width: 768px) {
+            .forecast-analysis-section {
+                padding: 15px;
+                margin-top: 15px;
+            }
+            
+            .forecast-analysis-title {
+                font-size: 15px;
+                margin-bottom: 12px;
+            }
+            
+            .forecast-analysis-content {
                 font-size: 13px;
                 line-height: 1.5;
             }
@@ -3269,9 +3324,18 @@
             filteredTrends.forEach((trend, index) => {
                 // Проверяем, является ли этот тренд текущим месяцем
                 const isCurrentMonth = trend.property_year === currentYear && trend.property_month === currentMonth;
+                const isFutureMonth = trend.property_year > currentYear || (trend.property_year === currentYear && trend.property_month > currentMonth);
                 
-                const rowClass = isCurrentMonth ? 'current-month-row' : '';
-                const rowStyle = isCurrentMonth ? 'background-color: #e8f4fd;' : '';
+                let rowClass = '';
+                let rowStyle = '';
+                
+                if (isCurrentMonth) {
+                    rowClass = 'current-month-row';
+                    rowStyle = 'background-color: #e8f4fd;';
+                } else if (isFutureMonth) {
+                    rowClass = 'forecast-row';
+                    rowStyle = 'background-color: #f0f8ff;';
+                }
                 
                 html += `<tr class="${rowClass}" style="${rowStyle}">`;
                 html += `<td>${formatTrendDateShort(trend.date)}</td>`;
@@ -3462,7 +3526,130 @@
             forecastHtml += '</tbody></table>';
             forecastHtml += '</div></div>';
             
+            // Добавляем блок "Вывод прогноза"
+            forecastHtml += generateForecastAnalysis(forecastTrends);
+            
             return forecastHtml;
+        }
+        
+        // Generate forecast analysis based on forecast table data
+        function generateForecastAnalysis(forecastTrends) {
+            if (!forecastTrends || forecastTrends.length === 0) {
+                return '';
+            }
+            
+            // Сортируем тренды по дате для правильного анализа
+            const sortedTrends = forecastTrends.sort((a, b) => {
+                if (a.property_year !== b.property_year) {
+                    return a.property_year - b.property_year;
+                }
+                return a.property_month - b.property_month;
+            });
+            
+            // Находим первый и последний месяц для анализа
+            const firstMonth = sortedTrends[0];
+            const lastMonth = sortedTrends[sortedTrends.length - 1];
+            
+            if (!firstMonth || !lastMonth) {
+                return '';
+            }
+            
+            // Рассчитываем рост цен на продажу
+            const firstSalePrice = parseFloat(firstMonth.unit_price_for_sale) || 0;
+            const lastSalePrice = parseFloat(lastMonth.unit_price_for_sale) || 0;
+            const salePriceGrowth = firstSalePrice > 0 ? ((lastSalePrice - firstSalePrice) / firstSalePrice * 100) : 0;
+            
+            // Рассчитываем рост цен на аренду
+            const firstRentPrice = parseFloat(firstMonth.unit_price_for_rent) || 0;
+            const lastRentPrice = parseFloat(lastMonth.unit_price_for_rent) || 0;
+            const rentPriceGrowth = firstRentPrice > 0 ? ((lastRentPrice - firstRentPrice) / firstRentPrice * 100) : 0;
+            
+            // Анализируем диапазон доходности
+            const yields = forecastTrends.map(t => parseFloat(t.yield) || 0).filter(y => y > 0);
+            const minYield = yields.length > 0 ? Math.min(...yields) : 0;
+            const maxYield = yields.length > 0 ? Math.max(...yields) : 0;
+            
+            // Определяем тренд доходности
+            let yieldTrend = '';
+            if (yields.length >= 2) {
+                const firstYield = yields[0];
+                const lastYield = yields[yields.length - 1];
+                const yieldChange = lastYield - firstYield;
+                
+                if (Math.abs(yieldChange) < 0.5) {
+                    yieldTrend = 'стабильность';
+                } else if (yieldChange > 0.5) {
+                    yieldTrend = 'рост';
+                } else {
+                    yieldTrend = 'снижение';
+                }
+            }
+            
+            // Форматируем названия месяцев
+            const monthNames = {
+                'ru': ['январь', 'февраль', 'март', 'апрель', 'май', 'июнь',
+                       'июль', 'август', 'сентябрь', 'октябрь', 'ноябрь', 'декабрь'],
+                'en': ['January', 'February', 'March', 'April', 'May', 'June',
+                       'July', 'August', 'September', 'October', 'November', 'December'],
+                'de': ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni',
+                       'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'],
+                'fr': ['janvier', 'février', 'mars', 'avril', 'mai', 'juin',
+                       'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'],
+                'tr': ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran',
+                       'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık']
+            };
+            
+            const firstMonthName = monthNames[userLanguage] ? monthNames[userLanguage][firstMonth.property_month - 1] : monthNames['ru'][firstMonth.property_month - 1];
+            const lastMonthName = monthNames[userLanguage] ? monthNames[userLanguage][lastMonth.property_month - 1] : monthNames['ru'][lastMonth.property_month - 1];
+            
+            // Формируем аналитический вывод на разных языках
+            const analysisTexts = {
+                'ru': {
+                    'title': 'Вывод прогноза',
+                    'sale': `Продажа: ожидается стабильный рост цен с ${formatValue(firstSalePrice, 'price')}/м² в ${firstMonthName} ${firstMonth.property_year} до ${formatValue(lastSalePrice, 'price')}/м² в ${lastMonthName} ${lastMonth.property_year} (+${salePriceGrowth.toFixed(1)}% за ${forecastTrends.length} месяцев).`,
+                    'rent': `Аренда: прогнозируется увеличение с ${formatValue(firstRentPrice, 'price')}/м² до ${formatValue(lastRentPrice, 'price')}/м² (+${rentPriceGrowth.toFixed(1)}%).`,
+                    'yield': `Доходность: остаётся на уровне ${minYield.toFixed(1)}–${maxYield.toFixed(1)}%, с лёгким ${yieldTrend === 'снижение' ? 'снижением' : yieldTrend === 'рост' ? 'ростом' : 'изменением'} к ${lastMonthName} ${lastMonth.property_year} года.`
+                },
+                'en': {
+                    'title': 'Forecast Analysis',
+                    'sale': `Sales: stable price growth is expected from ${formatValue(firstSalePrice, 'price')}/m² in ${firstMonthName} ${firstMonth.property_year} to ${formatValue(lastSalePrice, 'price')}/m² in ${lastMonthName} ${lastMonth.property_year} (+${salePriceGrowth.toFixed(1)}% over ${forecastTrends.length} months).`,
+                    'rent': `Rent: increase is forecasted from ${formatValue(firstRentPrice, 'price')}/m² to ${formatValue(lastRentPrice, 'price')}/m² (+${rentPriceGrowth.toFixed(1)}%).`,
+                    'yield': `Yield: remains at ${minYield.toFixed(1)}–${maxYield.toFixed(1)}%, with a slight ${yieldTrend === 'снижение' ? 'decrease' : yieldTrend === 'рост' ? 'increase' : 'change'} by ${lastMonthName} ${lastMonth.property_year}.`
+                },
+                'de': {
+                    'title': 'Prognose-Analyse',
+                    'sale': `Verkauf: Stabile Preiserhöhung wird erwartet von ${formatValue(firstSalePrice, 'price')}/m² im ${firstMonthName} ${firstMonth.property_year} bis ${formatValue(lastSalePrice, 'price')}/m² im ${lastMonthName} ${lastMonth.property_year} (+${salePriceGrowth.toFixed(1)}% über ${forecastTrends.length} Monate).`,
+                    'rent': `Miete: Anstieg wird prognostiziert von ${formatValue(firstRentPrice, 'price')}/m² auf ${formatValue(lastRentPrice, 'price')}/m² (+${rentPriceGrowth.toFixed(1)}%).`,
+                    'yield': `Rendite: bleibt bei ${minYield.toFixed(1)}–${maxYield.toFixed(1)}%, mit leichter ${yieldTrend === 'снижение' ? 'Abnahme' : yieldTrend === 'рост' ? 'Zunahme' : 'Änderung'} bis ${lastMonthName} ${lastMonth.property_year}.`
+                },
+                'fr': {
+                    'title': 'Analyse des prévisions',
+                    'sale': `Vente: une croissance stable des prix est attendue de ${formatValue(firstSalePrice, 'price')}/m² en ${firstMonthName} ${firstMonth.property_year} à ${formatValue(lastSalePrice, 'price')}/m² en ${lastMonthName} ${lastMonth.property_year} (+${salePriceGrowth.toFixed(1)}% sur ${forecastTrends.length} mois).`,
+                    'rent': `Location: une augmentation est prévue de ${formatValue(firstRentPrice, 'price')}/m² à ${formatValue(lastRentPrice, 'price')}/m² (+${rentPriceGrowth.toFixed(1)}%).`,
+                    'yield': `Rendement: reste à ${minYield.toFixed(1)}–${maxYield.toFixed(1)}%, avec une légère ${yieldTrend === 'снижение' ? 'diminution' : yieldTrend === 'рост' ? 'augmentation' : 'variation'} d'ici ${lastMonthName} ${lastMonth.property_year}.`
+                },
+                'tr': {
+                    'title': 'Tahmin Analizi',
+                    'sale': `Satış: ${firstMonthName} ${firstMonth.property_year}'de ${formatValue(firstSalePrice, 'price')}/m²'den ${lastMonthName} ${lastMonth.property_year}'de ${formatValue(lastSalePrice, 'price')}/m²'ye kararlı fiyat artışı bekleniyor (+${salePriceGrowth.toFixed(1)}% ${forecastTrends.length} ay boyunca).`,
+                    'rent': `Kiralama: ${formatValue(firstRentPrice, 'price')}/m²'den ${formatValue(lastRentPrice, 'price')}/m²'ye artış öngörülüyor (+${rentPriceGrowth.toFixed(1)}%).`,
+                    'yield': `Getiri: ${minYield.toFixed(1)}–${maxYield.toFixed(1)}% seviyesinde kalıyor, ${lastMonthName} ${lastMonth.property_year}'ye kadar hafif ${yieldTrend === 'снижение' ? 'azalma' : yieldTrend === 'рост' ? 'artış' : 'değişim'} ile.`
+                }
+            };
+            
+            // Получаем текст для текущего языка
+            const currentLanguage = userLanguage || 'ru';
+            const texts = analysisTexts[currentLanguage] || analysisTexts['ru'];
+            
+            // Формируем HTML для блока анализа прогноза
+            let analysisHtml = '<div class="forecast-analysis-section">';
+            analysisHtml += `<h4 class="forecast-analysis-title">${texts.title}</h4>`;
+            analysisHtml += '<div class="forecast-analysis-content">';
+            analysisHtml += `<p><strong>${texts.sale.split(':')[0]}:</strong> ${texts.sale.split(':')[1]}</p>`;
+            analysisHtml += `<p><strong>${texts.rent.split(':')[0]}:</strong> ${texts.rent.split(':')[1]}</p>`;
+            analysisHtml += `<p><strong>${texts.yield.split(':')[0]}:</strong> ${texts.yield.split(':')[1]}</p>`;
+            analysisHtml += '</div></div>';
+            
+            return analysisHtml;
         }
         
         // Format trend value based on type
