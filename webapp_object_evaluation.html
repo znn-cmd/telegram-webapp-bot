@@ -604,7 +604,7 @@
         }
         
         .trends-table-container {
-            overflow-x: auto;
+            overflow-x: hidden;
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
@@ -613,22 +613,25 @@
             width: 100%;
             border-collapse: collapse;
             background: white;
-            font-size: 13px;
+            font-size: 12px;
+            table-layout: fixed;
         }
         
         .trends-table th {
             background: #667eea;
             color: white;
-            padding: 10px 8px;
+            padding: 8px 6px;
             text-align: center;
             font-weight: 600;
-            white-space: nowrap;
+            line-height: 1.2;
+            word-wrap: break-word;
         }
         
         .trends-table td {
-            padding: 8px 6px;
+            padding: 6px 4px;
             text-align: center;
             border-bottom: 1px solid #dee2e6;
+            word-wrap: break-word;
         }
         
         .trends-table tr:nth-child(even) {
@@ -637,6 +640,33 @@
         
         .trends-table tr:hover {
             background: #e9ecef;
+        }
+        
+        /* Специальные стили для ширины столбцов */
+        .trends-table th:nth-child(1) { width: 15%; } /* Дата */
+        .trends-table th:nth-child(2) { width: 18%; } /* Продажа */
+        .trends-table th:nth-child(3) { width: 18%; } /* Изм-ие цены продажи */
+        .trends-table th:nth-child(4) { width: 18%; } /* Аренда */
+        .trends-table th:nth-child(5) { width: 18%; } /* Изм-ие цены аренды */
+        .trends-table th:nth-child(6) { width: 13%; } /* Доходность */
+        
+        /* Мобильные устройства */
+        @media (max-width: 768px) {
+            .trends-table {
+                font-size: 11px;
+            }
+            
+            .trends-table th,
+            .trends-table td {
+                padding: 4px 2px;
+            }
+            
+            .trends-table th:nth-child(1) { width: 18%; }
+            .trends-table th:nth-child(2) { width: 17%; }
+            .trends-table th:nth-child(3) { width: 17%; }
+            .trends-table th:nth-child(4) { width: 17%; }
+            .trends-table th:nth-child(5) { width: 17%; }
+            .trends-table th:nth-child(6) { width: 14%; }
         }
 
         /* Table Styles */
@@ -2962,10 +2992,10 @@
             let html = '<table class="trends-table">';
             html += '<thead><tr>';
             html += '<th>Дата</th>';
-            html += '<th>Цена продажи (₺/м²)</th>';
-            html += '<th>Изменение цен продажи</th>';
-            html += '<th>Цена аренды (₺/м²)</th>';
-            html += '<th>Изменение цен аренды</th>';
+            html += '<th>Продажа<br>(₺/м²)</th>';
+            html += '<th>Изм-ие цены<br>продажи</th>';
+            html += '<th>Аренда<br>(₺/м²)</th>';
+            html += '<th>Изм-ие цены<br>аренды</th>';
             html += '<th>Доходность</th>';
             html += '</tr></thead><tbody>';
             
