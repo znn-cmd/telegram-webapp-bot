@@ -2978,11 +2978,17 @@
             if (!dateStr) return '';
             try {
                 const date = new Date(dateStr);
-                return date.toLocaleDateString('ru-RU', { 
-                    year: 'numeric', 
-                    month: 'short' 
-                });
+                const monthNames = [
+                    'январь', 'февраль', 'март', 'апрель', 'май', 'июнь',
+                    'июль', 'август', 'сентябрь', 'октябрь', 'ноябрь', 'декабрь'
+                ];
+                
+                const month = monthNames[date.getMonth()];
+                const year = date.getFullYear();
+                
+                return `${month} ${year}`;
             } catch (e) {
+                console.error('Error formatting trend date:', e);
                 return dateStr;
             }
         }
@@ -3055,10 +3061,34 @@
             
             console.log(`🔍 Filtered trends: ${filteredTrends.length} out of ${trends.length} total`);
             console.log(`🔍 Date range: index ${startIndex} to ${endIndex}`);
+            console.log(`🔍 Current month index: ${currentMonthIndex}`);
+            console.log(`🔍 Start index: ${startIndex}, End index: ${endIndex}`);
             console.log(`🔍 Selected trends:`);
             filteredTrends.forEach((trend, index) => {
                 console.log(`  ${index}: ${trend.property_year}-${trend.property_month} (${trend.date})`);
             });
+            
+            // Если получили мало трендов, попробуем альтернативный подход
+            if (filteredTrends.length < 7) {
+                console.log(`⚠️ Получили мало трендов (${filteredTrends.length}), пробуем альтернативный подход...`);
+                
+                // Берем тренды за текущий год (2025) и ближайшие месяцы
+                const currentYearTrends = sortedTrends.filter(trend => 
+                    trend.property_year === currentYear || 
+                    (trend.property_year === currentYear - 1 && trend.property_month >= 9) ||
+                    (trend.property_year === currentYear + 1 && trend.property_month <= 3)
+                );
+                
+                console.log(`🔍 Current year trends: ${currentYearTrends.length}`);
+                
+                if (currentYearTrends.length >= 7) {
+                    return currentYearTrends.slice(0, 8);
+                } else {
+                    // Если все еще мало, берем первые 8 трендов
+                    console.log(`⚠️ Все еще мало трендов, берем первые 8`);
+                    return sortedTrends.slice(0, 8);
+                }
+            }
             
             return filteredTrends;
         }
