@@ -292,86 +292,9 @@
             font-size: 17px;
         }
 
-        /* Insights Styles */
-        .insights-section {
-            margin: 20px 0;
-        }
 
-        .insights-card {
-            background: white;
-            border: 1px solid #e0e0e0;
-            border-radius: 8px;
-            overflow: hidden;
-        }
 
-        .insights-header {
-            background: #f8f9fa;
-            padding: 12px 15px;
-            border-bottom: 1px solid #e0e0e0;
-        }
 
-        .insights-title {
-            font-size: 16px;
-            font-weight: 600;
-            color: #333;
-        }
-
-        .insights-content {
-            padding: 15px;
-        }
-
-        .insights-loading {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 10px;
-            padding: 20px;
-        }
-
-        .loading-spinner {
-            width: 30px;
-            height: 30px;
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #667eea;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        .loading-text {
-            font-size: 14px;
-            color: #666;
-            text-align: center;
-        }
-
-        .insights-text {
-            font-size: 15px;
-            line-height: 1.6;
-            color: #333;
-            text-align: justify;
-            padding: 8px 0;
-            word-wrap: break-word;
-            overflow-wrap: break-word;
-            white-space: normal;
-            max-width: 100%;
-        }
-
-        .insights-error {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 8px;
-            padding: 20px;
-            color: #721c24;
-        }
-
-        .insights-error .error-icon {
-            font-size: 24px;
-        }
-
-        .insights-error .error-text {
-            font-size: 14px;
-            text-align: center;
-        }
 
         /* Data Card Styles */
         .data-content {
@@ -1235,27 +1158,8 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* Mobile responsive for insights */
+        /* Mobile responsive styles */
         @media (max-width: 480px) {
-            .insights-card {
-                padding: 12px;
-            }
-            
-            .insights-title {
-                font-size: 16px;
-            }
-            
-            .insights-text {
-                font-size: 14px;
-                word-wrap: break-word;
-                overflow-wrap: break-word;
-                white-space: normal;
-                max-width: 100%;
-            }
-            
-            .insights-section {
-                margin: 15px 0;
-            }
             
             /* Мобильные стили для секций данных */
             .data-section {
@@ -1615,25 +1519,7 @@
             <!-- Ключевые метрики скрыты, показывается только таблица "Средние значения" -->
         </div>
 
-        <!-- AI Insights Section -->
-        <div class="insights-section" id="insightsSection" style="display: none;">
-            <div class="insights-card">
-                <div class="insights-header">
-                    <div class="insights-title" id="insightsTitle">Саммари</div>
-                </div>
-                <div class="insights-content" id="insightsContent">
-                    <div class="insights-loading" id="insightsLoading">
-                        <div class="loading-spinner"></div>
-                        <div class="loading-text" id="insightsLoadingText"></div>
-                    </div>
-                    <div class="insights-text" id="insightsText" style="display: none;"></div>
-                    <div class="insights-error" id="insightsError" style="display: none;">
-                        <div class="error-icon">⚠️</div>
-                        <div class="error-text" id="insightsErrorText"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
+
 
         <!-- Data Content -->
         <div class="data-content" id="dataContent" style="display: none;">
@@ -1721,9 +1607,7 @@
                 'listingPeriodSaleLabel': 'Период размещения (продажа)',
                 'listingPeriodRentLabel': 'Период размещения (аренда)',
                 'yieldLabel': 'Доходность',
-                'insightsTitle': 'Саммари',
-                'insightsLoading': 'Анализируем данные...',
-                'insightsError': 'Ошибка при анализе данных',
+
                 'listingTypeTitle': 'Выберите тип недвижимости для анализа:',
                 'houseTypeSubtitle': 'Количество спален:',
                 'floorSegmentSubtitle': 'Этаж:',
@@ -1791,9 +1675,7 @@
                 'listingPeriodSaleLabel': 'Listing Period (Sale)',
                 'listingPeriodRentLabel': 'Listing Period (Rent)',
                 'yieldLabel': 'Yield',
-                'insightsTitle': 'Summary',
-                'insightsLoading': 'Analyzing data...',
-                'insightsError': 'Error analyzing data',
+
                 'listingTypeTitle': 'Select property type for analysis:',
                 'houseTypeSubtitle': 'Bedroom count:',
                 'floorSegmentSubtitle': 'Floor:',
@@ -1946,9 +1828,7 @@
                 'listingPeriodSaleLabel': 'İlan süresi (satış)',
                 'listingPeriodRentLabel': 'İlan süresi (kiralama)',
                 'yieldLabel': 'Getiri',
-                'insightsTitle': 'Özet',
-                'insightsLoading': 'Veriler analiz ediliyor...',
-                'insightsError': 'Veri analizi hatası',
+
                 'marketComparisonTitle': 'Piyasa Karşılaştırması',
                 'pricePerM2Label': 'm² başına fiyat',
                 'areaLabel': 'Alan',
@@ -2158,17 +2038,7 @@
                 yieldLabel.textContent = getText('yieldLabel');
             }
             
-            // Update insights title
-            const insightsTitle = document.getElementById('insightsTitle');
-            if (insightsTitle) {
-                insightsTitle.textContent = getText('insightsTitle');
-            }
-            
-            // Update insights loading and error text
-            const insightsLoadingText = document.getElementById('insightsLoadingText');
-            if (insightsLoadingText) {
-                insightsLoadingText.textContent = getText('insightsLoading');
-            }
+
             
             // Update listing type selection elements
             const listingTypeTitle = document.getElementById('listingTypeTitle');
@@ -2212,10 +2082,7 @@
             const propertyTypesTitle = document.getElementById('propertyTypesTitle');
             if (propertyTypesTitle) { propertyTypesTitle.textContent = getText('propertyTypesTitle'); }
             
-            const insightsErrorText = document.getElementById('insightsErrorText');
-            if (insightsErrorText) {
-                insightsErrorText.textContent = getText('insightsError');
-            }
+
         }
 
         // Load countries from API
@@ -3035,9 +2902,6 @@
             
             // Show data content
             document.getElementById('dataContent').style.display = 'block';
-            
-            // Get AI insights
-            getRegionInsights(data);
         }
 
 
@@ -4276,69 +4140,7 @@
         }
 
         // Get AI insights for the region data
-        async function getRegionInsights(regionData) {
-            try {
-                console.log('🧠 Запрашиваем AI-вывод для данных региона');
-                
-                // Show insights section
-                const insightsSection = document.getElementById('insightsSection');
-                const insightsLoading = document.getElementById('insightsLoading');
-                const insightsText = document.getElementById('insightsText');
-                const insightsError = document.getElementById('insightsError');
-                
-                insightsSection.style.display = 'block';
-                insightsLoading.style.display = 'flex';
-                insightsText.style.display = 'none';
-                insightsError.style.display = 'none';
-                
-                // Update loading text based on user language
-                const loadingText = document.getElementById('insightsLoadingText');
-                loadingText.textContent = getText('insightsLoading');
-                
-                // Prepare data for AI analysis
-                const analysisData = {
-                    region_data: regionData,
-                    language: userLanguage
-                };
-                
-                // Make API request to get AI insights
-                const response = await fetch('/api/region_insights', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(analysisData)
-                });
-                
-                const data = await response.json();
-                
-                if (data.success) {
-                    // Hide loading and show insights
-                    insightsLoading.style.display = 'none';
-                    insightsText.style.display = 'block';
-                    
-                    // Update insights text
-                    const insightsTextElement = document.getElementById('insightsText');
-                    insightsTextElement.textContent = data.insights;
-                    
-                    console.log('✅ AI-вывод получен:', data.insights);
-                } else {
-                    throw new Error(data.error || 'Unknown error');
-                }
-                
-            } catch (error) {
-                console.error('❌ Ошибка получения AI-вывода:', error);
-                
-                // Hide loading and show error
-                const insightsLoading = document.getElementById('insightsLoading');
-                const insightsError = document.getElementById('insightsError');
-                const insightsErrorText = document.getElementById('insightsErrorText');
-                
-                insightsLoading.style.display = 'none';
-                insightsError.style.display = 'flex';
-                insightsErrorText.textContent = getText('insightsError');
-            }
-        }
+
 
 
 
