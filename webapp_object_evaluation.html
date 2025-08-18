@@ -596,17 +596,24 @@
         }
         
         .trends-table-title {
-            font-size: 16px;
-            font-weight: 600;
-            color: #495057;
-            margin-bottom: 15px;
+            font-size: 20px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 20px;
             text-align: center;
+            padding: 15px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.1);
         }
         
         .trends-table-container {
             overflow-x: hidden;
             border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            margin: 20px 0;
+            background: white;
         }
         
         .trends-table {
@@ -615,31 +622,67 @@
             background: white;
             font-size: 12px;
             table-layout: fixed;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            overflow: hidden;
         }
         
         .trends-table th {
-            background: #667eea;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 8px 6px;
+            padding: 10px 6px;
             text-align: center;
             font-weight: 600;
             line-height: 1.2;
             word-wrap: break-word;
+            border-right: 1px solid rgba(255,255,255,0.2);
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+        }
+        
+        .trends-table th:last-child {
+            border-right: none;
         }
         
         .trends-table td {
-            padding: 6px 4px;
+            padding: 8px 6px;
             text-align: center;
-            border-bottom: 1px solid #dee2e6;
+            border-bottom: 1px solid #e0e0e0;
+            border-right: 1px solid #f0f0f0;
             word-wrap: break-word;
+            vertical-align: middle;
+        }
+        
+        .trends-table td:last-child {
+            border-right: none;
         }
         
         .trends-table tr:nth-child(even) {
             background: #f8f9fa;
         }
         
+        .trends-table tr:nth-child(odd) {
+            background: #ffffff;
+        }
+        
         .trends-table tr:hover {
-            background: #e9ecef;
+            background: #e3f2fd;
+            transform: scale(1.01);
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .trends-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        /* Улучшенное разделение строк */
+        .trends-table tr {
+            border-bottom: 1px solid #e0e0e0;
+            transition: all 0.2s ease;
+        }
+        
+        .trends-table tr:hover td {
+            background: #e3f2fd !important;
         }
         
         /* Специальные стили для ширины столбцов */
@@ -2856,10 +2899,10 @@
                     7: 'июль', 8: 'август', 9: 'сентябрь', 10: 'октябрь', 11: 'ноябрь', 12: 'декабрь'
                 };
                 const monthName = monthNames[trend.property_month] || trend.property_month;
-                return `${monthName} ${trend.property_year} г.`;
+                return `${monthName} ${trend.property_year}`;
             }
             // Fallback to regular date formatting
-            return formatTrendDate(trend.date);
+            return formatTrendDateShort(trend.date);
         }
 
         // Add property trends section to the page
@@ -3086,7 +3129,7 @@
             } else if (type === 'percentage') {
                 console.log(`  📊 Processing as percentage`);
                 if (typeof value === 'number') {
-                    const result = `${(value * 100).toFixed(2)}%`;
+                    const result = `${value.toFixed(2)}%`;
                     console.log(`  ✅ Percentage formatted: ${result}`);
                     return result;
                 }
