@@ -684,8 +684,50 @@
             .trends-table th:nth-child(4) { width: 17%; }
             .trends-table th:nth-child(5) { width: 17%; }
             .trends-table th:nth-child(6) { width: 14%; }
+                }
+        
+        /* Trends Analysis Styles */
+        .trends-analysis-section {
+            margin-top: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            border: 1px solid #e9ecef;
         }
-
+        
+        .trends-analysis-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .trends-analysis-content {
+            font-size: 14px;
+            line-height: 1.6;
+            color: #333;
+            text-align: justify;
+        }
+        
+        /* Мобильные устройства для блока анализа */
+        @media (max-width: 768px) {
+            .trends-analysis-section {
+                padding: 15px;
+                margin-top: 15px;
+            }
+            
+            .trends-analysis-title {
+                font-size: 15px;
+                margin-bottom: 12px;
+            }
+            
+            .trends-analysis-content {
+                font-size: 13px;
+                line-height: 1.5;
+            }
+        }
+        
         /* Table Styles */
         .data-table {
             width: 100%;
@@ -3157,7 +3199,113 @@
             });
             
             html += '</tbody></table>';
+            
+            // Добавляем блок "Вывод по тренду"
+            html += generateTrendsAnalysis(filteredTrends);
+            
             return html;
+        }
+        
+        // Generate trends analysis based on table data
+        function generateTrendsAnalysis(trends) {
+            if (!trends || trends.length === 0) {
+                return '';
+            }
+            
+            // Сортируем тренды по дате для правильного анализа
+            const sortedTrends = trends.sort((a, b) => {
+                if (a.property_year !== b.property_year) {
+                    return a.property_year - b.property_year;
+                }
+                return a.property_month - b.property_month;
+            });
+            
+            // Находим первый и последний месяц для анализа
+            const firstMonth = sortedTrends[0];
+            const lastMonth = sortedTrends[sortedTrends.length - 1];
+            
+            if (!firstMonth || !lastMonth) {
+                return '';
+            }
+            
+            // Рассчитываем общий рост цен на продажу
+            const firstSalePrice = parseFloat(firstMonth.unit_price_for_sale) || 0;
+            const lastSalePrice = parseFloat(lastMonth.unit_price_for_sale) || 0;
+            const salePriceGrowth = firstSalePrice > 0 ? ((lastSalePrice - firstSalePrice) / firstSalePrice * 100) : 0;
+            
+            // Рассчитываем общий рост цен на аренду
+            const firstRentPrice = parseFloat(firstMonth.unit_price_for_rent) || 0;
+            const lastRentPrice = parseFloat(lastMonth.unit_price_for_rent) || 0;
+            const rentPriceGrowth = firstRentPrice > 0 ? ((lastRentPrice - firstRentPrice) / firstRentPrice * 100) : 0;
+            
+            // Анализируем диапазон доходности
+            const yields = trends.map(t => parseFloat(t.yield) || 0).filter(y => y > 0);
+            const minYield = yields.length > 0 ? Math.min(...yields) : 0;
+            const maxYield = yields.length > 0 ? Math.max(...yields) : 0;
+            
+            // Определяем тренд доходности (растет, падает или стабилен)
+            let yieldTrend = '';
+            if (yields.length >= 2) {
+                const firstYield = yields[0];
+                const lastYield = yields[yields.length - 1];
+                const yieldChange = lastYield - firstYield;
+                
+                if (Math.abs(yieldChange) < 0.5) {
+                    yieldTrend = 'стабильна';
+                } else if (yieldChange > 0.5) {
+                    yieldTrend = 'растет';
+                } else {
+                    yieldTrend = 'снижается';
+                }
+            }
+            
+            // Форматируем названия месяцев
+            const monthNames = [
+                'январь', 'февраль', 'март', 'апрель', 'май', 'июнь',
+                'июль', 'август', 'сентябрь', 'октябрь', 'ноябрь', 'декабрь'
+            ];
+            
+            const firstMonthName = monthNames[firstMonth.property_month - 1] || '';
+            const lastMonthName = monthNames[lastMonth.property_month - 1] || '';
+            
+            // Формируем аналитический вывод
+            let analysis = '<div class="trends-analysis-section">';
+            analysis += '<h4 class="trends-analysis-title">Вывод по тренду</h4>';
+            analysis += '<div class="trends-analysis-content">';
+            
+            if (salePriceGrowth > 0 && rentPriceGrowth > 0) {
+                analysis += `Рынок недвижимости демонстрирует устойчивый рост как в продажах, так и в аренде. `;
+                analysis += `С ${firstMonthName} по ${lastMonthName} ${firstMonth.property_year} года `;
+                analysis += `цены на продажу выросли примерно на ${salePriceGrowth.toFixed(1)}%, `;
+                analysis += `аренда — на ${rentPriceGrowth.toFixed(1)}%. `;
+                analysis += `Доходность держится в диапазоне ${minYield.toFixed(1)}–${maxYield.toFixed(1)}%, `;
+                analysis += `показывая привлекательность инвестиций. `;
+                
+                if (yieldTrend) {
+                    analysis += `Текущий тренд указывает на ${yieldTrend === 'стабильна' ? 'стабильность' : yieldTrend === 'растет' ? 'постепенное увеличение' : 'постепенное снижение'} `;
+                    analysis += `доходности, но сохраняется положительная динамика.`;
+                } else {
+                    analysis += `Текущий тренд указывает на постепенное замедление роста цен и доходности, но сохраняется положительная динамика.`;
+                }
+            } else if (salePriceGrowth > 0 || rentPriceGrowth > 0) {
+                analysis += `Рынок недвижимости показывает смешанную динамику. `;
+                if (salePriceGrowth > 0) {
+                    analysis += `Цены на продажу выросли на ${salePriceGrowth.toFixed(1)}%, `;
+                }
+                if (rentPriceGrowth > 0) {
+                    analysis += `аренда выросла на ${rentPriceGrowth.toFixed(1)}%. `;
+                }
+                analysis += `Доходность в диапазоне ${minYield.toFixed(1)}–${maxYield.toFixed(1)}% `;
+                analysis += `сохраняет привлекательность для инвесторов.`;
+            } else {
+                analysis += `Рынок недвижимости демонстрирует стабильность. `;
+                analysis += `Доходность в диапазоне ${minYield.toFixed(1)}–${maxYield.toFixed(1)}% `;
+                analysis += `показывает устойчивость инвестиционного потенциала.`;
+            }
+            
+            analysis += '</div></div>';
+            
+            return analysis;
         }
         
         // Format trend value based on type
