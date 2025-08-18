@@ -448,39 +448,39 @@
         }
         
         .section-header {
-            background: linear-gradient(135deg, #6c757d 0%, #495057 100%) !important;
+            background: #667eea !important;
             color: white;
             font-weight: 700;
             text-align: center;
         }
         
         .sale-header {
-            background: linear-gradient(135deg, #6c757d 0%, #495057 100%) !important;
+            background: #28a745 !important;
         }
         
         .rent-header {
-            background: linear-gradient(135deg, #6c757d 0%, #495057 100%) !important;
+            background: #17a2b8 !important;
         }
         
         .yield-header {
-            background: linear-gradient(135deg, #6c757d 0%, #495057 100%) !important;
-            color: white;
+            background: #ffc107 !important;
+            color: #212529;
             font-weight: 800;
             font-size: 18px;
         }
         
         .yield-data {
-            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%) !important;
+            background: #fff3cd !important;
         }
         
         .yield-label {
             font-weight: 700;
-            color: #495057;
+            color: #856404;
         }
         
         .yield-value {
             font-weight: 700;
-            color: #495057;
+            color: #856404;
         }
         
         /* Property Trends Styles */
@@ -542,31 +542,16 @@
             font-style: italic;
         }
         
-                .trend-card-price_trend {
+        .trend-card-price_trend {
             border-left: 4px solid #28a745;
         }
-
-        .trend-card-price {
-            border-left: 4px solid #28a745;
-        }
-
+        
         .trend-card-yield_trend {
             border-left: 4px solid #ffc107;
         }
-
+        
         .trend-card-count_trend {
             border-left: 4px solid #17a2b8;
-        }
-
-        .price-comparison {
-            font-size: 12px;
-            color: #495057;
-            margin-top: 6px;
-            line-height: 1.3;
-            padding: 4px 8px;
-            background: #f8f9fa;
-            border-radius: 4px;
-            border-left: 3px solid #28a745;
         }
         
         /* Trends Table Styles */
@@ -862,19 +847,19 @@
 
         /* Currency Buttons Styles */
         .currency-buttons-container {
-            margin-bottom: 12px;
+            margin-bottom: 15px;
         }
 
         .currency-buttons-title {
             font-size: 12px;
             color: #666;
-            margin-bottom: 6px;
+            margin-bottom: 8px;
             font-weight: 500;
         }
 
         .currency-buttons {
             display: flex;
-            gap: 6px;
+            gap: 8px;
             justify-content: center;
         }
 
@@ -903,20 +888,14 @@
             color: white;
         }
 
-        .currency-button.active .currency-symbol,
-        .currency-button.active .currency-code {
+        .currency-button.active .currency-symbol {
             color: white;
         }
 
         .currency-symbol {
             font-size: 18px;
-            margin-right: 4px;
-        }
-
-        .currency-code {
-            font-size: 12px;
             font-weight: 600;
-            color: #666;
+            color: #333;
         }
 
         /* Mobile responsive for listing type selection */
@@ -959,11 +938,6 @@
             
             .currency-symbol {
                 font-size: 16px;
-                margin-right: 3px;
-            }
-            
-            .currency-code {
-                font-size: 10px;
             }
             
             .selected-property-types {
@@ -1075,15 +1049,12 @@
                             <div class="currency-buttons">
                                 <button type="button" class="currency-button" data-currency="TRY">
                                     <span class="currency-symbol">₺</span>
-                                    <span class="currency-code">TRY</span>
                                 </button>
                                 <button type="button" class="currency-button" data-currency="EUR">
                                     <span class="currency-symbol">€</span>
-                                    <span class="currency-code">EUR</span>
                                 </button>
                                 <button type="button" class="currency-button" data-currency="USD">
                                     <span class="currency-symbol">$</span>
-                                    <span class="currency-code">USD</span>
                                 </button>
                             </div>
                         </div>
@@ -1108,7 +1079,7 @@
             
             <!-- Выбранные характеристики недвижимости -->
             <div class="selected-property-types" id="selectedPropertyTypes" style="display: none;">
-                <div class="property-types-title" id="propertyTypesTitle">Характеристики объекта:</div>
+                <div class="property-types-title" id="propertyTypesTitle">Выбранные характеристики недвижимости:</div>
                 <div class="property-types-details" id="propertyTypesDetails"></div>
             </div>
             
@@ -1243,7 +1214,7 @@
                 'selectFloor': 'этаж',
                 'selectAge': 'возраст объекта',
                 'selectHeating': 'тип отопления',
-                'propertyTypesTitle': 'Характеристики объекта:',
+                'propertyTypesTitle': 'Выбранные характеристики недвижимости:',
                 'bedroomsLabel': 'Количество спален',
                 'floorLabel': 'Этаж',
                 'ageLabel': 'Возраст объекта',
@@ -1254,14 +1225,7 @@
                 'rentHeader': 'Аренда',
                 'currencyTitle': 'Выберите валюту:',
                 'pricePlaceholder': 'Введите цену',
-                'areaPlaceholder': 'Введите площадь',
-                'marketPriceTrendTitle': 'Рыночный тренд цены по вашему объекту:',
-                'saleTrendLabel': 'Продажа',
-                'rentTrendLabel': 'Аренда',
-                'yourPriceAbove': 'Ваша цена выше трендовой на',
-                'yourPriceBelow': 'Ваша цена ниже трендовой на',
-                'yourPriceEqual': 'Ваша цена равна трендовой',
-                'trendBy': 'на'
+                'areaPlaceholder': 'Введите площадь'
             },
             'en': {
                 'slogan': 'Real Estate Market Insights',
@@ -1308,7 +1272,7 @@
                 'selectFloor': 'floor',
                 'selectAge': 'property age',
                 'selectHeating': 'heating type',
-                'propertyTypesTitle': 'Property characteristics:',
+                'propertyTypesTitle': 'Selected property characteristics:',
                 'bedroomsLabel': 'Bedroom count',
                 'floorLabel': 'Floor',
                 'ageLabel': 'Property age',
@@ -1319,14 +1283,7 @@
                 'rentHeader': 'Rent',
                 'currencyTitle': 'Select currency:',
                 'pricePlaceholder': 'Enter price',
-                'areaPlaceholder': 'Enter area',
-                'marketPriceTrendTitle': 'Market price trend for your property:',
-                'saleTrendLabel': 'Sale',
-                'rentTrendLabel': 'Rent',
-                'yourPriceAbove': 'Your price is above the trend by',
-                'yourPriceBelow': 'Your price is below the trend by',
-                'yourPriceEqual': 'Your price equals the trend',
-                'trendBy': 'by'
+                'areaPlaceholder': 'Enter area'
             },
             'de': {
                 'slogan': 'Immobilienmarkt-Einblicke',
@@ -1446,8 +1403,7 @@
                 'yieldLabel': 'Getiri',
                 'insightsTitle': 'Özet',
                 'insightsLoading': 'Veriler analiz ediliyor...',
-                'insightsError': 'Veri analizi hatası',
-                'propertyTypesTitle': 'Gayrimenkul özellikleri:'
+                'insightsError': 'Veri analizi hatası'
             },
             'de': {
                 'slogan': 'Immobilienmarkt-Einblicke',
@@ -2238,7 +2194,7 @@
                     html += `
                         <div class="property-type-item">
                             <span class="property-type-label">Цена объекта:</span>
-                            <span class="property-type-value">${selectedListingTypes.price} ${currencySymbol} ${selectedListingTypes.currency}</span>
+                            <span class="property-type-value">${currencySymbol}${selectedListingTypes.price}</span>
                         </div>
                     `;
                 }
@@ -2550,10 +2506,7 @@
             if (typeof value === 'number') {
                 if (field.includes('price') || field.includes('Price')) {
                     return formatValue(value, 'price');
-                } else if (field.includes('yield') || field.includes('Yield')) {
-                    // For yield, just add % symbol without multiplying
-                    return `${parseFloat(value).toFixed(2)}%`;
-                } else if (field.includes('rate')) {
+                } else if (field.includes('yield') || field.includes('Yield') || field.includes('rate')) {
                     return formatValue(value, 'percentage');
                 } else if (field.includes('age') || field.includes('Age')) {
                     return formatValue(value, 'years');
@@ -2575,12 +2528,7 @@
                 case 'price':
                     return `₺${parseFloat(value).toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
                 case 'percentage':
-                    // For yield, don't multiply by 100, just add % symbol
-                    if (type === 'percentage' && Math.abs(value) > 100) {
-                        return `${parseFloat(value).toFixed(2)}%`;
-                    } else {
-                        return `${parseFloat(value).toFixed(2)}%`;
-                    }
+                    return `${parseFloat(value).toFixed(2)}%`;
                 case 'years':
                     return `${value} лет`;
                 case 'days':
@@ -2759,9 +2707,22 @@
             const groupedTrends = groupTrendsByType(trends);
             
             trendsSection.innerHTML = `
+                <h3 class="data-section-title">${getText('marketTrendsTitle')}</h3>
                 <div class="data-section-content">
                     <div class="trends-grid">
-                        ${generateMarketPriceTrendCard(trends)}
+                        ${Object.entries(groupedTrends).map(([type, typeTrends]) => `
+                            <div class="trend-card trend-card-${type}">
+                                <div class="trend-title">${formatTrendType(type)}</div>
+                                <div class="trend-value">${formatTrendValue(typeTrends[0].trend_value, type)}</div>
+                                <div class="trend-details">
+                                    <div class="trend-change">
+                                        ${typeTrends[0].price_change_sale ? `Продажа: ${formatPercentage(typeTrends[0].price_change_sale)}` : ''}
+                                        ${typeTrends[0].price_change_rent ? `Аренда: ${formatPercentage(typeTrends[0].price_change_rent)}` : ''}
+                                    </div>
+                                    <div class="trend-date">${formatTrendDate(typeTrends[0].date)}</div>
+                                </div>
+                            </div>
+                        `).join('')}
                     </div>
                     
                     <!-- Таблица со всеми записями трендов -->
@@ -2810,17 +2771,6 @@
             const sign = numValue >= 0 ? '+' : '';
             return `${sign}${(numValue * 100).toFixed(2)}%`;
         }
-
-        // Format number with thousand separators
-        function formatNumber(value) {
-            if (value === null || value === undefined) return '0';
-            const numValue = parseFloat(value);
-            if (isNaN(numValue)) return '0';
-            return numValue.toLocaleString('tr-TR', { 
-                minimumFractionDigits: 2, 
-                maximumFractionDigits: 2 
-            });
-        }
         
         // Format trend date
         function formatTrendDate(dateStr) {
@@ -2835,109 +2785,7 @@
                 return dateStr;
             }
         }
-
-        // Format month name in Russian
-        function formatMonthName(monthNumber) {
-            const monthNames = {
-                1: 'Январь',
-                2: 'Февраль',
-                3: 'Март',
-                4: 'Апрель',
-                5: 'Май',
-                6: 'Июнь',
-                7: 'Июль',
-                8: 'Август',
-                9: 'Сентябрь',
-                10: 'Октябрь',
-                11: 'Ноябрь',
-                12: 'Декабрь'
-            };
-            return monthNames[monthNumber] || monthNumber;
-        }
         
-        // Generate market price trend card for user's property
-        function generateMarketPriceTrendCard(trends) {
-            if (!trends || trends.length === 0) {
-                return '<div class="no-data">Нет данных для отображения</div>';
-            }
-            
-            // Find the most recent trend data (latest month/year)
-            let latestTrend = null;
-            let latestDate = null;
-            
-            console.log('🔍 Analyzing trends data:', trends);
-            
-            trends.forEach(trend => {
-                if (trend.property_year && trend.property_month) {
-                    const trendDate = new Date(trend.property_year, trend.property_month - 1);
-                    console.log(`📅 Trend date: ${trend.property_year}-${trend.property_month} -> ${trendDate}`);
-                    if (!latestDate || trendDate > latestDate) {
-                        latestDate = trendDate;
-                        latestTrend = trend;
-                        console.log(`✅ New latest trend: ${trend.property_year}-${trend.property_month}`);
-                    }
-                }
-            });
-            
-            console.log('🎯 Selected latest trend:', latestTrend);
-            
-            if (!latestTrend) {
-                return '<div class="no-data">Нет данных для отображения</div>';
-            }
-            
-                        // Calculate market price for user's property
-            const marketPricePerM2 = latestTrend.unit_price_for_sale || 0;
-            const userArea = selectedListingTypes.area || 0;
-            const marketPriceTotal = marketPricePerM2 * userArea;
-            
-            // Calculate price difference with user's price
-            const userPrice = selectedListingTypes.price || 0;
-            let priceDifference = 0;
-            let priceDifferencePercent = 0;
-            let priceComparisonText = '';
-            
-            if (userPrice > 0) {
-                priceDifference = userPrice - marketPriceTotal;
-                priceDifferencePercent = (priceDifference / marketPriceTotal) * 100;
-                
-                if (priceDifference > 0) {
-                    priceComparisonText = getText('yourPriceAbove');
-                } else if (priceDifference < 0) {
-                    priceComparisonText = getText('yourPriceBelow');
-                } else {
-                    priceComparisonText = getText('yourPriceEqual');
-                }
-            }
-            
-            // Format currency based on user's selection
-            const currencySymbols = {
-                'TRY': '₺',
-                'EUR': '€',
-                'USD': '$'
-            };
-            const currencySymbol = currencySymbols[selectedListingTypes.currency] || '₺';
-            
-            return `
-                <div class="trend-card trend-card-price">
-                    <div class="trend-title">${getText('marketPriceTrendTitle')}</div>
-                    <div class="trend-value">${currencySymbol}${formatNumber(marketPriceTotal)}</div>
-                    <div class="trend-details">
-                        <div class="trend-change">
-                            ${latestTrend.price_change_sale ? `${getText('saleTrendLabel')}: ${formatPercentage(latestTrend.price_change_sale)}` : ''}
-                            ${latestTrend.price_change_rent ? `${getText('rentTrendLabel')}: ${formatPercentage(latestTrend.price_change_rent)}` : ''}
-                        </div>
-                        ${userPrice > 0 ? `
-                            <div class="price-comparison">
-                                ${priceComparisonText} ${getText('trendBy')} ${formatNumber(Math.abs(priceDifference))} ${selectedListingTypes.currency} 
-                                (${formatPercentage(Math.abs(priceDifferencePercent))})
-                            </div>
-                        ` : ''}
-                        <div class="trend-date">${latestTrend.property_year ? `${formatMonthName(latestTrend.property_month)} ${latestTrend.property_year} г.` : formatTrendDate(latestTrend.date)}</div>
-                    </div>
-                </div>
-            `;
-        }
-
         // Generate detailed trends table
         function generateTrendsTable(trends) {
             if (!trends || trends.length === 0) {
