@@ -2770,21 +2770,7 @@
             let analysis = '<div class="analytical-summary">';
             analysis += '<h4 class="summary-title">Анализ рынка</h4>';
             
-            // Age analysis
-            if (summary.average_age_for_sale || summary.average_age_for_rent) {
-                const saleAge = summary.average_age_for_sale;
-                const rentAge = summary.average_age_for_rent;
-                
-                if (saleAge && rentAge) {
-                    const minAge = Math.min(saleAge.min, rentAge.min);
-                    const maxAge = Math.max(saleAge.max, rentAge.max);
-                    analysis += `<p>В локации наиболее востребованы объекты возраста ${minAge}–${maxAge} года.</p>`;
-                } else if (saleAge) {
-                    analysis += `<p>В локации наиболее востребованы объекты возраста ${saleAge.min}–${saleAge.max} года.</p>`;
-                } else if (rentAge) {
-                    analysis += `<p>В локации наиболее востребованы объекты возраста ${rentAge.min}–${rentAge.max} года.</p>`;
-                }
-            }
+
             
             // Sale analysis
             if (summary.comparable_area_for_sale && summary.listing_period_for_sale && summary.min_unit_price_for_sale) {
@@ -3300,7 +3286,7 @@
             html += '</tbody></table>';
             
             // Добавляем блок "Вывод по тренду"
-            html += generateTrendsAnalysis(filteredTrends);
+            html += generateTrendsAnalysis(trends);
             
             return html;
         }
