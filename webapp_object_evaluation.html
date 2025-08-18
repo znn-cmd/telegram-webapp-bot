@@ -2964,11 +2964,22 @@
             html += '</tr></thead><tbody>';
             
             trends.forEach(trend => {
+                // Логируем данные для отладки
+                console.log('🔍 Trend data:', {
+                    date: trend.date,
+                    unit_price_for_sale: trend.unit_price_for_sale,
+                    unit_price_for_rent: trend.unit_price_for_rent,
+                    trend_value: trend.trend_value,
+                    price_change_sale: trend.price_change_sale,
+                    price_change_rent: trend.price_change_rent,
+                    yield: trend.yield
+                });
+                
                 html += '<tr>';
                 html += `<td>${formatTrendDateShort(trend.date)}</td>`;
-                html += `<td>${formatTrendValue(trend.unit_price_for_sale || trend.trend_value, 'price')}</td>`;
+                html += `<td>${formatTrendValue(trend.unit_price_for_sale, 'price')}</td>`;
                 html += `<td>${formatPercentage(trend.price_change_sale)}</td>`;
-                html += `<td>${formatTrendValue(trend.unit_price_for_rent || trend.trend_value, 'price')}</td>`;
+                html += `<td>${formatTrendValue(trend.unit_price_for_rent, 'price')}</td>`;
                 html += `<td>${formatPercentage(trend.price_change_rent)}</td>`;
                 html += `<td>${formatPercentage(trend.yield)}</td>`;
                 html += '</tr>';
