@@ -293,4 +293,42 @@ def update_user_balance(telegram_id: int, amount: float) -> bool:
 
 def charge_user_for_report(telegram_id: int, report_cost: float = 1.0) -> bool:
     """Списание средств за полный отчет"""
-    return update_user_balance(telegram_id, -report_cost) 
+    return update_user_balance(telegram_id, -report_cost)
+
+def get_latest_currency_rates() -> Dict[str, Any]:
+    """Получение последних курсов валют из таблицы currency"""
+    
+    headers = {
+        'apikey': SUPABASE_ANON_KEY,
+        'Authorization': f'Bearer {SUPABASE_ANON_KEY}',
+        'Content-Type': 'application/json',
+    }
+    
+    # Получаем последнюю запись из таблицы currency
+    url = f"{SUPABASE_URL}/rest/v1/currency?select=*&order=created_at.desc&limit=1"
+    
+    try:
+        response = requests.get(url, headers=headers)
+        if response.status_code == 200:
+            currencies = response.json()
+            if currencies:
+                return {
+                    'success': True,
+                    'data': currencies[0]
+                }
+            else:
+                return {
+                    'success': False,
+                    'error': 'Нет данных о курсах валют'
+                }
+        else:
+            return {
+                'success': False,
+                'error': f'Ошибка API: {response.status_code}'
+            }
+    except Exception as e:
+        print(f"Ошибка при получении курсов валют: {e}")
+        return {
+            'success': False,
+            'error': str(e)
+        } 

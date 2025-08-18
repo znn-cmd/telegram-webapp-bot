@@ -3963,51 +3963,43 @@
                 return '';
             }
             
-            // Рассчитываем процент изменения цен продажи
-            const baseSalePrice = parseFloat(baseTrend.unit_price_for_sale) || 0;
-            const futureSalePrice = parseFloat(futureTrend.unit_price_for_sale) || 0;
-            const salePriceChangePercent = baseSalePrice > 0 ? ((futureSalePrice - baseSalePrice) / baseSalePrice * 100) : 0;
+            // Рассчитываем прогнозную цену продажи для объекта пользователя
+            // Цена продажи = площадь объекта × прогноз цены продажи последнего месяца
+            const futureSalePricePerM2 = parseFloat(futureTrend.unit_price_for_sale) || 0;
+            const forecastSalePrice = userArea * futureSalePricePerM2;
             
-            // Получаем актуальный курс валют
-            let eurRate = 1; // По умолчанию 1:1 для EUR
+            // Рассчитываем прогнозную ставку аренды
+            // Ставка аренды = площадь объекта × прогноз аренды последнего месяца
+            const futureRentPricePerM2 = parseFloat(futureTrend.unit_price_for_rent) || 0;
+            const forecastRentPriceInTRY = userArea * futureRentPricePerM2; // В лирах
+            
+            // Получаем актуальный курс валют из таблицы currency
+            let tryToEurRate = 1; // По умолчанию 1:1
             try {
-                const currencyResponse = await fetch('/api/currency/convert', {
-                    method: 'POST',
+                // Получаем курс TRY к EUR из таблицы currency
+                const currencyResponse = await fetch('/api/currency/latest', {
+                    method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        amount: 1,
-                        from_currency: userCurrency,
-                        to_currency: 'EUR'
-                    })
+                    }
                 });
                 
                 if (currencyResponse.ok) {
                     const currencyData = await currencyResponse.json();
-                    if (currencyData.success) {
-                        eurRate = currencyData.rate || 1;
+                    if (currencyData.success && currencyData.data) {
+                        // В таблице currency базовая валюта - EUR, курс TRY хранится в поле try
+                        // Курс TRY к EUR = 1 / try (так как try показывает сколько TRY за 1 EUR)
+                        tryToEurRate = 1 / parseFloat(currencyData.data.try || 1);
                     }
                 }
             } catch (error) {
                 console.log('⚠️ Не удалось получить курс валют, используем примерные значения');
-                // Используем примерные курсы как fallback
-                eurRate = userCurrency === 'EUR' ? 1 : (userCurrency === 'USD' ? 0.85 : 0.03);
+                // Используем примерный курс TRY к EUR как fallback
+                tryToEurRate = 0.03; // Примерно 1 TRY = 0.03 EUR
             }
             
-            // Рассчитываем прогнозную цену продажи для объекта пользователя
-            const userPriceInEUR = userPrice * eurRate;
-            const forecastSalePrice = userPriceInEUR * (1 + salePriceChangePercent / 100);
-            
-            // Рассчитываем прогнозную цену аренды
-            const baseRentPrice = parseFloat(baseTrend.unit_price_for_rent) || 0;
-            const futureRentPrice = parseFloat(futureTrend.unit_price_for_rent) || 0;
-            
-            // Прогноз аренды = площадь объекта × прогноз аренды последнего месяца
-            const forecastRentPrice = userArea * futureRentPrice;
-            
-            // Рассчитываем процент изменения аренды
-            const rentPriceChangePercent = baseRentPrice > 0 ? ((futureRentPrice - baseRentPrice) / baseRentPrice * 100) : 0;
+            // Конвертируем ставку аренды из лир в евро
+            const forecastRentPriceInEUR = forecastRentPriceInTRY * tryToEurRate;
             
             // Форматируем названия месяцев
             const monthNames = {
@@ -4026,50 +4018,44 @@
             const currentLanguage = userLanguage || 'ru';
             const monthNamesList = monthNames[currentLanguage] || monthNames['ru'];
             
-            const baseMonthName = monthNamesList[baseTrend.property_month - 1] || '';
             const futureMonthName = monthNamesList[futureTrend.property_month - 1] || '';
             
             // Формируем тексты на разных языках
             const forecastTexts = {
                 'ru': {
                     'title': 'Прогноз цен',
-                    'sale': `Продажа: ${salePriceChangePercent >= 0 ? '+' : ''}${salePriceChangePercent.toFixed(1)}%`,
-                    'rent': `Аренда: ${rentPriceChangePercent >= 0 ? '+' : ''}${rentPriceChangePercent.toFixed(1)}%`,
-                    'rentRate': `Ставка: €${(forecastRentPrice * eurRate).toLocaleString('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/мес`,
+                    'saleLabel': 'Цена продажи',
+                    'rentLabel': 'Ставка аренды',
                     'date': `${futureMonthName} ${futureTrend.property_year}`,
-                    'currencyInfo': `Курс: 1 ${userCurrency} = €${eurRate.toFixed(4)}`
+                    'currencyInfo': `Курс: 1 TRY = €${tryToEurRate.toFixed(4)}`
                 },
                 'en': {
                     'title': 'Price Forecast',
-                    'sale': `Sale: ${salePriceChangePercent >= 0 ? '+' : ''}${salePriceChangePercent.toFixed(1)}%`,
-                    'rent': `Rent: ${rentPriceChangePercent >= 0 ? '+' : ''}${rentPriceChangePercent.toFixed(1)}%`,
-                    'rentRate': `Rate: €${(forecastRentPrice * eurRate).toLocaleString('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/month`,
+                    'saleLabel': 'Sale Price',
+                    'rentLabel': 'Rent Rate',
                     'date': `${futureMonthName} ${futureTrend.property_year}`,
-                    'currencyInfo': `Rate: 1 ${userCurrency} = €${eurRate.toFixed(4)}`
+                    'currencyInfo': `Rate: 1 TRY = €${tryToEurRate.toFixed(4)}`
                 },
                 'de': {
                     'title': 'Preisprognose',
-                    'sale': `Verkauf: ${salePriceChangePercent >= 0 ? '+' : ''}${salePriceChangePercent.toFixed(1)}%`,
-                    'rent': `Miete: ${rentPriceChangePercent >= 0 ? '+' : ''}${rentPriceChangePercent.toFixed(1)}%`,
-                    'rentRate': `Satz: €${(forecastRentPrice * eurRate).toLocaleString('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/Monat`,
+                    'saleLabel': 'Verkaufspreis',
+                    'rentLabel': 'Mietpreis',
                     'date': `${futureMonthName} ${futureTrend.property_year}`,
-                    'currencyInfo': `Kurs: 1 ${userCurrency} = €${eurRate.toFixed(4)}`
+                    'currencyInfo': `Kurs: 1 TRY = €${tryToEurRate.toFixed(4)}`
                 },
                 'fr': {
                     'title': 'Prévision des prix',
-                    'sale': `Vente: ${salePriceChangePercent >= 0 ? '+' : ''}${salePriceChangePercent.toFixed(1)}%`,
-                    'rent': `Location: ${rentPriceChangePercent >= 0 ? '+' : ''}${rentPriceChangePercent.toFixed(1)}%`,
-                    'rentRate': `Tarif: €${(forecastRentPrice * eurRate).toLocaleString('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/mois`,
+                    'saleLabel': 'Prix de vente',
+                    'rentLabel': 'Taux de location',
                     'date': `${futureMonthName} ${futureTrend.property_year}`,
-                    'currencyInfo': `Taux: 1 ${userCurrency} = €${eurRate.toFixed(4)}`
+                    'currencyInfo': `Taux: 1 TRY = €${tryToEurRate.toFixed(4)}`
                 },
                 'tr': {
                     'title': 'Fiyat Tahmini',
-                    'sale': `Satış: ${salePriceChangePercent >= 0 ? '+' : ''}${salePriceChangePercent.toFixed(1)}%`,
-                    'rent': `Kiralama: ${rentPriceChangePercent >= 0 ? '+' : ''}${rentPriceChangePercent.toFixed(1)}%`,
-                    'rentRate': `Oran: €${(forecastRentPrice * eurRate).toLocaleString('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/ay`,
+                    'saleLabel': 'Satış Fiyatı',
+                    'rentLabel': 'Kiralama Oranı',
                     'date': `${futureMonthName} ${futureTrend.property_year}`,
-                    'currencyInfo': `Kur: 1 ${userCurrency} = €${eurRate.toFixed(4)}`
+                    'currencyInfo': `Kur: 1 TRY = €${tryToEurRate.toFixed(4)}`
                 }
             };
             
@@ -4079,12 +4065,20 @@
             let forecastHtml = '<div class="price-forecast-block">';
             forecastHtml += '<div class="price-forecast-content">';
             forecastHtml += `<h4 class="price-forecast-title">${texts.title}</h4>`;
-            forecastHtml += `<div class="price-forecast-value">€${forecastSalePrice.toLocaleString('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>`;
-            forecastHtml += `<div class="price-forecast-details">`;
-            forecastHtml += `<div class="price-forecast-sale">${texts.sale}</div>`;
-            forecastHtml += `<div class="price-forecast-rent">${texts.rent}</div>`;
-            forecastHtml += `<div class="price-forecast-rent-rate">${texts.rentRate}</div>`;
-            forecastHtml += `</div>`;
+            
+            // Блок с ценой продажи
+            forecastHtml += '<div class="price-forecast-sale-section">';
+            forecastHtml += `<div class="price-forecast-sale-label">${texts.saleLabel}</div>`;
+            forecastHtml += `<div class="price-forecast-sale-value">€${forecastSalePrice.toLocaleString('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>`;
+            forecastHtml += '</div>';
+            
+            // Блок со ставкой аренды
+            forecastHtml += '<div class="price-forecast-rent-section">';
+            forecastHtml += `<div class="price-forecast-rent-label">${texts.rentLabel}</div>`;
+            forecastHtml += `<div class="price-forecast-rent-value">€${forecastRentPriceInEUR.toLocaleString('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/мес</div>`;
+            forecastHtml += '</div>';
+            
+            // Дата прогноза и курс валют
             forecastHtml += `<div class="price-forecast-date">${texts.date}</div>`;
             forecastHtml += `<div class="price-forecast-currency-info">${texts.currencyInfo}</div>`;
             forecastHtml += '</div></div>';

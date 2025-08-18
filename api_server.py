@@ -6,7 +6,8 @@ from api_functions import (
     generate_basic_report,
     get_user_balance,
     charge_user_for_report,
-    update_user_balance
+    update_user_balance,
+    get_latest_currency_rates
 )
 
 # Загружаем переменные окружения
@@ -199,6 +200,16 @@ def generate_full_report(basic_report_data):
             }
         ]
     }
+
+@app.route('/api/currency/latest', methods=['GET'])
+def latest_currency():
+    """Получение последних курсов валют"""
+    try:
+        currency_data = get_latest_currency_rates()
+        return jsonify(currency_data)
+        
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 @app.route('/health', methods=['GET'])
 def health_check():
