@@ -3021,28 +3021,49 @@
                 console.log(`  ${index}: ${trend.property_year}-${trend.property_month} (${trend.date})`);
             });
             
-            // Ищем тренды за текущий год (2025) и ближайшие месяцы
-            const currentYearTrends = sortedTrends.filter(trend => 
-                trend.property_year === currentYear || 
-                (trend.property_year === currentYear - 1 && trend.property_month >= 9) ||
-                (trend.property_year === currentYear + 1 && trend.property_month <= 3)
-            );
-            
+            // Фильтруем тренды за текущий год (2025)
+            const currentYearTrends = sortedTrends.filter(trend => trend.property_year === currentYear);
             console.log(`🔍 Current year trends: ${currentYearTrends.length}`);
             
-            if (currentYearTrends.length >= 8) {
-                // Берем 8 трендов за текущий год и ближайшие месяцы
-                const selectedTrends = currentYearTrends.slice(0, 8);
-                console.log(`✅ Selected ${selectedTrends.length} trends from current year range`);
-                return selectedTrends;
-            } else if (sortedTrends.length >= 8) {
-                // Если мало трендов за текущий год, берем первые 8 из всех
-                console.log(`⚠️ Few current year trends, taking first 8 from all`);
+            if (currentYearTrends.length === 0) {
+                console.log(`⚠️ No trends for current year ${currentYear}, returning first 8 from all`);
                 return sortedTrends.slice(0, 8);
+            }
+            
+            // Вычисляем диапазон месяцев: 6 месяцев назад от текущего + 1 месяц вперед
+            const startMonth = currentMonth - 6;
+            const endMonth = currentMonth + 1;
+            
+            console.log(`🔍 Target month range: ${startMonth} to ${endMonth}`);
+            
+            // Фильтруем тренды по диапазону месяцев
+            const filteredTrends = currentYearTrends.filter(trend => {
+                const month = trend.property_month;
+                
+                // Обрабатываем переход через год (например, если текущий месяц август, то февраль = -4)
+                if (startMonth <= 0) {
+                    // Если startMonth отрицательный, берем месяцы с конца предыдущего года
+                    return month >= (12 + startMonth) || month <= endMonth;
+                } else {
+                    // Обычный случай
+                    return month >= startMonth && month <= endMonth;
+                }
+            });
+            
+            console.log(`🔍 Filtered trends by month range: ${filteredTrends.length}`);
+            
+            // Сортируем по месяцу (от старых к новым)
+            filteredTrends.sort((a, b) => a.property_month - b.property_month);
+            
+            if (filteredTrends.length >= 8) {
+                // Берем первые 8 трендов из отфильтрованного диапазона
+                const selectedTrends = filteredTrends.slice(0, 8);
+                console.log(`✅ Selected ${selectedTrends.length} trends from month range`);
+                return selectedTrends;
             } else {
-                // Если всего мало трендов, возвращаем все
-                console.log(`⚠️ Very few trends total, returning all ${sortedTrends.length}`);
-                return sortedTrends;
+                // Если мало трендов в диапазоне, возвращаем все отфильтрованные
+                console.log(`⚠️ Few trends in month range, returning all ${filteredTrends.length}`);
+                return filteredTrends;
             }
         }
 
