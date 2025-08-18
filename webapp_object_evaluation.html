@@ -2991,25 +2991,70 @@
         function filterTrendsByDateRange(trends) {
             if (!trends || trends.length === 0) return [];
             
-            console.log(`🔍 Filtering trends: total trends = ${trends.length}`);
+            // Получаем текущую дату
+            const now = new Date();
+            const currentYear = now.getFullYear();
+            const currentMonth = now.getMonth() + 1; // getMonth() returns 0-11
             
-            // Сортируем тренды по дате (новые сначала)
+            console.log(`🔍 Filtering trends: current date = ${currentYear}-${currentMonth}`);
+            console.log(`🔍 Total trends = ${trends.length}`);
+            
+            // Сортируем тренды по property_year и property_month (новые сначала)
             const sortedTrends = trends.sort((a, b) => {
-                const dateA = new Date(a.date);
-                const dateB = new Date(b.date);
-                return dateB - dateA;
+                if (a.property_year !== b.property_year) {
+                    return b.property_year - a.property_year;
+                }
+                return b.property_month - a.property_month;
             });
             
-            console.log(`🔍 Sorted trends by date (newest first):`);
+            console.log(`🔍 Sorted trends by property_year/property_month (newest first):`);
             sortedTrends.forEach((trend, index) => {
                 console.log(`  ${index}: ${trend.property_year}-${trend.property_month} (${trend.date})`);
             });
             
-            // Берем первые 8 трендов (6 назад + текущий + 1 вперед)
-            // Поскольку тренды уже отсортированы по дате (новые сначала)
-            const filteredTrends = sortedTrends.slice(0, 8);
+            // Находим индекс текущего месяца в отсортированных трендах
+            let currentMonthIndex = -1;
+            for (let i = 0; i < sortedTrends.length; i++) {
+                const trend = sortedTrends[i];
+                if (trend.property_year === currentYear && trend.property_month === currentMonth) {
+                    currentMonthIndex = i;
+                    break;
+                }
+            }
+            
+            console.log(`🔍 Current month (${currentYear}-${currentMonth}) found at index: ${currentMonthIndex}`);
+            
+            // Если текущий месяц не найден, ищем ближайший к текущему
+            if (currentMonthIndex === -1) {
+                console.log(`🔍 Current month not found, looking for closest match...`);
+                
+                // Ищем ближайший месяц к текущему
+                let closestIndex = 0;
+                let minDifference = Infinity;
+                
+                for (let i = 0; i < sortedTrends.length; i++) {
+                    const trend = sortedTrends[i];
+                    const yearDiff = Math.abs(trend.property_year - currentYear);
+                    const monthDiff = Math.abs(trend.property_month - currentMonth);
+                    const totalDiff = yearDiff * 12 + monthDiff;
+                    
+                    if (totalDiff < minDifference) {
+                        minDifference = totalDiff;
+                        closestIndex = i;
+                    }
+                }
+                
+                currentMonthIndex = closestIndex;
+                console.log(`🔍 Closest month found at index: ${currentMonthIndex} (${sortedTrends[currentMonthIndex].property_year}-${sortedTrends[currentMonthIndex].property_month})`);
+            }
+            
+            // Выбираем тренды: 6 назад + текущий + 1 вперед
+            const startIndex = Math.max(0, currentMonthIndex - 6);
+            const endIndex = Math.min(sortedTrends.length - 1, currentMonthIndex + 1);
+            const filteredTrends = sortedTrends.slice(startIndex, endIndex + 1);
             
             console.log(`🔍 Filtered trends: ${filteredTrends.length} out of ${trends.length} total`);
+            console.log(`🔍 Date range: index ${startIndex} to ${endIndex}`);
             console.log(`🔍 Selected trends:`);
             filteredTrends.forEach((trend, index) => {
                 console.log(`  ${index}: ${trend.property_year}-${trend.property_month} (${trend.date})`);
@@ -3044,8 +3089,12 @@
             html += '</tr></thead><tbody>';
             
             // Добавляем информацию о фильтрации
+            const currentDate = new Date();
+            const currentYear = currentDate.getFullYear();
+            const currentMonth = currentDate.getMonth() + 1;
+            
             html += `<tr class="filter-info"><td colspan="6" style="text-align: center; font-size: 11px; color: #666; background: #f8f9fa; padding: 4px;">
-                Показано ${filteredTrends.length} из ${trends.length} трендов (последние 8 месяцев по дате)
+                Показано ${filteredTrends.length} из ${trends.length} трендов (6 месяцев назад + текущий ${currentMonth}/${currentYear} + 1 месяц вперед)
             </td></tr>`;
             
             filteredTrends.forEach((trend, index) => {
