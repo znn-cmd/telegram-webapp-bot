@@ -3057,8 +3057,36 @@
             
             console.log(`🔍 Filtered trends by month range: ${filteredTrends.length}`);
             
-            // Сортируем по месяцу (от старых к новым)
-            filteredTrends.sort((a, b) => a.property_month - b.property_month);
+            // Сортируем по месяцу (будущие месяцы сверху, прошедшие снизу)
+            filteredTrends.sort((a, b) => {
+                const monthA = a.property_month;
+                const monthB = b.property_month;
+                
+                // Если оба месяца в будущем (больше текущего)
+                if (monthA > currentMonth && monthB > currentMonth) {
+                    return monthA - monthB; // По возрастанию
+                }
+                // Если оба месяца в прошлом (меньше текущего)
+                else if (monthA < currentMonth && monthB < currentMonth) {
+                    return monthB - monthA; // По убыванию (новые снизу)
+                }
+                // Если один в будущем, а другой в прошлом
+                else if (monthA > currentMonth && monthB < currentMonth) {
+                    return -1; // Будущий месяц идет первым
+                }
+                else if (monthA < currentMonth && monthB > currentMonth) {
+                    return 1; // Прошедший месяц идет вторым
+                }
+                // Если один из месяцев - текущий
+                else if (monthA === currentMonth) {
+                    return -1; // Текущий месяц идет первым
+                }
+                else if (monthB === currentMonth) {
+                    return 1; // Текущий месяц идет первым
+                }
+                
+                return 0;
+            });
             
             if (filteredTrends.length >= 8) {
                 // Берем первые 8 трендов из отфильтрованного диапазона
