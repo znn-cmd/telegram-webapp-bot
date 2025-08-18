@@ -613,7 +613,7 @@
             width: 100%;
             border-collapse: collapse;
             background: white;
-            font-size: 12px;
+            font-size: 11px;
             table-layout: fixed;
         }
         
@@ -670,7 +670,7 @@
         /* Мобильные устройства */
         @media (max-width: 768px) {
             .trends-table {
-                font-size: 11px;
+                font-size: 10px;
             }
             
             .trends-table th,
@@ -2989,10 +2989,15 @@
             if (!dateStr) return '';
             try {
                 const date = new Date(dateStr);
-                return date.toLocaleDateString('ru-RU', { 
-                    year: 'numeric', 
-                    month: 'short' 
-                });
+                const monthNames = [
+                    'янв', 'фев', 'мар', 'апр', 'май', 'июн',
+                    'июл', 'авг', 'сен', 'окт', 'ноя', 'дек'
+                ];
+                
+                const month = monthNames[date.getMonth()];
+                const year = date.getFullYear();
+                
+                return `${month}. ${year}`;
             } catch (e) {
                 return dateStr;
             }
@@ -3151,7 +3156,7 @@
                 return value.toString();
             } else if (type === 'percentage') {
                 if (typeof value === 'number') {
-                    return `${(value * 100).toFixed(2)}%`;
+                    return `${value.toFixed(2)}%`;
                 }
                 return value.toString();
             }
