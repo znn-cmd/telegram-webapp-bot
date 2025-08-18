@@ -2776,10 +2776,14 @@
                 console.log('📊 Property trends response:', trendsData);
                 
                 if (trendsData.success && trendsData.trends && trendsData.trends.length > 0) {
+                    console.log('✅ Property trends data received:', trendsData.trends);
+                    console.log('🔍 First trend record:', trendsData.trends[0]);
+                    
                     // Add property trends section below the summary table
                     addPropertyTrendsSection(trendsData.trends);
                 } else {
                     console.log('⚠️ No property trends data available');
+                    console.log('trendsData:', trendsData);
                 }
                 
             } catch (error) {
@@ -2953,6 +2957,8 @@
                 return '<div class="no-data">Нет данных для отображения</div>';
             }
             
+            console.log('🔍 generateTrendsTable called with trends:', trends);
+            
             let html = '<table class="trends-table">';
             html += '<thead><tr>';
             html += '<th>Дата</th>';
@@ -2963,9 +2969,9 @@
             html += '<th>Доходность</th>';
             html += '</tr></thead><tbody>';
             
-            trends.forEach(trend => {
+            trends.forEach((trend, index) => {
                 // Логируем данные для отладки
-                console.log('🔍 Trend data:', {
+                console.log(`🔍 Trend ${index + 1} data:`, {
                     date: trend.date,
                     unit_price_for_sale: trend.unit_price_for_sale,
                     unit_price_for_rent: trend.unit_price_for_rent,
@@ -2975,13 +2981,24 @@
                     yield: trend.yield
                 });
                 
+                // Логируем результаты форматирования
+                const formattedSalePrice = formatTrendValue(trend.unit_price_for_sale, 'price');
+                const formattedRentPrice = formatTrendValue(trend.unit_price_for_rent, 'price');
+                const formattedYield = formatTrendValue(trend.yield, 'percentage');
+                
+                console.log(`🔍 Formatted values for trend ${index + 1}:`, {
+                    salePrice: formattedSalePrice,
+                    rentPrice: formattedRentPrice,
+                    yield: formattedYield
+                });
+                
                 html += '<tr>';
                 html += `<td>${formatTrendDateShort(trend.date)}</td>`;
-                html += `<td>${formatTrendValue(trend.unit_price_for_sale, 'price')}</td>`;
+                html += `<td>${formattedSalePrice}</td>`;
                 html += `<td>${formatPercentage(trend.price_change_sale)}</td>`;
-                html += `<td>${formatTrendValue(trend.unit_price_for_rent, 'price')}</td>`;
+                html += `<td>${formattedRentPrice}</td>`;
                 html += `<td>${formatPercentage(trend.price_change_rent)}</td>`;
-                html += `<td>${formatPercentage(trend.yield)}</td>`;
+                html += `<td>${formattedYield}</td>`;
                 html += '</tr>';
             });
             
@@ -2991,13 +3008,21 @@
         
         // Format trend value based on type
         function formatTrendValue(value, type) {
-            if (value === null || value === undefined) return '-';
+            console.log(`🔍 formatTrendValue called with:`, { value, type, valueType: typeof value });
+            
+            if (value === null || value === undefined) {
+                console.log(`  ❌ Value is null/undefined, returning '-'`);
+                return '-';
+            }
             
             if (type && type.includes('price')) {
+                console.log(`  💰 Processing as price`);
                 return formatValue(value, 'price');
             } else if (type && type.includes('percentage')) {
+                console.log(`  📊 Processing as percentage`);
                 return formatValue(value, 'percentage');
             } else if (typeof value === 'number') {
+                console.log(`  🔢 Processing as number`);
                 // Если это число, форматируем его
                 if (value >= 1000) {
                     return value.toLocaleString('ru-RU');
@@ -3005,26 +3030,41 @@
                     return value.toFixed(2);
                 }
             } else {
+                console.log(`  📝 Processing as string`);
                 return value.toString();
             }
         }
         
         // Helper function to format values consistently
         function formatValue(value, type) {
-            if (value === null || value === undefined) return '-';
+            console.log(`🔍 formatValue called with:`, { value, type, valueType: typeof value });
+            
+            if (value === null || value === undefined) {
+                console.log(`  ❌ Value is null/undefined, returning '-'`);
+                return '-';
+            }
             
             if (type === 'price') {
+                console.log(`  💰 Processing as price`);
                 if (typeof value === 'number') {
-                    return `₺${value.toLocaleString('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+                    const result = `₺${value.toLocaleString('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+                    console.log(`  ✅ Price formatted: ${result}`);
+                    return result;
                 }
+                console.log(`  ⚠️ Value is not a number, converting to string`);
                 return value.toString();
             } else if (type === 'percentage') {
+                console.log(`  📊 Processing as percentage`);
                 if (typeof value === 'number') {
-                    return `${(value * 100).toFixed(2)}%`;
+                    const result = `${(value * 100).toFixed(2)}%`;
+                    console.log(`  ✅ Percentage formatted: ${result}`);
+                    return result;
                 }
+                console.log(`  ⚠️ Value is not a number, converting to string`);
                 return value.toString();
             }
             
+            console.log(`  📝 Default processing, converting to string`);
             return value.toString();
         }
         

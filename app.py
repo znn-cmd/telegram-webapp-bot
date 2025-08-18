@@ -6913,6 +6913,19 @@ def api_property_trends():
         if response.data:
             logger.info(f"✅ Найдено {len(response.data)} записей трендов недвижимости")
             
+            # Логируем первую запись для отладки
+            if response.data:
+                first_record = response.data[0]
+                logger.info(f"🔍 Первая запись из базы:")
+                logger.info(f"  - unit_price_for_sale: {first_record.get('unit_price_for_sale')}")
+                logger.info(f"  - unit_price_for_rent: {first_record.get('unit_price_for_rent')}")
+                logger.info(f"  - price_change_sale: {first_record.get('price_change_sale')}")
+                logger.info(f"  - price_change_rent: {first_record.get('price_change_rent')}")
+                logger.info(f"  - yield: {first_record.get('yield')}")
+                logger.info(f"  - property_date: {first_record.get('property_date')}")
+                logger.info(f"  - property_year: {first_record.get('property_year')}")
+                logger.info(f"  - property_month: {first_record.get('property_month')}")
+            
             # Формируем тренды для отображения
             trends = []
             for record in response.data:
@@ -6923,6 +6936,8 @@ def api_property_trends():
                     'date': record.get('property_date'),
                     'year': record.get('property_year'),
                     'month': record.get('property_month'),
+                    'unit_price_for_sale': record.get('unit_price_for_sale'),
+                    'unit_price_for_rent': record.get('unit_price_for_rent'),
                     'price_change_sale': record.get('price_change_sale'),
                     'price_change_rent': record.get('price_change_rent'),
                     'annual_price_change_sale': record.get('annual_price_change_sale'),
