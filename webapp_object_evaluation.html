@@ -3316,7 +3316,7 @@
         }
 
         // Add property trends section to the page
-        function addPropertyTrendsSection(trends) {
+        async function addPropertyTrendsSection(trends) {
             // Проверяем, не существует ли уже секция трендов
             if (document.getElementById('propertyTrendsSection')) {
                 console.log('⚠️ Property trends section already exists, skipping...');
@@ -3362,8 +3362,8 @@
                     <!-- Таблица со всеми записями трендов -->
                     <div class="trends-table-section">
                         <h4 class="trends-table-title">Детальные данные трендов</h4>
-                        <div class="trends-table-container">
-                            ${generateTrendsTable(trends)}
+                        <div class="trends-table-container" id="trendsTableContainer">
+                            <!-- Тренды будут загружены асинхронно -->
                         </div>
                     </div>
                 </div>
@@ -3371,6 +3371,13 @@
             
             // Insert after summary section
             summarySection.parentNode.insertBefore(trendsSection, summarySection.nextSibling);
+            
+            // Асинхронно загружаем таблицу трендов
+            const trendsTableContainer = document.getElementById('trendsTableContainer');
+            if (trendsTableContainer) {
+                const trendsTableHtml = await generateTrendsTable(trends);
+                trendsTableContainer.innerHTML = trendsTableHtml;
+            }
         }
         
         // Group trends by type for better display
@@ -3544,7 +3551,7 @@
         }
 
         // Generate detailed trends table
-        function generateTrendsTable(trends) {
+        async function generateTrendsTable(trends) {
             if (!trends || trends.length === 0) {
                 return '<div class="no-data">Нет данных для отображения</div>';
             }
@@ -3604,13 +3611,13 @@
             html += '</tbody></table>';
             
             // Добавляем блок "Вывод по тренду"
-            html += generateTrendsAnalysis(trends);
+            html += await generateTrendsAnalysis(trends);
             
             return html;
         }
         
         // Generate trends analysis based on table data
-        function generateTrendsAnalysis(trends) {
+        async function generateTrendsAnalysis(trends) {
             if (!trends || trends.length === 0) {
                 return '';
             }
@@ -3709,13 +3716,13 @@
             analysis += '</div></div>';
             
             // Добавляем таблицу "Прогноз цены и аренды"
-            analysis += generateForecastTable(trends);
+            analysis += await generateForecastTable(trends);
             
             return analysis;
         }
         
         // Generate forecast table for current and future months
-        function generateForecastTable(trends) {
+        async function generateForecastTable(trends) {
             if (!trends || trends.length === 0) {
                 return '';
             }
@@ -3781,13 +3788,13 @@
             forecastHtml += '</div></div>';
             
             // Добавляем блок "Вывод прогноза"
-            forecastHtml += generateForecastAnalysis(forecastTrends);
+            forecastHtml += await generateForecastAnalysis(forecastTrends);
             
             return forecastHtml;
         }
         
         // Generate forecast analysis based on forecast table data
-        function generateForecastAnalysis(forecastTrends) {
+        async function generateForecastAnalysis(forecastTrends) {
             if (!forecastTrends || forecastTrends.length === 0) {
                 return '';
             }
@@ -3904,7 +3911,7 @@
             analysisHtml += '</div></div>';
             
             // Добавляем блок "Прогноз цен"
-            analysisHtml += generatePriceForecastBlock(forecastTrends);
+            analysisHtml += await generatePriceForecastBlock(forecastTrends);
             
             return analysisHtml;
         }
