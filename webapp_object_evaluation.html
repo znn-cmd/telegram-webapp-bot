@@ -650,6 +650,12 @@
         .trends-table th:nth-child(5) { width: 18%; } /* Изм-ие цены аренды */
         .trends-table th:nth-child(6) { width: 13%; } /* Доходность */
         
+        /* Стили для информационной строки о фильтрации */
+        .trends-table .filter-info td {
+            border: none;
+            font-style: italic;
+        }
+        
         /* Мобильные устройства */
         @media (max-width: 768px) {
             .trends-table {
@@ -2981,13 +2987,33 @@
             }
         }
 
+                // Filter trends to show only current year data
+        function filterTrendsByCurrentYear(trends) {
+            if (!trends || trends.length === 0) return [];
+            
+            const currentYear = new Date().getFullYear();
+            console.log(`🔍 Filtering trends for current year: ${currentYear}`);
+            
+            const currentYearTrends = trends.filter(trend => {
+                return trend.property_year === currentYear;
+            });
+            
+            console.log(`✅ Found ${currentYearTrends.length} trends for ${currentYear} year`);
+            return currentYearTrends;
+        }
+
         // Generate detailed trends table
         function generateTrendsTable(trends) {
             if (!trends || trends.length === 0) {
                 return '<div class="no-data">Нет данных для отображения</div>';
             }
             
-
+            // Фильтруем тренды по текущему году
+            const filteredTrends = filterTrendsByCurrentYear(trends);
+            
+            if (filteredTrends.length === 0) {
+                return '<div class="no-data">Нет данных за текущий год</div>';
+            }
             
             let html = '<table class="trends-table">';
             html += '<thead><tr>';
@@ -2999,7 +3025,12 @@
             html += '<th>Доходность</th>';
             html += '</tr></thead><tbody>';
             
-            trends.forEach((trend, index) => {
+            // Добавляем информацию о фильтрации
+            html += `<tr class="filter-info"><td colspan="6" style="text-align: center; font-size: 11px; color: #666; background: #f8f9fa; padding: 4px;">
+                Показано ${filteredTrends.length} из ${trends.length} трендов (только за ${new Date().getFullYear()} год)
+            </td></tr>`;
+            
+            filteredTrends.forEach((trend, index) => {
                 html += '<tr>';
                 html += `<td>${formatTrendDateShort(trend.date)}</td>`;
                 html += `<td>${formatTrendValue(trend.unit_price_for_sale, 'price')}</td>`;
