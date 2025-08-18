@@ -426,52 +426,77 @@
             font-weight: 500;
         }
         
+        .summary-table-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
         .summary-table {
-            margin-top: 20px;
+            margin-top: 0;
+        }
+        
+        .summary-table-container {
+            overflow-x: hidden;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         
         .summary-table th {
-            background: #667eea;
+            background: #28a745;
             color: white;
-            padding: 12px 8px;
-            font-weight: 600;
+            padding: 8px 6px;
             text-align: center;
+            font-weight: 600;
+            line-height: 1.2;
+            word-wrap: break-word;
         }
         
         .summary-table td {
-            padding: 10px 8px;
+            padding: 6px 4px;
             text-align: center;
+            border-bottom: 1px solid #dee2e6;
+            word-wrap: break-word;
         }
         
         .summary-table tr:nth-child(even) {
             background: #f8f9fa;
         }
         
+        .summary-table tr:hover {
+            background: #e9ecef;
+        }
+        
         .section-header {
-            background: #f8f9fa !important;
+            background: #f0f8ff !important;
             color: #495057;
-            font-weight: 700;
+            font-weight: 600;
             text-align: center;
             border: 1px solid #dee2e6;
+            font-size: 14px;
         }
         
         .sale-header {
-            background: #f8f9fa !important;
+            background: #f0f8ff !important;
             color: #495057;
             border: 1px solid #dee2e6;
+            font-weight: 600;
         }
         
         .rent-header {
-            background: #f8f9fa !important;
+            background: #f0f8ff !important;
             color: #495057;
             border: 1px solid #dee2e6;
+            font-weight: 600;
         }
         
         .yield-header {
-            background: #f8f9fa !important;
+            background: #f0f8ff !important;
             color: #495057;
-            font-weight: 800;
-            font-size: 18px;
+            font-weight: 600;
+            font-size: 14px;
             border: 1px solid #dee2e6;
         }
         
@@ -481,13 +506,132 @@
         }
         
         .yield-label {
-            font-weight: 700;
-            color: #856404;
+            font-weight: 600;
+            color: #495057;
         }
         
         .yield-value {
-            font-weight: 700;
-            color: #856404;
+            font-weight: 600;
+            color: #495057;
+        }
+        
+        /* Мобильные устройства для таблицы показателей рынка */
+        @media (max-width: 768px) {
+            .summary-table-title {
+                font-size: 15px;
+                margin-bottom: 12px;
+            }
+            
+            .summary-table {
+                font-size: 10px;
+            }
+            
+            .summary-table th,
+            .summary-table td {
+                padding: 4px 2px;
+            }
+        }
+        
+        /* Market Comparison Block Styles */
+        .market-comparison-block {
+            margin-top: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border: 1px solid #e9ecef;
+            overflow: hidden;
+        }
+        
+        .market-comparison-content {
+            padding: 20px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .market-comparison-content::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: #28a745;
+        }
+        
+        .market-comparison-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 15px;
+        }
+        
+        .market-comparison-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #28a745;
+            margin-bottom: 15px;
+        }
+        
+        .market-comparison-details {
+            margin-bottom: 15px;
+        }
+        
+        .market-comparison-price,
+        .market-comparison-area {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        
+        .market-comparison-analysis {
+            text-align: left;
+        }
+        
+        .market-comparison-analysis p {
+            font-size: 14px;
+            line-height: 1.6;
+            color: #333;
+            margin-bottom: 8px;
+        }
+        
+        .market-comparison-analysis p:last-child {
+            margin-bottom: 0;
+        }
+        
+        .market-comparison-analysis strong {
+            color: #495057;
+            font-weight: 600;
+        }
+        
+        /* Мобильные устройства для блока сравнения с рынком */
+        @media (max-width: 768px) {
+            .market-comparison-block {
+                margin-top: 15px;
+            }
+            
+            .market-comparison-content {
+                padding: 15px;
+            }
+            
+            .market-comparison-title {
+                font-size: 15px;
+                margin-bottom: 12px;
+            }
+            
+            .market-comparison-value {
+                font-size: 20px;
+                margin-bottom: 12px;
+            }
+            
+            .market-comparison-price,
+            .market-comparison-area {
+                font-size: 13px;
+            }
+            
+            .market-comparison-analysis p {
+                font-size: 13px;
+                line-height: 1.5;
+            }
         }
         
         /* Analytical Summary Styles */
@@ -877,6 +1021,106 @@
             .forecast-analysis-content {
                 font-size: 13px;
                 line-height: 1.5;
+            }
+        }
+        
+        /* Price Forecast Block Styles */
+        .price-forecast-block {
+            margin-top: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border: 1px solid #e9ecef;
+            overflow: hidden;
+        }
+        
+        .price-forecast-content {
+            padding: 20px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .price-forecast-content::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: #28a745;
+        }
+        
+        .price-forecast-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 15px;
+        }
+        
+        .price-forecast-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #28a745;
+            margin-bottom: 15px;
+        }
+        
+        .price-forecast-details {
+            margin-bottom: 15px;
+        }
+        
+        .price-forecast-sale,
+        .price-forecast-rent,
+        .price-forecast-rent-rate {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        
+        .price-forecast-currency-info {
+            font-size: 11px;
+            color: #999;
+            font-style: italic;
+            margin-top: 10px;
+        }
+        
+        .price-forecast-date {
+            font-size: 12px;
+            color: #999;
+            font-style: italic;
+        }
+        
+        /* Мобильные устройства для блока прогноза цен */
+        @media (max-width: 768px) {
+            .price-forecast-block {
+                margin-top: 15px;
+            }
+            
+            .price-forecast-content {
+                padding: 15px;
+            }
+            
+            .price-forecast-title {
+                font-size: 15px;
+                margin-bottom: 12px;
+            }
+            
+            .price-forecast-value {
+                font-size: 20px;
+                margin-bottom: 12px;
+            }
+            
+            .price-forecast-sale,
+            .price-forecast-rent {
+                font-size: 13px;
+            }
+            
+            .price-forecast-date {
+                font-size: 11px;
+            }
+            
+            .price-forecast-currency-info {
+                font-size: 10px;
+                margin-top: 8px;
             }
         }
         
@@ -1503,7 +1747,18 @@
                 'currencyTitle': 'Выберите валюту:',
                 'pricePlaceholder': 'Введите цену',
                 'areaPlaceholder': 'Введите площадь',
-                'trendsFilterInfo': 'Показано ${filteredCount} из ${totalCount} трендов'
+                'trendsFilterInfo': 'Показано ${filteredCount} из ${totalCount} трендов',
+                'marketComparisonTitle': 'Сравнение с рынком',
+                'pricePerM2Label': 'Цена за м²',
+                'areaLabel': 'Площадь',
+                'priceComparisonLabel': 'Цена за м²:',
+                'areaComparisonLabel': 'Площадь:',
+                'priceCloseToMarket': 'Ваш объект (${userPrice}) близок к рыночной (${marketMin} – ${marketMax}).',
+                'priceAboveMarket': 'Ваш объект (${userPrice}) выше рынка на ${percent}%.',
+                'priceBelowMarket': 'Ваш объект (${userPrice}) ниже рынка на ${percent}%.',
+                'areaMatchesMarket': 'Ваш объект (${userArea} м²) соответствует рыночному спросу (${marketMin}–${marketMax} м²).',
+                'areaBelowMarket': 'Ваш объект (${userArea} м²) меньше востребованной на рынке (${marketMin}–${marketMax} м²).',
+                'areaAboveMarket': 'Ваш объект (${userArea} м²) больше востребованной на рынке (${marketMin}–${marketMax} м²).'
             },
             'en': {
                 'slogan': 'Real Estate Market Insights',
@@ -1562,7 +1817,18 @@
                 'currencyTitle': 'Select currency:',
                 'pricePlaceholder': 'Enter price',
                 'areaPlaceholder': 'Enter area',
-                'trendsFilterInfo': 'Showing ${filteredCount} of ${totalCount} trends'
+                'trendsFilterInfo': 'Showing ${filteredCount} of ${totalCount} trends',
+                'marketComparisonTitle': 'Market Comparison',
+                'pricePerM2Label': 'Price per m²',
+                'areaLabel': 'Area',
+                'priceComparisonLabel': 'Price per m²:',
+                'areaComparisonLabel': 'Area:',
+                'priceCloseToMarket': 'Your object (${userPrice}) is close to market (${marketMin} – ${marketMax}).',
+                'priceAboveMarket': 'Your object (${userPrice}) is above market by ${percent}%.',
+                'priceBelowMarket': 'Your object (${userPrice}) is below market by ${percent}%.',
+                'areaMatchesMarket': 'Your object (${userArea} m²) matches market demand (${marketMin}–${marketMax} m²).',
+                'areaBelowMarket': 'Your object (${userArea} m²) is smaller than market demand (${marketMin}–${marketMax} m²).',
+                'areaAboveMarket': 'Your object (${userArea} m²) is larger than market demand (${marketMin}–${marketMax} m²).'
             },
             'de': {
                 'slogan': 'Immobilienmarkt-Einblicke',
@@ -1682,7 +1948,18 @@
                 'yieldLabel': 'Getiri',
                 'insightsTitle': 'Özet',
                 'insightsLoading': 'Veriler analiz ediliyor...',
-                'insightsError': 'Veri analizi hatası'
+                'insightsError': 'Veri analizi hatası',
+                'marketComparisonTitle': 'Piyasa Karşılaştırması',
+                'pricePerM2Label': 'm² başına fiyat',
+                'areaLabel': 'Alan',
+                'priceComparisonLabel': 'm² başına fiyat:',
+                'areaComparisonLabel': 'Alan:',
+                'priceCloseToMarket': 'Nesneniz (${userPrice}) piyasaya yakın (${marketMin} – ${marketMax}).',
+                'priceAboveMarket': 'Nesneniz (${userPrice}) piyasadan ${percent}% yüksek.',
+                'priceBelowMarket': 'Nesneniz (${userPrice}) piyasadan ${percent}% düşük.',
+                'areaMatchesMarket': 'Nesneniz (${userArea} m²) piyasa talebine uygun (${marketMin}–${marketMax} m²).',
+                'areaBelowMarket': 'Nesneniz (${userArea} m²) piyasa talebinden küçük (${marketMin}–${marketMax} m²).',
+                'areaAboveMarket': 'Nesneniz (${userArea} m²) piyasa talebinden büyük (${marketMin}–${marketMax} m²).'
             },
             'de': {
                 'slogan': 'Immobilienmarkt-Einblicke',
@@ -2820,6 +3097,111 @@
             }
         }
 
+        // Generate market comparison block
+        function generateMarketComparison(summary) {
+            // Get user's object data
+            const userPrice = selectedListingTypes.price || 0;
+            const userArea = selectedListingTypes.area || 0;
+            const userCurrency = selectedListingTypes.currency || 'EUR';
+            
+            if (!userPrice || !userArea) {
+                return '';
+            }
+            
+            // Calculate user's price per m²
+            const userPricePerM2 = userPrice / userArea;
+            
+            // Get market data for comparison
+            const marketPricePerM2 = summary.min_unit_price_for_sale;
+            const marketArea = summary.comparable_area_for_sale;
+            
+            if (!marketPricePerM2 || !marketArea) {
+                return '';
+            }
+            
+            // Determine target currency based on country
+            const targetCurrency = getCurrentCountry() === 'Turkey' ? 'TRY' : 'EUR';
+            
+            // Convert user's price to target currency for comparison
+            let userPriceInTargetCurrency = userPricePerM2;
+            if (userCurrency !== targetCurrency) {
+                // Use the same conversion logic as in price forecast
+                const conversionRate = getCurrencyRate(userCurrency, targetCurrency);
+                userPriceInTargetCurrency = userPricePerM2 * conversionRate;
+            }
+            
+            // Calculate price comparison
+            const priceDifference = userPriceInTargetCurrency - marketPricePerM2.min;
+            const priceDifferencePercent = marketPricePerM2.min > 0 ? (priceDifference / marketPricePerM2.min * 100) : 0;
+            
+            // Calculate area comparison
+            const areaDifference = userArea - marketArea.min;
+            const areaDifferencePercent = marketArea.min > 0 ? (areaDifference / marketArea.min * 100) : 0;
+            
+            // Generate comparison text
+            let comparisonText = '';
+            
+            // Price comparison
+            if (Math.abs(priceDifferencePercent) < 5) {
+                comparisonText += `<p><strong>${getText('priceComparisonLabel')}</strong> ${getText('priceCloseToMarket').replace('${userPrice}', formatValue(userPriceInTargetCurrency, 'price')).replace('${marketMin}', formatValue(marketPricePerM2.min, 'price')).replace('${marketMax}', formatValue(marketPricePerM2.max, 'price'))}</p>`;
+            } else if (priceDifferencePercent > 0) {
+                comparisonText += `<p><strong>${getText('priceComparisonLabel')}</strong> ${getText('priceAboveMarket').replace('${userPrice}', formatValue(userPriceInTargetCurrency, 'price')).replace('${percent}', Math.abs(priceDifferencePercent).toFixed(1))}</p>`;
+            } else {
+                comparisonText += `<p><strong>${getText('priceComparisonLabel')}</strong> ${getText('priceBelowMarket').replace('${userPrice}', formatValue(userPriceInTargetCurrency, 'price')).replace('${percent}', Math.abs(priceDifferencePercent).toFixed(1))}</p>`;
+            }
+            
+            // Area comparison
+            if (userArea >= marketArea.min && userArea <= marketArea.max) {
+                comparisonText += `<p><strong>${getText('areaLabel')}:</strong> ${getText('areaMatchesMarket').replace('${userArea}', userArea).replace('${marketMin}', marketArea.min).replace('${marketMax}', marketArea.max)}</p>`;
+            } else if (userArea < marketArea.min) {
+                comparisonText += `<p><strong>${getText('areaLabel')}:</strong> ${getText('areaBelowMarket').replace('${userArea}', userArea).replace('${marketMin}', marketArea.min).replace('${marketMax}', marketArea.max)}</p>`;
+            } else {
+                comparisonText += `<p><strong>${getText('areaLabel')}:</strong> ${getText('areaAboveMarket').replace('${userArea}', userArea).replace('${marketMin}', marketArea.min).replace('${marketMax}', marketArea.max)}</p>`;
+            }
+            
+            // Generate HTML
+            let html = '<div class="market-comparison-block">';
+            html += '<div class="market-comparison-content">';
+            html += `<h4 class="market-comparison-title">${getText('marketComparisonTitle')}</h4>`;
+            html += `<div class="market-comparison-value">${formatValue(userPricePerM2, 'price')}/м²</div>`;
+            html += '<div class="market-comparison-details">';
+            html += `<div class="market-comparison-price">${getText('priceComparisonLabel')} ${formatValue(userPriceInTargetCurrency, 'price')}</div>`;
+            html += `<div class="market-comparison-area">${getText('areaLabel')}: ${userArea} м²</div>`;
+            html += '</div>';
+            html += '<div class="market-comparison-analysis">';
+            html += comparisonText;
+            html += '</div>';
+            html += '</div></div>';
+            
+            return html;
+        }
+        
+        // Helper function to get current country
+        function getCurrentCountry() {
+            // Get country from selected location
+            if (selectedLocation && selectedLocation.country_name) {
+                const countryName = selectedLocation.country_name.toLowerCase();
+                if (countryName.includes('türkiye') || countryName.includes('turkey') || countryName.includes('турция')) {
+                    return 'Turkey';
+                }
+            }
+            return 'Other'; // Default to other countries
+        }
+        
+        // Helper function to get currency conversion rate
+        function getCurrencyRate(fromCurrency, toCurrency) {
+            // This should get the actual rate from the currency table
+            // For now, we'll use approximate rates
+            const rates = {
+                'EUR': { 'TRY': 30, 'USD': 1.18 },
+                'USD': { 'TRY': 25.4, 'EUR': 0.85 },
+                'TRY': { 'EUR': 0.033, 'USD': 0.039 }
+            };
+            
+            if (fromCurrency === toCurrency) return 1;
+            return rates[fromCurrency]?.[toCurrency] || 1;
+        }
+        
         // Generate analytical summary based on market data
         function generateAnalyticalSummary(summary) {
             let analysis = '<div class="analytical-summary">';
@@ -2911,7 +3293,9 @@
             });
             
             // Generate market indicators table
-            let html = '<table class="data-table summary-table">';
+            let html = '<h4 class="summary-table-title">Показатели рынка</h4>';
+            html += '<div class="summary-table-container">';
+            html += '<table class="summary-table">';
             html += '<thead><tr><th>Показатель</th><th>Минимальное значение</th><th>Максимальное значение</th></tr></thead><tbody>';
             
             // Add Sale section header
@@ -2961,8 +3345,14 @@
             }
             
             html += '</tbody></table>';
+            html += '</div>';
             
-            // Add analytical summary below the table
+            // Add market comparison block below the table
+            if (Object.keys(summary).length > 0) {
+                html += generateMarketComparison(summary);
+            }
+            
+            // Add analytical summary below the comparison block
             if (Object.keys(summary).length > 0) {
                 html += generateAnalyticalSummary(summary);
             }
@@ -3649,7 +4039,186 @@
             analysisHtml += `<p><strong>${texts.yield.split(':')[0]}:</strong> ${texts.yield.split(':')[1]}</p>`;
             analysisHtml += '</div></div>';
             
+            // Добавляем блок "Прогноз цен"
+            analysisHtml += generatePriceForecastBlock(forecastTrends);
+            
             return analysisHtml;
+        }
+        
+        // Generate price forecast block for user's property
+        async function generatePriceForecastBlock(forecastTrends) {
+            if (!forecastTrends || forecastTrends.length === 0) {
+                return '';
+            }
+            
+            // Получаем данные пользователя
+            const userPrice = selectedListingTypes.price || 0;
+            const userArea = selectedListingTypes.area || 0;
+            const userCurrency = selectedListingTypes.currency || 'EUR';
+            
+            if (!userPrice || !userArea) {
+                return '';
+            }
+            
+            // Сортируем тренды по дате для правильного анализа
+            const sortedTrends = forecastTrends.sort((a, b) => {
+                if (a.property_year !== b.property_year) {
+                    return a.property_year - b.property_year;
+                }
+                return a.property_month - b.property_month;
+            });
+            
+            // Находим текущий месяц (первый в отсортированном списке) и последний месяц
+            const currentMonthTrend = sortedTrends[0];
+            const lastMonthTrend = sortedTrends[sortedTrends.length - 1];
+            
+            if (!currentMonthTrend || !lastMonthTrend) {
+                return '';
+            }
+            
+            // Получаем текущую дату для определения текущего месяца
+            const currentDate = new Date();
+            const currentYear = currentDate.getFullYear();
+            const currentMonth = currentDate.getMonth() + 1;
+            
+            // Проверяем, является ли первый тренд текущим месяцем
+            const isFirstTrendCurrentMonth = currentMonthTrend.property_year === currentYear && currentMonthTrend.property_month === currentMonth;
+            
+            // Определяем тренды для расчетов
+            const baseTrend = isFirstTrendCurrentMonth ? currentMonthTrend : sortedTrends.find(t => t.property_year === currentYear && t.property_month === currentMonth) || currentMonthTrend;
+            const futureTrend = lastMonthTrend;
+            
+            if (!baseTrend || !futureTrend) {
+                return '';
+            }
+            
+            // Рассчитываем процент изменения цен продажи
+            const baseSalePrice = parseFloat(baseTrend.unit_price_for_sale) || 0;
+            const futureSalePrice = parseFloat(futureTrend.unit_price_for_sale) || 0;
+            const salePriceChangePercent = baseSalePrice > 0 ? ((futureSalePrice - baseSalePrice) / baseSalePrice * 100) : 0;
+            
+            // Получаем актуальный курс валют
+            let eurRate = 1; // По умолчанию 1:1 для EUR
+            try {
+                const currencyResponse = await fetch('/api/currency/convert', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        amount: 1,
+                        from_currency: userCurrency,
+                        to_currency: 'EUR'
+                    })
+                });
+                
+                if (currencyResponse.ok) {
+                    const currencyData = await currencyResponse.json();
+                    if (currencyData.success) {
+                        eurRate = currencyData.rate || 1;
+                    }
+                }
+            } catch (error) {
+                console.log('⚠️ Не удалось получить курс валют, используем примерные значения');
+                // Используем примерные курсы как fallback
+                eurRate = userCurrency === 'EUR' ? 1 : (userCurrency === 'USD' ? 0.85 : 0.03);
+            }
+            
+            // Рассчитываем прогнозную цену продажи для объекта пользователя
+            const userPriceInEUR = userPrice * eurRate;
+            const forecastSalePrice = userPriceInEUR * (1 + salePriceChangePercent / 100);
+            
+            // Рассчитываем прогнозную цену аренды
+            const baseRentPrice = parseFloat(baseTrend.unit_price_for_rent) || 0;
+            const futureRentPrice = parseFloat(futureTrend.unit_price_for_rent) || 0;
+            
+            // Прогноз аренды = площадь объекта × прогноз аренды последнего месяца
+            const forecastRentPrice = userArea * futureRentPrice;
+            
+            // Рассчитываем процент изменения аренды
+            const rentPriceChangePercent = baseRentPrice > 0 ? ((futureRentPrice - baseRentPrice) / baseRentPrice * 100) : 0;
+            
+            // Форматируем названия месяцев
+            const monthNames = {
+                'ru': ['январь', 'февраль', 'март', 'апрель', 'май', 'июнь',
+                       'июль', 'август', 'сентябрь', 'октябрь', 'ноябрь', 'декабрь'],
+                'en': ['January', 'February', 'March', 'April', 'May', 'June',
+                       'July', 'August', 'September', 'October', 'November', 'December'],
+                'de': ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni',
+                       'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'],
+                'fr': ['janvier', 'février', 'mars', 'avril', 'mai', 'juin',
+                       'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'],
+                'tr': ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran',
+                       'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık']
+            };
+            
+            const currentLanguage = userLanguage || 'ru';
+            const monthNamesList = monthNames[currentLanguage] || monthNames['ru'];
+            
+            const baseMonthName = monthNamesList[baseTrend.property_month - 1] || '';
+            const futureMonthName = monthNamesList[futureTrend.property_month - 1] || '';
+            
+            // Формируем тексты на разных языках
+            const forecastTexts = {
+                'ru': {
+                    'title': 'Прогноз цен',
+                    'sale': `Продажа: ${salePriceChangePercent >= 0 ? '+' : ''}${salePriceChangePercent.toFixed(1)}%`,
+                    'rent': `Аренда: ${rentPriceChangePercent >= 0 ? '+' : ''}${rentPriceChangePercent.toFixed(1)}%`,
+                    'rentRate': `Ставка: €${(forecastRentPrice * eurRate).toLocaleString('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/мес`,
+                    'date': `${futureMonthName} ${futureTrend.property_year}`,
+                    'currencyInfo': `Курс: 1 ${userCurrency} = €${eurRate.toFixed(4)}`
+                },
+                'en': {
+                    'title': 'Price Forecast',
+                    'sale': `Sale: ${salePriceChangePercent >= 0 ? '+' : ''}${salePriceChangePercent.toFixed(1)}%`,
+                    'rent': `Rent: ${rentPriceChangePercent >= 0 ? '+' : ''}${rentPriceChangePercent.toFixed(1)}%`,
+                    'rentRate': `Rate: €${(forecastRentPrice * eurRate).toLocaleString('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/month`,
+                    'date': `${futureMonthName} ${futureTrend.property_year}`,
+                    'currencyInfo': `Rate: 1 ${userCurrency} = €${eurRate.toFixed(4)}`
+                },
+                'de': {
+                    'title': 'Preisprognose',
+                    'sale': `Verkauf: ${salePriceChangePercent >= 0 ? '+' : ''}${salePriceChangePercent.toFixed(1)}%`,
+                    'rent': `Miete: ${rentPriceChangePercent >= 0 ? '+' : ''}${rentPriceChangePercent.toFixed(1)}%`,
+                    'rentRate': `Satz: €${(forecastRentPrice * eurRate).toLocaleString('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/Monat`,
+                    'date': `${futureMonthName} ${futureTrend.property_year}`,
+                    'currencyInfo': `Kurs: 1 ${userCurrency} = €${eurRate.toFixed(4)}`
+                },
+                'fr': {
+                    'title': 'Prévision des prix',
+                    'sale': `Vente: ${salePriceChangePercent >= 0 ? '+' : ''}${salePriceChangePercent.toFixed(1)}%`,
+                    'rent': `Location: ${rentPriceChangePercent >= 0 ? '+' : ''}${rentPriceChangePercent.toFixed(1)}%`,
+                    'rentRate': `Tarif: €${(forecastRentPrice * eurRate).toLocaleString('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/mois`,
+                    'date': `${futureMonthName} ${futureTrend.property_year}`,
+                    'currencyInfo': `Taux: 1 ${userCurrency} = €${eurRate.toFixed(4)}`
+                },
+                'tr': {
+                    'title': 'Fiyat Tahmini',
+                    'sale': `Satış: ${salePriceChangePercent >= 0 ? '+' : ''}${salePriceChangePercent.toFixed(1)}%`,
+                    'rent': `Kiralama: ${rentPriceChangePercent >= 0 ? '+' : ''}${rentPriceChangePercent.toFixed(1)}%`,
+                    'rentRate': `Oran: €${(forecastRentPrice * eurRate).toLocaleString('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/ay`,
+                    'date': `${futureMonthName} ${futureTrend.property_year}`,
+                    'currencyInfo': `Kur: 1 ${userCurrency} = €${eurRate.toFixed(4)}`
+                }
+            };
+            
+            const texts = forecastTexts[currentLanguage] || forecastTexts['ru'];
+            
+            // Формируем HTML для блока прогноза цен
+            let forecastHtml = '<div class="price-forecast-block">';
+            forecastHtml += '<div class="price-forecast-content">';
+            forecastHtml += `<h4 class="price-forecast-title">${texts.title}</h4>`;
+            forecastHtml += `<div class="price-forecast-value">€${forecastSalePrice.toLocaleString('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>`;
+            forecastHtml += `<div class="price-forecast-details">`;
+            forecastHtml += `<div class="price-forecast-sale">${texts.sale}</div>`;
+            forecastHtml += `<div class="price-forecast-rent">${texts.rent}</div>`;
+            forecastHtml += `<div class="price-forecast-rent-rate">${texts.rentRate}</div>`;
+            forecastHtml += `</div>`;
+            forecastHtml += `<div class="price-forecast-date">${texts.date}</div>`;
+            forecastHtml += `<div class="price-forecast-currency-info">${texts.currencyInfo}</div>`;
+            forecastHtml += '</div></div>';
+            
+            return forecastHtml;
         }
         
         // Format trend value based on type
