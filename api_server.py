@@ -7,7 +7,11 @@ from api_functions import (
     get_user_balance,
     charge_user_for_report,
     update_user_balance,
-    get_latest_currency_rates
+    get_latest_currency_rates,
+    get_house_type_data,
+    get_heating_data,
+    get_floor_segment_data,
+    get_age_data
 )
 
 # Загружаем переменные окружения
@@ -200,6 +204,86 @@ def generate_full_report(basic_report_data):
             }
         ]
     }
+
+@app.route('/api/detailed_analysis/house_type', methods=['POST'])
+def detailed_analysis_house_type():
+    """Получение данных по типам домов для детального анализа"""
+    try:
+        data = request.get_json()
+        location_ids = {
+            'city_id': data.get('city_id'),
+            'county_id': data.get('county_id'),
+            'district_id': data.get('district_id')
+        }
+        
+        if not all(location_ids.values()):
+            return jsonify({'success': False, 'error': 'Не все ID локации указаны'}), 400
+        
+        result = get_house_type_data(location_ids)
+        return jsonify(result)
+        
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/detailed_analysis/heating', methods=['POST'])
+def detailed_analysis_heating():
+    """Получение данных по отоплению для детального анализа"""
+    try:
+        data = request.get_json()
+        location_ids = {
+            'city_id': data.get('city_id'),
+            'county_id': data.get('county_id'),
+            'district_id': data.get('district_id')
+        }
+        
+        if not all(location_ids.values()):
+            return jsonify({'success': False, 'error': 'Не все ID локации указаны'}), 400
+        
+        result = get_heating_data(location_ids)
+        return jsonify(result)
+        
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/detailed_analysis/floor_segment', methods=['POST'])
+def detailed_analysis_floor_segment():
+    """Получение данных по этажам для детального анализа"""
+    try:
+        data = request.get_json()
+        location_ids = {
+            'city_id': data.get('city_id'),
+            'county_id': data.get('county_id'),
+            'district_id': data.get('district_id')
+        }
+        
+        if not all(location_ids.values()):
+            return jsonify({'success': False, 'error': 'Не все ID локации указаны'}), 400
+        
+        result = get_floor_segment_data(location_ids)
+        return jsonify(result)
+        
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/detailed_analysis/age', methods=['POST'])
+def detailed_analysis_age():
+    """Получение данных по возрасту для детального анализа"""
+    try:
+        data = request.get_json()
+        location_ids = {
+            'city_id': data.get('city_id'),
+            'county_id': data.get('county_id'),
+            'district_id': data.get('district_id')
+        }
+        
+        if not all(location_ids.values()):
+            return jsonify({'success': False, 'error': 'Не все ID локации указаны'}), 400
+        
+        result = get_age_data(location_ids)
+        return jsonify(result)
+        
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 @app.route('/api/currency/latest', methods=['GET'])
 def latest_currency():

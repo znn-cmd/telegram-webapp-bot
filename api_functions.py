@@ -331,4 +331,128 @@ def get_latest_currency_rates() -> Dict[str, Any]:
         return {
             'success': False,
             'error': str(e)
+        }
+
+def get_house_type_data(location_ids: Dict[str, int]) -> Dict[str, Any]:
+    """Получение данных по типам домов"""
+    
+    headers = {
+        'apikey': SUPABASE_ANON_KEY,
+        'Authorization': f'Bearer {SUPABASE_ANON_KEY}',
+        'Content-Type': 'application/json',
+    }
+    
+    url = f"{SUPABASE_URL}/rest/v1/house_type_data?city_id=eq.{location_ids['city_id']}&county_id=eq.{location_ids['county_id']}&district_id=eq.{location_ids['district_id']}&select=*"
+    
+    try:
+        response = requests.get(url, headers=headers)
+        if response.status_code == 200:
+            data = response.json()
+            return {
+                'success': True,
+                'data': data
+            }
+        else:
+            return {
+                'success': False,
+                'error': f'Ошибка API: {response.status_code}'
+            }
+    except Exception as e:
+        print(f"Ошибка при получении данных по типам домов: {e}")
+        return {
+            'success': False,
+            'error': str(e)
+        }
+
+def get_heating_data(location_ids: Dict[str, int]) -> Dict[str, Any]:
+    """Получение данных по отоплению"""
+    
+    headers = {
+        'apikey': SUPABASE_ANON_KEY,
+        'Authorization': f'Bearer {SUPABASE_ANON_KEY}',
+        'Content-Type': 'application/json',
+    }
+    
+    url = f"{SUPABASE_URL}/rest/v1/heating_data?city_id=eq.{location_ids['city_id']}&county_id=eq.{location_ids['county_id']}&district_id=eq.{location_ids['district_id']}&select=*"
+    
+    try:
+        response = requests.get(url, headers=headers)
+        if response.status_code == 200:
+            data = response.json()
+            return {
+                'success': True,
+                'data': data
+            }
+        else:
+            return {
+                'success': False,
+                'error': f'Ошибка API: {response.status_code}'
+            }
+    except Exception as e:
+        print(f"Ошибка при получении данных по отоплению: {e}")
+        return {
+            'success': False,
+            'error': str(e)
+        }
+
+def get_floor_segment_data(location_ids: Dict[str, int]) -> Dict[str, Any]:
+    """Получение данных по этажам"""
+    
+    headers = {
+        'apikey': SUPABASE_ANON_KEY,
+        'Authorization': f'Bearer {SUPABASE_ANON_KEY}',
+        'Content-Type': 'application/json',
+    }
+    
+    url = f"{SUPABASE_URL}/rest/v1/floor_segment_data?city_id=eq.{location_ids['city_id']}&county_id=eq.{location_ids['county_id']}&district_id=eq.{location_ids['district_id']}&select=*"
+    
+    try:
+        response = requests.get(url, headers=headers)
+        if response.status_code == 200:
+            data = response.json()
+            return {
+                'success': True,
+                'data': data
+            }
+        else:
+            return {
+                'success': False,
+                'error': f'Ошибка API: {response.status_code}'
+            }
+    except Exception as e:
+        print(f"Ошибка при получении данных по этажам: {e}")
+        return {
+            'success': False,
+            'error': str(e)
+        }
+
+def get_age_data(location_ids: Dict[str, int]) -> Dict[str, Any]:
+    """Получение данных по возрасту"""
+    
+    headers = {
+        'apikey': SUPABASE_ANON_KEY,
+        'Authorization': f'Bearer {SUPABASE_ANON_KEY}',
+        'Content-Type': 'application/json',
+    }
+    
+    url = f"{SUPABASE_URL}/rest/v1/age_data?city_id=eq.{location_ids['city_id']}&county_id=eq.{location_ids['county_id']}&district_id=eq.{location_ids['district_id']}&select=*"
+    
+    try:
+        response = requests.get(url, headers=headers)
+        if response.status_code == 200:
+            data = response.json()
+            return {
+                'success': True,
+                'data': data
+            }
+        else:
+            return {
+                'success': False,
+                'error': f'Ошибка API: {response.status_code}'
+            }
+    except Exception as e:
+        print(f"Ошибка при получении данных по возрасту: {e}")
+        return {
+            'success': False,
+            'error': str(e)
         } 

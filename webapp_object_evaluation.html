@@ -438,6 +438,89 @@
             color: #495057;
         }
         
+        /* Detailed Analysis Table Styles */
+        .detailed-analysis-section {
+            margin-top: 30px;
+            margin-bottom: 20px;
+        }
+        
+        .detailed-analysis-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .detailed-analysis-container {
+            overflow-x: auto;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            background: white;
+        }
+        
+        .detailed-analysis-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 0;
+            background: white;
+        }
+        
+        .detailed-analysis-table th {
+            background: #6c757d;
+            color: white;
+            padding: 10px 8px;
+            text-align: center;
+            font-weight: 600;
+            line-height: 1.2;
+            word-wrap: break-word;
+            border: 1px solid #dee2e6;
+        }
+        
+        .detailed-analysis-table td {
+            padding: 8px 6px;
+            text-align: center;
+            border: 1px solid #dee2e6;
+            word-wrap: break-word;
+        }
+        
+        .detailed-analysis-table tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+        
+        .detailed-analysis-table tr:hover {
+            background: #e9ecef;
+        }
+        
+        .data-source-header {
+            background: #e3f2fd !important;
+            color: #1976d2;
+            font-weight: 600;
+            text-align: center;
+            border: 1px solid #dee2e6;
+            font-size: 14px;
+        }
+        
+        .house-type-header {
+            background: #e8f5e8 !important;
+            color: #2e7d32;
+        }
+        
+        .heating-header {
+            background: #fff3e0 !important;
+            color: #f57c00;
+        }
+        
+        .floor-header {
+            background: #f3e5f5 !important;
+            color: #7b1fa2;
+        }
+        
+        .age-header {
+            background: #e0f2f1 !important;
+            color: #00695c;
+        }
+        
         /* Мобильные устройства для таблицы показателей рынка */
         @media (max-width: 768px) {
             .summary-table-title {
@@ -447,6 +530,21 @@
             
             .summary-table {
                 font-size: 10px;
+            }
+            
+            .detailed-analysis-title {
+                font-size: 15px;
+                margin-bottom: 12px;
+            }
+            
+            .detailed-analysis-table {
+                font-size: 10px;
+            }
+            
+            .detailed-analysis-table th,
+            .detailed-analysis-table td {
+                padding: 6px 4px;
+            }
             }
             
             .summary-table th,
@@ -3107,8 +3205,153 @@
             return analysis;
         }
 
+        // Generate detailed analysis table based on user selections
+        async function generateDetailedAnalysisTable() {
+            try {
+                // Check if user has selected location and parameters
+                if (!selectedLocation.country_id || !selectedLocation.city_id || 
+                    !selectedLocation.county_id || !selectedLocation.district_id) {
+                    return '';
+                }
+                
+                // Check if user has selected other parameters
+                if (!selectedListingTypes.house_type && !selectedListingTypes.heating_data && 
+                    !selectedListingTypes.floor_segment && !selectedListingTypes.age_data) {
+                    return '';
+                }
+                
+                const locationIds = {
+                    country_id: selectedLocation.country_id,
+                    city_id: selectedLocation.city_id,
+                    county_id: selectedLocation.county_id,
+                    district_id: selectedLocation.district_id
+                };
+                
+                console.log('🔄 Loading detailed analysis for location:', locationIds);
+                
+                // Make API requests to get data from all 4 tables
+                const [houseTypeResponse, heatingResponse, floorResponse, ageResponse] = await Promise.all([
+                    fetch('/api/detailed_analysis/house_type', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(locationIds)
+                    }),
+                    fetch('/api/detailed_analysis/heating', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(locationIds)
+                    }),
+                    fetch('/api/detailed_analysis/floor_segment', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(locationIds)
+                    }),
+                    fetch('/api/detailed_analysis/age', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(locationIds)
+                    })
+                ]);
+                
+                const [houseTypeData, heatingData, floorData, ageData] = await Promise.all([
+                    houseTypeResponse.json(),
+                    heatingResponse.json(),
+                    floorResponse.json(),
+                    ageResponse.json()
+                ]);
+                
+                console.log('📊 Detailed analysis data received:', {
+                    houseType: houseTypeData,
+                    heating: heatingData,
+                    floor: floorData,
+                    age: ageData
+                });
+                
+                // Generate HTML table
+                let html = '<div class="detailed-analysis-section">';
+                html += '<h4 class="detailed-analysis-title">Анализ по выбранным параметрам</h4>';
+                html += '<div class="detailed-analysis-container">';
+                html += '<table class="detailed-analysis-table">';
+                html += '<thead><tr><th>Источник данных</th><th>Показатель</th><th>Значение</th></tr></thead><tbody>';
+                
+                // Add House Type data
+                if (houseTypeData.success && houseTypeData.data && houseTypeData.data.length > 0) {
+                    html += '<tr class="data-source-header"><td colspan="3" class="house-type-header">🏠 Типы домов (house_type_data)</td></tr>';
+                    houseTypeData.data.forEach(item => {
+                        Object.keys(item).forEach(key => {
+                            if (key !== 'id' && key !== 'city_id' && key !== 'county_id' && key !== 'district_id') {
+                                html += `<tr>
+                                    <td>house_type_data</td>
+                                    <td>${key}</td>
+                                    <td>${item[key]}</td>
+                                </tr>`;
+                            }
+                        });
+                    });
+                }
+                
+                // Add Heating data
+                if (heatingData.success && heatingData.data && heatingData.data.length > 0) {
+                    html += '<tr class="data-source-header"><td colspan="3" class="heating-header">🔥 Отопление (heating_data)</td></tr>';
+                    heatingData.data.forEach(item => {
+                        Object.keys(item).forEach(key => {
+                            if (key !== 'id' && key !== 'city_id' && key !== 'county_id' && key !== 'district_id') {
+                                html += `<tr>
+                                    <td>heating_data</td>
+                                    <td>${key}</td>
+                                    <td>${item[key]}</td>
+                                </tr>`;
+                            }
+                        });
+                    });
+                }
+                
+                // Add Floor Segment data
+                if (floorData.success && floorData.data && floorData.data.length > 0) {
+                    html += '<tr class="data-source-header"><td colspan="3" class="floor-header">🏢 Этажи (floor_segment_data)</td></tr>';
+                    floorData.data.forEach(item => {
+                        Object.keys(item).forEach(key => {
+                            if (key !== 'id' && key !== 'city_id' && key !== 'county_id' && key !== 'district_id') {
+                                html += `<tr>
+                                    <td>floor_segment_data</td>
+                                    <td>${key}</td>
+                                    <td>${item[key]}</td>
+                                </tr>`;
+                            }
+                        });
+                    });
+                }
+                
+                // Add Age data
+                if (ageData.success && ageData.data && ageData.data.length > 0) {
+                    html += '<tr class="data-source-header"><td colspan="3" class="age-header">⏰ Возраст (age_data)</td></tr>';
+                    ageData.data.forEach(item => {
+                        Object.keys(item).forEach(key => {
+                            if (key !== 'id' && key !== 'city_id' && key !== 'county_id' && key !== 'district_id') {
+                                html += `<tr>
+                                    <td>age_data</td>
+                                    <td>${key}</td>
+                                    <td>${item[key]}</td>
+                                </tr>`;
+                            }
+                        });
+                    });
+                }
+                
+                html += '</tbody></table>';
+                html += '</div>';
+                html += '</div>';
+                
+                return html;
+                
+            } catch (error) {
+                console.error('❌ Error generating detailed analysis table:', error);
+                return '';
+            }
+        }
+        
         // Generate market indicators table with organized structure
-        function generateSummaryTable(data) {
+        async function generateSummaryTable(data) {
             const summaryContainer = document.getElementById('summaryDataContent');
             if (!summaryContainer) return;
             
@@ -3214,6 +3457,11 @@
             // Add market comparison block below the table
             if (Object.keys(summary).length > 0) {
                 html += generateMarketComparison(summary);
+            }
+            
+            // Add detailed analysis table based on user selections
+            if (Object.keys(summary).length > 0) {
+                html += await generateDetailedAnalysisTable();
             }
             
             // Add analytical summary below the comparison block
