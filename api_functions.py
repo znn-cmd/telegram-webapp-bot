@@ -333,8 +333,8 @@ def get_latest_currency_rates() -> Dict[str, Any]:
             'error': str(e)
         }
 
-def get_house_type_data(location_ids: Dict[str, int]) -> Dict[str, Any]:
-    """Получение данных по типам домов"""
+def get_house_type_analysis(location_ids: Dict[str, Any], bedrooms: int) -> Dict[str, Any]:
+    """Получение анализа данных по типу дома (количество спален)"""
     
     headers = {
         'apikey': SUPABASE_ANON_KEY,
@@ -342,15 +342,48 @@ def get_house_type_data(location_ids: Dict[str, int]) -> Dict[str, Any]:
         'Content-Type': 'application/json',
     }
     
-    url = f"{SUPABASE_URL}/rest/v1/house_type_data?city_id=eq.{location_ids['city_id']}&county_id=eq.{location_ids['county_id']}&district_id=eq.{location_ids['district_id']}&select=*"
+    # Формируем фильтры для запроса
+    filters = []
+    if location_ids.get('city_id'):
+        filters.append(f"city_id=eq.{location_ids['city_id']}")
+    if location_ids.get('county_id'):
+        filters.append(f"county_id=eq.{location_ids['county_id']}")
+    if location_ids.get('district_id'):
+        filters.append(f"district_id=eq.{location_ids['district_id']}")
+    if location_ids.get('listing_type'):
+        filters.append(f"listing_type=eq.{location_ids['listing_type']}")
+    
+    filters.append(f"bedrooms=eq.{bedrooms}")
+    
+    filter_string = "&".join(filters)
+    url = f"{SUPABASE_URL}/rest/v1/house_type_data?select=*&{filter_string}"
     
     try:
         response = requests.get(url, headers=headers)
         if response.status_code == 200:
             data = response.json()
+            if data:
+                # Вычисляем статистику
+                prices = [item.get('unit_price', 0) for item in data if item.get('unit_price')]
+                if prices:
+                    return {
+                        'success': True,
+                        'data': {
+                            'count': len(data),
+                            'avg_price': sum(prices) / len(prices),
+                            'min_price': min(prices),
+                            'max_price': max(prices)
+                        }
+                    }
+            
             return {
                 'success': True,
-                'data': data
+                'data': {
+                    'count': 0,
+                    'avg_price': 0,
+                    'min_price': 0,
+                    'max_price': 0
+                }
             }
         else:
             return {
@@ -358,14 +391,14 @@ def get_house_type_data(location_ids: Dict[str, int]) -> Dict[str, Any]:
                 'error': f'Ошибка API: {response.status_code}'
             }
     except Exception as e:
-        print(f"Ошибка при получении данных по типам домов: {e}")
+        print(f"Ошибка при получении данных house_type_data: {e}")
         return {
             'success': False,
             'error': str(e)
         }
 
-def get_heating_data(location_ids: Dict[str, int]) -> Dict[str, Any]:
-    """Получение данных по отоплению"""
+def get_floor_segment_analysis(location_ids: Dict[str, Any], floor: str) -> Dict[str, Any]:
+    """Получение анализа данных по этажу"""
     
     headers = {
         'apikey': SUPABASE_ANON_KEY,
@@ -373,15 +406,48 @@ def get_heating_data(location_ids: Dict[str, int]) -> Dict[str, Any]:
         'Content-Type': 'application/json',
     }
     
-    url = f"{SUPABASE_URL}/rest/v1/heating_data?city_id=eq.{location_ids['city_id']}&county_id=eq.{location_ids['county_id']}&district_id=eq.{location_ids['district_id']}&select=*"
+    # Формируем фильтры для запроса
+    filters = []
+    if location_ids.get('city_id'):
+        filters.append(f"city_id=eq.{location_ids['city_id']}")
+    if location_ids.get('county_id'):
+        filters.append(f"county_id=eq.{location_ids['county_id']}")
+    if location_ids.get('district_id'):
+        filters.append(f"district_id=eq.{location_ids['district_id']}")
+    if location_ids.get('listing_type'):
+        filters.append(f"listing_type=eq.{location_ids['listing_type']}")
+    
+    filters.append(f"floor=eq.{floor}")
+    
+    filter_string = "&".join(filters)
+    url = f"{SUPABASE_URL}/rest/v1/floor_segment_data?select=*&{filter_string}"
     
     try:
         response = requests.get(url, headers=headers)
         if response.status_code == 200:
             data = response.json()
+            if data:
+                # Вычисляем статистику
+                prices = [item.get('unit_price', 0) for item in data if item.get('unit_price')]
+                if prices:
+                    return {
+                        'success': True,
+                        'data': {
+                            'count': len(data),
+                            'avg_price': sum(prices) / len(prices),
+                            'min_price': min(prices),
+                            'max_price': max(prices)
+                        }
+                    }
+            
             return {
                 'success': True,
-                'data': data
+                'data': {
+                    'count': 0,
+                    'avg_price': 0,
+                    'min_price': 0,
+                    'max_price': 0
+                }
             }
         else:
             return {
@@ -389,14 +455,14 @@ def get_heating_data(location_ids: Dict[str, int]) -> Dict[str, Any]:
                 'error': f'Ошибка API: {response.status_code}'
             }
     except Exception as e:
-        print(f"Ошибка при получении данных по отоплению: {e}")
+        print(f"Ошибка при получении данных floor_segment_data: {e}")
         return {
             'success': False,
             'error': str(e)
         }
 
-def get_floor_segment_data(location_ids: Dict[str, int]) -> Dict[str, Any]:
-    """Получение данных по этажам"""
+def get_age_data_analysis(location_ids: Dict[str, Any], age: str) -> Dict[str, Any]:
+    """Получение анализа данных по возрасту объекта"""
     
     headers = {
         'apikey': SUPABASE_ANON_KEY,
@@ -404,15 +470,48 @@ def get_floor_segment_data(location_ids: Dict[str, int]) -> Dict[str, Any]:
         'Content-Type': 'application/json',
     }
     
-    url = f"{SUPABASE_URL}/rest/v1/floor_segment_data?city_id=eq.{location_ids['city_id']}&county_id=eq.{location_ids['county_id']}&district_id=eq.{location_ids['district_id']}&select=*"
+    # Формируем фильтры для запроса
+    filters = []
+    if location_ids.get('city_id'):
+        filters.append(f"city_id=eq.{location_ids['city_id']}")
+    if location_ids.get('county_id'):
+        filters.append(f"county_id=eq.{location_ids['county_id']}")
+    if location_ids.get('district_id'):
+        filters.append(f"district_id=eq.{location_ids['district_id']}")
+    if location_ids.get('listing_type'):
+        filters.append(f"listing_type=eq.{location_ids['listing_type']}")
+    
+    filters.append(f"age=eq.{age}")
+    
+    filter_string = "&".join(filters)
+    url = f"{SUPABASE_URL}/rest/v1/age_data?select=*&{filter_string}"
     
     try:
         response = requests.get(url, headers=headers)
         if response.status_code == 200:
             data = response.json()
+            if data:
+                # Вычисляем статистику
+                prices = [item.get('unit_price', 0) for item in data if item.get('unit_price')]
+                if prices:
+                    return {
+                        'success': True,
+                        'data': {
+                            'count': len(data),
+                            'avg_price': sum(prices) / len(prices),
+                            'min_price': min(prices),
+                            'max_price': max(prices)
+                        }
+                    }
+            
             return {
                 'success': True,
-                'data': data
+                'data': {
+                    'count': 0,
+                    'avg_price': 0,
+                    'min_price': 0,
+                    'max_price': 0
+                }
             }
         else:
             return {
@@ -420,14 +519,14 @@ def get_floor_segment_data(location_ids: Dict[str, int]) -> Dict[str, Any]:
                 'error': f'Ошибка API: {response.status_code}'
             }
     except Exception as e:
-        print(f"Ошибка при получении данных по этажам: {e}")
+        print(f"Ошибка при получении данных age_data: {e}")
         return {
             'success': False,
             'error': str(e)
         }
 
-def get_age_data(location_ids: Dict[str, int]) -> Dict[str, Any]:
-    """Получение данных по возрасту"""
+def get_heating_data_analysis(location_ids: Dict[str, Any], heating_type: str) -> Dict[str, Any]:
+    """Получение анализа данных по типу отопления"""
     
     headers = {
         'apikey': SUPABASE_ANON_KEY,
@@ -435,15 +534,48 @@ def get_age_data(location_ids: Dict[str, int]) -> Dict[str, Any]:
         'Content-Type': 'application/json',
     }
     
-    url = f"{SUPABASE_URL}/rest/v1/age_data?city_id=eq.{location_ids['city_id']}&county_id=eq.{location_ids['county_id']}&district_id=eq.{location_ids['district_id']}&select=*"
+    # Формируем фильтры для запроса
+    filters = []
+    if location_ids.get('city_id'):
+        filters.append(f"city_id=eq.{location_ids['city_id']}")
+    if location_ids.get('county_id'):
+        filters.append(f"county_id=eq.{location_ids['county_id']}")
+    if location_ids.get('district_id'):
+        filters.append(f"district_id=eq.{location_ids['district_id']}")
+    if location_ids.get('listing_type'):
+        filters.append(f"listing_type=eq.{location_ids['listing_type']}")
+    
+    filters.append(f"heating_type=eq.{heating_type}")
+    
+    filter_string = "&".join(filters)
+    url = f"{SUPABASE_URL}/rest/v1/heating_data?select=*&{filter_string}"
     
     try:
         response = requests.get(url, headers=headers)
         if response.status_code == 200:
             data = response.json()
+            if data:
+                # Вычисляем статистику
+                prices = [item.get('unit_price', 0) for item in data if item.get('unit_price')]
+                if prices:
+                    return {
+                        'success': True,
+                        'data': {
+                            'count': len(data),
+                            'avg_price': sum(prices) / len(prices),
+                            'min_price': min(prices),
+                            'max_price': max(prices)
+                        }
+                    }
+            
             return {
                 'success': True,
-                'data': data
+                'data': {
+                    'count': 0,
+                    'avg_price': 0,
+                    'min_price': 0,
+                    'max_price': 0
+                }
             }
         else:
             return {
@@ -451,7 +583,7 @@ def get_age_data(location_ids: Dict[str, int]) -> Dict[str, Any]:
                 'error': f'Ошибка API: {response.status_code}'
             }
     except Exception as e:
-        print(f"Ошибка при получении данных по возрасту: {e}")
+        print(f"Ошибка при получении данных heating_data: {e}")
         return {
             'success': False,
             'error': str(e)
