@@ -572,6 +572,187 @@
             }
         }
         
+        /* Consolidated Assessment Styles */
+        .consolidated-assessment-section {
+            margin-top: 25px;
+            margin-bottom: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border: 1px solid #e9ecef;
+            overflow: hidden;
+        }
+        
+        .consolidated-assessment-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #495057;
+            margin: 0;
+            padding: 20px 20px 15px 20px;
+            text-align: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .consolidated-assessment-content {
+            padding: 20px;
+        }
+        
+        .assessment-category {
+            margin-bottom: 25px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .assessment-category:last-child {
+            margin-bottom: 0;
+        }
+        
+        .assessment-category-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #495057;
+            margin: 0 0 15px 0;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .assessment-items {
+            margin-bottom: 15px;
+        }
+        
+        .assessment-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .assessment-item:last-child {
+            border-bottom: none;
+        }
+        
+        .assessment-label {
+            font-weight: 500;
+            color: #495057;
+            font-size: 14px;
+        }
+        
+        .assessment-value {
+            font-weight: 600;
+            color: #28a745;
+            font-size: 14px;
+        }
+        
+        .assessment-consolidated {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 15px;
+            background: #e8f5e8;
+            border-radius: 6px;
+            border: 1px solid #4caf50;
+        }
+        
+        .assessment-consolidated-label {
+            font-weight: 600;
+            color: #2e7d32;
+            font-size: 14px;
+        }
+        
+        .assessment-consolidated-value {
+            font-weight: 700;
+            color: #2e7d32;
+            font-size: 16px;
+        }
+        
+        /* Mobile responsive for consolidated assessment */
+        @media (max-width: 768px) {
+            .consolidated-assessment-section {
+                margin-top: 20px;
+                margin-bottom: 15px;
+            }
+            
+            .consolidated-assessment-title {
+                font-size: 16px;
+                padding: 15px 15px 12px 15px;
+            }
+            
+            .consolidated-assessment-content {
+                padding: 15px;
+            }
+            
+            .assessment-category {
+                padding: 12px;
+                margin-bottom: 20px;
+            }
+            
+            .assessment-category-title {
+                font-size: 15px;
+                margin-bottom: 12px;
+            }
+            
+            .assessment-item {
+                padding: 6px 0;
+            }
+            
+            .assessment-label,
+            .assessment-value {
+                font-size: 13px;
+            }
+            
+            .assessment-consolidated {
+                padding: 10px 12px;
+            }
+            
+            .assessment-consolidated-label,
+            .assessment-consolidated-value {
+                font-size: 13px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .consolidated-assessment-title {
+                font-size: 15px;
+                padding: 12px 12px 10px 12px;
+            }
+            
+            .consolidated-assessment-content {
+                padding: 12px;
+            }
+            
+            .assessment-category {
+                padding: 10px;
+                margin-bottom: 15px;
+            }
+            
+            .assessment-category-title {
+                font-size: 14px;
+                margin-bottom: 10px;
+            }
+            
+            .assessment-item {
+                padding: 5px 0;
+            }
+            
+            .assessment-label,
+            .assessment-value {
+                font-size: 12px;
+            }
+            
+            .assessment-consolidated {
+                padding: 8px 10px;
+            }
+            
+            .assessment-consolidated-label,
+            .assessment-consolidated-value {
+                font-size: 12px;
+            }
+        }
+        
         /* Market Comparison Block Styles */
         .market-comparison-block {
             margin-top: 20px;
@@ -1763,7 +1944,16 @@
                 'houseTypeDataTitle': 'Данные по количеству спален',
                 'floorSegmentDataTitle': 'Данные по этажу',
                 'ageDataTitle': 'Данные по возрасту объектов',
-                'heatingDataTitle': 'Данные по типу отопления'
+                'heatingDataTitle': 'Данные по типу отопления',
+                'consolidatedAssessmentTitle': 'Консолидированная оценка',
+                'salePriceTitle': 'Цена за м² (Unit Price For Sale):',
+                'rentPriceTitle': 'Цена аренды за м² (Unit Price For Rent):',
+                'yieldTitle': 'Доходность (Yield):',
+                'consolidatedAverageLabel': 'Консолидированная средняя:',
+                'bedroomsLabel': 'Спальни',
+                'floorLabel': 'Этаж',
+                'ageLabel': 'Возраст',
+                'heatingLabel': 'Отопление'
             },
             'en': {
                 'slogan': 'Real Estate Market Insights',
@@ -1835,7 +2025,16 @@
                 'houseTypeDataTitle': 'Bedroom Count Data',
                 'floorSegmentDataTitle': 'Floor Data',
                 'ageDataTitle': 'Property Age Data',
-                'heatingDataTitle': 'Heating Type Data'
+                'heatingDataTitle': 'Heating Type Data',
+                'consolidatedAssessmentTitle': 'Consolidated Assessment',
+                'salePriceTitle': 'Price per m² (Unit Price For Sale):',
+                'rentPriceTitle': 'Rent Price per m² (Unit Price For Rent):',
+                'yieldTitle': 'Yield:',
+                'consolidatedAverageLabel': 'Consolidated Average:',
+                'bedroomsLabel': 'Bedrooms',
+                'floorLabel': 'Floor',
+                'ageLabel': 'Age',
+                'heatingLabel': 'Heating'
             },
             'de': {
                 'slogan': 'Immobilienmarkt-Einblicke',
@@ -1964,136 +2163,16 @@
                 'priceBelowMarket': 'Nesneniz (${userPrice}) piyasadan ${percent}% düşük.',
                 'areaMatchesMarket': 'Nesneniz (${userArea} m²) piyasa talebine uygun (${marketMin}–${marketMax} m²).',
                 'areaBelowMarket': 'Nesneniz (${userArea} m²) piyasa talebinden küçük (${marketMin}–${marketMax} m²).',
-                'areaAboveMarket': 'Nesneniz (${userArea} m²) piyasa talebinden büyük (${marketMin}–${marketMax} m²).'
-            },
-            'de': {
-                'slogan': 'Immobilienmarkt-Einblicke',
-                'pageTitle': 'Objektbewertung',
-                'pageDescription': 'Erhalten Sie eine professionelle Immobilienbewertung in der ausgewählten Region',
-                'countryLabel': 'Land:',
-                'cityLabel': 'Stadt:',
-                'countyLabel': 'Region/Bereich:',
-                'districtLabel': 'Bezirk:',
-                'countryPlaceholder': 'Land auswählen',
-                'cityPlaceholder': 'Zuerst Land auswählen',
-                'countyPlaceholder': 'Zuerst Stadt auswählen',
-                'districtPlaceholder': 'Zuerst Region auswählen',
-                'confirmButtonText': 'Auswahl bestätigen',
-                'backButton': '← Zurück zum Hauptmenü',
-                'selectedLocationTitle': 'Ausgewählte Lage:',
-                'adminIdsTitle': 'IDs für Administratoren:',
-                'loading': 'Laden...',
-                'errorLoading': 'Fehler beim Laden der Daten',
-                'dataSectionTitle': 'Regionale Datenanalyse',
-                'generalDataTitle': 'Allgemeine Daten',
-                'houseTypeDataTitle': 'Schlafzimmer-Anzahl-Daten',
-                'floorSegmentDataTitle': 'Etagen-Daten',
-                'ageDataTitle': 'Altersdaten',
-                'heatingDataTitle': 'Heizungstyp-Daten',
-                'loadingText': 'Daten werden geladen...',
-                'errorText': 'Fehler beim Laden der Daten',
-                'totalProperties': 'Gesamtobjekte:',
-                'averagePrice': 'Durchschnittspreis:',
-                'priceRange': 'Preisbereich:',
-                'noDataAvailable': 'Daten nicht verfügbar',
-                'keyMetricsTitle': 'Wichtige Kennzahlen',
-                'avgSalePriceLabel': 'Durchschnittlicher Verkaufspreis pro m²',
-                'avgRentPriceLabel': 'Durchschnittlicher Mietpreis pro m²',
-                'listingPeriodSaleLabel': 'Angebotsdauer (Verkauf)',
-                'listingPeriodRentLabel': 'Angebotsdauer (Vermietung)',
-                'yieldLabel': 'Rendite',
-                'insightsTitle': 'Zusammenfassung',
-                'insightsLoading': 'Daten werden analysiert...',
-                'insightsError': 'Fehler bei der Datenanalyse'
-            },
-            'fr': {
-                'slogan': 'Aperçus du marché immobilier',
-                'pageTitle': 'Évaluation d\'objet',
-                'pageDescription': 'Obtenez une évaluation professionnelle de propriété dans la région sélectionnée',
-                'countryLabel': 'Pays :',
-                'cityLabel': 'Ville :',
-                'countyLabel': 'Région/Zone :',
-                'districtLabel': 'District :',
-                'countryPlaceholder': 'Sélectionner un pays',
-                'cityPlaceholder': 'D\'abord sélectionner un pays',
-                'countyPlaceholder': 'D\'abord sélectionner une ville',
-                'districtPlaceholder': 'D\'abord sélectionner une région',
-                'confirmButtonText': 'Confirmer la sélection',
-                'backButton': '← Retour au menu principal',
-                'selectedLocationTitle': 'Emplacement sélectionné :',
-                'adminIdsTitle': 'IDs pour les administrateurs :',
-                'loading': 'Chargement...',
-                'errorLoading': 'Erreur de chargement des données',
-                'dataSectionTitle': 'Analyse des données régionales',
-                'generalDataTitle': 'Données générales',
-                'houseTypeDataTitle': 'Données du nombre de chambres',
-                'floorSegmentDataTitle': 'Données d\'étage',
-                'ageDataTitle': 'Données d\'âge',
-                'heatingDataTitle': 'Données du type de chauffage',
-                'loadingText': 'Chargement des données...',
-                'errorText': 'Erreur de chargement des données',
-                'totalProperties': 'Total des propriétés :',
-                'averagePrice': 'Prix moyen :',
-                'priceRange': 'Fourchette de prix :',
-                'noDataAvailable': 'Données non disponibles',
-                'keyMetricsTitle': 'Métriques clés',
-                'avgSalePriceLabel': 'Prix de vente moyen par m²',
-                'avgRentPriceLabel': 'Prix de location moyen par m²',
-                'listingPeriodSaleLabel': 'Période d\'inscription (vente)',
-                'listingPeriodRentLabel': 'Période d\'inscription (location)',
-                'yieldLabel': 'Rendement',
-                'insightsTitle': 'Résumé',
-                'insightsLoading': 'Analyse des données...',
-                'insightsError': 'Erreur lors de l\'analyse des données'
-            },
-            'tr': {
-                'slogan': 'Gayrimenkul Piyasa İçgörüleri',
-                'pageTitle': 'Nesne Değerlendirmesi',
-                'pageDescription': 'Seçilen bölgede profesyonel gayrimenkul değerlendirmesi alın',
-                'countryLabel': 'Ülke:',
-                'cityLabel': 'Şehir:',
-                'countyLabel': 'Bölge/Alan:',
-                'districtLabel': 'İlçe:',
-                'countryPlaceholder': 'Ülke seçin',
-                'cityPlaceholder': 'Önce ülke seçin',
-                'countyPlaceholder': 'Önce şehir seçin',
-                'districtPlaceholder': 'Önce bölge seçin',
-                'confirmButtonText': 'Seçimi onayla',
-                'backButton': '← Ana menüye dön',
-                'selectedLocationTitle': 'Seçilen konum:',
-                'adminIdsTitle': 'Yöneticiler için ID\'ler:',
-                'loading': 'Yükleniyor...',
-                'errorLoading': 'Veri yükleme hatası',
-                'dataSectionTitle': 'Bölgesel Veri Analizi',
-                'generalDataTitle': 'Genel Veriler',
-                'houseTypeDataTitle': 'Yatak Odası Sayısı Verileri',
-                'floorSegmentDataTitle': 'Kat Verileri',
-                'ageDataTitle': 'Yaş Verileri',
-                'heatingDataTitle': 'Isıtma Tipi Verileri',
-                'loadingText': 'Veriler yükleniyor...',
-                'errorText': 'Veri yükleme hatası',
-                'totalProperties': 'Toplam mülk:',
-                'averagePrice': 'Ortalama fiyat:',
-                'priceRange': 'Fiyat aralığı:',
-                'noDataAvailable': 'Veri mevcut değil',
-                'keyMetricsTitle': 'Ana Metrikler',
-                'avgSalePriceLabel': 'm² başına ortalama satış fiyatı',
-                'avgRentPriceLabel': 'm² başına ortalama kiralama fiyatı',
-                'listingPeriodSaleLabel': 'İlan süresi (satış)',
-                'listingPeriodRentLabel': 'İlan süresi (kiralama)',
-                'yieldLabel': 'Getiri',
-
-                'marketComparisonTitle': 'Piyasa Karşılaştırması',
-                'pricePerM2Label': 'm² başına fiyat',
-                'areaLabel': 'Alan',
-                'priceComparisonLabel': 'm² başına fiyat:',
-                'areaComparisonLabel': 'Alan:',
-                'priceCloseToMarket': 'Nesneniz (${userPrice}) piyasaya yakın (${marketMin} – ${marketMax}).',
-                'priceAboveMarket': 'Nesneniz (${userPrice}) piyasadan ${percent}% yüksek.',
-                'priceBelowMarket': 'Nesneniz (${userPrice}) piyasadan ${percent}% düşük.',
-                'areaMatchesMarket': 'Nesneniz (${userArea} m²) piyasa talebine uygun (${marketMin}–${marketMax} m²).',
-                'areaBelowMarket': 'Nesneniz (${userArea} m²) piyasa talebinden küçük (${marketMin}–${marketMax} m²).',
-                'areaAboveMarket': 'Nesneniz (${userArea} m²) piyasa talebinden büyük (${marketMin}–${marketMax} m²).'
+                'areaAboveMarket': 'Nesneniz (${userArea} m²) piyasa talebinden büyük (${marketMin}–${marketMax} m²).',
+                'consolidatedAssessmentTitle': 'Konsolide Değerlendirme',
+                'salePriceTitle': 'm² başına fiyat (Satış Birim Fiyatı):',
+                'rentPriceTitle': 'm² başına kiralama fiyatı (Kiralama Birim Fiyatı):',
+                'yieldTitle': 'Getiri:',
+                'consolidatedAverageLabel': 'Konsolide ortalama:',
+                'bedroomsLabel': 'Yatak Odası',
+                'floorLabel': 'Kat',
+                'ageLabel': 'Yaş',
+                'heatingLabel': 'Isıtma'
             },
             'de': {
                 'slogan': 'Immobilienmarkt-Einblicke',
@@ -3483,6 +3562,9 @@
             // Add detailed data tables for each category
             html += generateDetailedDataTables(data);
             
+            // Add consolidated assessment block
+            html += generateConsolidatedAssessment(data);
+            
             // Add market comparison block below the detailed tables
             if (Object.keys(summary).length > 0) {
                 html += generateMarketComparison(summary);
@@ -4593,6 +4675,220 @@
 
         // Start initialization when page loads
         document.addEventListener('DOMContentLoaded', init);
+
+        // Generate consolidated assessment block
+        function generateConsolidatedAssessment(data) {
+            if (!data) return '';
+            
+            // Define coefficients for each category
+            const coefficients = {
+                house_type: 0.40,      // 40% - спальни
+                age: 0.30,             // 30% - возраст
+                floor_segment: 0.20,   // 20% - этаж
+                heating: 0.10          // 10% - отопление
+            };
+            
+            // Extract data for each category
+            const houseTypeData = data.house_type_data && data.house_type_data.length > 0 ? data.house_type_data[0] : null;
+            const floorSegmentData = data.floor_segment_data && data.floor_segment_data.length > 0 ? data.floor_segment_data[0] : null;
+            const ageData = data.age_data && data.age_data.length > 0 ? data.age_data[0] : null;
+            const heatingData = data.heating_data && data.heating_data.length > 0 ? data.heating_data[0] : null;
+            
+            // Calculate consolidated values
+            const salePrice = calculateConsolidatedValue([
+                { value: houseTypeData?.min_unit_price_for_sale, coefficient: coefficients.house_type, name: 'Спальни' },
+                { value: floorSegmentData?.min_unit_price_for_sale, coefficient: coefficients.floor_segment, name: 'Этаж' },
+                { value: ageData?.min_unit_price_for_sale, coefficient: coefficients.age, name: 'Возраст' },
+                { value: heatingData?.min_unit_price_for_sale, coefficient: coefficients.heating, name: 'Отопление' }
+            ]);
+            
+            const rentPrice = calculateConsolidatedValue([
+                { value: houseTypeData?.min_unit_price_for_rent, coefficient: coefficients.house_type, name: 'Спальни' },
+                { value: floorSegmentData?.min_unit_price_for_rent, coefficient: coefficients.floor_segment, name: 'Этаж' },
+                { value: ageData?.min_unit_price_for_rent, coefficient: coefficients.age, name: 'Возраст' },
+                { value: heatingData?.min_unit_price_for_rent, coefficient: coefficients.heating, name: 'Отопление' }
+            ]);
+            
+            const yield = calculateConsolidatedValue([
+                { value: houseTypeData?.yield, coefficient: coefficients.house_type, name: 'Спальни' },
+                { value: floorSegmentData?.yield, coefficient: coefficients.floor_segment, name: 'Этаж' },
+                { value: ageData?.yield, coefficient: coefficients.age, name: 'Возраст' },
+                { value: heatingData?.yield, coefficient: coefficients.heating, name: 'Отопление' }
+            ]);
+            
+            // Generate HTML for consolidated assessment
+            let html = '<div class="consolidated-assessment-section">';
+            html += `<h4 class="consolidated-assessment-title">${getText('consolidatedAssessmentTitle')}</h4>`;
+            html += '<div class="consolidated-assessment-content">';
+            
+            // Sale Price Section
+            html += '<div class="assessment-category">';
+            html += `<h5 class="assessment-category-title">${getText('salePriceTitle')}</h5>`;
+            html += '<div class="assessment-items">';
+            
+            if (houseTypeData?.min_unit_price_for_sale) {
+                const listingType = houseTypeData.listing_type || '1+1';
+                html += `<div class="assessment-item">
+                    <span class="assessment-label">${getText('bedroomsLabel')} ${listingType}:</span>
+                    <span class="assessment-value">${formatValue(houseTypeData.min_unit_price_for_sale, 'price')}</span>
+                </div>`;
+            }
+            
+            if (floorSegmentData?.min_unit_price_for_sale) {
+                const listingType = floorSegmentData.listing_type || 'Giriş';
+                html += `<div class="assessment-item">
+                    <span class="assessment-label">${getText('floorLabel')} ${listingType}:</span>
+                    <span class="assessment-value">${formatValue(floorSegmentData.min_unit_price_for_sale, 'price')}</span>
+                </div>`;
+            }
+            
+            if (ageData?.min_unit_price_for_sale) {
+                const listingType = ageData.listing_type || '0–4';
+                html += `<div class="assessment-item">
+                    <span class="assessment-label">${getText('ageLabel')} ${listingType}:</span>
+                    <span class="assessment-value">${formatValue(ageData.min_unit_price_for_sale, 'price')}</span>
+                </div>`;
+            }
+            
+            if (heatingData?.min_unit_price_for_sale) {
+                const listingType = heatingData.listing_type || 'Yok';
+                html += `<div class="assessment-item">
+                    <span class="assessment-label">${getText('heatingLabel')} ${listingType}:</span>
+                    <span class="assessment-value">${formatValue(heatingData.min_unit_price_for_sale, 'price')}</span>
+                </div>`;
+            }
+            
+            html += '</div>';
+            if (salePrice.calculated) {
+                html += `<div class="assessment-consolidated">
+                    <span class="assessment-consolidated-label">${getText('consolidatedAverageLabel')}</span>
+                    <span class="assessment-consolidated-value">≈ ${formatValue(salePrice.value, 'price')}/м²</span>
+                </div>`;
+            }
+            html += '</div>';
+            
+            // Rent Price Section
+            html += '<div class="assessment-category">';
+            html += `<h5 class="assessment-category-title">${getText('rentPriceTitle')}</h5>`;
+            html += '<div class="assessment-items">';
+            
+            if (houseTypeData?.min_unit_price_for_rent) {
+                const listingType = houseTypeData.listing_type || '1+1';
+                html += `<div class="assessment-item">
+                    <span class="assessment-label">${getText('bedroomsLabel')} ${listingType}:</span>
+                    <span class="assessment-value">${formatValue(houseTypeData.min_unit_price_for_rent, 'price')}</span>
+                </div>`;
+            }
+            
+            if (floorSegmentData?.min_unit_price_for_rent) {
+                const listingType = floorSegmentData.listing_type || 'Giriş';
+                html += `<div class="assessment-item">
+                    <span class="assessment-label">${getText('floorLabel')} ${listingType}:</span>
+                    <span class="assessment-value">${formatValue(floorSegmentData.min_unit_price_for_rent, 'price')}</span>
+                </div>`;
+            }
+            
+            if (ageData?.min_unit_price_for_rent) {
+                const listingType = ageData.listing_type || '0–4';
+                html += `<div class="assessment-item">
+                    <span class="assessment-label">${getText('ageLabel')} ${listingType}:</span>
+                    <span class="assessment-value">${formatValue(ageData.min_unit_price_for_rent, 'price')}</span>
+                </div>`;
+            }
+            
+            if (heatingData?.min_unit_price_for_rent) {
+                const listingType = heatingData.listing_type || 'Yok';
+                html += `<div class="assessment-item">
+                    <span class="assessment-label">${getText('heatingLabel')} ${listingType}:</span>
+                    <span class="assessment-value">${formatValue(heatingData.min_unit_price_for_rent, 'price')}</span>
+                </div>`;
+            }
+            
+            html += '</div>';
+            if (rentPrice.calculated) {
+                html += `<div class="assessment-consolidated">
+                    <span class="assessment-consolidated-label">${getText('consolidatedAverageLabel')}</span>
+                    <span class="assessment-consolidated-value">≈ ${formatValue(rentPrice.value, 'price')}/м²</span>
+                </div>`;
+            }
+            html += '</div>';
+            
+            // Yield Section
+            html += '<div class="assessment-category">';
+            html += `<h5 class="assessment-category-title">${getText('yieldTitle')}</h5>`;
+            html += '<div class="assessment-items">';
+            
+            if (houseTypeData?.yield) {
+                const listingType = houseTypeData.listing_type || '1+1';
+                html += `<div class="assessment-item">
+                    <span class="assessment-label">${getText('bedroomsLabel')}:</span>
+                    <span class="assessment-value">${formatValue(houseTypeData.yield, 'percentage')}</span>
+                </div>`;
+            }
+            
+            if (floorSegmentData?.yield) {
+                const listingType = floorSegmentData.listing_type || 'Giriş';
+                html += `<div class="assessment-item">
+                    <span class="assessment-label">${getText('floorLabel')}:</span>
+                    <span class="assessment-value">${formatValue(floorSegmentData.yield, 'percentage')}</span>
+                </div>`;
+            }
+            
+            if (ageData?.yield) {
+                const listingType = ageData.listing_type || '0–4';
+                html += `<div class="assessment-item">
+                    <span class="assessment-label">${getText('ageLabel')}:</span>
+                    <span class="assessment-value">${formatValue(ageData.yield, 'percentage')}</span>
+                </div>`;
+            }
+            
+            if (heatingData?.yield) {
+                const listingType = heatingData.listing_type || 'Yok';
+                html += `<div class="assessment-item">
+                    <span class="assessment-label">${getText('heatingLabel')}:</span>
+                    <span class="assessment-value">${formatValue(heatingData.yield, 'percentage')}</span>
+                </div>`;
+            }
+            
+            html += '</div>';
+            if (yield.calculated) {
+                html += `<div class="assessment-consolidated">
+                    <span class="assessment-consolidated-label">${getText('consolidatedAverageLabel')}</span>
+                    <span class="assessment-consolidated-value">≈ ${formatValue(yield.value, 'percentage')}</span>
+                </div>`;
+            }
+            html += '</div>';
+            
+            html += '</div></div>';
+            
+            return html;
+        }
+
+        // Calculate consolidated value with coefficients
+        function calculateConsolidatedValue(items) {
+            const validItems = items.filter(item => item.value !== null && item.value !== undefined && item.value !== 0 && !isNaN(parseFloat(item.value)));
+            
+            if (validItems.length === 0) {
+                return { calculated: false, value: 0 };
+            }
+            
+            // If some items are missing, redistribute coefficients proportionally
+            let totalCoefficient = 0;
+            validItems.forEach(item => {
+                totalCoefficient += item.coefficient;
+            });
+            
+            let weightedSum = 0;
+            validItems.forEach(item => {
+                const adjustedCoefficient = item.coefficient / totalCoefficient;
+                weightedSum += parseFloat(item.value) * adjustedCoefficient;
+            });
+            
+            return {
+                calculated: true,
+                value: weightedSum
+            };
+        }
     </script>
 </body>
 </html>

@@ -220,6 +220,9 @@
                 html += generateCategoryTable('heating_data', 'Данные по типу отопления', data.heating_data);
             }
             
+            // Add consolidated assessment block
+            html += generateConsolidatedAssessment(data);
+            
             return html;
         }
 
@@ -275,6 +278,222 @@
             return html;
         }
 
+        // Функция генерации блока консолидированной оценки
+        function generateConsolidatedAssessment(data) {
+            if (!data) return '';
+            
+            // Define coefficients for each category
+            const coefficients = {
+                house_type: 0.40,      // 40% - спальни
+                age: 0.30,             // 30% - возраст
+                floor_segment: 0.20,   // 20% - этаж
+                heating: 0.10          // 10% - отопление
+            };
+            
+            // Extract data for each category
+            const houseTypeData = data.house_type_data && data.house_type_data.length > 0 ? data.house_type_data[0] : null;
+            const floorSegmentData = data.floor_segment_data && data.floor_segment_data.length > 0 ? data.floor_segment_data[0] : null;
+            const ageData = data.age_data && data.age_data.length > 0 ? data.age_data[0] : null;
+            const heatingData = data.heating_data && data.heating_data.length > 0 ? data.heating_data[0] : null;
+            
+            // Calculate consolidated values
+            const salePrice = calculateConsolidatedValue([
+                { value: houseTypeData?.min_unit_price_for_sale, coefficient: coefficients.house_type, name: 'Спальни' },
+                { value: floorSegmentData?.min_unit_price_for_sale, coefficient: coefficients.floor_segment, name: 'Этаж' },
+                { value: ageData?.min_unit_price_for_sale, coefficient: coefficients.age, name: 'Возраст' },
+                { value: heatingData?.min_unit_price_for_sale, coefficient: coefficients.heating, name: 'Отопление' }
+            ]);
+            
+            const rentPrice = calculateConsolidatedValue([
+                { value: houseTypeData?.min_unit_price_for_rent, coefficient: coefficients.house_type, name: 'Спальни' },
+                { value: floorSegmentData?.min_unit_price_for_rent, coefficient: coefficients.floor_segment, name: 'Этаж' },
+                { value: ageData?.min_unit_price_for_rent, coefficient: coefficients.age, name: 'Возраст' },
+                { value: heatingData?.min_unit_price_for_rent, coefficient: coefficients.heating, name: 'Отопление' }
+            ]);
+            
+            const yield = calculateConsolidatedValue([
+                { value: houseTypeData?.yield, coefficient: coefficients.house_type, name: 'Спальни' },
+                { value: floorSegmentData?.yield, coefficient: coefficients.floor_segment, name: 'Этаж' },
+                { value: ageData?.yield, coefficient: coefficients.age, name: 'Возраст' },
+                { value: heatingData?.yield, coefficient: coefficients.heating, name: 'Отопление' }
+            ]);
+            
+            // Generate HTML for consolidated assessment
+            let html = '<div style="margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 8px; background: #f8f9fa;">';
+            html += '<h4 style="margin: 0 0 15px 0; color: #495057; text-align: center; border-bottom: 2px solid #667eea; padding-bottom: 8px;">Консолидированная оценка</h4>';
+            html += '<div style="padding: 15px;">';
+            
+            // Sale Price Section
+            html += '<div style="margin-bottom: 20px; padding: 12px; background: white; border-radius: 6px; border-left: 3px solid #667eea;">';
+            html += '<h5 style="margin: 0 0 12px 0; color: #495057; font-size: 14px;">Цена за м² (Unit Price For Sale):</h5>';
+            html += '<div style="margin-bottom: 12px;">';
+            
+            if (houseTypeData?.min_unit_price_for_sale) {
+                const listingType = houseTypeData.listing_type || '1+1';
+                html += `<div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #e9ecef;">
+                    <span style="font-weight: 500; color: #495057;">Спальни ${listingType}:</span>
+                    <span style="font-weight: 600; color: #28a745;">${formatValue(houseTypeData.min_unit_price_for_sale, 'price')}</span>
+                </div>`;
+            }
+            
+            if (floorSegmentData?.min_unit_price_for_sale) {
+                const listingType = floorSegmentData.listing_type || 'Giriş';
+                html += `<div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #e9ecef;">
+                    <span style="font-weight: 500; color: #495057;">Этаж ${listingType}:</span>
+                    <span style="font-weight: 600; color: #28a745;">${formatValue(floorSegmentData.min_unit_price_for_sale, 'price')}</span>
+                </div>`;
+            }
+            
+            if (ageData?.min_unit_price_for_sale) {
+                const listingType = ageData.listing_type || '0–4';
+                html += `<div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #e9ecef;">
+                    <span style="font-weight: 500; color: #495057;">Возраст ${listingType}:</span>
+                    <span style="font-weight: 600; color: #28a745;">${formatValue(ageData.min_unit_price_for_sale, 'price')}</span>
+                </div>`;
+            }
+            
+            if (heatingData?.min_unit_price_for_sale) {
+                const listingType = heatingData.listing_type || 'Yok';
+                html += `<div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #e9ecef;">
+                    <span style="font-weight: 500; color: #495057;">Отопление ${listingType}:</span>
+                    <span style="font-weight: 600; color: #28a745;">${formatValue(heatingData.min_unit_price_for_sale, 'price')}</span>
+                </div>`;
+            }
+            
+            html += '</div>';
+            if (salePrice.calculated) {
+                html += `<div style="display: flex; justify-content: space-between; padding: 10px 12px; background: #e8f5e8; border-radius: 4px; border: 1px solid #4caf50;">
+                    <span style="font-weight: 600; color: #2e7d32;">Консолидированная средняя:</span>
+                    <span style="font-weight: 700; color: #2e7d32;">≈ ${formatValue(salePrice.value, 'price')}/м²</span>
+                </div>`;
+            }
+            html += '</div>';
+            
+            // Rent Price Section
+            html += '<div style="margin-bottom: 20px; padding: 12px; background: white; border-radius: 6px; border-left: 3px solid #667eea;">';
+            html += '<h5 style="margin: 0 0 12px 0; color: #495057; font-size: 14px;">Цена аренды за м² (Unit Price For Rent):</h5>';
+            html += '<div style="margin-bottom: 12px;">';
+            
+            if (houseTypeData?.min_unit_price_for_rent) {
+                const listingType = houseTypeData.listing_type || '1+1';
+                html += `<div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #e9ecef;">
+                    <span style="font-weight: 500; color: #495057;">Спальни ${listingType}:</span>
+                    <span style="font-weight: 600; color: #28a745;">${formatValue(houseTypeData.min_unit_price_for_rent, 'price')}</span>
+                </div>`;
+            }
+            
+            if (floorSegmentData?.min_unit_price_for_rent) {
+                const listingType = floorSegmentData.listing_type || 'Giriş';
+                html += `<div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #e9ecef;">
+                    <span style="font-weight: 500; color: #495057;">Этаж ${listingType}:</span>
+                    <span style="font-weight: 600; color: #28a745;">${formatValue(floorSegmentData.min_unit_price_for_rent, 'price')}</span>
+                </div>`;
+            }
+            
+            if (ageData?.min_unit_price_for_rent) {
+                const listingType = ageData.listing_type || '0–4';
+                html += `<div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #e9ecef;">
+                    <span style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #e9ecef;">
+                    <span style="font-weight: 500; color: #495057;">Возраст ${listingType}:</span>
+                    <span style="font-weight: 600; color: #28a745;">${formatValue(ageData.min_unit_price_for_rent, 'price')}</span>
+                </div>`;
+            }
+            
+            if (heatingData?.min_unit_price_for_rent) {
+                const listingType = heatingData.listing_type || 'Yok';
+                html += `<div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #e9ecef;">
+                    <span style="font-weight: 500; color: #495057;">Отопление ${listingType}:</span>
+                    <span style="font-weight: 600; color: #28a745;">${formatValue(heatingData.min_unit_price_for_rent, 'price')}</span>
+                </div>`;
+            }
+            
+            html += '</div>';
+            if (rentPrice.calculated) {
+                html += `<div style="display: flex; justify-content: space-between; padding: 10px 12px; background: #e8f5e8; border-radius: 4px; border: 1px solid #4caf50;">
+                    <span style="font-weight: 600; color: #2e7d32;">Консолидированная средняя:</span>
+                    <span style="font-weight: 700; color: #2e7d32;">≈ ${formatValue(rentPrice.value, 'price')}/м²</span>
+                </div>`;
+            }
+            html += '</div>';
+            
+            // Yield Section
+            html += '<div style="margin-bottom: 0; padding: 12px; background: white; border-radius: 6px; border-left: 3px solid #667eea;">';
+            html += '<h5 style="margin: 0 0 12px 0; color: #495057; font-size: 14px;">Доходность (Yield):</h5>';
+            html += '<div style="margin-bottom: 12px;">';
+            
+            if (houseTypeData?.yield) {
+                const listingType = houseTypeData.listing_type || '1+1';
+                html += `<div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #e9ecef;">
+                    <span style="font-weight: 500; color: #495057;">Спальни:</span>
+                    <span style="font-weight: 600; color: #28a745;">${formatValue(houseTypeData.yield, 'percentage')}</span>
+                </div>`;
+            }
+            
+            if (floorSegmentData?.yield) {
+                const listingType = floorSegmentData.listing_type || 'Giriş';
+                html += `<div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #e9ecef;">
+                    <span style="font-weight: 500; color: #495057;">Этаж:</span>
+                    <span style="font-weight: 500; color: #495057;">Этаж:</span>
+                    <span style="font-weight: 600; color: #28a745;">${formatValue(floorSegmentData.yield, 'percentage')}</span>
+                </div>`;
+            }
+            
+            if (ageData?.yield) {
+                const listingType = ageData.listing_type || '0–4';
+                html += `<div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #e9ecef;">
+                    <span style="font-weight: 500; color: #495057;">Возраст:</span>
+                    <span style="font-weight: 600; color: #28a745;">${formatValue(ageData.yield, 'percentage')}</span>
+                </div>`;
+            }
+            
+            if (heatingData?.yield) {
+                const listingType = heatingData.listing_type || 'Yok';
+                html += `<div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #e9ecef;">
+                    <span style="font-weight: 500; color: #495057;">Отопление:</span>
+                    <span style="font-weight: 600; color: #28a745;">${formatValue(heatingData.yield, 'percentage')}</span>
+                </div>`;
+            }
+            
+            html += '</div>';
+            if (yield.calculated) {
+                html += `<div style="display: flex; justify-content: space-between; padding: 10px 12px; background: #e8f5e8; border-radius: 4px; border: 1px solid #4caf50;">
+                    <span style="font-weight: 600; color: #2e7d32;">Консолидированная средняя:</span>
+                    <span style="font-weight: 700; color: #2e7d32;">≈ ${formatValue(yield.value, 'percentage')}</span>
+                </div>`;
+            }
+            html += '</div>';
+            
+            html += '</div></div>';
+            
+            return html;
+        }
+
+        // Calculate consolidated value with coefficients
+        function calculateConsolidatedValue(items) {
+            const validItems = items.filter(item => item.value !== null && item.value !== undefined && item.value !== 0 && !isNaN(parseFloat(item.value)));
+            
+            if (validItems.length === 0) {
+                return { calculated: false, value: 0 };
+            }
+            
+            // If some items are missing, redistribute coefficients proportionally
+            let totalCoefficient = 0;
+            validItems.forEach(item => {
+                totalCoefficient += item.coefficient;
+            });
+            
+            let weightedSum = 0;
+            validItems.forEach(item => {
+                const adjustedCoefficient = item.coefficient / totalCoefficient;
+                weightedSum += parseFloat(item.value) * adjustedCoefficient;
+            });
+            
+            return {
+                calculated: true,
+                value: weightedSum
+            };
+        }
+
         // Вспомогательные функции
         function formatFieldName(field) {
             return field.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
@@ -298,6 +517,19 @@
             }
             
             return value.toString();
+        }
+
+        // Функция форматирования значений для консолидированной оценки
+        function formatValue(value, type) {
+            if (value === null || value === undefined || value === 0) return '-';
+            
+            if (type === 'price') {
+                return `₺${parseFloat(value).toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            } else if (type === 'percentage') {
+                return `${parseFloat(value).toFixed(2)}%`;
+            } else {
+                return value.toString();
+            }
         }
     </script>
 </body>
