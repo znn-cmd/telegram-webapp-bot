@@ -461,7 +461,7 @@
         }
         
         .unified-indicator-card {
-            background: white;
+            background: #f8f9fa;
             border-radius: 16px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
             overflow: hidden;
@@ -592,9 +592,8 @@
         .market-analysis-unified {
             margin: 30px 0;
             padding: 25px;
-            background: white;
+            background: #f8f9fa;
             border-radius: 16px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
             border: 1px solid rgba(0, 0, 0, 0.05);
         }
         
@@ -604,20 +603,6 @@
             color: #333333;
             margin-bottom: 20px;
             text-align: center;
-            position: relative;
-            padding-bottom: 12px;
-        }
-        
-        .analysis-title::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 50px;
-            height: 2px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 1px;
         }
         
         .analysis-content {
@@ -1678,18 +1663,18 @@
             }
         }
         
-        /* Price Forecast Block Styles */
+        /* Price Forecast Block Styles - в стиле "Тренд цен" */
         .price-forecast-block {
             margin-top: 20px;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            border: 1px solid #e9ecef;
+            background: #f8f9fa;
+            border-radius: 16px;
+            border: 1px solid rgba(0, 0, 0, 0.05);
             overflow: hidden;
+            position: relative;
         }
         
         .price-forecast-content {
-            padding: 20px;
+            padding: 25px 30px;
             text-align: center;
             position: relative;
         }
@@ -1700,46 +1685,47 @@
             left: 0;
             top: 0;
             bottom: 0;
-            width: 4px;
+            width: 6px;
             background: #28a745;
         }
         
         .price-forecast-title {
-            font-size: 16px;
-            font-weight: 600;
-            color: #495057;
-            margin-bottom: 15px;
+            font-size: 18px;
+            font-weight: 700;
+            color: #333333;
+            margin-bottom: 20px;
         }
         
-        .price-forecast-value {
-            font-size: 24px;
-            font-weight: bold;
+        .price-forecast-sale-section,
+        .price-forecast-rent-section {
+            margin-bottom: 16px;
+        }
+        
+        .price-forecast-sale-label,
+        .price-forecast-rent-label {
+            font-size: 15px;
+            color: #333333;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+        
+        .price-forecast-sale-value,
+        .price-forecast-rent-value {
+            font-size: 20px;
+            font-weight: 700;
             color: #28a745;
-            margin-bottom: 15px;
-        }
-        
-        .price-forecast-details {
-            margin-bottom: 15px;
-        }
-        
-        .price-forecast-sale,
-        .price-forecast-rent,
-        .price-forecast-rent-rate {
-            font-size: 14px;
-            color: #666;
-            margin-bottom: 5px;
-        }
-        
-        .price-forecast-currency-info {
-            font-size: 11px;
-            color: #999;
-            font-style: italic;
-            margin-top: 10px;
+            margin-bottom: 8px;
         }
         
         .price-forecast-date {
+            font-size: 14px;
+            color: #666666;
+            margin-bottom: 8px;
+        }
+        
+        .price-forecast-currency-info {
             font-size: 12px;
-            color: #999;
+            color: #999999;
             font-style: italic;
         }
         
@@ -1750,31 +1736,33 @@
             }
             
             .price-forecast-content {
-                padding: 15px;
+                padding: 20px 24px;
             }
             
             .price-forecast-title {
-                font-size: 15px;
-                margin-bottom: 12px;
+                font-size: 16px;
+                margin-bottom: 16px;
             }
             
-            .price-forecast-value {
-                font-size: 20px;
-                margin-bottom: 12px;
+            .price-forecast-sale-value,
+            .price-forecast-rent-value {
+                font-size: 18px;
+                margin-bottom: 6px;
             }
             
-            .price-forecast-sale,
-            .price-forecast-rent {
-                font-size: 13px;
+            .price-forecast-sale-label,
+            .price-forecast-rent-label {
+                font-size: 14px;
+                margin-bottom: 6px;
             }
             
             .price-forecast-date {
-                font-size: 11px;
+                font-size: 13px;
+                margin-bottom: 6px;
             }
             
             .price-forecast-currency-info {
-                font-size: 10px;
-                margin-top: 8px;
+                font-size: 11px;
             }
         }
         
@@ -3958,58 +3946,159 @@
             return analysis;
         }
         
+        // Calculate consolidated data for market analysis (для всех пользователей)
+        function calculateConsolidatedDataForAnalysis(data) {
+            if (!data) return null;
+            
+            // Define coefficients for each category
+            const coefficients = {
+                house_type: 0.40,      // 40% - спальни
+                age: 0.30,             // 30% - возраст
+                floor_segment: 0.20,   // 20% - этаж
+                heating: 0.10          // 10% - отопление
+            };
+            
+            const categories = ['house_type_data', 'floor_segment_data', 'age_data', 'heating_data'];
+            const consolidatedResults = {
+                salePrice: { calculated: false, value: 0 },
+                rentPrice: { calculated: false, value: 0 },
+                yield: { calculated: false, value: 0 }
+            };
+            
+            // Calculate consolidated sale price
+            const saleItems = [];
+            const rentItems = [];
+            const yieldItems = [];
+            
+            for (const categoryName of categories) {
+                if (data[categoryName] && data[categoryName].length > 0) {
+                    const categoryData = data[categoryName][0];
+                    const coefficient = coefficients[categoryName.replace('_data', '')];
+                    
+                    if (categoryData.unit_price_for_sale && categoryData.unit_price_for_sale > 0) {
+                        saleItems.push({
+                            value: parseFloat(categoryData.unit_price_for_sale),
+                            coefficient: coefficient
+                        });
+                    }
+                    
+                    if (categoryData.unit_price_for_rent && categoryData.unit_price_for_rent > 0) {
+                        rentItems.push({
+                            value: parseFloat(categoryData.unit_price_for_rent),
+                            coefficient: coefficient
+                        });
+                    }
+                    
+                    if (categoryData.yield_percentage && categoryData.yield_percentage > 0) {
+                        yieldItems.push({
+                            value: parseFloat(categoryData.yield_percentage),
+                            coefficient: coefficient
+                        });
+                    }
+                }
+            }
+            
+            // Calculate weighted averages
+            if (saleItems.length > 0) {
+                const result = calculateConsolidatedValue(saleItems);
+                if (result.calculated) {
+                    consolidatedResults.salePrice = result;
+                }
+            }
+            
+            if (rentItems.length > 0) {
+                const result = calculateConsolidatedValue(rentItems);
+                if (result.calculated) {
+                    consolidatedResults.rentPrice = result;
+                }
+            }
+            
+            if (yieldItems.length > 0) {
+                const result = calculateConsolidatedValue(yieldItems);
+                if (result.calculated) {
+                    consolidatedResults.yield = result;
+                }
+            }
+            
+            return consolidatedResults;
+        }
+        
         // Generate market analysis text in unified format (like "Вывод прогноза")
-        function generateMarketAnalysisText(summary) {
+        function generateMarketAnalysisText(summary, consolidatedData = null) {
             let analysis = '<div class="market-analysis-unified">';
             analysis += `<h4 class="analysis-title">${getText('marketAnalysisTitle')}</h4>`;
             analysis += '<div class="analysis-content">';
             
-            // Sale analysis text
-            if (summary.comparable_area_for_sale && summary.listing_period_for_sale && summary.unit_price_for_sale) {
-                const area = summary.comparable_area_for_sale;
-                const period = summary.listing_period_for_sale;
-                const price = summary.unit_price_for_sale;
+            // Если есть данные консолидированной оценки, показываем их
+            if (consolidatedData) {
+                // Консолидированная средняя цена продажи
+                if (consolidatedData.salePrice && consolidatedData.salePrice.calculated) {
+                    analysis += `<div class="analysis-section">
+                        <strong>Консолидированная средняя цена продажи:</strong> ≈ ${formatValue(consolidatedData.salePrice.value, 'price')}/м²
+                    </div>`;
+                }
                 
-                // Calculate average area
-                const avgArea = Math.round((area.min + area.max) / 2);
+                // Консолидированная средняя цена аренды
+                if (consolidatedData.rentPrice && consolidatedData.rentPrice.calculated) {
+                    analysis += `<div class="analysis-section">
+                        <strong>Консолидированная средняя цена аренды:</strong> ≈ ${formatValue(consolidatedData.rentPrice.value, 'price')}/м²
+                    </div>`;
+                }
                 
-                const saleText = getText('saleAnalysisText')
-                    .replace('{area}', avgArea)
-                    .replace('{minPrice}', formatValue(price.min, 'price'))
-                    .replace('{maxPrice}', formatValue(price.max, 'price'))
-                    .replace('{minDays}', period.min)
-                    .replace('{maxDays}', period.max);
+                // Консолидированная средняя доходность
+                if (consolidatedData.yield && consolidatedData.yield.calculated) {
+                    analysis += `<div class="analysis-section">
+                        <strong>Консолидированная средняя доходность:</strong> ≈ ${formatValue(consolidatedData.yield.value, 'percentage')}
+                    </div>`;
+                }
+            } else {
+                // Sale analysis text (оригинальный код)
+                if (summary.comparable_area_for_sale && summary.listing_period_for_sale && summary.unit_price_for_sale) {
+                    const area = summary.comparable_area_for_sale;
+                    const period = summary.listing_period_for_sale;
+                    const price = summary.unit_price_for_sale;
+                    
+                    // Calculate average area
+                    const avgArea = Math.round((area.min + area.max) / 2);
+                    
+                    const saleText = getText('saleAnalysisText')
+                        .replace('{area}', avgArea)
+                        .replace('{minPrice}', formatValue(price.min, 'price'))
+                        .replace('{maxPrice}', formatValue(price.max, 'price'))
+                        .replace('{minDays}', period.min)
+                        .replace('{maxDays}', period.max);
+                    
+                    analysis += `<div class="analysis-section">
+                        <strong>${getText('saleHeader')}:</strong> ${saleText}
+                    </div>`;
+                }
                 
-                analysis += `<div class="analysis-section">
-                    <strong>${getText('saleHeader')}:</strong> ${saleText}
-                </div>`;
-            }
-            
-            // Add spacing between sections
-            if ((summary.comparable_area_for_sale && summary.listing_period_for_sale && summary.unit_price_for_sale) &&
-                (summary.comparable_area_for_rent && summary.listing_period_for_rent && summary.unit_price_for_rent)) {
-                analysis += '<div class="section-spacing"></div>';
-            }
-            
-            // Rent analysis text
-            if (summary.comparable_area_for_rent && summary.listing_period_for_rent && summary.unit_price_for_rent) {
-                const area = summary.comparable_area_for_rent;
-                const period = summary.listing_period_for_rent;
-                const price = summary.unit_price_for_rent;
+                // Add spacing between sections
+                if ((summary.comparable_area_for_sale && summary.listing_period_for_sale && summary.unit_price_for_sale) &&
+                    (summary.comparable_area_for_rent && summary.listing_period_for_rent && summary.unit_price_for_rent)) {
+                    analysis += '<div class="section-spacing"></div>';
+                }
                 
-                // Calculate average area
-                const avgArea = Math.round((area.min + area.max) / 2);
-                
-                const rentText = getText('rentAnalysisText')
-                    .replace('{area}', avgArea)
-                    .replace('{minPrice}', formatValue(price.min, 'price'))
-                    .replace('{maxPrice}', formatValue(price.max, 'price'))
-                    .replace('{minDays}', period.min)
-                    .replace('{maxDays}', period.max);
-                
-                analysis += `<div class="analysis-section">
-                    <strong>${getText('rentHeader')}:</strong> ${rentText}
-                </div>`;
+                // Rent analysis text
+                if (summary.comparable_area_for_rent && summary.listing_period_for_rent && summary.unit_price_for_rent) {
+                    const area = summary.comparable_area_for_rent;
+                    const period = summary.listing_period_for_rent;
+                    const price = summary.unit_price_for_rent;
+                    
+                    // Calculate average area
+                    const avgArea = Math.round((area.min + area.max) / 2);
+                    
+                    const rentTextFinal = getText('rentAnalysisText')
+                        .replace('{area}', avgArea)
+                        .replace('{minPrice}', formatValue(price.min, 'price'))
+                        .replace('{maxPrice}', formatValue(price.max, 'price'))
+                        .replace('{minDays}', period.min)
+                        .replace('{maxDays}', period.max);
+                    
+                    analysis += `<div class="analysis-section">
+                        <strong>${getText('rentHeader')}:</strong> ${rentTextFinal}
+                    </div>`;
+                }
             }
             
             analysis += '</div></div>';
@@ -4156,9 +4245,11 @@
             // Add spacing between blocks
             html += '<div class="block-spacing"></div>';
             
-            // Add market analysis text
+            // Add market analysis text with consolidated data
             if (Object.keys(summary).length > 0) {
-                html += generateMarketAnalysisText(summary);
+                // Вычисляем консолидированные данные для всех пользователей
+                const consolidatedData = calculateConsolidatedDataForAnalysis(data);
+                html += generateMarketAnalysisText(summary, consolidatedData);
             }
             
             // Add detailed data tables for each category (admin only)
@@ -4166,7 +4257,8 @@
             html += detailedTablesHtml;
             
             // Add consolidated assessment block
-            html += generateConsolidatedAssessment(data);
+            const consolidatedAssessmentHtml = await generateConsolidatedAssessment(data);
+            html += consolidatedAssessmentHtml;
             
             // Add market comparison block below the detailed tables
             if (Object.keys(summary).length > 0) {
@@ -5349,9 +5441,22 @@
         // Start initialization when page loads
         document.addEventListener('DOMContentLoaded', init);
 
-        // Generate consolidated assessment block
-        function generateConsolidatedAssessment(data) {
+        // Generate consolidated assessment block (только для админов)
+        async function generateConsolidatedAssessment(data) {
             if (!data) return '';
+            
+            // Проверяем права администратора
+            const telegramId = getTelegramId();
+            if (!telegramId) {
+                console.log('⚠️ No telegram_id found');
+                return '';
+            }
+            
+            const isAdmin = await checkAdminStatus(telegramId);
+            if (!isAdmin) {
+                console.log('⚠️ User is not admin, hiding consolidated assessment');
+                return '';
+            }
             
             // Define coefficients for each category
             const coefficients = {
