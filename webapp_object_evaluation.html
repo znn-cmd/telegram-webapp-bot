@@ -5898,6 +5898,8 @@
                 
                 const data = await response.json();
                 console.log('🔍 User access check result:', data);
+                console.log('🔍 Raw period_end value:', data.period_end);
+                console.log('🔍 Type of period_end:', typeof data.period_end);
                 
                 if (data.success) {
                     // Check if user is admin
@@ -5908,8 +5910,20 @@
                     // Check if user has active subscription
                     if (data.period_end) {
                         const today = new Date();
+                        // Set time to start of day to avoid timezone issues
+                        today.setHours(0, 0, 0, 0);
+                        
                         const periodEnd = new Date(data.period_end);
+                        // Set time to end of day to include the full subscription day
+                        periodEnd.setHours(23, 59, 59, 999);
+                        
+                        console.log('🔍 Date comparison debug:');
+                        console.log('  Today:', today.toISOString(), '(', today.toDateString(), ')');
+                        console.log('  Period end:', periodEnd.toISOString(), '(', periodEnd.toDateString(), ')');
+                        console.log('  Raw period_end from API:', data.period_end);
+                        
                         const hasActiveSubscription = today <= periodEnd;
+                        console.log('  Has active subscription:', hasActiveSubscription);
                         
                         return { 
                             hasAccess: hasActiveSubscription, 

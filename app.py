@@ -1033,10 +1033,10 @@ def api_currency_test():
 
 @app.route('/api/check_admin_status', methods=['POST'])
 def api_check_admin_status():
-    """Проверка статуса администратора пользователя"""
+    """Проверка статуса администратора пользователя и подписки"""
     data = request.json or {}
     telegram_id_raw = data.get('telegram_id')
-    logger.info(f"🔍 Проверка статуса админа для telegram_id: {telegram_id_raw}")
+    logger.info(f"🔍 Проверка статуса админа и подписки для telegram_id: {telegram_id_raw}")
     
     if telegram_id_raw is None:
         logger.error("❌ telegram_id не предоставлен")
@@ -1050,19 +1050,24 @@ def api_check_admin_status():
     try:
         # Проверяем пользователя в базе
         logger.info(f"🔍 Поиск пользователя в базе для telegram_id: {telegram_id}")
-        user_result = supabase.table('users').select('user_status').eq('telegram_id', telegram_id).execute()
+        user_result = supabase.table('users').select('user_status, period_end').eq('telegram_id', telegram_id).execute()
         
         logger.info(f"📊 Результат поиска: {len(user_result.data) if user_result.data else 0} записей")
         
         if user_result.data and len(user_result.data) > 0:
-            user_status = user_result.data[0].get('user_status')
+            user = user_result.data[0]
+            user_status = user.get('user_status')
+            period_end = user.get('period_end')
             is_admin = user_status == 'admin' if user_status else False
-            logger.info(f"👤 Пользователь найден: user_status={user_status}, is_admin={is_admin}")
+            
+            logger.info(f"👤 Пользователь найден: user_status={user_status}, is_admin={is_admin}, period_end={period_end}")
             logger.info(f"📋 Проверяем user_status='{user_status}' == 'admin' = {user_status == 'admin'}")
+            
             return jsonify({
                 'success': True,
                 'is_admin': is_admin,
-                'user_status': user_status
+                'user_status': user_status,
+                'period_end': period_end
             })
         else:
             logger.warning(f"❌ Пользователь не найден для telegram_id: {telegram_id}")
