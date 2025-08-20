@@ -579,6 +579,13 @@
             }
         }
         
+        /* Пустое место между блоками */
+        .block-spacing {
+            height: 40px;
+            margin: 0;
+            padding: 0;
+        }
+        
         /* Стили для объединенного анализа рынка в стиле "Вывод прогноза" */
         .market-analysis-unified {
             margin: 30px 0;
@@ -764,6 +771,10 @@
                 margin-bottom: 14px;
                 font-size: 13px;
             }
+            
+            .block-spacing {
+                height: 30px;
+            }
         }
         
         @media (max-width: 480px) {
@@ -781,6 +792,10 @@
             .analysis-section {
                 margin-bottom: 12px;
                 font-size: 12px;
+            }
+            
+            .block-spacing {
+                height: 25px;
             }
         }
         
@@ -4110,21 +4125,10 @@
                 html += '</div>';
             }
             
-            // Yield Section
-            if (summary.yield) {
-                html += '<div class="indicator-section yield-section">';
-                html += `<div class="section-title">${getText('yieldLabel')}</div>`;
-                
-                const yieldData = summary.yield;
-                html += `<div class="indicator-item">
-                    <span class="indicator-label">${getText('yieldLabel')}:</span>
-                    <span class="indicator-value">${yieldData.min.toFixed(2)}% – ${yieldData.max.toFixed(2)}%</span>
-                </div>`;
-                
-                html += '</div>';
-            }
-            
             html += '</div></div>';
+            
+            // Add spacing between blocks
+            html += '<div class="block-spacing"></div>';
             
             // Add market analysis text
             if (Object.keys(summary).length > 0) {
