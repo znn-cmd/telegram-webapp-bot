@@ -60,12 +60,12 @@
                     comparable_area_for_sale: 45,
                     count_for_sale: 25,
                     listing_period_for_sale: 60,
-                    min_unit_price_for_sale: 15000,
+                    unit_price_for_sale: 15000,
                     average_age_for_rent: 3,
                     comparable_area_for_rent: 40,
                     count_for_rent: 15,
                     listing_period_for_rent: 45,
-                    min_unit_price_for_rent: 120,
+                    unit_price_for_rent: 120,
                     yield: 6.8
                 },
                 {
@@ -74,12 +74,12 @@
                     comparable_area_for_sale: 65,
                     count_for_sale: 35,
                     listing_period_for_sale: 75,
-                    min_unit_price_for_sale: 18000,
+                    unit_price_for_sale: 18000,
                     average_age_for_rent: 5,
                     comparable_area_for_rent: 60,
                     count_for_rent: 20,
                     listing_period_for_rent: 55,
-                    min_unit_price_for_rent: 150,
+                    unit_price_for_rent: 150,
                     yield: 7.2
                 }
             ],
@@ -90,12 +90,12 @@
                     comparable_area_for_sale: 55,
                     count_for_sale: 30,
                     listing_period_for_sale: 65,
-                    min_unit_price_for_sale: 16000,
+                    unit_price_for_sale: 16000,
                     average_age_for_rent: 2,
                     comparable_area_for_rent: 50,
                     count_for_rent: 18,
                     listing_period_for_rent: 50,
-                    min_unit_price_for_rent: 135,
+                    unit_price_for_rent: 135,
                     yield: 6.9
                 }
             ],
@@ -106,12 +106,12 @@
                     comparable_area_for_sale: 50,
                     count_for_sale: 40,
                     listing_period_for_sale: 55,
-                    min_unit_price_for_sale: 17000,
+                    unit_price_for_sale: 17000,
                     average_age_for_rent: 1,
                     comparable_area_for_rent: 45,
                     count_for_rent: 25,
                     listing_period_for_rent: 40,
-                    min_unit_price_for_rent: 140,
+                    unit_price_for_rent: 140,
                     yield: 7.5
                 }
             ],
@@ -122,12 +122,12 @@
                     comparable_area_for_sale: 60,
                     count_for_sale: 45,
                     listing_period_for_sale: 70,
-                    min_unit_price_for_sale: 16500,
+                    unit_price_for_sale: 16500,
                     average_age_for_rent: 4,
                     comparable_area_for_rent: 55,
                     count_for_rent: 30,
                     listing_period_for_rent: 60,
-                    min_unit_price_for_rent: 145,
+                    unit_price_for_rent: 145,
                     yield: 7.0
                 }
             ]
@@ -298,17 +298,17 @@
             
             // Calculate consolidated values
             const salePrice = calculateConsolidatedValue([
-                { value: houseTypeData?.min_unit_price_for_sale, coefficient: coefficients.house_type, name: 'Спальни' },
-                { value: floorSegmentData?.min_unit_price_for_sale, coefficient: coefficients.floor_segment, name: 'Этаж' },
-                { value: ageData?.min_unit_price_for_sale, coefficient: coefficients.age, name: 'Возраст' },
-                { value: heatingData?.min_unit_price_for_sale, coefficient: coefficients.heating, name: 'Отопление' }
+                { value: houseTypeData?.unit_price_for_sale, coefficient: coefficients.house_type, name: 'Спальни' },
+                { value: floorSegmentData?.unit_price_for_sale, coefficient: coefficients.floor_segment, name: 'Этаж' },
+                { value: ageData?.unit_price_for_sale, coefficient: coefficients.age, name: 'Возраст' },
+                { value: heatingData?.unit_price_for_sale, coefficient: coefficients.heating, name: 'Отопление' }
             ]);
             
             const rentPrice = calculateConsolidatedValue([
-                { value: houseTypeData?.min_unit_price_for_rent, coefficient: coefficients.house_type, name: 'Спальни' },
-                { value: floorSegmentData?.min_unit_price_for_rent, coefficient: coefficients.floor_segment, name: 'Этаж' },
-                { value: ageData?.min_unit_price_for_rent, coefficient: coefficients.age, name: 'Возраст' },
-                { value: heatingData?.min_unit_price_for_rent, coefficient: coefficients.heating, name: 'Отопление' }
+                { value: houseTypeData?.unit_price_for_rent, coefficient: coefficients.house_type, name: 'Спальни' },
+                { value: floorSegmentData?.unit_price_for_rent, coefficient: coefficients.floor_segment, name: 'Этаж' },
+                { value: ageData?.unit_price_for_rent, coefficient: coefficients.age, name: 'Возраст' },
+                { value: heatingData?.unit_price_for_rent, coefficient: coefficients.heating, name: 'Отопление' }
             ]);
             
             const yield = calculateConsolidatedValue([
@@ -328,35 +328,35 @@
             html += '<h5 style="margin: 0 0 12px 0; color: #495057; font-size: 14px;">Цена за м² (Unit Price For Sale):</h5>';
             html += '<div style="margin-bottom: 12px;">';
             
-            if (houseTypeData?.min_unit_price_for_sale) {
+            if (houseTypeData?.unit_price_for_sale) {
                 const listingType = houseTypeData.listing_type || '1+1';
                 html += `<div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #e9ecef;">
                     <span style="font-weight: 500; color: #495057;">Спальни ${listingType}:</span>
-                    <span style="font-weight: 600; color: #28a745;">${formatValue(houseTypeData.min_unit_price_for_sale, 'price')}</span>
+                    <span style="font-weight: 600; color: #28a745;">${formatValue(houseTypeData.unit_price_for_sale, 'price')}</span>
                 </div>`;
             }
             
-            if (floorSegmentData?.min_unit_price_for_sale) {
+            if (floorSegmentData?.unit_price_for_sale) {
                 const listingType = floorSegmentData.listing_type || 'Giriş';
                 html += `<div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #e9ecef;">
                     <span style="font-weight: 500; color: #495057;">Этаж ${listingType}:</span>
-                    <span style="font-weight: 600; color: #28a745;">${formatValue(floorSegmentData.min_unit_price_for_sale, 'price')}</span>
+                    <span style="font-weight: 600; color: #28a745;">${formatValue(floorSegmentData.unit_price_for_sale, 'price')}</span>
                 </div>`;
             }
             
-            if (ageData?.min_unit_price_for_sale) {
+            if (ageData?.unit_price_for_sale) {
                 const listingType = ageData.listing_type || '0–4';
                 html += `<div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #e9ecef;">
                     <span style="font-weight: 500; color: #495057;">Возраст ${listingType}:</span>
-                    <span style="font-weight: 600; color: #28a745;">${formatValue(ageData.min_unit_price_for_sale, 'price')}</span>
+                    <span style="font-weight: 600; color: #28a745;">${formatValue(ageData.unit_price_for_sale, 'price')}</span>
                 </div>`;
             }
             
-            if (heatingData?.min_unit_price_for_sale) {
+            if (heatingData?.unit_price_for_sale) {
                 const listingType = heatingData.listing_type || 'Yok';
                 html += `<div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #e9ecef;">
                     <span style="font-weight: 500; color: #495057;">Отопление ${listingType}:</span>
-                    <span style="font-weight: 600; color: #28a745;">${formatValue(heatingData.min_unit_price_for_sale, 'price')}</span>
+                    <span style="font-weight: 600; color: #28a745;">${formatValue(heatingData.unit_price_for_sale, 'price')}</span>
                 </div>`;
             }
             
@@ -374,36 +374,35 @@
             html += '<h5 style="margin: 0 0 12px 0; color: #495057; font-size: 14px;">Цена аренды за м² (Unit Price For Rent):</h5>';
             html += '<div style="margin-bottom: 12px;">';
             
-            if (houseTypeData?.min_unit_price_for_rent) {
+            if (houseTypeData?.unit_price_for_rent) {
                 const listingType = houseTypeData.listing_type || '1+1';
                 html += `<div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #e9ecef;">
                     <span style="font-weight: 500; color: #495057;">Спальни ${listingType}:</span>
-                    <span style="font-weight: 600; color: #28a745;">${formatValue(houseTypeData.min_unit_price_for_rent, 'price')}</span>
+                    <span style="font-weight: 600; color: #28a745;">${formatValue(houseTypeData.unit_price_for_rent, 'price')}</span>
                 </div>`;
             }
             
-            if (floorSegmentData?.min_unit_price_for_rent) {
+            if (floorSegmentData?.unit_price_for_rent) {
                 const listingType = floorSegmentData.listing_type || 'Giriş';
                 html += `<div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #e9ecef;">
                     <span style="font-weight: 500; color: #495057;">Этаж ${listingType}:</span>
-                    <span style="font-weight: 600; color: #28a745;">${formatValue(floorSegmentData.min_unit_price_for_rent, 'price')}</span>
+                    <span style="font-weight: 600; color: #28a745;">${formatValue(floorSegmentData.unit_price_for_rent, 'price')}</span>
                 </div>`;
             }
             
-            if (ageData?.min_unit_price_for_rent) {
+            if (ageData?.unit_price_for_rent) {
                 const listingType = ageData.listing_type || '0–4';
                 html += `<div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #e9ecef;">
-                    <span style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #e9ecef;">
                     <span style="font-weight: 500; color: #495057;">Возраст ${listingType}:</span>
-                    <span style="font-weight: 600; color: #28a745;">${formatValue(ageData.min_unit_price_for_rent, 'price')}</span>
+                    <span style="font-weight: 600; color: #28a745;">${formatValue(ageData.unit_price_for_rent, 'price')}</span>
                 </div>`;
             }
             
-            if (heatingData?.min_unit_price_for_rent) {
+            if (heatingData?.unit_price_for_rent) {
                 const listingType = heatingData.listing_type || 'Yok';
                 html += `<div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #e9ecef;">
                     <span style="font-weight: 500; color: #495057;">Отопление ${listingType}:</span>
-                    <span style="font-weight: 600; color: #28a745;">${formatValue(heatingData.min_unit_price_for_rent, 'price')}</span>
+                    <span style="font-weight: 600; color: #28a745;">${formatValue(heatingData.unit_price_for_rent, 'price')}</span>
                 </div>`;
             }
             

@@ -4696,17 +4696,17 @@
             
             // Calculate consolidated values
             const salePrice = calculateConsolidatedValue([
-                { value: houseTypeData?.min_unit_price_for_sale, coefficient: coefficients.house_type, name: 'Спальни' },
-                { value: floorSegmentData?.min_unit_price_for_sale, coefficient: coefficients.floor_segment, name: 'Этаж' },
-                { value: ageData?.min_unit_price_for_sale, coefficient: coefficients.age, name: 'Возраст' },
-                { value: heatingData?.min_unit_price_for_sale, coefficient: coefficients.heating, name: 'Отопление' }
+                { value: houseTypeData?.unit_price_for_sale, coefficient: coefficients.house_type, name: 'Спальни' },
+                { value: floorSegmentData?.unit_price_for_sale, coefficient: coefficients.floor_segment, name: 'Этаж' },
+                { value: ageData?.unit_price_for_sale, coefficient: coefficients.age, name: 'Возраст' },
+                { value: heatingData?.unit_price_for_sale, coefficient: coefficients.heating, name: 'Отопление' }
             ]);
             
             const rentPrice = calculateConsolidatedValue([
-                { value: houseTypeData?.min_unit_price_for_rent, coefficient: coefficients.house_type, name: 'Спальни' },
-                { value: floorSegmentData?.min_unit_price_for_rent, coefficient: coefficients.floor_segment, name: 'Этаж' },
-                { value: ageData?.min_unit_price_for_rent, coefficient: coefficients.age, name: 'Возраст' },
-                { value: heatingData?.min_unit_price_for_rent, coefficient: coefficients.heating, name: 'Отопление' }
+                { value: houseTypeData?.unit_price_for_rent, coefficient: coefficients.house_type, name: 'Спальни' },
+                { value: floorSegmentData?.unit_price_for_rent, coefficient: coefficients.floor_segment, name: 'Этаж' },
+                { value: ageData?.unit_price_for_rent, coefficient: coefficients.age, name: 'Возраст' },
+                { value: heatingData?.unit_price_for_rent, coefficient: coefficients.heating, name: 'Отопление' }
             ]);
             
             const yield = calculateConsolidatedValue([
@@ -4726,35 +4726,35 @@
             html += `<h5 class="assessment-category-title">${getText('salePriceTitle')}</h5>`;
             html += '<div class="assessment-items">';
             
-            if (houseTypeData?.min_unit_price_for_sale) {
+            if (houseTypeData?.unit_price_for_sale) {
                 const listingType = houseTypeData.listing_type || '1+1';
                 html += `<div class="assessment-item">
                     <span class="assessment-label">${getText('bedroomsLabel')} ${listingType}:</span>
-                    <span class="assessment-value">${formatValue(houseTypeData.min_unit_price_for_sale, 'price')}</span>
+                    <span class="assessment-value">${formatValue(houseTypeData.unit_price_for_sale, 'price')}</span>
                 </div>`;
             }
             
-            if (floorSegmentData?.min_unit_price_for_sale) {
+            if (floorSegmentData?.unit_price_for_sale) {
                 const listingType = floorSegmentData.listing_type || 'Giriş';
                 html += `<div class="assessment-item">
                     <span class="assessment-label">${getText('floorLabel')} ${listingType}:</span>
-                    <span class="assessment-value">${formatValue(floorSegmentData.min_unit_price_for_sale, 'price')}</span>
+                    <span class="assessment-value">${formatValue(floorSegmentData.unit_price_for_sale, 'price')}</span>
                 </div>`;
             }
             
-            if (ageData?.min_unit_price_for_sale) {
+            if (ageData?.unit_price_for_sale) {
                 const listingType = ageData.listing_type || '0–4';
                 html += `<div class="assessment-item">
                     <span class="assessment-label">${getText('ageLabel')} ${listingType}:</span>
-                    <span class="assessment-value">${formatValue(ageData.min_unit_price_for_sale, 'price')}</span>
+                    <span class="assessment-value">${formatValue(ageData.unit_price_for_sale, 'price')}</span>
                 </div>`;
             }
             
-            if (heatingData?.min_unit_price_for_sale) {
+            if (heatingData?.unit_price_for_sale) {
                 const listingType = heatingData.listing_type || 'Yok';
                 html += `<div class="assessment-item">
                     <span class="assessment-label">${getText('heatingLabel')} ${listingType}:</span>
-                    <span class="assessment-value">${formatValue(heatingData.min_unit_price_for_sale, 'price')}</span>
+                    <span class="assessment-value">${formatValue(heatingData.unit_price_for_sale, 'price')}</span>
                 </div>`;
             }
             
@@ -4772,35 +4772,35 @@
             html += `<h5 class="assessment-category-title">${getText('rentPriceTitle')}</h5>`;
             html += '<div class="assessment-items">';
             
-            if (houseTypeData?.min_unit_price_for_rent) {
+            if (houseTypeData?.unit_price_for_rent) {
                 const listingType = houseTypeData.listing_type || '1+1';
                 html += `<div class="assessment-item">
                     <span class="assessment-label">${getText('bedroomsLabel')} ${listingType}:</span>
-                    <span class="assessment-value">${formatValue(houseTypeData.min_unit_price_for_rent, 'price')}</span>
+                    <span class="assessment-value">${formatValue(houseTypeData.unit_price_for_rent, 'price')}</span>
                 </div>`;
             }
             
-            if (floorSegmentData?.min_unit_price_for_rent) {
+            if (floorSegmentData?.unit_price_for_rent) {
                 const listingType = floorSegmentData.listing_type || 'Giriş';
                 html += `<div class="assessment-item">
                     <span class="assessment-label">${getText('floorLabel')} ${listingType}:</span>
-                    <span class="assessment-value">${formatValue(floorSegmentData.min_unit_price_for_rent, 'price')}</span>
+                    <span class="assessment-value">${formatValue(floorSegmentData.unit_price_for_rent, 'price')}</span>
                 </div>`;
             }
             
-            if (ageData?.min_unit_price_for_rent) {
+            if (ageData?.unit_price_for_rent) {
                 const listingType = ageData.listing_type || '0–4';
                 html += `<div class="assessment-item">
                     <span class="assessment-label">${getText('ageLabel')} ${listingType}:</span>
-                    <span class="assessment-value">${formatValue(ageData.min_unit_price_for_rent, 'price')}</span>
+                    <span class="assessment-value">${formatValue(ageData.unit_price_for_rent, 'price')}</span>
                 </div>`;
             }
             
-            if (heatingData?.min_unit_price_for_rent) {
+            if (heatingData?.unit_price_for_rent) {
                 const listingType = heatingData.listing_type || 'Yok';
                 html += `<div class="assessment-item">
                     <span class="assessment-label">${getText('heatingLabel')} ${listingType}:</span>
-                    <span class="assessment-value">${formatValue(heatingData.min_unit_price_for_rent, 'price')}</span>
+                    <span class="assessment-value">${formatValue(heatingData.unit_price_for_rent, 'price')}</span>
                 </div>`;
             }
             
