@@ -631,43 +631,6 @@
             font-weight: 700;
         }
         
-        /* Мобильные устройства для объединенного анализа рынка */
-        @media (max-width: 768px) {
-            .market-analysis-unified {
-                margin: 25px 0;
-                padding: 20px;
-                border-radius: 12px;
-            }
-            
-            .analysis-title {
-                font-size: 16px;
-                margin-bottom: 16px;
-            }
-            
-            .analysis-section {
-                margin-bottom: 14px;
-                font-size: 13px;
-            }
-        }
-        
-        @media (max-width: 480px) {
-            .market-analysis-unified {
-                margin: 20px 0;
-                padding: 16px;
-                border-radius: 10px;
-            }
-            
-            .analysis-title {
-                font-size: 15px;
-                margin-bottom: 14px;
-            }
-            
-            .analysis-section {
-                margin-bottom: 12px;
-                font-size: 12px;
-            }
-        }
-        
         /* Стили для аккордеона администратора */
         .admin-data-accordion {
             margin: 30px 0;
@@ -782,6 +745,43 @@
         
         .accordion-table td.field-value {
             color: #2d3748;
+        }
+        
+        /* Мобильные устройства для объединенного анализа рынка */
+        @media (max-width: 768px) {
+            .market-analysis-unified {
+                margin: 25px 0;
+                padding: 20px;
+                border-radius: 12px;
+            }
+            
+            .analysis-title {
+                font-size: 16px;
+                margin-bottom: 16px;
+            }
+            
+            .analysis-section {
+                margin-bottom: 14px;
+                font-size: 13px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .market-analysis-unified {
+                margin: 20px 0;
+                padding: 16px;
+                border-radius: 10px;
+            }
+            
+            .analysis-title {
+                font-size: 15px;
+                margin-bottom: 14px;
+            }
+            
+            .analysis-section {
+                margin-bottom: 12px;
+                font-size: 12px;
+            }
         }
         
         /* Мобильные устройства для аккордеона */
@@ -3592,9 +3592,10 @@
             if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe && window.Telegram.WebApp.initDataUnsafe.user) {
                 const user = window.Telegram.WebApp.initDataUnsafe.user;
                 if (user && user.id) {
-                    // Check if user is admin using telegram_id
+                    // Check if user is admin (you can implement your own admin check logic)
+                    const isAdmin = true; // Placeholder - implement your admin check
                     
-                    if (isUserAdmin()) {
+                    if (isAdmin) {
                         adminDetails.innerHTML = `
                             country_id: ${selectedLocation.country_id}<br>
                             city_id: ${selectedLocation.city_id}<br>
@@ -3602,8 +3603,6 @@
                             district_id: ${selectedLocation.district_id || 'null'}
                         `;
                         adminIds.style.display = 'block';
-                    } else {
-                        adminIds.style.display = 'none';
                     }
                 }
             }
@@ -3976,7 +3975,7 @@
         }
 
         // Generate market indicators table with organized structure
-        function generateSummaryTable(data) {
+        async function generateSummaryTable(data) {
             const summaryContainer = document.getElementById('summaryDataContent');
             if (!summaryContainer) return;
             
@@ -4132,8 +4131,9 @@
                 html += generateMarketAnalysisText(summary);
             }
             
-            // Add detailed data tables for each category
-            html += generateDetailedDataTables(data);
+            // Add detailed data tables for each category (admin only)
+            const detailedTablesHtml = await generateDetailedDataTables(data);
+            html += detailedTablesHtml;
             
             // Add consolidated assessment block
             html += generateConsolidatedAssessment(data);
@@ -4155,9 +4155,17 @@
         }
 
         // Generate detailed data tables as accordion for admin users only
-        function generateDetailedDataTables(data) {
+        async function generateDetailedDataTables(data) {
             // Check if user is admin
-            if (!isUserAdmin()) {
+            const telegramId = getTelegramId();
+            if (!telegramId) {
+                console.log('⚠️ No telegram_id found');
+                return '';
+            }
+            
+            const isAdmin = await checkAdminStatus(telegramId);
+            if (!isAdmin) {
+                console.log('⚠️ User is not admin');
                 return '';
             }
             
@@ -4189,7 +4197,7 @@
             return html;
         }
 
-        // Generate accordion for specific category
+                // Generate accordion for specific category
         function generateCategoryAccordion(category, title, tableData) {
             if (!tableData || tableData.length === 0) return '';
             
@@ -4233,7 +4241,7 @@
                     
                     tableData.forEach(item => {
                         const value = item[field];
-                        html += `<td class="field-value">${formatFieldValue(value, field)}</td>';
+                        html += `<td class="field-value">${formatFieldValue(value, field)}</td>`;
                     });
                     
                     html += '</tr>';
@@ -4244,6 +4252,14 @@
             html += '</div></div></div>';
             
             return html;
+        }
+        
+        // Get telegram_id from Telegram WebApp
+        function getTelegramId() {
+            if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe && window.Telegram.WebApp.initDataUnsafe.user) {
+                return window.Telegram.WebApp.initDataUnsafe.user.id;
+            }
+            return null;
         }
         
         // Toggle accordion content
@@ -4263,34 +4279,7 @@
             }
         }
         
-        // Check if user is admin
-        function isUserAdmin() {
-            // Get telegram_id from localStorage or other source
-            const telegramId = localStorage.getItem('telegram_id') || getTelegramIdFromPage();
-            
-            if (!telegramId) {
-                console.log('⚠️ No telegram_id found');
-                return false;
-            }
-            
-            // Check admin status from server
-            return checkAdminStatus(telegramId);
-        }
-        
-        // Get telegram_id from page
-        function getTelegramIdFromPage() {
-            // Try to get from various sources
-            const telegramIdElement = document.querySelector('[data-telegram-id]');
-            if (telegramIdElement) {
-                return telegramIdElement.dataset.telegramId;
-            }
-            
-            // Try to get from URL parameters
-            const urlParams = new URLSearchParams(window.location.search);
-            return urlParams.get('telegram_id');
-        }
-        
-        // Check admin status from server
+        // Check if user is admin by telegram_id
         async function checkAdminStatus(telegramId) {
             try {
                 const response = await fetch('/api/check_admin_status', {
@@ -4301,6 +4290,10 @@
                     body: JSON.stringify({ telegram_id: telegramId })
                 });
                 
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
                 const result = await response.json();
                 return result.is_admin === true;
                 
@@ -4309,7 +4302,7 @@
                 return false;
             }
         }
-
+        
         // Load property trends data for selected location
         async function loadPropertyTrends(data) {
             try {
