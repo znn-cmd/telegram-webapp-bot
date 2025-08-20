@@ -839,168 +839,6 @@
             }
         }
         
-        /* Стили для сообщения о подписке */
-        .subscription-message {
-            background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
-            border-radius: 16px;
-            padding: 30px;
-            margin: 20px 0;
-            box-shadow: 0 4px 20px rgba(102, 126, 234, 0.1);
-            border: 1px solid rgba(102, 126, 234, 0.08);
-        }
-        
-        .subscription-title {
-            font-size: 18px;
-            font-weight: 700;
-            color: #2d3748;
-            text-align: center;
-            margin-bottom: 25px;
-            line-height: 1.4;
-        }
-        
-        .subscription-benefits,
-        .subscription-steps,
-        .subscription-support {
-            margin-bottom: 25px;
-        }
-        
-        .benefits-title,
-        .steps-title,
-        .support-title {
-            font-size: 16px;
-            font-weight: 600;
-            color: #4a5568;
-            margin-bottom: 15px;
-        }
-        
-        .benefits-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-        
-        .benefits-list li {
-            padding: 8px 0 8px 25px;
-            position: relative;
-            color: #2d3748;
-            font-size: 14px;
-        }
-        
-        .benefits-list li::before {
-            content: '✓';
-            position: absolute;
-            left: 0;
-            color: #28a745;
-            font-weight: bold;
-            font-size: 16px;
-        }
-        
-        .step-item {
-            display: flex;
-            align-items: flex-start;
-            margin-bottom: 12px;
-            padding: 8px 0;
-        }
-        
-        .step-number {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            font-weight: 600;
-            margin-right: 12px;
-            flex-shrink: 0;
-        }
-        
-        .step-text {
-            color: #2d3748;
-            font-size: 14px;
-            line-height: 1.5;
-        }
-        
-        .bot-link {
-            color: #667eea;
-            text-decoration: none;
-            font-weight: 600;
-            transition: color 0.2s ease;
-        }
-        
-        .bot-link:hover {
-            color: #5a67d8;
-            text-decoration: underline;
-        }
-        
-        .support-text {
-            color: #2d3748;
-            font-size: 14px;
-            line-height: 1.5;
-        }
-        
-        /* Мобильные устройства для сообщения о подписке */
-        @media (max-width: 768px) {
-            .subscription-message {
-                padding: 25px;
-                margin: 16px 0;
-                border-radius: 12px;
-            }
-            
-            .subscription-title {
-                font-size: 16px;
-                margin-bottom: 20px;
-            }
-            
-            .benefits-title,
-            .steps-title,
-            .support-title {
-                font-size: 15px;
-                margin-bottom: 12px;
-            }
-            
-            .benefits-list li,
-            .step-text,
-            .support-text {
-                font-size: 13px;
-            }
-        }
-        
-        @media (max-width: 480px) {
-            .subscription-message {
-                padding: 20px;
-                margin: 14px 0;
-                border-radius: 10px;
-            }
-            
-            .subscription-title {
-                font-size: 15px;
-                margin-bottom: 18px;
-            }
-            
-            .benefits-title,
-            .steps-title,
-            .support-title {
-                font-size: 14px;
-                margin-bottom: 10px;
-            }
-            
-            .benefits-list li,
-            .step-text,
-            .support-text {
-                font-size: 12px;
-            }
-            
-            .step-number {
-                width: 20px;
-                height: 20px;
-                font-size: 11px;
-                margin-right: 10px;
-            }
-        }
-        
         /* Мобильные устройства для таблицы показателей рынка */
         @media (max-width: 768px) {
             .summary-table-title {
@@ -2534,19 +2372,7 @@
                 // Ключи для текстового анализа рынка
                 'marketAnalysisTitle': 'Анализ рынка',
                 'saleAnalysisText': 'Продажа: при площади {area} м² (среднее значение по проданным объектам) и минимальной цене {minPrice}/м² срок продажи составляет ~{minDays} дней; при максимальной цене {maxPrice}/м² - срок продажи до {maxDays} дней.',
-                'rentAnalysisText': 'Аренда: при площади {area} м² (среднее значение по сданным в аренду объектам) минимальная цена {minPrice}/м² срок сдачи ~{minDays} дней; при максимальной цене {maxPrice}/м² срок до {maxDays} дней.',
-                
-                // Ключи для сообщения о подписке
-                'subscriptionRequiredTitle': 'Функция долгосрочного прогноза стоимости объекта доступна только для пользователей с активной подпиской.',
-                'subscriptionBenefitsTitle': 'Что даёт подписка:',
-                'subscriptionBenefit1': 'Прогноз цены объекта на 12 месяцев вперёд',
-                'subscriptionBenefit2': 'Дополнительные аналитические данные',
-                'subscriptionBenefit3': 'Дополнительные возможности сервиса',
-                'howToSubscribeTitle': 'Как оформить подписку:',
-                'subscriptionStep1': 'Перейдите к боту',
-                'subscriptionStep2': 'Следуйте инструкциям для подключения',
-                'needHelpTitle': 'Нужна помощь?',
-                'contactSupport': 'Свяжитесь с нашей поддержкой:'
+                'rentAnalysisText': 'Аренда: при площади {area} м² (среднее значение по сданным в аренду объектам) минимальная цена {minPrice}/м² срок сдачи ~{minDays} дней; при максимальной цене {maxPrice}/м² срок до {maxDays} дней.'
             },
             'en': {
                 'slogan': 'Real Estate Market Insights',
@@ -2645,19 +2471,7 @@
                 // Keys for market analysis text
                 'marketAnalysisTitle': 'Market Analysis',
                 'saleAnalysisText': 'Sale: with an area of {area} m² (average value for sold properties) and minimum price {minPrice}/m², the sale period is ~{minDays} days; with maximum price {maxPrice}/m² - sale period up to {maxDays} days.',
-                'rentAnalysisText': 'Rent: with an area of {area} m² (average value for rented properties) minimum price {minPrice}/m², rental period ~{minDays} days; with maximum price {maxPrice}/m², period up to {maxDays} days.',
-                
-                // Keys for subscription message
-                'subscriptionRequiredTitle': 'Long-term property value forecasting is only available for users with an active subscription.',
-                'subscriptionBenefitsTitle': 'What subscription gives you:',
-                'subscriptionBenefit1': 'Property price forecast for 12 months ahead',
-                'subscriptionBenefit2': 'Additional analytical data',
-                'subscriptionBenefit3': 'Additional service capabilities',
-                'howToSubscribeTitle': 'How to subscribe:',
-                'subscriptionStep1': 'Go to the bot',
-                'subscriptionStep2': 'Follow the connection instructions',
-                'needHelpTitle': 'Need help?',
-                'contactSupport': 'Contact our support:'
+                'rentAnalysisText': 'Rent: with an area of {area} m² (average value for rented properties) minimum price {minPrice}/m², rental period ~{minDays} days; with maximum price {maxPrice}/m², period up to {maxDays} days.'
             },
             'de': {
                 'slogan': 'Immobilienmarkt-Einblicke',
@@ -2800,19 +2614,7 @@
                 // "Piyasa Analizi" metni için anahtarlar
                 'marketAnalysisTitle': 'Piyasa Analizi',
                 'saleAnalysisText': 'Satış: {area} m² alan (satılan mülklerin ortalama değeri) ve {minPrice}/m² minimum fiyat ile satış süresi ~{minDays} gün; {maxPrice}/m² maksimum fiyat ile satış süresi {maxDays} güne kadar.',
-                'rentAnalysisText': 'Kiralama: {area} m² alan (kiralanan mülklerin ortalama değeri) {minPrice}/m² minimum fiyat, kiralama süresi ~{minDays} gün; {maxPrice}/m² maksimum fiyat ile süre {maxDays} güne kadar.',
-                
-                // "Abonelik" mesajı için anahtarlar
-                'subscriptionRequiredTitle': 'Uzun vadeli mülk değeri tahmin fonksiyonu sadece aktif aboneliği olan kullanıcılar için mevcuttur.',
-                'subscriptionBenefitsTitle': 'Abonelik ne sağlar:',
-                'subscriptionBenefit1': '12 ay öncesi mülk fiyat tahmini',
-                'subscriptionBenefit2': 'Ek analitik veriler',
-                'subscriptionBenefit3': 'Ek servis özellikleri',
-                'howToSubscribeTitle': 'Nasıl abone olunur:',
-                'subscriptionStep1': 'Bota gidin',
-                'subscriptionStep2': 'Bağlantı talimatlarını takip edin',
-                'needHelpTitle': 'Yardıma mı ihtiyacınız var?',
-                'contactSupport': 'Destek ekibimizle iletişime geçin:'
+                'rentAnalysisText': 'Kiralama: {area} m² alan (kiralanan mülklerin ortalama değeri) {minPrice}/m² minimum fiyat, kiralama süresi ~{minDays} gün; {maxPrice}/m² maksimum fiyat ile süre {maxDays} güne kadar.'
             },
             'de': {
                 'slogan': 'Immobilienmarkt-Einblicke',
@@ -3636,22 +3438,8 @@
                 }
                 
                 propertyTypesDetails.innerHTML = html;
-                
-                // Показываем секцию с ID только для администраторов
-                if (isUserAdmin()) {
-                    adminIds.style.display = 'block';
-                    adminDetails.innerHTML = `
-                        country_id: ${selectedLocation.country_id}<br>
-                        city_id: ${selectedLocation.city_id}<br>
-                        county_id: ${selectedLocation.county_id}<br>
-                        district_id: ${selectedLocation.district_id || 'null'}
-                    `;
-                } else {
-                    adminIds.style.display = 'none';
-                }
             } else {
                 selectedPropertyTypes.style.display = 'none';
-                adminIds.style.display = 'none';
             }
         }
 
@@ -3804,17 +3592,18 @@
             if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe && window.Telegram.WebApp.initDataUnsafe.user) {
                 const user = window.Telegram.WebApp.initDataUnsafe.user;
                 if (user && user.id) {
-                    // Check if user is admin (you can implement your own admin check logic)
-                    const isAdmin = true; // Placeholder - implement your admin check
+                    // Check if user is admin using telegram_id
                     
-                    if (isAdmin) {
+                    if (isUserAdmin()) {
                         adminDetails.innerHTML = `
                             country_id: ${selectedLocation.country_id}<br>
                             city_id: ${selectedLocation.city_id}<br>
                             county_id: ${selectedLocation.county_id}<br>
                             district_id: ${selectedLocation.district_id || 'null'}
                         `;
-                        // Секция с ID показывается только в displaySelectedTypes для администраторов
+                        adminIds.style.display = 'block';
+                    } else {
+                        adminIds.style.display = 'none';
                     }
                 }
             }
@@ -4520,83 +4309,6 @@
                 return false;
             }
         }
-        
-        // Check user subscription status
-        async function checkUserSubscription() {
-            try {
-                // Сначала проверяем, является ли пользователь администратором
-                if (await isUserAdmin()) {
-                    return true; // Администраторы имеют доступ ко всему
-                }
-                
-                // Получаем telegram_id
-                const telegramId = localStorage.getItem('telegram_id') || getTelegramIdFromPage();
-                if (!telegramId) {
-                    return false;
-                }
-                
-                // Проверяем статус подписки на сервере
-                const response = await fetch('/api/check_subscription_status', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ telegram_id: telegramId })
-                });
-                
-                const result = await response.json();
-                
-                // Проверяем, что подписка активна и не истекла
-                if (result.has_active_subscription && result.period_end) {
-                    const today = new Date();
-                    const periodEnd = new Date(result.period_end);
-                    return today <= periodEnd;
-                }
-                
-                return false;
-                
-            } catch (error) {
-                console.error('❌ Error checking subscription status:', error);
-                return false;
-            }
-        }
-        
-        // Generate subscription message
-        function generateSubscriptionMessage() {
-            return `
-                <div class="subscription-message">
-                    <div class="subscription-title">${getText('subscriptionRequiredTitle')}</div>
-                    
-                    <div class="subscription-benefits">
-                        <div class="benefits-title">${getText('subscriptionBenefitsTitle')}</div>
-                        <ul class="benefits-list">
-                            <li>${getText('subscriptionBenefit1')}</li>
-                            <li>${getText('subscriptionBenefit2')}</li>
-                            <li>${getText('subscriptionBenefit3')}</li>
-                        </ul>
-                    </div>
-                    
-                    <div class="subscription-steps">
-                        <div class="steps-title">${getText('howToSubscribeTitle')}</div>
-                        <div class="step-item">
-                            <span class="step-number">1.</span>
-                            <span class="step-text">${getText('subscriptionStep1')} <a href="http://t.me/Aaadviser_pay_bot" target="_blank" class="bot-link">@Aaadviser_pay_bot</a></span>
-                        </div>
-                        <div class="step-item">
-                            <span class="step-number">2.</span>
-                            <span class="step-text">${getText('subscriptionStep2')}</span>
-                        </div>
-                    </div>
-                    
-                    <div class="subscription-support">
-                        <div class="support-title">${getText('needHelpTitle')}</div>
-                        <div class="support-text">
-                            ${getText('contactSupport')} <a href="http://t.me/Aaadviser_support_bot" target="_blank" class="bot-link">@Aaadviser_support_bot</a>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
 
         // Load property trends data for selected location
         async function loadPropertyTrends(data) {
@@ -5102,14 +4814,6 @@
             const currentDate = new Date();
             const currentYear = currentDate.getFullYear();
             const currentMonth = currentDate.getMonth() + 1; // getMonth() returns 0-11
-            
-            // Проверяем права подписки пользователя
-            const hasActiveSubscription = await checkUserSubscription();
-            
-            if (!hasActiveSubscription) {
-                // Показываем сообщение о необходимости подписки
-                return generateSubscriptionMessage();
-            }
             
             // Фильтруем тренды: текущий месяц и все последующие
             const forecastTrends = trends.filter(trend => {
