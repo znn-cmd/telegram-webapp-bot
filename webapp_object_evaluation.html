@@ -438,6 +438,106 @@
             color: #495057;
         }
         
+        /* Стили для карточек показателей рынка */
+        .market-indicators-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .indicator-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            overflow: hidden;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        
+        .indicator-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        }
+        
+        .card-header {
+            padding: 16px 20px;
+            font-size: 16px;
+            font-weight: 600;
+            color: white;
+            text-align: center;
+        }
+        
+        .sale-header {
+            background: linear-gradient(135deg, #28a745, #20c997);
+        }
+        
+        .rent-header {
+            background: linear-gradient(135deg, #007bff, #6610f2);
+        }
+        
+        .yield-header {
+            background: linear-gradient(135deg, #ffc107, #fd7e14);
+        }
+        
+        .card-content {
+            padding: 20px;
+        }
+        
+        .indicator-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .indicator-item:last-child {
+            border-bottom: none;
+        }
+        
+        .indicator-label {
+            font-weight: 500;
+            color: #495057;
+            font-size: 14px;
+        }
+        
+        .indicator-value {
+            font-weight: 600;
+            color: #28a745;
+            font-size: 14px;
+        }
+        
+        /* Мобильные устройства для карточек */
+        @media (max-width: 768px) {
+            .market-indicators-cards {
+                grid-template-columns: 1fr;
+                gap: 15px;
+                margin-top: 15px;
+            }
+            
+            .indicator-card {
+                border-radius: 8px;
+            }
+            
+            .card-header {
+                padding: 12px 16px;
+                font-size: 14px;
+            }
+            
+            .card-content {
+                padding: 16px;
+            }
+            
+            .indicator-item {
+                padding: 10px 0;
+            }
+            
+            .indicator-label,
+            .indicator-value {
+                font-size: 13px;
+            }
+        }
+        
         /* Мобильные устройства для таблицы показателей рынка */
         @media (max-width: 768px) {
             .summary-table-title {
@@ -3577,59 +3677,85 @@
                 }
             });
             
-            // Generate market indicators table
+            // Generate market indicators in readable text format
             let html = `<h4 class="summary-table-title">${getText('marketIndicatorsTitle')}</h4>`;
-            html += '<div class="summary-table-container">';
-            html += '<table class="summary-table">';
-            html += `<thead><tr><th>${getText('indicatorLabel')}</th><th>${getText('minValueLabel')}</th><th>${getText('maxValueLabel')}</th></tr></thead><tbody>`;
+            html += '<div class="market-indicators-cards">';
             
-            // Add Sale section header
-            html += `<tr class="section-header"><td colspan="3" class="sale-header">${getText('saleHeader')}</td></tr>`;
+            // Sale Section Card
+            html += '<div class="indicator-card sale-card">';
+            html += `<div class="card-header sale-header">${getText('saleHeader')}</div>`;
+            html += '<div class="card-content">';
             
-            // Add Sale fields
-            saleFields.forEach(field => {
-                if (summary[field]) {
-                    const fieldName = getFieldLabel(field, 'sale');
-                    html += `
-                        <tr>
-                            <td>${fieldName}</td>
-                            <td>${formatFieldValue(summary[field].min, field)}</td>
-                            <td>${formatFieldValue(summary[field].max, field)}</td>
-                        </tr>
-                    `;
-                }
-            });
-            
-            // Add Rent section header
-            html += `<tr class="section-header"><td colspan="3" class="rent-header">${getText('rentHeader')}</td></tr>`;
-            
-            // Add Rent fields
-            rentFields.forEach(field => {
-                if (summary[field]) {
-                    const fieldName = getFieldLabel(field, 'rent');
-                    html += `
-                        <tr>
-                            <td>${fieldName}</td>
-                            <td>${formatFieldValue(summary[field].min, field)}</td>
-                            <td>${formatFieldValue(summary[field].max, field)}</td>
-                        </tr>
-                    `;
-                }
-            });
-            
-            // Add Yield with bold styling
-            if (summary.yield) {
-                html += `<tr class="yield-row"><td colspan="3" class="yield-header">${getText('yieldLabel')}</td></tr>`;
-                html += `
-                    <tr class="yield-data">
-                        <td class="yield-label">${getText('yieldLabel')}</td>
-                        <td class="yield-value">${formatFieldValue(summary.yield.min, 'yield')}</td>
-                        <td class="yield-value">${formatFieldValue(summary.yield.max, 'yield')}</td>
-                    </tr>
-                `;
+            if (summary.comparable_area_for_sale) {
+                const area = summary.comparable_area_for_sale;
+                html += `<div class="indicator-item">
+                    <span class="indicator-label">${getText('comparableAreaForSaleLabel')}:</span>
+                    <span class="indicator-value">${area.min} – ${area.max} м²</span>
+                </div>`;
             }
             
-            html += '</tbody></table>';
+            if (summary.listing_period_for_sale) {
+                const period = summary.listing_period_for_sale;
+                html += `<div class="indicator-item">
+                    <span class="indicator-label">${getText('listingPeriodForSaleLabel')}:</span>
+                    <span class="indicator-value">${period.min} – ${period.max} дней</span>
+                </div>`;
+            }
+            
+            if (summary.unit_price_for_sale) {
+                const price = summary.unit_price_for_sale;
+                html += `<div class="indicator-item">
+                    <span class="indicator-label">${getText('unitPriceForSaleLabel')}:</span>
+                    <span class="indicator-value">${formatValue(price.min, 'price')} – ${formatValue(price.max, 'price')}</span>
+                </div>`;
+            }
+            
+            html += '</div></div>';
+            
+            // Rent Section Card
+            html += '<div class="indicator-card rent-card">';
+            html += `<div class="card-header rent-header">${getText('rentHeader')}</div>`;
+            html += '<div class="card-content">';
+            
+            if (summary.comparable_area_for_rent) {
+                const area = summary.comparable_area_for_rent;
+                html += `<div class="indicator-item">
+                    <span class="indicator-label">${getText('comparableAreaForRentLabel')}:</span>
+                    <span class="indicator-value">${area.min} – ${area.max} м²</span>
+                </div>`;
+            }
+            
+            if (summary.listing_period_for_rent) {
+                const period = summary.listing_period_for_rent;
+                html += `<div class="indicator-item">
+                    <span class="indicator-label">${getText('listingPeriodForRentLabel')}:</span>
+                    <span class="indicator-value">${period.min} – ${period.max} дней</span>
+                </div>`;
+            }
+            
+            if (summary.unit_price_for_rent) {
+                const price = summary.unit_price_for_rent;
+                html += `<div class="indicator-item">
+                    <span class="indicator-label">${getText('unitPriceForRentLabel')}:</span>
+                    <span class="indicator-value">${formatValue(price.min, 'price')} – ${formatValue(price.max, 'price')}</span>
+                </div>`;
+            }
+            
+            html += '</div></div>';
+            
+            // Yield Section Card
+            if (summary.yield) {
+                const yieldData = summary.yield;
+                html += '<div class="indicator-card yield-card">';
+                html += `<div class="card-header yield-header">${getText('yieldLabel')}</div>`;
+                html += '<div class="card-content">';
+                html += `<div class="indicator-item">
+                    <span class="indicator-label">${getText('yieldLabel')}:</span>
+                    <span class="indicator-value">${yieldData.min.toFixed(2)}% – ${yieldData.max.toFixed(2)}%</span>
+                </div>`;
+                html += '</div></div>';
+            }
+            
             html += '</div>';
             
             // Add detailed data tables for each category
