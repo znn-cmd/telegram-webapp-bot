@@ -56,12 +56,10 @@
             house_type_data: [
                 {
                     listing_type: '1 спальня',
-                    average_age_for_sale: 5,
                     comparable_area_for_sale: 45,
                     count_for_sale: 25,
                     listing_period_for_sale: 60,
                     unit_price_for_sale: 15000,
-                    average_age_for_rent: 3,
                     comparable_area_for_rent: 40,
                     count_for_rent: 15,
                     listing_period_for_rent: 45,
@@ -70,12 +68,10 @@
                 },
                 {
                     listing_type: '2 спальни',
-                    average_age_for_sale: 7,
                     comparable_area_for_sale: 65,
                     count_for_sale: 35,
                     listing_period_for_sale: 75,
                     unit_price_for_sale: 18000,
-                    average_age_for_rent: 5,
                     comparable_area_for_rent: 60,
                     count_for_rent: 20,
                     listing_period_for_rent: 55,
@@ -86,12 +82,10 @@
             floor_segment_data: [
                 {
                     listing_type: '1-3 этаж',
-                    average_age_for_sale: 4,
                     comparable_area_for_sale: 55,
                     count_for_sale: 30,
                     listing_period_for_sale: 65,
                     unit_price_for_sale: 16000,
-                    average_age_for_rent: 2,
                     comparable_area_for_rent: 50,
                     count_for_rent: 18,
                     listing_period_for_rent: 50,
@@ -102,12 +96,10 @@
             age_data: [
                 {
                     listing_type: '0-5 лет',
-                    average_age_for_sale: 2,
                     comparable_area_for_sale: 50,
                     count_for_sale: 40,
                     listing_period_for_sale: 55,
                     unit_price_for_sale: 17000,
-                    average_age_for_rent: 1,
                     comparable_area_for_rent: 45,
                     count_for_rent: 25,
                     listing_period_for_rent: 40,
@@ -118,12 +110,10 @@
             heating_data: [
                 {
                     listing_type: 'Центральное',
-                    average_age_for_sale: 6,
                     comparable_area_for_sale: 60,
                     count_for_sale: 45,
                     listing_period_for_sale: 70,
                     unit_price_for_sale: 16500,
-                    average_age_for_rent: 4,
                     comparable_area_for_rent: 55,
                     count_for_rent: 30,
                     listing_period_for_rent: 60,
@@ -506,10 +496,12 @@
                     return `₺${value.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
                 } else if (field.includes('yield') || field.includes('Yield')) {
                     return `${value.toFixed(2)}%`;
-                } else if (field.includes('age') || field.includes('Age')) {
-                    return `${value} лет`;
                 } else if (field.includes('period') || field.includes('Period')) {
                     return `${value} дней`;
+                } else if (field.includes('area') || field.includes('Area')) {
+                    return `${value} м²`;
+                } else if (field.includes('count') || field.includes('Count')) {
+                    return value.toLocaleString();
                 } else {
                     return value.toLocaleString();
                 }

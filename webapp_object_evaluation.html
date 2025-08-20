@@ -3266,6 +3266,23 @@
             return field.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
         }
 
+        // Get localized field label
+        function getFieldLabel(field, type) {
+            const fieldLabels = {
+                'comparable_area_for_sale': 'comparableAreaForSaleLabel',
+                'count_for_sale': 'countForSaleLabel',
+                'listing_period_for_sale': 'listingPeriodForSaleLabel',
+                'unit_price_for_sale': 'unitPriceForSaleLabel',
+                'comparable_area_for_rent': 'comparableAreaForRentLabel',
+                'count_for_rent': 'countForRentLabel',
+                'listing_period_for_rent': 'listingPeriodForRentLabel',
+                'unit_price_for_rent': 'unitPriceForRentLabel'
+            };
+            
+            const labelKey = fieldLabels[field];
+            return labelKey ? getText(labelKey) : formatFieldName(field);
+        }
+
         // Format field value
         function formatFieldValue(value, field) {
             if (value === null || value === undefined) return '-';
@@ -3279,10 +3296,12 @@
                     return `${parseFloat(value).toFixed(2)}%`;
                 } else if (field.includes('rate')) {
                     return formatValue(value, 'percentage');
-                } else if (field.includes('age') || field.includes('Age')) {
-                    return formatValue(value, 'years');
                 } else if (field.includes('period') || field.includes('Period')) {
                     return formatValue(value, 'days');
+                } else if (field.includes('area') || field.includes('Area')) {
+                    return `${value} м²`;
+                } else if (field.includes('count') || field.includes('Count')) {
+                    return value.toLocaleString();
                 } else {
                     return value.toLocaleString();
                 }
@@ -3300,8 +3319,6 @@
                     return `₺${parseFloat(value).toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
                 case 'percentage':
                     return `${parseFloat(value).toFixed(2)}%`;
-                case 'years':
-                    return `${value} лет`;
                 case 'days':
                     return `${value} дней`;
                 default:
@@ -3478,13 +3495,13 @@
             
             // Define fields for summary with new structure
             const saleFields = [
-                'average_age_for_sale', 'comparable_area_for_sale', 'count_for_sale', 
-                'listing_period_for_sale', 'min_unit_price_for_sale'
+                'comparable_area_for_sale', 'count_for_sale', 
+                'listing_period_for_sale', 'unit_price_for_sale'
             ];
             
             const rentFields = [
-                'average_age_for_rent', 'comparable_area_for_rent', 'count_for_rent', 
-                'listing_period_for_rent', 'min_unit_price_for_rent'
+                'comparable_area_for_rent', 'count_for_rent', 
+                'listing_period_for_rent', 'unit_price_for_rent'
             ];
             
             // Calculate min/max values for all fields
@@ -3505,10 +3522,10 @@
             });
             
             // Generate market indicators table
-            let html = '<h4 class="summary-table-title">Показатели рынка</h4>';
+            let html = `<h4 class="summary-table-title">${getText('marketIndicatorsTitle')}</h4>`;
             html += '<div class="summary-table-container">';
             html += '<table class="summary-table">';
-            html += '<thead><tr><th>Показатель</th><th>Минимальное значение</th><th>Максимальное значение</th></tr></thead><tbody>';
+            html += `<thead><tr><th>${getText('indicatorLabel')}</th><th>${getText('minValueLabel')}</th><th>${getText('maxValueLabel')}</th></tr></thead><tbody>`;
             
             // Add Sale section header
             html += `<tr class="section-header"><td colspan="3" class="sale-header">${getText('saleHeader')}</td></tr>`;
@@ -3516,7 +3533,7 @@
             // Add Sale fields
             saleFields.forEach(field => {
                 if (summary[field]) {
-                    const fieldName = field === 'min_unit_price_for_sale' ? 'Unit Price For Sale' : formatFieldName(field);
+                    const fieldName = getFieldLabel(field, 'sale');
                     html += `
                         <tr>
                             <td>${fieldName}</td>
@@ -3533,7 +3550,7 @@
             // Add Rent fields
             rentFields.forEach(field => {
                 if (summary[field]) {
-                    const fieldName = field === 'min_unit_price_for_rent' ? 'Unit Price For Rent' : formatFieldName(field);
+                    const fieldName = getFieldLabel(field, 'rent');
                     html += `
                         <tr>
                             <td>${fieldName}</td>
@@ -3546,10 +3563,10 @@
             
             // Add Yield with bold styling
             if (summary.yield) {
-                html += '<tr class="yield-row"><td colspan="3" class="yield-header">Yield</td></tr>';
+                html += `<tr class="yield-row"><td colspan="3" class="yield-header">${getText('yieldLabel')}</td></tr>`;
                 html += `
                     <tr class="yield-data">
-                        <td class="yield-label">Yield</td>
+                        <td class="yield-label">${getText('yieldLabel')}</td>
                         <td class="yield-value">${formatFieldValue(summary.yield.min, 'yield')}</td>
                         <td class="yield-value">${formatFieldValue(summary.yield.max, 'yield')}</td>
                     </tr>
