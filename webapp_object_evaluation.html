@@ -455,13 +455,13 @@
             color: #495057;
         }
         
-        /* Стили для объединенной карточки показателей рынка в стиле "Тренд цен" */
+        /* Стили для объединенной карточки показателей рынка в стиле консолидированной оценки */
         .market-indicators-unified {
             margin-top: 20px;
         }
         
         .unified-indicator-card {
-            background: #f8f9fa;
+            background: white;
             border-radius: 16px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
             overflow: hidden;
@@ -491,7 +491,7 @@
         .section-title {
             font-size: 16px;
             font-weight: 700;
-            color: #2d3748;
+            color: #333333;
             margin-bottom: 16px;
             text-align: center;
         }
@@ -502,20 +502,22 @@
             align-items: center;
             padding: 12px 0;
             margin-bottom: 8px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.08);
         }
         
         .indicator-item:last-child {
             margin-bottom: 0;
+            border-bottom: none;
         }
         
         .indicator-label {
-            color: #4a5568;
+            color: #333333;
             font-weight: 500;
             font-size: 14px;
         }
         
         .indicator-value {
-            color: #2d3748;
+            color: #4CAF50;
             font-weight: 600;
             font-size: 14px;
         }
@@ -590,7 +592,7 @@
         .market-analysis-unified {
             margin: 30px 0;
             padding: 25px;
-            background: #f8f9fa;
+            background: white;
             border-radius: 16px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
             border: 1px solid rgba(0, 0, 0, 0.05);
@@ -599,7 +601,7 @@
         .analysis-title {
             font-size: 18px;
             font-weight: 700;
-            color: #2d3748;
+            color: #333333;
             margin-bottom: 20px;
             text-align: center;
             position: relative;
@@ -623,9 +625,9 @@
         }
         
         .analysis-section {
-            margin: 0 0 16px 0;
+            margin: 0 0 20px 0;
             padding: 0;
-            color: #2d3748;
+            color: #333333;
             font-size: 14px;
         }
         
@@ -636,6 +638,13 @@
         .analysis-section strong {
             color: #1a202c;
             font-weight: 700;
+        }
+        
+        /* Разделитель между секциями анализа */
+        .section-spacing {
+            height: 20px;
+            margin: 0;
+            padding: 0;
         }
         
         /* Стили для аккордеона администратора */
@@ -775,6 +784,10 @@
             .block-spacing {
                 height: 30px;
             }
+            
+            .section-spacing {
+                height: 16px;
+            }
         }
         
         @media (max-width: 480px) {
@@ -796,6 +809,10 @@
             
             .block-spacing {
                 height: 25px;
+            }
+            
+            .section-spacing {
+                height: 14px;
             }
         }
         
@@ -2375,13 +2392,13 @@
                 'indicatorLabel': 'Показатель',
                 'minValueLabel': 'Минимальное значение',
                 'maxValueLabel': 'Максимальное значение',
-                'comparableAreaForSaleLabel': 'Сопоставимая площадь для продажи',
+                'comparableAreaForSaleLabel': 'Сопоставимая площадь',
                 'countForSaleLabel': 'Количество для продажи',
-                'listingPeriodForSaleLabel': 'Период размещения для продажи',
+                'listingPeriodForSaleLabel': 'Срок до продажи',
                 'unitPriceForSaleLabel': 'Цена за м² для продажи',
-                'comparableAreaForRentLabel': 'Сопоставимая площадь для аренды',
+                'comparableAreaForRentLabel': 'Сопоставимая площадь',
                 'countForRentLabel': 'Количество для аренды',
-                'listingPeriodForRentLabel': 'Период размещения для аренды',
+                'listingPeriodForRentLabel': 'Срок до аренды',
                 'unitPriceForRentLabel': 'Цена за м² для аренды',
                 
                 // Ключи для текстового анализа рынка
@@ -2474,13 +2491,13 @@
                 'indicatorLabel': 'Indicator',
                 'minValueLabel': 'Minimum Value',
                 'maxValueLabel': 'Maximum Value',
-                'comparableAreaForSaleLabel': 'Comparable Area for Sale',
+                'comparableAreaForSaleLabel': 'Comparable Area',
                 'countForSaleLabel': 'Count for Sale',
-                'listingPeriodForSaleLabel': 'Listing Period for Sale',
+                'listingPeriodForSaleLabel': 'Time to Sale',
                 'unitPriceForSaleLabel': 'Unit Price for Sale',
-                'comparableAreaForRentLabel': 'Comparable Area for Rent',
+                'comparableAreaForRentLabel': 'Comparable Area',
                 'countForRentLabel': 'Count for Rent',
-                'listingPeriodForRentLabel': 'Listing Period for Rent',
+                'listingPeriodForRentLabel': 'Time to Rent',
                 'unitPriceForRentLabel': 'Unit Price for Rent',
                 
                 // Keys for market analysis text
@@ -2758,13 +2775,13 @@
                 'indicatorLabel': 'Gösterge',
                 'minValueLabel': 'Minimum değer',
                 'maxValueLabel': 'Maksimum değer',
-                'comparableAreaForSaleLabel': 'Satış için karşılaştırılabilir alan',
+                'comparableAreaForSaleLabel': 'Karşılaştırılabilir alan',
                 'countForSaleLabel': 'Satış için sayı',
-                'listingPeriodForSaleLabel': 'Satış için ilan süresi',
+                'listingPeriodForSaleLabel': 'Satışa kadar süre',
                 'unitPriceForSaleLabel': 'Satış için birim fiyat',
-                'comparableAreaForRentLabel': 'Kiralama için karşılaştırılabilir alan',
+                'comparableAreaForRentLabel': 'Karşılaştırılabilir alan',
                 'countForRentLabel': 'Kiralama için sayı',
-                'listingPeriodForRentLabel': 'Kiralama için ilan süresi',
+                'listingPeriodForRentLabel': 'Kiralamaya kadar süre',
                 'unitPriceForRentLabel': 'Kiralama için birim fiyat'
             }
         };
@@ -3941,9 +3958,9 @@
             return analysis;
         }
         
-        // Generate market analysis text
+        // Generate market analysis text in unified format (like "Вывод прогноза")
         function generateMarketAnalysisText(summary) {
-            let analysis = '<div class="market-analysis-text">';
+            let analysis = '<div class="market-analysis-unified">';
             analysis += `<h4 class="analysis-title">${getText('marketAnalysisTitle')}</h4>`;
             analysis += '<div class="analysis-content">';
             
@@ -3963,7 +3980,15 @@
                     .replace('{minDays}', period.min)
                     .replace('{maxDays}', period.max);
                 
-                analysis += `<p class="analysis-paragraph sale-analysis">${saleText}</p>`;
+                analysis += `<div class="analysis-section">
+                    <strong>${getText('saleHeader')}:</strong> ${saleText}
+                </div>`;
+            }
+            
+            // Add spacing between sections
+            if ((summary.comparable_area_for_sale && summary.listing_period_for_sale && summary.unit_price_for_sale) &&
+                (summary.comparable_area_for_rent && summary.listing_period_for_rent && summary.unit_price_for_rent)) {
+                analysis += '<div class="section-spacing"></div>';
             }
             
             // Rent analysis text
@@ -3982,7 +4007,9 @@
                     .replace('{minDays}', period.min)
                     .replace('{maxDays}', period.max);
                 
-                analysis += `<p class="analysis-paragraph rent-analysis">${rentText}</p>`;
+                analysis += `<div class="analysis-section">
+                    <strong>${getText('rentHeader')}:</strong> ${rentText}
+                </div>`;
             }
             
             analysis += '</div></div>';
@@ -4057,8 +4084,7 @@
             });
             
             // Generate market indicators in unified card format (like "Тренд цен")
-            let html = `<h4 class="summary-table-title">${getText('marketIndicatorsTitle')}</h4>`;
-            html += '<div class="market-indicators-unified">';
+            let html = '<div class="market-indicators-unified">';
             html += '<div class="unified-indicator-card">';
             
             // Sale Section
