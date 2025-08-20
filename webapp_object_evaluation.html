@@ -438,69 +438,6 @@
             color: #495057;
         }
         
-        /* Стили для новой таблицы анализа */
-        .data-row {
-            background: #ffffff;
-            border-bottom: 1px solid #dee2e6;
-        }
-        
-        .data-row:hover {
-            background: #f8f9fa;
-        }
-        
-        .data-source {
-            font-weight: 600;
-            color: #495057;
-            text-align: left;
-            padding-left: 12px;
-        }
-        
-        .data-criteria {
-            font-weight: 500;
-            color: #6c757d;
-            text-align: center;
-        }
-        
-        .data-count {
-            font-weight: 600;
-            color: #28a745;
-            text-align: center;
-        }
-        
-        .data-price {
-            font-weight: 600;
-            color: #007bff;
-            text-align: center;
-        }
-        
-        .data-range {
-            font-weight: 500;
-            color: #6c757d;
-            text-align: center;
-            font-size: 12px;
-        }
-        
-        /* Мобильные стили для новой таблицы */
-        @media (max-width: 480px) {
-            .data-source {
-                font-size: 11px;
-                padding-left: 8px;
-            }
-            
-            .data-criteria {
-                font-size: 10px;
-            }
-            
-            .data-count,
-            .data-price {
-                font-size: 11px;
-            }
-            
-            .data-range {
-                font-size: 9px;
-            }
-        }
-        
         /* Мобильные устройства для таблицы показателей рынка */
         @media (max-width: 768px) {
             .summary-table-title {
@@ -1687,7 +1624,7 @@
                 'floorLabel': 'Этаж',
                 'ageLabel': 'Возраст объекта',
                 'heatingLabel': 'Тип отопления',
-                'detailedAnalysisTitle': '📊 Анализ по выбранным параметрам',
+                'marketIndicatorsTitle': 'Показатели рынка',
                 'marketTrendsTitle': 'Тренды рынка',
                 'saleHeader': 'Продажа',
                 'rentHeader': 'Аренда',
@@ -1755,7 +1692,7 @@
                 'floorLabel': 'Floor',
                 'ageLabel': 'Property age',
                 'heatingLabel': 'Heating type',
-                'detailedAnalysisTitle': '📊 Analysis by Selected Parameters',
+                'marketIndicatorsTitle': 'Market Indicators',
                 'marketTrendsTitle': 'Market Trends',
                 'saleHeader': 'Sale',
                 'rentHeader': 'Rent',
@@ -3170,223 +3107,124 @@
             return analysis;
         }
 
-        // Generate detailed analysis table based on user selections
-        async function generateSummaryTable(data) {
+        // Generate market indicators table with organized structure
+        function generateSummaryTable(data) {
             const summaryContainer = document.getElementById('summaryDataContent');
             if (!summaryContainer) return;
             
-            // Check if user has made selections
-            if (!selectedListingTypes.bedrooms || !selectedListingTypes.floor || 
-                !selectedListingTypes.age || !selectedListingTypes.heating) {
+            // Collect all data from all tables
+            const allData = [];
+            const tables = ['general_data', 'house_type_data', 'floor_segment_data', 'age_data', 'heating_data'];
+            
+            tables.forEach(tableName => {
+                const tableData = data[tableName] || [];
+                if (Array.isArray(tableData)) {
+                    allData.push(...tableData);
+                }
+            });
+            
+            if (allData.length === 0) {
                 summaryContainer.innerHTML = `<div class="no-data">${getText('noDataAvailable')}</div>`;
                 return;
             }
             
-            // Get user selections
-            const userBedrooms = selectedListingTypes.bedrooms;
-            const userFloor = selectedListingTypes.floor;
-            const userAge = selectedListingTypes.age;
-            const userHeating = selectedListingTypes.heating;
+            // Define fields for summary with new structure
+            const saleFields = [
+                'average_age_for_sale', 'comparable_area_for_sale', 'count_for_sale', 
+                'listing_period_for_sale', 'min_unit_price_for_sale'
+            ];
             
-            // Get location IDs
-            const locationIds = {
-                city_id: selectedLocation.city_id,
-                county_id: selectedLocation.county_id,
-                district_id: selectedLocation.district_id,
-                listing_type: 'sale' // Default to sale, can be made dynamic later
-            };
+            const rentFields = [
+                'average_age_for_rent', 'comparable_area_for_rent', 'count_for_rent', 
+                'listing_period_for_rent', 'min_unit_price_for_rent'
+            ];
             
-            try {
-                // Fetch data from the specified tables with filters
-                const analysisData = await fetchDetailedAnalysis(locationIds, {
-                    bedrooms: userBedrooms,
-                    floor: userFloor,
-                    age: userAge,
-                    heating: userHeating
-                });
+            // Calculate min/max values for all fields
+            const summary = {};
+            const allFields = [...saleFields, ...rentFields, 'yield'];
+            
+            allFields.forEach(field => {
+                const values = allData
+                    .map(item => item[field])
+                    .filter(val => val !== null && val !== undefined && !isNaN(parseFloat(val)));
                 
-                if (!analysisData || Object.keys(analysisData).length === 0) {
-                    summaryContainer.innerHTML = `<div class="no-data">${getText('noDataAvailable')}</div>`;
-                    return;
+                if (values.length > 0) {
+                    summary[field] = {
+                        min: Math.min(...values),
+                        max: Math.max(...values)
+                    };
                 }
-                
-                // Generate the analysis table
-                let html = '<h4 class="summary-table-title">📊 Анализ по выбранным параметрам</h4>';
-                html += '<div class="summary-table-container">';
-                html += '<table class="summary-table">';
-                html += '<thead><tr><th>Источник данных</th><th>Критерий</th><th>Количество объектов</th><th>Средняя цена за м²</th><th>Диапазон цен</th></tr></thead><tbody>';
-                
-                // Add house_type_data analysis
-                if (analysisData.house_type_data) {
-                    const data = analysisData.house_type_data;
+            });
+            
+            // Generate market indicators table
+            let html = '<h4 class="summary-table-title">Показатели рынка</h4>';
+            html += '<div class="summary-table-container">';
+            html += '<table class="summary-table">';
+            html += '<thead><tr><th>Показатель</th><th>Минимальное значение</th><th>Максимальное значение</th></tr></thead><tbody>';
+            
+            // Add Sale section header
+            html += `<tr class="section-header"><td colspan="3" class="sale-header">${getText('saleHeader')}</td></tr>`;
+            
+            // Add Sale fields
+            saleFields.forEach(field => {
+                if (summary[field]) {
+                    const fieldName = field === 'min_unit_price_for_sale' ? 'Unit Price For Sale' : formatFieldName(field);
                     html += `
-                        <tr class="data-row">
-                            <td class="data-source">🏠 house_type_data</td>
-                            <td class="data-criteria">Спальны: ${userBedrooms}</td>
-                            <td class="data-count">${data.count || 0}</td>
-                            <td class="data-price">₺${(data.avg_price || 0).toLocaleString('ru-RU')}</td>
-                            <td class="data-range">₺${(data.min_price || 0).toLocaleString('ru-RU')} - ₺${(data.max_price || 0).toLocaleString('ru-RU')}</td>
+                        <tr>
+                            <td>${fieldName}</td>
+                            <td>${formatFieldValue(summary[field].min, field)}</td>
+                            <td>${formatFieldValue(summary[field].max, field)}</td>
                         </tr>
                     `;
                 }
-                
-                // Add floor_segment_data analysis
-                if (analysisData.floor_segment_data) {
-                    const data = analysisData.floor_segment_data;
+            });
+            
+            // Add Rent section header
+            html += `<tr class="section-header"><td colspan="3" class="rent-header">${getText('rentHeader')}</td></tr>`;
+            
+            // Add Rent fields
+            rentFields.forEach(field => {
+                if (summary[field]) {
+                    const fieldName = field === 'min_unit_price_for_rent' ? 'Unit Price For Rent' : formatFieldName(field);
                     html += `
-                        <tr class="data-row">
-                            <td class="data-source">🏢 floor_segment_data</td>
-                            <td class="data-criteria">Этаж: ${userFloor}</td>
-                            <td class="data-count">${data.count || 0}</td>
-                            <td class="data-price">₺${(data.avg_price || 0).toLocaleString('ru-RU')}</td>
-                            <td class="data-range">₺${(data.min_price || 0).toLocaleString('ru-RU')} - ₺${(data.max_price || 0).toLocaleString('ru-RU')}</td>
+                        <tr>
+                            <td>${fieldName}</td>
+                            <td>${formatFieldValue(summary[field].min, field)}</td>
+                            <td>${formatFieldValue(summary[field].max, field)}</td>
                         </tr>
                     `;
                 }
-                
-                // Add age_data analysis
-                if (analysisData.age_data) {
-                    const data = analysisData.age_data;
-                    html += `
-                        <tr class="data-row">
-                            <td class="data-source">🏗️ age_data</td>
-                            <td class="data-criteria">Возраст: ${userAge}</td>
-                            <td class="data-count">${data.count || 0}</td>
-                            <td class="data-price">₺${(data.avg_price || 0).toLocaleString('ru-RU')}</td>
-                            <td class="data-range">₺${(data.min_price || 0).toLocaleString('ru-RU')} - ₺${(data.max_price || 0).toLocaleString('ru-RU')}</td>
-                        </tr>
-                    `;
-                }
-                
-                // Add heating_data analysis
-                if (analysisData.heating_data) {
-                    const data = analysisData.heating_data;
-                    html += `
-                        <tr class="data-row">
-                            <td class="data-source">🔥 heating_data</td>
-                            <td class="data-criteria">Отопление: ${userHeating}</td>
-                            <td class="data-count">${data.count || 0}</td>
-                            <td class="data-price">₺${(data.avg_price || 0).toLocaleString('ru-RU')}</td>
-                            <td class="data-range">₺${(data.min_price || 0).toLocaleString('ru-RU')} - ₺${(data.max_price || 0).toLocaleString('ru-RU')}</td>
-                        </tr>
-                    `;
-                }
-                
-                html += '</tbody></table>';
-                html += '</div>';
-                
-                // Add market comparison block below the table
-                html += generateMarketComparison(analysisData);
-                
-                // Add analytical summary below the comparison block
-                html += generateAnalyticalSummary(analysisData);
-                
-                summaryContainer.innerHTML = html;
-                
-                // Load property trends data
-                loadPropertyTrends(data);
-                
-            } catch (error) {
-                console.error('Error generating summary table:', error);
-                summaryContainer.innerHTML = `<div class="error">Ошибка загрузки данных</div>`;
+            });
+            
+            // Add Yield with bold styling
+            if (summary.yield) {
+                html += '<tr class="yield-row"><td colspan="3" class="yield-header">Yield</td></tr>';
+                html += `
+                    <tr class="yield-data">
+                        <td class="yield-label">Yield</td>
+                        <td class="yield-value">${formatFieldValue(summary.yield.min, 'yield')}</td>
+                        <td class="yield-value">${formatFieldValue(summary.yield.max, 'yield')}</td>
+                    </tr>
+                `;
             }
-        }
-
-        // Fetch detailed analysis data from specified tables
-        async function fetchDetailedAnalysis(locationIds, userCriteria) {
-            try {
-                const analysisData = {};
-                
-                // Fetch house_type_data filtered by bedrooms
-                if (userCriteria.bedrooms) {
-                    const houseTypeResponse = await fetch('/api/analysis/house-type', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            ...locationIds,
-                            bedrooms: userCriteria.bedrooms
-                        })
-                    });
-                    
-                    if (houseTypeResponse.ok) {
-                        const houseTypeData = await houseTypeResponse.json();
-                        if (houseTypeData.success) {
-                            analysisData.house_type_data = houseTypeData.data;
-                        }
-                    }
-                }
-                
-                // Fetch floor_segment_data filtered by floor
-                if (userCriteria.floor) {
-                    const floorSegmentResponse = await fetch('/api/analysis/floor-segment', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            ...locationIds,
-                            floor: userCriteria.floor
-                        })
-                    });
-                    
-                    if (floorSegmentResponse.ok) {
-                        const floorSegmentData = await floorSegmentResponse.json();
-                        if (floorSegmentData.success) {
-                            analysisData.floor_segment_data = floorSegmentData.data;
-                        }
-                    }
-                }
-                
-                // Fetch age_data filtered by age
-                if (userCriteria.age) {
-                    const ageDataResponse = await fetch('/api/analysis/age-data', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            ...locationIds,
-                            age: userCriteria.age
-                        })
-                    });
-                    
-                    if (ageDataResponse.ok) {
-                        const ageData = await ageDataResponse.json();
-                        if (ageData.success) {
-                            analysisData.age_data = ageData.data;
-                        }
-                    }
-                }
-                
-                // Fetch heating_data filtered by heating type
-                if (userCriteria.heating) {
-                    const heatingDataResponse = await fetch('/api/analysis/heating-data', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            ...locationIds,
-                            heating_type: userCriteria.heating
-                        })
-                    });
-                    
-                    if (heatingDataResponse.ok) {
-                        const heatingData = await heatingDataResponse.json();
-                        if (heatingData.success) {
-                            analysisData.heating_data = heatingData.data;
-                        }
-                    }
-                }
-                
-                return analysisData;
-                
-            } catch (error) {
-                console.error('Error fetching detailed analysis:', error);
-                return {};
+            
+            html += '</tbody></table>';
+            html += '</div>';
+            
+            // Add market comparison block below the table
+            if (Object.keys(summary).length > 0) {
+                html += generateMarketComparison(summary);
             }
+            
+            // Add analytical summary below the comparison block
+            if (Object.keys(summary).length > 0) {
+                html += generateAnalyticalSummary(summary);
+            }
+            
+            summaryContainer.innerHTML = html;
+            
+            // Load property trends data
+            loadPropertyTrends(data);
         }
 
         // Load property trends data for selected location

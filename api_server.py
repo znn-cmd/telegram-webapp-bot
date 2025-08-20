@@ -7,11 +7,7 @@ from api_functions import (
     get_user_balance,
     charge_user_for_report,
     update_user_balance,
-    get_latest_currency_rates,
-    get_house_type_analysis,
-    get_floor_segment_analysis,
-    get_age_data_analysis,
-    get_heating_data_analysis
+    get_latest_currency_rates
 )
 
 # Загружаем переменные окружения
@@ -211,94 +207,6 @@ def latest_currency():
     try:
         currency_data = get_latest_currency_rates()
         return jsonify(currency_data)
-        
-    except Exception as e:
-        return jsonify({'success': False, 'error': str(e)}), 500
-
-@app.route('/api/analysis/house-type', methods=['POST'])
-def house_type_analysis():
-    """Анализ данных по типу дома (количество спален)"""
-    try:
-        data = request.get_json()
-        location_ids = {
-            'city_id': data.get('city_id'),
-            'county_id': data.get('county_id'),
-            'district_id': data.get('district_id'),
-            'listing_type': data.get('listing_type')
-        }
-        bedrooms = data.get('bedrooms')
-        
-        if not bedrooms:
-            return jsonify({'success': False, 'error': 'Количество спален не указано'}), 400
-        
-        analysis_result = get_house_type_analysis(location_ids, bedrooms)
-        return jsonify(analysis_result)
-        
-    except Exception as e:
-        return jsonify({'success': False, 'error': str(e)}), 500
-
-@app.route('/api/analysis/floor-segment', methods=['POST'])
-def floor_segment_analysis():
-    """Анализ данных по этажу"""
-    try:
-        data = request.get_json()
-        location_ids = {
-            'city_id': data.get('city_id'),
-            'county_id': data.get('county_id'),
-            'district_id': data.get('district_id'),
-            'listing_type': data.get('listing_type')
-        }
-        floor = data.get('floor')
-        
-        if not floor:
-            return jsonify({'success': False, 'error': 'Этаж не указан'}), 400
-        
-        analysis_result = get_floor_segment_analysis(location_ids, floor)
-        return jsonify(analysis_result)
-        
-    except Exception as e:
-        return jsonify({'success': False, 'error': str(e)}), 500
-
-@app.route('/api/analysis/age-data', methods=['POST'])
-def age_data_analysis():
-    """Анализ данных по возрасту объекта"""
-    try:
-        data = request.get_json()
-        location_ids = {
-            'city_id': data.get('city_id'),
-            'county_id': data.get('county_id'),
-            'district_id': data.get('district_id'),
-            'listing_type': data.get('listing_type')
-        }
-        age = data.get('age')
-        
-        if not age:
-            return jsonify({'success': False, 'error': 'Возраст объекта не указан'}), 400
-        
-        analysis_result = get_age_data_analysis(location_ids, age)
-        return jsonify(analysis_result)
-        
-    except Exception as e:
-        return jsonify({'success': False, 'error': str(e)}), 500
-
-@app.route('/api/analysis/heating-data', methods=['POST'])
-def heating_data_analysis():
-    """Анализ данных по типу отопления"""
-    try:
-        data = request.get_json()
-        location_ids = {
-            'city_id': data.get('city_id'),
-            'county_id': data.get('county_id'),
-            'district_id': data.get('district_id'),
-            'listing_type': data.get('listing_type')
-        }
-        heating_type = data.get('heating_type')
-        
-        if not heating_type:
-            return jsonify({'success': False, 'error': 'Тип отопления не указан'}), 400
-        
-        analysis_result = get_heating_data_analysis(location_ids, heating_type)
-        return jsonify(analysis_result)
         
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
