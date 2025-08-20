@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест таблиц данных</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px 5px;
+        }
+        .test-button:hover {
+            background: #0056b3;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background: #f9f9f9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Тест таблиц данных для оценки объекта</h1>
+        
+        <h2>Тестовые данные</h2>
+        <button class="test-button" onclick="testDetailedTables()">Тест детальных таблиц</button>
+        <button class="test-button" onclick="testLocalization()">Тест локализации</button>
+        
+        <div id="result" class="result"></div>
+    </div>
+
+    <script>
+        // Тестовые данные
+        const testData = {
+            house_type_data: [
+                {
+                    listing_type: '1 спальня',
+                    average_age_for_sale: 5,
+                    comparable_area_for_sale: 45,
+                    count_for_sale: 25,
+                    listing_period_for_sale: 60,
+                    min_unit_price_for_sale: 15000,
+                    average_age_for_rent: 3,
+                    comparable_area_for_rent: 40,
+                    count_for_rent: 15,
+                    listing_period_for_rent: 45,
+                    min_unit_price_for_rent: 120,
+                    yield: 6.8
+                },
+                {
+                    listing_type: '2 спальни',
+                    average_age_for_sale: 7,
+                    comparable_area_for_sale: 65,
+                    count_for_sale: 35,
+                    listing_period_for_sale: 75,
+                    min_unit_price_for_sale: 18000,
+                    average_age_for_rent: 5,
+                    comparable_area_for_rent: 60,
+                    count_for_rent: 20,
+                    listing_period_for_rent: 55,
+                    min_unit_price_for_rent: 150,
+                    yield: 7.2
+                }
+            ],
+            floor_segment_data: [
+                {
+                    listing_type: '1-3 этаж',
+                    average_age_for_sale: 4,
+                    comparable_area_for_sale: 55,
+                    count_for_sale: 30,
+                    listing_period_for_sale: 65,
+                    min_unit_price_for_sale: 16000,
+                    average_age_for_rent: 2,
+                    comparable_area_for_rent: 50,
+                    count_for_rent: 18,
+                    listing_period_for_rent: 50,
+                    min_unit_price_for_rent: 135,
+                    yield: 6.9
+                }
+            ],
+            age_data: [
+                {
+                    listing_type: '0-5 лет',
+                    average_age_for_sale: 2,
+                    comparable_area_for_sale: 50,
+                    count_for_sale: 40,
+                    listing_period_for_sale: 55,
+                    min_unit_price_for_sale: 17000,
+                    average_age_for_rent: 1,
+                    comparable_area_for_rent: 45,
+                    count_for_rent: 25,
+                    listing_period_for_rent: 40,
+                    min_unit_price_for_rent: 140,
+                    yield: 7.5
+                }
+            ],
+            heating_data: [
+                {
+                    listing_type: 'Центральное',
+                    average_age_for_sale: 6,
+                    comparable_area_for_sale: 60,
+                    count_for_sale: 45,
+                    listing_period_for_sale: 70,
+                    min_unit_price_for_sale: 16500,
+                    average_age_for_rent: 4,
+                    comparable_area_for_rent: 55,
+                    count_for_rent: 30,
+                    listing_period_for_rent: 60,
+                    min_unit_price_for_rent: 145,
+                    yield: 7.0
+                }
+            ]
+        };
+
+        // Функция для тестирования детальных таблиц
+        function testDetailedTables() {
+            const resultDiv = document.getElementById('result');
+            
+            // Генерируем HTML для таблиц
+            let html = '<h3>Результат генерации таблиц:</h3>';
+            html += generateDetailedDataTables(testData);
+            
+            resultDiv.innerHTML = html;
+        }
+
+        // Функция для тестирования локализации
+        function testLocalization() {
+            const resultDiv = document.getElementById('result');
+            
+            const locales = {
+                'ru': {
+                    'houseTypeDataTitle': 'Данные по количеству спален',
+                    'floorSegmentDataTitle': 'Данные по этажу',
+                    'ageDataTitle': 'Данные по возрасту объектов',
+                    'heatingDataTitle': 'Данные по типу отопления'
+                },
+                'en': {
+                    'houseTypeDataTitle': 'Bedroom Count Data',
+                    'floorSegmentDataTitle': 'Floor Data',
+                    'ageDataTitle': 'Property Age Data',
+                    'heatingDataTitle': 'Heating Type Data'
+                },
+                'de': {
+                    'houseTypeDataTitle': 'Schlafzimmer-Anzahl-Daten',
+                    'floorSegmentDataTitle': 'Etagen-Daten',
+                    'ageDataTitle': 'Altersdaten',
+                    'heatingDataTitle': 'Heizungstyp-Daten'
+                },
+                'fr': {
+                    'houseTypeDataTitle': 'Données du nombre de chambres',
+                    'floorSegmentDataTitle': 'Données d\'étage',
+                    'ageDataTitle': 'Données d\'âge',
+                    'heatingDataTitle': 'Données du type de chauffage'
+                },
+                'tr': {
+                    'houseTypeDataTitle': 'Yatak Odası Sayısı Verileri',
+                    'floorSegmentDataTitle': 'Kat Verileri',
+                    'ageDataTitle': 'Yaş Verileri',
+                    'heatingDataTitle': 'Isıtma Tipi Verileri'
+                }
+            };
+
+            let html = '<h3>Тест локализации:</h3>';
+            
+            Object.entries(locales).forEach(([lang, texts]) => {
+                html += `<h4>${lang.toUpperCase()}:</h4>`;
+                html += `<ul>`;
+                html += `<li>${texts.houseTypeDataTitle}</li>`;
+                html += `<li>${texts.floorSegmentDataTitle}</li>`;
+                html += `<li>${texts.ageDataTitle}</li>`;
+                html += `<li>${texts.heatingDataTitle}</li>`;
+                html += `</ul>`;
+            });
+            
+            resultDiv.innerHTML = html;
+        }
+
+        // Функция генерации детальных таблиц (копия из основного файла)
+        function generateDetailedDataTables(data) {
+            let html = '';
+            
+            // House Type Data Table
+            if (data.house_type_data && data.house_type_data.length > 0) {
+                html += generateCategoryTable('house_type_data', 'Данные по количеству спален', data.house_type_data);
+            }
+            
+            // Floor Segment Data Table
+            if (data.floor_segment_data && data.floor_segment_data.length > 0) {
+                html += generateCategoryTable('floor_segment_data', 'Данные по этажу', data.floor_segment_data);
+            }
+            
+            // Age Data Table
+            if (data.age_data && data.age_data.length > 0) {
+                html += generateCategoryTable('age_data', 'Данные по возрасту объектов', data.age_data);
+            }
+            
+            // Heating Data Table
+            if (data.heating_data && data.heating_data.length > 0) {
+                html += generateCategoryTable('heating_data', 'Данные по типу отопления', data.heating_data);
+            }
+            
+            return html;
+        }
+
+        // Функция генерации таблицы для конкретной категории
+        function generateCategoryTable(category, title, tableData) {
+            if (!tableData || tableData.length === 0) return '';
+            
+            // Получаем все уникальные поля из данных
+            const allFields = new Set();
+            tableData.forEach(item => {
+                Object.keys(item).forEach(key => {
+                    if (key !== 'id' && key !== 'created_at' && key !== 'updated_at' && 
+                        key !== 'country_id' && key !== 'city_id' && key !== 'county_id' && key !== 'district_id') {
+                        allFields.add(key);
+                    }
+                });
+            });
+            
+            const fields = Array.from(allFields).sort();
+            
+            let html = '<div style="margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 8px;">';
+            html += `<h4 style="margin: 0 0 15px 0; color: #495057; text-align: center; border-bottom: 2px solid #667eea; padding-bottom: 8px;">${title}</h4>`;
+            html += '<div style="overflow-x: auto;">';
+            html += '<table style="width: 100%; border-collapse: collapse; background: white; font-size: 12px; min-width: 600px;">';
+            html += '<thead><tr>';
+            
+            // Добавляем заголовки
+            html += '<th style="background: #28a745; color: white; padding: 10px 8px; text-align: center; font-weight: 600; border: 1px solid #dee2e6;">Параметр</th>';
+            tableData.forEach((item, index) => {
+                const listingType = item.listing_type || `Запись ${index + 1}`;
+                html += `<th style="background: #28a745; color: white; padding: 10px 8px; text-align: center; font-weight: 600; border: 1px solid #dee2e6;">${listingType}</th>`;
+            });
+            html += '</tr></thead><tbody>';
+            
+            // Добавляем строки данных
+            fields.forEach(field => {
+                if (field !== 'listing_type') {
+                    html += '<tr>';
+                    html += `<td style="background: #f8f9fa; font-weight: 600; color: #495057; text-align: left; padding: 8px 12px; border: 1px solid #dee2e6; min-width: 150px;">${formatFieldName(field)}</td>`;
+                    
+                    tableData.forEach(item => {
+                        const value = item[field];
+                        html += `<td style="padding: 8px 6px; text-align: center; border: 1px solid #dee2e6; background: white;">${formatFieldValue(value, field)}</td>`;
+                    });
+                    
+                    html += '</tr>';
+                }
+            });
+            
+            html += '</tbody></table>';
+            html += '</div></div>';
+            
+            return html;
+        }
+
+        // Вспомогательные функции
+        function formatFieldName(field) {
+            return field.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+        }
+
+        function formatFieldValue(value, field) {
+            if (value === null || value === undefined) return '-';
+            
+            if (typeof value === 'number') {
+                if (field.includes('price') || field.includes('Price')) {
+                    return `₺${value.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+                } else if (field.includes('yield') || field.includes('Yield')) {
+                    return `${value.toFixed(2)}%`;
+                } else if (field.includes('age') || field.includes('Age')) {
+                    return `${value} лет`;
+                } else if (field.includes('period') || field.includes('Period')) {
+                    return `${value} дней`;
+                } else {
+                    return value.toLocaleString();
+                }
+            }
+            
+            return value.toString();
+        }
+    </script>
+</body>
+</html>

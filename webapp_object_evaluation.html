@@ -455,6 +455,123 @@
             }
         }
         
+        /* Detailed Data Tables Styles */
+        .detailed-data-section {
+            margin-top: 25px;
+            margin-bottom: 20px;
+        }
+        
+        .detailed-data-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 15px;
+            text-align: center;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #667eea;
+        }
+        
+        .detailed-data-container {
+            overflow-x: auto;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            background: white;
+        }
+        
+        .detailed-data-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            font-size: 12px;
+            min-width: 600px;
+        }
+        
+        .detailed-data-table th {
+            background: #28a745;
+            color: white;
+            padding: 10px 8px;
+            text-align: center;
+            font-weight: 600;
+            line-height: 1.2;
+            word-wrap: break-word;
+            border: 1px solid #dee2e6;
+        }
+        
+        .detailed-data-table td {
+            padding: 8px 6px;
+            text-align: center;
+            border: 1px solid #dee2e6;
+            word-wrap: break-word;
+            vertical-align: middle;
+        }
+        
+        .detailed-data-table .field-name {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #495057;
+            text-align: left;
+            padding-left: 12px;
+            min-width: 150px;
+        }
+        
+        .detailed-data-table .field-value {
+            background: white;
+            color: #333;
+        }
+        
+        .detailed-data-table tr:nth-child(even) .field-value {
+            background: #f8f9fa;
+        }
+        
+        .detailed-data-table tr:hover .field-value {
+            background: #e9ecef;
+        }
+        
+        /* Mobile responsive for detailed data tables */
+        @media (max-width: 768px) {
+            .detailed-data-section {
+                margin-top: 20px;
+                margin-bottom: 15px;
+            }
+            
+            .detailed-data-title {
+                font-size: 15px;
+                margin-bottom: 12px;
+            }
+            
+            .detailed-data-table {
+                font-size: 11px;
+                min-width: 500px;
+            }
+            
+            .detailed-data-table th,
+            .detailed-data-table td {
+                padding: 6px 4px;
+            }
+            
+            .detailed-data-table .field-name {
+                min-width: 120px;
+                padding-left: 8px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .detailed-data-table {
+                font-size: 10px;
+                min-width: 400px;
+            }
+            
+            .detailed-data-table th,
+            .detailed-data-table td {
+                padding: 4px 2px;
+            }
+            
+            .detailed-data-table .field-name {
+                min-width: 100px;
+                padding-left: 6px;
+            }
+        }
+        
         /* Market Comparison Block Styles */
         .market-comparison-block {
             margin-top: 20px;
@@ -1642,7 +1759,11 @@
                 'priceBelowMarket': 'Ваш объект (${userPrice}) ниже рынка на ${percent}%.',
                 'areaMatchesMarket': 'Ваш объект (${userArea} м²) соответствует рыночному спросу (${marketMin}–${marketMax} м²).',
                 'areaBelowMarket': 'Ваш объект (${userArea} м²) меньше востребованной на рынке (${marketMin}–${marketMax} м²).',
-                'areaAboveMarket': 'Ваш объект (${userArea} м²) больше востребованной на рынке (${marketMin}–${marketMax} м²).'
+                'areaAboveMarket': 'Ваш объект (${userArea} м²) больше востребованной на рынке (${marketMin}–${marketMax} м²).',
+                'houseTypeDataTitle': 'Данные по количеству спален',
+                'floorSegmentDataTitle': 'Данные по этажу',
+                'ageDataTitle': 'Данные по возрасту объектов',
+                'heatingDataTitle': 'Данные по типу отопления'
             },
             'en': {
                 'slogan': 'Real Estate Market Insights',
@@ -1710,7 +1831,140 @@
                 'priceBelowMarket': 'Your object (${userPrice}) is below market by ${percent}%.',
                 'areaMatchesMarket': 'Your object (${userArea} m²) matches market demand (${marketMin}–${marketMax} m²).',
                 'areaBelowMarket': 'Your object (${userArea} m²) is smaller than market demand (${marketMin}–${marketMax} m²).',
-                'areaAboveMarket': 'Your object (${userArea} m²) is larger than market demand (${marketMin}–${marketMax} m²).'
+                'areaAboveMarket': 'Your object (${userArea} m²) is larger than market demand (${marketMin}–${marketMax} m²).',
+                'houseTypeDataTitle': 'Bedroom Count Data',
+                'floorSegmentDataTitle': 'Floor Data',
+                'ageDataTitle': 'Property Age Data',
+                'heatingDataTitle': 'Heating Type Data'
+            },
+            'de': {
+                'slogan': 'Immobilienmarkt-Einblicke',
+                'pageTitle': 'Objektbewertung',
+                'pageDescription': 'Erhalten Sie eine professionelle Immobilienbewertung in der ausgewählten Region',
+                'countryLabel': 'Land:',
+                'cityLabel': 'Stadt:',
+                'countyLabel': 'Region/Bereich:',
+                'districtLabel': 'Bezirk:',
+                'countryPlaceholder': 'Land auswählen',
+                'cityPlaceholder': 'Zuerst Land auswählen',
+                'countyPlaceholder': 'Zuerst Stadt auswählen',
+                'districtPlaceholder': 'Zuerst Region auswählen',
+                'confirmButtonText': 'Auswahl bestätigen',
+                'backButton': '← Zurück zum Hauptmenü',
+                'selectedLocationTitle': 'Ausgewählte Lage:',
+                'adminIdsTitle': 'IDs für Administratoren:',
+                'loading': 'Laden...',
+                'errorLoading': 'Fehler beim Laden der Daten',
+                'dataSectionTitle': 'Regionale Datenanalyse',
+                'generalDataTitle': 'Allgemeine Daten',
+                'houseTypeDataTitle': 'Schlafzimmer-Anzahl-Daten',
+                'floorSegmentDataTitle': 'Etagen-Daten',
+                'ageDataTitle': 'Altersdaten',
+                'heatingDataTitle': 'Heizungstyp-Daten',
+                'loadingText': 'Daten werden geladen...',
+                'errorText': 'Fehler beim Laden der Daten',
+                'totalProperties': 'Gesamtobjekte:',
+                'averagePrice': 'Durchschnittspreis:',
+                'priceRange': 'Preisbereich:',
+                'noDataAvailable': 'Daten nicht verfügbar',
+                'keyMetricsTitle': 'Wichtige Kennzahlen',
+                'avgSalePriceLabel': 'Durchschnittlicher Verkaufspreis pro m²',
+                'avgRentPriceLabel': 'Durchschnittlicher Mietpreis pro m²',
+                'listingPeriodSaleLabel': 'Angebotsdauer (Verkauf)',
+                'listingPeriodRentLabel': 'Angebotsdauer (Vermietung)',
+                'yieldLabel': 'Rendite',
+                'insightsTitle': 'Zusammenfassung',
+                'insightsLoading': 'Daten werden analysiert...',
+                'insightsError': 'Fehler bei der Datenanalyse'
+            },
+            'fr': {
+                'slogan': 'Aperçus du marché immobilier',
+                'pageTitle': 'Évaluation d\'objet',
+                'pageDescription': 'Obtenez une évaluation professionnelle de propriété dans la région sélectionnée',
+                'countryLabel': 'Pays :',
+                'cityLabel': 'Ville :',
+                'countyLabel': 'Région/Zone :',
+                'districtLabel': 'District :',
+                'countryPlaceholder': 'Sélectionner un pays',
+                'cityPlaceholder': 'D\'abord sélectionner un pays',
+                'countyPlaceholder': 'D\'abord sélectionner une ville',
+                'districtPlaceholder': 'D\'abord sélectionner une région',
+                'confirmButtonText': 'Confirmer la sélection',
+                'backButton': '← Retour au menu principal',
+                'selectedLocationTitle': 'Emplacement sélectionné :',
+                'adminIdsTitle': 'IDs pour les administrateurs :',
+                'loading': 'Chargement...',
+                'errorLoading': 'Erreur de chargement des données',
+                'dataSectionTitle': 'Analyse des données régionales',
+                'generalDataTitle': 'Données générales',
+                'houseTypeDataTitle': 'Données du nombre de chambres',
+                'floorSegmentDataTitle': 'Données d\'étage',
+                'ageDataTitle': 'Données d\'âge',
+                'heatingDataTitle': 'Données du type de chauffage',
+                'loadingText': 'Chargement des données...',
+                'errorText': 'Erreur de chargement des données',
+                'totalProperties': 'Total des propriétés :',
+                'averagePrice': 'Prix moyen :',
+                'priceRange': 'Fourchette de prix :',
+                'noDataAvailable': 'Données non disponibles',
+                'keyMetricsTitle': 'Métriques clés',
+                'avgSalePriceLabel': 'Prix de vente moyen par m²',
+                'avgRentPriceLabel': 'Prix de location moyen par m²',
+                'listingPeriodSaleLabel': 'Période d\'inscription (vente)',
+                'listingPeriodRentLabel': 'Période d\'inscription (location)',
+                'yieldLabel': 'Rendement',
+                'insightsTitle': 'Résumé',
+                'insightsLoading': 'Analyse des données...',
+                'insightsError': 'Erreur lors de l\'analyse des données'
+            },
+            'tr': {
+                'slogan': 'Gayrimenkul Piyasa İçgörüleri',
+                'pageTitle': 'Nesne Değerlendirmesi',
+                'pageDescription': 'Seçilen bölgede profesyonel gayrimenkul değerlendirmesi alın',
+                'countryLabel': 'Ülke:',
+                'cityLabel': 'Şehir:',
+                'countyLabel': 'Bölge/Alan:',
+                'districtLabel': 'İlçe:',
+                'countryPlaceholder': 'Ülke seçin',
+                'cityPlaceholder': 'Önce ülke seçin',
+                'countyPlaceholder': 'Önce şehir seçin',
+                'districtPlaceholder': 'Önce bölge seçin',
+                'confirmButtonText': 'Seçimi onayla',
+                'backButton': '← Ana menüye dön',
+                'selectedLocationTitle': 'Seçilen konum:',
+                'adminIdsTitle': 'Yöneticiler için ID\'ler:',
+                'loading': 'Yükleniyor...',
+                'errorLoading': 'Veri yükleme hatası',
+                'dataSectionTitle': 'Bölgesel Veri Analizi',
+                'generalDataTitle': 'Genel Veriler',
+                'houseTypeDataTitle': 'Yatak Odası Sayısı Verileri',
+                'floorSegmentDataTitle': 'Kat Verileri',
+                'ageDataTitle': 'Yaş Verileri',
+                'heatingDataTitle': 'Isıtma Tipi Verileri',
+                'loadingText': 'Veriler yükleniyor...',
+                'errorText': 'Veri yükleme hatası',
+                'totalProperties': 'Toplam mülk:',
+                'averagePrice': 'Ortalama fiyat:',
+                'priceRange': 'Fiyat aralığı:',
+                'noDataAvailable': 'Veri mevcut değil',
+                'keyMetricsTitle': 'Ana Metrikler',
+                'avgSalePriceLabel': 'm² başına ortalama satış fiyatı',
+                'avgRentPriceLabel': 'm² başına ortalama kiralama fiyatı',
+                'listingPeriodSaleLabel': 'İlan süresi (satış)',
+                'listingPeriodRentLabel': 'İlan süresi (kiralama)',
+                'yieldLabel': 'Getiri',
+
+                'marketComparisonTitle': 'Piyasa Karşılaştırması',
+                'pricePerM2Label': 'm² başına fiyat',
+                'areaLabel': 'Alan',
+                'priceComparisonLabel': 'm² başına fiyat:',
+                'areaComparisonLabel': 'Alan:',
+                'priceCloseToMarket': 'Nesneniz (${userPrice}) piyasaya yakın (${marketMin} – ${marketMax}).',
+                'priceAboveMarket': 'Nesneniz (${userPrice}) piyasadan ${percent}% yüksek.',
+                'priceBelowMarket': 'Nesneniz (${userPrice}) piyasadan ${percent}% düşük.',
+                'areaMatchesMarket': 'Nesneniz (${userArea} m²) piyasa talebine uygun (${marketMin}–${marketMax} m²).',
+                'areaBelowMarket': 'Nesneniz (${userArea} m²) piyasa talebinden küçük (${marketMin}–${marketMax} m²).',
+                'areaAboveMarket': 'Nesneniz (${userArea} m²) piyasa talebinden büyük (${marketMin}–${marketMax} m²).'
             },
             'de': {
                 'slogan': 'Immobilienmarkt-Einblicke',
@@ -2081,6 +2335,21 @@
             // Update property types section
             const propertyTypesTitle = document.getElementById('propertyTypesTitle');
             if (propertyTypesTitle) { propertyTypesTitle.textContent = getText('propertyTypesTitle'); }
+            
+            // Update detailed data table titles
+            const detailedDataTitles = document.querySelectorAll('.detailed-data-title');
+            detailedDataTitles.forEach(titleElement => {
+                const titleText = titleElement.textContent;
+                if (titleText.includes('количество спален') || titleText.includes('Bedroom Count') || titleText.includes('Schlafzimmer') || titleText.includes('chambres') || titleText.includes('Yatak Odası')) {
+                    titleElement.textContent = getText('houseTypeDataTitle');
+                } else if (titleText.includes('этажу') || titleText.includes('Floor') || titleText.includes('Etagen') || titleText.includes('étage') || titleText.includes('Kat')) {
+                    titleElement.textContent = getText('floorSegmentDataTitle');
+                } else if (titleText.includes('возрасту') || titleText.includes('Age') || titleText.includes('Alters') || titleText.includes('âge') || titleText.includes('Yaş')) {
+                    titleElement.textContent = getText('ageDataTitle');
+                } else if (titleText.includes('отопления') || titleText.includes('Heating') || titleText.includes('Heizung') || titleText.includes('chauffage') || titleText.includes('Isıtma')) {
+                    titleElement.textContent = getText('heatingDataTitle');
+                }
+            });
             
 
         }
@@ -3211,7 +3480,10 @@
             html += '</tbody></table>';
             html += '</div>';
             
-            // Add market comparison block below the table
+            // Add detailed data tables for each category
+            html += generateDetailedDataTables(data);
+            
+            // Add market comparison block below the detailed tables
             if (Object.keys(summary).length > 0) {
                 html += generateMarketComparison(summary);
             }
@@ -3225,6 +3497,85 @@
             
             // Load property trends data
             loadPropertyTrends(data);
+        }
+
+        // Generate detailed data tables for each category
+        function generateDetailedDataTables(data) {
+            let html = '';
+            
+            // House Type Data Table
+            if (data.house_type_data && data.house_type_data.length > 0) {
+                html += generateCategoryTable('house_type_data', 'Данные по количеству спален', data.house_type_data);
+            }
+            
+            // Floor Segment Data Table
+            if (data.floor_segment_data && data.floor_segment_data.length > 0) {
+                html += generateCategoryTable('floor_segment_data', 'Данные по этажу', data.floor_segment_data);
+            }
+            
+            // Age Data Table
+            if (data.age_data && data.age_data.length > 0) {
+                html += generateCategoryTable('age_data', 'Данные по возрасту объектов', data.age_data);
+            }
+            
+            // Heating Data Table
+            if (data.heating_data && data.heating_data.length > 0) {
+                html += generateCategoryTable('heating_data', 'Данные по типу отопления', data.heating_data);
+            }
+            
+            return html;
+        }
+
+        // Generate table for specific category
+        function generateCategoryTable(category, title, tableData) {
+            if (!tableData || tableData.length === 0) return '';
+            
+            // Get all unique fields from the data
+            const allFields = new Set();
+            tableData.forEach(item => {
+                Object.keys(item).forEach(key => {
+                    if (key !== 'id' && key !== 'created_at' && key !== 'updated_at' && 
+                        key !== 'country_id' && key !== 'city_id' && key !== 'county_id' && key !== 'district_id') {
+                        allFields.add(key);
+                    }
+                });
+            });
+            
+            const fields = Array.from(allFields).sort();
+            
+            let html = '<div class="detailed-data-section">';
+            html += `<h4 class="detailed-data-title">${title}</h4>`;
+            html += '<div class="detailed-data-container">';
+            html += '<table class="detailed-data-table">';
+            html += '<thead><tr>';
+            
+            // Add headers
+            html += '<th>Параметр</th>';
+            tableData.forEach((item, index) => {
+                const listingType = item.listing_type || `Запись ${index + 1}`;
+                html += `<th>${listingType}</th>`;
+            });
+            html += '</tr></thead><tbody>';
+            
+            // Add data rows
+            fields.forEach(field => {
+                if (field !== 'listing_type') {
+                    html += '<tr>';
+                    html += `<td class="field-name">${formatFieldName(field)}</td>`;
+                    
+                    tableData.forEach(item => {
+                        const value = item[field];
+                        html += `<td class="field-value">${formatFieldValue(value, field)}</td>`;
+                    });
+                    
+                    html += '</tr>';
+                }
+            });
+            
+            html += '</tbody></table>';
+            html += '</div></div>';
+            
+            return html;
         }
 
         // Load property trends data for selected location
