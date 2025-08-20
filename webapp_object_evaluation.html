@@ -1953,7 +1953,20 @@
                 'bedroomsLabel': 'Спальни',
                 'floorLabel': 'Этаж',
                 'ageLabel': 'Возраст',
-                'heatingLabel': 'Отопление'
+                'heatingLabel': 'Отопление',
+                
+                // Ключи локализации для таблицы "Показатели рынка"
+                'indicatorLabel': 'Показатель',
+                'minValueLabel': 'Минимальное значение',
+                'maxValueLabel': 'Максимальное значение',
+                'comparableAreaForSaleLabel': 'Сопоставимая площадь для продажи',
+                'countForSaleLabel': 'Количество для продажи',
+                'listingPeriodForSaleLabel': 'Период размещения для продажи',
+                'unitPriceForSaleLabel': 'Цена за м² для продажи',
+                'comparableAreaForRentLabel': 'Сопоставимая площадь для аренды',
+                'countForRentLabel': 'Количество для аренды',
+                'listingPeriodForRentLabel': 'Период размещения для аренды',
+                'unitPriceForRentLabel': 'Цена за м² для аренды'
             },
             'en': {
                 'slogan': 'Real Estate Market Insights',
@@ -2034,7 +2047,20 @@
                 'bedroomsLabel': 'Bedrooms',
                 'floorLabel': 'Floor',
                 'ageLabel': 'Age',
-                'heatingLabel': 'Heating'
+                'heatingLabel': 'Heating',
+                
+                // Keys for "Market Indicators" table
+                'indicatorLabel': 'Indicator',
+                'minValueLabel': 'Minimum Value',
+                'maxValueLabel': 'Maximum Value',
+                'comparableAreaForSaleLabel': 'Comparable Area for Sale',
+                'countForSaleLabel': 'Count for Sale',
+                'listingPeriodForSaleLabel': 'Listing Period for Sale',
+                'unitPriceForSaleLabel': 'Unit Price for Sale',
+                'comparableAreaForRentLabel': 'Comparable Area for Rent',
+                'countForRentLabel': 'Count for Rent',
+                'listingPeriodForRentLabel': 'Listing Period for Rent',
+                'unitPriceForRentLabel': 'Unit Price for Rent'
             },
             'de': {
                 'slogan': 'Immobilienmarkt-Einblicke',
@@ -2292,7 +2318,23 @@
                 'yieldLabel': 'Getiri',
                 'insightsTitle': 'Özet',
                 'insightsLoading': 'Veriler analiz ediliyor...',
-                'insightsError': 'Veri analizi hatası'
+                'insightsError': 'Veri analizi hatası',
+                
+                // "Piyasa Göstergeleri" tablosu için anahtarlar
+                'marketIndicatorsTitle': 'Piyasa Göstergeleri',
+                'saleHeader': 'Satış',
+                'rentHeader': 'Kiralama',
+                'indicatorLabel': 'Gösterge',
+                'minValueLabel': 'Minimum değer',
+                'maxValueLabel': 'Maksimum değer',
+                'comparableAreaForSaleLabel': 'Satış için karşılaştırılabilir alan',
+                'countForSaleLabel': 'Satış için sayı',
+                'listingPeriodForSaleLabel': 'Satış için ilan süresi',
+                'unitPriceForSaleLabel': 'Satış için birim fiyat',
+                'comparableAreaForRentLabel': 'Kiralama için karşılaştırılabilir alan',
+                'countForRentLabel': 'Kiralama için sayı',
+                'listingPeriodForRentLabel': 'Kiralama için ilan süresi',
+                'unitPriceForRentLabel': 'Kiralama için birim fiyat'
             }
         };
 
@@ -3270,11 +3312,9 @@
         function getFieldLabel(field, type) {
             const fieldLabels = {
                 'comparable_area_for_sale': 'comparableAreaForSaleLabel',
-                'count_for_sale': 'countForSaleLabel',
                 'listing_period_for_sale': 'listingPeriodForSaleLabel',
                 'unit_price_for_sale': 'unitPriceForSaleLabel',
                 'comparable_area_for_rent': 'comparableAreaForRentLabel',
-                'count_for_rent': 'countForRentLabel',
                 'listing_period_for_rent': 'listingPeriodForRentLabel',
                 'unit_price_for_rent': 'unitPriceForRentLabel'
             };
@@ -3300,8 +3340,6 @@
                     return formatValue(value, 'days');
                 } else if (field.includes('area') || field.includes('Area')) {
                     return `${value} м²`;
-                } else if (field.includes('count') || field.includes('Count')) {
-                    return value.toLocaleString();
                 } else {
                     return value.toLocaleString();
                 }
@@ -3495,12 +3533,12 @@
             
             // Define fields for summary with new structure
             const saleFields = [
-                'comparable_area_for_sale', 'count_for_sale', 
+                'comparable_area_for_sale', 
                 'listing_period_for_sale', 'unit_price_for_sale'
             ];
             
             const rentFields = [
-                'comparable_area_for_rent', 'count_for_rent', 
+                'comparable_area_for_rent', 
                 'listing_period_for_rent', 'unit_price_for_rent'
             ];
             
@@ -3508,16 +3546,34 @@
             const summary = {};
             const allFields = [...saleFields, ...rentFields, 'yield'];
             
+            // Special handling for comparable_area fields - only use house_type_data
+            const houseTypeData = data.house_type_data || [];
+            
             allFields.forEach(field => {
-                const values = allData
-                    .map(item => item[field])
-                    .filter(val => val !== null && val !== undefined && !isNaN(parseFloat(val)));
-                
-                if (values.length > 0) {
-                    summary[field] = {
-                        min: Math.min(...values),
-                        max: Math.max(...values)
-                    };
+                if (field === 'comparable_area_for_sale' || field === 'comparable_area_for_rent') {
+                    // For area fields, only use house_type_data
+                    const values = houseTypeData
+                        .map(item => item[field])
+                        .filter(val => val !== null && val !== undefined && !isNaN(parseFloat(val)));
+                    
+                    if (values.length > 0) {
+                        summary[field] = {
+                            min: Math.min(...values),
+                            max: Math.max(...values)
+                        };
+                    }
+                } else {
+                    // For other fields, use all data
+                    const values = allData
+                        .map(item => item[field])
+                        .filter(val => val !== null && val !== undefined && !isNaN(parseFloat(val)));
+                    
+                    if (values.length > 0) {
+                        summary[field] = {
+                            min: Math.min(...values),
+                            max: Math.max(...values)
+                        };
+                    }
                 }
             });
             
