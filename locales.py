@@ -105,7 +105,7 @@ locales = {
             'listingPeriodRentLabel': 'Период размещения (аренда)',
             'yieldLabel': 'Доходность',
             
-            // Ключи локализации для таблицы "Показатели рынка"
+            # Ключи локализации для таблицы "Показатели рынка"
             'marketIndicatorsTitle': 'Показатели рынка',
             'saleHeader': 'Продажа',
             'rentHeader': 'Аренда',
@@ -258,7 +258,7 @@ locales = {
             'listingPeriodRentLabel': 'Listing period (rent)',
             'yieldLabel': 'Yield',
             
-            // Keys for "Market Indicators" table
+            # Keys for "Market Indicators" table
             'marketIndicatorsTitle': 'Market Indicators',
             'saleHeader': 'Sale',
             'rentHeader': 'Rent',
@@ -411,7 +411,7 @@ locales = {
             'listingPeriodRentLabel': 'Einstellungszeitraum (Vermietung)',
             'yieldLabel': 'Rendite',
             
-            // Schlüssel für "Marktindikatoren"-Tabelle
+            # Schlüssel für "Marktindikatoren"-Tabelle
             'marketIndicatorsTitle': 'Marktindikatoren',
             'saleHeader': 'Verkauf',
             'rentHeader': 'Vermietung',
@@ -564,7 +564,7 @@ locales = {
             'listingPeriodRentLabel': 'Période d\'inscription (location)',
             'yieldLabel': 'Rendement',
             
-            // Clés pour le tableau "Indicateurs du marché"
+            # Clés pour le tableau "Indicateurs du marché"
             'marketIndicatorsTitle': 'Indicateurs du marché',
             'saleHeader': 'Vente',
             'rentHeader': 'Location',
@@ -711,7 +711,7 @@ locales = {
             'listingPeriodRentLabel': 'İlan süresi (kiralama)',
             'yieldLabel': 'Getiri',
             
-            // "Piyasa Göstergeleri" tablosu için anahtarlar
+            # "Piyasa Göstergeleri" tablosu için anahtarlar
             'marketIndicatorsTitle': 'Piyasa Göstergeleri',
             'saleHeader': 'Satış',
             'rentHeader': 'Kiralama',
