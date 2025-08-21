@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Aaadviser - Оценка объекта</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         * {
             margin: 0;
@@ -1550,13 +1551,10 @@
             color: #495057;
             margin-bottom: 4px;
             line-height: 1.3;
+            font-weight: bold;
         }
         
-        .trend-date {
-            font-size: 10px;
-            color: #6c757d;
-            font-style: italic;
-        }
+        /* .trend-date removed - now part of .trend-change */
         
         .trend-card-price_trend {
             border-left: 4px solid #28a745;
@@ -1634,6 +1632,65 @@
         .trends-table .filter-info td {
             border: none;
             font-style: italic;
+        }
+        
+        /* Стили для графика трендов */
+        .trends-chart-section {
+            margin-top: 25px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 20px;
+        }
+        
+        .trends-chart-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .chart-controls {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .chart-button {
+            padding: 8px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            background: white;
+            color: #495057;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .chart-button:hover {
+            border-color: #667eea;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+        }
+        
+        .chart-button.active {
+            border-color: #667eea;
+            background: #667eea;
+            color: white;
+        }
+        
+        .chart-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 200px;
+        }
+        
+        #trendsChart {
+            max-width: 100%;
+            height: auto;
         }
         
         /* Стили для выделения текущего месяца */
@@ -2142,11 +2199,10 @@
             .trend-change {
                 font-size: 10px;
                 margin-bottom: 3px;
+                font-weight: bold;
             }
             
-            .trend-date {
-                font-size: 9px;
-            }
+            /* .trend-date removed - now part of .trend-change */
             
             .trends-table-title {
                 font-size: 14px;
@@ -2160,6 +2216,29 @@
             .trends-table th,
             .trends-table td {
                 padding: 6px 4px;
+            }
+            
+            .trends-chart-section {
+                padding: 15px;
+            }
+            
+            .trends-chart-title {
+                font-size: 14px;
+                margin-bottom: 12px;
+            }
+            
+            .chart-controls {
+                gap: 8px;
+                margin-bottom: 15px;
+            }
+            
+            .chart-button {
+                padding: 6px 12px;
+                font-size: 11px;
+            }
+            
+            .chart-container {
+                min-height: 150px;
             }
             
             .data-available {
@@ -2720,6 +2799,11 @@
                 'saleAnalysisText': 'Продажа: при площади {area} м² (среднее значение по проданным объектам) и минимальной цене {minPrice}/м² срок продажи составляет ~{minDays} дней; при максимальной цене {maxPrice}/м² - срок продажи до {maxDays} дней.',
                 'rentAnalysisText': 'Аренда: при площади {area} м² (среднее значение по сданным в аренду объектам) минимальная цена {minPrice}/м² срок сдачи ~{minDays} дней; при максимальной цене {maxPrice}/м² срок до {maxDays} дней.',
                 
+                // Ключи для графика трендов
+                'chart_title': 'График трендов',
+                'sale_button': 'Цена м² продажи',
+                'rent_button': 'Цена м² аренды',
+                
                 // Ключи для блока "Вывод по объекту"
                 'objectSummaryTitle': 'Вывод по объекту',
                 'objectPricePerM2Label': 'Цена за м² вашего объекта:',
@@ -2849,6 +2933,11 @@
                 'marketAnalysisTitle': 'Market Analysis',
                 'saleAnalysisText': 'Sale: with an area of {area} m² (average value for sold properties) and minimum price {minPrice}/m², the sale period is ~{minDays} days; with maximum price {maxPrice}/m² - sale period up to {maxDays} days.',
                 'rentAnalysisText': 'Rent: with an area of {area} m² (average value for rented properties) minimum price {minPrice}/m², rental period ~{minDays} days; with maximum price {maxPrice}/m², period up to {maxDays} days.',
+                
+                // Keys for trends chart
+                'chart_title': 'Trends Chart',
+                'sale_button': 'Sale Price per m²',
+                'rent_button': 'Rent Price per m²',
                 
                 // Keys for subscription message
                 'subscriptionRequiredTitle': 'Long-term property value forecasting is only available for users with an active subscription.',
@@ -3124,6 +3213,11 @@
                 'insightsTitle': 'Özet',
                 'insightsLoading': 'Veriler analiz ediliyor...',
                 'insightsError': 'Veri analizi hatası',
+                
+                // Keys for trends chart
+                'chart_title': 'Trend Grafiği',
+                'sale_button': 'm² Satış Fiyatı',
+                'rent_button': 'm² Kiralama Fiyatı',
                 
                 // Abonelik mesajı için anahtarlar
                 'subscriptionRequiredTitle': 'Uzun vadeli mülk değeri tahmin fonksiyonu yalnızca aktif aboneliği olan kullanıcılar için kullanılabilir.',
@@ -4977,6 +5071,9 @@
                     console.log('✅ Property trends data received:', trendsData.trends);
                     console.log('🔍 First trend record:', trendsData.trends[0]);
                     
+                    // Сохраняем данные глобально для переключения графиков
+                    window.currentTrendsData = trendsData.trends;
+                    
                     // Add property trends section below the summary table
                     addPropertyTrendsSection(trendsData.trends);
                 } else {
@@ -5069,8 +5166,8 @@
                                         <div class="trend-change">
                                             ${currentTrend.price_change_sale ? `Продажа: ${formatPercentage(currentTrend.price_change_sale)}` : ''}
                                             ${currentTrend.price_change_rent ? `Аренда: ${formatPercentage(currentTrend.price_change_rent)}` : ''}
+                                            ${formatCurrentMonthDate(currentTrend)}
                                         </div>
-                                        <div class="trend-date">${formatCurrentMonthDate(currentTrend)}</div>
                                     </div>
                                 </div>
                             `;
@@ -5082,6 +5179,22 @@
                         <h4 class="trends-table-title">Детальные данные трендов</h4>
                         <div class="trends-table-container" id="trendsTableContainer">
                             <!-- Тренды будут загружены асинхронно -->
+                        </div>
+                    </div>
+                    
+                    <!-- График трендов -->
+                    <div class="trends-chart-section">
+                        <h4 class="trends-chart-title">${getText('chart_title')}</h4>
+                        <div class="chart-controls">
+                            <button class="chart-button active" data-chart-type="sale" onclick="switchChartType('sale')">
+                                ${getText('sale_button')}
+                            </button>
+                            <button class="chart-button" data-chart-type="rent" onclick="switchChartType('rent')">
+                                ${getText('rent_button')}
+                            </button>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="trendsChart" width="400" height="200"></canvas>
                         </div>
                     </div>
                 </div>
@@ -5096,6 +5209,9 @@
                 const trendsTableHtml = await generateTrendsTable(trends);
                 trendsTableContainer.innerHTML = trendsTableHtml;
             }
+            
+            // Инициализируем график трендов
+            initializeTrendsChart(trends);
         }
         
         // Group trends by type for better display
@@ -5117,7 +5233,10 @@
                 'price_trend': 'Тренд цен',
                 'yield_trend': 'Тренд доходности',
                 'count_trend': 'Тренд количества',
-                'general': 'Общий тренд'
+                'general': 'Общий тренд',
+                'chart_title': 'График трендов',
+                'sale_button': 'Цена м² продажи',
+                'rent_button': 'Цена м² аренды'
             };
             return typeMap[type] || type;
         }
@@ -6608,6 +6727,210 @@
                 value: weightedSum
             };
         }
+        
+        // Глобальные переменные для графика
+        let trendsChart = null;
+        let currentChartType = 'sale';
+        
+        // Инициализация графика трендов
+        function initializeTrendsChart(trends) {
+            if (!trends || trends.length === 0) {
+                console.log('⚠️ No trends data for chart initialization');
+                return;
+            }
+            
+            console.log('📊 Initializing trends chart with data:', trends.length, 'records');
+            
+            // Сортируем тренды по дате
+            const sortedTrends = trends.sort((a, b) => {
+                if (a.property_year !== b.property_year) {
+                    return a.property_year - b.property_year;
+                }
+                return a.property_month - b.property_month;
+            });
+            
+            // Создаем график
+            createTrendsChart(sortedTrends, currentChartType);
+        }
+        
+        // Создание графика трендов
+        function createTrendsChart(trends, chartType) {
+            const ctx = document.getElementById('trendsChart');
+            if (!ctx) {
+                console.log('⚠️ Chart canvas not found');
+                return;
+            }
+            
+            // Уничтожаем предыдущий график, если он существует
+            if (trendsChart) {
+                trendsChart.destroy();
+            }
+            
+            // Подготавливаем данные для графика
+            const chartData = prepareChartData(trends, chartType);
+            
+            // Создаем новый график
+            trendsChart = new Chart(ctx, {
+                type: 'line',
+                data: chartData,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false,
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            titleColor: 'white',
+                            bodyColor: 'white',
+                            borderColor: '#667eea',
+                            borderWidth: 1,
+                            callbacks: {
+                                label: function(context) {
+                                    const value = context.parsed.y;
+                                    if (chartType === 'sale') {
+                                        return `Цена продажи: ₺${value.toLocaleString('ru-RU', { minimumFractionDigits: 2 })}/м²`;
+                                    } else {
+                                        return `Цена аренды: ₺${value.toLocaleString('ru-RU', { minimumFractionDigits: 2 })}/м²`;
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            display: true,
+                            title: {
+                                display: true,
+                                text: 'Месяц',
+                                color: '#495057',
+                                font: {
+                                    size: 12,
+                                    weight: '500'
+                                }
+                            },
+                            ticks: {
+                                color: '#6c757d',
+                                font: {
+                                    size: 10
+                                }
+                            },
+                            grid: {
+                                color: '#e9ecef',
+                                drawBorder: false
+                            }
+                        },
+                        y: {
+                            display: true,
+                            title: {
+                                display: true,
+                                text: chartType === 'sale' ? 'Цена продажи (₺/м²)' : 'Цена аренды (₺/м²)',
+                                color: '#495057',
+                                font: {
+                                    size: 12,
+                                    weight: '500'
+                                }
+                            },
+                            ticks: {
+                                color: '#6c757d',
+                                font: {
+                                    size: 10
+                                },
+                                callback: function(value) {
+                                    if (chartType === 'sale') {
+                                        return `₺${value.toLocaleString('ru-RU')}`;
+                                    } else {
+                                        return `₺${value}`;
+                                    }
+                                }
+                            },
+                            grid: {
+                                color: '#e9ecef',
+                                drawBorder: false
+                            }
+                        }
+                    },
+                    elements: {
+                        line: {
+                            tension: 0.4,
+                            borderWidth: 3,
+                            borderColor: chartType === 'sale' ? '#28a745' : '#ffc107'
+                        },
+                        point: {
+                            radius: 4,
+                            backgroundColor: chartType === 'sale' ? '#28a745' : '#ffc107',
+                            borderColor: 'white',
+                            borderWidth: 2,
+                            hoverRadius: 6
+                        }
+                    },
+                    interaction: {
+                        mode: 'nearest',
+                        axis: 'x',
+                        intersect: false
+                    }
+                }
+            });
+        }
+        
+        // Подготовка данных для графика
+        function prepareChartData(trends, chartType) {
+            const monthNames = [
+                'Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн',
+                'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'
+            ];
+            
+            const labels = trends.map(trend => {
+                const monthName = monthNames[trend.property_month - 1] || trend.property_month;
+                return `${monthName} ${trend.property_year}`;
+            });
+            
+            const data = trends.map(trend => {
+                if (chartType === 'sale') {
+                    return parseFloat(trend.unit_price_for_sale) || 0;
+                } else {
+                    return parseFloat(trend.unit_price_for_rent) || 0;
+                }
+            });
+            
+            return {
+                labels: labels,
+                datasets: [{
+                    data: data,
+                    fill: false,
+                    pointBackgroundColor: chartType === 'sale' ? '#28a745' : '#ffc107',
+                    pointBorderColor: 'white',
+                    pointBorderWidth: 2,
+                    pointRadius: 4,
+                    pointHoverRadius: 6
+                }]
+            };
+        }
+        
+        // Переключение типа графика
+        function switchChartType(chartType) {
+            console.log('🔄 Switching chart type to:', chartType);
+            
+            // Обновляем активную кнопку
+            document.querySelectorAll('.chart-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector(`[data-chart-type="${chartType}"]`).classList.add('active');
+            
+            // Обновляем тип графика
+            currentChartType = chartType;
+            
+            // Пересоздаем график с новыми данными
+            if (window.currentTrendsData) {
+                createTrendsChart(window.currentTrendsData, chartType);
+            }
+        }
+        
+        // Сохраняем данные трендов глобально для переключения графиков
+        window.currentTrendsData = null;
     </script>
 </body>
 </html>
