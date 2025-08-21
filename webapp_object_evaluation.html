@@ -4540,6 +4540,9 @@
             
             // Show data content
             document.getElementById('dataContent').style.display = 'block';
+            
+            // Check and show save button if user has access
+            checkAndShowSaveButton();
         }
 
 
@@ -5767,6 +5770,11 @@
                 }
             }, 100);
             
+            // Check and show save button after report generation
+            setTimeout(() => {
+                checkAndShowSaveButton();
+            }, 200);
+            
             return html;
         }
         
@@ -6686,7 +6694,10 @@
             }
             
             // Проверяем и показываем кнопку сохранения отчета
-            checkAndShowSaveButton();
+            // Добавляем небольшую задержку для корректной инициализации
+            setTimeout(() => {
+                checkAndShowSaveButton();
+            }, 500);
         }
 
         // Start initialization when page loads
@@ -7573,8 +7584,15 @@
                 const saveReportSection = document.getElementById('saveReportSection');
                 
                 if (userAccess.hasAccess) {
-                    saveReportSection.style.display = 'block';
-                    console.log('✅ Save button shown for user with access');
+                    // Показываем кнопку только если отчет сформирован
+                    const dataContent = document.getElementById('dataContent');
+                    if (dataContent && dataContent.style.display !== 'none') {
+                        saveReportSection.style.display = 'block';
+                        console.log('✅ Save button shown for user with access and report ready');
+                    } else {
+                        saveReportSection.style.display = 'none';
+                        console.log('⚠️ Save button hidden - report not ready yet');
+                    }
                 } else {
                     saveReportSection.style.display = 'none';
                     console.log('⚠️ Save button hidden - no access');
@@ -7597,10 +7615,16 @@
                 saveButton.innerHTML = '⏳ Сохранение...';
                 saveButton.disabled = true;
                 
+                // Проверяем, что отчет сформирован
+                const dataContent = document.getElementById('dataContent');
+                if (!dataContent || dataContent.style.display === 'none') {
+                    throw new Error('Отчет еще не сформирован. Сначала сформируйте отчет, выбрав параметры и нажав "Подтвердить выбор"');
+                }
+                
                 // Собираем данные отчета
                 const reportData = {
                     telegram_id: getTelegramId(),
-                    report_html: document.querySelector('.main-content').innerHTML,
+                    report_html: dataContent.innerHTML,
                     report_data: {
                         location: getCurrentLocationString(),
                         timestamp: new Date().toISOString(),
