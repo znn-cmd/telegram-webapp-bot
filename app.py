@@ -7582,18 +7582,28 @@ def save_report():
             user_status = user.get('user_status')
             period_end = user.get('period_end')
             
+            logger.info(f"👤 Данные пользователя: user_id={user_id}, user_status='{user_status}', period_end='{period_end}'")
+            
             # Проверяем статус админа
             is_admin = user_status == 'admin'
+            logger.info(f"👑 Проверка админского статуса: user_status='{user_status}' == 'admin' = {is_admin}")
             
             # Проверяем активную подписку
             has_active_subscription = False
             if period_end:
                 try:
-                    period_end_date = datetime.fromisoformat(period_end.replace('Z', '+00:00'))
-                    current_date = datetime.now(period_end_date.tzinfo)
-                    has_active_subscription = period_end_date > current_date
+                    # period_end в формате YYYY-MM-DD, сравниваем с текущей датой
+                    current_date = datetime.now().date()
+                    period_end_date = datetime.strptime(period_end, '%Y-%m-%d').date()
+                    has_active_subscription = period_end_date >= current_date
+                    logger.info(f"📅 Проверка подписки: period_end={period_end_date}, current_date={current_date}, has_active={has_active_subscription}")
                 except Exception as date_error:
                     logger.warning(f"⚠️ Ошибка парсинга даты подписки: {date_error}")
+                    has_active_subscription = False
+            else:
+                logger.info("📅 У пользователя нет period_end")
+            
+            logger.info(f"🔐 Итоговая проверка доступа: is_admin={is_admin}, has_active_subscription={has_active_subscription}")
             
             if not is_admin and not has_active_subscription:
                 logger.warning(f"⚠️ Пользователь {telegram_id} не имеет доступа к сохранению отчетов")
@@ -7607,7 +7617,6 @@ def save_report():
         
         # Генерируем уникальный ID для отчета
         import uuid
-        from datetime import datetime
         report_id = str(uuid.uuid4())[:8]  # Первые 8 символов UUID
         current_datetime = datetime.now().strftime('%d.%m.%Y %H:%M')
         
