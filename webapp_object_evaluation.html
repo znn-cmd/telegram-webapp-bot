@@ -1739,6 +1739,18 @@
             background-color: #f0f8ff;
         }
         
+        /* Стили для предупреждающей строки в таблице трендов */
+        .trends-table .warning-row {
+            background-color: #fff3cd !important;
+            color: #856404 !important;
+            font-weight: 500;
+        }
+        
+        .trends-table .warning-row td {
+            border: none;
+            font-style: italic;
+        }
+        
         /* Мобильные устройства */
         @media (max-width: 768px) {
             .trends-table {
@@ -5005,51 +5017,168 @@
                 return;
             }
             
-            // Define fields for summary with new structure
-            const saleFields = [
-                'comparable_area_for_sale', 
-                'listing_period_for_sale', 'unit_price_for_sale'
-            ];
+            // Get user's selected property characteristics
+            const userBedrooms = selectedListingTypes.bedrooms || '';
+            const userFloor = selectedListingTypes.floor || '';
+            const userAge = selectedListingTypes.age || '';
+            const userHeating = selectedListingTypes.heating || '';
             
-            const rentFields = [
-                'comparable_area_for_rent', 
-                'listing_period_for_rent', 'unit_price_for_rent'
-            ];
+            console.log('🔍 User selected characteristics:', {
+                bedrooms: userBedrooms,
+                floor: userFloor,
+                age: userAge,
+                heating: userHeating
+            });
             
-            // Calculate min/max values for all fields
+            // Find matching data according to user's selection
+            const matchingHouseTypeData = data.house_type_data?.find(item => 
+                item.listing_type === userBedrooms
+            ) || data.house_type_data?.[0];
+            
+            const matchingFloorData = data.floor_segment_data?.find(item => 
+                item.listing_type === userFloor
+            ) || data.floor_segment_data?.[0];
+            
+            const matchingAgeData = data.age_data?.find(item => 
+                item.listing_type === userAge
+            ) || data.age_data?.[0];
+            
+            const matchingHeatingData = data.heating_data?.find(item => 
+                item.listing_type === userHeating
+            ) || data.heating_data?.[0];
+            
+            console.log('🔍 Matching data found:', {
+                houseType: matchingHouseTypeData,
+                floor: matchingFloorData,
+                age: matchingAgeData,
+                heating: matchingHeatingData
+            });
+            
+            // Calculate summary data
             const summary = {};
-            const allFields = [...saleFields, ...rentFields, 'yield'];
             
-            // Special handling for comparable_area fields - only use house_type_data
-            const houseTypeData = data.house_type_data || [];
+            // 1. comparable_area_for_sale - use house_type_data according to user selection
+            if (matchingHouseTypeData?.comparable_area_for_sale) {
+                summary.comparable_area_for_sale = {
+                    min: matchingHouseTypeData.comparable_area_for_sale,
+                    max: matchingHouseTypeData.comparable_area_for_sale
+                };
+            }
             
-            allFields.forEach(field => {
-                if (field === 'comparable_area_for_sale' || field === 'comparable_area_for_rent') {
-                    // For area fields, only use house_type_data
-                    const values = houseTypeData
-                        .map(item => item[field])
-                        .filter(val => val !== null && val !== undefined && !isNaN(parseFloat(val)));
-                    
-                    if (values.length > 0) {
-                        summary[field] = {
-                            min: Math.min(...values),
-                            max: Math.max(...values)
-                        };
-                    }
-                } else {
-                    // For other fields, use all data
-                const values = allData
-                    .map(item => item[field])
-                    .filter(val => val !== null && val !== undefined && !isNaN(parseFloat(val)));
-                
-                if (values.length > 0) {
-                    summary[field] = {
-                        min: Math.min(...values),
-                        max: Math.max(...values)
-                    };
-                    }
+            // 2. unit_price_for_sale - calculate average min/max from all tables
+            const salePriceData = [];
+            [matchingHouseTypeData, matchingFloorData, matchingAgeData, matchingHeatingData].forEach(item => {
+                if (item?.min_unit_price_for_sale && item?.max_unit_price_for_sale) {
+                    salePriceData.push({
+                        min: parseFloat(item.min_unit_price_for_sale),
+                        max: parseFloat(item.max_unit_price_for_sale)
+                    });
                 }
             });
+            
+            if (salePriceData.length > 0) {
+                const avgMinSalePrice = salePriceData.reduce((sum, item) => sum + item.min, 0) / salePriceData.length;
+                const avgMaxSalePrice = salePriceData.reduce((sum, item) => sum + item.max, 0) / salePriceData.length;
+                
+                summary.unit_price_for_sale = {
+                    min: avgMinSalePrice,
+                    max: avgMaxSalePrice
+                };
+            }
+            
+            // 3. comparable_area_for_rent - use house_type_data according to user selection
+            if (matchingHouseTypeData?.comparable_area_for_rent) {
+                summary.comparable_area_for_rent = {
+                    min: matchingHouseTypeData.comparable_area_for_rent,
+                    max: matchingHouseTypeData.comparable_area_for_rent
+                };
+            }
+            
+            // 4. unit_price_for_rent - calculate average min/max from all tables
+            const rentPriceData = [];
+            [matchingHouseTypeData, matchingFloorData, matchingAgeData, matchingHeatingData].forEach(item => {
+                if (item?.min_unit_price_for_rent && item?.max_unit_price_for_rent) {
+                    rentPriceData.push({
+                        min: parseFloat(item.min_unit_price_for_rent),
+                        max: parseFloat(item.max_unit_price_for_rent)
+                    });
+                }
+            });
+            
+            if (rentPriceData.length > 0) {
+                const avgMinRentPrice = rentPriceData.reduce((sum, item) => sum + item.min, 0) / rentPriceData.length;
+                const avgMaxRentPrice = rentPriceData.reduce((sum, item) => sum + item.max, 0) / rentPriceData.length;
+                
+                summary.unit_price_for_rent = {
+                    min: avgMinRentPrice,
+                    max: avgMaxRentPrice
+                };
+            }
+            
+            // Calculate listing periods from all data
+            const salePeriods = allData
+                .map(item => item.listing_period_for_sale)
+                .filter(val => val !== null && val !== undefined && !isNaN(parseFloat(val)));
+            
+            if (salePeriods.length > 0) {
+                summary.listing_period_for_sale = {
+                    min: Math.min(...salePeriods),
+                    max: Math.max(...salePeriods)
+                };
+            }
+            
+            const rentPeriods = allData
+                .map(item => item.listing_period_for_rent)
+                .filter(val => val !== null && val !== undefined && !isNaN(parseFloat(val)));
+            
+            if (rentPeriods.length > 0) {
+                summary.listing_period_for_rent = {
+                    min: Math.min(...rentPeriods),
+                    max: Math.max(...rentPeriods)
+                };
+            }
+            
+            // Calculate yield from all data
+            const yields = allData
+                .map(item => item.yield)
+                .filter(val => val !== null && val !== undefined && !isNaN(parseFloat(val)));
+            
+            if (yields.length > 0) {
+                summary.yield = {
+                    min: Math.min(...yields),
+                    max: Math.max(...yields)
+                };
+            }
+            
+            console.log('📊 Calculated summary:', summary);
+            
+            // Calculate overall average prices for sale and rent
+            let overallAverageSalePrice = null;
+            let overallAverageRentPrice = null;
+            
+            if (summary.unit_price_for_sale) {
+                overallAverageSalePrice = (summary.unit_price_for_sale.min + summary.unit_price_for_sale.max) / 2;
+                console.log('💰 Overall average sale price:', overallAverageSalePrice);
+            }
+            
+            if (summary.unit_price_for_rent) {
+                overallAverageRentPrice = (summary.unit_price_for_rent.min + summary.unit_price_for_rent.max) / 2;
+                console.log('💰 Overall average rent price:', overallAverageRentPrice);
+            }
+            
+            // Save overall averages globally for use in trends card
+            window.overallAveragePrices = {
+                sale: overallAverageSalePrice,
+                rent: overallAverageRentPrice
+            };
+            
+            console.log('💾 Overall average prices saved globally:', window.overallAveragePrices);
+            
+            // Update trends card if it exists
+            updateTrendsCardWithOverallPrices();
+            
+            // Update trends table if it exists
+            updateTrendsTableWithOverallPrices();
             
             // Generate market indicators in unified card format (like "Тренд цен")
             let html = '<div class="market-indicators-unified">';
@@ -5440,10 +5569,21 @@
                             const currentTrend = findCurrentMonthTrend(typeTrends);
                             if (!currentTrend) return '';
                             
+                            // Для карточки "Тренд цен" используем общую среднюю цену продажи
+                            let trendValue = formatTrendValue(currentTrend.trend_value, type);
+                            
+                            if (type === 'price_trend' && window.overallAveragePrices && window.overallAveragePrices.sale) {
+                                // Форматируем общую среднюю цену продажи в турецких лирах
+                                trendValue = formatValue(window.overallAveragePrices.sale, 'price');
+                                console.log('💰 Using overall average sale price in price trend card:', window.overallAveragePrices.sale);
+                            } else if (type === 'price_trend') {
+                                console.log('⚠️ Overall average sale price not available, using original trend value');
+                            }
+                            
                             return `
                                 <div class="trend-card trend-card-${type}">
                                     <div class="trend-title">${formatTrendType(type)}</div>
-                                    <div class="trend-value">${formatTrendValue(currentTrend.trend_value, type)}</div>
+                                    <div class="trend-value">${trendValue}</div>
                                     <div class="trend-details">
                                         <div class="trend-change">
                                             ${currentTrend.price_change_sale ? `Продажа: ${formatPercentage(currentTrend.price_change_sale)}` : ''}
@@ -5694,6 +5834,23 @@
                 Показано ${filteredTrends.length} из ${trends.length} трендов
             </td></tr>`;
             
+            // Получаем общие средние цены для расчетов
+            const overallSalePrice = window.overallAveragePrices?.sale;
+            const overallRentPrice = window.overallAveragePrices?.rent;
+            
+            console.log('💰 Overall average prices for trends table:', {
+                sale: overallSalePrice,
+                rent: overallRentPrice
+            });
+            
+            // Проверяем доступность общих средних цен
+            if (!overallSalePrice || !overallRentPrice) {
+                console.log('⚠️ Overall average prices not available, using original trend values');
+                html += `<tr class="warning-row" style="background-color: #fff3cd; color: #856404; text-align: center; font-size: 12px;">
+                    <td colspan="6">⚠️ Общие средние цены недоступны. Отображаются исходные данные трендов.</td>
+                </tr>`;
+            }
+            
             filteredTrends.forEach((trend, index) => {
                 // Проверяем, является ли этот тренд текущим месяцем
                 const isCurrentMonth = trend.property_year === currentYear && trend.property_month === currentMonth;
@@ -5710,11 +5867,42 @@
                     rowStyle = 'background-color: #f0f8ff;';
                 }
                 
+                // Рассчитываем цены для отображения
+                let displaySalePrice, displayRentPrice;
+                
+                if (isCurrentMonth) {
+                    // Для текущего месяца используем общие средние цены
+                    displaySalePrice = overallSalePrice || trend.unit_price_for_sale;
+                    displayRentPrice = overallRentPrice || trend.unit_price_for_rent;
+                    console.log(`💰 Current month (${trend.property_month}): using overall averages - Sale: ${displaySalePrice}, Rent: ${displayRentPrice}`);
+                } else {
+                    // Для остальных месяцев рассчитываем цены на основе процентного изменения
+                    if (overallSalePrice && trend.price_change_sale) {
+                        // Находим базовую цену (текущий месяц) и применяем процентное изменение
+                        const baseSalePrice = overallSalePrice;
+                        const priceChangeMultiplier = 1 + (parseFloat(trend.price_change_sale) / 100);
+                        displaySalePrice = baseSalePrice * priceChangeMultiplier;
+                        console.log(`💰 Month ${trend.property_month}: Sale price calculated: ${baseSalePrice} * ${priceChangeMultiplier} = ${displaySalePrice}`);
+                    } else {
+                        displaySalePrice = trend.unit_price_for_sale;
+                    }
+                    
+                    if (overallRentPrice && trend.price_change_rent) {
+                        // Находим базовую цену аренды (текущий месяц) и применяем процентное изменение
+                        const baseRentPrice = overallRentPrice;
+                        const priceChangeMultiplier = 1 + (parseFloat(trend.price_change_rent) / 100);
+                        displayRentPrice = baseRentPrice * priceChangeMultiplier;
+                        console.log(`💰 Month ${trend.property_month}: Rent price calculated: ${baseRentPrice} * ${priceChangeMultiplier} = ${displayRentPrice}`);
+                    } else {
+                        displayRentPrice = trend.unit_price_for_rent;
+                    }
+                }
+                
                 html += `<tr class="${rowClass}" style="${rowStyle}">`;
                 html += `<td>${formatTrendDateShort(trend.date)}</td>`;
-                html += `<td>${formatTrendValue(trend.unit_price_for_sale, 'price')}</td>`;
+                html += `<td>${formatTrendValue(displaySalePrice, 'price')}</td>`;
                 html += `<td>${formatPercentage(trend.price_change_sale)}</td>`;
-                html += `<td>${formatTrendValue(trend.unit_price_for_rent, 'price')}</td>`;
+                html += `<td>${formatTrendValue(displayRentPrice, 'price')}</td>`;
                 html += `<td>${formatPercentage(trend.price_change_rent)}</td>`;
                 html += `<td>${formatTrendValue(trend.yield, 'percentage')}</td>`;
                 html += '</tr>';
@@ -7791,6 +7979,98 @@
                 document.body.removeChild(textArea);
                 alert('Ссылка скопирована в буфер обмена!');
             }
+        }
+        
+        // Обновление карточки трендов с общей средней ценой
+        function updateTrendsCardWithOverallPrices() {
+            if (!window.overallAveragePrices || !window.overallAveragePrices.sale) {
+                console.log('⚠️ Overall average prices not available for trends card update');
+                return;
+            }
+            
+            // Найти карточку "Тренд цен" и обновить её значение
+            const priceTrendCard = document.querySelector('.trend-card-price_trend');
+            if (priceTrendCard) {
+                const trendValueElement = priceTrendCard.querySelector('.trend-value');
+                if (trendValueElement) {
+                    const formattedPrice = formatValue(window.overallAveragePrices.sale, 'price');
+                    trendValueElement.textContent = formattedPrice;
+                    console.log('✅ Updated price trend card with overall average sale price:', formattedPrice);
+                }
+            } else {
+                console.log('⚠️ Price trend card not found for update');
+            }
+        }
+        
+        // Обновление таблицы трендов с общими средними ценами
+        function updateTrendsTableWithOverallPrices() {
+            if (!window.overallAveragePrices || !window.overallAveragePrices.sale || !window.overallAveragePrices.rent) {
+                console.log('⚠️ Overall average prices not available for trends table update');
+                return;
+            }
+            
+            // Найти таблицу трендов
+            const trendsTable = document.querySelector('.trends-table');
+            if (!trendsTable) {
+                console.log('⚠️ Trends table not found for update');
+                return;
+            }
+            
+            // Получаем текущую дату
+            const currentDate = new Date();
+            const currentYear = currentDate.getFullYear();
+            const currentMonth = currentDate.getMonth() + 1;
+            
+            // Обновляем строки таблицы
+            const tableRows = trendsTable.querySelectorAll('tbody tr:not(.filter-info):not(.warning-row)');
+            tableRows.forEach((row, index) => {
+                const cells = row.querySelectorAll('td');
+                if (cells.length >= 5) {
+                    // Проверяем, является ли это текущим месяцем
+                    const dateCell = cells[0];
+                    const dateText = dateCell.textContent;
+                    
+                    // Простая проверка на текущий месяц (можно улучшить)
+                    const isCurrentMonth = dateText.includes('авг') && dateText.includes('2025');
+                    
+                    if (isCurrentMonth) {
+                        // Обновляем цены для текущего месяца
+                        const salePriceCell = cells[1];
+                        const rentPriceCell = cells[3];
+                        
+                        salePriceCell.textContent = formatValue(window.overallAveragePrices.sale, 'price');
+                        rentPriceCell.textContent = formatValue(window.overallAveragePrices.rent, 'price');
+                        
+                        console.log('✅ Updated current month prices in trends table');
+                    } else {
+                        // Для остальных месяцев пересчитываем цены на основе процентных изменений
+                        const priceChangeSaleText = cells[2].textContent;
+                        const priceChangeRentText = cells[4].textContent;
+                        
+                        // Извлекаем процентные изменения
+                        const saleChangeMatch = priceChangeSaleText.match(/[+-]?(\d+\.?\d*)%/);
+                        const rentChangeMatch = priceChangeRentText.match(/[+-]?(\d+\.?\d*)%/);
+                        
+                        if (saleChangeMatch) {
+                            const changePercent = parseFloat(saleChangeMatch[1]);
+                            const isPositive = priceChangeSaleText.includes('+');
+                            const multiplier = 1 + (isPositive ? changePercent : -changePercent) / 100;
+                            const calculatedPrice = window.overallAveragePrices.sale * multiplier;
+                            cells[1].textContent = formatValue(calculatedPrice, 'price');
+                        }
+                        
+                        if (rentChangeMatch) {
+                            const changePercent = parseFloat(rentChangeMatch[1]);
+                            const isPositive = priceChangeRentText.includes('+');
+                            const multiplier = 1 + (isPositive ? changePercent : -changePercent) / 100;
+                            const calculatedPrice = window.overallAveragePrices.rent * multiplier;
+                            cells[3].textContent = formatValue(calculatedPrice, 'price');
+                        }
+                    }
+                }
+            });
+            
+            console.log('✅ Trends table updated with overall average prices');
         }
     </script>
 </body>
