@@ -339,6 +339,40 @@ def generate_standalone_html(report_html: str, report_data: dict, report_id: str
     
     from datetime import datetime
     
+    # Вспомогательные функции для форматирования
+    def format_price_with_currency(user_inputs):
+        """Форматирование цены с валютой"""
+        price = user_inputs.get('price')
+        currency = user_inputs.get('currency', 'EUR')
+        
+        if price is None or price == '':
+            return 'Не указано'
+        
+        # Символы валют
+        currency_symbols = {
+            'TRY': '₺',
+            'EUR': '€',
+            'USD': '$'
+        }
+        
+        symbol = currency_symbols.get(currency, currency)
+        
+        # Форматируем число с разделителями тысяч
+        try:
+            formatted_price = f"{float(price):,.0f}".replace(',', ' ')
+            return f"{symbol}{formatted_price}"
+        except (ValueError, TypeError):
+            return str(price)
+    
+    def format_area(area):
+        """Форматирование площади"""
+        if area is None or area == '':
+            return 'Не указано'
+        try:
+            return f"{float(area)} м²"
+        except (ValueError, TypeError):
+            return f"{area} м²"
+    
     # Получаем текущую дату и время
     current_datetime = datetime.now().strftime('%d.%m.%Y %H:%M')
     
@@ -371,11 +405,11 @@ def generate_standalone_html(report_html: str, report_data: dict, report_id: str
                 </div>
                 <div class="characteristic-item">
                     <span class="characteristic-label">Цена объекта:</span>
-                    <span class="characteristic-value">{user_inputs.get('price', 'Не указано')}</span>
+                    <span class="characteristic-value">{format_price_with_currency(user_inputs)}</span>
                 </div>
                 <div class="characteristic-item">
                     <span class="characteristic-label">Площадь объекта:</span>
-                    <span class="characteristic-value">{user_inputs.get('area', 'Не указано')} м²</span>
+                    <span class="characteristic-value">{format_area(user_inputs.get('area'))}</span>
                 </div>
             </div>
         </div>"""

@@ -7631,14 +7631,81 @@ def save_report():
         base_url = request.host_url.rstrip('/')
         report_url = f'{base_url}/reports/report_{report_id}.html'
         
-        logger.info(f"✅ Отчет успешно сохранен: {report_url}")
-        
-        return jsonify({
-            'success': True,
-            'report_id': report_id,
-            'report_url': report_url,
-            'message': 'Отчет успешно сохранен'
-        })
+                                logger.info(f"✅ Отчет успешно сохранен: {report_url}")
+                        
+                        # Сохраняем запись в таблицу user_reports
+                        try:
+                            # Получаем ID пользователя из таблицы users
+                            user_result = supabase.table('users').select('id').eq('telegram_id', telegram_id).execute()
+                            
+                            if user_result.data:
+                                user_id = user_result.data[0]['id']
+                                
+                                # Подготавливаем данные для записи
+                                report_record = {
+                                    'user_id': user_id,
+                                    'report_type': 'object_evaluation',
+                                    'title': f'Отчет по оценке объекта - {report_data.get("location", "Неизвестно")}',
+                                    'description': f'Отчет по оценке объекта недвижимости для локации {report_data.get("location", "Неизвестно")}',
+                                    'parameters': report_data,
+                                    'address': report_data.get('location', ''),
+                                    'report_url': report_url,
+                                    'full_report': {
+                                        'report_html': report_html,
+                                        'report_data': report_data,
+                                        'report_id': report_id,
+                                        'generated_at': datetime.now().isoformat()
+                                    },
+                                    'created_at': datetime.now().isoformat(),
+                                    'updated_at': datetime.now().isoformat()
+                                }
+                                
+                                # Добавляем дополнительные параметры если они есть
+                                if report_data.get('user_inputs'):
+                                    user_inputs = report_data['user_inputs']
+                                    report_record.update({
+                                        'bedrooms': user_inputs.get('bedrooms'),
+                                        'price': user_inputs.get('price'),
+                                        'area': user_inputs.get('area')
+                                    })
+                                
+                                # Добавляем координаты если они есть
+                                if report_data.get('coordinates'):
+                                    coords = report_data['coordinates']
+                                    report_record.update({
+                                        'latitude': coords.get('latitude'),
+                                        'longitude': coords.get('longitude')
+                                    })
+                                
+                                # Добавляем диапазон цен если есть
+                                if report_data.get('price_range'):
+                                    price_range = report_data['price_range']
+                                    report_record.update({
+                                        'price_range_min': price_range.get('min'),
+                                        'price_range_max': price_range.get('max')
+                                    })
+                                
+                                # Сохраняем запись в таблицу user_reports
+                                insert_result = supabase.table('user_reports').insert(report_record).execute()
+                                
+                                if insert_result.data:
+                                    logger.info(f"✅ Запись в user_reports создана: ID {insert_result.data[0]['id']}")
+                                else:
+                                    logger.warning(f"⚠️ Не удалось создать запись в user_reports")
+                                    
+                            else:
+                                logger.warning(f"⚠️ Пользователь с telegram_id {telegram_id} не найден в таблице users")
+                                
+                        except Exception as report_db_error:
+                            logger.error(f"❌ Ошибка при сохранении в user_reports: {report_db_error}")
+                            # Не прерываем выполнение, так как отчет уже сохранен
+                        
+                        return jsonify({
+                            'success': True,
+                            'report_id': report_id,
+                            'report_url': report_url,
+                            'message': 'Отчет успешно сохранен'
+                        })
         
     except Exception as e:
         logger.error(f"❌ Ошибка сохранения отчета: {e}")
@@ -7665,6 +7732,101 @@ def serve_report(filename):
     except Exception as e:
         logger.error(f"❌ Ошибка сервинга отчета {filename}: {e}")
         return jsonify({'error': 'Internal server error'}), 500
+
+
+@app.route('/api/user_reports', methods=['POST'])
+def get_user_reports():
+    """Получение списка отчетов пользователя"""
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({'success': False, 'error': 'No data provided'}), 400
+        
+        telegram_id = data.get('telegram_id')
+        if not telegram_id:
+            return jsonify({'success': False, 'error': 'Missing telegram_id'}), 400
+        
+        logger.info(f"🔍 Запрос отчетов для telegram_id: {telegram_id}")
+        
+        # Получаем ID пользователя
+        user_result = supabase.table('users').select('id').eq('telegram_id', telegram_id).execute()
+        
+        if not user_result.data:
+            return jsonify({'success': False, 'error': 'User not found'}), 404
+        
+        user_id = user_result.data[0]['id']
+        
+        # Получаем отчеты пользователя
+        reports_result = supabase.table('user_reports').select('*').eq('user_id', user_id).eq('deleted_at', None).order('created_at', desc=True).execute()
+        
+        if reports_result.data:
+            logger.info(f"✅ Найдено {len(reports_result.data)} отчетов для пользователя {user_id}")
+            return jsonify({
+                'success': True,
+                'reports': reports_result.data,
+                'count': len(reports_result.data)
+            })
+        else:
+            logger.info(f"ℹ️ Отчеты для пользователя {user_id} не найдены")
+            return jsonify({
+                'success': True,
+                'reports': [],
+                'count': 0
+            })
+            
+    except Exception as e:
+        logger.error(f"❌ Ошибка при получении отчетов пользователя: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@app.route('/api/user_reports/delete', methods=['POST'])
+def delete_user_report():
+    """Удаление отчета пользователя (мягкое удаление)"""
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({'success': False, 'error': 'No data provided'}), 400
+        
+        telegram_id = data.get('telegram_id')
+        report_id = data.get('report_id')
+        
+        if not telegram_id or not report_id:
+            return jsonify({'success': False, 'error': 'Missing telegram_id or report_id'}), 400
+        
+        logger.info(f"🗑️ Запрос на удаление отчета {report_id} для telegram_id: {telegram_id}")
+        
+        # Получаем ID пользователя
+        user_result = supabase.table('users').select('id').eq('telegram_id', telegram_id).execute()
+        
+        if not user_result.data:
+            return jsonify({'success': False, 'error': 'User not found'}), 404
+        
+        user_id = user_result.data[0]['id']
+        
+        # Проверяем, что отчет принадлежит пользователю
+        report_result = supabase.table('user_reports').select('*').eq('id', report_id).eq('user_id', user_id).execute()
+        
+        if not report_result.data:
+            return jsonify({'success': False, 'error': 'Report not found or access denied'}), 404
+        
+        # Мягкое удаление - устанавливаем deleted_at
+        update_result = supabase.table('user_reports').update({
+            'deleted_at': datetime.now().isoformat()
+        }).eq('id', report_id).eq('user_id', user_id).execute()
+        
+        if update_result.data:
+            logger.info(f"✅ Отчет {report_id} успешно удален для пользователя {user_id}")
+            return jsonify({
+                'success': True,
+                'message': 'Отчет успешно удален'
+            })
+        else:
+            logger.warning(f"⚠️ Не удалось удалить отчет {report_id}")
+            return jsonify({'success': False, 'error': 'Failed to delete report'}), 500
+            
+    except Exception as e:
+        logger.error(f"❌ Ошибка при удалении отчета: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 
 if __name__ == '__main__':
