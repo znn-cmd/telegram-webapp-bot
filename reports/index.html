@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Сохраненные отчеты - Aaadviser</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f5f5;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+            border-radius: 12px;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        
+        .reports-list {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        .reports-list h2 {
+            background: #f8f9fa;
+            padding: 20px;
+            border-bottom: 1px solid #e9ecef;
+            font-size: 20px;
+            font-weight: 600;
+            color: #495057;
+        }
+        
+        .report-item {
+            padding: 20px;
+            border-bottom: 1px solid #e9ecef;
+            transition: background-color 0.3s ease;
+        }
+        
+        .report-item:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .report-item:last-child {
+            border-bottom: none;
+        }
+        
+        .report-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 10px;
+        }
+        
+        .report-info {
+            color: #6c757d;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+        
+        .report-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #5a6fd8;
+            transform: translateY(-1px);
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+        
+        .no-reports {
+            padding: 40px 20px;
+            text-align: center;
+            color: #6c757d;
+        }
+        
+        .no-reports h3 {
+            margin-bottom: 10px;
+            color: #495057;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .header {
+                padding: 20px 15px;
+            }
+            
+            .header h1 {
+                font-size: 24px;
+            }
+            
+            .report-actions {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 Сохраненные отчеты</h1>
+            <p>Список всех сохраненных отчетов по оценке объектов</p>
+        </div>
+        
+        <div class="reports-list">
+            <h2>📋 Доступные отчеты</h2>
+            <div id="reportsContainer">
+                <div class="no-reports">
+                    <h3>Отчеты не найдены</h3>
+                    <p>Пока нет сохраненных отчетов. Создайте первый отчет в приложении!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Функция для получения списка отчетов
+        async function loadReports() {
+            try {
+                // В реальном приложении здесь был бы API запрос
+                // Пока используем заглушку
+                const reports = [
+                    {
+                        id: 'demo1',
+                        title: 'Отчет по оценке объекта в Анталии',
+                        location: 'Турция, Анталия, Лара',
+                        date: '21.08.2025 17:30',
+                        url: '#'
+                    },
+                    {
+                        id: 'demo2',
+                        title: 'Анализ недвижимости в Стамбуле',
+                        location: 'Турция, Стамбул, Бешикташ',
+                        date: '21.08.2025 16:45',
+                        url: '#'
+                    }
+                ];
+                
+                displayReports(reports);
+            } catch (error) {
+                console.error('Ошибка загрузки отчетов:', error);
+                showError('Не удалось загрузить список отчетов');
+            }
+        }
+        
+        // Функция для отображения отчетов
+        function displayReports(reports) {
+            const container = document.getElementById('reportsContainer');
+            
+            if (!reports || reports.length === 0) {
+                container.innerHTML = `
+                    <div class="no-reports">
+                        <h3>Отчеты не найдены</h3>
+                        <p>Пока нет сохраненных отчетов. Создайте первый отчет в приложении!</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            const reportsHTML = reports.map(report => `
+                <div class="report-item">
+                    <div class="report-title">${report.title}</div>
+                    <div class="report-info">
+                        <strong>Локация:</strong> ${report.location}<br>
+                        <strong>Дата создания:</strong> ${report.date}
+                    </div>
+                    <div class="report-actions">
+                        <a href="${report.url}" class="btn btn-primary" target="_blank">
+                            👁️ Просмотреть
+                        </a>
+                        <button class="btn btn-secondary" onclick="copyReportUrl('${report.url}')">
+                            📋 Копировать ссылку
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+            
+            container.innerHTML = reportsHTML;
+        }
+        
+        // Функция для копирования ссылки на отчет
+        function copyReportUrl(url) {
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(url).then(() => {
+                    alert('Ссылка скопирована в буфер обмена!');
+                });
+            } else {
+                // Fallback для старых браузеров
+                const textArea = document.createElement('textarea');
+                textArea.value = url;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                alert('Ссылка скопирована в буфер обмена!');
+            }
+        }
+        
+        // Функция для показа ошибки
+        function showError(message) {
+            const container = document.getElementById('reportsContainer');
+            container.innerHTML = `
+                <div class="no-reports">
+                    <h3>❌ Ошибка</h3>
+                    <p>${message}</p>
+                </div>
+            `;
+        }
+        
+        // Загружаем отчеты при загрузке страницы
+        document.addEventListener('DOMContentLoaded', loadReports);
+    </script>
+</body>
+</html>

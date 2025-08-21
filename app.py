@@ -7540,5 +7540,119 @@ def api_test_api_keys():
         return jsonify({'success': False, 'error': str(e)}), 500
 
 
+@app.route('/api/reports/save', methods=['POST'])
+def save_report():
+    """Сохранение отчета в HTML файл"""
+    try:
+        logger.info("💾 Начало сохранения отчета")
+        
+        # Получаем данные запроса
+        data = request.get_json()
+        if not data:
+            return jsonify({'success': False, 'error': 'No data provided'}), 400
+        
+        telegram_id = data.get('telegram_id')
+        report_html = data.get('report_html')
+        report_data = data.get('report_data')
+        
+        if not telegram_id or not report_html:
+            return jsonify({'success': False, 'error': 'Missing required data'}), 400
+        
+        logger.info(f"🔍 Проверка доступа для telegram_id: {telegram_id}")
+        
+        # Проверяем права доступа пользователя
+        try:
+            # Получаем информацию о пользователе
+            user_result = supabase.table('users').select('user_status, period_end').eq('telegram_id', telegram_id).execute()
+            
+            if not user_result.data:
+                logger.warning(f"⚠️ Пользователь {telegram_id} не найден в базе")
+                return jsonify({'success': False, 'error': 'User not found'}), 404
+            
+            user = user_result.data[0]
+            user_status = user.get('user_status')
+            period_end = user.get('period_end')
+            
+            # Проверяем статус админа
+            is_admin = user_status == 'admin'
+            
+            # Проверяем активную подписку
+            has_active_subscription = False
+            if period_end:
+                try:
+                    period_end_date = datetime.fromisoformat(period_end.replace('Z', '+00:00'))
+                    current_date = datetime.now(period_end_date.tzinfo)
+                    has_active_subscription = period_end_date > current_date
+                except Exception as date_error:
+                    logger.warning(f"⚠️ Ошибка парсинга даты подписки: {date_error}")
+            
+            if not is_admin and not has_active_subscription:
+                logger.warning(f"⚠️ Пользователь {telegram_id} не имеет доступа к сохранению отчетов")
+                return jsonify({'success': False, 'error': 'Access denied. Admin status or active subscription required.'}), 403
+            
+            logger.info(f"✅ Пользователь {telegram_id} имеет доступ: admin={is_admin}, subscription={has_active_subscription}")
+            
+        except Exception as access_error:
+            logger.error(f"❌ Ошибка проверки доступа: {access_error}")
+            return jsonify({'success': False, 'error': 'Access check failed'}), 500
+        
+        # Генерируем уникальный ID для отчета
+        import uuid
+        report_id = str(uuid.uuid4())[:8]  # Первые 8 символов UUID
+        
+        # Создаем HTML файл с отчетом
+        html_content = generate_standalone_html(report_html, report_data, report_id)
+        
+        # Сохраняем файл в папку reports
+        file_path = f'reports/report_{report_id}.html'
+        try:
+            with open(file_path, 'w', encoding='utf-8') as f:
+                f.write(html_content)
+            logger.info(f"✅ HTML файл сохранен: {file_path}")
+        except Exception as file_error:
+            logger.error(f"❌ Ошибка сохранения файла: {file_error}")
+            return jsonify({'success': False, 'error': 'File save failed'}), 500
+        
+        # Формируем URL для доступа к отчету
+        # Используем текущий хост из запроса
+        base_url = request.host_url.rstrip('/')
+        report_url = f'{base_url}/reports/report_{report_id}.html'
+        
+        logger.info(f"✅ Отчет успешно сохранен: {report_url}")
+        
+        return jsonify({
+            'success': True,
+            'report_id': report_id,
+            'report_url': report_url,
+            'message': 'Отчет успешно сохранен'
+        })
+        
+    except Exception as e:
+        logger.error(f"❌ Ошибка сохранения отчета: {e}")
+        import traceback
+        logger.error(f"❌ Traceback: {traceback.format_exc()}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@app.route('/reports/<filename>')
+def serve_report(filename):
+    """Сервинг сохраненных отчетов"""
+    try:
+        # Проверяем, что файл существует и имеет расширение .html
+        if not filename.endswith('.html') or '..' in filename:
+            return jsonify({'error': 'Invalid filename'}), 400
+        
+        file_path = f'reports/{filename}'
+        if not os.path.exists(file_path):
+            return jsonify({'error': 'Report not found'}), 404
+        
+        # Отдаем HTML файл как статический контент
+        return send_file(file_path, mimetype='text/html')
+        
+    except Exception as e:
+        logger.error(f"❌ Ошибка сервинга отчета {filename}: {e}")
+        return jsonify({'error': 'Internal server error'}), 500
+
+
 if __name__ == '__main__':
     run_flask()

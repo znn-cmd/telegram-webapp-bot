@@ -332,3 +332,362 @@ def get_latest_currency_rates() -> Dict[str, Any]:
             'success': False,
             'error': str(e)
         } 
+
+
+def generate_standalone_html(report_html: str, report_data: dict, report_id: str) -> str:
+    """Генерация автономного HTML файла с отчетом"""
+    
+    from datetime import datetime
+    
+    # Получаем текущую дату и время
+    current_datetime = datetime.now().strftime('%d.%m.%Y %H:%M')
+    
+    # Извлекаем данные локации
+    location = report_data.get('location', 'Неизвестно')
+    
+    # Базовый HTML шаблон с встроенными стилями
+    html_template = f"""<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Отчет по оценке объекта - {location}</title>
+    
+    <!-- Встроенные CSS стили -->
+    <style>
+        /* Основные стили */
+        * {{
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }}
+        
+        body {{
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f5f5;
+        }}
+        
+        /* Заголовок отчета */
+        .report-header {{
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+            margin-bottom: 30px;
+        }}
+        
+        .report-title h1 {{
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }}
+        
+        .report-date, .report-location {{
+            font-size: 16px;
+            opacity: 0.9;
+            margin-bottom: 5px;
+        }}
+        
+        /* Основной контент */
+        .report-content {{
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            margin-bottom: 30px;
+        }}
+        
+        /* Стили для блоков отчета */
+        .summary-section, .trends-section, .forecast-section {{
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 25px;
+            overflow: hidden;
+        }}
+        
+        .section-title {{
+            background: #f8f9fa;
+            padding: 20px;
+            border-bottom: 1px solid #e9ecef;
+            font-size: 20px;
+            font-weight: 600;
+            color: #495057;
+        }}
+        
+        .section-content {{
+            padding: 20px;
+        }}
+        
+        /* Стили для таблиц */
+        .data-table {{
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            font-size: 14px;
+        }}
+        
+        .data-table th, .data-table td {{
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e9ecef;
+        }}
+        
+        .data-table th {{
+            background-color: #f8f9fa;
+            font-weight: 600;
+            color: #495057;
+        }}
+        
+        /* Стили для карточек */
+        .indicator-card, .forecast-card {{
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+            border-left: 4px solid #667eea;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }}
+        
+        /* Стили для графиков */
+        .chart-container {{
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }}
+        
+        /* Футер отчета */
+        .report-footer {{
+            background: #343a40;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            margin-top: 40px;
+        }}
+        
+        .report-footer p {{
+            margin-bottom: 5px;
+            font-size: 14px;
+        }}
+        
+        /* Адаптивность */
+        @media (max-width: 768px) {{
+            .report-content {{
+                padding: 0 15px;
+            }}
+            
+            .report-title h1 {{
+                font-size: 24px;
+            }}
+            
+            .section-title {{
+                font-size: 18px;
+                padding: 15px;
+            }}
+            
+            .section-content {{
+                padding: 15px;
+            }}
+        }}
+        
+        /* Дополнительные стили для специфических элементов */
+        .price-forecast-block {{
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin: 20px 0;
+            overflow: hidden;
+        }}
+        
+        .price-forecast-content {{
+            padding: 20px;
+        }}
+        
+        .price-forecast-title {{
+            font-size: 18px;
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 15px;
+            text-align: center;
+        }}
+        
+        .price-forecast-sale-section,
+        .price-forecast-rent-section {{
+            margin: 15px 0;
+            text-align: center;
+        }}
+        
+        .price-forecast-sale-label,
+        .price-forecast-rent-label {{
+            font-size: 14px;
+            color: #6c757d;
+            margin-bottom: 5px;
+        }}
+        
+        .price-forecast-sale-value,
+        .price-forecast-rent-value {{
+            font-size: 24px;
+            font-weight: 700;
+            color: #28a745;
+            margin-bottom: 8px;
+        }}
+        
+        .price-forecast-date {{
+            font-size: 14px;
+            color: #666666;
+            margin-bottom: 8px;
+            font-weight: 600;
+            text-align: center;
+        }}
+        
+        .price-forecast-currency-info {{
+            font-size: 12px;
+            color: #999999;
+            font-style: italic;
+            text-align: center;
+        }}
+        
+        /* Стили для трендов */
+        .trends-analysis-section {{
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin: 20px 0;
+            overflow: hidden;
+        }}
+        
+        .trends-analysis-title {{
+            background: #f8f9fa;
+            padding: 20px;
+            border-bottom: 1px solid #e9ecef;
+            font-size: 20px;
+            font-weight: 600;
+            color: #495057;
+        }}
+        
+        .trends-analysis-content {{
+            padding: 20px;
+        }}
+        
+        /* Стили для детальных таблиц */
+        .detailed-tables-section {{
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin: 20px 0;
+            overflow: hidden;
+        }}
+        
+        .detailed-tables-title {{
+            background: #f8f9fa;
+            padding: 20px;
+            border-bottom: 1px solid #e9ecef;
+            font-size: 20px;
+            font-weight: 600;
+            color: #495057;
+        }}
+        
+        .detailed-tables-content {{
+            padding: 20px;
+        }}
+        
+        /* Стили для аккордеонов */
+        .accordion-item {{
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            overflow: hidden;
+        }}
+        
+        .accordion-header {{
+            background: #f8f9fa;
+            padding: 15px;
+            cursor: pointer;
+            border-bottom: 1px solid #e9ecef;
+            font-weight: 600;
+            color: #495057;
+        }}
+        
+        .accordion-content {{
+            padding: 15px;
+            display: none;
+        }}
+        
+        .accordion-content.active {{
+            display: block;
+        }}
+    </style>
+</head>
+<body>
+    <!-- Заголовок отчета -->
+    <header class="report-header">
+        <div class="report-title">
+            <h1>Отчет по оценке объекта</h1>
+            <p class="report-date">Сформирован: {current_datetime}</p>
+            <p class="report-location">Локация: {location}</p>
+        </div>
+    </header>
+    
+    <!-- Основной контент отчета -->
+    <main class="report-content">
+        {report_html}
+    </main>
+    
+    <!-- Футер отчета -->
+    <footer class="report-footer">
+        <p>Отчет сгенерирован системой Aaadviser</p>
+        <p>ID отчета: {report_id}</p>
+        <p>Дата создания: {current_datetime}</p>
+    </footer>
+    
+    <!-- Встроенный JavaScript для интерактивности -->
+    <script>
+        // Функция для переключения аккордеонов
+        function toggleAccordion(accordionId) {{
+            const content = document.getElementById(accordionId);
+            if (content) {{
+                content.classList.toggle('active');
+            }}
+        }}
+        
+        // Функция для копирования ссылки в буфер обмена
+        function copyToClipboard(text) {{
+            if (navigator.clipboard) {{
+                navigator.clipboard.writeText(text).then(() => {{
+                    alert('Ссылка скопирована в буфер обмена!');
+                }});
+            }} else {{
+                // Fallback для старых браузеров
+                const textArea = document.createElement('textarea');
+                textArea.value = text;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                alert('Ссылка скопирована в буфер обмена!');
+            }}
+        }}
+        
+        // Инициализация при загрузке страницы
+        document.addEventListener('DOMContentLoaded', function() {{
+            console.log('Отчет загружен и готов к просмотру');
+            
+            // Добавляем обработчики для всех аккордеонов
+            const accordionHeaders = document.querySelectorAll('.accordion-header');
+            accordionHeaders.forEach(header => {{
+                header.addEventListener('click', function() {{
+                    const content = this.nextElementSibling;
+                    if (content && content.classList.contains('accordion-content')) {{
+                        content.classList.toggle('active');
+                    }}
+                }});
+            }});
+        }});
+    </script>
+</body>
+</html>"""
+    
+    return html_template

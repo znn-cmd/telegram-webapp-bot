@@ -2005,6 +2005,7 @@
             font-size: 14px;
             color: #666666;
             margin-bottom: 8px;
+            font-weight: 600;
         }
         
         .price-forecast-currency-info {
@@ -2043,6 +2044,7 @@
             .price-forecast-date {
                 font-size: 13px;
                 margin-bottom: 6px;
+                font-weight: 600;
             }
             
             .price-forecast-currency-info {
@@ -2154,6 +2156,172 @@
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(40, 167, 69, 0.3);
         }
+        
+        /* Стили для кнопки сохранения отчета */
+        .save-report-section {
+            margin: 20px 0;
+            text-align: center;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+        }
+        
+        .save-report-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .save-report-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        
+        .save-report-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .save-report-info {
+            margin-top: 8px;
+            color: #6c757d;
+            font-size: 12px;
+        }
+        
+        /* Стили для модального окна */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .modal-body {
+            margin-bottom: 20px;
+        }
+        
+        .modal-footer {
+            text-align: center;
+        }
+        
+        .modal-close-button {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        
+        .modal-close-button:hover {
+            background: #5a6268;
+        }
+        
+        /* Стили для сообщений об успехе/ошибке */
+        .save-success-message {
+            text-align: center;
+        }
+        
+        .save-success-message h3 {
+            color: #28a745;
+            margin-bottom: 15px;
+        }
+        
+        .report-link {
+            margin: 15px 0;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            border: 1px solid #e9ecef;
+        }
+        
+        .report-url {
+            color: #667eea;
+            text-decoration: none;
+            word-break: break-all;
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+        
+        .report-url:hover {
+            text-decoration: underline;
+        }
+        
+        .copy-link-button {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: background-color 0.3s ease;
+        }
+        
+        .copy-link-button:hover {
+            background: #218838;
+        }
+        
+        .report-info {
+            margin-top: 10px;
+            color: #6c757d;
+        }
+        
+        .save-error-message {
+            text-align: center;
+        }
+        
+        .save-error-message h3 {
+            color: #dc3545;
+            margin-bottom: 15px;
+        }
+        
+        .error-details {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+            font-family: monospace;
+            font-size: 12px;
+        }
 
         /* Animations */
         @keyframes spin {
@@ -2255,6 +2423,45 @@
             }
             
             .trends-chart-title {
+            
+            /* Мобильные стили для кнопки сохранения отчета */
+            .save-report-section {
+                padding: 12px;
+                margin-top: 15px;
+                margin-bottom: 15px;
+            }
+            
+            .save-report-button {
+                padding: 10px 20px;
+                font-size: 13px;
+            }
+            
+            .save-report-info {
+                font-size: 11px;
+                margin-top: 6px;
+            }
+            
+            /* Мобильные стили для модального окна */
+            .modal-content {
+                padding: 15px;
+                max-width: 95%;
+                width: 95%;
+            }
+            
+            .modal-title {
+                font-size: 16px;
+                margin-bottom: 12px;
+            }
+            
+            .report-link {
+                padding: 12px;
+                margin: 12px 0;
+            }
+            
+            .copy-link-button {
+                padding: 6px 12px;
+                font-size: 11px;
+            }
                 font-size: 13px;
                 margin-bottom: 10px;
             }
@@ -2706,6 +2913,16 @@
         <div class="error-state" id="errorState" style="display: none;">
             <div class="error-icon">❌</div>
             <div class="error-text" id="errorText">Ошибка загрузки данных</div>
+        </div>
+
+        <!-- Кнопка сохранения отчета (только для админов/подписчиков) -->
+        <div class="save-report-section" id="saveReportSection" style="display: none;">
+            <button class="save-report-button" onclick="saveReport()">
+                💾 Сохранить отчет
+            </button>
+            <div class="save-report-info">
+                <small>Отчет будет сохранен и доступен по ссылке</small>
+            </div>
         </div>
 
         <!-- Back Button -->
@@ -6159,7 +6376,7 @@
             // Рассчитываем прогнозную цену продажи для объекта пользователя
             // Цена продажи = площадь объекта × прогноз цены продажи последнего месяца
             const futureSalePricePerM2 = parseFloat(futureTrend.unit_price_for_sale) || 0;
-            const forecastSalePrice = userArea * futureSalePricePerM2;
+            const forecastSalePriceInTRY = userArea * futureSalePricePerM2; // В лирах
             
             // Рассчитываем прогнозную ставку аренды
             // Ставка аренды = площадь объекта × прогноз аренды последнего месяца
@@ -6180,9 +6397,13 @@
                 if (currencyResponse.ok) {
                     const currencyData = await currencyResponse.json();
                     if (currencyData.success && currencyData.data) {
-                        // В таблице currency базовая валюта - EUR, курс TRY хранится в поле try
-                        // Курс TRY к EUR = 1 / try (так как try показывает сколько TRY за 1 EUR)
-                        tryToEurRate = 1 / parseFloat(currencyData.data.try || 1);
+                        console.log('📊 Currency data received:', currencyData.data);
+                        // В таблице currency базовая валюта - EUR
+                        // Поле 'try' показывает сколько TRY за 1 EUR
+                        // Нам нужен курс TRY к EUR для конвертации
+                        const eurToTryRate = parseFloat(currencyData.data.try || 1);
+                        tryToEurRate = 1 / eurToTryRate;
+                        console.log(`💱 Exchange rate: 1 EUR = ${eurToTryRate} TRY, 1 TRY = ${tryToEurRate} EUR`);
                     }
                 }
             } catch (error) {
@@ -6191,8 +6412,22 @@
                 tryToEurRate = 0.03; // Примерно 1 TRY = 0.03 EUR
             }
             
-            // Конвертируем ставку аренды из лир в евро
+            console.log(`💱 Final exchange rate: 1 TRY = ${tryToEurRate} EUR`);
+            
+            // Конвертируем цены из лир в евро
+            const forecastSalePriceInEUR = forecastSalePriceInTRY * tryToEurRate;
             const forecastRentPriceInEUR = forecastRentPriceInTRY * tryToEurRate;
+            
+            console.log('💰 Price calculations:', {
+                userArea: userArea,
+                futureSalePricePerM2: futureSalePricePerM2,
+                forecastSalePriceInTRY: forecastSalePriceInTRY,
+                forecastSalePriceInEUR: forecastSalePriceInEUR,
+                futureRentPricePerM2: futureRentPricePerM2,
+                forecastRentPriceInTRY: forecastRentPriceInTRY,
+                forecastRentPriceInEUR: forecastRentPriceInEUR,
+                tryToEurRate: tryToEurRate
+            });
             
             // Форматируем названия месяцев
             const monthNames = {
@@ -6220,35 +6455,35 @@
                     'saleLabel': 'Цена продажи',
                     'rentLabel': 'Ставка аренды',
                     'date': `${futureMonthName} ${futureTrend.property_year}`,
-                    'currencyInfo': `Курс: 1 TRY = €${tryToEurRate.toFixed(4)}`
+                    'currencyInfo': `Курс: 1 EUR = ₺${(1 / tryToEurRate).toFixed(2)}`
                 },
                 'en': {
                     'title': 'Price Forecast',
                     'saleLabel': 'Sale Price',
                     'rentLabel': 'Rent Rate',
                     'date': `${futureMonthName} ${futureTrend.property_year}`,
-                    'currencyInfo': `Rate: 1 TRY = €${tryToEurRate.toFixed(4)}`
+                    'currencyInfo': `Rate: 1 EUR = ₺${(1 / tryToEurRate).toFixed(2)}`
                 },
                 'de': {
                     'title': 'Preisprognose',
                     'saleLabel': 'Verkaufspreis',
                     'rentLabel': 'Mietpreis',
                     'date': `${futureMonthName} ${futureTrend.property_year}`,
-                    'currencyInfo': `Kurs: 1 TRY = €${tryToEurRate.toFixed(4)}`
+                    'currencyInfo': `Kurs: 1 EUR = ₺${(1 / tryToEurRate).toFixed(2)}`
                 },
                 'fr': {
                     'title': 'Prévision des prix',
                     'saleLabel': 'Prix de vente',
                     'rentLabel': 'Taux de location',
                     'date': `${futureMonthName} ${futureTrend.property_year}`,
-                    'currencyInfo': `Taux: 1 TRY = €${tryToEurRate.toFixed(4)}`
+                    'currencyInfo': `Taux: 1 EUR = ₺${(1 / tryToEurRate).toFixed(2)}`
                 },
                 'tr': {
                     'title': 'Fiyat Tahmini',
                     'saleLabel': 'Satış Fiyatı',
                     'rentLabel': 'Kiralama Oranı',
                     'date': `${futureMonthName} ${futureTrend.property_year}`,
-                    'currencyInfo': `Kur: 1 TRY = €${tryToEurRate.toFixed(4)}`
+                    'currencyInfo': `Kur: 1 EUR = ₺${(1 / tryToEurRate).toFixed(2)}`
                 }
             };
             
@@ -6262,7 +6497,7 @@
             // Блок с ценой продажи
             forecastHtml += '<div class="price-forecast-sale-section">';
             forecastHtml += `<div class="price-forecast-sale-label">${texts.saleLabel}</div>`;
-            forecastHtml += `<div class="price-forecast-sale-value">€${forecastSalePrice.toLocaleString('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>`;
+            forecastHtml += `<div class="price-forecast-sale-value">€${forecastSalePriceInEUR.toLocaleString('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>`;
             forecastHtml += '</div>';
             
             // Блок со ставкой аренды
@@ -6449,6 +6684,9 @@
                 eurButton.classList.add('active');
                 selectedListingTypes.currency = 'EUR';
             }
+            
+            // Проверяем и показываем кнопку сохранения отчета
+            checkAndShowSaveButton();
         }
 
         // Start initialization when page loads
@@ -7323,6 +7561,197 @@
             // Пересоздаем график с новыми данными
             if (currentForecastData) {
                 createForecastChart(currentForecastData, chartType);
+            }
+        }
+        
+        // Функции для сохранения отчета
+        
+        // Проверка и отображение кнопки сохранения
+        async function checkAndShowSaveButton() {
+            try {
+                const userAccess = await checkUserAccess();
+                const saveReportSection = document.getElementById('saveReportSection');
+                
+                if (userAccess.hasAccess) {
+                    saveReportSection.style.display = 'block';
+                    console.log('✅ Save button shown for user with access');
+                } else {
+                    saveReportSection.style.display = 'none';
+                    console.log('⚠️ Save button hidden - no access');
+                }
+            } catch (error) {
+                console.error('❌ Error checking save button access:', error);
+                const saveReportSection = document.getElementById('saveReportSection');
+                saveReportSection.style.display = 'none';
+            }
+        }
+        
+        // Сохранение отчета
+        async function saveReport() {
+            try {
+                console.log('💾 Starting report save process...');
+                
+                // Показываем индикатор загрузки
+                const saveButton = document.querySelector('.save-report-button');
+                const originalText = saveButton.innerHTML;
+                saveButton.innerHTML = '⏳ Сохранение...';
+                saveButton.disabled = true;
+                
+                // Собираем данные отчета
+                const reportData = {
+                    telegram_id: getTelegramId(),
+                    report_html: document.querySelector('.main-content').innerHTML,
+                    report_data: {
+                        location: getCurrentLocationString(),
+                        timestamp: new Date().toISOString(),
+                        user_inputs: {
+                            price: selectedListingTypes.price,
+                            area: selectedListingTypes.area,
+                            currency: selectedListingTypes.currency
+                        }
+                    }
+                };
+                
+                console.log('📊 Report data prepared:', reportData);
+                
+                // Отправляем на backend
+                const response = await fetch('/api/reports/save', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(reportData)
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        // Показываем успешное сообщение с ссылкой
+                        showSaveSuccess(result.report_url);
+                        console.log('✅ Report saved successfully:', result.report_url);
+                    } else {
+                        throw new Error(result.message || 'Unknown error');
+                    }
+                } else {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+            } catch (error) {
+                console.error('❌ Error saving report:', error);
+                showSaveError(error.message);
+            } finally {
+                // Восстанавливаем кнопку
+                const saveButton = document.querySelector('.save-report-button');
+                saveButton.innerHTML = originalText;
+                saveButton.disabled = false;
+            }
+        }
+        
+        // Показ успешного сохранения
+        function showSaveSuccess(reportUrl) {
+            const message = `
+                <div class="save-success-message">
+                    <h3>✅ Отчет успешно сохранен!</h3>
+                    <p>Ваш отчет доступен по ссылке:</p>
+                    <div class="report-link">
+                        <a href="${reportUrl}" target="_blank" class="report-url">${reportUrl}</a>
+                        <button class="copy-link-button" onclick="copyToClipboard('${reportUrl}')">
+                            📋 Копировать
+                        </button>
+                    </div>
+                    <p class="report-info">
+                        <small>Ссылка действительна постоянно. Отчет содержит все данные на момент создания.</small>
+                    </p>
+                </div>
+            `;
+            
+            // Показываем модальное окно
+            showModal(message, 'Сохранение отчета');
+        }
+        
+        // Показ ошибки сохранения
+        function showSaveError(errorMessage) {
+            const message = `
+                <div class="save-error-message">
+                    <h3>❌ Ошибка сохранения</h3>
+                    <p>Не удалось сохранить отчет:</p>
+                    <p class="error-details">${errorMessage}</p>
+                    <p>Попробуйте еще раз или обратитесь в поддержку.</p>
+                </div>
+            `;
+            
+            showModal(message, 'Ошибка');
+        }
+        
+        // Вспомогательные функции
+        
+        // Получение текущей локации в виде строки
+        function getCurrentLocationString() {
+            const location = selectedLocation;
+            if (location.country_name && location.city_name && location.county_name && location.district_name) {
+                return `${location.country_name}, ${location.city_name}, ${location.county_name}, ${location.district_name}`;
+            } else if (location.country_name && location.city_name) {
+                return `${location.country_name}, ${location.city_name}`;
+            } else if (location.country_name) {
+                return location.country_name;
+            }
+            return 'Неизвестно';
+        }
+        
+        // Получение Telegram ID пользователя
+        function getTelegramId() {
+            if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe) {
+                return window.Telegram.WebApp.initDataUnsafe.user?.id;
+            }
+            return null;
+        }
+        
+        // Показ модального окна
+        function showModal(content, title = '') {
+            // Создаем модальное окно
+            const modal = document.createElement('div');
+            modal.className = 'modal-overlay';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    ${title ? `<h2 class="modal-title">${title}</h2>` : ''}
+                    <div class="modal-body">
+                        ${content}
+                    </div>
+                    <div class="modal-footer">
+                        <button class="modal-close-button" onclick="this.closest('.modal-overlay').remove()">
+                            Закрыть
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            // Добавляем на страницу
+            document.body.appendChild(modal);
+            
+            // Закрытие по клику вне модального окна
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    modal.remove();
+                }
+            });
+        }
+        
+        // Копирование в буфер обмена
+        function copyToClipboard(text) {
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(text).then(() => {
+                    alert('Ссылка скопирована в буфер обмена!');
+                });
+            } else {
+                // Fallback для старых браузеров
+                const textArea = document.createElement('textarea');
+                textArea.value = text;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                alert('Ссылка скопирована в буфер обмена!');
             }
         }
     </script>
