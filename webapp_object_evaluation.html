@@ -262,22 +262,7 @@
             line-height: 1.6;
         }
         
-        /* Стили для сообщения об ограниченном доступе */
-        .admin-restricted-message {
-            background: #fff3cd;
-            border: 1px solid #ffeaa7;
-            border-radius: 8px;
-            padding: 15px;
-            margin: 20px 0;
-            text-align: center;
-        }
-        
-        .admin-restricted-message p {
-            margin: 0;
-            color: #856404;
-            font-size: 14px;
-            font-weight: 500;
-        }
+
 
         /* Key Metrics Styles */
         .key-metrics-section {
@@ -623,17 +608,6 @@
                 font-size: 11px;
             }
             
-            /* Мобильные стили для сообщения об ограниченном доступе */
-            .admin-restricted-message {
-                padding: 12px;
-                margin: 16px 0;
-                border-radius: 6px;
-            }
-            
-            .admin-restricted-message p {
-                font-size: 13px;
-            }
-            
             /* Мобильные стили для блока "Вывод по объекту" */
             .object-summary-section {
                 margin: 24px 0;
@@ -709,17 +683,6 @@
             
             .admin-ids-details {
                 font-size: 10px;
-            }
-            
-            /* Мобильные стили для сообщения об ограниченном доступе */
-            .admin-restricted-message {
-                padding: 10px;
-                margin: 14px 0;
-                border-radius: 5px;
-            }
-            
-            .admin-restricted-message p {
-                font-size: 12px;
             }
             
             /* Мобильные стили для блока "Вывод по объекту" */
@@ -4377,12 +4340,25 @@
             return rates[fromCurrency]?.[toCurrency] || 1;
         }
         
-        // Generate analytical summary based on market data
-        function generateAnalyticalSummary(summary) {
+        // Generate analytical summary based on market data (только для админов)
+                async function generateAnalyticalSummary(summary) {
+            // Check if user is admin
+            try {
+                const userAccess = await checkUserAccess();
+                if (!userAccess.hasAccess || userAccess.reason !== 'admin') {
+                    // User is not admin, return empty string to hide the block
+                    return '';
+                }
+            } catch (error) {
+                console.error('Error checking user access:', error);
+                // On error, hide the block
+                return '';
+            }
+            
             let analysis = '<div class="analytical-summary">';
             analysis += '<h4 class="summary-title">Анализ рынка</h4>';
             
-
+            
             
             // Sale analysis
             if (summary.comparable_area_for_sale && summary.listing_period_for_sale && summary.min_unit_price_for_sale) {
@@ -4787,7 +4763,7 @@
             
             // Add analytical summary below the comparison block
             if (Object.keys(summary).length > 0) {
-                html += generateAnalyticalSummary(summary);
+                html += await generateAnalyticalSummary(summary);
             }
             
             summaryContainer.innerHTML = html;
@@ -6148,17 +6124,13 @@
             try {
                 const userAccess = await checkUserAccess();
                 if (!userAccess.hasAccess || userAccess.reason !== 'admin') {
-                    // User is not admin, return message about restricted access
-                    return '<div class="admin-restricted-message">' +
-                           '<p>Блок "Анализ рынка" доступен только администраторам</p>' +
-                           '</div>';
+                    // User is not admin, return empty string to hide the block
+                    return '';
                 }
             } catch (error) {
                 console.error('Error checking user access:', error);
-                // On error, show restricted message
-                return '<div class="admin-restricted-message">' +
-                       '<p>Ошибка проверки доступа</p>' +
-                       '</div>';
+                // On error, hide the block
+                return '';
             }
             
             // Define coefficients for each category
