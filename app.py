@@ -701,6 +701,142 @@ def api_currency_rates():
         logger.error(f"❌ Ошибка при получении курсов валют: {e}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
+@app.route('/api/currency/rate', methods=['POST'])
+def api_currency_rate():
+    """Получение курса валют на конкретную дату"""
+    try:
+        data = request.json or {}
+        from_currency = data.get('from_currency', 'EUR').upper()
+        to_currency = data.get('to_currency', 'TRY').upper()
+        date = data.get('date')
+        
+        if not date:
+            return jsonify({'success': False, 'error': 'date required'}), 400
+        
+        logger.info(f"🔍 Запрос курса валют {from_currency} -> {to_currency} на {date}")
+        
+        # Если запрашиваем курс к базовой валюте (EUR), возвращаем 1
+        if from_currency == 'EUR':
+            if to_currency == 'EUR':
+                return jsonify({'success': True, 'rate': 1.0})
+            else:
+                # Получаем курс из базы данных
+                result = supabase.table('currency').select('*').eq('created_at::date', date).limit(1).execute()
+                
+                if result.data and len(result.data) > 0:
+                    currency_data = result.data[0]
+                    rate = currency_data.get(to_currency.lower(), 1.0)
+                    logger.info(f"✅ Курс валют из БД: {from_currency} -> {to_currency} = {rate}")
+                    return jsonify({'success': True, 'rate': rate})
+                else:
+                    logger.warning(f"⚠️ Курс валют на {date} не найден в БД")
+                    return jsonify({'success': False, 'error': 'Rate not found for this date'})
+        
+        # Если запрашиваем курс от другой валюты к EUR
+        elif to_currency == 'EUR':
+            result = supabase.table('currency').select('*').eq('created_at::date', date).limit(1).execute()
+            
+            if result.data and len(result.data) > 0:
+                currency_data = result.data[0]
+                rate = 1.0 / currency_data.get(from_currency.lower(), 1.0)
+                logger.info(f"✅ Курс валют из БД: {from_currency} -> {to_currency} = {rate}")
+                return jsonify({'success': True, 'rate': rate})
+            else:
+                logger.warning(f"⚠️ Курс валют на {date} не найден в БД")
+                return jsonify({'success': False, 'error': 'Rate not found for this date'})
+        
+        # Если запрашиваем курс между двумя валютами (не EUR)
+        else:
+            result = supabase.table('currency').select('*').eq('created_at::date', date).limit(1).execute()
+            
+            if result.data and len(result.data) > 0:
+                currency_data = result.data[0]
+                from_rate = currency_data.get(from_currency.lower(), 1.0)
+                to_rate = currency_data.get(to_currency.lower(), 1.0)
+                rate = to_rate / from_rate
+                logger.info(f"✅ Курс валют из БД: {from_currency} -> {to_currency} = {rate}")
+                return jsonify({'success': True, 'rate': rate})
+            else:
+                logger.warning(f"⚠️ Курс валют на {date} не найден в БД")
+                return jsonify({'success': False, 'error': 'Rate not found for this date'})
+                
+    except Exception as e:
+        logger.error(f"❌ Ошибка при получении курса валют: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/currency/update', methods=['POST'])
+def api_currency_update():
+    """Обновление курсов валют через внешний API"""
+    try:
+        data = request.json or {}
+        from_currency = data.get('from_currency', 'EUR').upper()
+        to_currency = data.get('to_currency', 'TRY').upper()
+        
+        logger.info(f"🔄 Обновление курса валют {from_currency} -> {to_currency}")
+        
+        # API ключ для currencylayer
+        api_key = os.getenv('CURRENCY_API_KEY')
+        if not api_key:
+            logger.error("❌ API ключ для валют не найден в переменных окружения")
+            return jsonify({'success': False, 'error': 'Currency API key not configured'}), 500
+        
+        # URL для API (базовая валюта - EUR)
+        url = f"http://api.currencylayer.com/live?access_key={api_key}&currencies=RUB,USD,TRY,AED,THB&source=EUR"
+        
+        logger.info(f"🌐 Запрос к API: {url}")
+        response = requests.get(url, timeout=30)
+        response.raise_for_status()
+        
+        data = response.json()
+        logger.info(f"📊 Ответ API: {data}")
+        
+        if not data.get('success'):
+            error_info = data.get('error', {})
+            logger.error(f"❌ Ошибка API валют: {error_info}")
+            return jsonify({'success': False, 'error': f"Currency API error: {error_info}"}), 500
+        
+        # Извлекаем курсы валют
+        quotes = data.get('quotes', {})
+        
+        # Конвертируем в формат нашей базы данных
+        currency_rates = {
+            'rub': quotes.get('EURRUB', 1.0),
+            'usd': quotes.get('EURUSD', 1.0),
+            'euro': 1.0,  # Базовая валюта
+            'try': quotes.get('EURTRY', 1.0),
+            'aed': quotes.get('EURAED', 1.0),
+            'thb': quotes.get('EURTHB', 1.0)
+        }
+        
+        # Сохраняем в базу данных
+        result = supabase.table('currency').insert(currency_rates).execute()
+        
+        if result.data:
+            logger.info(f"✅ Курсы валют обновлены: {currency_rates}")
+            
+            # Рассчитываем нужный курс
+            if from_currency == 'EUR':
+                rate = currency_rates.get(to_currency.lower(), 1.0)
+            elif to_currency == 'EUR':
+                rate = 1.0 / currency_rates.get(from_currency.lower(), 1.0)
+            else:
+                from_rate = currency_rates.get(from_currency.lower(), 1.0)
+                to_rate = currency_rates.get(to_currency.lower(), 1.0)
+                rate = to_rate / from_rate
+            
+            return jsonify({
+                'success': True,
+                'rate': rate,
+                'rates_updated': True
+            })
+        else:
+            logger.error("❌ Ошибка при сохранении курсов валют в БД")
+            return jsonify({'success': False, 'error': 'Failed to save currency rates'}), 500
+            
+    except Exception as e:
+        logger.error(f"❌ Ошибка при обновлении курсов валют: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
 @app.route('/api/user/language', methods=['POST'])
 def api_user_language():
     """Получение языка пользователя из таблицы users"""
@@ -7333,152 +7469,6 @@ def api_test_api_keys():
         import traceback
         logger.error(f"❌ Traceback: {traceback.format_exc()}")
         return jsonify({'success': False, 'error': str(e)}), 500
-
-
-@app.route('/api/currency/rate', methods=['POST'])
-def api_currency_rate():
-    """Получение курса валюты из таблицы currency на определенную дату"""
-    try:
-        data = request.json or {}
-        from_currency = data.get('from_currency', '').upper()
-        to_currency = data.get('to_currency', '').upper()
-        date = data.get('date', '')
-        
-        logger.info(f"🔍 Запрос курса валюты: {from_currency} -> {to_currency} на {date}")
-        
-        if not from_currency or not to_currency or not date:
-            return jsonify({'error': 'Missing required parameters'}), 400
-        
-        # Получаем курс валюты из таблицы currency
-        # Базовая валюта - EUR, поэтому получаем курс относительно EUR
-        if from_currency == 'EUR':
-            # Если конвертируем из EUR, берем прямой курс
-            result = supabase.table('currency').select('try' if to_currency == 'TRY' else 'usd').eq('created_at::date', date).order('created_at', desc=True).limit(1).execute()
-        elif to_currency == 'EUR':
-            # Если конвертируем в EUR, берем обратный курс
-            result = supabase.table('currency').select('try' if from_currency == 'TRY' else 'usd').eq('created_at::date', date).order('created_at', desc=True).limit(1).execute()
-        else:
-            # Для других валют используем USD как промежуточную
-            result = supabase.table('currency').select('usd').eq('created_at::date', date).order('created_at', desc=True).limit(1).execute()
-        
-        if result.data and len(result.data) > 0:
-            record = result.data[0]
-            if from_currency == 'EUR' and to_currency == 'TRY':
-                rate = record.get('try', 1)
-            elif from_currency == 'TRY' and to_currency == 'EUR':
-                rate = 1 / record.get('try', 1)
-            elif from_currency == 'EUR' and to_currency == 'USD':
-                rate = record.get('usd', 1)
-            elif from_currency == 'USD' and to_currency == 'EUR':
-                rate = 1 / record.get('usd', 1)
-            else:
-                # Для других комбинаций используем USD как промежуточную
-                usd_rate = record.get('usd', 1)
-                if from_currency == 'USD':
-                    rate = usd_rate
-                else:
-                    rate = 1 / usd_rate
-            
-            logger.info(f"✅ Курс валюты получен: {from_currency} -> {to_currency} = {rate}")
-            return jsonify({
-                'success': True,
-                'rate': rate,
-                'from_currency': from_currency,
-                'to_currency': to_currency,
-                'date': date
-            })
-        else:
-            logger.warning(f"⚠️ Курс валюты не найден на {date}")
-            return jsonify({
-                'success': False,
-                'error': 'Exchange rate not found for the specified date'
-            }), 404
-            
-    except Exception as e:
-        logger.error(f"❌ Ошибка получения курса валюты: {e}")
-        return jsonify({'error': 'Internal error'}), 500
-
-
-@app.route('/api/currency/update', methods=['POST'])
-def api_currency_update():
-    """Обновление курсов валют через currencylayer.com API"""
-    try:
-        data = request.json or {}
-        from_currency = data.get('from_currency', '').upper()
-        to_currency = data.get('to_currency', '').upper()
-        
-        logger.info(f"🔄 Обновление курса валюты: {from_currency} -> {to_currency}")
-        
-        if not from_currency or not to_currency:
-            return jsonify({'error': 'Missing required parameters'}), 400
-        
-        # Получаем API ключ из .env
-        currency_api_key = os.getenv('CURRENCY_API_KEY')
-        if not currency_api_key:
-            logger.error("❌ CURRENCY_API_KEY не найден в .env")
-            return jsonify({'error': 'Currency API key not configured'}), 500
-        
-        # Формируем URL для API currencylayer.com
-        # Базовая валюта - EUR
-        url = f"http://api.currencylayer.com/live?access_key={currency_api_key}&source=EUR&currencies={from_currency},{to_currency}"
-        
-        logger.info(f"🌐 Отправляем запрос к currencylayer.com API")
-        response = requests.get(url, timeout=10)
-        
-        if response.status_code == 200:
-            data = response.json()
-            logger.info(f"📊 Ответ API: {data}")
-            
-            if data.get('success'):
-                quotes = data.get('quotes', {})
-                
-                # Получаем курсы относительно EUR
-                eur_from_rate = quotes.get(f'EUR{from_currency}', 1)
-                eur_to_rate = quotes.get(f'EUR{to_currency}', 1)
-                
-                # Рассчитываем курс между валютами
-                if from_currency == 'EUR':
-                    rate = eur_to_rate
-                elif to_currency == 'EUR':
-                    rate = 1 / eur_from_rate
-                else:
-                    # Для других комбинаций используем EUR как промежуточную
-                    rate = eur_to_rate / eur_from_rate
-                
-                # Сохраняем курс в таблицу currency
-                currency_data = {
-                    'created_at': datetime.now().isoformat(),
-                    'rub': 1.0,  # Заглушка, нужно получать реальные данные
-                    'usd': eur_to_rate if to_currency == 'USD' else (1 / eur_from_rate if from_currency == 'USD' else 1.0),
-                    'euro': 1.0,  # Базовая валюта
-                    'try': eur_to_rate if to_currency == 'TRY' else (1 / eur_from_rate if from_currency == 'TRY' else 1.0),
-                    'aed': 1.0,  # Заглушка
-                    'thb': 1.0   # Заглушка
-                }
-                
-                # Вставляем новую запись
-                insert_result = supabase.table('currency').insert(currency_data).execute()
-                logger.info(f"💾 Курс валюты сохранен в БД: {insert_result}")
-                
-                logger.info(f"✅ Курс валюты обновлен: {from_currency} -> {to_currency} = {rate}")
-                return jsonify({
-                    'success': True,
-                    'rate': rate,
-                    'from_currency': from_currency,
-                    'to_currency': to_currency,
-                    'message': 'Exchange rate updated successfully'
-                })
-            else:
-                error = data.get('error', {}).get('info', 'Unknown API error')
-                logger.error(f"❌ Ошибка API currencylayer.com: {error}")
-                return jsonify({'error': f'Currency API error: {error}'}), 500
-        else:
-            logger.error(f"❌ HTTP ошибка API currencylayer.com: {response.status_code}")
-            return jsonify({'error': f'HTTP error: {response.status_code}'}), 500
-            
-    except Exception as e:
-        logger.error(f"❌ Ошибка обновления курса валюты: {e}")
-        return jsonify({'error': 'Internal error'}), 500
 
 
 if __name__ == '__main__':

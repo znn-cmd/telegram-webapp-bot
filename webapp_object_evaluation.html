@@ -633,6 +633,22 @@
             .admin-restricted-message p {
                 font-size: 13px;
             }
+            
+            /* Мобильные стили для блока "Вывод по объекту" */
+            .object-summary-section {
+                margin: 24px 0;
+                padding: 22px;
+                border-radius: 14px;
+            }
+            
+            .object-summary-title {
+                font-size: 17px;
+                margin-bottom: 18px;
+            }
+            
+            .object-summary-content {
+                font-size: 13px;
+            }
         }
         
         @media (max-width: 480px) {
@@ -766,41 +782,6 @@
         .object-summary-content strong {
             color: #1a202c;
             font-weight: 700;
-        }
-        
-        /* Мобильные стили для блока "Вывод по объекту" */
-        @media (max-width: 768px) {
-            .object-summary-section {
-                margin: 24px 0;
-                padding: 22px;
-                border-radius: 14px;
-            }
-            
-            .object-summary-title {
-                font-size: 17px;
-                margin-bottom: 18px;
-            }
-            
-            .object-summary-content {
-                font-size: 13px;
-            }
-        }
-        
-        @media (max-width: 480px) {
-            .object-summary-section {
-                margin: 20px 0;
-                padding: 20px;
-                border-radius: 12px;
-            }
-            
-            .object-summary-title {
-                font-size: 16px;
-                margin-bottom: 16px;
-            }
-            
-            .object-summary-content {
-                font-size: 13px;
-            }
         }
         
         /* Стили для блока "Анализ рынка" в стиле "Вывод по тренду" */
@@ -2775,6 +2756,13 @@
                 'saleAnalysisText': 'Продажа: при площади {area} м² (среднее значение по проданным объектам) и минимальной цене {minPrice}/м² срок продажи составляет ~{minDays} дней; при максимальной цене {maxPrice}/м² - срок продажи до {maxDays} дней.',
                 'rentAnalysisText': 'Аренда: при площади {area} м² (среднее значение по сданным в аренду объектам) минимальная цена {minPrice}/м² срок сдачи ~{minDays} дней; при максимальной цене {maxPrice}/м² срок до {maxDays} дней.',
                 
+                // Ключи для блока "Вывод по объекту"
+                'objectSummaryTitle': 'Вывод по объекту',
+                'objectPricePerM2Label': 'Цена за м² вашего объекта:',
+                'objectCurrencyLabel': 'Валюта объекта:',
+                'objectAreaLabel': 'Площадь объекта:',
+                'exchangeRateLabel': 'Курс конвертации:',
+                
                 // Ключи для сообщения о подписке
                 'subscriptionRequiredTitle': 'Функция долгосрочного прогноза стоимости объекта доступна только для пользователей с активной подпиской.',
                 'subscriptionBenefits': 'Что даёт подписка:',
@@ -2869,6 +2857,13 @@
                 'marketAnalysisTitle': 'Market Analysis',
                 'saleAnalysisText': 'Sale: with an area of {area} m² (average value for sold properties) and a minimum price of {minPrice}/m², the sale period is ~{minDays} days; with a maximum price of {maxPrice}/m² - the sale period is up to {maxDays} days.',
                 'rentAnalysisText': 'Rent: with an area of {area} m² (average value for rented properties) minimum price {minPrice}/m², rental period ~{minDays} days; with a maximum price of {maxPrice}/m² period up to {maxDays} days.',
+                
+                // Object summary localization keys
+                'objectSummaryTitle': 'Object Summary',
+                'objectPricePerM2Label': 'Price per m² of your object:',
+                'objectCurrencyLabel': 'Object currency:',
+                'objectAreaLabel': 'Object area:',
+                'exchangeRateLabel': 'Exchange rate:',
                 'floorLabel': 'Floor',
                 'ageLabel': 'Age',
                 'heatingLabel': 'Heating',
@@ -5570,14 +5565,14 @@
                 const currencySymbol = targetCurrency === 'TRY' ? '₺' : '€';
                 
                 let html = '<div class="object-summary-section">';
-                html += '<h4 class="object-summary-title">Вывод по объекту</h4>';
+                html += `<h4 class="object-summary-title">${getText('objectSummaryTitle')}</h4>`;
                 html += '<div class="object-summary-content">';
-                html += `<p>Цена за м² вашего объекта: <strong>${currencySymbol}${convertedPricePerM2.toFixed(2)}</strong></p>`;
-                html += `<p>Валюта объекта: <strong>${objectCurrency}</strong></p>`;
-                html += `<p>Площадь объекта: <strong>${objectArea} м²</strong></p>`;
+                html += `<p>${getText('objectPricePerM2Label')} <strong>${currencySymbol}${convertedPricePerM2.toFixed(2)}</strong></p>`;
+                html += `<p>${getText('objectCurrencyLabel')} <strong>${objectCurrency}</strong></p>`;
+                html += `<p>${getText('objectAreaLabel')} <strong>${objectArea} м²</strong></p>`;
                 
                 if (objectCurrency !== targetCurrency) {
-                    html += `<p>Курс конвертации: <strong>1 ${objectCurrency} = ${exchangeRate.toFixed(4)} ${targetCurrency}</strong></p>`;
+                    html += `<p>${getText('exchangeRateLabel')} <strong>1 ${objectCurrency} = ${exchangeRate.toFixed(4)} ${targetCurrency}</strong></p>`;
                 }
                 
                 html += '</div></div>';
