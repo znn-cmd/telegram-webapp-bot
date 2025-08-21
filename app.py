@@ -7568,19 +7568,19 @@ def save_report():
         
         logger.info(f"🔍 Проверка доступа для telegram_id: {telegram_id}")
         
-                                # Проверяем права доступа пользователя
-                        try:
-                            # Получаем информацию о пользователе
-                            user_result = supabase.table('users').select('id, user_status, period_end').eq('telegram_id', telegram_id).execute()
-                            
-                            if not user_result.data:
-                                logger.warning(f"⚠️ Пользователь {telegram_id} не найден в базе")
-                                return jsonify({'success': False, 'error': 'User not found'}), 404
-                            
-                            user = user_result.data[0]
-                            user_id = user.get('id')
-                            user_status = user.get('user_status')
-                            period_end = user.get('period_end')
+        # Проверяем права доступа пользователя
+        try:
+            # Получаем информацию о пользователе
+            user_result = supabase.table('users').select('id, user_status, period_end').eq('telegram_id', telegram_id).execute()
+            
+            if not user_result.data:
+                logger.warning(f"⚠️ Пользователь {telegram_id} не найден в базе")
+                return jsonify({'success': False, 'error': 'User not found'}), 404
+            
+            user = user_result.data[0]
+            user_id = user.get('id')
+            user_status = user.get('user_status')
+            period_end = user.get('period_end')
             
             # Проверяем статус админа
             is_admin = user_status == 'admin'
@@ -7605,11 +7605,11 @@ def save_report():
             logger.error(f"❌ Ошибка проверки доступа: {access_error}")
             return jsonify({'success': False, 'error': 'Access check failed'}), 500
         
-                                # Генерируем уникальный ID для отчета
-                        import uuid
-                        from datetime import datetime
-                        report_id = str(uuid.uuid4())[:8]  # Первые 8 символов UUID
-                        current_datetime = datetime.now().strftime('%d.%m.%Y %H:%M')
+        # Генерируем уникальный ID для отчета
+        import uuid
+        from datetime import datetime
+        report_id = str(uuid.uuid4())[:8]  # Первые 8 символов UUID
+        current_datetime = datetime.now().strftime('%d.%m.%Y %H:%M')
         
         # Проверяем, что функция generate_standalone_html доступна
         if not generate_standalone_html:
@@ -7629,105 +7629,105 @@ def save_report():
             logger.error(f"❌ Ошибка сохранения файла: {file_error}")
             return jsonify({'success': False, 'error': 'File save failed'}), 500
         
-                                # Формируем URL для доступа к отчету
-                        # Используем текущий хост из запроса
-                        base_url = request.host_url.rstrip('/')
-                        report_url = f'{base_url}/reports/report_{report_id}.html'
-                        
-                        logger.info(f"✅ Отчет успешно сохранен: {report_url}")
-                        
-                        # Сохраняем запись в таблицу user_reports
-                        try:
-                            # Извлекаем данные для записи в таблицу
-                            location_str = report_data.get('location', '')
-                            user_inputs = report_data.get('user_inputs', {})
-                            location_data = report_data.get('location_data', {})
-                            
-                            # Формируем title и description
-                            report_title = f"Отчет по оценке объекта - {location_str}"
-                            report_description = f"Анализ недвижимости в локации {location_str}"
-                            
-                            # Извлекаем параметры
-                            bedrooms_str = user_inputs.get('bedrooms', '')
-                            # Пытаемся извлечь число спален из строки типа "1+1" или "2"
-                            bedrooms = None
-                            if bedrooms_str:
-                                try:
-                                    if '+' in bedrooms_str:
-                                        # Для случаев типа "1+1", "2+1"
-                                        parts = bedrooms_str.split('+')
-                                        bedrooms = int(parts[0]) + int(parts[1])
-                                    else:
-                                        bedrooms = int(bedrooms_str)
-                                except (ValueError, IndexError):
-                                    bedrooms = None
-                            
-                            # Извлекаем цену
-                            price_str = user_inputs.get('price', '')
-                            price = None
-                            if price_str:
-                                try:
-                                    # Убираем символы валют и пробелы
-                                    price_clean = price_str.replace('€', '').replace('$', '').replace('₺', '').replace(',', '').replace(' ', '')
-                                    price = float(price_clean)
-                                except ValueError:
-                                    price = None
-                            
-                            # Извлекаем площадь
-                            area_str = user_inputs.get('area', '')
-                            area = None
-                            if area_str:
-                                try:
-                                    area = float(area_str)
-                                except ValueError:
-                                    area = None
-                            
-                            # Формируем JSONB параметры
-                            parameters = {
-                                'location_data': location_data,
-                                'user_inputs': user_inputs,
-                                'timestamp': report_data.get('timestamp', ''),
-                                'report_id': report_id
-                            }
-                            
-                            # Создаем запись в user_reports
-                            user_report_data = {
-                                'user_id': user_id,
-                                'report_type': 'object_evaluation',
-                                'title': report_title,
-                                'description': report_description,
-                                'parameters': parameters,
-                                'address': location_str,
-                                'bedrooms': bedrooms,
-                                'price': price,
-                                'area': area,
-                                'report_url': report_url,
-                                'full_report': {
-                                    'html_content': report_html,
-                                    'generated_at': current_datetime,
-                                    'file_path': file_path
-                                }
-                            }
-                            
-                            # Сохраняем в базу данных
-                            user_report_result = supabase.table('user_reports').insert(user_report_data).execute()
-                            
-                            if user_report_result.data:
-                                logger.info(f"✅ Запись в user_reports создана: ID {user_report_result.data[0]['id']}")
-                            else:
-                                logger.warning("⚠️ Не удалось получить ID созданной записи в user_reports")
-                                
-                        except Exception as db_error:
-                            logger.error(f"❌ Ошибка при сохранении в user_reports: {db_error}")
-                            # Не прерываем выполнение, так как HTML файл уже сохранен
-                        
-                        return jsonify({
-                            'success': True,
-                            'report_id': report_id,
-                            'report_url': report_url,
-                            'message': 'Отчет успешно сохранен'
-                        })
+        # Формируем URL для доступа к отчету
+        # Используем текущий хост из запроса
+        base_url = request.host_url.rstrip('/')
+        report_url = f'{base_url}/reports/report_{report_id}.html'
         
+        logger.info(f"✅ Отчет успешно сохранен: {report_url}")
+        
+        # Сохраняем запись в таблицу user_reports
+        try:
+            # Извлекаем данные для записи в таблицу
+            location_str = report_data.get('location', '')
+            user_inputs = report_data.get('user_inputs', {})
+            location_data = report_data.get('location_data', {})
+            
+            # Формируем title и description
+            report_title = f"Отчет по оценке объекта - {location_str}"
+            report_description = f"Анализ недвижимости в локации {location_str}"
+            
+            # Извлекаем параметры
+            bedrooms_str = user_inputs.get('bedrooms', '')
+            # Пытаемся извлечь число спален из строки типа "1+1" или "2"
+            bedrooms = None
+            if bedrooms_str:
+                try:
+                    if '+' in bedrooms_str:
+                        # Для случаев типа "1+1", "2+1"
+                        parts = bedrooms_str.split('+')
+                        bedrooms = int(parts[0]) + int(parts[1])
+                    else:
+                        bedrooms = int(bedrooms_str)
+                except (ValueError, IndexError):
+                    bedrooms = None
+            
+            # Извлекаем цену
+            price_str = user_inputs.get('price', '')
+            price = None
+            if price_str:
+                try:
+                    # Убираем символы валют и пробелы
+                    price_clean = price_str.replace('€', '').replace('$', '').replace('₺', '').replace(',', '').replace(' ', '')
+                    price = float(price_clean)
+                except ValueError:
+                    price = None
+            
+            # Извлекаем площадь
+            area_str = user_inputs.get('area', '')
+            area = None
+            if area_str:
+                try:
+                    area = float(area_str)
+                except ValueError:
+                    area = None
+            
+            # Формируем JSONB параметры
+            parameters = {
+                'location_data': location_data,
+                'user_inputs': user_inputs,
+                'timestamp': report_data.get('timestamp', ''),
+                'report_id': report_id
+            }
+            
+            # Создаем запись в user_reports
+            user_report_data = {
+                'user_id': user_id,
+                'report_type': 'object_evaluation',
+                'title': report_title,
+                'description': report_description,
+                'parameters': parameters,
+                'address': location_str,
+                'bedrooms': bedrooms,
+                'price': price,
+                'area': area,
+                'report_url': report_url,
+                'full_report': {
+                    'html_content': report_html,
+                    'generated_at': current_datetime,
+                    'file_path': file_path
+                }
+            }
+            
+            # Сохраняем в базу данных
+            user_report_result = supabase.table('user_reports').insert(user_report_data).execute()
+            
+            if user_report_result.data:
+                logger.info(f"✅ Запись в user_reports создана: ID {user_report_result.data[0]['id']}")
+            else:
+                logger.warning("⚠️ Не удалось получить ID созданной записи в user_reports")
+                
+        except Exception as db_error:
+            logger.error(f"❌ Ошибка при сохранении в user_reports: {db_error}")
+            # Не прерываем выполнение, так как HTML файл уже сохранен
+        
+        return jsonify({
+            'success': True,
+            'report_id': report_id,
+            'report_url': report_url,
+            'message': 'Отчет успешно сохранен'
+        })
+                        
     except Exception as e:
         logger.error(f"❌ Ошибка сохранения отчета: {e}")
         import traceback
