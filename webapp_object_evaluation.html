@@ -1636,37 +1636,38 @@
         
         /* Стили для графика трендов */
         .trends-chart-section {
-            margin-top: 25px;
+            margin-top: 20px;
+            margin-bottom: 20px;
             background: white;
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            padding: 20px;
+            padding: 15px;
         }
         
         .trends-chart-title {
-            font-size: 16px;
+            font-size: 14px;
             font-weight: 600;
             color: #495057;
-            margin-bottom: 15px;
+            margin-bottom: 12px;
             text-align: center;
         }
         
         .chart-controls {
             display: flex;
             justify-content: center;
-            gap: 10px;
-            margin-bottom: 20px;
+            gap: 8px;
+            margin-bottom: 15px;
         }
         
         .chart-button {
-            padding: 8px 16px;
+            padding: 6px 12px;
             border: 2px solid #e0e0e0;
             border-radius: 6px;
             background: white;
             color: #495057;
             cursor: pointer;
             transition: all 0.3s ease;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 500;
         }
         
@@ -1685,7 +1686,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 200px;
+            min-height: 180px;
         }
         
         #trendsChart {
@@ -2219,26 +2220,28 @@
             }
             
             .trends-chart-section {
-                padding: 15px;
-            }
-            
-            .trends-chart-title {
-                font-size: 14px;
-                margin-bottom: 12px;
-            }
-            
-            .chart-controls {
-                gap: 8px;
+                padding: 12px;
+                margin-top: 15px;
                 margin-bottom: 15px;
             }
             
+            .trends-chart-title {
+                font-size: 13px;
+                margin-bottom: 10px;
+            }
+            
+            .chart-controls {
+                gap: 6px;
+                margin-bottom: 12px;
+            }
+            
             .chart-button {
-                padding: 6px 12px;
-                font-size: 11px;
+                padding: 5px 10px;
+                font-size: 10px;
             }
             
             .chart-container {
-                min-height: 150px;
+                min-height: 140px;
             }
             
             .data-available {
@@ -5182,21 +5185,7 @@
                         </div>
                     </div>
                     
-                    <!-- График трендов -->
-                    <div class="trends-chart-section">
-                        <h4 class="trends-chart-title">${getText('chart_title')}</h4>
-                        <div class="chart-controls">
-                            <button class="chart-button active" data-chart-type="sale" onclick="switchChartType('sale')">
-                                ${getText('sale_button')}
-                            </button>
-                            <button class="chart-button" data-chart-type="rent" onclick="switchChartType('rent')">
-                                ${getText('rent_button')}
-                            </button>
-                        </div>
-                        <div class="chart-container">
-                            <canvas id="trendsChart" width="400" height="200"></canvas>
-                        </div>
-                    </div>
+                    <!-- График трендов будет добавлен в generateTrendsTable -->
                 </div>
             `;
             
@@ -5208,10 +5197,12 @@
             if (trendsTableContainer) {
                 const trendsTableHtml = await generateTrendsTable(trends);
                 trendsTableContainer.innerHTML = trendsTableHtml;
+                
+                // Инициализируем график трендов после добавления HTML
+                setTimeout(() => {
+                    initializeTrendsChart(trends);
+                }, 100);
             }
-            
-            // Инициализируем график трендов
-            initializeTrendsChart(trends);
         }
         
         // Group trends by type for better display
@@ -5451,6 +5442,24 @@
             });
             
             html += '</tbody></table>';
+            
+            // Добавляем график трендов
+            html += `
+                <div class="trends-chart-section">
+                    <h4 class="trends-chart-title">${getText('chart_title')}</h4>
+                    <div class="chart-controls">
+                        <button class="chart-button active" data-chart-type="sale" onclick="switchChartType('sale')">
+                            ${getText('sale_button')}
+                        </button>
+                        <button class="chart-button" data-chart-type="rent" onclick="switchChartType('rent')">
+                            ${getText('rent_button')}
+                        </button>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="trendsChart" width="400" height="200"></canvas>
+                    </div>
+                </div>
+            `;
             
             // Добавляем блок "Вывод по тренду"
             html += await generateTrendsAnalysis(trends);
