@@ -4,6 +4,7 @@ import json
 from typing import Dict, List, Optional, Tuple, Any
 from dotenv import load_dotenv
 import math
+from datetime import datetime
 
 # Загружаем переменные окружения
 load_dotenv()
@@ -336,8 +337,6 @@ def get_latest_currency_rates() -> Dict[str, Any]:
 
 def generate_standalone_html(report_html: str, report_data: dict, report_id: str) -> str:
     """Генерация автономного HTML файла с отчетом"""
-    
-    from datetime import datetime
     
     # Получаем текущую дату и время
     current_datetime = datetime.now().strftime('%d.%m.%Y %H:%M')

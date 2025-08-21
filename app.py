@@ -5528,8 +5528,6 @@ def get_market_data_by_location_ids(location_codes, target_year=None, target_mon
         dict: Данные рынка недвижимости
     """
     try:
-        from datetime import datetime
-        
         # Если год и месяц не указаны, используем текущие
         if target_year is None or target_month is None:
             now = datetime.now()
@@ -5853,7 +5851,6 @@ def get_property_trends_data(city_name, district_name, county_name):
     """
     try:
         # Получаем текущую дату для определения последнего месяца
-        from datetime import datetime
         current_date = datetime.now()
         current_year = current_date.year
         current_month = current_date.month
@@ -6383,7 +6380,6 @@ def get_historical_property_trends(city_name, district_name, county_name, years_
         dict: Словарь с данными по годам для продажи и аренды
     """
     try:
-        from datetime import datetime
         current_date = datetime.now()
         current_year = current_date.year
         
