@@ -2615,7 +2615,8 @@
             house_type: null,
             floor_segment: null,
             age: null,
-            heating: null
+            heating: null,
+            currency: 'EUR'  // По умолчанию EUR
         };
 
         // Localization data
@@ -3564,7 +3565,10 @@
             });
             // Set EUR as default active
             const eurButton = document.querySelector('.currency-button[data-currency="EUR"]');
-            if (eurButton) eurButton.classList.add('active');
+            if (eurButton) {
+                eurButton.classList.add('active');
+                selectedListingTypes.currency = 'EUR';
+            }
             
             // Hide selected property types section
             const selectedPropertyTypes = document.getElementById('selectedPropertyTypes');
@@ -5522,7 +5526,10 @@
                 const objectPrice = parseFloat(document.getElementById('priceObjectInput')?.value) || 0;
                 const objectArea = parseFloat(document.getElementById('areaObjectInput')?.value) || 0;
                 const selectedCountry = selectedLocation.country_name || '';
-                const objectCurrency = selectedListingTypes.currency || 'EUR';
+                
+                // Получаем выбранную валюту из кнопок
+                const selectedCurrencyButton = document.querySelector('.currency-button.active');
+                const objectCurrency = selectedCurrencyButton ? selectedCurrencyButton.dataset.currency : 'EUR';
                 
                 console.log('📊 Object data:', {
                     price: objectPrice,
