@@ -345,6 +345,41 @@ def generate_standalone_html(report_html: str, report_data: dict, report_id: str
     # Извлекаем данные локации
     location = report_data.get('location', 'Неизвестно')
     
+    # Генерируем блок характеристик недвижимости
+    property_characteristics_html = ""
+    if report_data.get('user_inputs'):
+        user_inputs = report_data['user_inputs']
+        property_characteristics_html = f"""
+        <div class="property-characteristics-section">
+            <h4 class="property-characteristics-title">Выбранные характеристики недвижимости</h4>
+            <div class="property-characteristics-content">
+                <div class="characteristic-item">
+                    <span class="characteristic-label">Спальни:</span>
+                    <span class="characteristic-value">{user_inputs.get('bedrooms', 'Не указано')}</span>
+                </div>
+                <div class="characteristic-item">
+                    <span class="characteristic-label">Этаж:</span>
+                    <span class="characteristic-value">{user_inputs.get('floor', 'Не указано')}</span>
+                </div>
+                <div class="characteristic-item">
+                    <span class="characteristic-label">Возраст:</span>
+                    <span class="characteristic-value">{user_inputs.get('age', 'Не указано')}</span>
+                </div>
+                <div class="characteristic-item">
+                    <span class="characteristic-label">Отопление:</span>
+                    <span class="characteristic-value">{user_inputs.get('heating', 'Не указано')}</span>
+                </div>
+                <div class="characteristic-item">
+                    <span class="characteristic-label">Цена объекта:</span>
+                    <span class="characteristic-value">{user_inputs.get('price', 'Не указано')}</span>
+                </div>
+                <div class="characteristic-item">
+                    <span class="characteristic-label">Площадь объекта:</span>
+                    <span class="characteristic-value">{user_inputs.get('area', 'Не указано')} м²</span>
+                </div>
+            </div>
+        </div>"""
+    
     # Базовый HTML шаблон с встроенными стилями
     html_template = f"""<!DOCTYPE html>
 <html lang="ru">
@@ -391,6 +426,16 @@ def generate_standalone_html(report_html: str, report_data: dict, report_id: str
             font-size: 16px;
             opacity: 0.9;
             margin-bottom: 5px;
+        }}
+        
+        .header-logo {{
+            margin-bottom: 15px;
+        }}
+        
+        .header-logo img {{
+            height: 60px;
+            width: auto;
+            filter: brightness(0) invert(1);
         }}
         
         /* Основной контент */
@@ -474,6 +519,45 @@ def generate_standalone_html(report_html: str, report_data: dict, report_id: str
         .report-footer p {{
             margin-bottom: 5px;
             font-size: 14px;
+        }}
+        
+        .report-footer .footer-logo {{
+            margin-bottom: 15px;
+        }}
+        
+        .report-footer .footer-logo img {{
+            height: 40px;
+            width: auto;
+        }}
+        
+        .report-footer .footer-text {{
+            margin-bottom: 15px;
+        }}
+        
+        .report-footer .telegram-link {{
+            display: inline-block;
+            background: #0088cc;
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: 600;
+            margin-top: 10px;
+            transition: background-color 0.3s ease;
+        }}
+        
+        .report-footer .telegram-link:hover {{
+            background: #006699;
+        }}
+        
+        .report-footer .footer-info {{
+            margin-bottom: 15px;
+            opacity: 0.8;
+        }}
+        
+        .report-footer .footer-info p {{
+            margin-bottom: 3px;
+            font-size: 12px;
         }}
         
         /* Адаптивность */
@@ -951,6 +1035,53 @@ def generate_standalone_html(report_html: str, report_data: dict, report_id: str
             line-height: 1.6;
         }}
         
+        /* Стили для характеристик недвижимости */
+        .property-characteristics-section {{
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin: 20px 0;
+            overflow: hidden;
+        }}
+        
+        .property-characteristics-title {{
+            background: #f8f9fa;
+            padding: 20px;
+            border-bottom: 1px solid #e9ecef;
+            font-size: 18px;
+            font-weight: 600;
+            color: #495057;
+            margin: 0;
+        }}
+        
+        .property-characteristics-content {{
+            padding: 20px;
+        }}
+        
+        .characteristic-item {{
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #f1f3f4;
+        }}
+        
+        .characteristic-item:last-child {{
+            border-bottom: none;
+        }}
+        
+        .characteristic-label {{
+            font-size: 14px;
+            color: #6c757d;
+            font-weight: 500;
+        }}
+        
+        .characteristic-value {{
+            font-size: 14px;
+            color: #495057;
+            font-weight: 600;
+        }}
+        
         /* Отступы между блоками */
         .block-spacing {{
             height: 20px;
@@ -971,6 +1102,25 @@ def generate_standalone_html(report_html: str, report_data: dict, report_id: str
             .chart-container {{
                 height: 250px;
             }}
+            
+            .header-logo img {{
+                height: 50px;
+            }}
+            
+            .report-footer .footer-logo img {{
+                height: 35px;
+            }}
+            
+            .report-footer .telegram-link {{
+                padding: 10px 20px;
+                font-size: 16px;
+            }}
+            
+            .characteristic-item {{
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 5px;
+            }}
         }}
     </style>
 </head>
@@ -978,6 +1128,9 @@ def generate_standalone_html(report_html: str, report_data: dict, report_id: str
     <!-- Заголовок отчета -->
     <header class="report-header">
         <div class="report-title">
+            <div class="header-logo">
+                <img src="logo-sqv.png" alt="Aaadviser Logo" style="height: 60px; width: auto; margin-bottom: 15px;">
+            </div>
             <h1>Отчет по оценке объекта</h1>
             <p class="report-date">Сформирован: {current_datetime}</p>
             <p class="report-location">Локация: {location}</p>
@@ -986,14 +1139,26 @@ def generate_standalone_html(report_html: str, report_data: dict, report_id: str
     
     <!-- Основной контент отчета -->
     <main class="report-content">
+        {property_characteristics_html}
         {report_html}
     </main>
     
     <!-- Футер отчета -->
     <footer class="report-footer">
-        <p>Отчет сгенерирован системой Aaadviser</p>
-        <p>ID отчета: {report_id}</p>
-        <p>Дата создания: {current_datetime}</p>
+        <div class="footer-logo">
+            <img src="logo-flt.png" alt="Aaadviser Logo">
+        </div>
+        <div class="footer-text">
+            <p>Отчет сгенерирован системой Aaadviser</p>
+            <p>Отчёт сформирован на основании комплексного анализа открытых источников и официальной рыночной статистики</p>
+        </div>
+        <div class="footer-info">
+            <p>ID отчета: {report_id}</p>
+            <p>Дата создания: {current_datetime}</p>
+        </div>
+        <a href="https://t.me/Aaadviser_bot" class="telegram-link" target="_blank">
+            📱 Открыть в Telegram
+        </a>
     </footer>
     
     <!-- Встроенный JavaScript для интерактивности -->

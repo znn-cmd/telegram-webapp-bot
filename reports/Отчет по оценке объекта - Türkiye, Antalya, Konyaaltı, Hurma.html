@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Отчет по оценке объекта - Türkiye, Antalya, Konyaaltı, Hurma</title>
     
+    <!-- Chart.js для графиков -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
     <!-- Встроенные CSS стили -->
     <style>
         /* Основные стили */
@@ -271,6 +274,356 @@
         .accordion-content.active {
             display: block;
         }
+        
+        /* Стили для графиков */
+        .trends-chart-section, .forecast-chart-section {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin: 20px 0;
+            padding: 20px;
+        }
+        
+        .trends-chart-title, .forecast-chart-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .chart-controls {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .chart-button {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            color: #495057;
+            transition: all 0.3s ease;
+        }
+        
+        .chart-button:hover {
+            background: #e9ecef;
+            border-color: #adb5bd;
+        }
+        
+        .chart-button.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        
+        .chart-container {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            position: relative;
+            height: 300px;
+        }
+        
+        .chart-info {
+            text-align: center;
+            margin-top: 15px;
+        }
+        
+        /* Стили для трендов */
+        .trends-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .trend-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            border-left: 4px solid #667eea;
+        }
+        
+        .trend-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 15px;
+        }
+        
+        .trend-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #28a745;
+            margin-bottom: 10px;
+        }
+        
+        .trend-details {
+            font-size: 14px;
+            color: #6c757d;
+        }
+        
+        .trend-change {
+            font-weight: 600;
+            color: #495057;
+        }
+        
+        /* Стили для таблиц трендов */
+        .trends-table-section {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin: 20px 0;
+            overflow: hidden;
+        }
+        
+        .trends-table-title {
+            background: #f8f9fa;
+            padding: 20px;
+            border-bottom: 1px solid #e9ecef;
+            font-size: 18px;
+            font-weight: 600;
+            color: #495057;
+            margin: 0;
+        }
+        
+        .trends-table-container {
+            padding: 20px;
+        }
+        
+        .trends-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+        
+        .trends-table th, .trends-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .trends-table th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            color: #495057;
+        }
+        
+        .current-month-row {
+            background-color: #e8f4fd;
+        }
+        
+        .forecast-row {
+            background-color: #f0f8ff;
+        }
+        
+        .filter-info {
+            background-color: #f8f9fa;
+            font-size: 11px;
+            color: #666;
+            text-align: center;
+            padding: 4px;
+        }
+        
+        /* Стили для прогнозов */
+        .forecast-table-section {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin: 20px 0;
+            overflow: hidden;
+        }
+        
+        .forecast-table-title {
+            background: #f8f9fa;
+            padding: 20px;
+            border-bottom: 1px solid #e9ecef;
+            font-size: 18px;
+            font-weight: 600;
+            color: #495057;
+            margin: 0;
+        }
+        
+        .forecast-table-container {
+            padding: 20px;
+        }
+        
+        .forecast-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+        
+        .forecast-table th, .forecast-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .forecast-table th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            color: #495057;
+        }
+        
+        /* Стили для блоков анализа */
+        .trends-analysis-section, .forecast-analysis-section {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin: 20px 0;
+            overflow: hidden;
+        }
+        
+        .trends-analysis-title, .forecast-analysis-title {
+            background: #f8f9fa;
+            padding: 20px;
+            border-bottom: 1px solid #e9ecef;
+            font-size: 18px;
+            font-weight: 600;
+            color: #495057;
+            margin: 0;
+        }
+        
+        .trends-analysis-content, .forecast-analysis-content {
+            padding: 20px;
+        }
+        
+        /* Стили для показателей рынка */
+        .market-indicators-unified {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin: 20px 0;
+            overflow: hidden;
+        }
+        
+        .unified-indicator-card {
+            display: flex;
+            gap: 20px;
+            padding: 20px;
+        }
+        
+        .indicator-section {
+            flex: 1;
+        }
+        
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 15px;
+            text-align: center;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 6px;
+        }
+        
+        .indicator-item {
+            margin: 10px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .indicator-label {
+            font-size: 14px;
+            color: #6c757d;
+            font-weight: 500;
+        }
+        
+        .indicator-value {
+            font-size: 14px;
+            color: #495057;
+            font-weight: 600;
+        }
+        
+        /* Стили для текстового блока анализа */
+        .market-analysis-text-block {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin: 20px 0;
+            overflow: hidden;
+        }
+        
+        .market-analysis-text-title {
+            background: #f8f9fa;
+            padding: 20px;
+            border-bottom: 1px solid #e9ecef;
+            font-size: 18px;
+            font-weight: 600;
+            color: #495057;
+            margin: 0;
+        }
+        
+        .market-analysis-text-content {
+            padding: 20px;
+        }
+        
+        .market-analysis-text-content p {
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+        
+        /* Стили для объекта */
+        .object-summary-section {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin: 20px 0;
+            overflow: hidden;
+        }
+        
+        .object-summary-title {
+            background: #f8f9fa;
+            padding: 20px;
+            border-bottom: 1px solid #e9ecef;
+            font-size: 18px;
+            font-weight: 600;
+            color: #495057;
+            margin: 0;
+        }
+        
+        .object-summary-content {
+            padding: 20px;
+        }
+        
+        .object-summary-content p {
+            margin-bottom: 10px;
+            line-height: 1.6;
+        }
+        
+        /* Отступы между блоками */
+        .block-spacing {
+            height: 20px;
+        }
+        
+        /* Адаптивность */
+        @media (max-width: 768px) {
+            .unified-indicator-card {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .chart-controls {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .chart-container {
+                height: 250px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -278,7 +631,7 @@
     <header class="report-header">
         <div class="report-title">
             <h1>Отчет по оценке объекта</h1>
-            <p class="report-date">Сформирован: 21.08.2025 15:50</p>
+            <p class="report-date">Сформирован: 21.08.2025 16:15</p>
             <p class="report-location">Локация: Türkiye, Antalya, Konyaaltı, Hurma</p>
         </div>
     </header>
@@ -386,8 +739,8 @@
     <!-- Футер отчета -->
     <footer class="report-footer">
         <p>Отчет сгенерирован системой Aaadviser</p>
-        <p>ID отчета: e4cdf7be</p>
-        <p>Дата создания: 21.08.2025 15:50</p>
+        <p>ID отчета: 6f60c5d4</p>
+        <p>Дата создания: 21.08.2025 16:15</p>
     </footer>
     
     <!-- Встроенный JavaScript для интерактивности -->
@@ -418,9 +771,156 @@
             }
         }
         
+        // Данные для графиков (жестко прописаны для автономности)
+        const trendsData = {
+            labels: ['фев. 2025', 'мар. 2025', 'апр. 2025', 'май. 2025', 'июн. 2025', 'июл. 2025', 'авг. 2025', 'сен. 2025'],
+            sale: [53200, 54330, 55921, 57464, 58990, 60441, 61803, 62794],
+            rent: [264.05, 270.11, 274.56, 280.06, 288.40, 295.72, 302.77, 310.37]
+        };
+        
+        const forecastData = {
+            labels: ['авг. 2025', 'сен. 2025', 'окт. 2025', 'ноя. 2025', 'дек. 2025', 'янв. 2026', 'фев. 2026', 'мар. 2026', 'апр. 2026', 'май. 2026', 'июн. 2026'],
+            sale: [61803, 62794, 63567, 64226, 64904, 65852, 66577, 67385, 68486, 69763, 71107],
+            rent: [302.77, 310.37, 316.58, 322.12, 327.45, 331.43, 335.06, 339.32, 342.95, 347.95, 355.43]
+        };
+        
+        // Функция для переключения типа графика трендов
+        function switchChartType(type) {
+            // Обновляем активную кнопку
+            document.querySelectorAll('[data-chart-type]').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector(`[data-chart-type="${type}"]`).classList.add('active');
+            
+            // Обновляем данные графика
+            if (window.trendsChart) {
+                const data = type === 'sale' ? trendsData.sale : trendsData.rent;
+                const label = type === 'sale' ? 'Цена м² продажи (₺)' : 'Цена м² аренды (₺)';
+                
+                window.trendsChart.data.datasets[0].data = data;
+                window.trendsChart.data.datasets[0].label = label;
+                window.trendsChart.update();
+            }
+        }
+        
+        // Функция для переключения типа графика прогноза
+        function switchForecastChartType(type) {
+            // Обновляем активную кнопку
+            document.querySelectorAll('[data-chart-type]').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector(`[data-chart-type="${type}"]`).classList.add('active');
+            
+            // Обновляем данные графика
+            if (window.forecastChart) {
+                const data = type === 'sale' ? forecastData.sale : forecastData.rent;
+                const label = type === 'sale' ? 'Прогноз цены м² продажи (₺)' : 'Прогноз цены м² аренды (₺)';
+                
+                window.forecastChart.data.datasets[0].data = data;
+                window.forecastChart.data.datasets[0].label = label;
+                window.forecastChart.update();
+            }
+        }
+        
+        // Функция для создания графика трендов
+        function createTrendsChart() {
+            const ctx = document.getElementById('trendsChart');
+            if (!ctx) return;
+            
+            window.trendsChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: trendsData.labels,
+                    datasets: [{
+                        label: 'Цена м² продажи (₺)',
+                        data: trendsData.sale,
+                        borderColor: '#667eea',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.1)'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.1)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Функция для создания графика прогноза
+        function createForecastChart() {
+            const ctx = document.getElementById('forecastChart');
+            if (!ctx) return;
+            
+            window.forecastChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: forecastData.labels,
+                    datasets: [{
+                        label: 'Прогноз цены м² продажи (₺)',
+                        data: forecastData.sale,
+                        borderColor: '#28a745',
+                        backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.1)'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.1)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
         // Инициализация при загрузке страницы
         document.addEventListener('DOMContentLoaded', function() {
             console.log('Отчет загружен и готов к просмотру');
+            
+            // Создаем графики
+            setTimeout(() => {
+                createTrendsChart();
+                createForecastChart();
+            }, 100);
             
             // Добавляем обработчики для всех аккордеонов
             const accordionHeaders = document.querySelectorAll('.accordion-header');
