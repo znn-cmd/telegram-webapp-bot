@@ -5097,11 +5097,10 @@ def api_admin_balance_100():
 
 @app.route('/api/admin_users_stats', methods=['GET'])
 def api_admin_users_stats():
-    import datetime
     from dateutil.relativedelta import relativedelta
     now = datetime.now()
     today = now.date()
-    week_ago = today - datetime.timedelta(days=7)
+    week_ago = today - timedelta(days=7)
     month_ago = today - relativedelta(months=1)
     quarter_ago = today - relativedelta(months=3)
     year_ago = today - relativedelta(years=1)
