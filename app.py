@@ -46,6 +46,14 @@ except ImportError as e:
     calculate_3month_forecast = None
     format_chart_data = None
 
+# Импорт модуля api_functions
+try:
+    from api_functions import generate_standalone_html
+    logger.info("✅ Модуль api_functions успешно импортирован")
+except ImportError as e:
+    logger.error(f"❌ Ошибка импорта модуля api_functions: {e}")
+    generate_standalone_html = None
+
 # Условный импорт openai
 try:
     import openai
@@ -7599,6 +7607,11 @@ def save_report():
         # Генерируем уникальный ID для отчета
         import uuid
         report_id = str(uuid.uuid4())[:8]  # Первые 8 символов UUID
+        
+        # Проверяем, что функция generate_standalone_html доступна
+        if not generate_standalone_html:
+            logger.error("❌ Функция generate_standalone_html недоступна")
+            return jsonify({'success': False, 'error': 'Report generation function not available'}), 500
         
         # Создаем HTML файл с отчетом
         html_content = generate_standalone_html(report_html, report_data, report_id)
