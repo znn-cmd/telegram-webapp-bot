@@ -5437,7 +5437,10 @@
             analysis += '</div></div>';
             
             // Добавляем блок "Вывод по объекту"
-            analysis += await generateObjectSummary();
+            console.log('🔍 Adding object summary to analysis...');
+            const objectSummary = await generateObjectSummary();
+            console.log('📊 Object summary result:', objectSummary);
+            analysis += objectSummary;
             
             // Добавляем таблицу "Прогноз цены и аренды"
             analysis += await generateForecastTable(trends);
@@ -5448,8 +5451,11 @@
         // Get exchange rate from currency table or API
         async function getExchangeRate(fromCurrency, toCurrency) {
             try {
+                console.log(`🔄 Getting exchange rate: ${fromCurrency} -> ${toCurrency}`);
+                
                 // Сначала пытаемся получить курс из таблицы currency на текущую дату
                 const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+                console.log(`📅 Requesting rate for date: ${today}`);
                 
                 const response = await fetch('/api/currency/rate', {
                     method: 'POST',
@@ -5463,8 +5469,11 @@
                     })
                 });
                 
+                console.log(`📡 API response status: ${response.status}`);
+                
                 if (response.ok) {
                     const data = await response.json();
+                    console.log(`📊 API response data:`, data);
                     if (data.success && data.rate) {
                         console.log(`✅ Exchange rate from DB: ${fromCurrency} to ${toCurrency} = ${data.rate}`);
                         return data.rate;
@@ -5484,8 +5493,11 @@
                     })
                 });
                 
+                console.log(`📡 API update response status: ${apiResponse.status}`);
+                
                 if (apiResponse.ok) {
                     const apiData = await apiResponse.json();
+                    console.log(`📊 API update response data:`, apiData);
                     if (apiData.success && apiData.rate) {
                         console.log(`✅ Exchange rate from API: ${fromCurrency} to ${toCurrency} = ${apiData.rate}`);
                         return apiData.rate;
@@ -5504,13 +5516,23 @@
         // Generate object summary block
         async function generateObjectSummary() {
             try {
+                console.log('🔍 Generating object summary...');
+                
                 // Получаем данные объекта из формы
                 const objectPrice = parseFloat(document.getElementById('priceObjectInput')?.value) || 0;
-                const objectArea = parseFloat(document.getElementById('objectArea')?.value) || 0;
+                const objectArea = parseFloat(document.getElementById('areaObjectInput')?.value) || 0;
                 const selectedCountry = selectedLocation.country_name || '';
                 const objectCurrency = selectedListingTypes.currency || 'EUR';
                 
+                console.log('📊 Object data:', {
+                    price: objectPrice,
+                    area: objectArea,
+                    country: selectedCountry,
+                    currency: objectCurrency
+                });
+                
                 if (!objectPrice || !objectArea || !selectedCountry) {
+                    console.log('⚠️ Missing required data for object summary');
                     return '';
                 }
                 
