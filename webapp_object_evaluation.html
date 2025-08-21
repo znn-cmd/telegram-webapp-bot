@@ -238,6 +238,29 @@
             color: #666;
             font-family: monospace;
         }
+        
+        /* Стили для отдельного блока с ID для админов */
+        .admin-ids-block {
+            background: #e8f5e8;
+            border: 1px solid #4caf50;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .admin-ids-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #2e7d32;
+            margin-bottom: 10px;
+        }
+        
+        .admin-ids-details {
+            font-size: 12px;
+            color: #666;
+            font-family: monospace;
+            line-height: 1.6;
+        }
 
         /* Key Metrics Styles */
         .key-metrics-section {
@@ -550,6 +573,38 @@
             .indicator-value {
                 font-size: 13px;
             }
+            
+            /* Мобильные стили для блока "Анализ рынка" */
+            .market-analysis-text-block {
+                margin: 24px 0;
+                padding: 22px;
+                border-radius: 14px;
+            }
+            
+            .market-analysis-text-title {
+                font-size: 17px;
+                margin-bottom: 18px;
+            }
+            
+            .market-analysis-text-content {
+                font-size: 13px;
+            }
+            
+            /* Мобильные стили для блока с ID для админов */
+            .admin-ids-block {
+                padding: 14px;
+                border-radius: 7px;
+                margin-bottom: 18px;
+            }
+            
+            .admin-ids-title {
+                font-size: 15px;
+                margin-bottom: 9px;
+            }
+            
+            .admin-ids-details {
+                font-size: 11px;
+            }
         }
         
         @media (max-width: 480px) {
@@ -579,6 +634,38 @@
             .indicator-value {
                 font-size: 12px;
             }
+            
+            /* Мобильные стили для блока "Анализ рынка" */
+            .market-analysis-text-block {
+                margin: 20px 0;
+                padding: 20px;
+                border-radius: 12px;
+            }
+            
+            .market-analysis-text-title {
+                font-size: 16px;
+                margin-bottom: 16px;
+            }
+            
+            .market-analysis-text-content {
+                font-size: 13px;
+            }
+            
+            /* Мобильные стили для блока с ID для админов */
+            .admin-ids-block {
+                padding: 10px;
+                border-radius: 5px;
+                margin-bottom: 14px;
+            }
+            
+            .admin-ids-title {
+                font-size: 13px;
+                margin-bottom: 6px;
+            }
+            
+            .admin-ids-details {
+                font-size: 10px;
+            }
         }
         
         /* Пустое место между блоками */
@@ -586,6 +673,44 @@
             height: 40px;
             margin: 0;
             padding: 0;
+        }
+        
+        /* Стили для блока "Анализ рынка" в стиле "Вывод по тренду" */
+        .market-analysis-text-block {
+            margin: 30px 0;
+            padding: 25px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        
+        .market-analysis-text-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #333333;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .market-analysis-text-content {
+            line-height: 1.6;
+            color: #333333;
+            font-size: 14px;
+        }
+        
+        .market-analysis-text-content p {
+            margin: 0 0 15px 0;
+            padding: 0;
+        }
+        
+        .market-analysis-text-content p:last-child {
+            margin-bottom: 0;
+        }
+        
+        .market-analysis-text-content strong {
+            color: #1a202c;
+            font-weight: 700;
         }
         
         /* Стили для объединенного анализа рынка в стиле "Вывод прогноза" */
@@ -2353,10 +2478,12 @@
                 <div class="property-types-details" id="propertyTypesDetails"></div>
             </div>
             
-            <div class="admin-ids" id="adminIds" style="display: none;">
-                <div class="admin-title" id="adminIdsTitle">ID для админов:</div>
-                <div class="admin-details" id="adminDetails"></div>
-            </div>
+        </div>
+        
+        <!-- Блок с ID для админов (отдельный) -->
+        <div class="admin-ids-block" id="adminIdsBlock" style="display: none;">
+            <div class="admin-ids-title" id="adminIdsTitle">ID для админов:</div>
+            <div class="admin-ids-details" id="adminIdsDetails"></div>
         </div>
 
         <!-- Ключевые метрики - скрыты -->
@@ -2609,6 +2736,11 @@
                 'yieldTitle': 'Yield:',
                 'consolidatedAverageLabel': 'Consolidated Average:',
                 'bedroomsLabel': 'Bedrooms',
+                
+                // Market analysis text localization keys
+                'marketAnalysisTitle': 'Market Analysis',
+                'saleAnalysisText': 'Sale: with an area of {area} m² (average value for sold properties) and a minimum price of {minPrice}/m², the sale period is ~{minDays} days; with a maximum price of {maxPrice}/m² - the sale period is up to {maxDays} days.',
+                'rentAnalysisText': 'Rent: with an area of {area} m² (average value for rented properties) minimum price {minPrice}/m², rental period ~{minDays} days; with a maximum price of {maxPrice}/m² period up to {maxDays} days.',
                 'floorLabel': 'Floor',
                 'ageLabel': 'Age',
                 'heatingLabel': 'Heating',
@@ -3776,11 +3908,53 @@
         }
 
         // Display selected location
-        function displaySelectedLocation() {
+        // Check and display admin IDs if user is admin
+        async function checkAndDisplayAdminIds(adminIdsBlock, adminIdsDetails) {
+            try {
+                if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe && window.Telegram.WebApp.initDataUnsafe.user) {
+                    const user = window.Telegram.WebApp.initDataUnsafe.user;
+                    if (user && user.id) {
+                        // Check if user is admin via API
+                        const response = await fetch('/api/check_admin_status', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({ telegram_id: user.id })
+                        });
+                        
+                        if (response.ok) {
+                            const data = await response.json();
+                            if (data.success && data.is_admin) {
+                                // User is admin, show admin IDs
+                                adminIdsDetails.innerHTML = `
+                                    country_id: ${selectedLocation.country_id}<br>
+                                    city_id: ${selectedLocation.city_id}<br>
+                                    county_id: ${selectedLocation.county_id}<br>
+                                    district_id: ${selectedLocation.district_id || 'null'}
+                                `;
+                                adminIdsBlock.style.display = 'block';
+                                return;
+                            }
+                        }
+                    }
+                }
+                
+                // Hide admin IDs block if user is not admin
+                adminIdsBlock.style.display = 'none';
+            } catch (error) {
+                console.error('Error checking admin status:', error);
+                // Hide admin IDs block on error
+                adminIdsBlock.style.display = 'none';
+            }
+        }
+
+        // Display selected location
+        async function displaySelectedLocation() {
             const selectedLocationDiv = document.getElementById('selectedLocation');
             const locationDetails = document.getElementById('locationDetails');
-            const adminIds = document.getElementById('adminIds');
-            const adminDetails = document.getElementById('adminDetails');
+            const adminIdsBlock = document.getElementById('adminIdsBlock');
+            const adminIdsDetails = document.getElementById('adminIdsDetails');
             
             // Build location string
             let locationString = selectedLocation.country_name;
@@ -3799,24 +3973,8 @@
             // Update selected property types display
             updateSelectedPropertyTypesDisplay();
             
-            // Show admin IDs if user is admin
-            if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe && window.Telegram.WebApp.initDataUnsafe.user) {
-                const user = window.Telegram.WebApp.initDataUnsafe.user;
-                if (user && user.id) {
-                    // Check if user is admin (you can implement your own admin check logic)
-                    const isAdmin = true; // Placeholder - implement your admin check
-                    
-                    if (isAdmin) {
-                        adminDetails.innerHTML = `
-                            country_id: ${selectedLocation.country_id}<br>
-                            city_id: ${selectedLocation.city_id}<br>
-                            county_id: ${selectedLocation.county_id}<br>
-                            district_id: ${selectedLocation.district_id || 'null'}
-                        `;
-                        adminIds.style.display = 'block';
-                    }
-                }
-            }
+            // Check if user is admin and show admin IDs block
+            await checkAndDisplayAdminIds(adminIdsBlock, adminIdsDetails);
             
             selectedLocationDiv.style.display = 'block';
         }
@@ -4294,6 +4452,56 @@
             return analysis;
         }
 
+        // Generate market analysis text block
+        function generateMarketAnalysisText(summary) {
+            if (!summary || Object.keys(summary).length === 0) {
+                return '';
+            }
+            
+            // Calculate average values for areas
+            const avgSaleArea = summary.comparable_area_for_sale ? 
+                Math.round((summary.comparable_area_for_sale.min + summary.comparable_area_for_sale.max) / 2) : 60;
+            const avgRentArea = summary.comparable_area_for_rent ? 
+                Math.round((summary.comparable_area_for_rent.min + summary.comparable_area_for_rent.max) / 2) : 65;
+            
+            // Get min/max prices and periods
+            const saleMinPrice = summary.unit_price_for_sale ? summary.unit_price_for_sale.min : 31061;
+            const saleMaxPrice = summary.unit_price_for_sale ? summary.unit_price_for_sale.max : 45385;
+            const saleMinPeriod = summary.listing_period_for_sale ? summary.listing_period_for_sale.min : 62;
+            const saleMaxPeriod = summary.listing_period_for_sale ? summary.listing_period_for_sale.max : 90;
+            
+            const rentMinPrice = summary.unit_price_for_rent ? summary.unit_price_for_rent.min : 196.24;
+            const rentMaxPrice = summary.unit_price_for_rent ? summary.unit_price_for_rent.max : 250;
+            const rentMinPeriod = summary.listing_period_for_rent ? summary.listing_period_for_rent.min : 65;
+            const rentMaxPeriod = summary.listing_period_for_rent ? summary.listing_period_for_rent.max : 96;
+            
+            let html = '<div class="market-analysis-text-block">';
+            html += `<h4 class="market-analysis-text-title">${getText('marketAnalysisTitle')}</h4>`;
+            html += '<div class="market-analysis-text-content">';
+            
+            // Sale analysis
+            const saleText = getText('saleAnalysisText')
+                .replace('{area}', avgSaleArea)
+                .replace('{minPrice}', formatValue(saleMinPrice, 'price'))
+                .replace('{minDays}', saleMinPeriod)
+                .replace('{maxPrice}', formatValue(saleMaxPrice, 'price'))
+                .replace('{maxDays}', saleMaxPeriod);
+            html += `<p>${saleText}</p>`;
+            
+            // Rent analysis
+            const rentText = getText('rentAnalysisText')
+                .replace('{area}', avgRentArea)
+                .replace('{minPrice}', formatValue(rentMinPrice, 'price'))
+                .replace('{minDays}', rentMinPeriod)
+                .replace('{maxPrice}', formatValue(rentMaxPrice, 'price'))
+                .replace('{maxDays}', rentMaxPeriod);
+            html += `<p>${rentText}</p>`;
+            
+            html += '</div></div>';
+            
+            return html;
+        }
+
         // Generate market indicators table with organized structure
         async function generateSummaryTable(data) {
             const summaryContainer = document.getElementById('summaryDataContent');
@@ -4434,7 +4642,12 @@
             // Add spacing between blocks
             html += '<div class="block-spacing"></div>';
             
-            // Market analysis text is now included in consolidated assessment block
+            // Add market analysis text block
+            const marketAnalysisTextHtml = generateMarketAnalysisText(summary);
+            html += marketAnalysisTextHtml;
+            
+            // Add spacing after market analysis
+            html += '<div class="block-spacing"></div>';
             
             // Add detailed data tables for each category (admin only)
             const detailedTablesHtml = await generateDetailedDataTables(data);
