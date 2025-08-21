@@ -764,9 +764,15 @@ def api_currency_rate():
                             'thb': quotes.get('EURTHB', 1.0)
                         }
                         
-                        # Сохраняем в БД
-                        supabase.table('currency').insert(currency_rates).execute()
-                        logger.info(f"✅ Курсы валют обновлены через API: {currency_rates}")
+                        # Проверяем, есть ли уже запись на сегодня
+                        today_result = supabase.table('currency').select('id').eq('created_at::date', date).limit(1).execute()
+                        
+                        if not today_result.data or len(today_result.data) == 0:
+                            # Сохраняем в БД только если записи на сегодня нет
+                            supabase.table('currency').insert(currency_rates).execute()
+                            logger.info(f"✅ Курсы валют обновлены через API: {currency_rates}")
+                        else:
+                            logger.info(f"✅ Курсы валют уже есть в БД на {date}")
                         
                         # Рассчитываем нужный курс
                         if from_currency == 'EUR':
@@ -835,30 +841,37 @@ def api_currency_update():
             'thb': quotes.get('EURTHB', 1.0)
         }
         
-        # Сохраняем в базу данных
-        result = supabase.table('currency').insert(currency_rates).execute()
+        # Проверяем, есть ли уже запись на сегодня
+        today = datetime.now().strftime('%Y-%m-%d')
+        today_result = supabase.table('currency').select('id').eq('created_at::date', today).limit(1).execute()
         
-        if result.data:
-            logger.info(f"✅ Курсы валют обновлены: {currency_rates}")
+        if not today_result.data or len(today_result.data) == 0:
+            # Сохраняем в БД только если записи на сегодня нет
+            result = supabase.table('currency').insert(currency_rates).execute()
             
-            # Рассчитываем нужный курс
-            if from_currency == 'EUR':
-                rate = currency_rates.get(to_currency.lower(), 1.0)
-            elif to_currency == 'EUR':
-                rate = 1.0 / currency_rates.get(from_currency.lower(), 1.0)
+            if result.data:
+                logger.info(f"✅ Курсы валют обновлены: {currency_rates}")
             else:
-                from_rate = currency_rates.get(from_currency.lower(), 1.0)
-                to_rate = currency_rates.get(to_currency.lower(), 1.0)
-                rate = to_rate / from_rate
-            
-            return jsonify({
-                'success': True,
-                'rate': rate,
-                'rates_updated': True
-            })
+                logger.error("❌ Ошибка при сохранении курсов валют в БД")
+                return jsonify({'success': False, 'error': 'Failed to save currency rates'}), 500
         else:
-            logger.error("❌ Ошибка при сохранении курсов валют в БД")
-            return jsonify({'success': False, 'error': 'Failed to save currency rates'}), 500
+            logger.info(f"✅ Курсы валют уже есть в БД на {today}")
+        
+        # Рассчитываем нужный курс
+        if from_currency == 'EUR':
+            rate = currency_rates.get(to_currency.lower(), 1.0)
+        elif to_currency == 'EUR':
+            rate = 1.0 / currency_rates.get(from_currency.lower(), 1.0)
+        else:
+            from_rate = currency_rates.get(from_currency.lower(), 1.0)
+            to_rate = currency_rates.get(to_currency.lower(), 1.0)
+            rate = to_rate / from_rate
+        
+        return jsonify({
+            'success': True,
+            'rate': rate,
+            'rates_updated': True
+        })
             
     except Exception as e:
         logger.error(f"❌ Ошибка при обновлении курсов валют: {e}")

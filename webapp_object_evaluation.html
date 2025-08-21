@@ -4607,6 +4607,9 @@
 
         // Generate market indicators table with organized structure
         async function generateSummaryTable(data) {
+            // Save data globally for recalculation
+            window.currentSummaryData = data;
+            
             const summaryContainer = document.getElementById('summaryDataContent');
             if (!summaryContainer) return;
             
@@ -5444,7 +5447,13 @@
             console.log('🔍 Adding object summary to analysis...');
             const objectSummary = await generateObjectSummary();
             console.log('📊 Object summary result:', objectSummary);
-            analysis += objectSummary;
+            
+            if (objectSummary) {
+                analysis += objectSummary;
+                console.log('✅ Object summary added to analysis');
+            } else {
+                console.log('⚠️ Object summary is empty, not adding to analysis');
+            }
             
             // Добавляем таблицу "Прогноз цены и аренды"
             analysis += await generateForecastTable(trends);
@@ -5517,6 +5526,26 @@
             }
         }
 
+        // Recalculate object summary when currency changes
+        async function recalculateObjectSummary() {
+            if (!window.currentSummaryData) {
+                console.log('⚠️ No summary data available for recalculation');
+                return;
+            }
+            
+            console.log('🔄 Recalculating object summary with new currency...');
+            
+            // Find the object summary section and update it
+            const objectSummarySection = document.querySelector('.object-summary-section');
+            if (objectSummarySection) {
+                const newSummary = await generateObjectSummary();
+                if (newSummary) {
+                    objectSummarySection.outerHTML = newSummary;
+                    console.log('✅ Object summary updated with new currency');
+                }
+            }
+        }
+        
         // Generate object summary block
         async function generateObjectSummary() {
             try {
@@ -5538,8 +5567,18 @@
                     currency: objectCurrency
                 });
                 
+                console.log('🔍 Currency button state:', {
+                    selectedButton: selectedCurrencyButton,
+                    activeButtons: document.querySelectorAll('.currency-button.active'),
+                    allButtons: document.querySelectorAll('.currency-button')
+                });
+                
                 if (!objectPrice || !objectArea || !selectedCountry) {
-                    console.log('⚠️ Missing required data for object summary');
+                    console.log('⚠️ Missing required data for object summary:', {
+                        objectPrice: !!objectPrice,
+                        objectArea: !!objectArea,
+                        selectedCountry: !!selectedCountry
+                    });
                     return '';
                 }
                 
@@ -6105,6 +6144,12 @@
                 priceInput.addEventListener('input', function() {
                     selectedListingTypes.price = this.value ? parseFloat(this.value) : null;
                     updateConfirmButton();
+                    
+                    // Recalculate object summary if data is already loaded
+                    if (window.currentSummaryData) {
+                        console.log('🔄 Price changed, recalculating object summary...');
+                        recalculateObjectSummary();
+                    }
                 });
             }
             
@@ -6114,6 +6159,12 @@
                 areaInput.addEventListener('input', function() {
                     selectedListingTypes.area = this.value ? parseInt(this.value) : null;
                     updateConfirmButton();
+                    
+                    // Recalculate object summary if data is already loaded
+                    if (window.currentSummaryData) {
+                        console.log('🔄 Area changed, recalculating object summary...');
+                        recalculateObjectSummary();
+                    }
                 });
             }
             
@@ -6131,6 +6182,12 @@
                     
                     // Update selected currency
                     selectedListingTypes.currency = selectedCurrency;
+                    
+                    // Recalculate object summary if data is already loaded
+                    if (window.currentSummaryData) {
+                        console.log('🔄 Currency changed, recalculating object summary...');
+                        recalculateObjectSummary();
+                    }
                 });
             });
             
