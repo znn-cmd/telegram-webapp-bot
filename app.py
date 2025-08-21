@@ -716,7 +716,8 @@ def api_currency_rate():
         logger.info(f"🔍 Запрос курса валют {from_currency} -> {to_currency} на {date}")
         
         # Получаем курсы валют из базы данных
-        result = supabase.table('currency').select('*').eq('created_at::date', date).limit(1).execute()
+        # Используем правильный синтаксис для Supabase с датами
+        result = supabase.table('currency').select('*').gte('created_at', f'{date}T00:00:00').lt('created_at', f'{date}T23:59:59').limit(1).execute()
         
         if result.data and len(result.data) > 0:
             currency_data = result.data[0]
@@ -843,7 +844,7 @@ def api_currency_update():
         
         # Проверяем, есть ли уже запись на сегодня
         today = datetime.now().strftime('%Y-%m-%d')
-        today_result = supabase.table('currency').select('id').eq('created_at::date', today).limit(1).execute()
+        today_result = supabase.table('currency').select('id').gte('created_at', f'{today}T00:00:00').lt('created_at', f'{today}T23:59:59').limit(1).execute()
         
         if not today_result.data or len(today_result.data) == 0:
             # Сохраняем в БД только если записи на сегодня нет

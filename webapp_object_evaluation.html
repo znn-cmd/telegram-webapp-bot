@@ -5582,6 +5582,9 @@
                     return '';
                 }
                 
+                // Дополнительная проверка данных
+                console.log('✅ All required data present, proceeding with calculation...');
+                
                 // Рассчитываем цену за м²
                 const pricePerM2 = objectPrice / objectArea;
                 
@@ -5597,13 +5600,24 @@
                     targetCurrency = 'EUR'; // Евро для других стран
                 }
                 
+                console.log('💱 Currency conversion:', {
+                    objectCurrency: objectCurrency,
+                    targetCurrency: targetCurrency,
+                    needsConversion: objectCurrency !== targetCurrency
+                });
+                
                 if (objectCurrency !== targetCurrency) {
                     // Получаем курс валюты
+                    console.log(`🔄 Getting exchange rate for ${objectCurrency} -> ${targetCurrency}`);
                     exchangeRate = await getExchangeRate(objectCurrency, targetCurrency);
+                    console.log(`💱 Exchange rate received: ${exchangeRate}`);
+                } else {
+                    console.log(`✅ No conversion needed, using rate: ${exchangeRate}`);
                 }
                 
                 // Конвертируем цену
                 const convertedPricePerM2 = pricePerM2 * exchangeRate;
+                console.log(`💰 Price conversion: ${pricePerM2} ${objectCurrency} * ${exchangeRate} = ${convertedPricePerM2} ${targetCurrency}`);
                 
                 // Форматируем валюту для отображения
                 const currencySymbol = targetCurrency === 'TRY' ? '₺' : '€';
@@ -5621,6 +5635,7 @@
                 
                 html += '</div></div>';
                 
+                console.log('📝 Generated HTML for object summary:', html);
                 return html;
             } catch (error) {
                 console.error('Error generating object summary:', error);
