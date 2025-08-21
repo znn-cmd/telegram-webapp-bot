@@ -2167,28 +2167,8 @@
             border: 1px solid #e9ecef;
         }
         
-        .save-report-buttons {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            margin-bottom: 15px;
-        }
-        
         .save-report-button {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 6px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        
-        .my-reports-button {
-            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
             color: white;
             border: none;
             padding: 12px 24px;
@@ -2206,17 +2186,6 @@
         }
         
         .save-report-button:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-        
-        .my-reports-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-        }
-        
-        .my-reports-button:disabled {
             opacity: 0.6;
             cursor: not-allowed;
             transform: none;
@@ -2353,89 +2322,6 @@
             font-family: monospace;
             font-size: 12px;
         }
-        
-        /* Стили для списка отчетов пользователя */
-        .user-reports-list {
-            max-width: 600px;
-            margin: 0 auto;
-        }
-        
-        .user-reports-list h3 {
-            text-align: center;
-            color: #495057;
-            margin-bottom: 20px;
-        }
-        
-        .reports-container {
-            max-height: 400px;
-            overflow-y: auto;
-        }
-        
-        .report-item {
-            background: white;
-            border: 1px solid #e9ecef;
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: all 0.3s ease;
-        }
-        
-        .report-item:hover {
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            border-color: #667eea;
-        }
-        
-        .report-info {
-            flex: 1;
-        }
-        
-        .report-info h4 {
-            margin: 0 0 8px 0;
-            color: #495057;
-            font-size: 16px;
-        }
-        
-        .report-date {
-            margin: 0 0 5px 0;
-            color: #6c757d;
-            font-size: 12px;
-        }
-        
-        .report-address {
-            margin: 0;
-            color: #495057;
-            font-size: 14px;
-        }
-        
-        .report-actions {
-            display: flex;
-            gap: 10px;
-            flex-shrink: 0;
-        }
-        
-        .report-actions .btn {
-            padding: 8px 12px;
-            font-size: 12px;
-            border-radius: 6px;
-        }
-        
-        .user-reports-message {
-            text-align: center;
-            padding: 20px;
-        }
-        
-        .user-reports-message h3 {
-            color: #495057;
-            margin-bottom: 15px;
-        }
-        
-        .user-reports-message p {
-            color: #6c757d;
-            margin-bottom: 10px;
-        }
 
         /* Animations */
         @keyframes spin {
@@ -2445,18 +2331,6 @@
 
         /* Mobile responsive styles */
         @media (max-width: 480px) {
-            
-            /* Мобильные стили для кнопок отчетов */
-            .save-report-buttons {
-                flex-direction: column;
-                gap: 10px;
-            }
-            
-            .save-report-button,
-            .my-reports-button {
-                padding: 15px 20px;
-                font-size: 16px;
-            }
             
             /* Мобильные стили для секций данных */
             .data-section {
@@ -2884,32 +2758,6 @@
                 font-size: 13px;
             }
         }
-        
-        /* Мобильные стили для списка отчетов */
-        @media (max-width: 480px) {
-            .report-item {
-                flex-direction: column;
-                align-items: stretch;
-                gap: 15px;
-            }
-            
-            .report-actions {
-                justify-content: center;
-            }
-            
-            .report-actions .btn {
-                flex: 1;
-                max-width: 120px;
-            }
-            
-            .user-reports-list {
-                max-width: 100%;
-            }
-            
-            .reports-container {
-                max-height: 300px;
-            }
-        }
     </style>
 </head>
 <body>
@@ -3069,14 +2917,9 @@
 
         <!-- Кнопка сохранения отчета (только для админов/подписчиков) -->
         <div class="save-report-section" id="saveReportSection" style="display: none;">
-            <div class="save-report-buttons">
-                <button class="save-report-button" onclick="saveReport()">
-                    💾 Сохранить отчет
-                </button>
-                <button class="my-reports-button" onclick="showUserReports()">
-                    📋 Мои отчеты
-                </button>
-            </div>
+            <button class="save-report-button" onclick="saveReport()">
+                💾 Сохранить отчет
+            </button>
             <div class="save-report-info">
                 <small>Отчет будет сохранен и доступен по ссылке</small>
             </div>
@@ -4004,10 +3847,6 @@
                 
                 console.log('✅ Все listing_type загружены для выбранной локации');
                 
-                // Обновляем выбранные типы после загрузки всех данных
-                updateSelectedTypes();
-                updateSelectedPropertyTypesDisplay();
-                
                 // Load property trends for the selected location
                 const trendsLocationData = {
                     country_id: document.getElementById('countrySelect').value,
@@ -4042,11 +3881,7 @@
             });
             
             // Add change event listener
-            select.onchange = () => {
-                selectListingType(category, select.value);
-                updateSelectedTypes();
-                updateSelectedPropertyTypesDisplay();
-            };
+            select.onchange = () => selectListingType(category, select.value);
             
             console.log(`✅ Select ${selectId} populated with ${listingTypes.length} items`);
         }
@@ -4113,12 +3948,6 @@
             if (selectedPropertyTypes) {
                 selectedPropertyTypes.style.display = 'none';
             }
-            
-            // Update display
-            updateSelectedTypes();
-            updateSelectedPropertyTypesDisplay();
-            
-            console.log('🔄 Listing type selection reset');
         }
 
         // Handle listing type selection
@@ -4134,7 +3963,6 @@
             }
             
             // Update the display of selected property types
-            updateSelectedTypes();
             updateSelectedPropertyTypesDisplay();
             
             updateConfirmButton();
@@ -4234,10 +4062,6 @@
                 loadCities(countryId);
             }
             
-            // Update display after reset
-            updateSelectedTypes();
-            updateSelectedPropertyTypesDisplay();
-            
             updateConfirmButton();
         }
 
@@ -4267,10 +4091,6 @@
             if (cityId) {
                 loadCounties(cityId);
             }
-            
-            // Update display after reset
-            updateSelectedTypes();
-            updateSelectedPropertyTypesDisplay();
             
             updateConfirmButton();
         }
@@ -4306,10 +4126,6 @@
                 console.log('❌ No county selected');
             }
             
-            // Update display after reset
-            updateSelectedTypes();
-            updateSelectedPropertyTypesDisplay();
-            
             updateConfirmButton();
         }
 
@@ -4337,12 +4153,6 @@
                     district_id: districtSelect.value
                 };
                 loadPropertyTrends(districtLocationData);
-                
-                // Обновляем выбранные типы после загрузки данных
-                setTimeout(() => {
-                    updateSelectedTypes();
-                    updateSelectedPropertyTypesDisplay();
-                }, 500);
             } else {
                 console.log('❌ No district selected, hiding listing type section...');
                 listingTypeSection.style.display = 'none';
@@ -4350,10 +4160,6 @@
                 resetListingTypeSelection();
                 // Clear existing property trends
                 clearPropertyTrends();
-                
-                // Update display after reset
-                updateSelectedTypes();
-                updateSelectedPropertyTypesDisplay();
             }
         }
 
@@ -4496,10 +4302,6 @@
         // Confirm location selection
         async function confirmLocation() {
             console.log('🎯 confirmLocation function called');
-            
-            // Обновляем выбранные типы недвижимости перед подтверждением
-            updateSelectedTypes();
-            updateSelectedPropertyTypesDisplay();
             
             const countrySelect = document.getElementById('countrySelect');
             const citySelect = document.getElementById('citySelect');
@@ -6831,17 +6633,11 @@
             updatePageText();
             loadCountries();
             
-            // Инициализируем выбранные типы недвижимости
-            updateSelectedTypes();
-            updateSelectedPropertyTypesDisplay();
-            
             // Initialize price input
             const priceInput = document.getElementById('priceObjectInput');
             if (priceInput) {
                 priceInput.addEventListener('input', function() {
                     selectedListingTypes.price = this.value ? parseFloat(this.value) : null;
-                    updateSelectedTypes();
-                    updateSelectedPropertyTypesDisplay();
                     updateConfirmButton();
                     
                     // Recalculate object summary if data is already loaded
@@ -6857,8 +6653,6 @@
             if (areaInput) {
                 areaInput.addEventListener('input', function() {
                     selectedListingTypes.area = this.value ? parseInt(this.value) : null;
-                    updateSelectedTypes();
-                    updateSelectedPropertyTypesDisplay();
                     updateConfirmButton();
                     
                     // Recalculate object summary if data is already loaded
@@ -6883,8 +6677,6 @@
                     
                     // Update selected currency
                     selectedListingTypes.currency = selectedCurrency;
-                    updateSelectedTypes();
-                    updateSelectedPropertyTypesDisplay();
                     
                     // Recalculate object summary if data is already loaded
                     if (window.currentSummaryData) {
@@ -7812,124 +7604,10 @@
             }
         }
         
-        // Обновление выбранных типов недвижимости
-        function updateSelectedTypes() {
-            // Обновляем значения из select элементов
-            selectedListingTypes.house_type = document.getElementById('houseTypeSelect').value || null;
-            selectedListingTypes.floor_segment = document.getElementById('floorSegmentSelect').value || null;
-            selectedListingTypes.age = document.getElementById('ageDataSelect').value || null;
-            selectedListingTypes.heating = document.getElementById('heatingDataSelect').value || null;
-            
-            // Обновляем значения из input элементов
-            const priceInput = document.getElementById('priceObjectInput');
-            const areaInput = document.getElementById('areaObjectInput');
-            
-            if (priceInput && priceInput.value) {
-                selectedListingTypes.price = parseFloat(priceInput.value);
-            } else {
-                selectedListingTypes.price = null;
-            }
-            
-            if (areaInput && areaInput.value) {
-                selectedListingTypes.area = parseInt(areaInput.value);
-            } else {
-                selectedListingTypes.area = null;
-            }
-            
-            console.log('🔄 Updated selectedListingTypes:', selectedListingTypes);
-            
-            // Обновляем отображение выбранных характеристик
-            updateSelectedPropertyTypesDisplay();
-        }
-        
-        // Обновление отображения выбранных характеристик недвижимости
-        function updateSelectedPropertyTypesDisplay() {
-            const selectedPropertyTypesDiv = document.getElementById('selectedPropertyTypes');
-            if (!selectedPropertyTypesDiv) return;
-            
-            const propertyTypesDetails = document.getElementById('propertyTypesDetails');
-            if (!propertyTypesDetails) return;
-            
-            // Проверяем, есть ли выбранные характеристики
-            const hasSelectedTypes = selectedListingTypes.house_type ||
-                selectedListingTypes.floor_segment ||
-                selectedListingTypes.age ||
-                selectedListingTypes.heating ||
-                selectedListingTypes.price ||
-                selectedListingTypes.area;
-            
-            if (!hasSelectedTypes) {
-                selectedPropertyTypesDiv.style.display = 'none';
-                return;
-            }
-            
-            // Формируем HTML для отображения характеристик
-            let html = '';
-            
-            if (selectedListingTypes.house_type) {
-                html += `<div class="property-type-item">
-                    <span class="property-type-label">${getText('bedroomsLabel')}:</span>
-                    <span class="property-type-value">${selectedListingTypes.house_type}</span>
-                </div>`;
-            }
-            
-            if (selectedListingTypes.floor_segment) {
-                html += `<div class="property-type-item">
-                    <span class="property-type-label">${getText('floorLabel')}:</span>
-                    <span class="property-type-value">${selectedListingTypes.floor_segment}</span>
-                </div>`;
-            }
-            
-            if (selectedListingTypes.age) {
-                html += `<div class="property-type-item">
-                    <span class="property-type-label">${getText('ageLabel')}:</span>
-                    <span class="property-type-value">${selectedListingTypes.age}</span>
-                </div>`;
-            }
-            
-            if (selectedListingTypes.heating) {
-                html += `<div class="property-type-item">
-                    <span class="property-type-label">${getText('heatingLabel')}:</span>
-                    <span class="property-type-value">${selectedListingTypes.heating}</span>
-                </div>`;
-            }
-            
-            if (selectedListingTypes.price) {
-                const currencySymbols = {
-                    'TRY': '₺',
-                    'EUR': '€',
-                    'USD': '$'
-                };
-                const currencySymbol = currencySymbols[selectedListingTypes.currency] || '';
-                html += `<div class="property-type-item">
-                    <span class="property-type-label">${getText('priceObjectSubtitle')}:</span>
-                    <span class="property-type-value">${currencySymbol}${selectedListingTypes.price}</span>
-                </div>`;
-            }
-            
-            if (selectedListingTypes.area) {
-                html += `<div class="property-type-item">
-                    <span class="property-type-label">${getText('areaObjectSubtitle')}:</span>
-                    <span class="property-type-value">${selectedListingTypes.area} м²</span>
-                </div>`;
-            }
-            
-            if (html) {
-                propertyTypesDetails.innerHTML = html;
-                selectedPropertyTypesDiv.style.display = 'block';
-            } else {
-                selectedPropertyTypesDiv.style.display = 'none';
-            }
-        }
-        
         // Сохранение отчета
         async function saveReport() {
             try {
                 console.log('💾 Starting report save process...');
-                
-                // Обновляем selectedListingTypes перед сохранением
-                updateSelectedTypes();
-                console.log('🔄 Updated selectedListingTypes before save:', selectedListingTypes);
                 
                 // Показываем индикатор загрузки
                 const saveButton = document.querySelector('.save-report-button');
@@ -7950,27 +7628,29 @@
                     report_data: {
                         location: getCurrentLocationString(),
                         timestamp: new Date().toISOString(),
-                        coordinates: {
-                            country_id: selectedLocation.country_id,
-                            city_id: selectedLocation.city_id,
-                            county_id: selectedLocation.county_id,
-                            district_id: selectedLocation.district_id
-                        },
                         user_inputs: {
-                            bedrooms: selectedListingTypes.house_type,
-                            floor: selectedListingTypes.floor_segment,
-                            age: selectedListingTypes.age,
-                            heating: selectedListingTypes.heating,
-                            price: selectedListingTypes.price,
-                            area: selectedListingTypes.area,
-                            currency: selectedListingTypes.currency
+                            bedrooms: selectedListingTypes.bedrooms || '',
+                            floor: selectedListingTypes.floor || '',
+                            age: selectedListingTypes.age || '',
+                            heating: selectedListingTypes.heating || '',
+                            price: document.getElementById('priceObjectInput')?.value || selectedListingTypes.price || '',
+                            area: document.getElementById('areaObjectInput')?.value || selectedListingTypes.area || '',
+                            currency: selectedListingTypes.currency || 'EUR'
+                        },
+                        location_data: {
+                            country_id: selectedLocation.country_id || null,
+                            city_id: selectedLocation.city_id || null,
+                            county_id: selectedLocation.county_id || null,
+                            district_id: selectedLocation.district_id || null,
+                            country_name: selectedLocation.country_name || '',
+                            city_name: selectedLocation.city_name || '',
+                            county_name: selectedLocation.county_name || '',
+                            district_name: selectedLocation.district_name || ''
                         }
                     }
                 };
                 
                 console.log('📊 Report data prepared:', reportData);
-                console.log('🔍 selectedListingTypes current values:', selectedListingTypes);
-                console.log('📋 user_inputs being sent:', reportData.report_data.user_inputs);
                 
                 // Отправляем на backend
                 const response = await fetch('/api/reports/save', {
@@ -8105,154 +7785,11 @@
                 // Fallback для старых браузеров
                 const textArea = document.createElement('textarea');
                 textArea.value = text;
+                document.body.appendChild(textArea);
                 textArea.select();
                 document.execCommand('copy');
                 document.body.removeChild(textArea);
                 alert('Ссылка скопирована в буфер обмена!');
-            }
-        }
-        
-        // Получение списка отчетов пользователя
-        async function getUserReports() {
-            try {
-                const telegramId = getTelegramId();
-                if (!telegramId) {
-                    console.error('Telegram ID не найден');
-                    return [];
-                }
-                
-                const response = await fetch('/api/user_reports', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ telegram_id: telegramId })
-                });
-                
-                const data = await response.json();
-                if (data.success) {
-                    return data.reports || [];
-                } else {
-                    console.error('Ошибка получения отчетов:', data.error);
-                    return [];
-                }
-            } catch (error) {
-                console.error('Ошибка при получении отчетов:', error);
-                return [];
-            }
-        }
-        
-        // Удаление отчета пользователя
-        async function deleteUserReport(reportId) {
-            try {
-                const telegramId = getTelegramId();
-                if (!telegramId) {
-                    console.error('Telegram ID не найден');
-                    return false;
-                }
-                
-                const response = await fetch('/api/user_reports/delete', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ 
-                        telegram_id: telegramId,
-                        report_id: reportId 
-                    })
-                });
-                
-                const data = await response.json();
-                if (data.success) {
-                    console.log('Отчет успешно удален');
-                    return true;
-                } else {
-                    console.error('Ошибка удаления отчета:', data.error);
-                    return false;
-                }
-            } catch (error) {
-                console.error('Ошибка при удалении отчета:', error);
-                return false;
-            }
-        }
-        
-        // Показ списка отчетов пользователя
-        async function showUserReports() {
-            try {
-                const reports = await getUserReports();
-                
-                if (reports.length === 0) {
-                    showModal(`
-                        <div class="user-reports-message">
-                            <h3>📋 Ваши отчеты</h3>
-                            <p>У вас пока нет сохраненных отчетов.</p>
-                            <p>Создайте первый отчет, нажав кнопку "💾 Сохранить отчет" после формирования отчета.</p>
-                        </div>
-                    `, 'Мои отчеты');
-                    return;
-                }
-                
-                let reportsHtml = `
-                    <div class="user-reports-list">
-                        <h3>📋 Ваши отчеты (${reports.length})</h3>
-                        <div class="reports-container">
-                `;
-                
-                reports.forEach(report => {
-                    const createdDate = new Date(report.created_at).toLocaleDateString('ru-RU');
-                    const reportTitle = report.title || 'Отчет по оценке объекта';
-                    
-                    reportsHtml += `
-                        <div class="report-item" data-report-id="${report.id}">
-                            <div class="report-info">
-                                <h4>${reportTitle}</h4>
-                                <p class="report-date">Создан: ${createdDate}</p>
-                                <p class="report-address">${report.address || 'Локация не указана'}</p>
-                            </div>
-                            <div class="report-actions">
-                                <button class="btn btn-primary" onclick="window.open('${report.report_url}', '_blank')">
-                                    👁️ Открыть
-                                </button>
-                                <button class="btn btn-danger" onclick="deleteReport(${report.id})">
-                                    🗑️ Удалить
-                                </button>
-                            </div>
-                        </div>
-                    `;
-                });
-                
-                reportsHtml += `
-                        </div>
-                    </div>
-                `;
-                
-                showModal(reportsHtml, 'Мои отчеты');
-                
-            } catch (error) {
-                console.error('Ошибка при показе отчетов:', error);
-                showModal(`
-                    <div class="user-reports-message">
-                        <h3>❌ Ошибка</h3>
-                        <p>Не удалось загрузить ваши отчеты.</p>
-                        <p>Попробуйте еще раз позже.</p>
-                    </div>
-                `, 'Ошибка');
-            }
-        }
-        
-        // Удаление отчета с подтверждением
-        async function deleteReport(reportId) {
-            if (confirm('Вы уверены, что хотите удалить этот отчет? Это действие нельзя отменить.')) {
-                const success = await deleteUserReport(reportId);
-                if (success) {
-                    // Закрываем модальное окно и показываем обновленный список
-                    document.querySelector('.modal-overlay').remove();
-                    setTimeout(() => {
-                        showUserReports();
-                    }, 500);
-                } else {
-                    alert('Не удалось удалить отчет. Попробуйте еще раз.');
-                }
             }
         }
     </script>
