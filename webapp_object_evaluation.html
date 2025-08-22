@@ -1087,6 +1087,117 @@
             }
         }
         
+        /* Detailed Indicators Table Styles */
+        .detailed-indicators-table-section {
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .detailed-indicators-table-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #333333;
+            margin-bottom: 15px;
+            text-align: center;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #667eea;
+        }
+        
+        .detailed-indicators-table-container {
+            overflow-x: auto;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            background: white;
+        }
+        
+        .detailed-indicators-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            font-size: 14px;
+        }
+        
+        .detailed-indicators-table th {
+            background: #28a745;
+            color: white;
+            padding: 12px 15px;
+            text-align: center;
+            font-weight: 600;
+            line-height: 1.2;
+            border: 1px solid #dee2e6;
+        }
+        
+        .detailed-indicators-table th:first-child {
+            text-align: left;
+            padding-left: 20px;
+        }
+        
+        .detailed-indicators-table td {
+            padding: 12px 15px;
+            text-align: center;
+            border: 1px solid #dee2e6;
+            vertical-align: middle;
+        }
+        
+        .detailed-indicators-table td:first-child {
+            text-align: left;
+            font-weight: 600;
+            color: #495057;
+            background: #f8f9fa;
+            padding-left: 20px;
+        }
+        
+        .detailed-indicators-table tr:nth-child(even) td:not(:first-child) {
+            background: #f8f9fa;
+        }
+        
+        .detailed-indicators-table tr:hover td:not(:first-child) {
+            background: #e9ecef;
+        }
+        
+        /* Mobile responsive for detailed indicators table */
+        @media (max-width: 768px) {
+            .detailed-indicators-table {
+                font-size: 12px;
+            }
+            
+            .detailed-indicators-table th,
+            .detailed-indicators-table td {
+                padding: 8px 10px;
+            }
+            
+            .detailed-indicators-table th:first-child,
+            .detailed-indicators-table td:first-child {
+                padding-left: 12px;
+            }
+            
+            .detailed-indicators-table-title {
+                font-size: 16px;
+                margin-bottom: 12px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .detailed-indicators-table {
+                font-size: 11px;
+            }
+            
+            .detailed-indicators-table th,
+            .detailed-indicators-table td {
+                padding: 6px 8px;
+            }
+            
+            .detailed-indicators-table th:first-child,
+            .detailed-indicators-table td:first-child {
+                padding-left: 10px;
+            }
+            
+            .detailed-indicators-table-title {
+                font-size: 15px;
+                margin-bottom: 10px;
+            }
+        }
+
         /* Detailed Data Tables Styles */
         .detailed-data-section {
             margin-top: 25px;
@@ -2865,6 +2976,13 @@
                 'detailedRentAreaLabel': 'Площадь аренды',
                 'detailedRentPeriodLabel': 'Срок аренды',
                 'detailedRentPriceLabel': 'Цена аренды',
+                'indicatorNameLabel': 'Показатель',
+                'saleColumnLabel': 'Продажа',
+                'rentColumnLabel': 'Аренда',
+                'areaRowLabel': 'Площадь',
+                'periodRowLabel': 'Срок',
+                'priceRowLabel': 'Цена',
+                'daysUnit': 'дней',
                 
                 // Ключи для текстового анализа рынка
                 'marketAnalysisTitle': 'Анализ рынка',
@@ -2961,6 +3079,13 @@
                 'detailedRentAreaLabel': 'Rent Area',
                 'detailedRentPeriodLabel': 'Rent Period',
                 'detailedRentPriceLabel': 'Rent Price',
+                'indicatorNameLabel': 'Indicator',
+                'saleColumnLabel': 'Sale',
+                'rentColumnLabel': 'Rent',
+                'areaRowLabel': 'Area',
+                'periodRowLabel': 'Period',
+                'priceRowLabel': 'Price',
+                'daysUnit': 'days',
                 'currencyTitle': 'Select currency:',
                 'pricePlaceholder': 'Enter price',
                 'areaPlaceholder': 'Enter area',
@@ -3089,7 +3214,14 @@
                 'detailedSalePriceLabel': 'Verkaufspreis',
                 'detailedRentAreaLabel': 'Mietfläche',
                 'detailedRentPeriodLabel': 'Mietzeitraum',
-                'detailedRentPriceLabel': 'Mietpreis'
+                'detailedRentPriceLabel': 'Mietpreis',
+                'indicatorNameLabel': 'Indikator',
+                'saleColumnLabel': 'Verkauf',
+                'rentColumnLabel': 'Miete',
+                'areaRowLabel': 'Fläche',
+                'periodRowLabel': 'Zeitraum',
+                'priceRowLabel': 'Preis',
+                'daysUnit': 'Tage'
             },
             'fr': {
                 'slogan': 'Aperçus du marché immobilier',
@@ -3138,7 +3270,14 @@
                 'detailedSalePriceLabel': 'Prix de vente',
                 'detailedRentAreaLabel': 'Surface de location',
                 'detailedRentPeriodLabel': 'Période de location',
-                'detailedRentPriceLabel': 'Prix de location'
+                'detailedRentPriceLabel': 'Prix de location',
+                'indicatorNameLabel': 'Indicateur',
+                'saleColumnLabel': 'Vente',
+                'rentColumnLabel': 'Location',
+                'areaRowLabel': 'Surface',
+                'periodRowLabel': 'Période',
+                'priceRowLabel': 'Prix',
+                'daysUnit': 'jours'
             },
             'tr': {
                 'slogan': 'Gayrimenkul Piyasa İçgörüleri',
@@ -3358,6 +3497,13 @@
                 'detailedRentAreaLabel': 'Kiralama Alanı',
                 'detailedRentPeriodLabel': 'Kiralama Süresi',
                 'detailedRentPriceLabel': 'Kiralama Fiyatı',
+                'indicatorNameLabel': 'Gösterge',
+                'saleColumnLabel': 'Satış',
+                'rentColumnLabel': 'Kiralama',
+                'areaRowLabel': 'Alan',
+                'periodRowLabel': 'Süre',
+                'priceRowLabel': 'Fiyat',
+                'daysUnit': 'gün',
                 'indicatorLabel': 'Gösterge',
                 'minValueLabel': 'Minimum değer',
                 'maxValueLabel': 'Maksimum değer',
@@ -4875,80 +5021,60 @@
             const avgMaxRentPrice = maxUnitPriceForRent.length > 0 ? 
                 Math.round((maxUnitPriceForRent.reduce((sum, val) => sum + parseFloat(val), 0) / maxUnitPriceForRent.length) * 100) / 100 : 0;
             
+            // Calculate average area values (single value instead of range)
+            const avgSaleArea = comparableAreaForSale.length > 0 ? 
+                Math.round(comparableAreaForSale.reduce((sum, val) => sum + parseFloat(val), 0) / comparableAreaForSale.length) : 0;
+            const avgRentArea = comparableAreaForRent.length > 0 ? 
+                Math.round(comparableAreaForRent.reduce((sum, val) => sum + parseFloat(val), 0) / comparableAreaForRent.length) : 0;
+            
             // Get sale and rent periods from existing summary
             const salePeriod = summary.listing_period_for_sale || { min: 0, max: 0 };
             const rentPeriod = summary.listing_period_for_rent || { min: 0, max: 0 };
             
-            let html = '<div class="market-indicators-unified">';
-            html += `<h4 class="detailed-indicators-title">${getText('detailedIndicatorsTitle')}</h4>`;
-            html += '<div class="unified-indicator-card">';
+            // Generate table HTML
+            let html = '<div class="detailed-indicators-table-section">';
+            html += `<h4 class="detailed-indicators-table-title">${getText('detailedIndicatorsTitle')}</h4>`;
+            html += '<div class="detailed-indicators-table-container">';
+            html += '<table class="detailed-indicators-table">';
             
-            // Sale Section
-            if (comparableAreaForSale.length > 0 || salePeriod.min > 0 || avgMinSalePrice > 0) {
-                html += '<div class="indicator-section sale-section">';
-                html += `<div class="section-title">${getText('saleHeader')}</div>`;
-                
-                if (comparableAreaForSale.length > 0) {
-                    const area = {
-                        min: Math.min(...comparableAreaForSale),
-                        max: Math.max(...comparableAreaForSale)
-                    };
-                    html += `<div class="indicator-item">
-                        <span class="indicator-label">${getText('detailedSaleAreaLabel')}:</span>
-                        <span class="indicator-value">${area.min} – ${area.max} м²</span>
-                    </div>`;
-                }
-                
-                if (salePeriod.min > 0) {
-                    html += `<div class="indicator-item">
-                        <span class="indicator-label">${getText('detailedSalePeriodLabel')}:</span>
-                        <span class="indicator-value">${salePeriod.min} – ${salePeriod.max} дней</span>
-                    </div>`;
-                }
-                
-                if (avgMinSalePrice > 0 && avgMaxSalePrice > 0) {
-                    html += `<div class="indicator-item">
-                        <span class="indicator-label">${getText('detailedSalePriceLabel')}:</span>
-                        <span class="indicator-value">${formatValue(avgMinSalePrice, 'price')} – ${formatValue(avgMaxSalePrice, 'price')}</span>
-                    </div>`;
-                }
-                
-                html += '</div>';
+            // Table header
+            html += '<thead><tr>';
+            html += `<th>${getText('indicatorNameLabel')}</th>`;
+            html += `<th>${getText('saleColumnLabel')}</th>`;
+            html += `<th>${getText('rentColumnLabel')}</th>`;
+            html += '</tr></thead>';
+            
+            // Table body
+            html += '<tbody>';
+            
+            // Area row
+            if (avgSaleArea > 0 || avgRentArea > 0) {
+                html += '<tr>';
+                html += `<td>${getText('areaRowLabel')}</td>`;
+                html += `<td>${avgSaleArea > 0 ? avgSaleArea + ' м²' : '-'}</td>`;
+                html += `<td>${avgRentArea > 0 ? avgRentArea + ' м²' : '-'}</td>`;
+                html += '</tr>';
             }
             
-            // Rent Section
-            if (comparableAreaForRent.length > 0 || rentPeriod.min > 0 || avgMinRentPrice > 0) {
-                html += '<div class="indicator-section rent-section">';
-                html += `<div class="section-title">${getText('rentHeader')}</div>`;
-                
-                if (comparableAreaForRent.length > 0) {
-                    const area = {
-                        min: Math.min(...comparableAreaForRent),
-                        max: Math.max(...comparableAreaForRent)
-                    };
-                    html += `<div class="indicator-item">
-                        <span class="indicator-label">${getText('detailedRentAreaLabel')}:</span>
-                        <span class="indicator-value">${area.min} – ${area.max} м²</span>
-                    </div>`;
-                }
-                
-                if (rentPeriod.min > 0) {
-                    html += `<div class="indicator-item">
-                        <span class="indicator-label">${getText('detailedRentPeriodLabel')}:</span>
-                        <span class="indicator-value">${rentPeriod.min} – ${rentPeriod.max} дней</span>
-                    </div>`;
-                }
-                
-                if (avgMinRentPrice > 0 && avgMaxRentPrice > 0) {
-                    html += `<div class="indicator-item">
-                        <span class="indicator-label">${getText('detailedRentPriceLabel')}:</span>
-                        <span class="indicator-value">${formatValue(avgMinRentPrice, 'price')} – ${formatValue(avgMaxRentPrice, 'price')}</span>
-                    </div>`;
-                }
-                
-                html += '</div>';
+            // Period row
+            if (salePeriod.min > 0 || rentPeriod.min > 0) {
+                html += '<tr>';
+                html += `<td>${getText('periodRowLabel')}</td>`;
+                html += `<td>${salePeriod.min > 0 ? salePeriod.min + ' – ' + salePeriod.max + ' ' + getText('daysUnit') : '-'}</td>`;
+                html += `<td>${rentPeriod.min > 0 ? rentPeriod.min + ' – ' + rentPeriod.max + ' ' + getText('daysUnit') : '-'}</td>`;
+                html += '</tr>';
             }
             
+            // Price row
+            if (avgMinSalePrice > 0 || avgMinRentPrice > 0) {
+                html += '<tr>';
+                html += `<td>${getText('priceRowLabel')}</td>`;
+                html += `<td>${avgMinSalePrice > 0 && avgMaxSalePrice > 0 ? formatValue(avgMinSalePrice, 'price') + ' – ' + formatValue(avgMaxSalePrice, 'price') : '-'}</td>`;
+                html += `<td>${avgMinRentPrice > 0 && avgMaxRentPrice > 0 ? formatValue(avgMinRentPrice, 'price') + ' – ' + formatValue(avgMaxRentPrice, 'price') : '-'}</td>`;
+                html += '</tr>';
+            }
+            
+            html += '</tbody></table>';
             html += '</div></div>';
             
             return html;
