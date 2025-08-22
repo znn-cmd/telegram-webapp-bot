@@ -435,102 +435,6 @@
             background: #e9ecef;
         }
         
-        /* Стили для таблицы детальных характеристик недвижимости */
-        .detailed-characteristics-section {
-            margin-top: 20px;
-            background: #f8f9fa;
-            border-radius: 16px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-            position: relative;
-            border: 1px solid rgba(0, 0, 0, 0.05);
-        }
-        
-        .detailed-characteristics-title {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 16px 20px;
-            margin: 0;
-            font-size: 18px;
-            font-weight: 600;
-            text-align: center;
-        }
-        
-        .detailed-characteristics-table {
-            padding: 20px;
-        }
-        
-        .characteristics-table {
-            width: 100%;
-            border-collapse: collapse;
-            background: white;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        }
-        
-        .characteristics-table th {
-            background: #28a745;
-            color: white;
-            padding: 12px 8px;
-            text-align: center;
-            font-weight: 600;
-            line-height: 1.2;
-            word-wrap: break-word;
-        }
-        
-        .characteristics-table td {
-            padding: 10px 8px;
-            text-align: center;
-            border-bottom: 1px solid #dee2e6;
-            word-wrap: break-word;
-        }
-        
-        .characteristics-table tr:nth-child(even) {
-            background: #f8f9fa;
-        }
-        
-        .characteristics-table tr:hover {
-            background: #e9ecef;
-        }
-        
-        .characteristics-table .characteristic-label {
-            font-weight: 600;
-            color: #495057;
-            text-align: left;
-        }
-        
-        .characteristics-table .characteristic-value {
-            color: #6c757d;
-        }
-        
-        /* Мобильные стили для таблицы характеристик */
-        @media (max-width: 480px) {
-            .detailed-characteristics-section {
-                margin-top: 15px;
-                border-radius: 12px;
-            }
-            
-            .detailed-characteristics-title {
-                padding: 12px 16px;
-                font-size: 16px;
-            }
-            
-            .detailed-characteristics-table {
-                padding: 15px;
-            }
-            
-            .characteristics-table th,
-            .characteristics-table td {
-                padding: 8px 6px;
-                font-size: 13px;
-            }
-            
-            .characteristics-table .characteristic-label {
-                font-size: 13px;
-            }
-        }
-        
         .section-header {
             background: #f0f8ff !important;
             color: #495057;
@@ -673,6 +577,105 @@
                 font-size: 13px;
             }
             
+        }
+        
+        /* Стили для таблицы данных по выбранным характеристикам */
+        .user-specific-data-table {
+            margin-top: 20px;
+        }
+        
+        .user-specific-data-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #333333;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .user-specific-data-container {
+            background: #f8f9fa;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            position: relative;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        
+        .user-specific-data-container::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 6px;
+            background: #007bff;
+        }
+        
+        .user-specific-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+        
+        .user-specific-table th {
+            background: #e9ecef;
+            color: #333333;
+            font-weight: 600;
+            font-size: 14px;
+            padding: 16px 12px;
+            text-align: center;
+            border-bottom: 2px solid #dee2e6;
+        }
+        
+        .user-specific-table td {
+            padding: 14px 12px;
+            text-align: center;
+            border-bottom: 1px solid #dee2e6;
+            font-size: 14px;
+        }
+        
+        .user-specific-table .parameter-name {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #495057;
+            text-align: left;
+        }
+        
+        .user-specific-table .sale-value {
+            color: #28a745;
+            font-weight: 600;
+        }
+        
+        .user-specific-table .rent-value {
+            color: #007bff;
+            font-weight: 600;
+        }
+        
+        /* Мобильные устройства для таблицы данных по характеристикам */
+        @media (max-width: 768px) {
+            .user-specific-data-table {
+                margin-top: 16px;
+            }
+            
+            .user-specific-data-title {
+                font-size: 16px;
+                margin-bottom: 16px;
+            }
+            
+            .user-specific-data-container {
+                border-radius: 12px;
+            }
+            
+            .user-specific-table th,
+            .user-specific-table td {
+                padding: 10px 8px;
+                font-size: 12px;
+            }
+            
+            .user-specific-table .parameter-name {
+                font-size: 11px;
+            }
+        }
             /* Мобильные стили для блока "Анализ рынка" */
             .market-analysis-text-block {
                 margin: 24px 0;
@@ -749,54 +752,54 @@
             .indicator-value {
                 font-size: 12px;
             }
-            
-            /* Мобильные стили для блока "Анализ рынка" */
-            .market-analysis-text-block {
-                margin: 20px 0;
-                padding: 20px;
-                border-radius: 12px;
-            }
-            
-            .market-analysis-text-title {
-                font-size: 16px;
-                margin-bottom: 16px;
-            }
-            
-            .market-analysis-text-content {
-                font-size: 13px;
-            }
-            
-            /* Мобильные стили для блока с ID для админов */
-            .admin-ids-block {
-                padding: 10px;
-                border-radius: 5px;
-                margin-bottom: 14px;
-            }
-            
-            .admin-ids-title {
-                font-size: 13px;
-                margin-bottom: 6px;
-            }
-            
-            .admin-ids-details {
-                font-size: 10px;
-            }
-            
-            /* Мобильные стили для блока "Вывод по объекту" */
-            .object-summary-section {
-                margin: 20px 0;
-                padding: 20px;
-                border-radius: 12px;
-            }
-            
-            .object-summary-title {
-                font-size: 16px;
-                margin-bottom: 16px;
-            }
-            
-            .object-summary-content {
-                font-size: 13px;
-            }
+        }
+        
+        /* Мобильные стили для блока "Анализ рынка" */
+        .market-analysis-text-block {
+            margin: 20px 0;
+            padding: 20px;
+            border-radius: 12px;
+        }
+        
+        .market-analysis-text-title {
+            font-size: 16px;
+            margin-bottom: 16px;
+        }
+        
+        .market-analysis-text-content {
+            font-size: 13px;
+        }
+        
+        /* Мобильные стили для блока с ID для админов */
+        .admin-ids-block {
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 14px;
+        }
+        
+        .admin-ids-title {
+            font-size: 13px;
+            margin-bottom: 6px;
+        }
+        
+        .admin-ids-details {
+            font-size: 10px;
+        }
+        
+        /* Мобильные стили для блока "Вывод по объекту" */
+        .object-summary-section {
+            margin: 20px 0;
+            padding: 20px;
+            border-radius: 12px;
+        }
+        
+        .object-summary-title {
+            font-size: 16px;
+            margin-bottom: 16px;
+        }
+        
+        .object-summary-content {
+            font-size: 13px;
         }
         
         /* Пустое место между блоками */
@@ -804,6 +807,104 @@
             height: 40px;
             margin: 0;
             padding: 0;
+        }
+        
+        /* Стили для таблицы данных по выбранным характеристикам */
+        .user-specific-data-table {
+            margin-top: 20px;
+        }
+        
+        .user-specific-data-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #333333;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .user-specific-data-container {
+            background: #f8f9fa;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            position: relative;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        
+        .user-specific-data-container::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 6px;
+            background: #007bff;
+        }
+        
+        .user-specific-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+        
+        .user-specific-table th {
+            background: #e9ecef;
+            color: #333333;
+            font-weight: 600;
+            font-size: 14px;
+            padding: 16px 12px;
+            text-align: center;
+            border-bottom: 2px solid #dee2e6;
+        }
+        
+        .user-specific-table td {
+            padding: 14px 12px;
+            text-align: center;
+            border-bottom: 1px solid #dee2e6;
+            font-size: 14px;
+        }
+        
+        .user-specific-table .parameter-name {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #495057;
+            text-align: left;
+        }
+        
+        .user-specific-table .sale-value {
+            color: #28a745;
+            font-weight: 600;
+        }
+        
+        .user-specific-table .rent-value {
+            color: #007bff;
+            font-weight: 600;
+        }
+        
+        /* Мобильные устройства для таблицы данных по характеристикам */
+        @media (max-width: 768px) {
+            .user-specific-data-table {
+                margin-top: 16px;
+            }
+            
+            .user-specific-data-title {
+                font-size: 16px;
+                margin-bottom: 16px;
+            }
+            
+            .user-specific-data-container {
+                border-radius: 12px;
+            }
+            
+            .user-specific-table th,
+            .user-specific-table td {
+                padding: 10px 8px;
+                font-size: 12px;
+            }
+            
+            .user-specific-table .parameter-name {
+                font-size: 11px;
+            }
         }
         
         /* Стили для блока "Вывод по объекту" в стиле "Вывод по тренду" */
@@ -3186,19 +3287,7 @@
                 'subscribeInstructions': 'Перейдите к боту @Aaadviser_pay_bot',
                 'followInstructions': 'Следуйте инструкциям для подключения',
                 'needHelp': 'Нужна помощь?',
-                'contactSupport': 'Свяжитесь с нашей поддержкой: @Aaadviser_support_bot',
-                
-                // Ключи для таблицы детальных характеристик недвижимости
-                'detailedCharacteristicsTitle': 'Детальные характеристики недвижимости',
-                'parameterLabel': 'Параметр',
-                'saleLabel': 'Продажа',
-                'rentLabel': 'Аренда',
-                'saleAreaLabel': 'Площадь продажи',
-                'rentAreaLabel': 'Площадь аренды',
-                'salePeriodLabel': 'Срок продажи',
-                'rentPeriodLabel': 'Срок аренды',
-                'salePriceLabel': 'Цена продажи',
-                'rentPriceLabel': 'Цена аренды'
+                'contactSupport': 'Свяжитесь с нашей поддержкой: @Aaadviser_support_bot'
             },
             'en': {
                 'slogan': 'Real Estate Market Insights',
@@ -3331,19 +3420,7 @@
                 'subscribeInstructions': 'Go to bot @Aaadviser_pay_bot',
                 'followInstructions': 'Follow the connection instructions',
                 'needHelp': 'Need help?',
-                'contactSupport': 'Contact our support: @Aaadviser_support_bot',
-                
-                // Keys for detailed property characteristics table
-                'detailedCharacteristicsTitle': 'Detailed Property Characteristics',
-                'parameterLabel': 'Parameter',
-                'saleLabel': 'Sale',
-                'rentLabel': 'Rent',
-                'saleAreaLabel': 'Sale Area',
-                'rentAreaLabel': 'Rent Area',
-                'salePeriodLabel': 'Sale Period',
-                'rentPeriodLabel': 'Rent Period',
-                'salePriceLabel': 'Sale Price',
-                'rentPriceLabel': 'Rent Price'
+                'contactSupport': 'Contact our support: @Aaadviser_support_bot'
             },
             'de': {
                 'slogan': 'Immobilienmarkt-Einblicke',
@@ -3644,19 +3721,7 @@
                 'comparableAreaForRentLabel': 'Karşılaştırılabilir alan',
                 'countForRentLabel': 'Kiralama için sayı',
                 'listingPeriodForRentLabel': 'Kiralamaya kadar süre',
-                'unitPriceForRentLabel': 'Birim fiyat',
-                
-                // Keys for detailed property characteristics table
-                'detailedCharacteristicsTitle': 'Detaylı Mülk Özellikleri',
-                'parameterLabel': 'Parametre',
-                'saleLabel': 'Satış',
-                'rentLabel': 'Kiralama',
-                'saleAreaLabel': 'Satış Alanı',
-                'rentAreaLabel': 'Kiralama Alanı',
-                'salePeriodLabel': 'Satış Süresi',
-                'rentPeriodLabel': 'Kiralama Süresi',
-                'salePriceLabel': 'Satış Fiyatı',
-                'rentPriceLabel': 'Kiralama Fiyatı'
+                'unitPriceForRentLabel': 'Birim fiyat'
             }
         };
 
@@ -3799,43 +3864,30 @@
 
         // Load countries from API
         async function loadCountries() {
-            console.log('🔄 loadCountries called');
             try {
                 const response = await fetch('/api/locations/countries');
                 const data = await response.json();
-                console.log('📊 Countries API response:', data);
                 
                 if (data.success) {
                     const countrySelect = document.getElementById('countrySelect');
-                    if (!countrySelect) {
-                        console.error('❌ countrySelect element not found');
-                        return;
-                    }
-                    
                     countrySelect.innerHTML = `<option value="">${getText('countryPlaceholder')}</option>`;
                     
-                    if (data.countries && Array.isArray(data.countries)) {
-                        data.countries.forEach(([id, name]) => {
-                            const option = document.createElement('option');
-                            option.value = id;
-                            option.textContent = name;
-                            countrySelect.appendChild(option);
-                        });
-                        console.log('✅ Countries loaded successfully');
-                    } else {
-                        console.error('❌ Invalid countries data format:', data.countries);
-                    }
+                    data.countries.forEach(([id, name]) => {
+                        const option = document.createElement('option');
+                        option.value = id;
+                        option.textContent = name;
+                        countrySelect.appendChild(option);
+                    });
                 } else {
-                    console.error('❌ Failed to load countries:', data.error);
+                    console.error('Failed to load countries:', data.error);
                 }
             } catch (error) {
-                console.error('❌ Error loading countries:', error);
+                console.error('Error loading countries:', error);
             }
         }
 
         // Load cities based on selected country
         async function loadCities(countryId) {
-            console.log('🔄 loadCities called with country_id:', countryId);
             try {
                 const response = await fetch('/api/locations/cities', {
                     method: 'POST',
@@ -3846,35 +3898,24 @@
                 });
                 
                 const data = await response.json();
-                console.log('📊 Cities API response:', data);
                 
                 if (data.success) {
                     const citySelect = document.getElementById('citySelect');
-                    if (!citySelect) {
-                        console.error('❌ citySelect element not found');
-                        return;
-                    }
-                    
                     citySelect.innerHTML = `<option value="">${getText('cityPlaceholder')}</option>`;
                     
-                    if (data.cities && Array.isArray(data.cities)) {
-                        data.cities.forEach(([id, name]) => {
-                            const option = document.createElement('option');
-                            option.value = id;
-                            option.textContent = name;
-                            citySelect.appendChild(option);
-                        });
-                        
-                        citySelect.disabled = false;
-                        console.log('✅ Cities loaded successfully, citySelect enabled');
-                    } else {
-                        console.error('❌ Invalid cities data format:', data.cities);
-                    }
+                    data.cities.forEach(([id, name]) => {
+                        const option = document.createElement('option');
+                        option.value = id;
+                        option.textContent = name;
+                        citySelect.appendChild(option);
+                    });
+                    
+                    citySelect.disabled = false;
                 } else {
-                    console.error('❌ Failed to load cities:', data.error);
+                    console.error('Failed to load cities:', data.error);
                 }
             } catch (error) {
-                console.error('❌ Error loading cities:', error);
+                console.error('Error loading cities:', error);
             }
         }
 
@@ -4189,50 +4230,36 @@
 
         // Event handlers for location changes
         function onCountryChange() {
-            console.log('🔄 onCountryChange called');
-            try {
-                const countrySelect = document.getElementById('countrySelect');
-                const citySelect = document.getElementById('citySelect');
-                const countySelect = document.getElementById('countySelect');
-                const districtSelect = document.getElementById('districtSelect');
-                
-                if (!countrySelect || !citySelect || !countySelect || !districtSelect) {
-                    console.error('❌ One or more select elements not found');
-                    return;
-                }
-                
-                const countryId = countrySelect.value;
-                console.log('📍 Selected country_id:', countryId);
-                
-                // Reset dependent selects
-                citySelect.innerHTML = `<option value="">${getText('cityPlaceholder')}</option>`;
-                citySelect.disabled = true;
-                countySelect.innerHTML = `<option value="">${getText('countyPlaceholder')}</option>`;
-                countySelect.disabled = true;
-                districtSelect.innerHTML = `<option value="">${getText('districtPlaceholder')}</option>`;
-                districtSelect.disabled = true;
-                
-                // Reset listing type selection and hide section
-                resetListingTypeSelection();
-                const listingTypeSection = document.getElementById('listingTypeSection');
-                if (listingTypeSection) {
-                    listingTypeSection.style.display = 'none';
-                }
-                
-                // Clear existing property trends
-                clearPropertyTrends();
-                
-                if (countryId) {
-                    console.log('✅ Loading cities for country_id:', countryId);
-                    loadCities(countryId);
-                } else {
-                    console.log('❌ No country selected');
-                }
-                
-                updateConfirmButton();
-            } catch (error) {
-                console.error('❌ Error in onCountryChange:', error);
+            const countrySelect = document.getElementById('countrySelect');
+            const citySelect = document.getElementById('citySelect');
+            const countySelect = document.getElementById('countySelect');
+            const districtSelect = document.getElementById('districtSelect');
+            
+            const countryId = countrySelect.value;
+            
+            // Reset dependent selects
+            citySelect.innerHTML = `<option value="">${getText('cityPlaceholder')}</option>`;
+            citySelect.disabled = true;
+            countySelect.innerHTML = `<option value="">${getText('countyPlaceholder')}</option>`;
+            countySelect.disabled = true;
+            districtSelect.innerHTML = `<option value="">${getText('districtPlaceholder')}</option>`;
+            districtSelect.disabled = true;
+            
+            // Reset listing type selection and hide section
+            resetListingTypeSelection();
+            const listingTypeSection = document.getElementById('listingTypeSection');
+            if (listingTypeSection) {
+                listingTypeSection.style.display = 'none';
             }
+            
+            // Clear existing property trends
+            clearPropertyTrends();
+            
+            if (countryId) {
+                loadCities(countryId);
+            }
+            
+            updateConfirmButton();
         }
 
         function onCityChange() {
@@ -5301,14 +5328,12 @@
             // Add spacing after market analysis
             html += '<div class="block-spacing"></div>';
             
-            // Add detailed property characteristics table only if user has made selections
-            if (window.selectedListingTypes && window.selectedListingTypes.house_type) {
-                const detailedCharacteristicsHtml = generateDetailedPropertyCharacteristics(data);
-                html += detailedCharacteristicsHtml;
-                
-                // Add spacing after detailed characteristics only if table was added
-                html += '<div class="block-spacing"></div>';
-            }
+            // Add user-specific data table
+            const userSpecificTableHtml = await generateUserSpecificDataTable(data, summary);
+            html += userSpecificTableHtml;
+            
+            // Add spacing after user-specific table
+            html += '<div class="block-spacing"></div>';
             
             // Add detailed data tables for each category (admin only)
             const detailedTablesHtml = await generateDetailedDataTables(data);
@@ -5334,229 +5359,126 @@
             loadPropertyTrends(data);
         }
 
-        // Generate detailed property characteristics table based on user selections
-        function generateDetailedPropertyCharacteristics(data) {
-            if (!data) {
-                return '';
-            }
-            
-            // Check if selectedListingTypes exists and has any selections
-            if (!window.selectedListingTypes || !window.selectedListingTypes.house_type) {
-                return '';
-            }
-            
-            // Get user selections
-            const userHouseType = window.selectedListingTypes.house_type;
-            const userFloorSegment = window.selectedListingTypes.floor_segment;
-            const userAge = window.selectedListingTypes.age;
-            const userHeating = window.selectedListingTypes.heating;
-            
-            if (!userHouseType && !userFloorSegment && !userAge && !userHeating) {
-                return '';
-            }
-            
-            let html = '<div class="detailed-characteristics-section">';
-            html += `<h4 class="detailed-characteristics-title">${getText('detailedCharacteristicsTitle')}</h4>`;
-            html += '<div class="detailed-characteristics-table">';
-            html += '<table class="characteristics-table">';
-            html += '<thead><tr>';
-            html += `<th>${getText('parameterLabel')}</th>`;
-            html += `<th>${getText('saleLabel')}</th>`;
-            html += `<th>${getText('rentLabel')}</th>`;
-            html += '</tr></thead><tbody>';
-            
-            // Area for Sale
-            if (userHouseType && data.house_type_data && data.house_type_data.length > 0) {
-                const houseTypeData = data.house_type_data.find(item => item.listing_type === userHouseType);
-                if (houseTypeData && houseTypeData.comparable_area_for_sale) {
-                    html += '<tr>';
-                    html += `<td class="characteristic-label">${getText('saleAreaLabel')}</td>`;
-                    html += `<td class="characteristic-value">${houseTypeData.comparable_area_for_sale} м²</td>`;
-                    html += '<td class="characteristic-value">-</td>';
-                    html += '</tr>';
+        // Generate user-specific data table based on selected property characteristics
+        async function generateUserSpecificDataTable(data, summary) {
+            try {
+                console.log('🔍 Generating user-specific data table...');
+                
+                // Check if user has selected property characteristics
+                if (!selectedListingTypes.house_type && !selectedListingTypes.floor_segment && 
+                    !selectedListingTypes.age && !selectedListingTypes.heating) {
+                    console.log('⚠️ No property characteristics selected');
+                    return '';
                 }
-            }
-            
-            // Area for Rent
-            if (userHouseType && data.house_type_data && data.house_type_data.length > 0) {
-                const houseTypeData = data.house_type_data.find(item => item.listing_type === userHouseType);
-                if (houseTypeData && houseTypeData.comparable_area_for_rent) {
-                    html += '<tr>';
-                    html += `<td class="characteristic-label">${getText('rentAreaLabel')}</td>`;
-                    html += '<td class="characteristic-value">-</td>';
-                    html += `<td class="characteristic-value">${houseTypeData.comparable_area_for_rent} м²</td>';
-                    html += '</tr>';
-                }
-            }
-            
-            // Sale Period (same logic as in summary table)
-            const salePeriods = [];
-            if (userHouseType && data.house_type_data) {
-                const houseTypePeriods = data.house_type_data
-                    .filter(item => item.listing_type === userHouseType)
-                    .map(item => item.listing_period_for_sale)
-                    .filter(val => val !== null && val !== undefined && !isNaN(parseFloat(val)));
-                if (houseTypePeriods.length > 0) salePeriods.push(...houseTypePeriods);
-            }
-            if (userFloorSegment && data.floor_segment_data) {
-                const floorPeriods = data.floor_segment_data
-                    .filter(item => item.listing_type === userFloorSegment)
-                    .map(item => item.listing_period_for_sale)
-                    .filter(val => val !== null && val !== undefined && !isNaN(parseFloat(val)));
-                if (floorPeriods.length > 0) salePeriods.push(...floorPeriods);
-            }
-            if (userAge && data.age_data) {
-                const agePeriods = data.age_data
-                    .filter(item => item.listing_type === userAge)
-                    .map(item => item.listing_period_for_sale)
-                    .filter(val => val !== null && val !== undefined && !isNaN(parseFloat(val)));
-                if (agePeriods.length > 0) salePeriods.push(...agePeriods);
-            }
-            if (userHeating && data.heating_data) {
-                const heatingPeriods = data.heating_data
-                    .filter(item => item.listing_type === userHeating)
-                    .map(item => item.listing_period_for_sale)
-                    .filter(val => val !== null && val !== undefined && !isNaN(parseFloat(val)));
-                if (heatingPeriods.length > 0) salePeriods.push(...heatingPeriods);
-            }
-            
-            if (salePeriods.length > 0) {
-                const minPeriod = Math.min(...salePeriods);
-                const maxPeriod = Math.max(...salePeriods);
+                
+                // Get data for user's specific selections
+                const userHouseTypeData = data.house_type_data?.find(item => 
+                    item.listing_type === selectedListingTypes.house_type) || null;
+                const userFloorSegmentData = data.floor_segment_data?.find(item => 
+                    item.listing_type === selectedListingTypes.floor_segment) || null;
+                const userAgeData = data.age_data?.find(item => 
+                    item.listing_type === selectedListingTypes.age) || null;
+                const userHeatingData = data.heating_data?.find(item => 
+                    item.listing_type === selectedListingTypes.heating) || null;
+                
+                console.log('📊 User-specific data found:', {
+                    houseType: userHouseTypeData,
+                    floorSegment: userFloorSegmentData,
+                    age: userAgeData,
+                    heating: userHeatingData
+                });
+                
+                // Get all min and max prices for sale from all tables
+                const saleMinPrices = [];
+                const saleMaxPrices = [];
+                if (userHouseTypeData?.unit_price_for_sale) saleMinPrices.push(userHouseTypeData.unit_price_for_sale);
+                if (userFloorSegmentData?.unit_price_for_sale) saleMinPrices.push(userFloorSegmentData.unit_price_for_sale);
+                if (userAgeData?.unit_price_for_sale) saleMinPrices.push(userAgeData.unit_price_for_sale);
+                if (userHeatingData?.unit_price_for_sale) saleMinPrices.push(userHeatingData.unit_price_for_sale);
+                
+                // Get all min and max prices for rent from all tables
+                const rentMinPrices = [];
+                const rentMaxPrices = [];
+                if (userHouseTypeData?.unit_price_for_rent) rentMinPrices.push(userHouseTypeData.unit_price_for_rent);
+                if (userFloorSegmentData?.unit_price_for_rent) rentMinPrices.push(userFloorSegmentData.unit_price_for_rent);
+                if (userAgeData?.unit_price_for_rent) rentMinPrices.push(userAgeData.unit_price_for_rent);
+                if (userHeatingData?.unit_price_for_rent) rentMinPrices.push(userHeatingData.unit_price_for_rent);
+                
+                // Calculate average min prices
+                const avgMinSalePrice = saleMinPrices.length > 0 ? 
+                    saleMinPrices.reduce((sum, price) => sum + price, 0) / saleMinPrices.length : 0;
+                const avgMinRentPrice = rentMinPrices.length > 0 ? 
+                    rentMinPrices.reduce((sum, price) => sum + price, 0) / rentMinPrices.length : 0;
+                
+                // Calculate average max prices (same as min for now, but can be enhanced later)
+                const avgMaxSalePrice = avgMinSalePrice;
+                const avgMaxRentPrice = avgMinRentPrice;
+                
+                // Get listing periods from the same logic as the main table
+                const listingPeriodSale = summary?.listing_period_for_sale || { min: 0, max: 0 };
+                const listingPeriodRent = summary?.listing_period_for_rent || { min: 0, max: 0 };
+                
+                // Get comparable areas from house_type_data
+                const comparableAreaSale = userHouseTypeData?.comparable_area_for_sale || 0;
+                const comparableAreaRent = userHouseTypeData?.comparable_area_for_rent || 0;
+                
+                console.log('📊 Calculated values:', {
+                    avgMinSalePrice,
+                    avgMaxSalePrice,
+                    avgMinRentPrice,
+                    avgMaxRentPrice,
+                    listingPeriodSale,
+                    listingPeriodRent,
+                    comparableAreaSale,
+                    comparableAreaRent
+                });
+                
+                // Generate HTML table
+                let html = '<div class="user-specific-data-table">';
+                html += '<h4 class="user-specific-data-title">Данные по выбранным характеристикам</h4>';
+                html += '<div class="user-specific-data-container">';
+                html += '<table class="user-specific-table">';
+                html += '<thead><tr>';
+                html += '<th>Параметр</th>';
+                html += '<th>Продажа</th>';
+                html += '<th>Аренда</th>';
+                html += '</tr></thead><tbody>';
+                
+                // Area row
                 html += '<tr>';
-                html += `<td class="characteristic-label">${getText('salePeriodLabel')}</td>`;
-                html += `<td class="characteristic-value">${minPeriod} – ${maxPeriod} дней</td>`;
-                html += '<td class="characteristic-value">-</td>';
+                html += '<td class="parameter-name">Площадь</td>';
+                html += `<td class="sale-value">${comparableAreaSale ? comparableAreaSale + ' м²' : '-'}</td>`;
+                html += `<td class="rent-value">${comparableAreaRent ? comparableAreaRent + ' м²' : '-'}</td>`;
                 html += '</tr>';
-            }
-            
-            // Rent Period (same logic as in summary table)
-            const rentPeriods = [];
-            if (userHouseType && data.house_type_data) {
-                const houseTypePeriods = data.house_type_data
-                    .filter(item => item.listing_type === userHouseType)
-                    .map(item => item.listing_period_for_rent)
-                    .filter(val => val !== null && val !== undefined && !isNaN(parseFloat(val)));
-                if (houseTypePeriods.length > 0) rentPeriods.push(...houseTypePeriods);
-            }
-            if (userFloorSegment && data.floor_segment_data) {
-                const floorPeriods = data.floor_segment_data
-                    .filter(item => item.listing_type === userFloorSegment)
-                    .map(item => item.listing_period_for_rent)
-                    .filter(val => val !== null && val !== undefined && !isNaN(parseFloat(val)));
-                if (floorPeriods.length > 0) rentPeriods.push(...floorPeriods);
-            }
-            if (userAge && data.age_data) {
-                const agePeriods = data.age_data
-                    .filter(item => item.listing_type === userAge)
-                    .map(item => item.listing_period_for_rent)
-                    .filter(val => val !== null && val !== undefined && !isNaN(parseFloat(val)));
-                if (agePeriods.length > 0) rentPeriods.push(...agePeriods);
-            }
-            if (userHeating && data.heating_data) {
-                const heatingPeriods = data.heating_data
-                    .filter(item => item.listing_type === userHeating)
-                    .map(item => item.listing_period_for_rent)
-                    .filter(val => val !== null && val !== undefined && !isNaN(parseFloat(val)));
-                if (heatingPeriods.length > 0) rentPeriods.push(...heatingPeriods);
-            }
-            
-            if (rentPeriods.length > 0) {
-                const minPeriod = Math.min(...rentPeriods);
-                const maxPeriod = Math.max(...rentPeriods);
+                
+                // Listing period row
                 html += '<tr>';
-                html += `<td class="characteristic-label">${getText('rentPeriodLabel')}</td>`;
-                html += '<td class="characteristic-value">-</td>';
-                html += `<td class="characteristic-value">${minPeriod} – ${maxPeriod} дней</td>`;
+                html += '<td class="parameter-name">Срок размещения</td>';
+                html += `<td class="sale-value">${listingPeriodSale.min && listingPeriodSale.max ? 
+                    listingPeriodSale.min + ' – ' + listingPeriodSale.max + ' дней' : '-'}</td>`;
+                html += `<td class="rent-value">${listingPeriodRent.min && listingPeriodRent.max ? 
+                    listingPeriodRent.min + ' – ' + listingPeriodRent.max + ' дней' : '-'}</td>`;
                 html += '</tr>';
-            }
-            
-            // Sale Price (average of min/max from all relevant tables)
-            const salePrices = [];
-            if (userHouseType && data.house_type_data) {
-                const houseTypePrices = data.house_type_data
-                    .filter(item => item.listing_type === userHouseType)
-                    .map(item => item.unit_price_for_sale)
-                    .filter(val => val !== null && val !== undefined && !isNaN(parseFloat(val)));
-                if (houseTypePrices.length > 0) salePrices.push(...houseTypePrices);
-            }
-            if (userFloorSegment && data.floor_segment_data) {
-                const floorPrices = data.floor_segment_data
-                    .filter(item => item.listing_type === userFloorSegment)
-                    .map(item => item.unit_price_for_sale)
-                    .filter(val => val !== null && val !== undefined && !isNaN(parseFloat(val)));
-                if (floorPrices.length > 0) salePrices.push(...floorPrices);
-            }
-            if (userAge && data.age_data) {
-                const agePrices = data.age_data
-                    .filter(item => item.listing_type === userAge)
-                    .map(item => item.unit_price_for_sale)
-                    .filter(val => val !== null && val !== undefined && !isNaN(parseFloat(val)));
-                if (agePrices.length > 0) salePrices.push(...agePrices);
-            }
-            if (userHeating && data.heating_data) {
-                const heatingPrices = data.heating_data
-                    .filter(item => item.listing_type === userHeating)
-                    .map(item => item.unit_price_for_sale)
-                    .filter(val => val !== null && val !== undefined && !isNaN(parseFloat(val)));
-                if (heatingPrices.length > 0) salePrices.push(...heatingPrices);
-            }
-            
-            if (salePrices.length > 0) {
-                const minPrice = Math.min(...salePrices);
-                const maxPrice = Math.max(...salePrices);
+                
+                // Price row
                 html += '<tr>';
-                html += `<td class="characteristic-label">${getText('salePriceLabel')}</td>`;
-                html += `<td class="characteristic-value">${formatValue(minPrice, 'price')} – ${formatValue(maxPrice, 'price')}</td>`;
-                html += '<td class="characteristic-value">-</td>';
+                html += '<td class="parameter-name">Цена за м²</td>';
+                html += `<td class="sale-value">${avgMinSalePrice && avgMaxSalePrice ? 
+                    formatValue(avgMinSalePrice, 'price') + ' – ' + formatValue(avgMaxSalePrice, 'price') : '-'}</td>`;
+                html += `<td class="rent-value">${avgMinRentPrice && avgMaxRentPrice ? 
+                    formatValue(avgMinRentPrice, 'price') + ' – ' + formatValue(avgMaxRentPrice, 'price') : '-'}</td>`;
                 html += '</tr>';
+                
+                html += '</tbody></table>';
+                html += '</div></div>';
+                
+                console.log('📝 Generated user-specific table HTML');
+                return html;
+                
+            } catch (error) {
+                console.error('❌ Error generating user-specific data table:', error);
+                return '';
             }
-            
-            // Rent Price (average of min/max from all relevant tables)
-            const rentPrices = [];
-            if (userHouseType && data.house_type_data) {
-                const houseTypePrices = data.house_type_data
-                    .filter(item => item.listing_type === userHouseType)
-                    .map(item => item.unit_price_for_rent)
-                    .filter(val => val !== null && val !== undefined && !isNaN(parseFloat(val)));
-                if (houseTypePrices.length > 0) rentPrices.push(...houseTypePrices);
-            }
-            if (userFloorSegment && data.floor_segment_data) {
-                const floorPrices = data.floor_segment_data
-                    .filter(item => item.listing_type === userFloorSegment)
-                    .map(item => item.unit_price_for_rent)
-                    .filter(val => val !== null && val !== undefined && !isNaN(parseFloat(val)));
-                if (floorPrices.length > 0) rentPrices.push(...floorPrices);
-            }
-            if (userAge && data.age_data) {
-                const agePrices = data.age_data
-                    .filter(item => item.listing_type === userAge)
-                    .map(item => item.unit_price_for_rent)
-                    .filter(val => val !== null && val !== undefined && !isNaN(parseFloat(val)));
-                if (agePrices.length > 0) rentPrices.push(...agePrices);
-            }
-            if (userHeating && data.heating_data) {
-                const heatingPrices = data.heating_data
-                    .filter(item => item.listing_type === userHeating)
-                    .map(item => item.unit_price_for_rent)
-                    .filter(val => val !== null && val !== undefined && !isNaN(parseFloat(val)));
-                if (heatingPrices.length > 0) rentPrices.push(...heatingPrices);
-            }
-            
-            if (rentPrices.length > 0) {
-                const minPrice = Math.min(...rentPrices);
-                const maxPrice = Math.max(...rentPrices);
-                html += '<tr>';
-                html += `<td class="characteristic-label">${getText('rentPriceLabel')}</td>`;
-                html += '<td class="characteristic-value">-</td>';
-                html += `<td class="characteristic-value">${formatValue(minPrice, 'price')} – ${formatValue(maxPrice, 'price')}</td>`;
-                html += '</tr>';
-            }
-            
-            html += '</tbody></table>';
-            html += '</div></div>';
-            
-            return html;
         }
 
         // Generate detailed data tables as accordion for admin users only
