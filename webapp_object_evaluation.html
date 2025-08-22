@@ -75,6 +75,9 @@
             font-size: 14px;
             background: white;
             color: #333;
+            position: relative;
+            z-index: 1000;
+            cursor: pointer;
         }
 
         .form-group select:disabled {
@@ -3769,11 +3772,22 @@
         // Load countries from API
         async function loadCountries() {
             try {
+                console.log('🌍 Loading countries...');
+                const countrySelect = document.getElementById('countrySelect');
+                
+                if (!countrySelect) {
+                    console.error('❌ Country select element not found!');
+                    return;
+                }
+                
+                console.log('✅ Country select element found, making API request...');
                 const response = await fetch('/api/locations/countries');
+                console.log('📡 API response status:', response.status);
+                
                 const data = await response.json();
+                console.log('📊 API response data:', data);
                 
                 if (data.success) {
-                    const countrySelect = document.getElementById('countrySelect');
                     countrySelect.innerHTML = `<option value="">${getText('countryPlaceholder')}</option>`;
                     
                     data.countries.forEach(([id, name]) => {
@@ -3782,11 +3796,22 @@
                         option.textContent = name;
                         countrySelect.appendChild(option);
                     });
+                    
+                    console.log('✅ Countries loaded successfully:', data.countries.length, 'countries');
                 } else {
-                    console.error('Failed to load countries:', data.error);
+                    console.error('❌ Failed to load countries:', data.error);
+                    // Добавляем fallback опции для тестирования
+                    countrySelect.innerHTML = `<option value="">${getText('countryPlaceholder')}</option>`;
+                    countrySelect.innerHTML += '<option value="1">Турция</option>';
                 }
             } catch (error) {
-                console.error('Error loading countries:', error);
+                console.error('❌ Error loading countries:', error);
+                // Добавляем fallback опции для тестирования
+                const countrySelect = document.getElementById('countrySelect');
+                if (countrySelect) {
+                    countrySelect.innerHTML = `<option value="">${getText('countryPlaceholder')}</option>`;
+                    countrySelect.innerHTML += '<option value="1">Турция</option>';
+                }
             }
         }
 
@@ -6090,11 +6115,120 @@
                 }
             }
             
+            // Каскадная логика расчета: каждый месяц рассчитывается на основе предыдущего
+            const monthlyPrices = new Map(); // Сохраняем рассчитанные цены для каждого месяца
+            
+            // Сначала находим текущий месяц и устанавливаем базовые цены
+            const currentMonthTrend = filteredTrends.find(t => t.property_year === currentYear && t.property_month === currentMonth);
+            if (currentMonthTrend) {
+                monthlyPrices.set(`${currentYear}-${currentMonth}`, {
+                    salePrice: currentMonthSalePrice,
+                    rentPrice: currentMonthRentPrice
+                });
+            }
+            
+            // Рассчитываем будущие месяцы (от текущего вперед)
+            filteredTrends
+                .filter(t => t.property_year > currentYear || (t.property_year === currentYear && t.property_month > currentMonth))
+                .sort((a, b) => {
+                    if (a.property_year !== b.property_year) return a.property_year - b.property_year;
+                    return a.property_month - b.property_month;
+                })
+                .forEach(trend => {
+                    // Находим предыдущий месяц (базу для расчета)
+                    const prevMonth = trend.property_month === 1 ? 12 : trend.property_month - 1;
+                    const prevYear = trend.property_month === 1 ? trend.property_year - 1 : trend.property_year;
+                    const prevKey = `${prevYear}-${prevMonth}`;
+                    
+                    // Получаем цены предыдущего месяца (либо рассчитанные, либо текущего месяца)
+                    let prevPrices;
+                    if (prevYear === currentYear && prevMonth === currentMonth) {
+                        prevPrices = { salePrice: currentMonthSalePrice, rentPrice: currentMonthRentPrice };
+                    } else {
+                        prevPrices = monthlyPrices.get(prevKey) || { salePrice: currentMonthSalePrice, rentPrice: currentMonthRentPrice };
+                    }
+                    
+                    const priceChangeSale = parseFloat(trend.price_change_sale) || 0;
+                    const priceChangeRent = parseFloat(trend.price_change_rent) || 0;
+                    
+                    const salePrice = prevPrices.salePrice * (1 + priceChangeSale);
+                    const rentPrice = prevPrices.rentPrice * (1 + priceChangeRent);
+                    
+                    monthlyPrices.set(`${trend.property_year}-${trend.property_month}`, {
+                        salePrice,
+                        rentPrice
+                    });
+                    
+                    console.log('🔍 Future month calculation:', {
+                        month: `${trend.property_month}/${trend.property_year}`,
+                        prevMonth: `${prevMonth}/${prevYear}`,
+                        prevPrices,
+                        priceChangeSale,
+                        priceChangeRent,
+                        calculatedSalePrice: salePrice,
+                        calculatedRentPrice: rentPrice
+                    });
+                });
+            
+            // Рассчитываем прошлые месяцы (от текущего назад)
+            filteredTrends
+                .filter(t => t.property_year < currentYear || (t.property_year === currentYear && t.property_month < currentMonth))
+                .sort((a, b) => {
+                    if (b.property_year !== a.property_year) return b.property_year - a.property_year;
+                    return b.property_month - a.property_month;
+                })
+                .forEach(trend => {
+                    // Находим следующий месяц (на который будем опираться)
+                    const nextMonth = trend.property_month === 12 ? 1 : trend.property_month + 1;
+                    const nextYear = trend.property_month === 12 ? trend.property_year + 1 : trend.property_year;
+                    const nextKey = `${nextYear}-${nextMonth}`;
+                    
+                    let nextPrices;
+                    if (nextYear === currentYear && nextMonth === currentMonth) {
+                        // Следующий месяц - текущий
+                        nextPrices = { salePrice: currentMonthSalePrice, rentPrice: currentMonthRentPrice };
+                    } else {
+                        // Ищем уже рассчитанные цены следующего месяца
+                        const nextTrend = filteredTrends.find(t => t.property_year === nextYear && t.property_month === nextMonth);
+                        if (nextTrend) {
+                            const nextPriceChangeSale = parseFloat(nextTrend.price_change_sale) || 0;
+                            const nextPriceChangeRent = parseFloat(nextTrend.price_change_rent) || 0;
+                            nextPrices = monthlyPrices.get(nextKey) || { 
+                                salePrice: currentMonthSalePrice,
+                                rentPrice: currentMonthRentPrice 
+                            };
+                        } else {
+                            nextPrices = { salePrice: currentMonthSalePrice, rentPrice: currentMonthRentPrice };
+                        }
+                    }
+                    
+                    // Находим процент изменения следующего месяца
+                    const nextTrend = filteredTrends.find(t => t.property_year === nextYear && t.property_month === nextMonth);
+                    const nextPriceChangeSale = nextTrend ? (parseFloat(nextTrend.price_change_sale) || 0) : 0;
+                    const nextPriceChangeRent = nextTrend ? (parseFloat(nextTrend.price_change_rent) || 0) : 0;
+                    
+                    const salePrice = nextPrices.salePrice / (1 + nextPriceChangeSale);
+                    const rentPrice = nextPrices.rentPrice / (1 + nextPriceChangeRent);
+                    
+                    monthlyPrices.set(`${trend.property_year}-${trend.property_month}`, {
+                        salePrice,
+                        rentPrice
+                    });
+                    
+                    console.log('🔍 Past month calculation:', {
+                        month: `${trend.property_month}/${trend.property_year}`,
+                        nextPrices,
+                        nextPriceChangeSale,
+                        nextPriceChangeRent,
+                        calculatedSalePrice: salePrice,
+                        calculatedRentPrice: rentPrice
+                    });
+                });
+            
+            // Теперь генерируем таблицу с рассчитанными ценами
             filteredTrends.forEach((trend, index) => {
-                // Проверяем, является ли этот тренд текущим месяцем
                 const isCurrentMonth = trend.property_year === currentYear && trend.property_month === currentMonth;
                 const isFutureMonth = trend.property_year > currentYear || (trend.property_year === currentYear && trend.property_month > currentMonth);
-                const isPastMonth = trend.property_year < currentYear || (trend.property_year === currentYear && trend.property_month < currentMonth);
                 
                 let rowClass = '';
                 let rowStyle = '';
@@ -6107,56 +6241,26 @@
                     rowStyle = 'background-color: #f0f8ff;';
                 }
                 
-                // Рассчитываем цены на основе логики
-                let salePrice = trend.unit_price_for_sale;
-                let rentPrice = trend.unit_price_for_rent;
+                // Получаем рассчитанные цены
+                const monthKey = `${trend.property_year}-${trend.property_month}`;
+                const prices = monthlyPrices.get(monthKey) || { 
+                    salePrice: parseFloat(trend.unit_price_for_sale) || 0, 
+                    rentPrice: parseFloat(trend.unit_price_for_rent) || 0 
+                };
                 
-                if (isCurrentMonth) {
-                    // Для текущего месяца используем рассчитанные средние значения
-                    salePrice = currentMonthSalePrice;
-                    rentPrice = currentMonthRentPrice;
-                    console.log('🔍 Current month - using calculated averages:', { salePrice, rentPrice });
-                } else if (isFutureMonth) {
-                    // Для будущих месяцев: цена = текущая_цена × (1 + процент_изменения)
-                    const priceChangeSale = parseFloat(trend.price_change_sale) || 0;
-                    const priceChangeRent = parseFloat(trend.price_change_rent) || 0;
-                    
-                    salePrice = currentMonthSalePrice * (1 + priceChangeSale);
-                    rentPrice = currentMonthRentPrice * (1 + priceChangeRent);
-                    
-                    console.log('🔍 Future month calculation:', {
-                        month: `${trend.property_month}/${trend.property_year}`,
-                        priceChangeSale,
-                        priceChangeRent,
-                        calculatedSalePrice: salePrice,
-                        calculatedRentPrice: rentPrice
-                    });
-                } else if (isPastMonth) {
-                    // Для прошлых месяцев: цена = текущая_цена ÷ (1 + процент_изменения)
-                    const priceChangeSale = parseFloat(trend.price_change_sale) || 0;
-                    const priceChangeRent = parseFloat(trend.price_change_rent) || 0;
-                    
-                    salePrice = currentMonthSalePrice / (1 + priceChangeSale);
-                    rentPrice = currentMonthRentPrice / (1 + priceChangeRent);
-                    
-                    console.log('🔍 Past month calculation:', {
-                        month: `${trend.property_month}/${trend.property_year}`,
-                        priceChangeSale,
-                        priceChangeRent,
-                        calculatedSalePrice: salePrice,
-                        calculatedRentPrice: rentPrice
-                    });
-                }
+                const salePrice = prices.salePrice;
+                const rentPrice = prices.rentPrice;
                 
-                // Рассчитываем доходность как отношение цены аренды к цене продажи
+                // Рассчитываем годовую доходность: (цена_аренды / цена_продажи) × 12 × 100%
                 let yieldValue = 0;
                 if (salePrice > 0) {
-                    yieldValue = (rentPrice / salePrice) * 100; // Конвертируем в проценты
-                    console.log('🔍 Yield calculation:', {
+                    yieldValue = (rentPrice / salePrice) * 12 * 100; // Годовая доходность
+                    console.log('🔍 Annual yield calculation:', {
                         month: `${trend.property_month}/${trend.property_year}`,
                         rentPrice,
                         salePrice,
-                        yieldValue: yieldValue.toFixed(2) + '%'
+                        monthlyYield: ((rentPrice / salePrice) * 100).toFixed(2) + '%',
+                        annualYield: yieldValue.toFixed(2) + '%'
                     });
                 } else {
                     console.log('⚠️ Cannot calculate yield: salePrice is 0 or negative');
@@ -7148,8 +7252,33 @@
 
         // Initialize page
         function init() {
+            console.log('🚀 Initializing app...');
+            
+            // Check if critical elements exist
+            const countrySelect = document.getElementById('countrySelect');
+            const citySelect = document.getElementById('citySelect');
+            const countySelect = document.getElementById('countySelect');
+            
+            console.log('🔍 Checking elements:', {
+                countrySelect: !!countrySelect,
+                citySelect: !!citySelect,
+                countySelect: !!countySelect
+            });
+            
             updatePageText();
             loadCountries();
+            
+            // Add click handlers for selects (fallback)
+            const selects = document.querySelectorAll('select');
+            selects.forEach(select => {
+                select.addEventListener('click', function() {
+                    console.log('🖱️ Select clicked:', this.id);
+                });
+                
+                select.addEventListener('change', function() {
+                    console.log('🔄 Select changed:', this.id, 'value:', this.value);
+                });
+            });
             
             // Initialize price input
             const priceInput = document.getElementById('priceObjectInput');
