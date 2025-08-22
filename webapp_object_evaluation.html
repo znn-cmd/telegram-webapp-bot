@@ -578,104 +578,6 @@
             }
             
         }
-        
-        /* Стили для таблицы данных по выбранным характеристикам */
-        .user-specific-data-table {
-            margin-top: 20px;
-        }
-        
-        .user-specific-data-title {
-            font-size: 18px;
-            font-weight: 700;
-            color: #333333;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-        
-        .user-specific-data-container {
-            background: #f8f9fa;
-            border-radius: 16px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-            position: relative;
-            border: 1px solid rgba(0, 0, 0, 0.05);
-        }
-        
-        .user-specific-data-container::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            width: 6px;
-            background: #007bff;
-        }
-        
-        .user-specific-table {
-            width: 100%;
-            border-collapse: collapse;
-            background: white;
-        }
-        
-        .user-specific-table th {
-            background: #e9ecef;
-            color: #333333;
-            font-weight: 600;
-            font-size: 14px;
-            padding: 16px 12px;
-            text-align: center;
-            border-bottom: 2px solid #dee2e6;
-        }
-        
-        .user-specific-table td {
-            padding: 14px 12px;
-            text-align: center;
-            border-bottom: 1px solid #dee2e6;
-            font-size: 14px;
-        }
-        
-        .user-specific-table .parameter-name {
-            background: #f8f9fa;
-            font-weight: 600;
-            color: #495057;
-            text-align: left;
-        }
-        
-        .user-specific-table .sale-value {
-            color: #28a745;
-            font-weight: 600;
-        }
-        
-        .user-specific-table .rent-value {
-            color: #007bff;
-            font-weight: 600;
-        }
-        
-        /* Мобильные устройства для таблицы данных по характеристикам */
-        @media (max-width: 768px) {
-            .user-specific-data-table {
-                margin-top: 16px;
-            }
-            
-            .user-specific-data-title {
-                font-size: 16px;
-                margin-bottom: 16px;
-            }
-            
-            .user-specific-data-container {
-                border-radius: 12px;
-            }
-            
-            .user-specific-table th,
-            .user-specific-table td {
-                padding: 10px 8px;
-                font-size: 12px;
-            }
-            
-            .user-specific-table .parameter-name {
-                font-size: 11px;
-            }
-        }
             /* Мобильные стили для блока "Анализ рынка" */
             .market-analysis-text-block {
                 margin: 24px 0;
@@ -807,6 +709,49 @@
             height: 40px;
             margin: 0;
             padding: 0;
+        }
+        
+        /* Стили для заголовка показателей рынка */
+        .market-indicators-header {
+            margin-top: 20px;
+            text-align: center;
+        }
+        
+        .market-indicators-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #333333;
+            margin: 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            position: relative;
+        }
+        
+        .market-indicators-title::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 6px;
+            background: #007bff;
+            border-radius: 3px 0 0 3px;
+        }
+        
+        /* Мобильные устройства для заголовка показателей рынка */
+        @media (max-width: 768px) {
+            .market-indicators-header {
+                margin-top: 16px;
+            }
+            
+            .market-indicators-title {
+                font-size: 18px;
+                padding: 16px;
+                border-radius: 12px;
+            }
         }
         
         /* Стили для таблицы данных по выбранным характеристикам */
@@ -5248,77 +5193,12 @@
                 }
             });
             
-            // Generate market indicators in unified card format (like "Тренд цен")
-            let html = '<div class="market-indicators-unified">';
-            html += '<div class="unified-indicator-card">';
-            
-            // Sale Section
-            if (summary.comparable_area_for_sale || summary.listing_period_for_sale || summary.unit_price_for_sale) {
-                html += '<div class="indicator-section sale-section">';
-                html += `<div class="section-title">${getText('saleHeader')}</div>`;
-                
-                if (summary.comparable_area_for_sale) {
-                    const area = summary.comparable_area_for_sale;
-                    html += `<div class="indicator-item">
-                        <span class="indicator-label">${getText('comparableAreaForSaleLabel')}:</span>
-                        <span class="indicator-value">${area.min} – ${area.max} м²</span>
-                    </div>`;
-                }
-                
-                if (summary.listing_period_for_sale) {
-                    const period = summary.listing_period_for_sale;
-                    html += `<div class="indicator-item">
-                        <span class="indicator-label">${getText('listingPeriodForSaleLabel')}:</span>
-                        <span class="indicator-value">${period.min} – ${period.max} дней</span>
-                </div>`;
-                }
-                
-                if (summary.unit_price_for_sale) {
-                    const price = summary.unit_price_for_sale;
-                    html += `<div class="indicator-item">
-                        <span class="indicator-label">${getText('unitPriceForSaleLabel')}:</span>
-                        <span class="indicator-value">${formatValue(price.min, 'price')} – ${formatValue(price.max, 'price')}</span>
-                    </div>`;
-                }
-                
-                html += '</div>';
-            }
-            
-            // Rent Section
-            if (summary.comparable_area_for_rent || summary.listing_period_for_rent || summary.unit_price_for_rent) {
-                html += '<div class="indicator-section rent-section">';
-                html += `<div class="section-title">${getText('rentHeader')}</div>`;
-                
-                if (summary.comparable_area_for_rent) {
-                    const area = summary.comparable_area_for_rent;
-                    html += `<div class="indicator-item">
-                        <span class="indicator-label">${getText('comparableAreaForRentLabel')}:</span>
-                        <span class="indicator-value">${area.min} – ${area.max} м²</span>
-                    </div>`;
-                }
-                
-                if (summary.listing_period_for_rent) {
-                    const period = summary.listing_period_for_rent;
-                    html += `<div class="indicator-item">
-                        <span class="indicator-label">${getText('listingPeriodForRentLabel')}:</span>
-                        <span class="indicator-value">${period.min} – ${period.max} дней</span>
-                    </div>`;
-                }
-                
-                if (summary.unit_price_for_rent) {
-                    const price = summary.unit_price_for_rent;
-                    html += `<div class="indicator-item">
-                        <span class="indicator-label">${getText('unitPriceForRentLabel')}:</span>
-                        <span class="indicator-value">${formatValue(price.min, 'price')} – ${formatValue(price.max, 'price')}</span>
-                    </div>`;
-                }
-                
+            // Generate header for market indicators section
+            let html = '<div class="market-indicators-header">';
+            html += '<h3 class="market-indicators-title">Показатели рынка</h3>';
             html += '</div>';
-            }
             
-            html += '</div></div>';
-            
-            // Add spacing between blocks
+            // Add spacing after header
             html += '<div class="block-spacing"></div>';
             
             // Add user-specific data table FIRST
