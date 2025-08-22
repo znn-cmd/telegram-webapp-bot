@@ -5391,18 +5391,28 @@
                 // Get all min and max prices for sale from all tables
                 const saleMinPrices = [];
                 const saleMaxPrices = [];
-                if (userHouseTypeData?.unit_price_for_sale) saleMinPrices.push(userHouseTypeData.unit_price_for_sale);
-                if (userFloorSegmentData?.unit_price_for_sale) saleMinPrices.push(userFloorSegmentData.unit_price_for_sale);
-                if (userAgeData?.unit_price_for_sale) saleMinPrices.push(userAgeData.unit_price_for_sale);
-                if (userHeatingData?.unit_price_for_sale) saleMinPrices.push(userHeatingData.unit_price_for_sale);
+                if (userHouseTypeData?.min_unit_price_for_sale) saleMinPrices.push(userHouseTypeData.min_unit_price_for_sale);
+                if (userFloorSegmentData?.min_unit_price_for_sale) saleMinPrices.push(userFloorSegmentData.min_unit_price_for_sale);
+                if (userAgeData?.min_unit_price_for_sale) saleMinPrices.push(userAgeData.min_unit_price_for_sale);
+                if (userHeatingData?.min_unit_price_for_sale) saleMinPrices.push(userHeatingData.min_unit_price_for_sale);
+                
+                if (userHouseTypeData?.max_unit_price_for_sale) saleMaxPrices.push(userHouseTypeData.max_unit_price_for_sale);
+                if (userFloorSegmentData?.max_unit_price_for_sale) saleMaxPrices.push(userFloorSegmentData.max_unit_price_for_sale);
+                if (userAgeData?.max_unit_price_for_sale) saleMaxPrices.push(userAgeData.max_unit_price_for_sale);
+                if (userHeatingData?.max_unit_price_for_sale) saleMaxPrices.push(userHeatingData.max_unit_price_for_sale);
                 
                 // Get all min and max prices for rent from all tables
                 const rentMinPrices = [];
                 const rentMaxPrices = [];
-                if (userHouseTypeData?.unit_price_for_rent) rentMinPrices.push(userHouseTypeData.unit_price_for_rent);
-                if (userFloorSegmentData?.unit_price_for_rent) rentMinPrices.push(userFloorSegmentData.unit_price_for_rent);
-                if (userAgeData?.unit_price_for_rent) rentMinPrices.push(userAgeData.unit_price_for_rent);
-                if (userHeatingData?.unit_price_for_rent) rentMinPrices.push(userHeatingData.unit_price_for_rent);
+                if (userHouseTypeData?.min_unit_price_for_rent) rentMinPrices.push(userHouseTypeData.min_unit_price_for_rent);
+                if (userFloorSegmentData?.min_unit_price_for_rent) rentMinPrices.push(userFloorSegmentData.min_unit_price_for_rent);
+                if (userAgeData?.min_unit_price_for_rent) rentMinPrices.push(userAgeData.min_unit_price_for_rent);
+                if (userHeatingData?.min_unit_price_for_rent) rentMinPrices.push(userHeatingData.min_unit_price_for_rent);
+                
+                if (userHouseTypeData?.max_unit_price_for_rent) rentMaxPrices.push(userHouseTypeData.max_unit_price_for_rent);
+                if (userFloorSegmentData?.max_unit_price_for_rent) rentMaxPrices.push(userFloorSegmentData.max_unit_price_for_rent);
+                if (userAgeData?.max_unit_price_for_rent) rentMaxPrices.push(userAgeData.max_unit_price_for_rent);
+                if (userHeatingData?.max_unit_price_for_rent) rentMaxPrices.push(userHeatingData.max_unit_price_for_rent);
                 
                 // Calculate average min prices
                 const avgMinSalePrice = saleMinPrices.length > 0 ? 
@@ -5410,9 +5420,11 @@
                 const avgMinRentPrice = rentMinPrices.length > 0 ? 
                     rentMinPrices.reduce((sum, price) => sum + price, 0) / rentMinPrices.length : 0;
                 
-                // Calculate average max prices (same as min for now, but can be enhanced later)
-                const avgMaxSalePrice = avgMinSalePrice;
-                const avgMaxRentPrice = avgMinRentPrice;
+                // Calculate average max prices
+                const avgMaxSalePrice = saleMaxPrices.length > 0 ? 
+                    saleMaxPrices.reduce((sum, price) => sum + price, 0) / saleMaxPrices.length : 0;
+                const avgMaxRentPrice = rentMaxPrices.length > 0 ? 
+                    rentMaxPrices.reduce((sum, price) => sum + price, 0) / rentMaxPrices.length : 0;
                 
                 // Get listing periods from the same logic as the main table
                 const listingPeriodSale = summary?.listing_period_for_sale || { min: 0, max: 0 };
@@ -5431,6 +5443,13 @@
                     listingPeriodRent,
                     comparableAreaSale,
                     comparableAreaRent
+                });
+                
+                console.log('🔍 Raw price data:', {
+                    saleMinPrices,
+                    saleMaxPrices,
+                    rentMinPrices,
+                    rentMaxPrices
                 });
                 
                 // Generate HTML table
