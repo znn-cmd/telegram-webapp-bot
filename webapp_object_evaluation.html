@@ -5263,12 +5263,14 @@
             // Add spacing after market analysis
             html += '<div class="block-spacing"></div>';
             
-            // Add detailed property characteristics table
-            const detailedCharacteristicsHtml = generateDetailedPropertyCharacteristics(data);
-            html += detailedCharacteristicsHtml;
-            
-            // Add spacing after detailed characteristics
-            html += '<div class="block-spacing"></div>';
+            // Add detailed property characteristics table only if user has made selections
+            if (window.selectedListingTypes && window.selectedListingTypes.house_type) {
+                const detailedCharacteristicsHtml = generateDetailedPropertyCharacteristics(data);
+                html += detailedCharacteristicsHtml;
+                
+                // Add spacing after detailed characteristics only if table was added
+                html += '<div class="block-spacing"></div>';
+            }
             
             // Add detailed data tables for each category (admin only)
             const detailedTablesHtml = await generateDetailedDataTables(data);
@@ -5296,15 +5298,20 @@
 
         // Generate detailed property characteristics table based on user selections
         function generateDetailedPropertyCharacteristics(data) {
-            if (!data || !selectedListingTypes) {
+            if (!data) {
+                return '';
+            }
+            
+            // Check if selectedListingTypes exists and has any selections
+            if (!window.selectedListingTypes || !window.selectedListingTypes.house_type) {
                 return '';
             }
             
             // Get user selections
-            const userHouseType = selectedListingTypes.house_type;
-            const userFloorSegment = selectedListingTypes.floor_segment;
-            const userAge = selectedListingTypes.age;
-            const userHeating = selectedListingTypes.heating;
+            const userHouseType = window.selectedListingTypes.house_type;
+            const userFloorSegment = window.selectedListingTypes.floor_segment;
+            const userAge = window.selectedListingTypes.age;
+            const userHeating = window.selectedListingTypes.heating;
             
             if (!userHouseType && !userFloorSegment && !userAge && !userHeating) {
                 return '';
