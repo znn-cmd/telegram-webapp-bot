@@ -711,48 +711,7 @@
             padding: 0;
         }
         
-        /* Стили для заголовка показателей рынка */
-        .market-indicators-header {
-            margin-top: 20px;
-            text-align: center;
-        }
-        
-        .market-indicators-title {
-            font-size: 20px;
-            font-weight: 700;
-            color: #333333;
-            margin: 0;
-            padding: 20px;
-            background: #f8f9fa;
-            border-radius: 16px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-            border: 1px solid rgba(0, 0, 0, 0.05);
-            position: relative;
-        }
-        
-        .market-indicators-title::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            width: 6px;
-            background: #007bff;
-            border-radius: 3px 0 0 3px;
-        }
-        
-        /* Мобильные устройства для заголовка показателей рынка */
-        @media (max-width: 768px) {
-            .market-indicators-header {
-                margin-top: 16px;
-            }
-            
-            .market-indicators-title {
-                font-size: 18px;
-                padding: 16px;
-                border-radius: 12px;
-            }
-        }
+
         
         /* Стили для таблицы данных по выбранным характеристикам */
         .user-specific-data-table {
@@ -783,7 +742,7 @@
             top: 0;
             bottom: 0;
             width: 6px;
-            background: #007bff;
+            background: #28a745;
         }
         
         .user-specific-table {
@@ -5193,15 +5152,8 @@
                 }
             });
             
-            // Generate header for market indicators section
-            let html = '<div class="market-indicators-header">';
-            html += '<h3 class="market-indicators-title">Показатели рынка</h3>';
-            html += '</div>';
-            
-            // Add spacing after header
-            html += '<div class="block-spacing"></div>';
-            
-            // Add user-specific data table FIRST
+            // Generate user-specific data table directly
+            let html = '';
             const userSpecificTableHtml = await generateUserSpecificDataTable(data, summary);
             html += userSpecificTableHtml;
             
@@ -5772,10 +5724,59 @@
                             const currentTrend = findCurrentMonthTrend(typeTrends);
                             if (!currentTrend) return '';
                             
+                            // Для price_trend используем среднее значение из нашей таблицы
+                            let trendValue = currentTrend.trend_value;
+                            if (type === 'price_trend' && window.currentSummaryData) {
+                                console.log('🔍 Processing price_trend with currentSummaryData:', window.currentSummaryData);
+                                console.log('🔍 selectedListingTypes:', selectedListingTypes);
+                                
+                                // Получаем данные из нашей таблицы характеристик
+                                const userHouseTypeData = window.currentSummaryData.house_type_data?.find(item => 
+                                    item.listing_type === selectedListingTypes.house_type) || null;
+                                const userFloorSegmentData = window.currentSummaryData.floor_segment_data?.find(item => 
+                                    item.listing_type === selectedListingTypes.floor_segment) || null;
+                                const userAgeData = window.currentSummaryData.age_data?.find(item => 
+                                    item.listing_type === selectedListingTypes.age) || null;
+                                const userHeatingData = window.currentSummaryData.heating_data?.find(item => 
+                                    item.listing_type === selectedListingTypes.heating) || null;
+                                
+                                console.log('🔍 Found data:', {
+                                    userHouseTypeData,
+                                    userFloorSegmentData,
+                                    userAgeData,
+                                    userHeatingData
+                                });
+                                
+                                // Собираем все цены продажи
+                                const salePrices = [];
+                                if (userHouseTypeData?.min_unit_price_for_sale) salePrices.push(userHouseTypeData.min_unit_price_for_sale);
+                                if (userFloorSegmentData?.min_unit_price_for_sale) salePrices.push(userFloorSegmentData.min_unit_price_for_sale);
+                                if (userAgeData?.min_unit_price_for_sale) salePrices.push(userAgeData.min_unit_price_for_sale);
+                                if (userHeatingData?.min_unit_price_for_sale) salePrices.push(userHeatingData.min_unit_price_for_sale);
+                                
+                                if (userHouseTypeData?.max_unit_price_for_sale) salePrices.push(userHouseTypeData.max_unit_price_for_sale);
+                                if (userFloorSegmentData?.max_unit_price_for_sale) salePrices.push(userFloorSegmentData.max_unit_price_for_sale);
+                                if (userAgeData?.max_unit_price_for_sale) salePrices.push(userAgeData.max_unit_price_for_sale);
+                                if (userHeatingData?.max_unit_price_for_sale) salePrices.push(userHeatingData.max_unit_price_for_sale);
+                                
+                                console.log('🔍 Collected sale prices:', salePrices);
+                                
+                                // Вычисляем среднее значение
+                                if (salePrices.length > 0) {
+                                    const avgPrice = salePrices.reduce((sum, price) => sum + price, 0) / salePrices.length;
+                                    trendValue = avgPrice;
+                                    console.log('🔍 Using average price from characteristics table:', avgPrice);
+                                } else {
+                                    console.log('⚠️ No sale prices found, using original trend value');
+                                }
+                            } else {
+                                console.log('🔍 Not processing price_trend or no currentSummaryData available');
+                            }
+                            
                             return `
                                 <div class="trend-card trend-card-${type}">
                                     <div class="trend-title">${formatTrendType(type)}</div>
-                                    <div class="trend-value">${formatTrendValue(currentTrend.trend_value, type)}</div>
+                                    <div class="trend-value">${formatTrendValue(trendValue, type)}</div>
                                     <div class="trend-details">
                                         <div class="trend-change">
                                             ${currentTrend.price_change_sale ? `Продажа: ${formatPercentage(currentTrend.price_change_sale)}` : ''}
