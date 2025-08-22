@@ -5983,16 +5983,9 @@
                 return 0;
             });
             
-            if (filteredTrends.length >= 8) {
-                // Берем первые 8 трендов из отфильтрованного диапазона
-                const selectedTrends = filteredTrends.slice(0, 8);
-                console.log(`✅ Selected ${selectedTrends.length} trends from month range`);
-                return selectedTrends;
-            } else {
-                // Если мало трендов в диапазоне, возвращаем все отфильтрованные
-                console.log(`⚠️ Few trends in month range, returning all ${filteredTrends.length}`);
-                return filteredTrends;
-            }
+            // Возвращаем все отфильтрованные тренды (показываем все записи)
+            console.log(`✅ Returning all ${filteredTrends.length} filtered trends`);
+            return filteredTrends;
         }
 
         // Generate detailed trends table
@@ -6090,6 +6083,99 @@
                 }
             }
             
+            // Сортируем тренды по дате для правильного каскадного расчета
+            const sortedTrends = [...filteredTrends].sort((a, b) => {
+                if (a.property_year !== b.property_year) {
+                    return a.property_year - b.property_year;
+                }
+                return a.property_month - b.property_month;
+            });
+            
+            // Создаем объект для хранения рассчитанных цен по месяцам
+            const calculatedPrices = {};
+            
+            // Сначала рассчитываем цены для текущего месяца
+            calculatedPrices[`${currentYear}-${currentMonth}`] = {
+                salePrice: currentMonthSalePrice,
+                rentPrice: currentMonthRentPrice
+            };
+            
+            // Рассчитываем цены для всех месяцев по каскадной логике
+            sortedTrends.forEach((trend) => {
+                const trendKey = `${trend.property_year}-${trend.property_month}`;
+                const isCurrentMonth = trend.property_year === currentYear && trend.property_month === currentMonth;
+                const isFutureMonth = trend.property_year > currentYear || (trend.property_year === currentYear && trend.property_month > currentMonth);
+                const isPastMonth = trend.property_year < currentYear || (trend.property_year === currentYear && trend.property_month < currentMonth);
+                
+                if (isCurrentMonth) {
+                    // Текущий месяц уже рассчитан
+                    return;
+                } else if (isFutureMonth) {
+                    // Для будущих месяцев: цена = текущая_цена × (1 + процент_изменения)
+                    const priceChangeSale = parseFloat(trend.price_change_sale) || 0;
+                    const priceChangeRent = parseFloat(trend.price_change_rent) || 0;
+                    
+                    const salePrice = currentMonthSalePrice * (1 + priceChangeSale);
+                    const rentPrice = currentMonthRentPrice * (1 + priceChangeRent);
+                    
+                    calculatedPrices[trendKey] = { salePrice, rentPrice };
+                    
+                    console.log('🔍 Future month calculation:', {
+                        month: `${trend.property_month}/${trend.property_year}`,
+                        priceChangeSale,
+                        priceChangeRent,
+                        calculatedSalePrice: salePrice,
+                        calculatedRentPrice: rentPrice
+                    });
+                } else if (isPastMonth) {
+                    // Для прошлых месяцев используем каскадный расчет
+                    let salePrice = currentMonthSalePrice;
+                    let rentPrice = currentMonthRentPrice;
+                    
+                    // Проходим по всем месяцам от текущего до целевого
+                    const monthsToCalculate = [];
+                    let currentMonthKey = `${currentYear}-${currentMonth}`;
+                    
+                    // Собираем все месяцы от текущего до целевого
+                    for (let year = currentYear; year >= trend.property_year; year--) {
+                        const startMonth = year === currentYear ? currentMonth : 12;
+                        const endMonth = year === trend.property_year ? trend.property_month : 1;
+                        
+                        for (let month = startMonth; month >= endMonth; month--) {
+                            if (year === currentYear && month === currentMonth) continue;
+                            monthsToCalculate.push({ year, month });
+                        }
+                    }
+                    
+                    // Рассчитываем цены каскадно
+                    monthsToCalculate.forEach(({ year, month }) => {
+                        const monthKey = `${year}-${month}`;
+                        const monthTrend = sortedTrends.find(t => t.property_year === year && t.property_month === month);
+                        
+                        if (monthTrend) {
+                            const priceChangeSale = parseFloat(monthTrend.price_change_sale) || 0;
+                            const priceChangeRent = parseFloat(monthTrend.price_change_rent) || 0;
+                            
+                            // Для прошлых месяцев: цена = предыдущая_цена ÷ (1 + процент_изменения)
+                            salePrice = salePrice / (1 + priceChangeSale);
+                            rentPrice = rentPrice / (1 + priceChangeRent);
+                            
+                            calculatedPrices[monthKey] = { salePrice, rentPrice };
+                        }
+                    });
+                    
+                    // Сохраняем финальные цены для целевого месяца
+                    calculatedPrices[trendKey] = { salePrice, rentPrice };
+                    
+                    console.log('🔍 Past month cascade calculation:', {
+                        month: `${trend.property_month}/${trend.property_year}`,
+                        finalSalePrice: salePrice,
+                        finalRentPrice: rentPrice
+                    });
+                }
+            });
+            
+            // Теперь отображаем тренды с рассчитанными ценами
             filteredTrends.forEach((trend, index) => {
                 // Проверяем, является ли этот тренд текущим месяцем
                 const isCurrentMonth = trend.property_year === currentYear && trend.property_month === currentMonth;
@@ -6107,46 +6193,12 @@
                     rowStyle = 'background-color: #f0f8ff;';
                 }
                 
-                // Рассчитываем цены на основе логики
-                let salePrice = trend.unit_price_for_sale;
-                let rentPrice = trend.unit_price_for_rent;
+                // Получаем рассчитанные цены
+                const trendKey = `${trend.property_year}-${trend.property_month}`;
+                const calculatedPrice = calculatedPrices[trendKey];
                 
-                if (isCurrentMonth) {
-                    // Для текущего месяца используем рассчитанные средние значения
-                    salePrice = currentMonthSalePrice;
-                    rentPrice = currentMonthRentPrice;
-                    console.log('🔍 Current month - using calculated averages:', { salePrice, rentPrice });
-                } else if (isFutureMonth) {
-                    // Для будущих месяцев: цена = текущая_цена × (1 + процент_изменения)
-                    const priceChangeSale = parseFloat(trend.price_change_sale) || 0;
-                    const priceChangeRent = parseFloat(trend.price_change_rent) || 0;
-                    
-                    salePrice = currentMonthSalePrice * (1 + priceChangeSale);
-                    rentPrice = currentMonthRentPrice * (1 + priceChangeRent);
-                    
-                    console.log('🔍 Future month calculation:', {
-                        month: `${trend.property_month}/${trend.property_year}`,
-                        priceChangeSale,
-                        priceChangeRent,
-                        calculatedSalePrice: salePrice,
-                        calculatedRentPrice: rentPrice
-                    });
-                } else if (isPastMonth) {
-                    // Для прошлых месяцев: цена = текущая_цена ÷ (1 + процент_изменения)
-                    const priceChangeSale = parseFloat(trend.price_change_sale) || 0;
-                    const priceChangeRent = parseFloat(trend.price_change_rent) || 0;
-                    
-                    salePrice = currentMonthSalePrice / (1 + priceChangeSale);
-                    rentPrice = currentMonthRentPrice / (1 + priceChangeRent);
-                    
-                    console.log('🔍 Past month calculation:', {
-                        month: `${trend.property_month}/${trend.property_year}`,
-                        priceChangeSale,
-                        priceChangeRent,
-                        calculatedSalePrice: salePrice,
-                        calculatedRentPrice: rentPrice
-                    });
-                }
+                let salePrice = calculatedPrice ? calculatedPrice.salePrice : trend.unit_price_for_sale;
+                let rentPrice = calculatedPrice ? calculatedPrice.rentPrice : trend.unit_price_for_rent;
                 
                 // Рассчитываем доходность как отношение цены аренды к цене продажи
                 let yieldValue = 0;
@@ -6257,14 +6309,151 @@
                 return '';
             }
             
+            // Используем данные из таблицы "Детальные данные трендов" для расчета
+            let firstSalePrice = parseFloat(firstMonth.unit_price_for_sale) || 0;
+            let lastSalePrice = parseFloat(lastMonth.unit_price_for_sale) || 0;
+            let firstRentPrice = parseFloat(firstMonth.unit_price_for_rent) || 0;
+            let lastRentPrice = parseFloat(lastMonth.unit_price_for_rent) || 0;
+            
+            // Если у нас есть данные из таблицы характеристик, используем их для расчета
+            if (window.currentSummaryData && typeof selectedListingTypes !== 'undefined') {
+                try {
+                    // Получаем базовые цены для текущего месяца
+                    const userHouseTypeData = window.currentSummaryData.house_type_data?.find(item => 
+                        item.listing_type === (selectedListingTypes?.house_type || '')) || null;
+                    const userFloorSegmentData = window.currentSummaryData.floor_segment_data?.find(item => 
+                        item.listing_type === (selectedListingTypes?.floor_segment || '')) || null;
+                    const userAgeData = window.currentSummaryData.age_data?.find(item => 
+                        item.listing_type === (selectedListingTypes?.age || '')) || null;
+                    const userHeatingData = window.currentSummaryData.heating_data?.find(item => 
+                        item.listing_type === (selectedListingTypes?.heating || '')) || null;
+                    
+                    // Собираем все цены продажи
+                    const salePrices = [];
+                    if (userHouseTypeData && userHouseTypeData.min_unit_price_for_sale) salePrices.push(userHouseTypeData.min_unit_price_for_sale);
+                    if (userFloorSegmentData && userFloorSegmentData.min_unit_price_for_sale) salePrices.push(userFloorSegmentData.min_unit_price_for_sale);
+                    if (userAgeData && userAgeData.min_unit_price_for_sale) salePrices.push(userAgeData.min_unit_price_for_sale);
+                    if (userHeatingData && userHeatingData.min_unit_price_for_sale) salePrices.push(userHeatingData.min_unit_price_for_sale);
+                    
+                    if (userHouseTypeData && userHouseTypeData.max_unit_price_for_sale) salePrices.push(userHouseTypeData.max_unit_price_for_sale);
+                    if (userFloorSegmentData && userFloorSegmentData.max_unit_price_for_sale) salePrices.push(userFloorSegmentData.max_unit_price_for_sale);
+                    if (userAgeData && userAgeData.max_unit_price_for_sale) salePrices.push(userAgeData.max_unit_price_for_sale);
+                    if (userHeatingData && userHeatingData.max_unit_price_for_sale) salePrices.push(userHeatingData.max_unit_price_for_sale);
+                    
+                    // Собираем все цены аренды
+                    const rentPrices = [];
+                    if (userHouseTypeData && userHouseTypeData.min_unit_price_for_rent) rentPrices.push(userHouseTypeData.min_unit_price_for_rent);
+                    if (userFloorSegmentData && userFloorSegmentData.min_unit_price_for_rent) rentPrices.push(userFloorSegmentData.min_unit_price_for_rent);
+                    if (userAgeData && userAgeData.min_unit_price_for_rent) rentPrices.push(userAgeData.min_unit_price_for_rent);
+                    if (userHeatingData && userHeatingData.min_unit_price_for_rent) rentPrices.push(userHeatingData.min_unit_price_for_rent);
+                    
+                    if (userHouseTypeData && userHouseTypeData.max_unit_price_for_rent) rentPrices.push(userHouseTypeData.max_unit_price_for_rent);
+                    if (userFloorSegmentData && userFloorSegmentData.max_unit_price_for_rent) rentPrices.push(userFloorSegmentData.max_unit_price_for_rent);
+                    if (userAgeData && userAgeData.max_unit_price_for_rent) rentPrices.push(userAgeData.max_unit_price_for_rent);
+                    if (userHeatingData && userHeatingData.max_unit_price_for_rent) rentPrices.push(userHeatingData.max_unit_price_for_rent);
+                    
+                    if (salePrices.length > 0 && rentPrices.length > 0) {
+                        const currentMonthSalePrice = salePrices.reduce((sum, price) => sum + price, 0) / salePrices.length;
+                        const currentMonthRentPrice = rentPrices.reduce((sum, price) => sum + price, 0) / rentPrices.length;
+                        
+                        // Рассчитываем цены для первого и последнего месяца по каскадной логике
+                        const currentYear = new Date().getFullYear();
+                        const currentMonth = new Date().getMonth() + 1;
+                        
+                        // Для первого месяца (самого раннего) используем каскадный расчет
+                        if (firstMonth.property_year < currentYear || (firstMonth.property_year === currentYear && firstMonth.property_month < currentMonth)) {
+                            let salePrice = currentMonthSalePrice;
+                            let rentPrice = currentMonthRentPrice;
+                            
+                            // Проходим по всем месяцам от текущего до первого
+                            for (let year = currentYear; year >= firstMonth.property_year; year--) {
+                                const startMonth = year === currentYear ? currentMonth : 12;
+                                const endMonth = year === firstMonth.property_year ? firstMonth.property_month : 1;
+                                
+                                for (let month = startMonth; month >= endMonth; month--) {
+                                    if (year === currentYear && month === currentMonth) continue;
+                                    
+                                    const monthTrend = trends.find(t => t.property_year === year && t.property_month === month);
+                                    if (monthTrend) {
+                                        const priceChangeSale = parseFloat(monthTrend.price_change_sale) || 0;
+                                        const priceChangeRent = parseFloat(monthTrend.price_change_rent) || 0;
+                                        
+                                        salePrice = salePrice / (1 + priceChangeSale);
+                                        rentPrice = rentPrice / (1 + priceChangeRent);
+                                    }
+                                }
+                            }
+                            
+                            firstSalePrice = salePrice;
+                            firstRentPrice = rentPrice;
+                        } else if (firstMonth.property_year === currentYear && firstMonth.property_month === currentMonth) {
+                            // Текущий месяц
+                            firstSalePrice = currentMonthSalePrice;
+                            firstRentPrice = currentMonthRentPrice;
+                        } else {
+                            // Будущий месяц: цена = текущая_цена × (1 + процент_изменения)
+                            const priceChangeSale = parseFloat(firstMonth.price_change_sale) || 0;
+                            const priceChangeRent = parseFloat(firstMonth.price_change_rent) || 0;
+                            firstSalePrice = currentMonthSalePrice * (1 + priceChangeSale);
+                            firstRentPrice = currentMonthRentPrice * (1 + priceChangeRent);
+                        }
+                        
+                        // Для последнего месяца (самого позднего) используем каскадный расчет
+                        if (lastMonth.property_year < currentYear || (lastMonth.property_year === currentYear && lastMonth.property_month < currentMonth)) {
+                            let salePrice = currentMonthSalePrice;
+                            let rentPrice = currentMonthRentPrice;
+                            
+                            // Проходим по всем месяцам от текущего до последнего
+                            for (let year = currentYear; year >= lastMonth.property_year; year--) {
+                                const startMonth = year === currentYear ? currentMonth : 12;
+                                const endMonth = year === lastMonth.property_year ? lastMonth.property_month : 1;
+                                
+                                for (let month = startMonth; month >= endMonth; month--) {
+                                    if (year === currentYear && month === currentMonth) continue;
+                                    
+                                    const monthTrend = trends.find(t => t.property_year === year && t.property_month === month);
+                                    if (monthTrend) {
+                                        const priceChangeSale = parseFloat(monthTrend.price_change_sale) || 0;
+                                        const priceChangeRent = parseFloat(monthTrend.price_change_rent) || 0;
+                                        
+                                        salePrice = salePrice / (1 + priceChangeSale);
+                                        rentPrice = rentPrice / (1 + priceChangeRent);
+                                    }
+                                }
+                            }
+                            
+                            lastSalePrice = salePrice;
+                            lastRentPrice = rentPrice;
+                        } else if (lastMonth.property_year === currentYear && lastMonth.property_month === currentMonth) {
+                            // Текущий месяц
+                            lastSalePrice = currentMonthSalePrice;
+                            lastRentPrice = currentMonthRentPrice;
+                        } else {
+                            // Будущий месяц: цена = текущая_цена × (1 + процент_изменения)
+                            const priceChangeSale = parseFloat(lastMonth.price_change_sale) || 0;
+                            const priceChangeRent = parseFloat(lastMonth.price_change_rent) || 0;
+                            lastSalePrice = currentMonthSalePrice * (1 + priceChangeSale);
+                            lastRentPrice = currentMonthRentPrice * (1 + priceChangeRent);
+                        }
+                        
+                        console.log('🔍 Calculated prices for analysis (cascade method):', {
+                            firstMonth: `${firstMonth.property_month}/${firstMonth.property_year}`,
+                            lastMonth: `${lastMonth.property_month}/${lastMonth.property_year}`,
+                            firstSalePrice,
+                            lastSalePrice,
+                            firstRentPrice,
+                            lastRentPrice
+                        });
+                    }
+                } catch (error) {
+                    console.error('❌ Error calculating prices for analysis:', error);
+                }
+            }
+            
             // Рассчитываем общий рост цен на продажу
-            const firstSalePrice = parseFloat(firstMonth.unit_price_for_sale) || 0;
-            const lastSalePrice = parseFloat(lastMonth.unit_price_for_sale) || 0;
             const salePriceGrowth = firstSalePrice > 0 ? ((lastSalePrice - firstSalePrice) / firstSalePrice * 100) : 0;
             
             // Рассчитываем общий рост цен на аренду
-            const firstRentPrice = parseFloat(firstMonth.unit_price_for_rent) || 0;
-            const lastRentPrice = parseFloat(lastMonth.unit_price_for_rent) || 0;
             const rentPriceGrowth = firstRentPrice > 0 ? ((lastRentPrice - firstRentPrice) / firstRentPrice * 100) : 0;
             
             // Анализируем диапазон доходности из таблицы
@@ -6330,10 +6519,31 @@
                                     salePrice = currentMonthSalePrice * (1 + priceChangeSale);
                                     rentPrice = currentMonthRentPrice * (1 + priceChangeRent);
                                 } else if (isPastMonth) {
-                                    const priceChangeSale = parseFloat(trend.price_change_sale) || 0;
-                                    const priceChangeRent = parseFloat(trend.price_change_rent) || 0;
-                                    salePrice = currentMonthSalePrice / (1 + priceChangeSale);
-                                    rentPrice = currentMonthRentPrice / (1 + priceChangeRent);
+                                    // Для прошлых месяцев используем каскадный расчет
+                                    let cascadeSalePrice = currentMonthSalePrice;
+                                    let cascadeRentPrice = currentMonthRentPrice;
+                                    
+                                    // Проходим по всем месяцам от текущего до целевого
+                                    for (let year = currentYear; year >= trend.property_year; year--) {
+                                        const startMonth = year === currentYear ? currentMonth : 12;
+                                        const endMonth = year === trend.property_year ? trend.property_month : 1;
+                                        
+                                        for (let month = startMonth; month >= endMonth; month--) {
+                                            if (year === currentYear && month === currentMonth) continue;
+                                            
+                                            const monthTrend = trends.find(t => t.property_year === year && t.property_month === month);
+                                            if (monthTrend) {
+                                                const priceChangeSale = parseFloat(monthTrend.price_change_sale) || 0;
+                                                const priceChangeRent = parseFloat(monthTrend.price_change_rent) || 0;
+                                                
+                                                cascadeSalePrice = cascadeSalePrice / (1 + priceChangeSale);
+                                                cascadeRentPrice = cascadeRentPrice / (1 + priceChangeRent);
+                                            }
+                                        }
+                                    }
+                                    
+                                    salePrice = cascadeSalePrice;
+                                    rentPrice = cascadeRentPrice;
                                 }
                             }
                         }
@@ -6351,7 +6561,7 @@
             const minYield = yields.length > 0 ? Math.min(...yields) : 0;
             const maxYield = yields.length > 0 ? Math.max(...yields) : 0;
             
-            // Определяем тренд доходности (растет, падает или стабилен)
+
             let yieldTrend = '';
             if (yields.length >= 2) {
                 const firstYield = yields[0];
@@ -6359,12 +6569,8 @@
                 const yieldChange = lastYield - firstYield;
                 
                 if (Math.abs(yieldChange) < 0.5) {
-                    yieldTrend = 'стабильна';
-                } else if (yieldChange > 0.5) {
-                    yieldTrend = 'растет';
-                } else {
-                    yieldTrend = 'снижается';
-                }
+
+
             }
             
             // Форматируем названия месяцев
@@ -6772,11 +6978,9 @@
                 
                 if (Math.abs(yieldChange) < 0.5) {
                     yieldTrend = 'стабильность';
-                } else if (yieldChange > 0.5) {
+
                     yieldTrend = 'рост';
-                } else {
-                    yieldTrend = 'снижение';
-                }
+
             }
             
             // Форматируем названия месяцев
@@ -7854,8 +8058,26 @@
                                         const priceChangeSale = parseFloat(trend.price_change_sale) || 0;
                                         salePrice = currentMonthSalePrice * (1 + priceChangeSale);
                                     } else if (isPastMonth) {
-                                        const priceChangeSale = parseFloat(trend.price_change_sale) || 0;
-                                        salePrice = currentMonthSalePrice / (1 + priceChangeSale);
+                                        // Для прошлых месяцев используем каскадный расчет
+                                        let cascadeSalePrice = currentMonthSalePrice;
+                                        
+                                        // Проходим по всем месяцам от текущего до целевого
+                                        for (let year = currentYear; year >= trend.property_year; year--) {
+                                            const startMonth = year === currentYear ? currentMonth : 12;
+                                            const endMonth = year === trend.property_year ? trend.property_month : 1;
+                                            
+                                            for (let month = startMonth; month >= endMonth; month--) {
+                                                if (year === currentYear && month === currentMonth) continue;
+                                                
+                                                const monthTrend = trends.find(t => t.property_year === year && t.property_month === month);
+                                                if (monthTrend) {
+                                                    const priceChangeSale = parseFloat(monthTrend.price_change_sale) || 0;
+                                                    cascadeSalePrice = cascadeSalePrice / (1 + priceChangeSale);
+                                                }
+                                            }
+                                        }
+                                        
+                                        salePrice = cascadeSalePrice;
                                     }
                                 }
                             }
@@ -7909,8 +8131,26 @@
                                         const priceChangeRent = parseFloat(trend.price_change_rent) || 0;
                                         rentPrice = currentMonthRentPrice * (1 + priceChangeRent);
                                     } else if (isPastMonth) {
-                                        const priceChangeRent = parseFloat(trend.price_change_rent) || 0;
-                                        rentPrice = currentMonthRentPrice / (1 + priceChangeRent);
+                                        // Для прошлых месяцев используем каскадный расчет
+                                        let cascadeRentPrice = currentMonthRentPrice;
+                                        
+                                        // Проходим по всем месяцам от текущего до целевого
+                                        for (let year = currentYear; year >= trend.property_year; year--) {
+                                            const startMonth = year === currentYear ? currentMonth : 12;
+                                            const endMonth = year === trend.property_year ? trend.property_month : 1;
+                                            
+                                            for (let month = startMonth; month >= endMonth; month--) {
+                                                if (year === currentYear && month === currentMonth) continue;
+                                                
+                                                const monthTrend = trends.find(t => t.property_year === year && t.property_month === month);
+                                                if (monthTrend) {
+                                                    const priceChangeRent = parseFloat(monthTrend.price_change_rent) || 0;
+                                                    cascadeRentPrice = cascadeRentPrice / (1 + priceChangeRent);
+                                                }
+                                            }
+                                        }
+                                        
+                                        rentPrice = cascadeRentPrice;
                                     }
                                 }
                             }
