@@ -2709,10 +2709,11 @@
 
         <!-- Data Content -->
         <div class="data-content" id="dataContent" style="display: none;">
-            <!-- Detailed Indicators Table -->
-            <div class="data-section" id="detailedIndicatorsSection">
-                <div class="data-section-content" id="detailedIndicatorsContent">
-                    <!-- Detailed indicators data will be populated here -->
+            <!-- Market Indicators Table -->
+            <div class="data-section" id="summaryDataSection">
+                <h3 class="data-section-title" id="summaryDataTitle"></h3>
+                <div class="data-section-content" id="summaryDataContent">
+                    <!-- Market indicators data will be populated here -->
                 </div>
             </div>
         </div>
@@ -3400,7 +3401,10 @@
                 dataSectionTitle.textContent = getText('dataSectionTitle');
             }
             
-
+            const summaryDataTitle = document.getElementById('summaryDataTitle');
+            if (summaryDataTitle) {
+                summaryDataTitle.textContent = getText('marketIndicatorsTitle');
+            }
 
             const loadingText = document.getElementById('loadingText');
             if (loadingText) {
@@ -4373,10 +4377,10 @@
                 heating: heatingData.length
             });
             
-            // Data sections removed - only detailed indicators table is shown
+            // Data sections removed - only market indicators table is shown
             
-            // Generate and display detailed indicators table
-            generateDetailedIndicators(data);
+            // Generate and display summary table
+            generateSummaryTable(data);
             
             // Show data content
             document.getElementById('dataContent').style.display = 'block';
@@ -4876,6 +4880,7 @@
             const rentPeriod = summary.listing_period_for_rent || { min: 0, max: 0 };
             
             let html = '<div class="market-indicators-unified">';
+            html += `<h4 class="detailed-indicators-title">${getText('detailedIndicatorsTitle')}</h4>`;
             html += '<div class="unified-indicator-card">';
             
             // Sale Section
@@ -4949,13 +4954,13 @@
             return html;
         }
 
-        // Generate detailed indicators table (main function)
-        async function generateDetailedIndicators(data) {
+        // Generate market indicators table with organized structure
+        async function generateSummaryTable(data) {
             // Save data globally for recalculation
-            window.currentDetailedData = data;
+            window.currentSummaryData = data;
             
-            const detailedContainer = document.getElementById('detailedIndicatorsContent');
-            if (!detailedContainer) return;
+            const summaryContainer = document.getElementById('summaryDataContent');
+            if (!summaryContainer) return;
             
             // Collect all data from all tables
             const allData = [];
@@ -4969,17 +4974,43 @@
             });
             
             if (allData.length === 0) {
-                detailedContainer.innerHTML = `<div class="no-data">${getText('noDataAvailable')}</div>`;
+                summaryContainer.innerHTML = `<div class="no-data">${getText('noDataAvailable')}</div>`;
                 return;
             }
             
-            // Calculate summary for detailed indicators
+            // Define fields for summary with new structure
+            const saleFields = [
+                'comparable_area_for_sale', 
+                'listing_period_for_sale', 'unit_price_for_sale'
+            ];
+            
+            const rentFields = [
+                'comparable_area_for_rent', 
+                'listing_period_for_rent', 'unit_price_for_rent'
+            ];
+            
+            // Calculate min/max values for all fields
             const summary = {};
-            const saleFields = ['listing_period_for_sale'];
-            const rentFields = ['listing_period_for_rent'];
+            const allFields = [...saleFields, ...rentFields, 'yield'];
             
-            // Calculate min/max values for listing periods
-            saleFields.forEach(field => {
+            // Special handling for comparable_area fields - only use house_type_data
+            const houseTypeData = data.house_type_data || [];
+            
+            allFields.forEach(field => {
+                if (field === 'comparable_area_for_sale' || field === 'comparable_area_for_rent') {
+                    // For area fields, only use house_type_data
+                    const values = houseTypeData
+                        .map(item => item[field])
+                        .filter(val => val !== null && val !== undefined && !isNaN(parseFloat(val)));
+                    
+                    if (values.length > 0) {
+                        summary[field] = {
+                            min: Math.min(...values),
+                            max: Math.max(...values)
+                        };
+                    }
+                } else {
+                    // For other fields, use all data
                 const values = allData
                     .map(item => item[field])
                     .filter(val => val !== null && val !== undefined && !isNaN(parseFloat(val)));
@@ -4989,28 +5020,122 @@
                         min: Math.min(...values),
                         max: Math.max(...values)
                     };
+                    }
                 }
             });
             
-            rentFields.forEach(field => {
-                const values = allData
-                    .map(item => item[field])
-                    .filter(val => val !== null && val !== undefined && !isNaN(parseFloat(val)));
+            // Generate market indicators in unified card format (like "Тренд цен")
+            let html = '<div class="market-indicators-unified">';
+            html += '<div class="unified-indicator-card">';
+            
+            // Sale Section
+            if (summary.comparable_area_for_sale || summary.listing_period_for_sale || summary.unit_price_for_sale) {
+                html += '<div class="indicator-section sale-section">';
+                html += `<div class="section-title">${getText('saleHeader')}</div>`;
                 
-                if (values.length > 0) {
-                    summary[field] = {
-                        min: Math.min(...values),
-                        max: Math.max(...values)
-                    };
+                if (summary.comparable_area_for_sale) {
+                    const area = summary.comparable_area_for_sale;
+                    html += `<div class="indicator-item">
+                        <span class="indicator-label">${getText('comparableAreaForSaleLabel')}:</span>
+                        <span class="indicator-value">${area.min} – ${area.max} м²</span>
+                    </div>`;
                 }
-            });
+                
+                if (summary.listing_period_for_sale) {
+                    const period = summary.listing_period_for_sale;
+                    html += `<div class="indicator-item">
+                        <span class="indicator-label">${getText('listingPeriodForSaleLabel')}:</span>
+                        <span class="indicator-value">${period.min} – ${period.max} дней</span>
+                </div>`;
+                }
+                
+                if (summary.unit_price_for_sale) {
+                    const price = summary.unit_price_for_sale;
+                    html += `<div class="indicator-item">
+                        <span class="indicator-label">${getText('unitPriceForSaleLabel')}:</span>
+                        <span class="indicator-value">${formatValue(price.min, 'price')} – ${formatValue(price.max, 'price')}</span>
+                    </div>`;
+                }
+                
+                html += '</div>';
+            }
             
-            // Generate detailed indicators using existing function
-            const detailedHtml = generateDetailedIndicatorsTable(data, summary);
-            detailedContainer.innerHTML = detailedHtml;
+            // Rent Section
+            if (summary.comparable_area_for_rent || summary.listing_period_for_rent || summary.unit_price_for_rent) {
+                html += '<div class="indicator-section rent-section">';
+                html += `<div class="section-title">${getText('rentHeader')}</div>`;
+                
+                if (summary.comparable_area_for_rent) {
+                    const area = summary.comparable_area_for_rent;
+                    html += `<div class="indicator-item">
+                        <span class="indicator-label">${getText('comparableAreaForRentLabel')}:</span>
+                        <span class="indicator-value">${area.min} – ${area.max} м²</span>
+                    </div>`;
+                }
+                
+                if (summary.listing_period_for_rent) {
+                    const period = summary.listing_period_for_rent;
+                    html += `<div class="indicator-item">
+                        <span class="indicator-label">${getText('listingPeriodForRentLabel')}:</span>
+                        <span class="indicator-value">${period.min} – ${period.max} дней</span>
+                    </div>`;
+                }
+                
+                if (summary.unit_price_for_rent) {
+                    const price = summary.unit_price_for_rent;
+                    html += `<div class="indicator-item">
+                        <span class="indicator-label">${getText('unitPriceForRentLabel')}:</span>
+                        <span class="indicator-value">${formatValue(price.min, 'price')} – ${formatValue(price.max, 'price')}</span>
+                    </div>`;
+                }
+                
+            html += '</div>';
+            }
+            
+            html += '</div></div>';
+            
+            // Add spacing between blocks
+            html += '<div class="block-spacing"></div>';
+            
+            // Add detailed indicators table
+            if (Object.keys(summary).length > 0) {
+                const detailedIndicatorsHtml = generateDetailedIndicatorsTable(data, summary);
+                html += detailedIndicatorsHtml;
+            }
+            
+            // Add spacing between blocks
+            html += '<div class="block-spacing"></div>';
+            
+            // Add market analysis text block
+            const marketAnalysisTextHtml = generateMarketAnalysisText(summary);
+            html += marketAnalysisTextHtml;
+            
+            // Add spacing after market analysis
+            html += '<div class="block-spacing"></div>';
+            
+            // Add detailed data tables for each category (admin only)
+            const detailedTablesHtml = await generateDetailedDataTables(data);
+            html += detailedTablesHtml;
+            
+            // Add consolidated assessment block
+            const consolidatedAssessmentHtml = await generateConsolidatedAssessment(data);
+            html += consolidatedAssessmentHtml;
+            
+            // Add market comparison block below the detailed tables
+            if (Object.keys(summary).length > 0) {
+                html += generateMarketComparison(summary);
+            }
+            
+            // Add analytical summary below the comparison block
+            if (Object.keys(summary).length > 0) {
+                html += await generateAnalyticalSummary(summary);
+            }
+            
+            summaryContainer.innerHTML = html;
+            
+            // Load property trends data
+            loadPropertyTrends(data);
         }
-
-
 
         // Generate detailed data tables as accordion for admin users only
         async function generateDetailedDataTables(data) {
