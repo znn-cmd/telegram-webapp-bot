@@ -5321,18 +5321,18 @@
             // Add spacing between blocks
             html += '<div class="block-spacing"></div>';
             
-            // Add market analysis text block
-            const marketAnalysisTextHtml = generateMarketAnalysisText(summary);
-            html += marketAnalysisTextHtml;
-            
-            // Add spacing after market analysis
-            html += '<div class="block-spacing"></div>';
-            
-            // Add user-specific data table
+            // Add user-specific data table FIRST
             const userSpecificTableHtml = await generateUserSpecificDataTable(data, summary);
             html += userSpecificTableHtml;
             
             // Add spacing after user-specific table
+            html += '<div class="block-spacing"></div>';
+            
+            // Add market analysis text block SECOND (based on user-specific data)
+            const marketAnalysisTextHtml = await generateMarketAnalysisTextFromUserData(data, summary);
+            html += marketAnalysisTextHtml;
+            
+            // Add spacing after market analysis
             html += '<div class="block-spacing"></div>';
             
             // Add detailed data tables for each category (admin only)
@@ -5496,6 +5496,113 @@
                 
             } catch (error) {
                 console.error('❌ Error generating user-specific data table:', error);
+                return '';
+            }
+        }
+
+        // Generate market analysis text based on user-specific data table
+        async function generateMarketAnalysisTextFromUserData(data, summary) {
+            try {
+                console.log('🔍 Generating market analysis text from user data...');
+                
+                // Check if user has selected property characteristics
+                if (!selectedListingTypes.house_type && !selectedListingTypes.floor_segment && 
+                    !selectedListingTypes.age && !selectedListingTypes.heating) {
+                    console.log('⚠️ No property characteristics selected');
+                    return '';
+                }
+                
+                // Get data for user's specific selections
+                const userHouseTypeData = data.house_type_data?.find(item => 
+                    item.listing_type === selectedListingTypes.house_type) || null;
+                const userFloorSegmentData = data.floor_segment_data?.find(item => 
+                    item.listing_type === selectedListingTypes.floor_segment) || null;
+                const userAgeData = data.age_data?.find(item => 
+                    item.listing_type === selectedListingTypes.age) || null;
+                const userHeatingData = data.heating_data?.find(item => 
+                    item.listing_type === selectedListingTypes.heating) || null;
+                
+                // Get comparable areas from house_type_data
+                const comparableAreaSale = userHouseTypeData?.comparable_area_for_sale || 0;
+                const comparableAreaRent = userHouseTypeData?.comparable_area_for_rent || 0;
+                
+                // Get listing periods from the same logic as the main table
+                const listingPeriodSale = summary?.listing_period_for_sale || { min: 0, max: 0 };
+                const listingPeriodRent = summary?.listing_period_for_rent || { min: 0, max: 0 };
+                
+                // Get all min and max prices for sale from all tables
+                const saleMinPrices = [];
+                const saleMaxPrices = [];
+                if (userHouseTypeData?.min_unit_price_for_sale) saleMinPrices.push(userHouseTypeData.min_unit_price_for_sale);
+                if (userFloorSegmentData?.min_unit_price_for_sale) saleMinPrices.push(userFloorSegmentData.min_unit_price_for_sale);
+                if (userAgeData?.min_unit_price_for_sale) saleMinPrices.push(userAgeData.min_unit_price_for_sale);
+                if (userHeatingData?.min_unit_price_for_sale) saleMinPrices.push(userHeatingData.min_unit_price_for_sale);
+                
+                if (userHouseTypeData?.max_unit_price_for_sale) saleMaxPrices.push(userHouseTypeData.max_unit_price_for_sale);
+                if (userFloorSegmentData?.max_unit_price_for_sale) saleMaxPrices.push(userFloorSegmentData.max_unit_price_for_sale);
+                if (userAgeData?.max_unit_price_for_sale) saleMaxPrices.push(userAgeData.max_unit_price_for_sale);
+                if (userHeatingData?.max_unit_price_for_sale) saleMaxPrices.push(userHeatingData.max_unit_price_for_sale);
+                
+                // Get all min and max prices for rent from all tables
+                const rentMinPrices = [];
+                const rentMaxPrices = [];
+                if (userHouseTypeData?.min_unit_price_for_rent) rentMinPrices.push(userHouseTypeData.min_unit_price_for_rent);
+                if (userFloorSegmentData?.min_unit_price_for_rent) rentMinPrices.push(userFloorSegmentData.min_unit_price_for_rent);
+                if (userAgeData?.min_unit_price_for_rent) rentMinPrices.push(userAgeData.min_unit_price_for_rent);
+                if (userHeatingData?.min_unit_price_for_rent) rentMinPrices.push(userHeatingData.min_unit_price_for_rent);
+                
+                if (userHouseTypeData?.max_unit_price_for_rent) rentMaxPrices.push(userHouseTypeData.max_unit_price_for_rent);
+                if (userFloorSegmentData?.max_unit_price_for_rent) rentMaxPrices.push(userFloorSegmentData.max_unit_price_for_rent);
+                if (userAgeData?.max_unit_price_for_rent) rentMaxPrices.push(userAgeData.max_unit_price_for_rent);
+                if (userHeatingData?.max_unit_price_for_rent) rentMaxPrices.push(userHeatingData.max_unit_price_for_rent);
+                
+                // Calculate average min prices
+                const avgMinSalePrice = saleMinPrices.length > 0 ? 
+                    saleMinPrices.reduce((sum, price) => sum + price, 0) / saleMinPrices.length : 0;
+                const avgMinRentPrice = rentMinPrices.length > 0 ? 
+                    rentMinPrices.reduce((sum, price) => sum + price, 0) / rentMinPrices.length : 0;
+                
+                // Calculate average max prices
+                const avgMaxSalePrice = saleMaxPrices.length > 0 ? 
+                    saleMaxPrices.reduce((sum, price) => sum + price, 0) / saleMaxPrices.length : 0;
+                const avgMaxRentPrice = rentMaxPrices.length > 0 ? 
+                    rentMaxPrices.reduce((sum, price) => sum + price, 0) / rentMaxPrices.length : 0;
+                
+                console.log('📊 Market analysis data from user table:', {
+                    comparableAreaSale,
+                    comparableAreaRent,
+                    listingPeriodSale,
+                    listingPeriodRent,
+                    avgMinSalePrice,
+                    avgMaxSalePrice,
+                    avgMinRentPrice,
+                    avgMaxRentPrice
+                });
+                
+                // Generate HTML for market analysis text
+                let html = '<div class="market-analysis-text-block">';
+                html += `<h4 class="market-analysis-text-title">${getText('marketAnalysisTitle')}</h4>`;
+                html += '<div class="market-analysis-text-content">';
+                
+                // Sale analysis based on user data
+                if (comparableAreaSale && avgMinSalePrice && avgMaxSalePrice && listingPeriodSale.min && listingPeriodSale.max) {
+                    const saleText = `Продажа: при площади ${comparableAreaSale} м² (среднее значение по проданным объектам) и минимальной цене ${formatValue(avgMinSalePrice, 'price')}/м² срок продажи составляет ~${listingPeriodSale.min} дней; при максимальной цене ${formatValue(avgMaxSalePrice, 'price')}/м² - срок продажи до ${listingPeriodSale.max} дней.`;
+                    html += `<p>${saleText}</p>`;
+                }
+                
+                // Rent analysis based on user data
+                if (comparableAreaRent && avgMinRentPrice && avgMaxRentPrice && listingPeriodRent.min && listingPeriodRent.max) {
+                    const rentText = `Аренда: при площади ${comparableAreaRent} м² (среднее значение по сданным в аренду объектам) минимальная цена ${formatValue(avgMinRentPrice, 'price')}/м² срок сдачи ~${listingPeriodRent.min} дней; при максимальной цене ${formatValue(avgMaxRentPrice, 'price')}/м² срок до ${listingPeriodRent.max} дней.`;
+                    html += `<p>${rentText}</p>`;
+                }
+                
+                html += '</div></div>';
+                
+                console.log('📝 Generated market analysis text HTML from user data');
+                return html;
+                
+            } catch (error) {
+                console.error('❌ Error generating market analysis text from user data:', error);
                 return '';
             }
         }
