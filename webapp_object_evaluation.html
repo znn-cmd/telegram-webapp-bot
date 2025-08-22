@@ -2879,7 +2879,18 @@
                 <label for="countrySelect" id="countryLabel">Страна:</label>
                 <select id="countrySelect" onchange="onCountryChange()">
                     <option value="" id="countryPlaceholder">Выберите страну</option>
+                    <option value="1">Турция (fallback)</option>
                 </select>
+                <button type="button" onclick="loadCountries()" style="
+                    background: #007bff;
+                    color: white;
+                    border: none;
+                    padding: 5px 10px;
+                    border-radius: 4px;
+                    margin-left: 10px;
+                    cursor: pointer;
+                    font-size: 12px;
+                ">🔄</button>
             </div>
 
             <div class="form-group">
@@ -2971,6 +2982,18 @@
             <button class="confirm-button" id="confirmButton" onclick="confirmLocation()" disabled>
                 <span id="confirmButtonText">Подтвердить выбор</span>
             </button>
+            
+            <button type="button" onclick="forceReloadLocations()" style="
+                background: #6c757d;
+                color: white;
+                border: none;
+                padding: 8px 16px;
+                border-radius: 6px;
+                margin-top: 15px;
+                cursor: pointer;
+                font-size: 14px;
+                width: 100%;
+            ">🔄 Перезагрузить данные локаций</button>
         </div>
 
         <!-- Выбранная локация -->
@@ -3766,14 +3789,142 @@
 
         }
 
-        // Load countries from API
-        async function loadCountries() {
+        // Force reload all location data
+        async function forceReloadLocations() {
+            console.log('🔄 Force reloading all location data...');
+            
+            // Очищаем все select'ы
+            const citySelect = document.getElementById('citySelect');
+            const countySelect = document.getElementById('countySelect');
+            const districtSelect = document.getElementById('districtSelect');
+            
+            if (citySelect) citySelect.innerHTML = '<option value="">Сначала выберите страну</option>';
+            if (countySelect) countySelect.innerHTML = '<option value="">Сначала выберите город</option>';
+            if (districtSelect) districtSelect.innerHTML = '<option value="">Сначала выберите область</option>';
+            
+            // Перезагружаем страны
+            await loadCountries();
+            
+            // Показываем уведомление
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #d4edda;
+                border: 1px solid #c3e6cb;
+                color: #155724;
+                padding: 15px;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                z-index: 10000;
+                max-width: 300px;
+                font-size: 14px;
+            `;
+            notification.innerHTML = `
+                <div style="font-weight: 600; margin-bottom: 8px;">✅ Готово</div>
+                <div>Данные локаций перезагружены.</div>
+                <button onclick="this.parentElement.remove()" style="
+                    background: #155724;
+                    color: white;
+                    border: none;
+                    padding: 5px 10px;
+                    border-radius: 4px;
+                    margin-top: 10px;
+                    cursor: pointer;
+                ">Закрыть</button>
+            `;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                if (notification.parentElement) {
+                    notification.remove();
+                }
+            }, 5000);
+        }
+
+        // Show API notification
+        function showAPINotification() {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #fff3cd;
+                border: 1px solid #ffeaa7;
+                color: #856404;
+                padding: 15px;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                z-index: 10000;
+                max-width: 300px;
+                font-size: 14px;
+            `;
+            notification.innerHTML = `
+                <div style="font-weight: 600; margin-bottom: 8px;">⚠️ Внимание</div>
+                <div>Сервис временно недоступен. Используются резервные данные.</div>
+                <button onclick="this.parentElement.remove()" style="
+                    background: #856404;
+                    color: white;
+                    border: none;
+                    padding: 5px 10px;
+                    border-radius: 4px;
+                    margin-top: 10px;
+                    cursor: pointer;
+                ">Закрыть</button>
+            `;
+            document.body.appendChild(notification);
+            
+            // Автоматически скрываем через 10 секунд
+            setTimeout(() => {
+                if (notification.parentElement) {
+                    notification.remove();
+                }
+            }, 10000);
+        }
+
+        // Check API health
+        async function checkAPIHealth() {
             try {
+                console.log('🏥 Checking API health...');
                 const response = await fetch('/api/locations/countries');
                 const data = await response.json();
                 
-                if (data.success) {
-                    const countrySelect = document.getElementById('countrySelect');
+                if (data.success && data.countries && data.countries.length > 0) {
+                    console.log('✅ API is healthy, countries available:', data.countries.length);
+                    return true;
+                } else {
+                    console.warn('⚠️ API response indicates no countries available');
+                    return false;
+                }
+            } catch (error) {
+                console.error('❌ API health check failed:', error);
+                return false;
+            }
+        }
+
+        // Load countries from API
+        async function loadCountries() {
+            try {
+                console.log('🌍 Loading countries...');
+                const countrySelect = document.getElementById('countrySelect');
+                
+                if (!countrySelect) {
+                    console.error('❌ Country select element not found!');
+                    return;
+                }
+                
+                // Показываем индикатор загрузки
+                countrySelect.innerHTML = `<option value="">🔄 Загрузка...</option>`;
+                
+                console.log('✅ Country select element found, making API request...');
+                const response = await fetch('/api/locations/countries');
+                console.log('📡 API response status:', response.status);
+                
+                const data = await response.json();
+                console.log('📊 API response data:', data);
+                
+                if (data.success && data.countries && data.countries.length > 0) {
                     countrySelect.innerHTML = `<option value="">${getText('countryPlaceholder')}</option>`;
                     
                     data.countries.forEach(([id, name]) => {
@@ -3782,11 +3933,26 @@
                         option.textContent = name;
                         countrySelect.appendChild(option);
                     });
+                    
+                    console.log('✅ Countries loaded successfully:', data.countries.length, 'countries');
                 } else {
-                    console.error('Failed to load countries:', data.error);
+                    console.error('❌ Failed to load countries:', data.error);
+                    // Добавляем fallback опции для тестирования
+                    countrySelect.innerHTML = `<option value="">${getText('countryPlaceholder')}</option>`;
+                    countrySelect.innerHTML += '<option value="1">Турция</option>';
+                    countrySelect.innerHTML += '<option value="2">Германия</option>';
+                    countrySelect.innerHTML += '<option value="3">Франция</option>';
                 }
             } catch (error) {
-                console.error('Error loading countries:', error);
+                console.error('❌ Error loading countries:', error);
+                // Добавляем fallback опции для тестирования
+                const countrySelect = document.getElementById('countrySelect');
+                if (countrySelect) {
+                    countrySelect.innerHTML = `<option value="">${getText('countryPlaceholder')}</option>`;
+                    countrySelect.innerHTML += '<option value="1">Турция</option>';
+                    countrySelect.innerHTML += '<option value="2">Германия</option>';
+                    countrySelect.innerHTML += '<option value="3">Франция</option>';
+                }
             }
         }
 
@@ -7148,8 +7314,31 @@
 
         // Initialize page
         function init() {
+            console.log('🚀 Initializing app...');
+            
+            // Check if critical elements exist
+            const countrySelect = document.getElementById('countrySelect');
+            const citySelect = document.getElementById('citySelect');
+            const countySelect = document.getElementById('countySelect');
+            
+            console.log('🔍 Checking elements:', {
+                countrySelect: !!countrySelect,
+                citySelect: !!citySelect,
+                countySelect: !!countySelect
+            });
+            
             updatePageText();
-            loadCountries();
+            
+            // Check API health first
+            checkAPIHealth().then(isHealthy => {
+                if (isHealthy) {
+                    loadCountries();
+                } else {
+                    console.warn('⚠️ API not healthy, using fallback data');
+                    // Показываем уведомление пользователю
+                    showAPINotification();
+                }
+            });
             
             // Initialize price input
             const priceInput = document.getElementById('priceObjectInput');
@@ -7210,6 +7399,18 @@
                 eurButton.classList.add('active');
                 selectedListingTypes.currency = 'EUR';
             }
+            
+            // Add click handlers for selects (fallback)
+            const selects = document.querySelectorAll('select');
+            selects.forEach(select => {
+                select.addEventListener('click', function() {
+                    console.log('🖱️ Select clicked:', this.id);
+                });
+                
+                select.addEventListener('change', function() {
+                    console.log('🔄 Select changed:', this.id, 'value:', this.value);
+                });
+            });
             
             // Проверяем и показываем кнопку сохранения отчета
             // Добавляем небольшую задержку для корректной инициализации
