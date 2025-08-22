@@ -6048,11 +6048,69 @@
                     rowStyle = 'background-color: #f0f8ff;';
                 }
                 
+                // Для текущего месяца используем средние значения из таблицы характеристик
+                let salePrice = trend.unit_price_for_sale;
+                let rentPrice = trend.unit_price_for_rent;
+                
+                if (isCurrentMonth && window.currentSummaryData && typeof selectedListingTypes !== 'undefined') {
+                    try {
+                        // Получаем данные из нашей таблицы характеристик
+                        const userHouseTypeData = window.currentSummaryData.house_type_data?.find(item => 
+                            item.listing_type === (selectedListingTypes?.house_type || '')) || null;
+                        const userFloorSegmentData = window.currentSummaryData.floor_segment_data?.find(item => 
+                            item.listing_type === (selectedListingTypes?.floor_segment || '')) || null;
+                        const userAgeData = window.currentSummaryData.age_data?.find(item => 
+                            item.listing_type === (selectedListingTypes?.age || '')) || null;
+                        const userHeatingData = window.currentSummaryData.heating_data?.find(item => 
+                            item.listing_type === (selectedListingTypes?.heating || '')) || null;
+                        
+                        // Собираем все цены продажи
+                        const salePrices = [];
+                        if (userHouseTypeData && userHouseTypeData.min_unit_price_for_sale) salePrices.push(userHouseTypeData.min_unit_price_for_sale);
+                        if (userFloorSegmentData && userFloorSegmentData.min_unit_price_for_sale) salePrices.push(userFloorSegmentData.min_unit_price_for_sale);
+                        if (userAgeData && userAgeData.min_unit_price_for_sale) salePrices.push(userAgeData.min_unit_price_for_sale);
+                        if (userHeatingData && userHeatingData.min_unit_price_for_sale) salePrices.push(userHeatingData.min_unit_price_for_sale);
+                        
+                        if (userHouseTypeData && userHouseTypeData.max_unit_price_for_sale) salePrices.push(userHouseTypeData.max_unit_price_for_sale);
+                        if (userFloorSegmentData && userFloorSegmentData.max_unit_price_for_sale) salePrices.push(userFloorSegmentData.max_unit_price_for_sale);
+                        if (userAgeData && userAgeData.max_unit_price_for_sale) salePrices.push(userAgeData.max_unit_price_for_sale);
+                        if (userHeatingData && userHeatingData.max_unit_price_for_sale) salePrices.push(userHeatingData.max_unit_price_for_sale);
+                        
+                        // Собираем все цены аренды
+                        const rentPrices = [];
+                        if (userHouseTypeData && userHouseTypeData.min_unit_price_for_rent) rentPrices.push(userHouseTypeData.min_unit_price_for_rent);
+                        if (userFloorSegmentData && userFloorSegmentData.min_unit_price_for_rent) rentPrices.push(userFloorSegmentData.min_unit_price_for_rent);
+                        if (userAgeData && userAgeData.min_unit_price_for_rent) rentPrices.push(userAgeData.min_unit_price_for_rent);
+                        if (userHeatingData && userHeatingData.min_unit_price_for_rent) rentPrices.push(userHeatingData.min_unit_price_for_rent);
+                        
+                        if (userHouseTypeData && userHouseTypeData.max_unit_price_for_rent) rentPrices.push(userHouseTypeData.max_unit_price_for_rent);
+                        if (userFloorSegmentData && userFloorSegmentData.max_unit_price_for_rent) rentPrices.push(userFloorSegmentData.max_unit_price_for_rent);
+                        if (userAgeData && userAgeData.max_unit_price_for_rent) rentPrices.push(userAgeData.max_unit_price_for_rent);
+                        if (userHeatingData && userHeatingData.max_unit_price_for_rent) rentPrices.push(userHeatingData.max_unit_price_for_rent);
+                        
+                        // Вычисляем средние значения
+                        if (salePrices.length > 0) {
+                            const avgSalePrice = salePrices.reduce((sum, price) => sum + price, 0) / salePrices.length;
+                            salePrice = avgSalePrice;
+                            console.log('🔍 Using average sale price from characteristics table:', avgSalePrice);
+                        }
+                        
+                        if (rentPrices.length > 0) {
+                            const avgRentPrice = rentPrices.reduce((sum, price) => sum + price, 0) / rentPrices.length;
+                            rentPrice = avgRentPrice;
+                            console.log('🔍 Using average rent price from characteristics table:', avgRentPrice);
+                        }
+                    } catch (error) {
+                        console.error('❌ Error calculating average prices for current month:', error);
+                        console.log('🔍 Falling back to original trend values');
+                    }
+                }
+                
                 html += `<tr class="${rowClass}" style="${rowStyle}">`;
                 html += `<td>${formatTrendDateShort(trend.date)}</td>`;
-                html += `<td>${formatTrendValue(trend.unit_price_for_sale, 'price')}</td>`;
+                html += `<td>${formatTrendValue(salePrice, 'price')}</td>`;
                 html += `<td>${formatPercentage(trend.price_change_sale)}</td>`;
-                html += `<td>${formatTrendValue(trend.unit_price_for_rent, 'price')}</td>`;
+                html += `<td>${formatTrendValue(rentPrice, 'price')}</td>`;
                 html += `<td>${formatPercentage(trend.price_change_rent)}</td>`;
                 html += `<td>${formatTrendValue(trend.yield, 'percentage')}</td>`;
                 html += '</tr>';
