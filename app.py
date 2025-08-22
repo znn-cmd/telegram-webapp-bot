@@ -46,14 +46,6 @@ except ImportError as e:
     calculate_3month_forecast = None
     format_chart_data = None
 
-# Импорт модуля api_functions
-try:
-    from api_functions import generate_standalone_html
-    logger.info("✅ Модуль api_functions успешно импортирован")
-except ImportError as e:
-    logger.error(f"❌ Ошибка импорта модуля api_functions: {e}")
-    generate_standalone_html = None
-
 # Условный импорт openai
 try:
     import openai
@@ -5097,10 +5089,11 @@ def api_admin_balance_100():
 
 @app.route('/api/admin_users_stats', methods=['GET'])
 def api_admin_users_stats():
+    import datetime
     from dateutil.relativedelta import relativedelta
     now = datetime.now()
     today = now.date()
-    week_ago = today - timedelta(days=7)
+    week_ago = today - datetime.timedelta(days=7)
     month_ago = today - relativedelta(months=1)
     quarter_ago = today - relativedelta(months=3)
     year_ago = today - relativedelta(years=1)
@@ -5527,6 +5520,8 @@ def get_market_data_by_location_ids(location_codes, target_year=None, target_mon
         dict: Данные рынка недвижимости
     """
     try:
+        from datetime import datetime
+        
         # Если год и месяц не указаны, используем текущие
         if target_year is None or target_month is None:
             now = datetime.now()
@@ -5850,6 +5845,7 @@ def get_property_trends_data(city_name, district_name, county_name):
     """
     try:
         # Получаем текущую дату для определения последнего месяца
+        from datetime import datetime
         current_date = datetime.now()
         current_year = current_date.year
         current_month = current_date.month
@@ -6379,6 +6375,7 @@ def get_historical_property_trends(city_name, district_name, county_name, years_
         dict: Словарь с данными по годам для продажи и аренды
     """
     try:
+        from datetime import datetime
         current_date = datetime.now()
         current_year = current_date.year
         
@@ -7540,263 +7537,6 @@ def api_test_api_keys():
         logger.error(f"❌ Ошибка тестирования api_keys: {e}")
         import traceback
         logger.error(f"❌ Traceback: {traceback.format_exc()}")
-        return jsonify({'success': False, 'error': str(e)}), 500
-
-
-@app.route('/api/reports/save', methods=['POST'])
-def save_report():
-    """Сохранение отчета в HTML файл"""
-    try:
-        logger.info("💾 Начало сохранения отчета")
-        
-        # Получаем данные запроса
-        data = request.get_json()
-        if not data:
-            return jsonify({'success': False, 'error': 'No data provided'}), 400
-        
-        telegram_id = data.get('telegram_id')
-        report_html = data.get('report_html')
-        report_data = data.get('report_data')
-        
-        if not telegram_id or not report_html:
-            return jsonify({'success': False, 'error': 'Missing required data'}), 400
-        
-        logger.info(f"🔍 Проверка доступа для telegram_id: {telegram_id}")
-        
-        # Проверяем права доступа пользователя
-        try:
-            # Получаем информацию о пользователе
-            user_result = supabase.table('users').select('id, user_status, period_end').eq('telegram_id', telegram_id).execute()
-            
-            if not user_result.data:
-                logger.warning(f"⚠️ Пользователь {telegram_id} не найден в базе")
-                return jsonify({'success': False, 'error': 'User not found'}), 404
-            
-            user = user_result.data[0]
-            user_id = user.get('id')
-            user_status = user.get('user_status')
-            period_end = user.get('period_end')
-            
-            logger.info(f"👤 Данные пользователя: user_id={user_id}, user_status='{user_status}', period_end='{period_end}'")
-            
-            # Проверяем статус админа
-            is_admin = user_status == 'admin'
-            logger.info(f"👑 Проверка админского статуса: user_status='{user_status}' == 'admin' = {is_admin}")
-            
-            # Проверяем активную подписку
-            has_active_subscription = False
-            if period_end:
-                try:
-                    # period_end в формате YYYY-MM-DD, сравниваем с текущей датой
-                    current_date = datetime.now().date()
-                    period_end_date = datetime.strptime(period_end, '%Y-%m-%d').date()
-                    has_active_subscription = period_end_date >= current_date
-                    logger.info(f"📅 Проверка подписки: period_end={period_end_date}, current_date={current_date}, has_active={has_active_subscription}")
-                except Exception as date_error:
-                    logger.warning(f"⚠️ Ошибка парсинга даты подписки: {date_error}")
-                    has_active_subscription = False
-            else:
-                logger.info("📅 У пользователя нет period_end")
-            
-            logger.info(f"🔐 Итоговая проверка доступа: is_admin={is_admin}, has_active_subscription={has_active_subscription}")
-            
-            if not is_admin and not has_active_subscription:
-                logger.warning(f"⚠️ Пользователь {telegram_id} не имеет доступа к сохранению отчетов")
-                return jsonify({'success': False, 'error': 'Access denied. Admin status or active subscription required.'}), 403
-            
-            logger.info(f"✅ Пользователь {telegram_id} имеет доступ: admin={is_admin}, subscription={has_active_subscription}")
-            
-        except Exception as access_error:
-            logger.error(f"❌ Ошибка проверки доступа: {access_error}")
-            return jsonify({'success': False, 'error': 'Access check failed'}), 500
-        
-        # Генерируем уникальный ID для отчета
-        import uuid
-        report_id = str(uuid.uuid4())[:8]  # Первые 8 символов UUID
-        current_datetime = datetime.now().strftime('%d.%m.%Y %H:%M')
-        
-        # Проверяем, что функция generate_standalone_html доступна
-        if not generate_standalone_html:
-            logger.error("❌ Функция generate_standalone_html недоступна")
-            return jsonify({'success': False, 'error': 'Report generation function not available'}), 500
-        
-        # Создаем HTML файл с отчетом
-        html_content = generate_standalone_html(report_html, report_data, report_id)
-        
-        # Сохраняем файл в папку reports
-        file_path = f'reports/report_{report_id}.html'
-        try:
-            with open(file_path, 'w', encoding='utf-8') as f:
-                f.write(html_content)
-            logger.info(f"✅ HTML файл сохранен: {file_path}")
-        except Exception as file_error:
-            logger.error(f"❌ Ошибка сохранения файла: {file_error}")
-            return jsonify({'success': False, 'error': 'File save failed'}), 500
-        
-        # Формируем URL для доступа к отчету
-        # Используем текущий хост из запроса
-        base_url = request.host_url.rstrip('/')
-        report_url = f'{base_url}/reports/report_{report_id}.html'
-        
-        logger.info(f"✅ Отчет успешно сохранен: {report_url}")
-        
-        # Сохраняем запись в таблицу user_reports
-        try:
-            # Извлекаем данные для записи в таблицу
-            location_str = report_data.get('location', '')
-            user_inputs = report_data.get('user_inputs', {})
-            location_data = report_data.get('location_data', {})
-            
-            # Формируем title и description
-            report_title = f"Отчет по оценке объекта - {location_str}"
-            report_description = f"Анализ недвижимости в локации {location_str}"
-            
-            # Извлекаем параметры
-            bedrooms_str = user_inputs.get('bedrooms', '')
-            # Пытаемся извлечь число спален из строки типа "1+1" или "2"
-            bedrooms = None
-            if bedrooms_str:
-                try:
-                    if '+' in bedrooms_str:
-                        # Для случаев типа "1+1", "2+1"
-                        parts = bedrooms_str.split('+')
-                        bedrooms = int(parts[0]) + int(parts[1])
-                    else:
-                        bedrooms = int(bedrooms_str)
-                except (ValueError, IndexError):
-                    bedrooms = None
-            
-            # Извлекаем цену
-            price_str = user_inputs.get('price', '')
-            price = None
-            if price_str:
-                try:
-                    # Убираем символы валют и пробелы
-                    price_clean = price_str.replace('€', '').replace('$', '').replace('₺', '').replace(',', '').replace(' ', '')
-                    price = float(price_clean)
-                except ValueError:
-                    price = None
-            
-            # Извлекаем площадь
-            area_str = user_inputs.get('area', '')
-            area = None
-            if area_str:
-                try:
-                    area = float(area_str)
-                except ValueError:
-                    area = None
-            
-            # Формируем JSONB параметры
-            parameters = {
-                'location_data': location_data,
-                'user_inputs': user_inputs,
-                'timestamp': report_data.get('timestamp', ''),
-                'report_id': report_id
-            }
-            
-            # Создаем запись в user_reports
-            user_report_data = {
-                'user_id': user_id,
-                'report_type': 'object_evaluation',
-                'title': report_title,
-                'description': report_description,
-                'parameters': parameters,
-                'address': location_str,
-                'bedrooms': bedrooms,
-                'price': price,
-                'area': area,
-                'report_url': report_url,
-                'full_report': {
-                    'html_content': report_html,
-                    'generated_at': current_datetime,
-                    'file_path': file_path
-                }
-            }
-            
-            # Сохраняем в базу данных
-            user_report_result = supabase.table('user_reports').insert(user_report_data).execute()
-            
-            if user_report_result.data:
-                logger.info(f"✅ Запись в user_reports создана: ID {user_report_result.data[0]['id']}")
-            else:
-                logger.warning("⚠️ Не удалось получить ID созданной записи в user_reports")
-                
-        except Exception as db_error:
-            logger.error(f"❌ Ошибка при сохранении в user_reports: {db_error}")
-            # Не прерываем выполнение, так как HTML файл уже сохранен
-        
-        return jsonify({
-            'success': True,
-            'report_id': report_id,
-            'report_url': report_url,
-            'message': 'Отчет успешно сохранен'
-        })
-                        
-    except Exception as e:
-        logger.error(f"❌ Ошибка сохранения отчета: {e}")
-        import traceback
-        logger.error(f"❌ Traceback: {traceback.format_exc()}")
-        return jsonify({'success': False, 'error': str(e)}), 500
-
-
-@app.route('/reports/<filename>')
-def serve_report(filename):
-    """Сервинг сохраненных отчетов"""
-    try:
-        # Проверяем, что файл существует и имеет расширение .html
-        if not filename.endswith('.html') or '..' in filename:
-            return jsonify({'error': 'Invalid filename'}), 400
-        
-        file_path = f'reports/{filename}'
-        if not os.path.exists(file_path):
-            return jsonify({'error': 'Report not found'}), 404
-        
-        # Отдаем HTML файл как статический контент
-        return send_file(file_path, mimetype='text/html')
-        
-    except Exception as e:
-        logger.error(f"❌ Ошибка сервинга отчета {filename}: {e}")
-        return jsonify({'error': 'Internal server error'}), 500
-
-@app.route('/api/user_reports', methods=['POST'])
-def get_user_reports():
-    """Получение списка сохраненных отчетов пользователя"""
-    try:
-        data = request.get_json()
-        if not data:
-            return jsonify({'success': False, 'error': 'No data provided'}), 400
-        
-        telegram_id = data.get('telegram_id')
-        if not telegram_id:
-            return jsonify({'success': False, 'error': 'Missing telegram_id'}), 400
-        
-        logger.info(f"🔍 Получение отчетов для telegram_id: {telegram_id}")
-        
-        # Получаем user_id по telegram_id
-        user_result = supabase.table('users').select('id').eq('telegram_id', telegram_id).execute()
-        
-        if not user_result.data:
-            return jsonify({'success': False, 'error': 'User not found'}), 404
-        
-        user_id = user_result.data[0]['id']
-        
-        # Получаем отчеты пользователя
-        reports_result = supabase.table('user_reports').select(
-            'id, title, description, report_type, created_at, report_url, area, bedrooms, price'
-        ).eq('user_id', user_id).is_('deleted_at', 'null').order('created_at', desc=True).execute()
-        
-        reports = reports_result.data or []
-        
-        logger.info(f"✅ Найдено {len(reports)} отчетов для пользователя {telegram_id}")
-        
-        return jsonify({
-            'success': True,
-            'reports': reports,
-            'count': len(reports)
-        })
-        
-    except Exception as e:
-        logger.error(f"❌ Ошибка получения отчетов: {e}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
 
