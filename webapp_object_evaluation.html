@@ -1912,6 +1912,20 @@
             text-align: center;
         }
         
+        .trends-data-table-info {
+            background: #f8f9fa;
+            border-radius: 6px;
+            padding: 8px 12px;
+            margin-bottom: 15px;
+            border: 1px solid #e9ecef;
+            line-height: 1.4;
+        }
+        
+        .trends-data-table-info strong {
+            color: #495057;
+            font-weight: 600;
+        }
+        
         .trends-data-table-container {
             overflow-x: auto;
             border-radius: 8px;
@@ -2120,6 +2134,13 @@
                 margin-bottom: 12px;
             }
             
+            .trends-data-table-info {
+                font-size: 11px;
+                padding: 6px 10px;
+                margin-bottom: 12px;
+                line-height: 1.3;
+            }
+            
             .trends-data-table-container {
                 min-width: 320px;
             }
@@ -2143,6 +2164,13 @@
             .trends-data-table-title {
                 font-size: 13px;
                 margin-bottom: 10px;
+            }
+            
+            .trends-data-table-info {
+                font-size: 10px;
+                padding: 5px 8px;
+                margin-bottom: 10px;
+                line-height: 1.2;
             }
             
             .trends-data-table-container {
@@ -2170,6 +2198,13 @@
             .trends-data-table-title {
                 font-size: 12px;
                 margin-bottom: 8px;
+            }
+            
+            .trends-data-table-info {
+                font-size: 9px;
+                padding: 4px 6px;
+                margin-bottom: 8px;
+                line-height: 1.2;
             }
             
             .trends-data-table-container {
@@ -6409,7 +6444,7 @@
                 return '';
             }
             
-            // Сортируем тренды по дате (новые сначала)
+            // Сортируем тренды по дате (новые сначала) - БЕЗ ФИЛЬТРАЦИИ
             const sortedTrends = trends.sort((a, b) => {
                 if (a.property_year !== b.property_year) {
                     return b.property_year - a.property_year;
@@ -6417,8 +6452,19 @@
                 return b.property_month - a.property_month;
             });
             
+            console.log(`📊 Trends data table will show ALL ${sortedTrends.length} trends without date filtering`);
+            
             let html = '<div class="trends-data-table-section">';
             html += '<h4 class="trends-data-table-title">Данные трендов по месяцам</h4>';
+            // Определяем диапазон дат для отображения
+            const firstTrend = sortedTrends[sortedTrends.length - 1];
+            const lastTrend = sortedTrends[0];
+            const dateRange = `${firstTrend.property_month}/${firstTrend.property_year} - ${lastTrend.property_month}/${lastTrend.property_year}`;
+            
+            html += `<div class="trends-data-table-info" style="text-align: center; margin-bottom: 10px; font-size: 12px; color: #666;">
+                Показано ${sortedTrends.length} трендов для выбранной локации (все доступные данные без фильтрации)
+                <br><strong>Диапазон: ${dateRange}</strong>
+            </div>`;
             html += '<div class="trends-data-table-container">';
             html += '<table class="trends-data-table">';
             
@@ -6441,6 +6487,9 @@
                 
                 const monthName = monthNames[trend.property_month - 1] || trend.property_month;
                 const year = trend.property_year;
+                
+                // Логируем каждую строку для отладки
+                console.log(`📊 Row ${index + 1}: ${monthName} ${year} - Sale: ${trend.unit_price_for_sale}, Rent: ${trend.unit_price_for_rent}`);
                 
                 // Определяем тип строки для стилизации
                 const currentDate = new Date();
