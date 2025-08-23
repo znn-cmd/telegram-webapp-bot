@@ -5778,7 +5778,7 @@
             }
             
             // Вычисляем диапазон месяцев: 18 месяцев назад от текущего + 1 месяц вперед
-            const startMonth = currentMonth - 24;
+            const startMonth = currentMonth - 18;
             const endMonth = currentMonth + 1;
             
             console.log(`🔍 Target month range: ${startMonth} to ${endMonth}`);
@@ -5837,9 +5837,9 @@
                 return 0;
             });
             
-            if (filteredTrends.length >= 8) {
+            if (filteredTrends.length >= 19) {
                 // Берем первые 8 трендов из отфильтрованного диапазона (18 месяцев назад + 1 месяц вперед)
-                const selectedTrends = filteredTrends.slice(0, 8);
+                const selectedTrends = filteredTrends.slice(0, 19);
                 console.log(`✅ Selected ${selectedTrends.length} trends from month range (18 months back + 1 month forward)`);
                 return selectedTrends;
             } else {
