@@ -360,21 +360,23 @@
                 trend.property_month === currentMonth || trend.property_month === currentMonth + 1
             );
             
-            // Объединяем все тренды: будущие + текущий месяц + исторические
-            const allTrends = [...futureTrends, ...currentMonthTrends, ...historicalTrends];
+            // Объединяем все тренды: исторические + текущий месяц + будущие
+            // Изменен порядок: сначала исторические, потом текущий месяц, потом будущие
+            const allTrends = [...historicalTrends, ...currentMonthTrends, ...futureTrends];
             
             let html = '<h3>Новая логика фильтрации:</h3>';
             html += `<p><strong>Текущая дата:</strong> ${currentYear}-${currentMonth}</p>`;
             html += `<p><strong>Всего трендов:</strong> ${mockTrends.length}</p>`;
             
             html += '<h4>Разбивка по категориям:</h4>';
-            html += '<table><tr><th>Категория</th><th>Количество</th><th>Описание</th></tr>';
-            html += `<tr><td>Будущие месяцы</td><td>${futureTrends.length}</td><td>Месяцы после текущего</td></tr>`;
+            html += '<table><tr><th>Категория</th><th>Количество</th><th>Описание</th></tr>`;
+            html += `<tr><td>Исторические</td><td>${historicalTrends.length}</td><td>Все данные за предыдущие годы (новые сначала)</td></tr>`;
             html += `<td>Текущий месяц</td><td>${currentMonthTrends.length}</td><td>Текущий месяц + 1 месяц вперед</td></tr>`;
-            html += `<td>Исторические</td><td>${historicalTrends.length}</td><td>Все данные за предыдущие годы</td></tr>`;
+            html += `<td>Будущие месяцы</td><td>${futureTrends.length}</td><td>Месяцы после текущего (старые сначала)</td></tr>`;
             html += '</table>';
             
             html += `<p><strong>Итого отображаемых трендов:</strong> ${allTrends.length}</p>`;
+            html += `<p><strong>Порядок отображения:</strong> Исторические (новые сначала) → Текущий месяц → Будущие (старые сначала)</p>`;
             
             if (allTrends.length > 8) {
                 html += '<p class="success">✅ Теперь отображается больше трендов (все исторические данные)</p>';
@@ -419,7 +421,8 @@
                 trend.property_month === currentMonth || trend.property_month === currentMonth + 1
             );
             
-            const allTrends = [...futureTrends, ...currentMonthTrends, ...historicalTrends];
+            // Объединяем все тренды: исторические + текущий месяц + будущие
+            const allTrends = [...historicalTrends, ...currentMonthTrends, ...futureTrends];
             
             let html = '<h3>Тест данных трендов с новой логикой:</h3>';
             html += `<p><strong>Отображается трендов:</strong> ${allTrends.length} (все исторические + текущий месяц + прогноз)</p>`;
