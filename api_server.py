@@ -310,6 +310,141 @@ def get_property_trends():
             'message': f'Ошибка сервера: {str(e)}'
         }), 500
 
+@app.route('/api/property_data/average_prices', methods=['POST'])
+def get_average_prices():
+    """Получение средних цен продажи и аренды из таблиц данных для текущего месяца"""
+    try:
+        data = request.get_json()
+        country_id = data.get('country_id')
+        city_id = data.get('city_id')
+        county_id = data.get('county_id')
+        district_id = data.get('district_id')
+        
+        if not all([country_id, city_id, county_id, district_id]):
+            return jsonify({
+                'success': False,
+                'message': 'Не все параметры локации указаны'
+            }), 400
+        
+        # Подключаемся к базе данных
+        connection = get_db_connection()
+        if not connection:
+            return jsonify({
+                'success': False,
+                'message': 'Ошибка подключения к базе данных'
+            }), 500
+        
+        try:
+            with connection.cursor(cursor_factory=RealDictCursor) as cursor:
+                # Получаем средние цены из всех таблиц данных
+                query = """
+                    WITH all_prices AS (
+                        -- Цены продажи
+                        SELECT 
+                            COALESCE(min_unit_price_for_sale, 0) as min_sale,
+                            COALESCE(max_unit_price_for_sale, 0) as max_sale
+                        FROM age_data 
+                        WHERE country_id = %s AND city_id = %s AND county_id = %s AND district_id = %s
+                        
+                        UNION ALL
+                        
+                        SELECT 
+                            COALESCE(min_unit_price_for_sale, 0) as min_sale,
+                            COALESCE(max_unit_price_for_sale, 0) as max_sale
+                        FROM floor_segment_data 
+                        WHERE country_id = %s AND city_id = %s AND county_id = %s AND district_id = %s
+                        
+                        UNION ALL
+                        
+                        SELECT 
+                            COALESCE(min_unit_price_for_sale, 0) as min_sale,
+                            COALESCE(max_unit_price_for_sale, 0) as max_sale
+                        FROM heating_data 
+                        WHERE country_id = %s AND city_id = %s AND county_id = %s AND district_id = %s
+                        
+                        UNION ALL
+                        
+                        SELECT 
+                            COALESCE(min_unit_price_for_sale, 0) as min_sale,
+                            COALESCE(max_unit_price_for_sale, 0) as max_sale
+                        FROM house_type_data 
+                        WHERE country_id = %s AND city_id = %s AND county_id = %s AND district_id = %s
+                    ),
+                    sale_prices AS (
+                        SELECT 
+                            AVG(min_sale) as avg_min_sale,
+                            AVG(max_sale) as avg_max_sale
+                        FROM all_prices
+                        WHERE min_sale > 0 AND max_sale > 0
+                    ),
+                    rent_prices AS (
+                        SELECT 
+                            AVG(COALESCE(min_unit_price_for_rent, 0)) as avg_min_rent,
+                            AVG(COALESCE(max_unit_price_for_rent, 0)) as avg_max_rent
+                        FROM (
+                            SELECT min_unit_price_for_rent, max_unit_price_for_rent
+                            FROM age_data 
+                            WHERE country_id = %s AND city_id = %s AND county_id = %s AND district_id = %s
+                            
+                            UNION ALL
+                            
+                            SELECT min_unit_price_for_rent, max_unit_price_for_rent
+                            FROM floor_segment_data 
+                            WHERE country_id = %s AND city_id = %s AND county_id = %s AND district_id = %s
+                            
+                            UNION ALL
+                            
+                            SELECT min_unit_price_for_rent, max_unit_price_for_rent
+                            FROM heating_data 
+                            WHERE country_id = %s AND city_id = %s AND county_id = %s AND district_id = %s
+                            
+                            UNION ALL
+                            
+                            SELECT min_unit_price_for_rent, max_unit_price_for_rent
+                            FROM house_type_data 
+                            WHERE country_id = %s AND city_id = %s AND county_id = %s AND district_id = %s
+                        ) rent_data
+                        WHERE min_unit_price_for_rent > 0 AND max_unit_price_for_rent > 0
+                    )
+                    SELECT 
+                        (sp.avg_min_sale + sp.avg_max_sale) / 2 as avg_sale_price,
+                        (rp.avg_min_rent + rp.avg_max_rent) / 2 as avg_rent_price
+                    FROM sale_prices sp
+                    CROSS JOIN rent_prices rp
+                """
+                
+                # Выполняем запрос с параметрами (повторяем для каждого UNION)
+                params = [country_id, city_id, county_id, district_id] * 8  # 8 раз для всех UNION
+                cursor.execute(query, params)
+                result = cursor.fetchone()
+                
+                if result:
+                    avg_sale_price = float(result['avg_sale_price']) if result['avg_sale_price'] else 0
+                    avg_rent_price = float(result['avg_rent_price']) if result['avg_rent_price'] else 0
+                    
+                    print(f"📊 API: Средние цены - продажа: {avg_sale_price}, аренда: {avg_rent_price}")
+                    
+                    return jsonify({
+                        'success': True,
+                        'avg_sale_price': avg_sale_price,
+                        'avg_rent_price': avg_rent_price
+                    })
+                else:
+                    return jsonify({
+                        'success': False,
+                        'message': 'Данные о ценах не найдены'
+                    }), 404
+                
+        finally:
+            connection.close()
+            
+    except Exception as e:
+        print(f"Ошибка при получении средних цен: {e}")
+        return jsonify({
+            'success': False,
+            'message': f'Ошибка сервера: {str(e)}'
+        }), 500
+
 @app.route('/health', methods=['GET'])
 def health_check():
     """Проверка здоровья API"""

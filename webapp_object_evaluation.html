@@ -1718,7 +1718,7 @@
             width: 100%;
             border-collapse: collapse;
             background: white;
-            font-size: 11px;
+            font-size: 10.5px;
             table-layout: fixed;
         }
         
@@ -1869,7 +1869,7 @@
         /* Мобильные устройства */
         @media (max-width: 768px) {
             .trends-table {
-                font-size: 10px;
+                font-size: 9.5px;
             }
             
             .trends-table th,
@@ -5849,6 +5849,60 @@
             }
         }
 
+        // Функция для получения средних цен из таблиц данных
+        async function getAveragePricesFromDataTables() {
+            try {
+                // Получаем текущие выбранные локации
+                const currentLocation = selectedLocation || {};
+                const countryId = currentLocation.country_id;
+                const cityId = currentLocation.city_id;
+                const countyId = currentLocation.county_id;
+                const districtId = currentLocation.district_id;
+                
+                if (!countryId || !cityId || !countyId || !districtId) {
+                    console.log('⚠️ Location not selected, cannot fetch average prices');
+                    return null;
+                }
+                
+                console.log('🔍 Fetching average prices for location:', { countryId, cityId, countyId, districtId });
+                
+                // Получаем данные из всех таблиц
+                const response = await fetch('/api/property_data/average_prices', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        country_id: countryId,
+                        city_id: cityId,
+                        county_id: countyId,
+                        district_id: districtId
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    console.log('✅ Average prices fetched successfully:', data);
+                    return {
+                        avgSalePrice: data.avg_sale_price,
+                        avgRentPrice: data.avg_rent_price
+                    };
+                } else {
+                    console.log('⚠️ Failed to fetch average prices:', data.message);
+                    return null;
+                }
+                
+            } catch (error) {
+                console.error('❌ Error fetching average prices:', error);
+                return null;
+            }
+        }
+
         // Generate detailed trends table
         async function generateTrendsTable(trends) {
             console.log('📊 Generating trends table with trends:', trends.length, 'records');
@@ -5867,6 +5921,9 @@
                 return '<div class="no-data">Нет данных для отображения в выбранном диапазоне</div>';
             }
             
+            // Получаем средние цены для текущего месяца
+            const averagePrices = await getAveragePricesFromDataTables();
+            
             let html = '<table class="trends-table">';
             html += '<thead><tr>';
             html += '<th>Дата</th>';
@@ -5882,7 +5939,7 @@
             const currentYear = currentDate.getFullYear();
             const currentMonth = currentDate.getMonth() + 1;
             
-            html += `<tr class="filter-info"><td colspan="6" style="text-align: center; font-size: 11px; color: #666; background: #f8f9fa; padding: 4px;">
+            html += `<tr class="filter-info"><td colspan="6" style="text-align: center; font-size: 10.5px; color: #666; background: #f8f9fa; padding: 4px;">
                 Показано ${filteredTrends.length} из ${trends.length} трендов
             </td></tr>`;
             
@@ -5893,10 +5950,18 @@
                 
                 let rowClass = '';
                 let rowStyle = '';
+                let salePrice = trend.unit_price_for_sale;
+                let rentPrice = trend.unit_price_for_rent;
                 
                 if (isCurrentMonth) {
                     rowClass = 'current-month-row';
                     rowStyle = 'background-color: #e8f4fd;';
+                    
+                    // Для текущего месяца используем средние цены из таблиц данных
+                    if (averagePrices) {
+                        salePrice = averagePrices.avgSalePrice;
+                        rentPrice = averagePrices.avgRentPrice;
+                    }
                 } else if (isFutureMonth) {
                     rowClass = 'forecast-row';
                     rowStyle = 'background-color: #f0f8ff;';
@@ -5904,9 +5969,9 @@
                 
                 html += `<tr class="${rowClass}" style="${rowStyle}">`;
                 html += `<td>${formatTrendDateShort(trend.date)}</td>`;
-                html += `<td>${formatTrendValue(trend.unit_price_for_sale, 'price')}</td>`;
+                html += `<td>${formatTrendValue(salePrice, 'price')}</td>`;
                 html += `<td>${formatPercentage(trend.price_change_sale)}</td>`;
-                html += `<td>${formatTrendValue(trend.unit_price_for_rent, 'price')}</td>`;
+                html += `<td>${formatTrendValue(rentPrice, 'price')}</td>`;
                 html += `<td>${formatPercentage(trend.price_change_rent)}</td>`;
                 html += `<td>${formatTrendValue(trend.yield, 'percentage')}</td>`;
                 html += '</tr>';
