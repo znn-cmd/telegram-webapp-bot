@@ -5802,15 +5802,11 @@
             }
         }
 
-                // Filter trends to show 6 months before current month and 1 month after
+                // НОВАЯ ЛОГИКА: Показываем ВСЕ записи из property_trends для соответствующих локаций
         function filterTrendsByDateRange(trends) {
             if (!trends || trends.length === 0) return [];
             
-            const currentYear = new Date().getFullYear();
-            const currentMonth = new Date().getMonth() + 1; // getMonth() returns 0-11
-            
-            console.log(`🔍 Filtering trends: current date = ${currentYear}-${currentMonth}`);
-            console.log(`🔍 Total trends = ${trends.length}`);
+            console.log(`🔍 Показываем ВСЕ тренды для локации пользователя: ${trends.length} записей`);
             
             // Сортируем тренды по property_year и property_month (новые сначала)
             const sortedTrends = trends.sort((a, b) => {
@@ -5820,90 +5816,14 @@
                 return b.property_month - a.property_month;
             });
             
-            console.log(`🔍 Sorted trends by property_year/property_month (newest first):`);
+            console.log(`🔍 Отсортированные тренды (новые сначала):`);
             sortedTrends.forEach((trend, index) => {
-                console.log(`  ${index}: ${trend.property_year}-${trend.property_month} (${trend.date})`);
+                console.log(`  ${index}: ${trend.property_year}-${trend.property_month} - Продажа: ${trend.price_change_sale}%, Аренда: ${trend.price_change_rent}%`);
             });
             
-            // Фильтруем тренды за текущий год (2025)
-            const currentYearTrends = sortedTrends.filter(trend => trend.property_year === currentYear);
-            console.log(`🔍 Current year trends: ${currentYearTrends.length}`);
-            
-            if (currentYearTrends.length === 0) {
-                console.log(`⚠️ No trends for current year ${currentYear}, returning first 8 from all`);
-                return sortedTrends.slice(0, 8);
-            }
-            
-            // Вычисляем диапазон месяцев: 6 месяцев назад от текущего + 1 месяц вперед
-            const startMonth = currentMonth - 6;
-            const endMonth = currentMonth + 1;
-            
-            console.log(`🔍 Target month range: ${startMonth} to ${endMonth}`);
-            
-            // Фильтруем тренды по диапазону месяцев
-            const filteredTrends = currentYearTrends.filter(trend => {
-                const month = trend.property_month;
-                
-                // Обрабатываем переход через год (например, если текущий месяц август, то февраль = -4)
-                if (startMonth <= 0) {
-                    // Если startMonth отрицательный, берем месяцы с конца предыдущего года
-                    return month >= (12 + startMonth) || month <= endMonth;
-                } else {
-                    // Обычный случай
-                    return month >= startMonth && month <= endMonth;
-                }
-            });
-            
-            console.log(`🔍 Filtered trends by month range: ${filteredTrends.length}`);
-            
-            // Сортируем по месяцу (будущие месяцы сверху, текущий в середине, прошедшие снизу)
-            filteredTrends.sort((a, b) => {
-                const monthA = a.property_month;
-                const monthB = b.property_month;
-                
-                // Если оба месяца в будущем (больше текущего)
-                if (monthA > currentMonth && monthB > currentMonth) {
-                    return monthA - monthB; // По возрастанию (сентябрь перед октябрем)
-                }
-                // Если оба месяца в прошлом (меньше текущего)
-                else if (monthA < currentMonth && monthB < currentMonth) {
-                    return monthB - monthA; // По убыванию (июль перед июнем)
-                }
-                // Если один в будущем, а другой - текущий
-                else if (monthA > currentMonth && monthB === currentMonth) {
-                    return -1; // Будущий месяц идет перед текущим
-                }
-                else if (monthA === currentMonth && monthB > currentMonth) {
-                    return 1; // Текущий месяц идет после будущего
-                }
-                // Если один в будущем, а другой в прошлом
-                else if (monthA > currentMonth && monthB < currentMonth) {
-                    return -1; // Будущий месяц идет первым
-                }
-                else if (monthA < currentMonth && monthB > currentMonth) {
-                    return 1; // Прошедший месяц идет последним
-                }
-                // Если один из месяцев - текущий, а другой в прошлом
-                else if (monthA === currentMonth && monthB < currentMonth) {
-                    return -1; // Текущий месяц идет перед прошедшим
-                }
-                else if (monthA < currentMonth && monthB === currentMonth) {
-                    return 1; // Прошедший месяц идет после текущего
-                }
-                
-                return 0;
-            });
-            
-            if (filteredTrends.length >= 8) {
-                // Берем первые 8 трендов из отфильтрованного диапазона
-                const selectedTrends = filteredTrends.slice(0, 8);
-                console.log(`✅ Selected ${selectedTrends.length} trends from month range`);
-                return selectedTrends;
-            } else {
-                // Если мало трендов в диапазоне, возвращаем все отфильтрованные
-                console.log(`⚠️ Few trends in month range, returning all ${filteredTrends.length}`);
-                return filteredTrends;
-            }
+            // Возвращаем ВСЕ тренды без ограничений по месяцам
+            console.log(`✅ Возвращаем все ${sortedTrends.length} трендов для отображения`);
+            return sortedTrends;
         }
 
         // Generate detailed trends table
@@ -5915,18 +5835,14 @@
                 return '<div class="no-data">Нет данных для отображения</div>';
             }
             
-            // Проверяем, что у нас есть проценты изменения
-            const trendsWithPercentages = trends.filter(trend => 
-                (trend.price_change_sale !== null && trend.price_change_sale !== undefined && parseFloat(trend.price_change_sale) !== 0) ||
-                (trend.price_change_rent !== null && trend.price_change_rent !== undefined && parseFloat(trend.price_change_rent) !== 0)
-            );
+            // Показываем ВСЕ тренды, включая те, где проценты изменения могут быть 0 или null
+            console.log(`📊 Обрабатываем все ${trends.length} трендов для отображения`);
             
-            if (trendsWithPercentages.length === 0) {
-                console.log('⚠️ No trends with percentage changes');
-                return '<div class="no-data">Нет данных о процентных изменениях цен</div>';
+            // Проверяем, есть ли вообще данные
+            if (trends.length === 0) {
+                console.log('⚠️ Нет данных о трендах');
+                return '<div class="no-data">Нет данных о трендах</div>';
             }
-            
-            console.log(`📊 Найдено ${trendsWithPercentages.length} трендов с процентными изменениями из ${trends.length} общих`);
             
             // Получаем средние цены для текущего месяца
             let avgSalePrice = window.avgMinSalePrice && window.avgMaxSalePrice ? 
@@ -6027,25 +5943,37 @@
                 const salePercentage = parseFloat(trend.price_change_sale) || 0;
                 const rentPercentage = parseFloat(trend.price_change_rent) || 0;
                 
-                // Формула: предыдущая_цена × (1 + процент_изменения)
-                const newSalePrice = currentSalePrice * (1 + salePercentage / 100);
-                const newRentPrice = currentRentPrice * (1 + rentPercentage / 100);
-                
-                console.log(`   ${trend.property_month}/${trend.property_year}:`);
-                console.log(`     Продажа: ${currentSalePrice} × (1 + ${salePercentage}%) = ${newSalePrice.toFixed(2)} ₺/м²`);
-                console.log(`     Аренда: ${currentRentPrice} × (1 + ${rentPercentage}%) = ${newRentPrice.toFixed(2)} ₺/м²`);
-                
-                // Обновляем текущие цены для следующего месяца
-                currentSalePrice = newSalePrice;
-                currentRentPrice = newRentPrice;
-                
-                // Добавляем в массив результатов
-                calculatedTrends.push({
-                    ...trend,
-                    calculatedSalePrice: Math.round(newSalePrice),
-                    calculatedRentPrice: Math.round(newRentPrice * 100) / 100,
-                    calculatedYield: Math.round((newRentPrice / newSalePrice) * 100 * 12 * 100) / 100
-                });
+                // Если есть проценты изменения, рассчитываем цены
+                if (salePercentage !== 0 || rentPercentage !== 0) {
+                    // Формула: предыдущая_цена × (1 + процент_изменения)
+                    const newSalePrice = currentSalePrice * (1 + salePercentage / 100);
+                    const newRentPrice = currentRentPrice * (1 + rentPercentage / 100);
+                    
+                    console.log(`   ${trend.property_month}/${trend.property_year}:`);
+                    console.log(`     Продажа: ${currentSalePrice} × (1 + ${salePercentage}%) = ${newSalePrice.toFixed(2)} ₺/м²`);
+                    console.log(`     Аренда: ${currentRentPrice} × (1 + ${rentPercentage}%) = ${newRentPrice.toFixed(2)} ₺/м²`);
+                    
+                    // Обновляем текущие цены для следующего месяца
+                    currentSalePrice = newSalePrice;
+                    currentRentPrice = newRentPrice;
+                    
+                    // Добавляем в массив результатов
+                    calculatedTrends.push({
+                        ...trend,
+                        calculatedSalePrice: Math.round(newSalePrice),
+                        calculatedRentPrice: Math.round(newRentPrice * 100) / 100,
+                        calculatedYield: Math.round((newRentPrice / newSalePrice) * 100 * 12 * 100) / 100
+                    });
+                } else {
+                    // Если нет процентов изменения, используем базовые цены
+                    console.log(`   ${trend.property_month}/${trend.property_year}: Нет процентов изменения, используем базовые цены`);
+                    calculatedTrends.push({
+                        ...trend,
+                        calculatedSalePrice: Math.round(avgSalePrice),
+                        calculatedRentPrice: Math.round(avgRentPrice * 100) / 100,
+                        calculatedYield: Math.round((avgRentPrice / avgSalePrice) * 100 * 12 * 100) / 100
+                    });
+                }
             }
             
             // ШАГ 3: Рассчитываем цены для прошлых месяцев (от текущего к прошлому)
@@ -6058,25 +5986,37 @@
                 const salePercentage = parseFloat(trend.price_change_sale) || 0;
                 const rentPercentage = parseFloat(trend.price_change_rent) || 0;
                 
-                // Формула: следующая_цена ÷ (1 + процент_изменения)
-                const newSalePrice = currentSalePrice / (1 + salePercentage / 100);
-                const newRentPrice = currentRentPrice / (1 + rentPercentage / 100);
-                
-                console.log(`   ${trend.property_month}/${trend.property_year}:`);
-                console.log(`     Продажа: ${currentSalePrice} ÷ (1 + ${salePercentage}%) = ${newSalePrice.toFixed(2)} ₺/м²`);
-                console.log(`     Аренда: ${currentRentPrice} ÷ (1 + ${rentPercentage}%) = ${newRentPrice.toFixed(2)} ₺/м²`);
-                
-                // Обновляем текущие цены для следующего месяца назад
-                currentSalePrice = newSalePrice;
-                currentRentPrice = newRentPrice;
-                
-                // Добавляем в массив результатов
-                calculatedTrends.push({
-                    ...trend,
-                    calculatedSalePrice: Math.round(newSalePrice),
-                    calculatedRentPrice: Math.round(newRentPrice * 100) / 100,
-                    calculatedYield: Math.round((newRentPrice / newSalePrice) * 100 * 12 * 100) / 100
-                });
+                // Если есть проценты изменения, рассчитываем цены
+                if (salePercentage !== 0 || rentPercentage !== 0) {
+                    // Формула: следующая_цена ÷ (1 + процент_изменения)
+                    const newSalePrice = currentSalePrice / (1 + salePercentage / 100);
+                    const newRentPrice = currentRentPrice / (1 + rentPercentage / 100);
+                    
+                    console.log(`   ${trend.property_month}/${trend.property_year}:`);
+                    console.log(`     Продажа: ${currentSalePrice} ÷ (1 + ${salePercentage}%) = ${newSalePrice.toFixed(2)} ₺/м²`);
+                    console.log(`     Аренда: ${currentRentPrice} ÷ (1 + ${rentPercentage}%) = ${newRentPrice.toFixed(2)} ₺/м²`);
+                    
+                    // Обновляем текущие цены для следующего месяца назад
+                    currentSalePrice = newSalePrice;
+                    currentRentPrice = newRentPrice;
+                    
+                    // Добавляем в массив результатов
+                    calculatedTrends.push({
+                        ...trend,
+                        calculatedSalePrice: Math.round(newSalePrice),
+                        calculatedRentPrice: Math.round(newRentPrice * 100) / 100,
+                        calculatedYield: Math.round((newRentPrice / newSalePrice) * 100 * 12 * 100) / 100
+                    });
+                } else {
+                    // Если нет процентов изменения, используем базовые цены
+                    console.log(`   ${trend.property_month}/${trend.property_year}: Нет процентов изменения, используем базовые цены`);
+                    calculatedTrends.push({
+                        ...trend,
+                        calculatedSalePrice: Math.round(avgSalePrice),
+                        calculatedRentPrice: Math.round(avgRentPrice * 100) / 100,
+                        calculatedYield: Math.round((avgRentPrice / avgSalePrice) * 100 * 12 * 100) / 100
+                    });
+                }
             }
             
             // ШАГ 4: Добавляем текущий месяц в результаты
@@ -6101,16 +6041,11 @@
                 console.log(`   ${index}: ${trend.property_month}/${trend.property_year} - Продажа: ${trend.calculatedSalePrice} ₺/м², Аренда: ${trend.calculatedRentPrice} ₺/м², Доходность: ${trend.calculatedYield}%`);
             });
             
-            // Фильтруем тренды, оставляя только те, у которых есть проценты изменения
-            const filteredTrends = calculatedTrends.filter(trend => 
-                (trend.price_change_sale !== null && trend.price_change_sale !== undefined) ||
-                (trend.price_change_rent !== null && trend.price_change_rent !== undefined)
-            );
+            // Показываем ВСЕ рассчитанные тренды без фильтрации
+            console.log('🔍 Показываем все рассчитанные тренды:', calculatedTrends.length, 'записей');
             
-            console.log('🔍 Filtered trends with calculated prices:', filteredTrends.length, 'records');
-            
-            if (filteredTrends.length === 0) {
-                console.log('⚠️ No trends with percentage changes for trends table');
+            if (calculatedTrends.length === 0) {
+                console.log('⚠️ Нет рассчитанных трендов для отображения');
                 return '<div class="no-data">Нет данных для отображения</div>';
             }
             
@@ -6124,13 +6059,13 @@
             html += '<th>Доходность</th>';
             html += '</tr></thead><tbody>';
             
-            // Добавляем информацию о фильтрации
+            // Добавляем информацию о количестве записей
             
             html += `<tr class="filter-info"><td colspan="6" style="text-align: center; font-size: 11px; color: #666; background: #f8f9fa; padding: 4px;">
-                Показано ${filteredTrends.length} из ${trends.length} трендов
+                Показано ${calculatedTrends.length} из ${trends.length} трендов
             </td></tr>`;
             
-            filteredTrends.forEach((trend, index) => {
+            calculatedTrends.forEach((trend, index) => {
                 // Проверяем, является ли этот тренд текущим месяцем
                 const isCurrentMonth = trend.property_year === currentYear && trend.property_month === currentMonth;
                 const isFutureMonth = trend.property_year > currentYear || (trend.property_year === currentYear && trend.property_month > currentMonth);
