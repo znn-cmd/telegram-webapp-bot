@@ -106,28 +106,28 @@
             // Объединяем все тренды: исторические + текущий месяц + будущие
             const allTrends = [...historicalTrends, ...currentMonthTrends, ...futureTrends];
             
-            // Применяем сложную логику сортировки
-            allTrends.sort((a, b) => {
-                const aYear = a.property_year;
-                const bYear = b.property_year;
-                const aMonth = a.property_month;
-                const bMonth = b.property_month;
-                
-                // Если оба тренда исторические (прошлые годы)
-                if (aYear < currentYear && bYear < currentYear) {
-                    if (aYear !== bYear) {
-                        return bYear - aYear; // Новые годы сначала
-                    }
-                    return bMonth - aMonth; // Новые месяцы сначала
+                    // Применяем сложную логику сортировки
+        allTrends.sort((a, b) => {
+            const aYear = a.property_year;
+            const bYear = b.property_year;
+            const aMonth = a.property_month;
+            const bMonth = b.property_month;
+            
+            // Если оба тренда исторические (прошлые годы)
+            if (aYear < currentYear && bYear < currentYear) {
+                if (aYear !== bYear) {
+                    return aYear - bYear; // Старые годы сначала (2018, 2019, 2020, 2021, 2022, 2023, 2024)
                 }
-                
-                // Если оба тренда будущие (будущие годы)
-                if (aYear > currentYear && bYear > currentYear) {
-                    if (aYear !== bYear) {
-                        return aYear - bYear; // Старые годы сначала
-                    }
-                    return aMonth - bMonth; // Старые месяцы сначала
+                return aMonth - bMonth; // Старые месяцы сначала (январь, февраль, март...)
+            }
+            
+            // Если оба тренды будущие (будущие годы)
+            if (aYear > currentYear && bYear > currentYear) {
+                if (aYear !== bYear) {
+                    return bYear - aYear; // Новые годы сначала (2026, 2025)
                 }
+                return bMonth - aMonth; // Новые месяцы сначала (декабрь, ноябрь, октябрь...)
+            }
                 
                 // Если один исторический, а другой будущий
                 if (aYear < currentYear && bYear > currentYear) {
@@ -200,9 +200,9 @@
             
             html += '<h4>Проверка логики:</h4>';
             html += '<ul>';
-            html += `<li>✅ Исторические тренды: ${historicalTrends.length} (отображаются первыми, новые годы сначала)</li>`;
+            html += `<li>✅ Исторические тренды: ${historicalTrends.length} (отображаются первыми, старые годы сначала)</li>`;
             html += `<li>✅ Текущий месяц: ${currentMonthTrends.length} (отображается в середине)</li>`;
-            html += `<li>✅ Будущие тренды: ${futureTrends.length} (отображаются последними, старые годы сначала)</li>`;
+            html += `<li>✅ Будущие тренды: ${futureTrends.length} (отображаются последними, новые годы сначала)</li>`;
             html += '</ul>';
             
             // Проверяем правильность порядка
@@ -210,7 +210,7 @@
             const lastTrend = allTrends[allTrends.length - 1];
             
             if (firstTrend.type === 'historical' && lastTrend.type === 'future') {
-                html += '<p class="success">✅ Порядок отображения корректен: Исторические → Текущий месяц → Будущие</p>';
+                html += '<p class="success">✅ Порядок отображения корректен: Исторические (старые сначала) → Текущий месяц → Будущие (новые сначала)</p>';
             } else {
                 html += '<p class="error">❌ Порядок отображения некорректен</p>';
             }

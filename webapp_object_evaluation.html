@@ -5745,7 +5745,7 @@
             }
         }
 
-                // Filter trends: show all historical data + current month + future months
+                // Filter trends to show 6 months before current month and 1 month after
         function filterTrendsByDateRange(trends) {
             if (!trends || trends.length === 0) return [];
             
@@ -5768,96 +5768,85 @@
                 console.log(`  ${index}: ${trend.property_year}-${trend.property_month} (${trend.date})`);
             });
             
-            // Разделяем тренды на категории
+            // Фильтруем тренды за текущий год (2025)
             const currentYearTrends = sortedTrends.filter(trend => trend.property_year === currentYear);
-            const historicalTrends = sortedTrends.filter(trend => trend.property_year < currentYear);
-            const futureTrends = sortedTrends.filter(trend => 
-                trend.property_year > currentYear || 
-                (trend.property_year === currentYear && trend.property_month > currentMonth)
-            );
+            console.log(`🔍 Current year trends: ${currentYearTrends.length}`);
             
-            console.log(`🔍 Trends breakdown: current year = ${currentYearTrends.length}, historical = ${historicalTrends.length}, future = ${futureTrends.length}`);
+            if (currentYearTrends.length === 0) {
+                console.log(`⚠️ No trends for current year ${currentYear}, returning first 8 from all`);
+                return sortedTrends.slice(0, 8);
+            }
             
-            // Для текущего года берем только текущий месяц и 1 месяц вперед
-            const currentMonthTrends = currentYearTrends.filter(trend => 
-                trend.property_month === currentMonth || trend.property_month === currentMonth + 1
-            );
+            // Вычисляем диапазон месяцев: 6 месяцев назад от текущего + 1 месяц вперед
+            const startMonth = currentMonth - 6;
+            const endMonth = currentMonth + 1;
             
-            // Объединяем все тренды: исторические + текущий месяц + будущие
-            // Изменен порядок: сначала исторические, потом текущий месяц, потом будущие
-            const allTrends = [...historicalTrends, ...currentMonthTrends, ...futureTrends];
+            console.log(`🔍 Target month range: ${startMonth} to ${endMonth}`);
             
-            console.log(`🔍 Combined trends: historical = ${historicalTrends.length}, current month = ${currentMonthTrends.length}, future = ${futureTrends.length}`);
-            console.log(`🔍 Total combined trends: ${allTrends.length}`);
+            // Фильтруем тренды по диапазону месяцев
+            const filteredTrends = currentYearTrends.filter(trend => {
+                const month = trend.property_month;
+                
+                // Обрабатываем переход через год (например, если текущий месяц август, то февраль = -4)
+                if (startMonth <= 0) {
+                    // Если startMonth отрицательный, берем месяцы с конца предыдущего года
+                    return month >= (12 + startMonth) || month <= endMonth;
+                } else {
+                    // Обычный случай
+                    return month >= startMonth && month <= endMonth;
+                }
+            });
             
-            // Сортируем исторические тренды по убыванию (новые сначала), а будущие по возрастанию
-            allTrends.sort((a, b) => {
-                const aYear = a.property_year;
-                const bYear = b.property_year;
-                const aMonth = a.property_month;
-                const bMonth = b.property_month;
+            console.log(`🔍 Filtered trends by month range: ${filteredTrends.length}`);
+            
+            // Сортируем по месяцу (будущие месяцы сверху, текущий в середине, прошедшие снизу)
+            filteredTrends.sort((a, b) => {
+                const monthA = a.property_month;
+                const monthB = b.property_month;
                 
-                // Если оба тренда исторические (прошлые годы)
-                if (aYear < currentYear && bYear < currentYear) {
-                    if (aYear !== bYear) {
-                        return bYear - aYear; // Новые годы сначала
-                    }
-                    return bMonth - aMonth; // Новые месяцы сначала
+                // Если оба месяца в будущем (больше текущего)
+                if (monthA > currentMonth && monthB > currentMonth) {
+                    return monthA - monthB; // По возрастанию (сентябрь перед октябрем)
                 }
-                
-                // Если оба тренда будущие (будущие годы)
-                if (aYear > currentYear && bYear > currentYear) {
-                    if (aYear !== bYear) {
-                        return aYear - bYear; // Старые годы сначала
-                    }
-                    return aMonth - bMonth; // Старые месяцы сначала
+                // Если оба месяца в прошлом (меньше текущего)
+                else if (monthA < currentMonth && monthB < currentMonth) {
+                    return monthB - monthA; // По убыванию (июль перед июнем)
                 }
-                
-                // Если один исторический, а другой будущий
-                if (aYear < currentYear && bYear > currentYear) {
-                    return -1; // Исторический идет первым
+                // Если один в будущем, а другой - текущий
+                else if (monthA > currentMonth && monthB === currentMonth) {
+                    return -1; // Будущий месяц идет перед текущим
                 }
-                if (aYear > currentYear && bYear < currentYear) {
-                    return 1; // Будущий идет последним
+                else if (monthA === currentMonth && monthB > currentMonth) {
+                    return 1; // Текущий месяц идет после будущего
                 }
-                
-                // Если один из трендов текущего года
-                if (aYear === currentYear && bYear !== currentYear) {
-                    if (bYear < currentYear) {
-                        return 1; // Исторический идет перед текущим
-                    } else {
-                        return -1; // Будущий идет после текущего
-                    }
+                // Если один в будущем, а другой в прошлом
+                else if (monthA > currentMonth && monthB < currentMonth) {
+                    return -1; // Будущий месяц идет первым
                 }
-                if (bYear === currentYear && aYear !== currentYear) {
-                    if (aYear < currentYear) {
-                        return -1; // Исторический идет перед текущим
-                    } else {
-                        return 1; // Будущий идет после текущего
-                    }
+                else if (monthA < currentMonth && monthB > currentMonth) {
+                    return 1; // Прошедший месяц идет последним
                 }
-                
-                // Если оба тренда текущего года
-                if (aYear === currentYear && bYear === currentYear) {
-                    if (aMonth === currentMonth && bMonth !== currentMonth) {
-                        return -1; // Текущий месяц идет первым
-                    }
-                    if (bMonth === currentMonth && aMonth !== currentMonth) {
-                        return 1; // Текущий месяц идет первым
-                    }
-                    if (aMonth === currentMonth + 1 && bMonth !== currentMonth + 1) {
-                        return -1; // Следующий месяц идет вторым
-                    }
-                    if (bMonth === currentMonth + 1 && aMonth !== currentMonth + 1) {
-                        return 1; // Следующий месяц идет вторым
-                    }
-                    return aMonth - bMonth; // Остальные месяцы по порядку
+                // Если один из месяцев - текущий, а другой в прошлом
+                else if (monthA === currentMonth && monthB < currentMonth) {
+                    return -1; // Текущий месяц идет перед прошедшим
+                }
+                else if (monthA < currentMonth && monthB === currentMonth) {
+                    return 1; // Прошедший месяц идет после текущего
                 }
                 
                 return 0;
             });
             
-            return allTrends;
+            if (filteredTrends.length >= 8) {
+                // Берем первые 8 трендов из отфильтрованного диапазона
+                const selectedTrends = filteredTrends.slice(0, 8);
+                console.log(`✅ Selected ${selectedTrends.length} trends from month range`);
+                return selectedTrends;
+            } else {
+                // Если мало трендов в диапазоне, возвращаем все отфильтрованные
+                console.log(`⚠️ Few trends in month range, returning all ${filteredTrends.length}`);
+                return filteredTrends;
+            }
         }
 
         // Функция для получения средних цен из таблиц данных
@@ -5918,10 +5907,8 @@
         // Логика работы:
         // 1. Для текущего месяца цены продажи и аренды рассчитываются как среднее значение
         //    между avgMinSalePrice/avgMaxSalePrice и avgMinRentPrice/avgMaxRentPrice
-        // 2. Для исторических месяцев используются оригинальные значения из трендов (ВСЕ доступные данные)
+        // 2. Для исторических месяцев используются оригинальные значения из трендов
         // 3. Для будущих месяцев (прогноз) используются оригинальные значения из трендов
-        // 4. Отображаются ВСЕ исторические данные без ограничений по количеству
-        // 5. Порядок отображения: исторические (новые сначала) → текущий месяц → будущие (старые сначала)
         async function generateTrendsTable(trends) {
             console.log('📊 Generating trends table with trends:', trends.length, 'records');
             
@@ -5985,7 +5972,7 @@
             const currentMonth = currentDate.getMonth() + 1;
             
             html += `<tr class="filter-info"><td colspan="6" style="text-align: center; font-size: 10.5px; color: #666; background: #f8f9fa; padding: 4px;">
-                Показано ${filteredTrends.length} трендов (все исторические + текущий месяц + прогноз)
+                Показано ${filteredTrends.length} из ${trends.length} трендов
             </td></tr>`;
             
             filteredTrends.forEach((trend, index) => {
