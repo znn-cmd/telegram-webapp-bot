@@ -2980,8 +2980,10 @@
                 'saleColumnLabel': 'Продажа',
                 'rentColumnLabel': 'Аренда',
                 'areaRowLabel': 'Площадь',
-                'periodRowLabel': 'Срок',
-                'priceRowLabel': 'Цена',
+                'periodMinRowLabel': 'Срок min',
+                'periodMaxRowLabel': 'Срок max',
+                'priceMinRowLabel': 'Цена min',
+                'priceMaxRowLabel': 'Цена max',
                 'daysUnit': 'дней',
                 
                 // Ключи для текстового анализа рынка
@@ -3083,8 +3085,10 @@
                 'saleColumnLabel': 'Sale',
                 'rentColumnLabel': 'Rent',
                 'areaRowLabel': 'Area',
-                'periodRowLabel': 'Period',
-                'priceRowLabel': 'Price',
+                'periodMinRowLabel': 'Period min',
+                'periodMaxRowLabel': 'Period max',
+                'priceMinRowLabel': 'Price min',
+                'priceMaxRowLabel': 'Price max',
                 'daysUnit': 'days',
                 'currencyTitle': 'Select currency:',
                 'pricePlaceholder': 'Enter price',
@@ -3219,8 +3223,10 @@
                 'saleColumnLabel': 'Verkauf',
                 'rentColumnLabel': 'Miete',
                 'areaRowLabel': 'Fläche',
-                'periodRowLabel': 'Zeitraum',
-                'priceRowLabel': 'Preis',
+                'periodMinRowLabel': 'Zeitraum min',
+                'periodMaxRowLabel': 'Zeitraum max',
+                'priceMinRowLabel': 'Preis min',
+                'priceMaxRowLabel': 'Preis max',
                 'daysUnit': 'Tage'
             },
             'fr': {
@@ -3275,8 +3281,10 @@
                 'saleColumnLabel': 'Vente',
                 'rentColumnLabel': 'Location',
                 'areaRowLabel': 'Surface',
-                'periodRowLabel': 'Période',
-                'priceRowLabel': 'Prix',
+                'periodMinRowLabel': 'Période min',
+                'periodMaxRowLabel': 'Période max',
+                'priceMinRowLabel': 'Prix min',
+                'priceMaxRowLabel': 'Prix max',
                 'daysUnit': 'jours'
             },
             'tr': {
@@ -3501,8 +3509,10 @@
                 'saleColumnLabel': 'Satış',
                 'rentColumnLabel': 'Kiralama',
                 'areaRowLabel': 'Alan',
-                'periodRowLabel': 'Süre',
-                'priceRowLabel': 'Fiyat',
+                'periodMinRowLabel': 'Süre min',
+                'periodMaxRowLabel': 'Süre max',
+                'priceMinRowLabel': 'Fiyat min',
+                'priceMaxRowLabel': 'Fiyat max',
                 'daysUnit': 'gün',
                 'indicatorLabel': 'Gösterge',
                 'minValueLabel': 'Minimum değer',
@@ -5056,21 +5066,39 @@
                 html += '</tr>';
             }
             
-            // Period row
+            // Period min row
             if (salePeriod.min > 0 || rentPeriod.min > 0) {
                 html += '<tr>';
-                html += `<td>${getText('periodRowLabel')}</td>`;
-                html += `<td>${salePeriod.min > 0 ? salePeriod.min + ' – ' + salePeriod.max + ' ' + getText('daysUnit') : '-'}</td>`;
-                html += `<td>${rentPeriod.min > 0 ? rentPeriod.min + ' – ' + rentPeriod.max + ' ' + getText('daysUnit') : '-'}</td>`;
+                html += `<td>${getText('periodMinRowLabel')}</td>`;
+                html += `<td>${salePeriod.min > 0 ? salePeriod.min + ' ' + getText('daysUnit') : '-'}</td>`;
+                html += `<td>${rentPeriod.min > 0 ? rentPeriod.min + ' ' + getText('daysUnit') : '-'}</td>`;
                 html += '</tr>';
             }
             
-            // Price row
+            // Period max row
+            if (salePeriod.max > 0 || rentPeriod.max > 0) {
+                html += '<tr>';
+                html += `<td>${getText('periodMaxRowLabel')}</td>`;
+                html += `<td>${salePeriod.max > 0 ? salePeriod.max + ' ' + getText('daysUnit') : '-'}</td>`;
+                html += `<td>${rentPeriod.max > 0 ? rentPeriod.max + ' ' + getText('daysUnit') : '-'}</td>`;
+                html += '</tr>';
+            }
+            
+            // Price min row
             if (avgMinSalePrice > 0 || avgMinRentPrice > 0) {
                 html += '<tr>';
-                html += `<td>${getText('priceRowLabel')}</td>`;
-                html += `<td>${avgMinSalePrice > 0 && avgMaxSalePrice > 0 ? formatValue(avgMinSalePrice, 'price') + ' – ' + formatValue(avgMaxSalePrice, 'price') : '-'}</td>`;
-                html += `<td>${avgMinRentPrice > 0 && avgMaxRentPrice > 0 ? formatValue(avgMinRentPrice, 'price') + ' – ' + formatValue(avgMaxRentPrice, 'price') : '-'}</td>`;
+                html += `<td>${getText('priceMinRowLabel')}</td>`;
+                html += `<td>${avgMinSalePrice > 0 ? formatValue(avgMinSalePrice, 'price') : '-'}</td>`;
+                html += `<td>${avgMinRentPrice > 0 ? formatValue(avgMinRentPrice, 'price') : '-'}</td>`;
+                html += '</tr>';
+            }
+            
+            // Price max row
+            if (avgMaxSalePrice > 0 || avgMaxRentPrice > 0) {
+                html += '<tr>';
+                html += `<td>${getText('priceMaxRowLabel')}</td>`;
+                html += `<td>${avgMaxSalePrice > 0 ? formatValue(avgMaxSalePrice, 'price') : '-'}</td>`;
+                html += `<td>${avgMaxRentPrice > 0 ? formatValue(avgMaxRentPrice, 'price') : '-'}</td>`;
                 html += '</tr>';
             }
             
@@ -5151,74 +5179,7 @@
             });
             
             // Generate market indicators in unified card format (like "Тренд цен")
-            let html = '<div class="market-indicators-unified">';
-            html += '<div class="unified-indicator-card">';
-            
-            // Sale Section
-            if (summary.comparable_area_for_sale || summary.listing_period_for_sale || summary.unit_price_for_sale) {
-                html += '<div class="indicator-section sale-section">';
-                html += `<div class="section-title">${getText('saleHeader')}</div>`;
-                
-                if (summary.comparable_area_for_sale) {
-                    const area = summary.comparable_area_for_sale;
-                    html += `<div class="indicator-item">
-                        <span class="indicator-label">${getText('comparableAreaForSaleLabel')}:</span>
-                        <span class="indicator-value">${area.min} – ${area.max} м²</span>
-                    </div>`;
-                }
-                
-                if (summary.listing_period_for_sale) {
-                    const period = summary.listing_period_for_sale;
-                    html += `<div class="indicator-item">
-                        <span class="indicator-label">${getText('listingPeriodForSaleLabel')}:</span>
-                        <span class="indicator-value">${period.min} – ${period.max} дней</span>
-                </div>`;
-                }
-                
-                if (summary.unit_price_for_sale) {
-                    const price = summary.unit_price_for_sale;
-                    html += `<div class="indicator-item">
-                        <span class="indicator-label">${getText('unitPriceForSaleLabel')}:</span>
-                        <span class="indicator-value">${formatValue(price.min, 'price')} – ${formatValue(price.max, 'price')}</span>
-                    </div>`;
-                }
-                
-                html += '</div>';
-            }
-            
-            // Rent Section
-            if (summary.comparable_area_for_rent || summary.listing_period_for_rent || summary.unit_price_for_rent) {
-                html += '<div class="indicator-section rent-section">';
-                html += `<div class="section-title">${getText('rentHeader')}</div>`;
-                
-                if (summary.comparable_area_for_rent) {
-                    const area = summary.comparable_area_for_rent;
-                    html += `<div class="indicator-item">
-                        <span class="indicator-label">${getText('comparableAreaForRentLabel')}:</span>
-                        <span class="indicator-value">${area.min} – ${area.max} м²</span>
-                    </div>`;
-                }
-                
-                if (summary.listing_period_for_rent) {
-                    const period = summary.listing_period_for_rent;
-                    html += `<div class="indicator-item">
-                        <span class="indicator-label">${getText('listingPeriodForRentLabel')}:</span>
-                        <span class="indicator-value">${period.min} – ${period.max} дней</span>
-                    </div>`;
-                }
-                
-                if (summary.unit_price_for_rent) {
-                    const price = summary.unit_price_for_rent;
-                    html += `<div class="indicator-item">
-                        <span class="indicator-label">${getText('unitPriceForRentLabel')}:</span>
-                        <span class="indicator-value">${formatValue(price.min, 'price')} – ${formatValue(price.max, 'price')}</span>
-                    </div>`;
-                }
-                
-            html += '</div>';
-            }
-            
-            html += '</div></div>';
+            let html = '';
             
             // Add spacing between blocks
             html += '<div class="block-spacing"></div>';
