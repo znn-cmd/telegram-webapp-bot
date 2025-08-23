@@ -280,6 +280,8 @@ def get_property_trends():
                 cursor.execute(query, (country_id, city_id, county_id, district_id))
                 trends = cursor.fetchall()
                 
+                print(f"📊 API: Получено {len(trends)} записей из базы данных")
+                
                 # Конвертируем в список словарей
                 trends_list = []
                 for trend in trends:
@@ -289,6 +291,8 @@ def get_property_trends():
                         if hasattr(value, 'quantize'):
                             trend_dict[key] = float(value)
                     trends_list.append(trend_dict)
+                
+                print(f"📊 API: Возвращаем {len(trends_list)} записей")
                 
                 return jsonify({
                     'success': True,
