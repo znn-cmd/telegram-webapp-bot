@@ -2924,6 +2924,8 @@
                 'heatingLabel': 'Тип отопления',
                 'marketIndicatorsTitle': 'Показатели рынка',
                 'marketTrendsTitle': 'Тренды рынка',
+                'historicalTrendsTitle': 'Тренды прошлых месяцев',
+                'historicalTrendsInfo': 'Показано {count} исторических трендов',
                 'saleHeader': 'Продажа',
                 'rentHeader': 'Аренда',
                 'currencyTitle': 'Выберите валюту:',
@@ -3070,6 +3072,8 @@
                 'heatingLabel': 'Heating type',
                 'marketIndicatorsTitle': 'Market Indicators',
                 'marketTrendsTitle': 'Market Trends',
+                'historicalTrendsTitle': 'Historical Trends',
+                'historicalTrendsInfo': 'Showing {count} historical trends',
                 'saleHeader': 'Sale',
                 'rentHeader': 'Rent',
                 
@@ -3230,6 +3234,9 @@
                 'daysUnit': 'Tage',
                 
                 // Market analysis text localization keys
+                'marketTrendsTitle': 'Markttrends',
+                'historicalTrendsTitle': 'Historische Trends',
+                'historicalTrendsInfo': 'Zeigt {count} historische Trends',
                 'marketAnalysisTitle': 'Marktanalyse',
                 'saleAnalysisText': 'Verkauf: bei einer Fläche von {area} m² (Durchschnittswert für verkaufte Immobilien) und einem Mindestpreis von {minPrice}/m² beträgt die Verkaufsdauer ~{minDays} Tage; bei einem Höchstpreis von {maxPrice}/m² - die Verkaufsdauer bis zu {maxDays} Tagen.',
                 'rentAnalysisText': 'Vermietung: bei einer Fläche von {area} m² (Durchschnittswert für vermietete Immobilien) Mindestpreis {minPrice}/m², Mietdauer ~{minDays} Tage; bei einem Höchstpreis von {maxPrice}/m² Dauer bis zu {maxDays} Tagen.'
@@ -3293,6 +3300,9 @@
                 'daysUnit': 'jours',
                 
                 // Market analysis text localization keys
+                'marketTrendsTitle': 'Tendances du marché',
+                'historicalTrendsTitle': 'Tendances historiques',
+                'historicalTrendsInfo': 'Affichage de {count} tendances historiques',
                 'marketAnalysisTitle': 'Analyse du marché',
                 'saleAnalysisText': 'Vente : avec une surface de {area} m² (valeur moyenne pour les propriétés vendues) et un prix minimum de {minPrice}/m², la période de vente est de ~{minDays} jours ; avec un prix maximum de {maxPrice}/m² - la période de vente est jusqu\'à {maxDays} jours.',
                 'rentAnalysisText': 'Location : avec une surface de {area} m² (valeur moyenne pour les propriétés louées) prix minimum {minPrice}/m², période de location ~{minDays} jours ; avec un prix maximum de {maxPrice}/m² période jusqu\'à {maxDays} jours.'
@@ -3356,6 +3366,9 @@
                 'heatingLabel': 'Isıtma',
                 
                 // "Piyasa Analizi" metni için anahtarlar
+                'marketTrendsTitle': 'Piyasa Trendleri',
+                'historicalTrendsTitle': 'Geçmiş Trendler',
+                'historicalTrendsInfo': '{count} geçmiş trend gösteriliyor',
                 'marketAnalysisTitle': 'Piyasa Analizi',
                 'saleAnalysisText': 'Satış: {area} m² alan (satılan mülklerin ortalama değeri) ve {minPrice}/m² minimum fiyat ile satış süresi ~{minDays} gün; {maxPrice}/m² maksimum fiyat ile satış süresi {maxDays} güne kadar.',
                 'rentAnalysisText': 'Kiralama: {area} m² alan (kiralanan mülklerin ortalama değeri) {minPrice}/m² minimum fiyat, kiralama süresi ~{minDays} gün; {maxPrice}/m² maksimum fiyat ile süre {maxDays} güne kadar.'
@@ -5640,6 +5653,14 @@
                         </div>
                     </div>
                     
+                    <!-- Таблица трендов прошлых месяцев -->
+                    <div class="trends-table-section" style="margin-top: 25px;">
+                        <h4 class="trends-table-title">${getText('historicalTrendsTitle')}</h4>
+                        <div class="trends-table-container" id="historicalTrendsTableContainer">
+                            <!-- Исторические тренды будут загружены асинхронно -->
+                        </div>
+                    </div>
+                    
                     <!-- График трендов будет добавлен в generateTrendsTable -->
                 </div>
             `;
@@ -5657,6 +5678,13 @@
                 setTimeout(() => {
                     initializeTrendsChart(trends);
                 }, 100);
+            }
+            
+            // Асинхронно загружаем таблицу исторических трендов
+            const historicalTrendsTableContainer = document.getElementById('historicalTrendsTableContainer');
+            if (historicalTrendsTableContainer) {
+                const historicalTrendsTableHtml = await generateHistoricalTrendsTable(trends);
+                historicalTrendsTableContainer.innerHTML = historicalTrendsTableHtml;
             }
         }
         
@@ -5945,6 +5973,72 @@
                     initializeForecastChart(forecastTrends);
                 }
             }, 100);
+            
+            return html;
+        }
+        
+        // Generate historical trends table with all available data
+        async function generateHistoricalTrendsTable(trends) {
+            console.log('📊 Generating historical trends table with trends:', trends.length, 'records');
+            
+            if (!trends || trends.length === 0) {
+                console.log('⚠️ No trends data for historical trends table');
+                return '<div class="no-data">Нет данных для отображения</div>';
+            }
+            
+            // Сортируем тренды по property_year и property_month (новые сначала)
+            const sortedTrends = trends.sort((a, b) => {
+                if (a.property_year !== b.property_year) {
+                    return b.property_year - a.property_year;
+                }
+                return b.property_month - a.property_month;
+            });
+            
+            console.log('🔍 Sorted historical trends:', sortedTrends.length, 'records');
+            
+            let html = '<table class="trends-table">';
+            html += '<thead><tr>';
+            html += '<th>Дата</th>';
+            html += '<th>Продажа<br>(₺/м²)</th>';
+            html += '<th>Изм-ие цены<br>продажи</th>';
+            html += '<th>Аренда<br>(₺/м²)</th>';
+            html += '<th>Изм-ие цены<br>аренды</th>';
+            html += '<th>Доходность</th>';
+            html += '</tr></thead><tbody>';
+            
+            // Добавляем информацию о количестве записей
+            html += `<tr class="filter-info"><td colspan="6" style="text-align: center; font-size: 11px; color: #666; background: #f8f9fa; padding: 4px;">
+                ${getText('historicalTrendsInfo').replace('{count}', sortedTrends.length)}
+            </td></tr>`;
+            
+            // Получаем текущую дату для выделения текущего месяца
+            const currentDate = new Date();
+            const currentYear = currentDate.getFullYear();
+            const currentMonth = currentDate.getMonth() + 1;
+            
+            sortedTrends.forEach((trend, index) => {
+                // Проверяем, является ли этот тренд текущим месяцем
+                const isCurrentMonth = trend.property_year === currentYear && trend.property_month === currentMonth;
+                
+                let rowClass = '';
+                let rowStyle = '';
+                
+                if (isCurrentMonth) {
+                    rowClass = 'current-month-row';
+                    rowStyle = 'background-color: #e8f4fd;';
+                }
+                
+                html += `<tr class="${rowClass}" style="${rowStyle}">`;
+                html += `<td>${formatTrendDateShort(trend.date)}</td>`;
+                html += `<td>${formatTrendValue(trend.unit_price_for_sale, 'price')}</td>`;
+                html += `<td>${formatPercentage(trend.price_change_sale)}</td>`;
+                html += `<td>${formatTrendValue(trend.unit_price_for_rent, 'price')}</td>`;
+                html += `<td>${formatPercentage(trend.price_change_rent)}</td>`;
+                html += `<td>${formatTrendValue(trend.yield, 'percentage')}</td>`;
+                html += '</tr>';
+            });
+            
+            html += '</tbody></table>';
             
             return html;
         }
