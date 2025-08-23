@@ -1761,72 +1761,6 @@
             font-style: italic;
         }
         
-        /* Стили для новой таблицы property_trends */
-        .property-trends-table-section {
-            margin-top: 25px;
-        }
-        
-        .property-trends-table-title {
-            font-size: 16px;
-            font-weight: 600;
-            color: #495057;
-            margin-bottom: 15px;
-            text-align: center;
-        }
-        
-        .property-trends-table-container {
-            overflow-x: hidden;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        
-        .property-trends-table {
-            width: 100%;
-            border-collapse: collapse;
-            background: white;
-            font-size: 11px;
-            table-layout: fixed;
-        }
-        
-        .property-trends-table th {
-            background: #28a745;
-            color: white;
-            padding: 8px 6px;
-            text-align: center;
-            font-weight: 600;
-            line-height: 1.2;
-            word-wrap: break-word;
-        }
-        
-        .property-trends-table td {
-            padding: 6px 4px;
-            text-align: center;
-            border-bottom: 1px solid #dee2e6;
-            word-wrap: break-word;
-        }
-        
-        .property-trends-table tr:nth-child(even) {
-            background: #f8f9fa;
-        }
-        
-        .property-trends-table tr:hover {
-            background: #e9ecef;
-        }
-        
-        /* Специальные стили для ширины столбцов property_trends */
-        .property-trends-table th:nth-child(1) { width: 15%; } /* Дата */
-        .property-trends-table th:nth-child(2) { width: 18%; } /* Продажа */
-        .property-trends-table th:nth-child(3) { width: 18%; } /* Изм-ие цены продажи */
-        .property-trends-table th:nth-child(4) { width: 18%; } /* Аренда */
-        .property-trends-table th:nth-child(5) { width: 18%; } /* Изм-ие цены аренды */
-        .property-trends-table th:nth-child(6) { width: 13%; } /* Доходность */
-        
-        /* Стили для информационной строки о фильтрации */
-        .property-trends-table .filter-info td {
-            border: none;
-            font-style: italic;
-        }
-        
         /* Стили для графика трендов */
         .trends-chart-section {
             margin-top: 20px;
@@ -1949,23 +1883,7 @@
             .trends-table th:nth-child(4) { width: 17%; }
             .trends-table th:nth-child(5) { width: 17%; }
             .trends-table th:nth-child(6) { width: 14%; }
-            
-            .property-trends-table {
-                font-size: 10px;
-            }
-            
-            .property-trends-table th,
-            .property-trends-table td {
-                padding: 4px 2px;
-            }
-            
-            .property-trends-table th:nth-child(1) { width: 18%; }
-            .property-trends-table th:nth-child(2) { width: 17%; }
-            .property-trends-table th:nth-child(3) { width: 17%; }
-            .property-trends-table th:nth-child(4) { width: 17%; }
-            .property-trends-table th:nth-child(5) { width: 17%; }
-            .property-trends-table th:nth-child(6) { width: 14%; }
-        }
+                }
         
         /* Trends Analysis Styles */
         .trends-analysis-section {
@@ -3012,7 +2930,6 @@
                 'pricePlaceholder': 'Введите цену',
                 'areaPlaceholder': 'Введите площадь',
                 'trendsFilterInfo': 'Показано ${filteredCount} из ${totalCount} трендов',
-                'trendsFilterInfoDetailed': 'Показано ${filteredCount} трендов (все месяцы до ${currentMonth}.${currentYear})',
                 'marketComparisonTitle': 'Сравнение с рынком',
                 'pricePerM2Label': 'Цена за м²',
                 'areaLabel': 'Площадь',
@@ -3101,17 +3018,7 @@
                 'subscribeInstructions': 'Перейдите к боту @Aaadviser_pay_bot',
                 'followInstructions': 'Следуйте инструкциям для подключения',
                 'needHelp': 'Нужна помощь?',
-                'contactSupport': 'Свяжитесь с нашей поддержкой: @Aaadviser_support_bot',
-                
-                // Ключи для новой таблицы property_trends
-                'propertyTrendsTitle': 'Детальные данные трендов (property_trends)',
-                'propertyTrendsFilterInfo': 'Показано ${filteredCount} трендов (все месяцы до ${currentMonth}.${currentYear})',
-                'dateLabel': 'Дата',
-                'salePriceLabel': 'Продажа<br>(₺/м²)',
-                'salePriceChangeLabel': 'Изм-ие цены<br>продажи',
-                'rentPriceLabel': 'Аренда<br>(₺/м²)',
-                'rentPriceChangeLabel': 'Изм-ие цены<br>аренды',
-                'yieldLabel': 'Доходность'
+                'contactSupport': 'Свяжитесь с нашей поддержкой: @Aaadviser_support_bot'
             },
             'en': {
                 'slogan': 'Real Estate Market Insights',
@@ -3187,7 +3094,6 @@
                 'pricePlaceholder': 'Enter price',
                 'areaPlaceholder': 'Enter area',
                 'trendsFilterInfo': 'Showing ${filteredCount} of ${totalCount} trends',
-                'trendsFilterInfoDetailed': 'Showing ${filteredCount} trends (all months up to ${currentMonth}.${currentYear})',
                 'marketComparisonTitle': 'Market Comparison',
                 'pricePerM2Label': 'Price per m²',
                 'areaLabel': 'Area',
@@ -3263,17 +3169,7 @@
                 'subscribeInstructions': 'Go to bot @Aaadviser_pay_bot',
                 'followInstructions': 'Follow the connection instructions',
                 'needHelp': 'Need help?',
-                'contactSupport': 'Contact our support: @Aaadviser_support_bot',
-                
-                // Keys for new property_trends table
-                'propertyTrendsTitle': 'Detailed Trend Data (property_trends)',
-                'propertyTrendsFilterInfo': 'Showing ${filteredCount} trends (all months up to ${currentMonth}.${currentYear})',
-                'dateLabel': 'Date',
-                'salePriceLabel': 'Sale<br>(₺/m²)',
-                'salePriceChangeLabel': 'Price<br>Change',
-                'rentPriceLabel': 'Rent<br>(₺/m²)',
-                'rentPriceChangeLabel': 'Rent Price<br>Change',
-                'yieldLabel': 'Yield'
+                'contactSupport': 'Contact our support: @Aaadviser_support_bot'
             },
             'de': {
                 'slogan': 'Immobilienmarkt-Einblicke',
@@ -5623,7 +5519,6 @@
                 if (trendsData.success && trendsData.trends && trendsData.trends.length > 0) {
                     console.log('✅ Property trends data received:', trendsData.trends);
                     console.log('🔍 First trend record:', trendsData.trends[0]);
-                    console.log('📊 Total trends count from API:', trendsData.trends.length);
                     
                     // Сохраняем данные глобально для переключения графиков
                     window.currentTrendsData = trendsData.trends;
@@ -5755,7 +5650,6 @@
             // Асинхронно загружаем таблицу трендов
             const trendsTableContainer = document.getElementById('trendsTableContainer');
             if (trendsTableContainer) {
-                console.log('📊 Generating main trends table with data:', trends.length, 'records');
                 const trendsTableHtml = await generateTrendsTable(trends);
                 trendsTableContainer.innerHTML = trendsTableHtml;
                 
@@ -5835,7 +5729,7 @@
             }
         }
 
-                // Filter trends to show all records from all months up to current month
+                // Filter trends to show 6 months before current month and 1 month after
         function filterTrendsByDateRange(trends) {
             if (!trends || trends.length === 0) return [];
             
@@ -5858,44 +5752,85 @@
                 console.log(`  ${index}: ${trend.property_year}-${trend.property_month} (${trend.date})`);
             });
             
-            // Фильтруем тренды: показываем все записи всех месяцев до текущего (включая текущий)
-            const filteredTrends = sortedTrends.filter(trend => {
-                let shouldShow = false;
+            // Фильтруем тренды за текущий год (2025)
+            const currentYearTrends = sortedTrends.filter(trend => trend.property_year === currentYear);
+            console.log(`🔍 Current year trends: ${currentYearTrends.length}`);
+            
+            if (currentYearTrends.length === 0) {
+                console.log(`⚠️ No trends for current year ${currentYear}, returning first 8 from all`);
+                return sortedTrends.slice(0, 8);
+            }
+            
+            // Вычисляем диапазон месяцев: 6 месяцев назад от текущего + 1 месяц вперед
+            const startMonth = currentMonth - 6;
+            const endMonth = currentMonth + 1;
+            
+            console.log(`🔍 Target month range: ${startMonth} to ${endMonth}`);
+            
+            // Фильтруем тренды по диапазону месяцев
+            const filteredTrends = currentYearTrends.filter(trend => {
+                const month = trend.property_month;
                 
-                // Если год меньше текущего - показываем все
-                if (trend.property_year < currentYear) {
-                    shouldShow = true;
-                    console.log(`  ✅ ${trend.property_year}-${trend.property_month}: показан (год меньше текущего)`);
+                // Обрабатываем переход через год (например, если текущий месяц август, то февраль = -4)
+                if (startMonth <= 0) {
+                    // Если startMonth отрицательный, берем месяцы с конца предыдущего года
+                    return month >= (12 + startMonth) || month <= endMonth;
+                } else {
+                    // Обычный случай
+                    return month >= startMonth && month <= endMonth;
                 }
-                // Если год равен текущему - показываем месяцы до текущего включительно
-                else if (trend.property_year === currentYear) {
-                    if (trend.property_month <= currentMonth) {
-                        shouldShow = true;
-                        console.log(`  ✅ ${trend.property_year}-${trend.property_month}: показан (текущий год, месяц <= текущего)`);
-                    } else {
-                        console.log(`  ❌ ${trend.property_year}-${trend.property_month}: скрыт (текущий год, месяц > текущего)`);
-                    }
-                }
-                // Если год больше текущего - не показываем (это прогнозы)
-                else {
-                    console.log(`  ❌ ${trend.property_year}-${trend.property_month}: скрыт (будущий год)`);
-                }
-                
-                return shouldShow;
             });
             
-            console.log(`🔍 Filtered trends (all months up to current): ${filteredTrends.length}`);
+            console.log(`🔍 Filtered trends by month range: ${filteredTrends.length}`);
             
-            // Сортируем по дате (новые сначала)
+            // Сортируем по месяцу (будущие месяцы сверху, текущий в середине, прошедшие снизу)
             filteredTrends.sort((a, b) => {
-                if (a.property_year !== b.property_year) {
-                    return b.property_year - a.property_year;
+                const monthA = a.property_month;
+                const monthB = b.property_month;
+                
+                // Если оба месяца в будущем (больше текущего)
+                if (monthA > currentMonth && monthB > currentMonth) {
+                    return monthA - monthB; // По возрастанию (сентябрь перед октябрем)
                 }
-                return b.property_month - a.property_month;
+                // Если оба месяца в прошлом (меньше текущего)
+                else if (monthA < currentMonth && monthB < currentMonth) {
+                    return monthB - monthA; // По убыванию (июль перед июнем)
+                }
+                // Если один в будущем, а другой - текущий
+                else if (monthA > currentMonth && monthB === currentMonth) {
+                    return -1; // Будущий месяц идет перед текущим
+                }
+                else if (monthA === currentMonth && monthB > currentMonth) {
+                    return 1; // Текущий месяц идет после будущего
+                }
+                // Если один в будущем, а другой в прошлом
+                else if (monthA > currentMonth && monthB < currentMonth) {
+                    return -1; // Будущий месяц идет первым
+                }
+                else if (monthA < currentMonth && monthB > currentMonth) {
+                    return 1; // Прошедший месяц идет последним
+                }
+                // Если один из месяцев - текущий, а другой в прошлом
+                else if (monthA === currentMonth && monthB < currentMonth) {
+                    return -1; // Текущий месяц идет перед прошедшим
+                }
+                else if (monthA < currentMonth && monthB === currentMonth) {
+                    return 1; // Прошедший месяц идет после текущего
+                }
+                
+                return 0;
             });
             
-            console.log(`✅ Returning all ${filteredTrends.length} trends from all months up to current`);
-            return filteredTrends;
+            if (filteredTrends.length >= 8) {
+                // Берем первые 8 трендов из отфильтрованного диапазона
+                const selectedTrends = filteredTrends.slice(0, 8);
+                console.log(`✅ Selected ${selectedTrends.length} trends from month range`);
+                return selectedTrends;
+            } else {
+                // Если мало трендов в диапазоне, возвращаем все отфильтрованные
+                console.log(`⚠️ Few trends in month range, returning all ${filteredTrends.length}`);
+                return filteredTrends;
+            }
         }
 
         // Generate detailed trends table
@@ -5907,21 +5842,9 @@
                 return '<div class="no-data">Нет данных для отображения</div>';
             }
             
-            // Добавляем детальное логирование полученных трендов
-            console.log('🔍 Received trends details:');
-            trends.forEach((trend, index) => {
-                console.log(`  ${index}: ${trend.property_year}-${trend.property_month} (${trend.date})`);
-            });
-            
             // Фильтруем тренды по диапазону дат
             const filteredTrends = filterTrendsByDateRange(trends);
             console.log('🔍 Filtered trends for table:', filteredTrends.length, 'records');
-            
-            // Добавляем детальное логирование отфильтрованных трендов
-            console.log('🔍 Filtered trends details:');
-            filteredTrends.forEach((trend, index) => {
-                console.log(`  ${index}: ${trend.property_year}-${trend.property_month} (${trend.date})`);
-            });
             
             if (filteredTrends.length === 0) {
                 console.log('⚠️ No trends in date range for trends table');
@@ -5930,12 +5853,12 @@
             
             let html = '<table class="trends-table">';
             html += '<thead><tr>';
-            html += `<th>${getText('dateLabel')}</th>`;
-            html += `<th>${getText('salePriceLabel')}</th>`;
-            html += `<th>${getText('salePriceChangeLabel')}</th>`;
-            html += `<th>${getText('rentPriceLabel')}</th>`;
-            html += `<th>${getText('rentPriceChangeLabel')}</th>`;
-            html += `<th>${getText('yieldLabel')}</th>`;
+            html += '<th>Дата</th>';
+            html += '<th>Продажа<br>(₺/м²)</th>';
+            html += '<th>Изм-ие цены<br>продажи</th>';
+            html += '<th>Аренда<br>(₺/м²)</th>';
+            html += '<th>Изм-ие цены<br>аренды</th>';
+            html += '<th>Доходность</th>';
             html += '</tr></thead><tbody>';
             
             // Добавляем информацию о фильтрации
@@ -5943,13 +5866,8 @@
             const currentYear = currentDate.getFullYear();
             const currentMonth = currentDate.getMonth() + 1;
             
-            const filterInfo = getText('trendsFilterInfoDetailed')
-                .replace('${filteredCount}', filteredTrends.length)
-                .replace('${currentMonth}', currentMonth)
-                .replace('${currentYear}', currentYear);
-            
             html += `<tr class="filter-info"><td colspan="6" style="text-align: center; font-size: 11px; color: #666; background: #f8f9fa; padding: 4px;">
-                ${filterInfo}
+                Показано ${filteredTrends.length} из ${trends.length} трендов
             </td></tr>`;
             
             filteredTrends.forEach((trend, index) => {
@@ -6028,216 +5946,6 @@
                 }
             }, 100);
             
-            // Добавляем новую таблицу property_trends, используя данные из window.currentTrendsData
-            if (window.currentTrendsData && window.currentTrendsData.length > 0) {
-                html += await generatePropertyTrendsTableFromData(window.currentTrendsData);
-            }
-            
-            return html;
-        }
-        
-        // Generate property trends table from property_trends table (API call)
-        async function generatePropertyTrendsTable() {
-            console.log('📊 Generating property trends table...');
-            
-            try {
-                // Получаем данные из таблицы property_trends для подтвержденных пользователей
-                const response = await fetch('/api/property_trends', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        country_id: selectedLocation.country_id,
-                        city_id: selectedLocation.city_id,
-                        county_id: selectedLocation.county_id,
-                        district_id: selectedLocation.district_id
-                    })
-                });
-                
-                if (!response.ok) {
-                    console.log('⚠️ Failed to fetch property trends data');
-                    return '';
-                }
-                
-                const data = await response.json();
-                console.log('📊 Property trends API response:', data);
-                
-                if (!data.success || !data.trends || data.trends.length === 0) {
-                    console.log('⚠️ No property trends data available');
-                    return '';
-                }
-                
-                const trends = data.trends;
-                console.log('📊 Property trends data:', trends.length, 'records');
-                
-                // Добавляем детальное логирование полученных трендов
-                console.log('🔍 Received property trends details:');
-                trends.forEach((trend, index) => {
-                    console.log(`  ${index}: ${trend.property_year}-${trend.property_month} (${trend.date})`);
-                });
-                
-                // Фильтруем тренды по диапазону дат
-                const filteredTrends = filterTrendsByDateRange(trends);
-                console.log('🔍 Filtered property trends for table:', filteredTrends.length, 'records');
-                
-                // Добавляем детальное логирование отфильтрованных трендов
-                console.log('🔍 Filtered property trends details:');
-                filteredTrends.forEach((trend, index) => {
-                    console.log(`  ${index}: ${trend.property_year}-${trend.property_month} (${trend.date})`);
-                });
-                
-                if (filteredTrends.length === 0) {
-                    console.log('⚠️ No property trends in date range for table');
-                    return '';
-                }
-                
-                let html = '<div class="property-trends-table-section">';
-                html += `<h4 class="property-trends-table-title">${getText('propertyTrendsTitle')}</h4>`;
-                html += '<div class="property-trends-table-container">';
-                html += '<table class="property-trends-table">';
-                html += '<thead><tr>';
-                html += `<th>${getText('dateLabel')}</th>`;
-                html += `<th>${getText('salePriceLabel')}</th>`;
-                html += `<th>${getText('salePriceChangeLabel')}</th>`;
-                html += `<th>${getText('rentPriceLabel')}</th>`;
-                html += `<th>${getText('rentPriceChangeLabel')}</th>`;
-                html += `<th>${getText('yieldLabel')}</th>`;
-                html += '</tr></thead><tbody>';
-                
-                // Добавляем информацию о фильтрации
-                const currentDate = new Date();
-                const currentYear = currentDate.getFullYear();
-                const currentMonth = currentDate.getMonth() + 1;
-                
-                const filterInfo = getText('propertyTrendsFilterInfo')
-                    .replace('${filteredCount}', filteredTrends.length)
-                    .replace('${currentMonth}', currentMonth)
-                    .replace('${currentYear}', currentYear);
-                
-                html += `<tr class="filter-info"><td colspan="6" style="text-align: center; font-size: 11px; color: #666; background: #f8f9fa; padding: 4px;">
-                    ${filterInfo}
-                </td></tr>`;
-                
-                filteredTrends.forEach((trend, index) => {
-                    // Проверяем, является ли этот тренд текущим месяцем
-                    const isCurrentMonth = trend.property_year === currentYear && trend.property_month === currentMonth;
-                    const isFutureMonth = trend.property_year > currentYear || (trend.property_year === currentYear && trend.property_month > currentMonth);
-                    
-                    let rowClass = '';
-                    let rowStyle = '';
-                    
-                    if (isCurrentMonth) {
-                        rowClass = 'current-month-row';
-                        rowStyle = 'background-color: #e8f4fd;';
-                    } else if (isFutureMonth) {
-                        rowClass = 'forecast-row';
-                        rowStyle = 'background-color: #f0f8ff;';
-                    }
-                    
-                    html += `<tr class="${rowClass}" style="${rowStyle}">`;
-                    html += `<td>${formatTrendDateShort(trend.date)}</td>`;
-                    html += `<td>${formatTrendValue(trend.unit_price_for_sale, 'price')}</td>`;
-                    html += `<td>${formatPercentage(trend.price_change_sale)}</td>`;
-                    html += `<td>${formatTrendValue(trend.unit_price_for_rent, 'price')}</td>`;
-                    html += `<td>${formatPercentage(trend.price_change_rent)}</td>`;
-                    html += `<td>${formatTrendValue(trend.yield, 'percentage')}</td>`;
-                    html += '</tr>';
-                });
-                
-                html += '</tbody></table>';
-                html += '</div></div>';
-                
-                console.log('✅ Property trends table generated successfully');
-                return html;
-                
-            } catch (error) {
-                console.error('❌ Error generating property trends table:', error);
-                return '';
-            }
-        }
-        
-        // Generate property trends table from existing data (no API call)
-        async function generatePropertyTrendsTableFromData(trends) {
-            console.log('📊 Generating property trends table from existing data:', trends.length, 'records');
-            
-            if (!trends || trends.length === 0) {
-                console.log('⚠️ No trends data for property trends table');
-                return '';
-            }
-            
-            // Фильтруем тренды по диапазону дат
-            const filteredTrends = filterTrendsByDateRange(trends);
-            console.log('🔍 Filtered property trends for table:', filteredTrends.length, 'records');
-            
-            // Добавляем детальное логирование отфильтрованных трендов
-            console.log('🔍 Filtered property trends details:');
-            filteredTrends.forEach((trend, index) => {
-                console.log(`  ${index}: ${trend.property_year}-${trend.property_month} (${trend.date})`);
-            });
-            
-            if (filteredTrends.length === 0) {
-                console.log('⚠️ No property trends in date range for table');
-                return '';
-            }
-            
-            let html = '<div class="property-trends-table-section">';
-            html += `<h4 class="property-trends-table-title">${getText('propertyTrendsTitle')}</h4>`;
-            html += '<div class="property-trends-table-container">';
-            html += '<table class="property-trends-table">';
-            html += '<thead><tr>';
-            html += `<th>${getText('dateLabel')}</th>`;
-            html += `<th>${getText('salePriceLabel')}</th>`;
-            html += `<th>${getText('salePriceChangeLabel')}</th>`;
-            html += `<th>${getText('rentPriceLabel')}</th>`;
-            html += `<th>${getText('rentPriceChangeLabel')}</th>`;
-            html += `<th>${getText('yieldLabel')}</th>`;
-            html += '</tr></thead><tbody>';
-            
-            // Добавляем информацию о фильтрации
-            const currentDate = new Date();
-            const currentYear = currentDate.getFullYear();
-            const currentMonth = currentDate.getMonth() + 1;
-            
-            const filterInfo = getText('propertyTrendsFilterInfo')
-                .replace('${filteredCount}', filteredTrends.length)
-                .replace('${currentMonth}', currentMonth)
-                .replace('${currentYear}', currentYear);
-            
-            html += `<tr class="filter-info"><td colspan="6" style="text-align: center; font-size: 11px; color: #666; background: #f8f9fa; padding: 4px;">
-                ${filterInfo}
-            </td></tr>`;
-            
-            filteredTrends.forEach((trend, index) => {
-                // Проверяем, является ли этот тренд текущим месяцем
-                const isCurrentMonth = trend.property_year === currentYear && trend.property_month === currentMonth;
-                const isFutureMonth = trend.property_year > currentYear || (trend.property_year === currentYear && trend.property_month > currentMonth);
-                
-                let rowClass = '';
-                let rowStyle = '';
-                
-                if (isCurrentMonth) {
-                    rowClass = 'current-month-row';
-                    rowStyle = 'background-color: #e8f4fd;';
-                } else if (isFutureMonth) {
-                    rowClass = 'forecast-row';
-                    rowStyle = 'background-color: #f0f8ff;';
-                }
-                
-                html += `<tr class="${rowClass}" style="${rowStyle}">`;
-                html += `<td>${formatTrendDateShort(trend.date)}</td>`;
-                html += `<td>${formatTrendValue(trend.unit_price_for_sale, 'price')}</td>`;
-                html += `<td>${formatPercentage(trend.price_change_sale)}</td>`;
-                html += `<td>${formatTrendValue(trend.unit_price_for_rent, 'price')}</td>`;
-                html += `<td>${formatPercentage(trend.price_change_rent)}</td>`;
-                html += `<td>${formatTrendValue(trend.yield, 'percentage')}</td>`;
-                html += '</tr>';
-            });
-            
-            html += '</tbody></table>';
-            html += '</div></div>';
-            
-            console.log('✅ Property trends table generated successfully from existing data');
             return html;
         }
         
@@ -7555,26 +7263,26 @@
                 return a.property_month - b.property_month;
             });
             
-            // Фильтруем данные: показываем все тренды до текущего месяца включительно
+            // Фильтруем данные: до текущего месяца и один месяц вперед
             const today = new Date();
             const currentYear = today.getFullYear();
             const currentMonth = today.getMonth() + 1; // getMonth() returns 0-11
             
+            const oneMonthAhead = new Date();
+            oneMonthAhead.setMonth(today.getMonth() + 1); // Set to next month
+            const oneMonthAheadYear = oneMonthAhead.getFullYear();
+            const oneMonthAheadMonth = oneMonthAhead.getMonth() + 1;
+            
             const filteredTrends = sortedTrends.filter(trend => {
-                // Если год меньше текущего - показываем все
-                if (trend.property_year < currentYear) {
-                    return true;
-                }
-                // Если год равен текущему - показываем месяцы до текущего включительно
-                if (trend.property_year === currentYear) {
-                    return trend.property_month <= currentMonth;
-                }
-                // Если год больше текущего - не показываем (это прогнозы)
-                return false;
+                const trendDate = new Date(trend.property_year, trend.property_month - 1, 1); // Month is 0-indexed for Date object
+                const filterEndDate = new Date(oneMonthAheadYear, oneMonthAheadMonth - 1, 1); // Month is 0-indexed for Date object
+                
+                // Include trends up to and including the month one month ahead
+                return trendDate <= filterEndDate;
             });
             
             console.log('📊 Filtered trends for chart:', filteredTrends.length, 'records');
-            console.log('📅 Chart date range: up to current month', currentMonth, currentYear);
+            console.log('📅 Chart date range: up to', oneMonthAheadMonth, oneMonthAheadYear);
             
             // Создаем график с отфильтрованными данными
             createTrendsChart(filteredTrends, currentChartType);
@@ -7776,20 +7484,15 @@
                 });
                 
                 const today = new Date();
-                const currentYear = today.getFullYear();
-                const currentMonth = today.getMonth() + 1;
+                const oneMonthAhead = new Date();
+                oneMonthAhead.setMonth(today.getMonth() + 1);
+                const oneMonthAheadYear = oneMonthAhead.getFullYear();
+                const oneMonthAheadMonth = oneMonthAhead.getMonth() + 1;
                 
                 const filteredTrends = sortedTrends.filter(trend => {
-                    // Если год меньше текущего - показываем все
-                    if (trend.property_year < currentYear) {
-                        return true;
-                    }
-                    // Если год равен текущему - показываем месяцы до текущего включительно
-                    if (trend.property_year === currentYear) {
-                        return trend.property_month <= currentMonth;
-                    }
-                    // Если год больше текущего - не показываем (это прогнозы)
-                    return false;
+                    const trendDate = new Date(trend.property_year, trend.property_month - 1, 1);
+                    const filterEndDate = new Date(oneMonthAheadYear, oneMonthAheadMonth - 1, 1);
+                    return trendDate <= filterEndDate;
                 });
                 
                 createTrendsChart(filteredTrends, chartType);
