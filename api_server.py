@@ -338,13 +338,14 @@ def get_average_prices():
             with connection.cursor(cursor_factory=RealDictCursor) as cursor:
                 # Получаем средние цены из всех таблиц данных
                 query = """
-                    WITH all_prices AS (
-                        -- Цены продажи
+                    WITH all_sale_prices AS (
+                        -- Цены продажи из всех таблиц
                         SELECT 
                             COALESCE(min_unit_price_for_sale, 0) as min_sale,
                             COALESCE(max_unit_price_for_sale, 0) as max_sale
                         FROM age_data 
                         WHERE country_id = %s AND city_id = %s AND county_id = %s AND district_id = %s
+                        AND min_unit_price_for_sale > 0 AND max_unit_price_for_sale > 0
                         
                         UNION ALL
                         
@@ -353,6 +354,7 @@ def get_average_prices():
                             COALESCE(max_unit_price_for_sale, 0) as max_sale
                         FROM floor_segment_data 
                         WHERE country_id = %s AND city_id = %s AND county_id = %s AND district_id = %s
+                        AND min_unit_price_for_sale > 0 AND max_unit_price_for_sale > 0
                         
                         UNION ALL
                         
@@ -361,6 +363,7 @@ def get_average_prices():
                             COALESCE(max_unit_price_for_sale, 0) as max_sale
                         FROM heating_data 
                         WHERE country_id = %s AND city_id = %s AND county_id = %s AND district_id = %s
+                        AND min_unit_price_for_sale > 0 AND max_unit_price_for_sale > 0
                         
                         UNION ALL
                         
@@ -369,52 +372,58 @@ def get_average_prices():
                             COALESCE(max_unit_price_for_sale, 0) as max_sale
                         FROM house_type_data 
                         WHERE country_id = %s AND city_id = %s AND county_id = %s AND district_id = %s
+                        AND min_unit_price_for_sale > 0 AND max_unit_price_for_sale > 0
                     ),
-                    sale_prices AS (
+                    all_rent_prices AS (
+                        -- Цены аренды из всех таблиц
                         SELECT 
-                            AVG(min_sale) as avg_min_sale,
-                            AVG(max_sale) as avg_max_sale
-                        FROM all_prices
-                        WHERE min_sale > 0 AND max_sale > 0
-                    ),
-                    rent_prices AS (
+                            COALESCE(min_unit_price_for_rent, 0) as min_rent,
+                            COALESCE(max_unit_price_for_rent, 0) as max_rent
+                        FROM age_data 
+                        WHERE country_id = %s AND city_id = %s AND county_id = %s AND district_id = %s
+                        AND min_unit_price_for_rent > 0 AND max_unit_price_for_rent > 0
+                        
+                        UNION ALL
+                        
                         SELECT 
-                            AVG(COALESCE(min_unit_price_for_rent, 0)) as avg_min_rent,
-                            AVG(COALESCE(max_unit_price_for_rent, 0)) as avg_max_rent
-                        FROM (
-                            SELECT min_unit_price_for_rent, max_unit_price_for_rent
-                            FROM age_data 
-                            WHERE country_id = %s AND city_id = %s AND county_id = %s AND district_id = %s
-                            
-                            UNION ALL
-                            
-                            SELECT min_unit_price_for_rent, max_unit_price_for_rent
-                            FROM floor_segment_data 
-                            WHERE country_id = %s AND city_id = %s AND county_id = %s AND district_id = %s
-                            
-                            UNION ALL
-                            
-                            SELECT min_unit_price_for_rent, max_unit_price_for_rent
-                            FROM heating_data 
-                            WHERE country_id = %s AND city_id = %s AND county_id = %s AND district_id = %s
-                            
-                            UNION ALL
-                            
-                            SELECT min_unit_price_for_rent, max_unit_price_for_rent
-                            FROM house_type_data 
-                            WHERE country_id = %s AND city_id = %s AND county_id = %s AND district_id = %s
-                        ) rent_data
-                        WHERE min_unit_price_for_rent > 0 AND max_unit_price_for_rent > 0
+                            COALESCE(min_unit_price_for_rent, 0) as min_rent,
+                            COALESCE(max_unit_price_for_rent, 0) as max_rent
+                        FROM floor_segment_data 
+                        WHERE country_id = %s AND city_id = %s AND county_id = %s AND district_id = %s
+                        AND min_unit_price_for_rent > 0 AND max_unit_price_for_rent > 0
+                        
+                        UNION ALL
+                        
+                        SELECT 
+                            COALESCE(min_unit_price_for_rent, 0) as min_rent,
+                            COALESCE(max_unit_price_for_rent, 0) as max_rent
+                        FROM heating_data 
+                        WHERE country_id = %s AND city_id = %s AND county_id = %s AND district_id = %s
+                        AND min_unit_price_for_rent > 0 AND max_unit_price_for_rent > 0
+                        
+                        UNION ALL
+                        
+                        SELECT 
+                            COALESCE(min_unit_price_for_rent, 0) as min_rent,
+                            COALESCE(max_unit_price_for_rent, 0) as max_rent
+                        FROM house_type_data 
+                        WHERE country_id = %s AND city_id = %s AND county_id = %s AND district_id = %s
+                        AND min_unit_price_for_rent > 0 AND max_unit_price_for_rent > 0
                     )
                     SELECT 
-                        (sp.avg_min_sale + sp.avg_max_sale) / 2 as avg_sale_price,
-                        (rp.avg_min_rent + rp.avg_max_rent) / 2 as avg_rent_price
-                    FROM sale_prices sp
-                    CROSS JOIN rent_prices rp
+                        CASE 
+                            WHEN COUNT(*) > 0 THEN (AVG(min_sale) + AVG(max_sale)) / 2 
+                            ELSE 0 
+                        END as avg_sale_price,
+                        CASE 
+                            WHEN COUNT(*) > 0 THEN (AVG(min_rent) + AVG(max_rent)) / 2 
+                            ELSE 0 
+                        END as avg_rent_price
+                    FROM all_sale_prices, all_rent_prices
                 """
                 
                 # Выполняем запрос с параметрами (повторяем для каждого UNION)
-                params = [country_id, city_id, county_id, district_id] * 8  # 8 раз для всех UNION
+                params = [country_id, city_id, county_id, district_id] * 8  # 8 раз для всех UNION (4 для продажи + 4 для аренды)
                 cursor.execute(query, params)
                 result = cursor.fetchone()
                 
@@ -423,11 +432,13 @@ def get_average_prices():
                     avg_rent_price = float(result['avg_rent_price']) if result['avg_rent_price'] else 0
                     
                     print(f"📊 API: Средние цены - продажа: {avg_sale_price}, аренда: {avg_rent_price}")
+                    print(f"📊 API: Метод расчета - среднее арифметическое между минимальной и максимальной ценой из всех таблиц данных")
                     
                     return jsonify({
                         'success': True,
                         'avg_sale_price': avg_sale_price,
-                        'avg_rent_price': avg_rent_price
+                        'avg_rent_price': avg_rent_price,
+                        'calculation_method': 'Среднее арифметическое между минимальной и максимальной ценой из всех таблиц данных (age_data, floor_segment_data, heating_data, house_type_data)'
                     })
                 else:
                     return jsonify({
