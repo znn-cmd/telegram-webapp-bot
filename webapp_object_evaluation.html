@@ -5729,7 +5729,7 @@
             }
         }
 
-                // Filter trends to show 6 months before current month and 1 month after
+                // Filter trends to show all months up to current month (no future months)
         function filterTrendsByDateRange(trends) {
             if (!trends || trends.length === 0) return [];
             
@@ -5752,85 +5752,32 @@
                 console.log(`  ${index}: ${trend.property_year}-${trend.property_month} (${trend.date})`);
             });
             
-            // Фильтруем тренды за текущий год (2025)
-            const currentYearTrends = sortedTrends.filter(trend => trend.property_year === currentYear);
-            console.log(`🔍 Current year trends: ${currentYearTrends.length}`);
-            
-            if (currentYearTrends.length === 0) {
-                console.log(`⚠️ No trends for current year ${currentYear}, returning first 8 from all`);
-                return sortedTrends.slice(0, 8);
-            }
-            
-            // Вычисляем диапазон месяцев: 6 месяцев назад от текущего + 1 месяц вперед
-            const startMonth = currentMonth - 6;
-            const endMonth = currentMonth + 1;
-            
-            console.log(`🔍 Target month range: ${startMonth} to ${endMonth}`);
-            
-            // Фильтруем тренды по диапазону месяцев
-            const filteredTrends = currentYearTrends.filter(trend => {
-                const month = trend.property_month;
-                
-                // Обрабатываем переход через год (например, если текущий месяц август, то февраль = -4)
-                if (startMonth <= 0) {
-                    // Если startMonth отрицательный, берем месяцы с конца предыдущего года
-                    return month >= (12 + startMonth) || month <= endMonth;
-                } else {
-                    // Обычный случай
-                    return month >= startMonth && month <= endMonth;
+            // Фильтруем тренды: все месяцы до текущего включительно (без будущих месяцев)
+            const filteredTrends = sortedTrends.filter(trend => {
+                // Если год меньше текущего - включаем все месяцы
+                if (trend.property_year < currentYear) {
+                    return true;
                 }
+                // Если год равен текущему - включаем месяцы до текущего включительно
+                if (trend.property_year === currentYear) {
+                    return trend.property_month <= currentMonth;
+                }
+                // Если год больше текущего - не включаем (будущие годы)
+                return false;
             });
             
-            console.log(`🔍 Filtered trends by month range: ${filteredTrends.length}`);
+            console.log(`🔍 Filtered trends (all months up to current): ${filteredTrends.length}`);
             
-            // Сортируем по месяцу (будущие месяцы сверху, текущий в середине, прошедшие снизу)
+            // Сортируем по дате (новые сначала)
             filteredTrends.sort((a, b) => {
-                const monthA = a.property_month;
-                const monthB = b.property_month;
-                
-                // Если оба месяца в будущем (больше текущего)
-                if (monthA > currentMonth && monthB > currentMonth) {
-                    return monthA - monthB; // По возрастанию (сентябрь перед октябрем)
+                if (a.property_year !== b.property_year) {
+                    return b.property_year - a.property_year;
                 }
-                // Если оба месяца в прошлом (меньше текущего)
-                else if (monthA < currentMonth && monthB < currentMonth) {
-                    return monthB - monthA; // По убыванию (июль перед июнем)
-                }
-                // Если один в будущем, а другой - текущий
-                else if (monthA > currentMonth && monthB === currentMonth) {
-                    return -1; // Будущий месяц идет перед текущим
-                }
-                else if (monthA === currentMonth && monthB > currentMonth) {
-                    return 1; // Текущий месяц идет после будущего
-                }
-                // Если один в будущем, а другой в прошлом
-                else if (monthA > currentMonth && monthB < currentMonth) {
-                    return -1; // Будущий месяц идет первым
-                }
-                else if (monthA < currentMonth && monthB > currentMonth) {
-                    return 1; // Прошедший месяц идет последним
-                }
-                // Если один из месяцев - текущий, а другой в прошлом
-                else if (monthA === currentMonth && monthB < currentMonth) {
-                    return -1; // Текущий месяц идет перед прошедшим
-                }
-                else if (monthA < currentMonth && monthB === currentMonth) {
-                    return 1; // Прошедший месяц идет после текущего
-                }
-                
-                return 0;
+                return b.property_month - a.property_month;
             });
             
-            if (filteredTrends.length >= 8) {
-                // Берем первые 8 трендов из отфильтрованного диапазона
-                const selectedTrends = filteredTrends.slice(0, 8);
-                console.log(`✅ Selected ${selectedTrends.length} trends from month range`);
-                return selectedTrends;
-            } else {
-                // Если мало трендов в диапазоне, возвращаем все отфильтрованные
-                console.log(`⚠️ Few trends in month range, returning all ${filteredTrends.length}`);
-                return filteredTrends;
-            }
+            console.log(`✅ Returning all ${filteredTrends.length} trends up to current month`);
+            return filteredTrends;
         }
 
         // Generate detailed trends table
@@ -5867,13 +5814,12 @@
             const currentMonth = currentDate.getMonth() + 1;
             
             html += `<tr class="filter-info"><td colspan="6" style="text-align: center; font-size: 11px; color: #666; background: #f8f9fa; padding: 4px;">
-                Показано ${filteredTrends.length} из ${trends.length} трендов
+                Показано ${filteredTrends.length} трендов (все месяцы до ${currentMonth}.${currentYear})
             </td></tr>`;
             
             filteredTrends.forEach((trend, index) => {
                 // Проверяем, является ли этот тренд текущим месяцем
                 const isCurrentMonth = trend.property_year === currentYear && trend.property_month === currentMonth;
-                const isFutureMonth = trend.property_year > currentYear || (trend.property_year === currentYear && trend.property_month > currentMonth);
                 
                 let rowClass = '';
                 let rowStyle = '';
@@ -5881,9 +5827,6 @@
                 if (isCurrentMonth) {
                     rowClass = 'current-month-row';
                     rowStyle = 'background-color: #e8f4fd;';
-                } else if (isFutureMonth) {
-                    rowClass = 'forecast-row';
-                    rowStyle = 'background-color: #f0f8ff;';
                 }
                 
                 html += `<tr class="${rowClass}" style="${rowStyle}">`;
@@ -5926,7 +5869,7 @@
             
             // Инициализируем график прогноза после добавления HTML
             setTimeout(() => {
-                // Находим данные прогноза для графика
+                // Находим данные прогноза для графика (только будущие месяцы)
                 const currentDate = new Date();
                 const currentYear = currentDate.getFullYear();
                 const currentMonth = currentDate.getMonth() + 1;
@@ -5935,13 +5878,13 @@
                     if (trend.property_year > currentYear) {
                         return true; // Будущие годы
                     } else if (trend.property_year === currentYear) {
-                        return trend.property_month >= currentMonth; // Текущий месяц и будущие
+                        return trend.property_month > currentMonth; // Только будущие месяцы (не включая текущий)
                     }
                     return false;
                 });
                 
                 if (forecastTrends.length > 0) {
-                    console.log('📊 Initializing forecast chart with filtered data:', forecastTrends.length, 'records');
+                    console.log('📊 Initializing forecast chart with future data:', forecastTrends.length, 'records');
                     initializeForecastChart(forecastTrends);
                 }
             }, 100);
