@@ -1108,6 +1108,7 @@
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             background: white;
+            min-width: 300px;
         }
         
         .detailed-indicators-table {
@@ -1115,28 +1116,44 @@
             border-collapse: collapse;
             background: white;
             font-size: 14px;
+            table-layout: fixed;
         }
         
         .detailed-indicators-table th {
             background: #28a745;
             color: white;
-            padding: 12px 15px;
+            padding: 8px 10px;
             text-align: center;
             font-weight: 600;
-            line-height: 1.2;
+            line-height: 1;
             border: 1px solid #dee2e6;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         
         .detailed-indicators-table th:first-child {
             text-align: left;
-            padding-left: 20px;
+            padding-left: 15px;
+            width: 40%;
+        }
+        
+        .detailed-indicators-table th:nth-child(2),
+        .detailed-indicators-table th:nth-child(3) {
+            width: 30%;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         
         .detailed-indicators-table td {
-            padding: 12px 15px;
+            padding: 8px 10px;
             text-align: center;
             border: 1px solid #dee2e6;
             vertical-align: middle;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         
         .detailed-indicators-table td:first-child {
@@ -1144,11 +1161,61 @@
             font-weight: 600;
             color: #495057;
             background: #f8f9fa;
-            padding-left: 20px;
+            padding-left: 15px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            width: 40%;
+            position: relative;
+        }
+        
+        .detailed-indicators-table td:first-child:hover::after {
+            content: attr(title);
+            position: absolute;
+            left: 100%;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #333;
+            color: white;
+            padding: 5px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            white-space: nowrap;
+            z-index: 1000;
+            margin-left: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+        
+        /* Mobile touch alternative for tooltips */
+        @media (max-width: 768px) {
+            .detailed-indicators-table td:first-child:active::after,
+            .detailed-indicators-table td:first-child:focus::after {
+                content: attr(title);
+                position: absolute;
+                left: 50%;
+                top: -40px;
+                transform: translateX(-50%);
+                background: #333;
+                color: white;
+                padding: 5px 8px;
+                border-radius: 4px;
+                font-size: 11px;
+                white-space: nowrap;
+                z-index: 1000;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            }
         }
         
         .detailed-indicators-table tr:nth-child(even) td:not(:first-child) {
             background: #f8f9fa;
+        }
+        
+        .detailed-indicators-table td:nth-child(2),
+        .detailed-indicators-table td:nth-child(3) {
+            width: 30%;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         
         .detailed-indicators-table tr:hover td:not(:first-child) {
@@ -1157,27 +1224,6 @@
         
         /* Mobile responsive for detailed indicators table */
         @media (max-width: 768px) {
-            .detailed-indicators-table {
-                font-size: 12px;
-            }
-            
-            .detailed-indicators-table th,
-            .detailed-indicators-table td {
-                padding: 8px 10px;
-            }
-            
-            .detailed-indicators-table th:first-child,
-            .detailed-indicators-table td:first-child {
-                padding-left: 12px;
-            }
-            
-            .detailed-indicators-table-title {
-                font-size: 16px;
-                margin-bottom: 12px;
-            }
-        }
-        
-        @media (max-width: 480px) {
             .detailed-indicators-table {
                 font-size: 11px;
             }
@@ -1193,8 +1239,57 @@
             }
             
             .detailed-indicators-table-title {
+                font-size: 16px;
+                margin-bottom: 12px;
+            }
+            
+            .detailed-indicators-table-container {
+                min-width: 320px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .detailed-indicators-table {
+                font-size: 10px;
+            }
+            
+            .detailed-indicators-table th,
+            .detailed-indicators-table td {
+                padding: 4px 6px;
+            }
+            
+            .detailed-indicators-table th:first-child,
+            .detailed-indicators-table td:first-child {
+                padding-left: 8px;
+            }
+            
+            .detailed-indicators-table-title {
                 font-size: 15px;
                 margin-bottom: 10px;
+            }
+            
+            .detailed-indicators-table-container {
+                min-width: 280px;
+            }
+        }
+        
+        @media (max-width: 360px) {
+            .detailed-indicators-table {
+                font-size: 9px;
+            }
+            
+            .detailed-indicators-table th,
+            .detailed-indicators-table td {
+                padding: 3px 4px;
+            }
+            
+            .detailed-indicators-table th:first-child,
+            .detailed-indicators-table td:first-child {
+                padding-left: 6px;
+            }
+            
+            .detailed-indicators-table-container {
+                min-width: 260px;
             }
         }
 
@@ -5170,7 +5265,7 @@
             // Area row
             if (avgSaleArea > 0 || avgRentArea > 0) {
                 html += '<tr>';
-                html += `<td>${getText('areaRowLabel')}</td>`;
+                html += `<td title="${getText('areaRowLabel')}">${getText('areaRowLabel')}</td>`;
                 html += `<td>${avgSaleArea > 0 ? avgSaleArea + ' м²' : '-'}</td>`;
                 html += `<td>${avgRentArea > 0 ? avgRentArea + ' м²' : '-'}</td>`;
                 html += '</tr>';
@@ -5179,7 +5274,7 @@
             // Period min row
             if (salePeriod.min > 0 || rentPeriod.min > 0) {
                 html += '<tr>';
-                html += `<td>${getText('periodMinRowLabel')}</td>`;
+                html += `<td title="${getText('periodMinRowLabel')}">${getText('periodMinRowLabel')}</td>`;
                 html += `<td>${salePeriod.min > 0 ? salePeriod.min + ' ' + getText('daysUnit') : '-'}</td>`;
                 html += `<td>${rentPeriod.min > 0 ? rentPeriod.min + ' ' + getText('daysUnit') : '-'}</td>`;
                 html += '</tr>';
@@ -5188,7 +5283,7 @@
             // Period max row
             if (salePeriod.max > 0 || rentPeriod.max > 0) {
                 html += '<tr>';
-                html += `<td>${getText('periodMaxRowLabel')}</td>`;
+                html += `<td title="${getText('periodMaxRowLabel')}">${getText('periodMaxRowLabel')}</td>`;
                 html += `<td>${salePeriod.max > 0 ? salePeriod.max + ' ' + getText('daysUnit') : '-'}</td>`;
                 html += `<td>${rentPeriod.max > 0 ? rentPeriod.max + ' ' + getText('daysUnit') : '-'}</td>`;
                 html += '</tr>';
@@ -5197,7 +5292,7 @@
             // Price min row
             if (avgMinSalePrice > 0 || avgMinRentPrice > 0) {
                 html += '<tr>';
-                html += `<td>${getText('priceMinRowLabel')}</td>`;
+                html += `<td title="${getText('priceMinRowLabel')}">${getText('priceMinRowLabel')}</td>`;
                 html += `<td>${avgMinSalePrice > 0 ? formatValue(avgMinSalePrice, 'price') : '-'}</td>`;
                 html += `<td>${avgMinRentPrice > 0 ? formatValue(avgMinRentPrice, 'price') : '-'}</td>`;
                 html += '</tr>';
@@ -5206,7 +5301,7 @@
             // Price max row
             if (avgMaxSalePrice > 0 || avgMaxRentPrice > 0) {
                 html += '<tr>';
-                html += `<td>${getText('priceMaxRowLabel')}</td>`;
+                html += `<td title="${getText('priceMaxRowLabel')}">${getText('priceMaxRowLabel')}</td>`;
                 html += `<td>${avgMaxSalePrice > 0 ? formatValue(avgMaxSalePrice, 'price') : '-'}</td>`;
                 html += `<td>${avgMaxRentPrice > 0 ? formatValue(avgMaxRentPrice, 'price') : '-'}</td>`;
                 html += '</tr>';
