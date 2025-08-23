@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Тест расчета средних цен для трендов</title>
+    <title>Тест новой логики таблицы трендов</title>
     <style>
         body { font-family: Arial, sans-serif; margin: 20px; }
         .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
@@ -13,10 +13,14 @@
         table { border-collapse: collapse; width: 100%; margin: 10px 0; }
         th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
         th { background-color: #f2f2f2; }
+        .current-month { background-color: #e8f4fd; }
+        .future-month { background-color: #f0f8ff; }
+        .historical-month { background-color: #f9f9f9; }
     </style>
 </head>
 <body>
-    <h1>Тест расчета средних цен для таблицы трендов</h1>
+    <h1>Тест новой логики таблицы трендов</h1>
+    <p><strong>Новая логика:</strong> Отображение ВСЕХ исторических данных + текущий месяц + прогноз</p>
     
     <div class="test-section">
         <h2>1. Тест глобальных переменных</h2>
@@ -31,14 +35,14 @@
     </div>
     
     <div class="test-section">
-        <h2>3. Тест определения текущего месяца</h2>
-        <button onclick="testCurrentMonthDetection()">Проверить определение текущего месяца</button>
-        <div id="currentMonthResult" class="result"></div>
+        <h2>3. Тест новой логики фильтрации</h2>
+        <button onclick="testNewFilteringLogic()">Проверить новую логику фильтрации</button>
+        <div id="filteringResult" class="result"></div>
     </div>
     
     <div class="test-section">
-        <h2>4. Тест данных трендов</h2>
-        <button onclick="testTrendsData()">Проверить данные трендов</button>
+        <h2>4. Тест данных трендов с новой логикой</h2>
+        <button onclick="testNewTrendsData()">Проверить данные трендов</button>
         <div id="trendsDataResult" class="result"></div>
     </div>
 
@@ -49,50 +53,45 @@
         window.avgMinRentPrice = 200;
         window.avgMaxRentPrice = 250;
         
-        // Имитируем данные трендов
+        // Имитируем расширенные данные трендов (включая предыдущие годы)
         const mockTrends = [
+            // Текущий год (2025) - будущие месяцы
             {
-                date: '2025-02-01',
-                unit_price_for_sale: 32752,
-                unit_price_for_rent: 213.23,
-                price_change_sale: 0.0395,
-                price_change_rent: 0.0223,
-                yield: 0.0781
+                date: '2025-10-01',
+                property_year: 2025,
+                property_month: 10,
+                unit_price_for_sale: 39000,
+                unit_price_for_rent: 250.00,
+                price_change_sale: 0.0100,
+                price_change_rent: 0.0250,
+                yield: 0.0770
             },
             {
-                date: '2025-03-01',
-                unit_price_for_sale: 33806,
-                unit_price_for_rent: 215.33,
-                price_change_sale: 0.0322,
-                price_change_rent: 0.0098,
-                yield: 0.0764
+                date: '2025-09-01',
+                property_year: 2025,
+                property_month: 9,
+                unit_price_for_sale: 38041,
+                unit_price_for_rent: 245.40,
+                price_change_sale: 0.0114,
+                price_change_rent: 0.0298,
+                yield: 0.0774
             },
+            // Текущий год (2025) - текущий месяц (август)
             {
-                date: '2025-04-01',
-                unit_price_for_sale: 34937,
-                unit_price_for_rent: 219.14,
-                price_change_sale: 0.0335,
-                price_change_rent: 0.0177,
-                yield: 0.0753
+                date: '2025-08-01',
+                property_year: 2025,
+                property_month: 8,
+                unit_price_for_sale: 37613,
+                unit_price_for_rent: 238.29,
+                price_change_sale: 0.0166,
+                price_change_rent: 0.0264,
+                yield: 0.0760
             },
-            {
-                date: '2025-05-01',
-                unit_price_for_sale: 35740,
-                unit_price_for_rent: 222.20,
-                price_change_sale: 0.0230,
-                price_change_rent: 0.0140,
-                yield: 0.0746
-            },
-            {
-                date: '2025-06-01',
-                unit_price_for_sale: 36505,
-                unit_price_for_rent: 227.62,
-                price_change_sale: 0.0214,
-                price_change_rent: 0.0244,
-                yield: 0.0748
-            },
+            // Текущий год (2025) - прошедшие месяцы
             {
                 date: '2025-07-01',
+                property_year: 2025,
+                property_month: 7,
                 unit_price_for_sale: 37000,
                 unit_price_for_rent: 232.16,
                 price_change_sale: 0.0136,
@@ -100,20 +99,185 @@
                 yield: 0.0753
             },
             {
-                date: '2025-08-01',
-                unit_price_for_sale: 37613,
-                unit_price_for_rent: 238.29,
-                price_change_sale: 0.0166,
-                price_change_rent: 0.0264,
-                yield: 0.0760
+                date: '2025-06-01',
+                property_year: 2025,
+                property_month: 6,
+                unit_price_for_sale: 36505,
+                unit_price_for_rent: 227.62,
+                price_change_sale: 0.0214,
+                price_change_rent: 0.0244,
+                yield: 0.0748
             },
             {
-                date: '2025-09-01',
-                unit_price_for_sale: 38041,
-                unit_price_for_rent: 245.40,
-                price_change_sale: 0.0114,
-                price_change_rent: 0.0298,
-                yield: 0.0774
+                date: '2025-05-01',
+                property_year: 2025,
+                property_month: 5,
+                unit_price_for_sale: 35740,
+                unit_price_for_rent: 222.20,
+                price_change_sale: 0.0230,
+                price_change_rent: 0.0140,
+                yield: 0.0746
+            },
+            {
+                date: '2025-04-01',
+                property_year: 2025,
+                property_month: 4,
+                unit_price_for_sale: 34937,
+                unit_price_for_rent: 219.14,
+                price_change_sale: 0.0335,
+                price_change_rent: 0.0177,
+                yield: 0.0753
+            },
+            {
+                date: '2025-03-01',
+                property_year: 2025,
+                property_month: 3,
+                unit_price_for_sale: 33806,
+                unit_price_for_rent: 215.33,
+                price_change_sale: 0.0322,
+                price_change_rent: 0.0098,
+                yield: 0.0764
+            },
+            {
+                date: '2025-02-01',
+                property_year: 2025,
+                property_month: 2,
+                unit_price_for_sale: 32752,
+                unit_price_for_rent: 213.23,
+                price_change_sale: 0.0395,
+                price_change_rent: 0.0223,
+                yield: 0.0781
+            },
+            {
+                date: '2025-01-01',
+                property_year: 2025,
+                property_month: 1,
+                unit_price_for_sale: 31500,
+                unit_price_for_rent: 210.00,
+                price_change_sale: 0.0400,
+                price_change_rent: 0.0200,
+                yield: 0.0800
+            },
+            // Предыдущий год (2024) - все месяцы
+            {
+                date: '2024-12-01',
+                property_year: 2024,
+                property_month: 12,
+                unit_price_for_sale: 30288,
+                unit_price_for_rent: 205.88,
+                price_change_sale: 0.0350,
+                price_change_rent: 0.0180,
+                yield: 0.0815
+            },
+            {
+                date: '2024-11-01',
+                property_year: 2024,
+                property_month: 11,
+                unit_price_for_sale: 29264,
+                unit_price_for_rent: 202.00,
+                price_change_sale: 0.0380,
+                price_change_rent: 0.0190,
+                yield: 0.0828
+            },
+            {
+                date: '2024-10-01',
+                property_year: 2024,
+                property_month: 10,
+                unit_price_for_sale: 28190,
+                unit_price_for_rent: 198.00,
+                price_change_sale: 0.0400,
+                price_change_rent: 0.0200,
+                yield: 0.0842
+            },
+            {
+                date: '2024-09-01',
+                property_year: 2024,
+                property_month: 9,
+                unit_price_for_sale: 27106,
+                unit_price_for_rent: 194.12,
+                price_change_sale: 0.0420,
+                price_change_rent: 0.0210,
+                yield: 0.0858
+            },
+            {
+                date: '2024-08-01',
+                property_year: 2024,
+                property_month: 8,
+                unit_price_for_sale: 26000,
+                unit_price_for_rent: 190.00,
+                price_change_sale: 0.0440,
+                price_change_rent: 0.0220,
+                yield: 0.0877
+            },
+            {
+                date: '2024-07-01',
+                property_year: 2024,
+                property_month: 7,
+                unit_price_for_sale: 24904,
+                unit_price_for_rent: 186.00,
+                price_change_sale: 0.0460,
+                price_change_rent: 0.0230,
+                yield: 0.0896
+            },
+            {
+                date: '2024-06-01',
+                property_year: 2024,
+                property_month: 6,
+                unit_price_for_sale: 23760,
+                unit_price_for_rent: 182.00,
+                price_change_sale: 0.0480,
+                price_change_rent: 0.0240,
+                yield: 0.0918
+            },
+            {
+                date: '2024-05-01',
+                property_year: 2024,
+                property_month: 5,
+                unit_price_for_sale: 22629,
+                unit_price_for_rent: 178.00,
+                price_change_sale: 0.0500,
+                price_change_rent: 0.0250,
+                yield: 0.0943
+            },
+            {
+                date: '2024-04-01',
+                property_year: 2024,
+                property_month: 4,
+                unit_price_for_sale: 21552,
+                unit_price_for_rent: 174.00,
+                price_change_sale: 0.0520,
+                price_change_rent: 0.0260,
+                yield: 0.0969
+            },
+            {
+                date: '2024-03-01',
+                property_year: 2024,
+                property_month: 3,
+                unit_price_for_sale: 20478,
+                unit_price_for_rent: 170.00,
+                price_change_sale: 0.0540,
+                price_change_rent: 0.0270,
+                yield: 0.0996
+            },
+            {
+                date: '2024-02-01',
+                property_year: 2024,
+                property_month: 2,
+                unit_price_for_sale: 19436,
+                unit_price_for_rent: 166.00,
+                price_change_sale: 0.0560,
+                price_change_rent: 0.0280,
+                yield: 0.1025
+            },
+            {
+                date: '2024-01-01',
+                property_year: 2024,
+                property_month: 1,
+                unit_price_for_sale: 18400,
+                unit_price_for_rent: 162.00,
+                price_change_sale: 0.0580,
+                price_change_rent: 0.0290,
+                yield: 0.1057
             }
         ];
         
@@ -168,49 +332,63 @@
             result.innerHTML = html;
         }
         
-        function testCurrentMonthDetection() {
-            const result = document.getElementById('currentMonthResult');
-            const currentDate = new Date();
-            const currentYear = currentDate.getFullYear();
-            const currentMonth = currentDate.getMonth() + 1;
+        function testNewFilteringLogic() {
+            const result = document.getElementById('filteringResult');
             
-            let html = '<h3>Определение текущего месяца:</h3>';
-            html += `<p><strong>Текущая дата:</strong> ${currentDate.toLocaleDateString('ru-RU')}</p>`;
-            html += `<p><strong>Текущий год:</strong> ${currentYear}</p>`;
-            html += `<p><strong>Текущий месяц:</strong> ${currentMonth}</p>`;
+            // Имитируем новую логику фильтрации
+            const currentYear = new Date().getFullYear();
+            const currentMonth = new Date().getMonth() + 1;
             
-            // Тестируем на данных трендов
-            html += '<h4>Анализ дат трендов:</h4>';
-            html += '<table><tr><th>Дата тренда</th><th>Год</th><th>Месяц</th><th>Текущий месяц?</th><th>Будущий месяц?</th></tr>';
-            
-            mockTrends.forEach(trend => {
-                const trendDate = new Date(trend.date);
-                const trendYear = trendDate.getFullYear();
-                const trendMonth = trendDate.getMonth() + 1;
-                
-                const isCurrentMonth = trendYear === currentYear && trendMonth === currentMonth;
-                const isFutureMonth = trendYear > currentYear || (trendYear === currentYear && trendMonth > currentMonth);
-                
-                const currentMonthClass = isCurrentMonth ? 'success' : '';
-                const futureMonthClass = isFutureMonth ? 'success' : '';
-                
-                html += `<tr>
-                    <td>${trend.date}</td>
-                    <td>${trendYear}</td>
-                    <td>${trendMonth}</td>
-                    <td class="${currentMonthClass}">${isCurrentMonth ? 'Да' : 'Нет'}</td>
-                    <td class="${futureMonthClass}">${isFutureMonth ? 'Да' : 'Нет'}</td>
-                </tr>`;
+            // Сортируем тренды по property_year и property_month (новые сначала)
+            const sortedTrends = mockTrends.sort((a, b) => {
+                if (a.property_year !== b.property_year) {
+                    return b.property_year - a.property_year;
+                }
+                return b.property_month - a.property_month;
             });
             
+            // Разделяем тренды на категории
+            const currentYearTrends = sortedTrends.filter(trend => trend.property_year === currentYear);
+            const historicalTrends = sortedTrends.filter(trend => trend.property_year < currentYear);
+            const futureTrends = sortedTrends.filter(trend => 
+                trend.property_year > currentYear || 
+                (trend.property_year === currentYear && trend.property_month > currentMonth)
+            );
+            
+            // Для текущего года берем только текущий месяц и 1 месяц вперед
+            const currentMonthTrends = currentYearTrends.filter(trend => 
+                trend.property_month === currentMonth || trend.property_month === currentMonth + 1
+            );
+            
+            // Объединяем все тренды: будущие + текущий месяц + исторические
+            const allTrends = [...futureTrends, ...currentMonthTrends, ...historicalTrends];
+            
+            let html = '<h3>Новая логика фильтрации:</h3>';
+            html += `<p><strong>Текущая дата:</strong> ${currentYear}-${currentMonth}</p>`;
+            html += `<p><strong>Всего трендов:</strong> ${mockTrends.length}</p>`;
+            
+            html += '<h4>Разбивка по категориям:</h4>';
+            html += '<table><tr><th>Категория</th><th>Количество</th><th>Описание</th></tr>';
+            html += `<tr><td>Будущие месяцы</td><td>${futureTrends.length}</td><td>Месяцы после текущего</td></tr>`;
+            html += `<td>Текущий месяц</td><td>${currentMonthTrends.length}</td><td>Текущий месяц + 1 месяц вперед</td></tr>`;
+            html += `<td>Исторические</td><td>${historicalTrends.length}</td><td>Все данные за предыдущие годы</td></tr>`;
             html += '</table>';
+            
+            html += `<p><strong>Итого отображаемых трендов:</strong> ${allTrends.length}</p>`;
+            
+            if (allTrends.length > 8) {
+                html += '<p class="success">✅ Теперь отображается больше трендов (все исторические данные)</p>';
+            } else {
+                html += '<p class="warning">⚠️ Отображается мало трендов</p>';
+            }
+            
             result.innerHTML = html;
         }
         
-        function testTrendsData() {
+        function testNewTrendsData() {
             const result = document.getElementById('trendsDataResult');
             
-            // Имитируем логику generateTrendsTable
+            // Имитируем новую логику generateTrendsTable
             const currentDate = new Date();
             const currentYear = currentDate.getFullYear();
             const currentMonth = currentDate.getMonth() + 1;
@@ -222,16 +400,39 @@
                     Math.round((window.avgMinRentPrice + window.avgMaxRentPrice) / 2) : null
             };
             
-            let html = '<h3>Тест данных трендов с обновленными ценами:</h3>';
-            html += '<table><tr><th>Дата</th><th>Продажа (₺/м²)</th><th>Аренда (₺/м²)</th><th>Тип</th></tr>';
+            // Применяем новую логику фильтрации
+            const sortedTrends = mockTrends.sort((a, b) => {
+                if (a.property_year !== b.property_year) {
+                    return b.property_year - a.property_year;
+                }
+                return b.property_month - a.property_month;
+            });
             
-            mockTrends.forEach(trend => {
+            const currentYearTrends = sortedTrends.filter(trend => trend.property_year === currentYear);
+            const historicalTrends = sortedTrends.filter(trend => trend.property_year < currentYear);
+            const futureTrends = sortedTrends.filter(trend => 
+                trend.property_year > currentYear || 
+                (trend.property_year === currentYear && trend.property_month > currentMonth)
+            );
+            
+            const currentMonthTrends = currentYearTrends.filter(trend => 
+                trend.property_month === currentMonth || trend.property_month === currentMonth + 1
+            );
+            
+            const allTrends = [...futureTrends, ...currentMonthTrends, ...historicalTrends];
+            
+            let html = '<h3>Тест данных трендов с новой логикой:</h3>';
+            html += `<p><strong>Отображается трендов:</strong> ${allTrends.length} (все исторические + текущий месяц + прогноз)</p>`;
+            html += '<table><tr><th>Дата</th><th>Продажа (₺/м²)</th><th>Аренда (₺/м²)</th><th>Тип</th><th>Год</th></tr>';
+            
+            allTrends.forEach(trend => {
                 const trendDate = new Date(trend.date);
                 const trendYear = trendDate.getFullYear();
                 const trendMonth = trendDate.getMonth() + 1;
                 
                 const isCurrentMonth = trendYear === currentYear && trendMonth === currentMonth;
                 const isFutureMonth = trendYear > currentYear || (trendYear === currentYear && trendMonth > currentMonth);
+                const isHistoricalMonth = trendYear < currentYear;
                 
                 let salePrice = trend.unit_price_for_sale;
                 let rentPrice = trend.unit_price_for_rent;
@@ -239,7 +440,7 @@
                 let type = 'Исторический';
                 
                 if (isCurrentMonth) {
-                    rowClass = 'current-month-row';
+                    rowClass = 'current-month';
                     type = 'Текущий месяц';
                     
                     // Для текущего месяца используем средние цены
@@ -248,18 +449,19 @@
                         rentPrice = averagePrices.avgRentPrice;
                     }
                 } else if (isFutureMonth) {
-                    rowClass = 'forecast-row';
+                    rowClass = 'future-month';
                     type = 'Прогноз';
+                } else if (isHistoricalMonth) {
+                    rowClass = 'historical-month';
+                    type = 'Исторический';
                 }
                 
-                const rowStyle = isCurrentMonth ? 'background-color: #e8f4fd;' : 
-                               isFutureMonth ? 'background-color: #f0f8ff;' : '';
-                
-                html += `<tr class="${rowClass}" style="${rowStyle}">
+                html += `<tr class="${rowClass}">
                     <td>${trend.date}</td>
                     <td>${salePrice.toLocaleString('ru-RU', {minimumFractionDigits: 2})}</td>
                     <td>${rentPrice.toLocaleString('ru-RU', {minimumFractionDigits: 2})}</td>
                     <td>${type}</td>
+                    <td>${trend.property_year}</td>
                 </tr>`;
             });
             
@@ -270,6 +472,14 @@
             } else {
                 html += '<p class="error">❌ Средние цены не рассчитаны</p>';
             }
+            
+            html += `<p><strong>Преимущества новой логики:</strong></p>`;
+            html += `<ul>`;
+            html += `<li>Отображаются ВСЕ исторические данные (${historicalTrends.length} трендов)</li>`;
+            html += `<li>Текущий месяц выделяется и использует средние цены</li>`;
+            html += `<li>Прогнозные данные отображаются корректно</li>`;
+            html += `<li>Нет ограничений по количеству исторических трендов</li>`;
+            html += `</ul>`;
             
             result.innerHTML = html;
         }
