@@ -5915,15 +5915,60 @@
                 return '<div class="no-data">Нет данных для отображения</div>';
             }
             
+            // Проверяем, что у нас есть проценты изменения
+            const trendsWithPercentages = trends.filter(trend => 
+                (trend.price_change_sale !== null && trend.price_change_sale !== undefined && parseFloat(trend.price_change_sale) !== 0) ||
+                (trend.price_change_rent !== null && trend.price_change_rent !== undefined && parseFloat(trend.price_change_rent) !== 0)
+            );
+            
+            if (trendsWithPercentages.length === 0) {
+                console.log('⚠️ No trends with percentage changes');
+                return '<div class="no-data">Нет данных о процентных изменениях цен</div>';
+            }
+            
+            console.log(`📊 Найдено ${trendsWithPercentages.length} трендов с процентными изменениями из ${trends.length} общих`);
+            
             // Получаем средние цены для текущего месяца
-            const avgSalePrice = window.avgMinSalePrice && window.avgMaxSalePrice ? 
+            let avgSalePrice = window.avgMinSalePrice && window.avgMaxSalePrice ? 
                 Math.round((window.avgMinSalePrice + window.avgMaxSalePrice) / 2) : 0;
-            const avgRentPrice = window.avgMinRentPrice && window.avgMaxRentPrice ? 
+            let avgRentPrice = window.avgMinRentPrice && window.avgMaxRentPrice ? 
                 Math.round((window.avgMinRentPrice + window.avgMaxRentPrice) * 100) / 100 : 0;
             
             console.log('💰 Базовые цены для текущего месяца:');
             console.log(`   Продажа: (${window.avgMinSalePrice} + ${window.avgMaxSalePrice}) / 2 = ${avgSalePrice} ₺/м²`);
             console.log(`   Аренда: (${window.avgMinRentPrice} + ${window.avgMaxRentPrice}) / 2 = ${avgRentPrice} ₺/м²`);
+            
+            // Проверяем, что базовые цены не равны 0
+            if (avgSalePrice === 0) {
+                console.log('⚠️ Базовая цена продажи равна 0, используем fallback значение');
+                // Используем fallback значение из первого тренда с ценой продажи
+                const firstTrendWithPrice = trends.find(t => t.unit_price_for_sale && t.unit_price_for_sale > 0);
+                if (firstTrendWithPrice) {
+                    avgSalePrice = parseFloat(firstTrendWithPrice.unit_price_for_sale);
+                    console.log(`   Fallback цена продажи: ${avgSalePrice} ₺/м²`);
+                }
+            }
+            
+            if (avgRentPrice === 0) {
+                console.log('⚠️ Базовая цена аренды равна 0, используем fallback значение');
+                // Используем fallback значение из первого тренда с ценой аренды
+                const firstTrendWithRent = trends.find(t => t.unit_price_for_rent && t.unit_price_for_rent > 0);
+                if (firstTrendWithRent) {
+                    avgRentPrice = parseFloat(firstTrendWithRent.unit_price_for_rent);
+                    console.log(`   Fallback цена аренды: ${avgRentPrice} ₺/м²`);
+                }
+            }
+            
+            // Если все еще нет базовых цен, используем примерные значения
+            if (avgSalePrice === 0) {
+                avgSalePrice = 60000; // Примерная цена за м² в Турции
+                console.log(`   Используем примерную цену продажи: ${avgSalePrice} ₺/м²`);
+            }
+            
+            if (avgRentPrice === 0) {
+                avgRentPrice = 300; // Примерная цена аренды за м² в Турции
+                console.log(`   Используем примерную цену аренды: ${avgRentPrice} ₺/м²`);
+            }
             
             // Сортируем тренды по дате (новые сначала)
             const sortedTrends = trends.sort((a, b) => {
@@ -5983,6 +6028,10 @@
                 let calculatedSalePrice = 0;
                 let calculatedRentPrice = 0;
                 
+                // Проверяем, что у тренда есть проценты изменения
+                const salePercentage = parseFloat(trend.price_change_sale) || 0;
+                const rentPercentage = parseFloat(trend.price_change_rent) || 0;
+                
                 if (i === currentMonthIndex) {
                     // Текущий месяц - используем базовые цены
                     calculatedSalePrice = avgSalePrice;
@@ -5991,33 +6040,65 @@
                 } else if (i > currentMonthIndex) {
                     // Будущий месяц - рассчитываем от предыдущего месяца
                     const previousTrend = sortedTrendsForCalculation[i - 1];
-                    const salePercentage = parseFloat(trend.price_change_sale) || 0;
-                    const rentPercentage = parseFloat(trend.price_change_rent) || 0;
                     
-                    // Формула: предыдущая_цена × (1 + процент_изменения)
-                    calculatedSalePrice = previousTrend.calculatedSalePrice * (1 + salePercentage / 100);
-                    calculatedRentPrice = previousTrend.calculatedRentPrice * (1 + rentPercentage / 100);
-                    
-                    console.log(`📈 Будущий месяц ${trend.property_month}/${trend.property_year}: от ${previousTrend.property_month}/${previousTrend.property_year}`);
-                    console.log(`   Продажа: ${previousTrend.calculatedSalePrice} × (1 + ${salePercentage}%) = ${calculatedSalePrice}`);
-                    console.log(`   Аренда: ${previousTrend.calculatedRentPrice} × (1 + ${rentPercentage}%) = ${calculatedRentPrice}`);
+                    if (previousTrend && previousTrend.calculatedSalePrice > 0 && previousTrend.calculatedRentPrice > 0) {
+                        // Формула: предыдущая_цена × (1 + процент_изменения)
+                        calculatedSalePrice = previousTrend.calculatedSalePrice * (1 + salePercentage / 100);
+                        calculatedRentPrice = previousTrend.calculatedRentPrice * (1 + rentPercentage / 100);
+                        
+                        console.log(`📈 Будущий месяц ${trend.property_month}/${trend.property_year}: от ${previousTrend.property_month}/${previousTrend.property_year}`);
+                        console.log(`   Продажа: ${previousTrend.calculatedSalePrice} × (1 + ${salePercentage}%) = ${calculatedSalePrice}`);
+                        console.log(`   Аренда: ${previousTrend.calculatedRentPrice} × (1 + ${rentPercentage}%) = ${calculatedRentPrice}`);
+                    } else {
+                        console.log(`⚠️ Не удалось рассчитать для ${trend.property_month}/${trend.property_year} - нет данных предыдущего месяца`);
+                        calculatedSalePrice = 0;
+                        calculatedRentPrice = 0;
+                    }
                 } else {
                     // Прошлый месяц - рассчитываем от следующего месяца
                     const nextTrend = sortedTrendsForCalculation[i + 1];
-                    const salePercentage = parseFloat(nextTrend.price_change_sale) || 0;
-                    const rentPercentage = parseFloat(nextTrend.price_change_rent) || 0;
                     
-                    // Формула: следующая_цена ÷ (1 + процент_изменения)
-                    calculatedSalePrice = nextTrend.calculatedSalePrice / (1 + salePercentage / 100);
-                    calculatedRentPrice = nextTrend.calculatedRentPrice / (1 + rentPercentage / 100);
-                    
-                    console.log(`📉 Прошлый месяц ${trend.property_month}/${trend.property_year}: от ${nextTrend.property_month}/${nextTrend.property_year}`);
-                    console.log(`   Продажа: ${nextTrend.calculatedSalePrice} ÷ (1 + ${salePercentage}%) = ${calculatedSalePrice}`);
-                    console.log(`   Аренда: ${nextTrend.calculatedRentPrice} ÷ (1 + ${rentPercentage}%) = ${calculatedRentPrice}`);
+                    if (nextTrend && nextTrend.calculatedSalePrice > 0 && nextTrend.calculatedRentPrice > 0) {
+                        // Формула: следующая_цена ÷ (1 + процент_изменения)
+                        calculatedSalePrice = nextTrend.calculatedSalePrice / (1 + salePercentage / 100);
+                        calculatedRentPrice = nextTrend.calculatedRentPrice / (1 + rentPercentage / 100);
+                        
+                        console.log(`📉 Прошлый месяц ${trend.property_month}/${trend.property_year}: от ${nextTrend.property_month}/${nextTrend.property_year}`);
+                        console.log(`   Продажа: ${nextTrend.calculatedSalePrice} ÷ (1 + ${salePercentage}%) = ${calculatedSalePrice}`);
+                        console.log(`   Аренда: ${nextTrend.calculatedRentPrice} ÷ (1 + ${rentPercentage}%) = ${calculatedRentPrice}`);
+                    } else {
+                        console.log(`⚠️ Не удалось рассчитать для ${trend.property_month}/${trend.property_year} - нет данных следующего месяца`);
+                        calculatedSalePrice = 0;
+                        calculatedRentPrice = 0;
+                    }
                 }
                 
                 // Рассчитываем доходность: (аренда / продажа) * 100 * 12
-                const yield = calculatedSalePrice > 0 ? (calculatedRentPrice / calculatedSalePrice) * 100 * 12 : 0;
+                let yield = 0;
+                if (calculatedSalePrice > 0 && calculatedRentPrice > 0) {
+                    yield = (calculatedRentPrice / calculatedSalePrice) * 100 * 12;
+                } else if (calculatedSalePrice > 0 && calculatedRentPrice === 0) {
+                    // Если аренда равна 0, но продажа есть, показываем 0 доходность
+                    yield = 0;
+                } else {
+                    yield = 0;
+                }
+                
+                // Проверяем корректность рассчитанных значений
+                if (isNaN(calculatedSalePrice) || calculatedSalePrice < 0) {
+                    console.log(`⚠️ Некорректная цена продажи для ${trend.property_month}/${trend.property_year}: ${calculatedSalePrice}`);
+                    calculatedSalePrice = 0;
+                }
+                
+                if (isNaN(calculatedRentPrice) || calculatedRentPrice < 0) {
+                    console.log(`⚠️ Некорректная цена аренды для ${trend.property_month}/${trend.property_year}: ${calculatedRentPrice}`);
+                    calculatedRentPrice = 0;
+                }
+                
+                if (isNaN(yield) || yield < 0) {
+                    console.log(`⚠️ Некорректная доходность для ${trend.property_month}/${trend.property_year}: ${yield}`);
+                    yield = 0;
+                }
                 
                 calculatedTrends.push({
                     ...trend,
