@@ -1856,13 +1856,6 @@
             font-style: italic;
         }
         
-        /* Стили для информационной строки о расчетах */
-        .trends-table .calculation-info td {
-            border: none;
-            font-style: italic;
-            font-weight: 500;
-        }
-        
         /* Стили для графика трендов */
         .trends-chart-section {
             margin-top: 20px;
@@ -1903,6 +1896,134 @@
         .chart-button:hover {
             border-color: #667eea;
             box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+        }
+        
+        /* Trends Data Table Styles */
+        .trends-data-table-section {
+            margin-top: 25px;
+            margin-bottom: 20px;
+        }
+        
+        .trends-data-table-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .trends-data-table-container {
+            overflow-x: auto;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            background: white;
+            min-width: 400px;
+        }
+        
+        .trends-data-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            font-size: 12px;
+            table-layout: fixed;
+        }
+        
+        .trends-data-table th {
+            background: #17a2b8;
+            color: white;
+            padding: 10px 8px;
+            text-align: center;
+            font-weight: 600;
+            line-height: 1.2;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .trends-data-table td {
+            padding: 8px 6px;
+            text-align: center;
+            border: 1px solid #dee2e6;
+            vertical-align: middle;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .trends-data-table tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+        
+        .trends-data-table tr:hover {
+            background: #e9ecef;
+        }
+        
+        /* Специальные стили для ширины столбцов таблицы данных трендов */
+        .trends-data-table th:nth-child(1) { width: 20%; } /* Месяц/Год */
+        .trends-data-table th:nth-child(2) { width: 18%; } /* Цена продажи */
+        .trends-data-table th:nth-child(3) { width: 18%; } /* Изменение цены продажи */
+        .trends-data-table th:nth-child(4) { width: 18%; } /* Цена аренды */
+        .trends-data-table th:nth-child(5) { width: 18%; } /* Изменение цены аренды */
+        .trends-data-table th:nth-child(6) { width: 8%; } /* Доходность */
+        
+        /* Стили для разных типов строк */
+        .trends-data-table .current-month-row {
+            background-color: #e8f4fd !important;
+        }
+        
+        .trends-data-table .future-month-row {
+            background-color: #f0f8ff !important;
+        }
+        
+        .trends-data-table .past-month-row {
+            background-color: #f8f9fa !important;
+        }
+        
+        .trends-data-table .current-month-row:hover,
+        .trends-data-table .future-month-row:hover,
+        .trends-data-table .past-month-row:hover {
+            background-color: #e9ecef !important;
+        }
+        
+        /* Подсказки для длинного текста в таблице данных трендов */
+        .trends-data-table td:first-child {
+            position: relative;
+        }
+        
+        .trends-data-table td:first-child:hover::after {
+            content: attr(title);
+            position: absolute;
+            left: 50%;
+            top: -40px;
+            transform: translateX(-50%);
+            background: #333;
+            color: white;
+            padding: 5px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            white-space: nowrap;
+            z-index: 1000;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+        
+        /* Мобильные подсказки для таблицы данных трендов */
+        @media (max-width: 768px) {
+            .trends-data-table td:first-child:active::after,
+            .trends-data-table td:first-child:focus::after {
+                content: attr(title);
+                position: absolute;
+                left: 50%;
+                top: -35px;
+                transform: translateX(-50%);
+                background: #333;
+                color: white;
+                padding: 4px 6px;
+                border-radius: 4px;
+                font-size: 10px;
+                white-space: nowrap;
+                z-index: 1000;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            }
         }
         
         .chart-button.active {
@@ -1968,17 +2089,6 @@
             background-color: #f0f8ff;
         }
         
-        /* Стили для рассчитанных исторических цен */
-        .trends-table .historical-calculated {
-            background-color: #fff8e1;
-        }
-        
-        .trends-table .historical-calculated td:nth-child(2),
-        .trends-table .historical-calculated td:nth-child(4) {
-            font-weight: 600;
-            color: #e65100;
-        }
-        
         /* Мобильные устройства */
         @media (max-width: 768px) {
             .trends-table {
@@ -1994,9 +2104,88 @@
             .trends-table th:nth-child(2) { width: 17%; }
             .trends-table th:nth-child(3) { width: 17%; }
             .trends-table th:nth-child(4) { width: 17%; }
-            .trends-table th:nth-child(5) { width: 17%; }
-            .trends-table th:nth-child(6) { width: 14%; }
-                }
+            
+            /* Мобильные стили для таблицы данных трендов */
+            .trends-data-table {
+                font-size: 10px;
+            }
+            
+            .trends-data-table th,
+            .trends-data-table td {
+                padding: 6px 4px;
+            }
+            
+            .trends-data-table-title {
+                font-size: 14px;
+                margin-bottom: 12px;
+            }
+            
+            .trends-data-table-container {
+                min-width: 320px;
+            }
+            
+            /* Убираем подсказки на мобильных для экономии места */
+            .trends-data-table td:first-child:hover::after {
+                display: none;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .trends-data-table {
+                font-size: 9px;
+            }
+            
+            .trends-data-table th,
+            .trends-data-table td {
+                padding: 4px 3px;
+            }
+            
+            .trends-data-table-title {
+                font-size: 13px;
+                margin-bottom: 10px;
+            }
+            
+            .trends-data-table-container {
+                min-width: 280px;
+            }
+            
+            /* Убираем подсказки на маленьких экранах */
+            .trends-data-table td:first-child:hover::after,
+            .trends-data-table td:first-child:active::after,
+            .trends-data-table td:first-child:focus::after {
+                display: none;
+            }
+        }
+        
+        @media (max-width: 360px) {
+            .trends-data-table {
+                font-size: 8px;
+            }
+            
+            .trends-data-table th,
+            .trends-data-table td {
+                padding: 3px 2px;
+            }
+            
+            .trends-data-table-title {
+                font-size: 12px;
+                margin-bottom: 8px;
+            }
+            
+            .trends-data-table-container {
+                min-width: 260px;
+            }
+            
+            /* Убираем подсказки на очень маленьких экранах */
+            .trends-data-table td:first-child:hover::after,
+            .trends-data-table td:first-child:active::after,
+            .trends-data-table td:first-child:focus::after {
+                display: none;
+            }
+        }
+        
+        .trends-table th:nth-child(5) { width: 17%; }
+        .trends-table th:nth-child(6) { width: 14%; }
         
         /* Trends Analysis Styles */
         .trends-analysis-section {
@@ -6069,10 +6258,6 @@
                 }
             }
             
-            // Рассчитываем исторические цены на основе обратного расчета
-            const calculatedTrends = calculateHistoricalPrices(filteredTrends, averagePrices);
-            console.log('📊 Calculated historical prices:', calculatedTrends);
-            
             let html = '<table class="trends-table">';
             html += '<thead><tr>';
             html += '<th>Дата</th>';
@@ -6083,7 +6268,7 @@
             html += '<th>Доходность</th>';
             html += '</tr></thead><tbody>';
             
-            // Добавляем информацию о фильтрации и расчетах
+            // Добавляем информацию о фильтрации
             const currentDate = new Date();
             const currentYear = currentDate.getFullYear();
             const currentMonth = currentDate.getMonth() + 1;
@@ -6092,19 +6277,15 @@
                 Показано ${filteredTrends.length} из ${trends.length} трендов
             </td></tr>`;
             
-            html += `<tr class="calculation-info"><td colspan="6" style="text-align: center; font-size: 10.5px; color: #e65100; background: #fff8e1; padding: 4px;">
-                💡 Исторические цены рассчитаны на основе обратного расчета от текущих цен (август → июль → июнь → май...)
-            </td></tr>`;
-            
-            calculatedTrends.forEach((trend, index) => {
+            filteredTrends.forEach((trend, index) => {
                 // Проверяем, является ли этот тренд текущим месяцем
+                // Используем поле date для определения текущего месяца
                 const trendDate = new Date(trend.date);
                 const trendYear = trendDate.getFullYear();
                 const trendMonth = trendDate.getMonth() + 1;
                 
                 const isCurrentMonth = trendYear === currentYear && trendMonth === currentMonth;
                 const isFutureMonth = trendYear > currentYear || (trendYear === currentYear && trendMonth > currentMonth);
-                const isHistoricalCalculated = !isCurrentMonth && !isFutureMonth;
                 
                 console.log('📅 Trend date analysis:', {
                     trendDate: trend.date,
@@ -6113,31 +6294,45 @@
                     currentYear,
                     currentMonth,
                     isCurrentMonth,
-                    isFutureMonth,
-                    isHistoricalCalculated,
-                    calculatedSalePrice: trend.calculatedSalePrice,
-                    calculatedRentPrice: trend.calculatedRentPrice
+                    isFutureMonth
                 });
                 
                 let rowClass = '';
                 let rowStyle = '';
+                let salePrice = trend.unit_price_for_sale;
+                let rentPrice = trend.unit_price_for_rent;
                 
                 if (isCurrentMonth) {
                     rowClass = 'current-month-row';
                     rowStyle = 'background-color: #e8f4fd;';
+                    
+                    // Для текущего месяца используем средние цены из таблиц данных
+                    if (averagePrices && averagePrices.avgSalePrice && averagePrices.avgRentPrice) {
+                        salePrice = averagePrices.avgSalePrice;
+                        rentPrice = averagePrices.avgRentPrice;
+                        console.log('📊 Current month prices updated:', { 
+                            originalSale: trend.unit_price_for_sale, 
+                            newSale: salePrice,
+                            originalRent: trend.unit_price_for_rent, 
+                            newRent: rentPrice,
+                            avgMinSalePrice: window.avgMinSalePrice,
+                            avgMaxSalePrice: window.avgMaxSalePrice,
+                            avgMinRentPrice: window.avgMinRentPrice,
+                            avgMaxRentPrice: window.avgMaxRentPrice
+                        });
+                    } else {
+                        console.log('⚠️ No average prices available for current month:', averagePrices);
+                    }
                 } else if (isFutureMonth) {
                     rowClass = 'forecast-row';
                     rowStyle = 'background-color: #f0f8ff;';
-                } else if (isHistoricalCalculated) {
-                    rowClass = 'historical-calculated';
-                    rowStyle = 'background-color: #fff8e1;';
                 }
                 
                 html += `<tr class="${rowClass}" style="${rowStyle}">`;
                 html += `<td>${formatTrendDateShort(trend.date)}</td>`;
-                html += `<td>${formatTrendValue(trend.calculatedSalePrice, 'price')}</td>`;
+                html += `<td>${formatTrendValue(salePrice, 'price')}</td>`;
                 html += `<td>${formatPercentage(trend.price_change_sale)}</td>`;
-                html += `<td>${formatTrendValue(trend.calculatedRentPrice, 'price')}</td>`;
+                html += `<td>${formatTrendValue(rentPrice, 'price')}</td>`;
                 html += `<td>${formatPercentage(trend.price_change_rent)}</td>`;
                 html += `<td>${formatTrendValue(trend.yield, 'percentage')}</td>`;
                 html += '</tr>';
@@ -6168,8 +6363,11 @@
                 </div>
             `;
             
+            // Добавляем таблицу с данными трендов
+            html += generateTrendsDataTable(trends);
+            
             // Добавляем блок "Вывод по тренду"
-            html += await generateTrendsAnalysis(calculatedTrends);
+            html += await generateTrendsAnalysis(trends);
             
             // Инициализируем график прогноза после добавления HTML
             setTimeout(() => {
@@ -6178,7 +6376,7 @@
                 const currentYear = currentDate.getFullYear();
                 const currentMonth = currentDate.getMonth() + 1;
                 
-                const forecastTrends = calculatedTrends.filter(trend => {
+                const forecastTrends = trends.filter(trend => {
                     const trendDate = new Date(trend.date);
                     const trendYear = trendDate.getFullYear();
                     const trendMonth = trendDate.getMonth() + 1;
@@ -6192,7 +6390,7 @@
                 });
                 
                 if (forecastTrends.length > 0) {
-                    console.log('📊 Initializing forecast chart with calculated data:', forecastTrends.length, 'records');
+                    console.log('📊 Initializing forecast chart with filtered data:', forecastTrends.length, 'records');
                     initializeForecastChart(forecastTrends);
                 }
             }, 100);
@@ -6202,95 +6400,81 @@
         
 
         
-        // Рассчитываем исторические цены на основе обратного расчета от текущих цен
-        // Логика: идем от текущего месяца назад во времени, используя проценты прироста
-        // Формула: Цена_предыдущего_месяца = Цена_текущего_месяца ÷ (1 + Процент_прироста_текущего_месяца)
-        // Пример: если в августе цена 1000₺/м², а прирост +5%, то в июле цена была 1000 ÷ 1.05 = 952₺/м²
-        function calculateHistoricalPrices(trends, averagePrices) {
-            console.log('🔄 Calculating historical prices from current prices...');
+        // Generate trends data table with detailed information
+        function generateTrendsDataTable(trends) {
+            console.log('📊 Generating trends data table with trends:', trends.length, 'records');
             
             if (!trends || trends.length === 0) {
-                console.log('⚠️ No trends data for historical calculation');
-                return [];
+                console.log('⚠️ No trends data for trends data table');
+                return '';
             }
             
-            if (!averagePrices.avgSalePrice || !averagePrices.avgRentPrice) {
-                console.log('⚠️ No average prices available for historical calculation');
-                return trends;
-            }
-            
-            // Сортируем тренды по дате (от новых к старым)
-            const sortedTrends = [...trends].sort((a, b) => new Date(b.date) - new Date(a.date));
-            
-            // Начинаем с текущих цен (август)
-            let currentSalePrice = averagePrices.avgSalePrice;
-            let currentRentPrice = averagePrices.avgRentPrice;
-            
-            const calculatedTrends = sortedTrends.map((trend, index) => {
-                // Для текущего месяца (август) используем актуальные цены из таблиц данных
-                if (index === 0) {
-                    return {
-                        ...trend,
-                        calculatedSalePrice: currentSalePrice,
-                        calculatedRentPrice: currentRentPrice
-                    };
+            // Сортируем тренды по дате (новые сначала)
+            const sortedTrends = trends.sort((a, b) => {
+                if (a.property_year !== b.property_year) {
+                    return b.property_year - a.property_year;
                 }
-                
-                // Для предыдущих месяцев (июль, июнь, май...) рассчитываем цены на основе обратного расчета
-                // Получаем процент прироста для текущего месяца (который мы только что обработали)
-                const previousTrend = sortedTrends[index - 1];
-                const saleGrowthRate = previousTrend.price_change_sale / 100; // конвертируем в десятичную дробь
-                const rentGrowthRate = previousTrend.price_change_rent / 100;
-                
-                // Рассчитываем цены для предыдущего месяца
-                let previousSalePrice = currentSalePrice;
-                let previousRentPrice = currentRentPrice;
-                
-                // Проверяем корректность процента прироста (не должен быть меньше -100%)
-                if (saleGrowthRate !== 0 && saleGrowthRate > -1) {
-                    previousSalePrice = Math.round(currentSalePrice / (1 + saleGrowthRate));
-                } else if (saleGrowthRate <= -1) {
-                    // Если прирост -100% или меньше, цена была 0, что некорректно
-                    console.warn('⚠️ Invalid sale growth rate:', saleGrowthRate, 'for date:', trend.date);
-                    previousSalePrice = currentSalePrice; // Оставляем текущую цену
-                }
-                
-                if (rentGrowthRate !== 0 && rentGrowthRate > -1) {
-                    previousRentPrice = Math.round(currentRentPrice / (1 + rentGrowthRate));
-                } else if (rentGrowthRate <= -1) {
-                    // Если прирост -100% или меньше, цена была 0, что некорректно
-                    console.warn('⚠️ Invalid rent growth rate:', rentGrowthRate, 'for date:', trend.date);
-                    previousRentPrice = currentRentPrice; // Оставляем текущую цену
-                }
-                
-                // Проверяем минимальные цены (не должны быть меньше 1₺/м²)
-                previousSalePrice = Math.max(previousSalePrice, 1);
-                previousRentPrice = Math.max(previousRentPrice, 1);
-                
-                // Обновляем текущие цены для следующей итерации
-                currentSalePrice = previousSalePrice;
-                currentRentPrice = previousRentPrice;
-                
-                            console.log('📊 Historical price calculation:', {
-                date: trend.date,
-                originalSalePrice: trend.unit_price_for_sale,
-                calculatedSalePrice: previousSalePrice,
-                saleGrowthRate: saleGrowthRate,
-                originalRentPrice: trend.unit_price_for_rent,
-                calculatedRentPrice: previousRentPrice,
-                rentGrowthRate: rentGrowthRate,
-                calculation: `Цена ${previousSalePrice} = ${currentSalePrice} ÷ (1 + ${saleGrowthRate})`
-            });
-                
-                return {
-                    ...trend,
-                    calculatedSalePrice: previousSalePrice,
-                    calculatedRentPrice: previousRentPrice
-                };
+                return b.property_month - a.property_month;
             });
             
-            // Возвращаем в исходном порядке (от старых к новым)
-            return calculatedTrends.reverse();
+            let html = '<div class="trends-data-table-section">';
+            html += '<h4 class="trends-data-table-title">Данные трендов по месяцам</h4>';
+            html += '<div class="trends-data-table-container">';
+            html += '<table class="trends-data-table">';
+            
+            // Заголовок таблицы
+            html += '<thead><tr>';
+            html += '<th>Месяц/Год</th>';
+            html += '<th>Цена продажи<br>(₺/м²)</th>';
+            html += '<th>Изменение цены<br>продажи</th>';
+            html += '<th>Цена аренды<br>(₺/м²)</th>';
+            html += '<th>Изменение цены<br>аренды</th>';
+            html += '<th>Доходность (%)</th>';
+            html += '</tr></thead><tbody>';
+            
+            // Добавляем строки с данными
+            sortedTrends.forEach((trend, index) => {
+                const monthNames = [
+                    'Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
+                    'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'
+                ];
+                
+                const monthName = monthNames[trend.property_month - 1] || trend.property_month;
+                const year = trend.property_year;
+                
+                // Определяем тип строки для стилизации
+                const currentDate = new Date();
+                const currentYear = currentDate.getFullYear();
+                const currentMonth = currentDate.getMonth() + 1;
+                
+                let rowClass = '';
+                let rowStyle = '';
+                
+                if (year === currentYear && trend.property_month === currentMonth) {
+                    rowClass = 'current-month-row';
+                    rowStyle = 'background-color: #e8f4fd;';
+                } else if (year > currentYear || (year === currentYear && trend.property_month > currentMonth)) {
+                    rowClass = 'future-month-row';
+                    rowStyle = 'background-color: #f0f8ff;';
+                } else {
+                    rowClass = 'past-month-row';
+                    rowStyle = 'background-color: #f8f9fa;';
+                }
+                
+                html += `<tr class="${rowClass}" style="${rowStyle}">`;
+                html += `<td title="${monthName} ${year}"><strong>${monthName} ${year}</strong></td>`;
+                html += `<td>${formatTrendValue(trend.unit_price_for_sale, 'price')}</td>`;
+                html += `<td>${formatPercentage(trend.price_change_sale)}</td>`;
+                html += `<td>${formatTrendValue(trend.unit_price_for_rent, 'price')}</td>`;
+                html += `<td>${formatPercentage(trend.price_change_rent)}</td>`;
+                html += `<td>${formatTrendValue(trend.yield, 'percentage')}</td>`;
+                html += '</tr>';
+            });
+            
+            html += '</tbody></table>';
+            html += '</div></div>';
+            
+            return html;
         }
         
         // Generate trends analysis based on table data
