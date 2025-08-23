@@ -231,7 +231,7 @@ def latest_currency():
 
 @app.route('/api/property_trends', methods=['POST'])
 def get_property_trends():
-    """Получение данных трендов из таблицы property_trends для подтвержденных пользователей"""
+    """Получение данных трендов из таблицы property_trends для указанной локации"""
     try:
         data = request.get_json()
         country_id = data.get('country_id')
@@ -256,7 +256,7 @@ def get_property_trends():
         try:
             with connection.cursor(cursor_factory=RealDictCursor) as cursor:
                 # Получаем данные из таблицы property_trends для указанной локации
-                # и только для подтвержденных пользователей
+                # Возвращаем все данные независимо от статуса пользователя
                 query = """
                     SELECT 
                         pt.date,
@@ -268,12 +268,10 @@ def get_property_trends():
                         pt.property_year,
                         pt.property_month
                     FROM property_trends pt
-                    INNER JOIN users u ON pt.user_id = u.id
                     WHERE pt.country_id = %s 
                         AND pt.city_id = %s 
                         AND pt.county_id = %s 
                         AND pt.district_id = %s
-                        AND u.is_confirmed = true
                     ORDER BY pt.property_year DESC, pt.property_month DESC
                 """
                 
@@ -281,6 +279,16 @@ def get_property_trends():
                 trends = cursor.fetchall()
                 
                 print(f"📊 API: Получено {len(trends)} записей из базы данных")
+                print(f"🔍 API: Параметры запроса: country_id={country_id}, city_id={city_id}, county_id={county_id}, district_id={district_id}")
+                
+                # Логируем диапазон дат для диагностики
+                if trends:
+                    years = sorted(set(trend['property_year'] for trend in trends))
+                    months = sorted(set(trend['property_month'] for trend in trends))
+                    print(f"📅 API: Диапазон лет: {min(years)} - {max(years)}")
+                    print(f"📅 API: Диапазон месяцев: {min(months)} - {max(months)}")
+                    print(f"📅 API: Первая запись: {trends[0]}")
+                    print(f"📅 API: Последняя запись: {trends[-1]}")
                 
                 # Конвертируем в список словарей
                 trends_list = []
@@ -305,6 +313,95 @@ def get_property_trends():
             
     except Exception as e:
         print(f"Ошибка при получении property_trends: {e}")
+        return jsonify({
+            'success': False,
+            'message': f'Ошибка сервера: {str(e)}'
+        }), 500
+
+@app.route('/api/property_trends/all', methods=['POST'])
+def get_all_property_trends():
+    """Получение всех данных трендов из таблицы property_trends для указанной локации (включая исторические)"""
+    try:
+        data = request.get_json()
+        country_id = data.get('country_id')
+        city_id = data.get('city_id')
+        county_id = data.get('county_id')
+        district_id = data.get('district_id')
+        
+        if not all([country_id, city_id, county_id, district_id]):
+            return jsonify({
+                'success': False,
+                'message': 'Не все параметры локации указаны'
+            }), 400
+        
+        # Подключаемся к базе данных
+        connection = get_db_connection()
+        if not connection:
+            return jsonify({
+                'success': False,
+                'message': 'Ошибка подключения к базе данных'
+            }), 500
+        
+        try:
+            with connection.cursor(cursor_factory=RealDictCursor) as cursor:
+                # Получаем ВСЕ данные из таблицы property_trends для указанной локации
+                # Без ограничений по пользователям и с более широким поиском
+                query = """
+                    SELECT 
+                        pt.date,
+                        pt.unit_price_for_sale,
+                        pt.price_change_sale,
+                        pt.unit_price_for_rent,
+                        pt.price_change_rent,
+                        pt.yield,
+                        pt.property_year,
+                        pt.property_month
+                    FROM property_trends pt
+                    WHERE pt.country_id = %s 
+                        AND (pt.city_id = %s OR pt.city_id IS NULL)
+                        AND (pt.county_id = %s OR pt.county_id IS NULL)
+                        AND (pt.district_id = %s OR pt.district_id IS NULL)
+                    ORDER BY pt.property_year DESC, pt.property_month DESC
+                """
+                
+                cursor.execute(query, (country_id, city_id, county_id, district_id))
+                trends = cursor.fetchall()
+                
+                print(f"📊 API ALL: Получено {len(trends)} записей из базы данных")
+                print(f"🔍 API ALL: Параметры запроса: country_id={country_id}, city_id={city_id}, county_id={county_id}, district_id={district_id}")
+                
+                # Логируем диапазон дат для диагностики
+                if trends:
+                    years = sorted(set(trend['property_year'] for trend in trends))
+                    months = sorted(set(trend['property_month'] for trend in trends))
+                    print(f"📅 API ALL: Диапазон лет: {min(years)} - {max(years)}")
+                    print(f"📅 API ALL: Диапазон месяцев: {min(months)} - {max(months)}")
+                    print(f"📅 API ALL: Первая запись: {trends[0]}")
+                    print(f"📅 API ALL: Последняя запись: {trends[-1]}")
+                
+                # Конвертируем в список словарей
+                trends_list = []
+                for trend in trends:
+                    trend_dict = dict(trend)
+                    # Преобразуем Decimal в float для JSON сериализации
+                    for key, value in trend_dict.items():
+                        if hasattr(value, 'quantize'):
+                            trend_dict[key] = float(value)
+                    trends_list.append(trend_dict)
+                
+                print(f"📊 API ALL: Возвращаем {len(trends_list)} записей")
+                
+                return jsonify({
+                    'success': True,
+                    'trends': trends_list,
+                    'count': len(trends_list)
+                })
+                
+        finally:
+            connection.close()
+            
+    except Exception as e:
+        print(f"Ошибка при получении всех property_trends: {e}")
         return jsonify({
             'success': False,
             'message': f'Ошибка сервера: {str(e)}'

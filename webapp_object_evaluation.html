@@ -2648,6 +2648,17 @@
             text-decoration: underline;
         }
         
+        /* Стили для кнопки обновления исторических данных */
+        .refresh-button:hover {
+            background: #218838 !important;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);
+        }
+        
+        .refresh-button:active {
+            transform: translateY(0);
+        }
+        
         /* Mobile responsiveness for subscription message */
         @media (max-width: 768px) {
             .subscription-required-section {
@@ -2926,6 +2937,10 @@
                 'marketTrendsTitle': 'Тренды рынка',
                 'historicalTrendsTitle': 'Тренды прошлых месяцев',
                 'historicalTrendsInfo': 'Показано {count} исторических трендов',
+                'refreshHistoricalButton': '🔄 Обновить исторические данные',
+                'loadingHistoricalData': '🔄 Загрузка исторических данных...',
+                'failedToLoadHistorical': '❌ Не удалось загрузить исторические данные',
+                'errorUpdatingData': '❌ Ошибка при обновлении данных',
                 'saleHeader': 'Продажа',
                 'rentHeader': 'Аренда',
                 'currencyTitle': 'Выберите валюту:',
@@ -3074,6 +3089,10 @@
                 'marketTrendsTitle': 'Market Trends',
                 'historicalTrendsTitle': 'Historical Trends',
                 'historicalTrendsInfo': 'Showing {count} historical trends',
+                'refreshHistoricalButton': '🔄 Refresh Historical Data',
+                'loadingHistoricalData': '🔄 Loading historical data...',
+                'failedToLoadHistorical': '❌ Failed to load historical data',
+                'errorUpdatingData': '❌ Error updating data',
                 'saleHeader': 'Sale',
                 'rentHeader': 'Rent',
                 
@@ -3237,6 +3256,10 @@
                 'marketTrendsTitle': 'Markttrends',
                 'historicalTrendsTitle': 'Historische Trends',
                 'historicalTrendsInfo': 'Zeigt {count} historische Trends',
+                'refreshHistoricalButton': '🔄 Historische Daten aktualisieren',
+                'loadingHistoricalData': '🔄 Historische Daten werden geladen...',
+                'failedToLoadHistorical': '❌ Historische Daten konnten nicht geladen werden',
+                'errorUpdatingData': '❌ Fehler beim Aktualisieren der Daten',
                 'marketAnalysisTitle': 'Marktanalyse',
                 'saleAnalysisText': 'Verkauf: bei einer Fläche von {area} m² (Durchschnittswert für verkaufte Immobilien) und einem Mindestpreis von {minPrice}/m² beträgt die Verkaufsdauer ~{minDays} Tage; bei einem Höchstpreis von {maxPrice}/m² - die Verkaufsdauer bis zu {maxDays} Tagen.',
                 'rentAnalysisText': 'Vermietung: bei einer Fläche von {area} m² (Durchschnittswert für vermietete Immobilien) Mindestpreis {minPrice}/m², Mietdauer ~{minDays} Tage; bei einem Höchstpreis von {maxPrice}/m² Dauer bis zu {maxDays} Tagen.'
@@ -3303,6 +3326,10 @@
                 'marketTrendsTitle': 'Tendances du marché',
                 'historicalTrendsTitle': 'Tendances historiques',
                 'historicalTrendsInfo': 'Affichage de {count} tendances historiques',
+                'refreshHistoricalButton': '🔄 Actualiser les données historiques',
+                'loadingHistoricalData': '🔄 Chargement des données historiques...',
+                'failedToLoadHistorical': '❌ Impossible de charger les données historiques',
+                'errorUpdatingData': '❌ Erreur lors de la mise à jour des données',
                 'marketAnalysisTitle': 'Analyse du marché',
                 'saleAnalysisText': 'Vente : avec une surface de {area} m² (valeur moyenne pour les propriétés vendues) et un prix minimum de {minPrice}/m², la période de vente est de ~{minDays} jours ; avec un prix maximum de {maxPrice}/m² - la période de vente est jusqu\'à {maxDays} jours.',
                 'rentAnalysisText': 'Location : avec une surface de {area} m² (valeur moyenne pour les propriétés louées) prix minimum {minPrice}/m², période de location ~{minDays} jours ; avec un prix maximum de {maxPrice}/m² période jusqu\'à {maxDays} jours.'
@@ -3369,6 +3396,10 @@
                 'marketTrendsTitle': 'Piyasa Trendleri',
                 'historicalTrendsTitle': 'Geçmiş Trendler',
                 'historicalTrendsInfo': '{count} geçmiş trend gösteriliyor',
+                'refreshHistoricalButton': '🔄 Geçmiş verileri yenile',
+                'loadingHistoricalData': '🔄 Geçmiş veriler yükleniyor...',
+                'failedToLoadHistorical': '❌ Geçmiş veriler yüklenemedi',
+                'errorUpdatingData': '❌ Veri güncellenirken hata oluştu',
                 'marketAnalysisTitle': 'Piyasa Analizi',
                 'saleAnalysisText': 'Satış: {area} m² alan (satılan mülklerin ortalama değeri) ve {minPrice}/m² minimum fiyat ile satış süresi ~{minDays} gün; {maxPrice}/m² maksimum fiyat ile satış süresi {maxDays} güne kadar.',
                 'rentAnalysisText': 'Kiralama: {area} m² alan (kiralanan mülklerin ortalama değeri) {minPrice}/m² minimum fiyat, kiralama süresi ~{minDays} gün; {maxPrice}/m² maksimum fiyat ile süre {maxDays} güne kadar.'
@@ -4443,6 +4474,14 @@
                 property_price_currency: selectedListingTypes.currency,
                 property_price_eur: priceInEUR,
                 property_area: selectedListingTypes.area
+            };
+            
+            // Сохраняем локацию в глобальной переменной для использования в других функциях
+            window.currentLocation = {
+                country_id: countryId,
+                city_id: cityId,
+                county_id: countyId,
+                district_id: districtId
             };
             
             console.log('📍 Selected location for data loading:', {
@@ -5656,6 +5695,20 @@
                     <!-- Таблица трендов прошлых месяцев -->
                     <div class="trends-table-section" style="margin-top: 25px;">
                         <h4 class="trends-table-title">${getText('historicalTrendsTitle')}</h4>
+                        <div style="text-align: center; margin-bottom: 10px;">
+                            <button class="refresh-button" onclick="refreshHistoricalTrends()" style="
+                                padding: 8px 16px;
+                                background: #28a745;
+                                color: white;
+                                border: none;
+                                border-radius: 6px;
+                                font-size: 12px;
+                                cursor: pointer;
+                                transition: all 0.3s ease;
+                            ">
+                                ${getText('refreshHistoricalButton')}
+                            </button>
+                        </div>
                         <div class="trends-table-container" id="historicalTrendsTableContainer">
                             <!-- Исторические тренды будут загружены асинхронно -->
                         </div>
@@ -5683,8 +5736,18 @@
             // Асинхронно загружаем таблицу исторических трендов
             const historicalTrendsTableContainer = document.getElementById('historicalTrendsTableContainer');
             if (historicalTrendsTableContainer) {
-                const historicalTrendsTableHtml = await generateHistoricalTrendsTable(trends);
-                historicalTrendsTableContainer.innerHTML = historicalTrendsTableHtml;
+                // Загружаем все исторические данные из нового endpoint
+                const allHistoricalTrends = await fetchAllHistoricalTrends();
+                if (allHistoricalTrends && allHistoricalTrends.length > 0) {
+                    console.log('📊 Historical trends loaded:', allHistoricalTrends.length, 'records');
+                    const historicalTrendsTableHtml = await generateHistoricalTrendsTable(allHistoricalTrends);
+                    historicalTrendsTableContainer.innerHTML = historicalTrendsTableHtml;
+                } else {
+                    // Если не удалось загрузить все данные, используем текущие
+                    console.log('⚠️ Using current trends for historical table');
+                    const historicalTrendsTableHtml = await generateHistoricalTrendsTable(trends);
+                    historicalTrendsTableContainer.innerHTML = historicalTrendsTableHtml;
+                }
             }
         }
         
@@ -5977,6 +6040,86 @@
             return html;
         }
         
+        // Fetch all historical trends data from the API
+        async function fetchAllHistoricalTrends() {
+            try {
+                // Получаем текущие выбранные локации
+                const currentLocation = window.currentLocation || {};
+                const countryId = currentLocation.country_id;
+                const cityId = currentLocation.city_id;
+                const countyId = currentLocation.county_id;
+                const districtId = currentLocation.district_id;
+                
+                if (!countryId || !cityId || !countyId || !districtId) {
+                    console.log('⚠️ Location not selected, cannot fetch historical trends');
+                    return null;
+                }
+                
+                console.log('🔍 Fetching historical trends for location:', { countryId, cityId, countyId, districtId });
+                
+                const response = await fetch('/api/property_trends/all', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        country_id: countryId,
+                        city_id: cityId,
+                        county_id: countyId,
+                        district_id: districtId
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                if (data.success && data.trends) {
+                    console.log('✅ Historical trends fetched successfully:', data.trends.length, 'records');
+                    return data.trends;
+                } else {
+                    console.log('⚠️ Failed to fetch historical trends:', data.message);
+                    return null;
+                }
+                
+            } catch (error) {
+                console.error('❌ Error fetching historical trends:', error);
+                return null;
+            }
+        }
+        
+        // Refresh historical trends data
+        async function refreshHistoricalTrends() {
+            console.log('🔄 Refreshing historical trends...');
+            
+            const historicalTrendsTableContainer = document.getElementById('historicalTrendsTableContainer');
+            if (!historicalTrendsTableContainer) {
+                console.log('⚠️ Historical trends container not found');
+                return;
+            }
+            
+            // Показываем индикатор загрузки
+            historicalTrendsTableContainer.innerHTML = `<div style="text-align: center; padding: 20px; color: #666;">${getText('loadingHistoricalData')}</div>`;
+            
+            try {
+                // Загружаем все исторические данные заново
+                const allHistoricalTrends = await fetchAllHistoricalTrends();
+                if (allHistoricalTrends && allHistoricalTrends.length > 0) {
+                    console.log('✅ Historical trends refreshed:', allHistoricalTrends.length, 'records');
+                    const historicalTrendsTableHtml = await generateHistoricalTrendsTable(allHistoricalTrends);
+                    historicalTrendsTableContainer.innerHTML = historicalTrendsTableHtml;
+                } else {
+                    console.log('⚠️ Failed to refresh historical trends');
+                    historicalTrendsTableContainer.innerHTML = `<div style="text-align: center; padding: 20px; color: #dc3545;">${getText('failedToLoadHistorical')}</div>`;
+                }
+            } catch (error) {
+                console.error('❌ Error refreshing historical trends:', error);
+                historicalTrendsTableContainer.innerHTML = `<div style="text-align: center; padding: 20px; color: #dc3545;">${getText('errorUpdatingData')}</div>`;
+            }
+        }
+        
         // Generate historical trends table with all available data
         async function generateHistoricalTrendsTable(trends) {
             console.log('📊 Generating historical trends table with trends:', trends.length, 'records');
@@ -5995,6 +6138,17 @@
             });
             
             console.log('🔍 Sorted historical trends:', sortedTrends.length, 'records');
+            
+            // Диагностика: выводим диапазон дат
+            if (sortedTrends.length > 0) {
+                const years = sortedTrends.map(t => t.property_year).sort((a, b) => b - a);
+                const months = sortedTrends.map(t => t.property_month).sort((a, b) => b - a);
+                console.log('📅 Historical trends date range:');
+                console.log('  - Years:', years[0], 'to', years[years.length - 1]);
+                console.log('  - Months:', months[0], 'to', months[months.length - 1]);
+                console.log('  - First record:', sortedTrends[0]);
+                console.log('  - Last record:', sortedTrends[sortedTrends.length - 1]);
+            }
             
             let html = '<table class="trends-table">';
             html += '<thead><tr>';
