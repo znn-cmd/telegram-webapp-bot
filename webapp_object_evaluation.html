@@ -5745,7 +5745,7 @@
             }
         }
 
-                // Filter trends to show 6 months before current month and 1 month after
+                // Filter trends to show 18 months before current month and 1 month after
         function filterTrendsByDateRange(trends) {
             if (!trends || trends.length === 0) return [];
             
@@ -5777,8 +5777,8 @@
                 return sortedTrends.slice(0, 8);
             }
             
-            // Вычисляем диапазон месяцев: 6 месяцев назад от текущего + 1 месяц вперед
-            const startMonth = currentMonth - 6;
+            // Вычисляем диапазон месяцев: 18 месяцев назад от текущего + 1 месяц вперед
+            const startMonth = currentMonth - 24;
             const endMonth = currentMonth + 1;
             
             console.log(`🔍 Target month range: ${startMonth} to ${endMonth}`);
@@ -5787,7 +5787,7 @@
             const filteredTrends = currentYearTrends.filter(trend => {
                 const month = trend.property_month;
                 
-                // Обрабатываем переход через год (например, если текущий месяц август, то февраль = -4)
+                // Обрабатываем переход через год (например, если текущий месяц август, то startMonth = -10)
                 if (startMonth <= 0) {
                     // Если startMonth отрицательный, берем месяцы с конца предыдущего года
                     return month >= (12 + startMonth) || month <= endMonth;
@@ -5838,9 +5838,9 @@
             });
             
             if (filteredTrends.length >= 8) {
-                // Берем первые 8 трендов из отфильтрованного диапазона
+                // Берем первые 8 трендов из отфильтрованного диапазона (18 месяцев назад + 1 месяц вперед)
                 const selectedTrends = filteredTrends.slice(0, 8);
-                console.log(`✅ Selected ${selectedTrends.length} trends from month range`);
+                console.log(`✅ Selected ${selectedTrends.length} trends from month range (18 months back + 1 month forward)`);
                 return selectedTrends;
             } else {
                 // Если мало трендов в диапазоне, возвращаем все отфильтрованные
@@ -5972,7 +5972,7 @@
             const currentMonth = currentDate.getMonth() + 1;
             
             html += `<tr class="filter-info"><td colspan="6" style="text-align: center; font-size: 10.5px; color: #666; background: #f8f9fa; padding: 4px;">
-                Показано ${filteredTrends.length} из ${trends.length} трендов
+                Показано ${filteredTrends.length} из ${trends.length} трендов (диапазон: 18 месяцев назад + 1 месяц вперед)
             </td></tr>`;
             
             filteredTrends.forEach((trend, index) => {
