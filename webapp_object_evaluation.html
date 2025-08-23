@@ -579,7 +579,7 @@
             
             /* Мобильные стили для блока "Анализ рынка" */
             .market-analysis-text-block {
-                margin: 24px 0;
+                margin: 12px 0;
                 padding: 22px;
                 border-radius: 14px;
             }
@@ -619,7 +619,7 @@
             
             /* Мобильные стили для блока "Вывод по объекту" */
             .object-summary-section {
-                margin: 24px 0;
+                margin: 12px 0;
                 padding: 22px;
                 border-radius: 14px;
             }
@@ -664,7 +664,7 @@
             
             /* Мобильные стили для блока "Анализ рынка" */
             .market-analysis-text-block {
-                margin: 20px 0;
+                margin: 10px 0;
                 padding: 20px;
                 border-radius: 12px;
             }
@@ -704,7 +704,7 @@
             
             /* Мобильные стили для блока "Вывод по объекту" */
             .object-summary-section {
-                margin: 20px 0;
+                margin: 10px 0;
                 padding: 20px;
                 border-radius: 12px;
             }
@@ -721,14 +721,14 @@
         
         /* Пустое место между блоками */
         .block-spacing {
-            height: 40px;
+            height: 20px;
             margin: 0;
             padding: 0;
         }
         
         /* Стили для блока "Вывод по объекту" в стиле "Вывод по тренду" */
         .object-summary-section {
-            margin: 30px 0;
+            margin: 15px 0;
             padding: 25px;
             background: white;
             border-radius: 16px;
@@ -766,7 +766,7 @@
         
         /* Стили для блока "Анализ рынка" в стиле "Вывод по тренду" */
         .market-analysis-text-block {
-            margin: 30px 0;
+            margin: 8px 0;
             padding: 25px;
             background: white;
             border-radius: 16px;
@@ -981,7 +981,7 @@
             }
             
             .block-spacing {
-                height: 30px;
+                height: 15px;
             }
             
             .section-spacing {
@@ -1007,7 +1007,7 @@
             }
             
             .block-spacing {
-                height: 25px;
+                height: 12px;
             }
             
             .section-spacing {
@@ -2462,7 +2462,7 @@
             align-items: center;
             justify-content: center;
             width: 50px;
-            height: 40px;
+            height: 20px;
             border: 2px solid #e0e0e0;
             border-radius: 6px;
             background: white;
@@ -4934,44 +4934,48 @@
                 return '';
             }
             
-            // Calculate average values for areas
+            // Get data from detailed indicators table
             const avgSaleArea = summary.comparable_area_for_sale ? 
-                Math.round((summary.comparable_area_for_sale.min + summary.comparable_area_for_sale.max) / 2) : 60;
+                Math.round((summary.comparable_area_for_sale.min + summary.comparable_area_for_sale.max) / 2) : 0;
             const avgRentArea = summary.comparable_area_for_rent ? 
-                Math.round((summary.comparable_area_for_rent.min + summary.comparable_area_for_rent.max) / 2) : 65;
+                Math.round((summary.comparable_area_for_rent.min + summary.comparable_area_for_rent.max) / 2) : 0;
             
-            // Get min/max prices and periods
-            const saleMinPrice = summary.unit_price_for_sale ? summary.unit_price_for_sale.min : 31061;
-            const saleMaxPrice = summary.unit_price_for_sale ? summary.unit_price_for_sale.max : 45385;
-            const saleMinPeriod = summary.listing_period_for_sale ? summary.listing_period_for_sale.min : 62;
-            const saleMaxPeriod = summary.listing_period_for_sale ? summary.listing_period_for_sale.max : 90;
+            // Get min/max prices and periods from summary
+            const saleMinPrice = summary.unit_price_for_sale ? summary.unit_price_for_sale.min : 0;
+            const saleMaxPrice = summary.unit_price_for_sale ? summary.unit_price_for_sale.max : 0;
+            const saleMinPeriod = summary.listing_period_for_sale ? summary.listing_period_for_sale.min : 0;
+            const saleMaxPeriod = summary.listing_period_for_sale ? summary.listing_period_for_sale.max : 0;
             
-            const rentMinPrice = summary.unit_price_for_rent ? summary.unit_price_for_rent.min : 196.24;
-            const rentMaxPrice = summary.unit_price_for_rent ? summary.unit_price_for_rent.max : 250;
-            const rentMinPeriod = summary.listing_period_for_rent ? summary.listing_period_for_rent.min : 65;
-            const rentMaxPeriod = summary.listing_period_for_rent ? summary.listing_period_for_rent.max : 96;
+            const rentMinPrice = summary.unit_price_for_rent ? summary.unit_price_for_rent.min : 0;
+            const rentMaxPrice = summary.unit_price_for_rent ? summary.unit_price_for_rent.max : 0;
+            const rentMinPeriod = summary.listing_period_for_rent ? summary.listing_period_for_rent.min : 0;
+            const rentMaxPeriod = summary.listing_period_for_rent ? summary.listing_period_for_rent.max : 0;
             
             let html = '<div class="market-analysis-text-block">';
             html += `<h4 class="market-analysis-text-title">${getText('marketAnalysisTitle')}</h4>`;
             html += '<div class="market-analysis-text-content">';
             
-            // Sale analysis
-            const saleText = getText('saleAnalysisText')
-                .replace('{area}', avgSaleArea)
-                .replace('{minPrice}', formatValue(saleMinPrice, 'price'))
-                .replace('{minDays}', saleMinPeriod)
-                .replace('{maxPrice}', formatValue(saleMaxPrice, 'price'))
-                .replace('{maxDays}', saleMaxPeriod);
-            html += `<p>${saleText}</p>`;
+            // Sale analysis using data from detailed indicators table
+            if (avgSaleArea > 0 && saleMinPrice > 0 && saleMaxPrice > 0 && saleMinPeriod > 0 && saleMaxPeriod > 0) {
+                const saleText = getText('saleAnalysisText')
+                    .replace('{area}', avgSaleArea)
+                    .replace('{minPrice}', formatValue(saleMinPrice, 'price'))
+                    .replace('{minDays}', saleMinPeriod)
+                    .replace('{maxPrice}', formatValue(saleMaxPrice, 'price'))
+                    .replace('{maxDays}', saleMaxPeriod);
+                html += `<p>${saleText}</p>`;
+            }
             
-            // Rent analysis
-            const rentText = getText('rentAnalysisText')
-                .replace('{area}', avgRentArea)
-                .replace('{minPrice}', formatValue(rentMinPrice, 'price'))
-                .replace('{minDays}', rentMinPeriod)
-                .replace('{maxPrice}', formatValue(rentMaxPrice, 'price'))
-                .replace('{maxDays}', rentMaxPeriod);
-            html += `<p>${rentText}</p>`;
+            // Rent analysis using data from detailed indicators table
+            if (avgRentArea > 0 && rentMinPrice > 0 && rentMaxPrice > 0 && rentMinPeriod > 0 && rentMaxPeriod > 0) {
+                const rentText = getText('rentAnalysisText')
+                    .replace('{area}', avgRentArea)
+                    .replace('{minPrice}', formatValue(rentMinPrice, 'price'))
+                    .replace('{minDays}', rentMinPeriod)
+                    .replace('{maxPrice}', formatValue(rentMaxPrice, 'price'))
+                    .replace('{maxDays}', rentMaxPeriod);
+                html += `<p>${rentText}</p>`;
+            }
             
             html += '</div></div>';
             
