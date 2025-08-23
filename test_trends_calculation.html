@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест расчета цен трендов</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px 5px;
+        }
+        .test-button:hover {
+            background: #0056b3;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background: #f9f9f9;
+        }
+        .trends-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            font-size: 12px;
+        }
+        .trends-table th {
+            background: #28a745;
+            color: white;
+            padding: 8px 6px;
+            text-align: center;
+            font-weight: 600;
+        }
+        .trends-table td {
+            padding: 6px 4px;
+            text-align: center;
+            border-bottom: 1px solid #dee2e6;
+        }
+        .trends-table .current-month-row {
+            background-color: #e8f4fd;
+            font-weight: 500;
+        }
+        .trends-table .forecast-row {
+            background-color: #f0f8ff;
+        }
+        .trends-table .past-month-row {
+            background-color: #f8f8f8;
+        }
+        .trends-table .filter-info td {
+            text-align: center;
+            font-size: 10.5px;
+            color: #666;
+            background: #f8f9fa;
+            padding: 4px;
+        }
+        .calculation-details {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 15px;
+            margin-top: 20px;
+            font-family: monospace;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Тест расчета цен трендов</h1>
+        
+        <h2>Логика расчета:</h2>
+        <ul>
+            <li><strong>Базовые цены для текущего месяца (август):</strong> Среднее между avgMinSalePrice и avgMaxSalePrice</li>
+            <li><strong>Для будущих месяцев (сентябрь и далее):</strong> текущая_цена × (1 + процент_изменения)</li>
+            <li><strong>Для прошлых месяцев (июль и ранее):</strong> текущая_цена ÷ (1 + процент_изменения)</li>
+        </ul>
+        
+        <h2>Тестовые данные</h2>
+        <button class="test-button" onclick="testTrendsCalculation()">Тест расчета трендов</button>
+        <button class="test-button" onclick="testWithRealData()">Тест с реальными данными</button>
+        
+        <div id="result" class="result"></div>
+    </div>
+
+    <script>
+        // Тестовые данные трендов (как на скриншоте)
+        const testTrends = [
+            {
+                id: 1,
+                date: '2025-09-01',
+                property_year: 2025,
+                property_month: 9,
+                unit_price_for_sale: 38041.00,
+                unit_price_for_rent: 245.40,
+                price_change_sale: 0.0114, // +1.14%
+                price_change_rent: 0.0298, // +2.98%
+                yield: 7.74
+            },
+            {
+                id: 2,
+                date: '2025-08-01',
+                property_year: 2025,
+                property_month: 8,
+                unit_price_for_sale: 37613.00,
+                unit_price_for_rent: 238.29,
+                price_change_sale: 0.0166, // +1.66%
+                price_change_rent: 0.0264, // +2.64%
+                yield: 7.60
+            },
+            {
+                id: 3,
+                date: '2025-07-01',
+                property_year: 2025,
+                property_month: 7,
+                unit_price_for_sale: 37000.00,
+                unit_price_for_rent: 232.16,
+                price_change_sale: 0.0136, // +1.36%
+                price_change_rent: 0.0199, // +1.99%
+                yield: 7.53
+            },
+            {
+                id: 4,
+                date: '2025-06-01',
+                property_year: 2025,
+                property_month: 6,
+                unit_price_for_sale: 36505.00,
+                unit_price_for_rent: 227.62,
+                price_change_sale: 0.0214, // +2.14%
+                price_change_rent: 0.0244, // +2.44%
+                yield: 7.48
+            },
+            {
+                id: 5,
+                date: '2025-05-01',
+                property_year: 2025,
+                property_month: 5,
+                unit_price_for_sale: 35740.00,
+                unit_price_for_rent: 222.20,
+                price_change_sale: 0.0230, // +2.30%
+                price_change_rent: 0.0140, // +1.40%
+                yield: 7.46
+            },
+            {
+                id: 6,
+                date: '2025-04-01',
+                property_year: 2025,
+                property_month: 4,
+                unit_price_for_sale: 34937.00,
+                unit_price_for_rent: 219.14,
+                price_change_sale: 0.0335, // +3.35%
+                price_change_rent: 0.0177, // +1.77%
+                yield: 7.53
+            },
+            {
+                id: 7,
+                date: '2025-03-01',
+                property_year: 2025,
+                property_month: 3,
+                unit_price_for_sale: 33806.00,
+                unit_price_for_rent: 215.33,
+                price_change_sale: 0.0322, // +3.22%
+                price_change_rent: 0.0098, // +0.98%
+                yield: 7.64
+            },
+            {
+                id: 8,
+                date: '2025-02-01',
+                property_year: 2025,
+                property_month: 2,
+                unit_price_for_sale: 32752.00,
+                unit_price_for_rent: 213.23,
+                price_change_sale: 0.0395, // +3.95%
+                price_change_rent: 0.0223, // +2.23%
+                yield: 7.81
+            }
+        ];
+
+        // Базовые цены для текущего месяца (август)
+        const basePrices = {
+            avgSalePrice: 37613.00, // Среднее между min и max
+            avgRentPrice: 238.29    // Среднее между min и max
+        };
+
+        // Функция форматирования даты
+        function formatTrendDateShort(dateStr) {
+            if (!dateStr) return '';
+            try {
+                const date = new Date(dateStr);
+                const monthNames = [
+                    'янв', 'фев', 'мар', 'апр', 'май', 'июн',
+                    'июл', 'авг', 'сен', 'окт', 'ноя', 'дек'
+                ];
+                
+                const month = monthNames[date.getMonth()];
+                const year = date.getFullYear();
+                return `${month}. ${year}`;
+            } catch (e) {
+                return dateStr;
+            }
+        }
+
+        // Функция форматирования процентных значений
+        function formatPercentage(value) {
+            if (value === null || value === undefined) return '-';
+            const numValue = parseFloat(value);
+            if (isNaN(numValue)) return '-';
+            const sign = numValue >= 0 ? '+' : '';
+            return `${sign}${(numValue * 100).toFixed(2)}%`;
+        }
+
+        // Функция форматирования значений
+        function formatTrendValue(value, type) {
+            if (value === null || value === undefined) return '-';
+            const numValue = parseFloat(value);
+            if (isNaN(numValue)) return '-';
+            
+            if (type === 'price') {
+                return numValue.toLocaleString('ru-RU', { 
+                    minimumFractionDigits: 2, 
+                    maximumFractionDigits: 2 
+                });
+            } else if (type === 'percentage') {
+                return `${numValue.toFixed(2)}%`;
+            }
+            return numValue.toString();
+        }
+
+        // Функция расчета цен на основе процентных изменений
+        function calculateTrendPrices(trends, baseSalePrice, baseRentPrice) {
+            const currentYear = 2025;
+            const currentMonth = 8; // Август
+            
+            // Сортируем тренды по дате
+            const sortedTrends = trends.sort((a, b) => {
+                if (a.property_year !== b.property_year) {
+                    return a.property_year - b.property_year;
+                }
+                return a.property_month - b.property_month;
+            });
+
+            console.log('💰 Base prices for current month:', { baseSalePrice, baseRentPrice });
+            
+            const calculatedTrends = sortedTrends.map(trend => {
+                const isCurrentMonth = trend.property_year === currentYear && trend.property_month === currentMonth;
+                const isFutureMonth = trend.property_year > currentYear || (trend.property_year === currentYear && trend.property_month > currentMonth);
+                const isPastMonth = trend.property_year < currentYear || (trend.property_year === currentYear && trend.property_month < currentMonth);
+                
+                let salePrice = baseSalePrice;
+                let rentPrice = baseRentPrice;
+                let calculationDetails = '';
+                
+                if (isCurrentMonth) {
+                    // Текущий месяц - используем базовые цены
+                    calculationDetails = `Текущий месяц: базовые цены`;
+                    console.log(`📊 Current month ${trend.property_month}: sale=${salePrice.toFixed(2)}, rent=${rentPrice.toFixed(2)}`);
+                } else if (isFutureMonth) {
+                    // Будущие месяцы: текущая_цена × (1 + процент_изменения)
+                    let saleMultiplier = 1;
+                    let rentMultiplier = 1;
+                    
+                    // Накапливаем процентные изменения от текущего месяца до будущего
+                    for (let i = 0; i < sortedTrends.length; i++) {
+                        const checkTrend = sortedTrends[i];
+                        if (checkTrend.property_year === trend.property_year && checkTrend.property_month === trend.property_month) {
+                            break; // Достигли целевого месяца
+                        }
+                        
+                        if (checkTrend.property_year >= currentYear && checkTrend.property_month >= currentMonth) {
+                            if (checkTrend.price_change_sale !== null && checkTrend.price_change_sale !== undefined) {
+                                saleMultiplier *= (1 + checkTrend.price_change_sale);
+                            }
+                            if (checkTrend.price_change_rent !== null && checkTrend.price_change_rent !== undefined) {
+                                rentMultiplier *= (1 + checkTrend.price_change_rent);
+                            }
+                        }
+                    }
+                    
+                    salePrice = baseSalePrice * saleMultiplier;
+                    rentPrice = baseRentPrice * rentMultiplier;
+                    
+                    calculationDetails = `Будущий: ${baseSalePrice.toFixed(2)} × ${saleMultiplier.toFixed(4)} = ${salePrice.toFixed(2)}`;
+                    console.log(`📊 Future month ${trend.property_month}: sale=${salePrice.toFixed(2)}, rent=${rentPrice.toFixed(2)}, multiplier=${saleMultiplier.toFixed(4)}`);
+                    
+                } else if (isPastMonth) {
+                    // Прошлые месяцы: текущая_цена ÷ (1 + процент_изменения)
+                    let saleDivider = 1;
+                    let rentDivider = 1;
+                    
+                    // Накапливаем процентные изменения от прошлого месяца до текущего
+                    for (let i = sortedTrends.length - 1; i >= 0; i--) {
+                        const checkTrend = sortedTrends[i];
+                        if (checkTrend.property_year === trend.property_year && checkTrend.property_month === trend.property_month) {
+                            break; // Достигли целевого месяца
+                        }
+                        
+                        if (checkTrend.property_year <= currentYear && checkTrend.property_month <= currentMonth) {
+                            if (checkTrend.price_change_sale !== null && checkTrend.price_change_sale !== undefined) {
+                                saleDivider *= (1 + checkTrend.price_change_sale);
+                            }
+                            if (checkTrend.price_change_rent !== null && checkTrend.price_change_rent !== undefined) {
+                                rentDivider *= (1 + checkTrend.price_change_rent);
+                            }
+                        }
+                    }
+                    
+                    salePrice = baseSalePrice / saleDivider;
+                    rentPrice = baseRentPrice / rentDivider;
+                    
+                    calculationDetails = `Прошлый: ${baseSalePrice.toFixed(2)} ÷ ${saleDivider.toFixed(4)} = ${salePrice.toFixed(2)}`;
+                    console.log(`📊 Past month ${trend.property_month}: sale=${salePrice.toFixed(2)}, rent=${rentPrice.toFixed(2)}, divider=${saleDivider.toFixed(4)}`);
+                }
+                
+                return {
+                    ...trend,
+                    calculatedSalePrice: salePrice,
+                    calculatedRentPrice: rentPrice,
+                    calculationDetails: calculationDetails
+                };
+            });
+            
+            return calculatedTrends;
+        }
+
+        // Функция генерации таблицы трендов
+        function generateTrendsTable(calculatedTrends) {
+            let html = '<table class="trends-table">';
+            html += '<thead><tr>';
+            html += '<th>Дата</th>';
+            html += '<th>Продажа<br>(₺/м²)</th>';
+            html += '<th>Изм-ие цены<br>продажи</th>';
+            html += '<th>Аренда<br>(₺/м²)</th>';
+            html += '<th>Изм-ие цены<br>аренды</th>';
+            html += '<th>Доходность</th>';
+            html += '</tr></thead><tbody>';
+            
+            // Информация о фильтрации
+            html += `<tr class="filter-info"><td colspan="6">
+                Показано ${calculatedTrends.length} из ${calculatedTrends.length} трендов
+            </td></tr>`;
+            
+            calculatedTrends.forEach(trend => {
+                const isCurrentMonth = trend.property_year === 2025 && trend.property_month === 8;
+                const isFutureMonth = trend.property_month > 8;
+                const isPastMonth = trend.property_month < 8;
+                
+                let rowClass = '';
+                let rowStyle = '';
+                
+                if (isCurrentMonth) {
+                    rowClass = 'current-month-row';
+                } else if (isFutureMonth) {
+                    rowClass = 'forecast-row';
+                } else if (isPastMonth) {
+                    rowClass = 'past-month-row';
+                }
+                
+                // Добавляем специальное выделение для последних месяцев
+                if (trend.property_month >= 6 && trend.property_month <= 8) {
+                    rowStyle = 'border-top: 2px solid #007bff;';
+                }
+                
+                html += `<tr class="${rowClass}" style="${rowStyle}">`;
+                html += `<td>${formatTrendDateShort(trend.date)}</td>`;
+                html += `<td>${formatTrendValue(trend.calculatedSalePrice, 'price')}</td>`;
+                html += `<td>${formatPercentage(trend.price_change_sale)}</td>`;
+                html += `<td>${formatTrendValue(trend.calculatedRentPrice, 'price')}</td>`;
+                html += `<td>${formatPercentage(trend.price_change_rent)}</td>`;
+                html += `<td>${formatTrendValue(trend.yield, 'percentage')}</td>`;
+                html += '</tr>';
+            });
+            
+            html += '</tbody></table>';
+            return html;
+        }
+
+        // Функция тестирования расчета трендов
+        function testTrendsCalculation() {
+            console.log('🧪 Testing trends calculation...');
+            
+            // Рассчитываем цены
+            const calculatedTrends = calculateTrendPrices(testTrends, basePrices.avgSalePrice, basePrices.avgRentPrice);
+            
+            // Генерируем таблицу
+            const tableHtml = generateTrendsTable(calculatedTrends);
+            
+            // Показываем результат
+            document.getElementById('result').innerHTML = `
+                <h3>Результат расчета:</h3>
+                ${tableHtml}
+                
+                <div class="calculation-details">
+                    <h4>Детали расчетов:</h4>
+                    ${calculatedTrends.map(trend => `
+                        <div><strong>${formatTrendDateShort(trend.date)}:</strong> ${trend.calculationDetails}</div>
+                    `).join('')}
+                </div>
+            `;
+            
+            console.log('✅ Trends calculation test completed');
+        }
+
+        // Функция тестирования с реальными данными
+        function testWithRealData() {
+            console.log('🧪 Testing with real data...');
+            
+            // Симулируем реальные данные с базовыми ценами
+            const realBasePrices = {
+                avgSalePrice: 37613.00, // Среднее между avgMinSalePrice и avgMaxSalePrice
+                avgRentPrice: 238.29    // Среднее между avgMinRentPrice и avgMaxRentPrice
+            };
+            
+            // Рассчитываем цены
+            const calculatedTrends = calculateTrendPrices(testTrends, realBasePrices.avgSalePrice, realBasePrices.avgRentPrice);
+            
+            // Генерируем таблицу
+            const tableHtml = generateTrendsTable(calculatedTrends);
+            
+            // Показываем результат
+            document.getElementById('result').innerHTML = `
+                <h3>Результат с реальными данными:</h3>
+                <p><strong>Базовые цены августа:</strong> Продажа: ${realBasePrices.avgSalePrice.toLocaleString('ru-RU')} ₺/м², Аренда: ${realBasePrices.avgRentPrice.toFixed(2)} ₺/м²</p>
+                ${tableHtml}
+                
+                <div class="calculation-details">
+                    <h4>Примеры расчетов:</h4>
+                    <div><strong>Сентябрь (продажа):</strong> ${realBasePrices.avgSalePrice.toFixed(2)} × (1 + 0.0114) = ${(realBasePrices.avgSalePrice * 1.0114).toFixed(2)} ₺/м²</div>
+                    <div><strong>Июль (продажа):</strong> ${realBasePrices.avgSalePrice.toFixed(2)} ÷ (1 + 0.0166) = ${(realBasePrices.avgSalePrice / 1.0166).toFixed(2)} ₺/м²</div>
+                </div>
+            `;
+            
+            console.log('✅ Real data test completed');
+        }
+    </script>
+</body>
+</html>

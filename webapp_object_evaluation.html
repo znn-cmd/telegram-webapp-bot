@@ -1866,6 +1866,11 @@
             background-color: #f0f8ff;
         }
         
+        /* Стили для строк прошлых месяцев в таблице трендов */
+        .trends-table .past-month-row {
+            background-color: #f8f8f8;
+        }
+        
         /* Мобильные устройства */
         @media (max-width: 768px) {
             .trends-table {
@@ -5943,28 +5948,121 @@
                 Показано ${filteredTrends.length} из ${trends.length} трендов
             </td></tr>`;
             
-            filteredTrends.forEach((trend, index) => {
-                // Проверяем, является ли этот тренд текущим месяцем
+            // Сортируем тренды по дате для правильного расчета цен
+            const sortedTrends = filteredTrends.sort((a, b) => {
+                if (a.property_year !== b.property_year) {
+                    return a.property_year - b.property_year;
+                }
+                return a.property_month - b.property_month;
+            });
+            
+            // Находим текущий месяц в отсортированных трендах
+            const currentMonthTrend = sortedTrends.find(trend => 
+                trend.property_year === currentYear && trend.property_month === currentMonth
+            );
+            
+            // Рассчитываем базовые цены для текущего месяца
+            let baseSalePrice = 0;
+            let baseRentPrice = 0;
+            
+            if (currentMonthTrend && averagePrices) {
+                // Используем средние цены из таблиц данных для текущего месяца
+                baseSalePrice = averagePrices.avgSalePrice || 0;
+                baseRentPrice = averagePrices.avgRentPrice || 0;
+            } else {
+                // Если нет данных, используем значения из тренда
+                baseSalePrice = currentMonthTrend?.unit_price_for_sale || 0;
+                baseRentPrice = currentMonthTrend?.unit_price_for_rent || 0;
+            }
+            
+            console.log('💰 Base prices for current month:', { baseSalePrice, baseRentPrice });
+            
+            // Рассчитываем цены для каждого месяца на основе процентных изменений
+            sortedTrends.forEach((trend, index) => {
                 const isCurrentMonth = trend.property_year === currentYear && trend.property_month === currentMonth;
                 const isFutureMonth = trend.property_year > currentYear || (trend.property_year === currentYear && trend.property_month > currentMonth);
+                const isPastMonth = trend.property_year < currentYear || (trend.property_year === currentYear && trend.property_month < currentMonth);
                 
                 let rowClass = '';
                 let rowStyle = '';
-                let salePrice = trend.unit_price_for_sale;
-                let rentPrice = trend.unit_price_for_rent;
+                let salePrice = baseSalePrice;
+                let rentPrice = baseRentPrice;
                 
+                // Рассчитываем цены на основе процентных изменений
                 if (isCurrentMonth) {
+                    // Текущий месяц - используем базовые цены
                     rowClass = 'current-month-row';
                     rowStyle = 'background-color: #e8f4fd;';
                     
-                    // Для текущего месяца используем средние цены из таблиц данных
-                    if (averagePrices) {
-                        salePrice = averagePrices.avgSalePrice;
-                        rentPrice = averagePrices.avgRentPrice;
-                    }
+                    console.log(`📊 Current month ${trend.property_month}: sale=${salePrice.toFixed(2)}, rent=${rentPrice.toFixed(2)}`);
                 } else if (isFutureMonth) {
+                    // Будущие месяцы: текущая_цена × (1 + процент_изменения)
                     rowClass = 'forecast-row';
                     rowStyle = 'background-color: #f0f8ff;';
+                    
+                    // Накапливаем процентные изменения от текущего месяца до будущего
+                    let saleMultiplier = 1;
+                    let rentMultiplier = 1;
+                    
+                    // Проходим по трендам от текущего месяца до целевого
+                    for (let i = 0; i < sortedTrends.length; i++) {
+                        const checkTrend = sortedTrends[i];
+                        if (checkTrend.property_year === trend.property_year && checkTrend.property_month === trend.property_month) {
+                            break; // Достигли целевого месяца
+                        }
+                        
+                        // Применяем процентные изменения только для месяцев между текущим и целевым
+                        if (checkTrend.property_year >= currentYear && checkTrend.property_month >= currentMonth) {
+                            if (checkTrend.price_change_sale !== null && checkTrend.price_change_sale !== undefined) {
+                                saleMultiplier *= (1 + checkTrend.price_change_sale);
+                            }
+                            if (checkTrend.price_change_rent !== null && checkTrend.price_change_rent !== undefined) {
+                                rentMultiplier *= (1 + checkTrend.price_change_rent);
+                            }
+                        }
+                    }
+                    
+                    salePrice = baseSalePrice * saleMultiplier;
+                    rentPrice = baseRentPrice * rentMultiplier;
+                    
+                    console.log(`📊 Future month ${trend.property_month}: sale=${salePrice.toFixed(2)}, rent=${rentPrice.toFixed(2)}, multiplier=${saleMultiplier.toFixed(4)}`);
+                    
+                } else if (isPastMonth) {
+                    // Прошлые месяцы: текущая_цена ÷ (1 + процент_изменения)
+                    rowClass = 'past-month-row';
+                    rowStyle = 'background-color: #f8f8f8;';
+                    
+                    // Накапливаем процентные изменения от прошлого месяца до текущего
+                    let saleDivider = 1;
+                    let rentDivider = 1;
+                    
+                    // Проходим по трендам от прошлого месяца до текущего (в обратном порядке)
+                    for (let i = sortedTrends.length - 1; i >= 0; i--) {
+                        const checkTrend = sortedTrends[i];
+                        if (checkTrend.property_year === trend.property_year && checkTrend.property_month === trend.property_month) {
+                            break; // Достигли целевого месяца
+                        }
+                        
+                        // Применяем процентные изменения только для месяцев между целевым и текущим
+                        if (checkTrend.property_year <= currentYear && checkTrend.property_month <= currentMonth) {
+                            if (checkTrend.price_change_sale !== null && checkTrend.price_change_sale !== undefined) {
+                                saleDivider *= (1 + checkTrend.price_change_sale);
+                            }
+                            if (checkTrend.price_change_rent !== null && checkTrend.price_change_rent !== undefined) {
+                                rentDivider *= (1 + checkTrend.price_change_rent);
+                            }
+                        }
+                    }
+                    
+                    salePrice = baseSalePrice / saleDivider;
+                    rentPrice = baseRentPrice / rentDivider;
+                    
+                    console.log(`📊 Past month ${trend.property_month}: sale=${salePrice.toFixed(2)}, rent=${rentPrice.toFixed(2)}, divider=${saleDivider.toFixed(4)}`);
+                }
+                
+                // Добавляем специальное выделение для последних месяцев (как на скриншоте)
+                if (trend.property_month >= currentMonth - 2 && trend.property_month <= currentMonth) {
+                    rowStyle += 'border-top: 2px solid #007bff;';
                 }
                 
                 html += `<tr class="${rowClass}" style="${rowStyle}">`;
