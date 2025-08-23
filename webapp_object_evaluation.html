@@ -5026,6 +5026,10 @@
             const avgMaxSalePrice = maxUnitPriceForSale.length > 0 ? 
                 Math.round(maxUnitPriceForSale.reduce((sum, val) => sum + parseFloat(val), 0) / maxUnitPriceForSale.length) : 0;
             
+            // Save average sale price values globally for use in price trends
+            window.avgMinSalePrice = avgMinSalePrice;
+            window.avgMaxSalePrice = avgMaxSalePrice;
+            
             const avgMinRentPrice = minUnitPriceForRent.length > 0 ? 
                 Math.round((minUnitPriceForRent.reduce((sum, val) => sum + parseFloat(val), 0) / minUnitPriceForRent.length) * 100) / 100 : 0;
             const avgMaxRentPrice = maxUnitPriceForRent.length > 0 ? 
@@ -5509,10 +5513,19 @@
                             const currentTrend = findCurrentMonthTrend(typeTrends);
                             if (!currentTrend) return '';
                             
+                            // Для блока "Тренд цен" используем среднее значение между avgMinSalePrice и avgMaxSalePrice
+                            let displayValue;
+                            if (type === 'price_trend' && window.avgMinSalePrice && window.avgMaxSalePrice) {
+                                const avgSalePrice = Math.round((window.avgMinSalePrice + window.avgMaxSalePrice) / 2);
+                                displayValue = formatTrendValue(avgSalePrice, type);
+                            } else {
+                                displayValue = formatTrendValue(currentTrend.trend_value, type);
+                            }
+                            
                             return `
                                 <div class="trend-card trend-card-${type}">
                                     <div class="trend-title">${formatTrendType(type)}</div>
-                                    <div class="trend-value">${formatTrendValue(currentTrend.trend_value, type)}</div>
+                                    <div class="trend-value">${displayValue}</div>
                                     <div class="trend-details">
                                         <div class="trend-change">
                                             ${currentTrend.price_change_sale ? `Продажа: ${formatPercentage(currentTrend.price_change_sale)}` : ''}
