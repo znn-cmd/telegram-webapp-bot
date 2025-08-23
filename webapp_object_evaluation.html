@@ -1718,7 +1718,7 @@
             width: 100%;
             border-collapse: collapse;
             background: white;
-            font-size: 10px;
+            font-size: 10.5px;
             table-layout: fixed;
         }
         
@@ -1869,7 +1869,7 @@
         /* Мобильные устройства */
         @media (max-width: 768px) {
             .trends-table {
-                font-size: 9px;
+                font-size: 9.5px;
             }
             
             .trends-table th,
@@ -2367,7 +2367,7 @@
             }
             
             .trends-table {
-                font-size: 10.5px;
+                font-size: 11px;
             }
             
             .trends-table th,
@@ -5971,138 +5971,24 @@
             const currentYear = currentDate.getFullYear();
             const currentMonth = currentDate.getMonth() + 1;
             
-            console.log('🔍 Current date analysis:', {
-                currentDate: currentDate.toISOString(),
-                currentYear,
-                currentMonth,
-                currentMonthName: currentDate.toLocaleString('ru-RU', { month: 'long' })
-            });
-            
             html += `<tr class="filter-info"><td colspan="6" style="text-align: center; font-size: 10.5px; color: #666; background: #f8f9fa; padding: 4px;">
                 Показано ${filteredTrends.length} из ${trends.length} трендов
             </td></tr>`;
             
-            // Сортируем тренды по дате для правильного расчета исторических цен
-            const sortedTrendsForCalculation = [...filteredTrends].sort((a, b) => {
-                const dateA = new Date(a.date);
-                const dateB = new Date(b.date);
-                return dateA - dateB; // По возрастанию даты (старые сначала)
-            });
-            
-            console.log('🔍 Sorted trends for calculation:', sortedTrendsForCalculation.map(t => ({
-                date: t.date,
-                property_year: t.property_year,
-                property_month: t.property_month,
-                monthFromDate: new Date(t.date).getMonth() + 1
-            })));
-            
-            // Создаем кэш для рассчитанных цен
-            const calculatedPrices = new Map();
-            
-            // Функция для расчета цены для исторического месяца
-            function calculateHistoricalPrice(basePrice, percentageChange) {
-                // Процент изменения может быть положительным или отрицательным
-                // Если процент положительный, значит цена выросла, поэтому для исторического месяца нужно уменьшить
-                // Если процент отрицательный, значит цена упала, поэтому для исторического месяца нужно увеличить
-                const changeMultiplier = 1 + (percentageChange / 100);
-                return Math.round(basePrice / changeMultiplier);
-            }
-            
-            // Сначала рассчитываем цены для всех месяцев, начиная с текущего
-            sortedTrendsForCalculation.forEach((trend, index) => {
-                const trendDate = new Date(trend.date);
-                const trendYear = trendDate.getFullYear();
-                const trendMonth = trendDate.getMonth() + 1;
-                
-                // Используем property_month из тренда для более точного определения
-                const trendPropertyMonth = trend.property_month;
-                
-                const isCurrentMonth = trendYear === currentYear && trendPropertyMonth === currentMonth;
-                const isFutureMonth = trendYear > currentYear || (trendYear === currentYear && trendPropertyMonth > currentMonth);
-                const isHistoricalMonth = trendYear < currentYear || (trendYear === currentYear && trendPropertyMonth < currentMonth);
-                
-                console.log(`📅 Trend analysis for ${trend.date}:`, {
-                    trendYear,
-                    trendMonth,
-                    trendPropertyMonth,
-                    currentYear,
-                    currentMonth,
-                    isCurrentMonth,
-                    isFutureMonth,
-                    isHistoricalMonth
-                });
-                
-                let salePrice, rentPrice;
-                
-                if (isCurrentMonth) {
-                    // Для текущего месяца используем средние цены из глобальных переменных
-                    salePrice = averagePrices.avgSalePrice || trend.unit_price_for_sale;
-                    rentPrice = averagePrices.avgRentPrice || trend.unit_price_for_rent;
-                } else if (isFutureMonth) {
-                    // Для будущих месяцев используем оригинальные значения
-                    salePrice = trend.unit_price_for_sale;
-                    rentPrice = trend.unit_price_for_rent;
-                } else if (isHistoricalMonth) {
-                    // Для исторических месяцев рассчитываем цены
-                    // Ищем следующий месяц (более новый) для расчета
-                    let nextMonthTrend = null;
-                    for (let i = index + 1; i < sortedTrendsForCalculation.length; i++) {
-                        const nextTrend = sortedTrendsForCalculation[i];
-                        const nextTrendDate = new Date(nextTrend.date);
-                        const nextTrendYear = nextTrendDate.getFullYear();
-                        const nextTrendMonth = nextTrendDate.getMonth() + 1;
-                        
-                        if (nextTrendYear > trendYear || (nextTrendYear === trendYear && nextTrendMonth > trendMonth)) {
-                            nextMonthTrend = nextTrend;
-                            break;
-                        }
-                    }
-                    
-                    if (nextMonthTrend) {
-                        // Используем цену следующего месяца и процент изменения для расчета
-                        const nextMonthSalePrice = calculatedPrices.get(nextMonthTrend.date + '_sale') || nextMonthTrend.unit_price_for_sale;
-                        const nextMonthRentPrice = calculatedPrices.get(nextMonthTrend.date + '_rent') || nextMonthTrend.unit_price_for_rent;
-                        
-                        salePrice = calculateHistoricalPrice(nextMonthSalePrice, nextMonthTrend.price_change_sale);
-                        rentPrice = calculateHistoricalPrice(nextMonthRentPrice, nextMonthTrend.price_change_rent);
-                        
-                        console.log(`📊 Historical price calculation for ${trend.date}:`, {
-                            nextMonth: nextMonthTrend.date,
-                            nextMonthSalePrice,
-                            nextMonthRentPrice,
-                            saleChange: nextMonthTrend.price_change_sale,
-                            rentChange: nextMonthTrend.price_change_rent,
-                            calculatedSalePrice: salePrice,
-                            calculatedRentPrice: rentPrice,
-                            formula: `${nextMonthSalePrice} / (1 + ${nextMonthTrend.price_change_sale}/100) = ${salePrice}`
-                        });
-                    } else {
-                        // Если нет следующего месяца, используем оригинальные значения
-                        salePrice = trend.unit_price_for_sale;
-                        rentPrice = trend.unit_price_for_rent;
-                    }
-                }
-                
-                // Сохраняем рассчитанные цены в кэш
-                calculatedPrices.set(trend.date + '_sale', salePrice);
-                calculatedPrices.set(trend.date + '_rent', rentPrice);
-            });
-            
-            // Теперь отображаем тренды в правильном порядке (новые сверху)
             filteredTrends.forEach((trend, index) => {
+                // Проверяем, является ли этот тренд текущим месяцем
+                // Используем поле date для определения текущего месяца
                 const trendDate = new Date(trend.date);
                 const trendYear = trendDate.getFullYear();
                 const trendMonth = trendDate.getMonth() + 1;
-                const trendPropertyMonth = trend.property_month;
                 
-                const isCurrentMonth = trendYear === currentYear && trendPropertyMonth === currentMonth;
-                const isFutureMonth = trendYear > currentYear || (trendYear === currentYear && trendPropertyMonth > currentMonth);
+                const isCurrentMonth = trendYear === currentYear && trendMonth === currentMonth;
+                const isFutureMonth = trendYear > currentYear || (trendYear === currentYear && trendMonth > currentMonth);
                 
-                console.log('📅 Trend display analysis:', {
+                console.log('📅 Trend date analysis:', {
                     trendDate: trend.date,
                     trendYear,
                     trendMonth,
-                    trendPropertyMonth,
                     currentYear,
                     currentMonth,
                     isCurrentMonth,
@@ -6111,21 +5997,30 @@
                 
                 let rowClass = '';
                 let rowStyle = '';
-                
-                // Получаем рассчитанные цены из кэша
-                const salePrice = calculatedPrices.get(trend.date + '_sale') || trend.unit_price_for_sale;
-                const rentPrice = calculatedPrices.get(trend.date + '_rent') || trend.unit_price_for_rent;
+                let salePrice = trend.unit_price_for_sale;
+                let rentPrice = trend.unit_price_for_rent;
                 
                 if (isCurrentMonth) {
                     rowClass = 'current-month-row';
                     rowStyle = 'background-color: #e8f4fd;';
                     
-                    console.log('📊 Current month prices:', { 
-                        originalSale: trend.unit_price_for_sale, 
-                        calculatedSale: salePrice,
-                        originalRent: trend.unit_price_for_rent, 
-                        calculatedRent: rentPrice
-                    });
+                    // Для текущего месяца используем средние цены из таблиц данных
+                    if (averagePrices && averagePrices.avgSalePrice && averagePrices.avgRentPrice) {
+                        salePrice = averagePrices.avgSalePrice;
+                        rentPrice = averagePrices.avgRentPrice;
+                        console.log('📊 Current month prices updated:', { 
+                            originalSale: trend.unit_price_for_sale, 
+                            newSale: salePrice,
+                            originalRent: trend.unit_price_for_rent, 
+                            newRent: rentPrice,
+                            avgMinSalePrice: window.avgMinSalePrice,
+                            avgMaxSalePrice: window.avgMaxSalePrice,
+                            avgMinRentPrice: window.avgMinRentPrice,
+                            avgMaxRentPrice: window.avgMaxRentPrice
+                        });
+                    } else {
+                        console.log('⚠️ No average prices available for current month:', averagePrices);
+                    }
                 } else if (isFutureMonth) {
                     rowClass = 'forecast-row';
                     rowStyle = 'background-color: #f0f8ff;';
@@ -7669,81 +7564,7 @@
                 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'
             ];
             
-            // Сортируем тренды по дате для правильного расчета исторических цен
-            const sortedTrendsForCalculation = [...trends].sort((a, b) => {
-                const dateA = new Date(a.date);
-                const dateB = new Date(b.date);
-                return dateA - dateB;
-            });
-            
-            // Создаем кэш для рассчитанных цен
-            const calculatedPrices = new Map();
-            
-            // Функция для расчета цены для исторического месяца
-            function calculateHistoricalPrice(basePrice, percentageChange) {
-                const changeMultiplier = 1 + (percentageChange / 100);
-                return Math.round(basePrice / changeMultiplier);
-            }
-            
-            // Сначала рассчитываем цены для всех месяцев
-            sortedTrendsForCalculation.forEach((trend, index) => {
-                const trendDate = new Date(trend.date);
-                const trendYear = trendDate.getFullYear();
-                const trendMonth = trendDate.getMonth() + 1;
-                
-                const currentYear = new Date().getFullYear();
-                const currentMonth = new Date().getMonth() + 1;
-                
-                const isCurrentMonth = trendYear === currentYear && trendMonth === currentMonth;
-                const isFutureMonth = trendYear > currentYear || (trendYear === currentYear && trendMonth > currentMonth);
-                const isHistoricalMonth = trendYear < currentYear || (trendYear === currentYear && trendMonth < currentMonth);
-                
-                let salePrice, rentPrice;
-                
-                if (isCurrentMonth) {
-                    // Для текущего месяца используем средние цены из глобальных переменных
-                    salePrice = window.avgMinSalePrice && window.avgMaxSalePrice ? 
-                        Math.round((window.avgMinSalePrice + window.avgMaxSalePrice) / 2) : trend.unit_price_for_sale;
-                    rentPrice = window.avgMinRentPrice && window.avgMaxRentPrice ? 
-                        Math.round((window.avgMinRentPrice + window.avgMaxRentPrice) / 2) : trend.unit_price_for_rent;
-                } else if (isFutureMonth) {
-                    // Для будущих месяцев используем оригинальные значения
-                    salePrice = trend.unit_price_for_sale;
-                    rentPrice = trend.unit_price_for_rent;
-                } else if (isHistoricalMonth) {
-                    // Для исторических месяцев рассчитываем цены
-                    let nextMonthTrend = null;
-                    for (let i = index + 1; i < sortedTrendsForCalculation.length; i++) {
-                        const nextTrend = sortedTrendsForCalculation[i];
-                        const nextTrendDate = new Date(nextTrend.date);
-                        const nextTrendYear = nextTrendDate.getFullYear();
-                        const nextTrendMonth = nextTrendDate.getMonth() + 1;
-                        
-                        if (nextTrendYear > trendYear || (nextTrendYear === trendYear && nextTrendMonth > trendMonth)) {
-                            nextMonthTrend = nextTrend;
-                            break;
-                        }
-                    }
-                    
-                    if (nextMonthTrend) {
-                        // Используем цену следующего месяца и процент изменения для расчета
-                        const nextMonthSalePrice = calculatedPrices.get(nextMonthTrend.date + '_sale') || nextMonthTrend.unit_price_for_sale;
-                        const nextMonthRentPrice = calculatedPrices.get(nextMonthTrend.date + '_rent') || nextMonthTrend.unit_price_for_rent;
-                        
-                        salePrice = calculateHistoricalPrice(nextMonthSalePrice, nextMonthTrend.price_change_sale);
-                        rentPrice = calculateHistoricalPrice(nextMonthRentPrice, nextMonthTrend.price_change_rent);
-                    } else {
-                        salePrice = trend.unit_price_for_sale;
-                        rentPrice = trend.unit_price_for_rent;
-                    }
-                }
-                
-                // Сохраняем рассчитанные цены в кэш
-                calculatedPrices.set(trend.date + '_sale', salePrice);
-                calculatedPrices.set(trend.date + '_rent', rentPrice);
-            });
-            
-            // Дополнительная фильтрация для обеспечения правильного порядка отображения
+            // Дополнительная фильтрация для обеспечения правильного порядка
             const sortedTrends = trends.sort((a, b) => {
                 if (a.property_year !== b.property_year) {
                     return a.property_year - b.property_year;
@@ -7758,9 +7579,9 @@
             
             const data = sortedTrends.map(trend => {
                 if (chartType === 'sale') {
-                    return calculatedPrices.get(trend.date + '_sale') || parseFloat(trend.unit_price_for_sale) || 0;
+                    return parseFloat(trend.unit_price_for_sale) || 0;
                 } else {
-                    return calculatedPrices.get(trend.date + '_rent') || parseFloat(trend.unit_price_for_rent) || 0;
+                    return parseFloat(trend.unit_price_for_rent) || 0;
                 }
             });
             
