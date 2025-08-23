@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Тест анализа рынка</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; }
+        .test-button { background: #007bff; color: white; border: none; padding: 10px 20px; cursor: pointer; }
+        .result { margin-top: 15px; padding: 10px; background: #f8f9fa; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Тест блока "Анализ рынка"</h1>
+        
+        <div class="test-section">
+            <h3>Тест 1: Генерация таблицы "Детальные показатели"</h3>
+            <button class="test-button" onclick="testDetailedIndicators()">Сгенерировать таблицу</button>
+            <div id="detailedIndicatorsResult"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>Тест 2: Генерация блока "Анализ рынка"</h3>
+            <button class="test-button" onclick="testMarketAnalysis()">Сгенерировать анализ</button>
+            <div id="marketAnalysisResult"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>Тест 3: Проверка глобальных переменных</h3>
+            <button class="test-button" onclick="checkGlobalVariables()">Проверить переменные</button>
+            <div id="globalVariablesResult"></div>
+        </div>
+    </div>
+
+    <script>
+        // Имитация данных
+        const mockData = {
+            house_type_data: [{
+                comparable_area_for_sale: 65,
+                comparable_area_for_rent: 70,
+                min_unit_price_for_sale: 49091,
+                max_unit_price_for_sale: 65000,
+                min_unit_price_for_rent: 196.24,
+                max_unit_price_for_rent: 250
+            }]
+        };
+
+        const mockSummary = {
+            listing_period_for_sale: { min: 50, max: 90 },
+            listing_period_for_rent: { min: 65, max: 96 }
+        };
+
+        function formatValue(value, type) {
+            if (type === 'price') {
+                return `₺${value.toLocaleString('tr-TR', { minimumFractionDigits: 2 })}`;
+            }
+            return value;
+        }
+
+        function getText(key) {
+            const locales = {
+                'ru': {
+                    'marketAnalysisTitle': 'Анализ рынка',
+                    'saleAnalysisText': 'Продажа: при площади {area} м² и минимальной цене {minPrice}/м² срок продажи составляет ~{minDays} дней; при максимальной цене {maxPrice}/м² - срок продажи до {maxDays} дней.',
+                    'rentAnalysisText': 'Аренда: при площади {area} м² минимальная цена {minPrice}/м² срок сдачи ~{minDays} дней; при максимальной цене {maxPrice}/м² срок до {maxDays} дней.',
+                    'detailedIndicatorsTitle': 'Детальные показатели',
+                    'indicatorNameLabel': 'Показатель',
+                    'saleColumnLabel': 'Продажа',
+                    'rentColumnLabel': 'Аренда',
+                    'areaRowLabel': 'Площадь',
+                    'periodMinRowLabel': 'Срок min',
+                    'periodMaxRowLabel': 'Срок max',
+                    'priceMinRowLabel': 'Цена min',
+                    'priceMaxRowLabel': 'Цена max',
+                    'daysUnit': 'дней'
+                }
+            };
+            return locales['ru'][key] || key;
+        }
+
+        function generateDetailedIndicatorsTable(data, summary) {
+            const houseTypeData = data.house_type_data || [];
+            const comparableAreaForSale = houseTypeData
+                .map(item => item.comparable_area_for_sale)
+                .filter(val => val !== null && !isNaN(parseFloat(val)));
+            
+            const comparableAreaForRent = houseTypeData
+                .map(item => item.comparable_area_for_rent)
+                .filter(val => val !== null && !isNaN(parseFloat(val)));
+            
+            const allData = [];
+            ['age_data', 'floor_segment_data', 'heating_data', 'house_type_data'].forEach(tableName => {
+                const tableData = data[tableName] || [];
+                if (Array.isArray(tableData)) {
+                    allData.push(...tableData);
+                }
+            });
+            
+            const minUnitPriceForSale = allData
+                .map(item => item.min_unit_price_for_sale)
+                .filter(val => val !== null && !isNaN(parseFloat(val)));
+            
+            const maxUnitPriceForSale = allData
+                .map(item => item.max_unit_price_for_sale)
+                .filter(val => val !== null && !isNaN(parseFloat(val)));
+            
+            const minUnitPriceForRent = allData
+                .map(item => item.min_unit_price_for_rent)
+                .filter(val => val !== null && !isNaN(parseFloat(val)));
+            
+            const maxUnitPriceForRent = allData
+                .map(item => item.max_unit_price_for_rent)
+                .filter(val => val !== null && !isNaN(parseFloat(val)));
+            
+            const avgMinSalePrice = minUnitPriceForSale.length > 0 ? 
+                Math.round(minUnitPriceForSale.reduce((sum, val) => sum + parseFloat(val), 0) / minUnitPriceForSale.length) : 0;
+            const avgMaxSalePrice = maxUnitPriceForSale.length > 0 ? 
+                Math.round(maxUnitPriceForSale.reduce((sum, val) => sum + parseFloat(val), 0) / maxUnitPriceForSale.length) : 0;
+            
+            window.avgMinSalePrice = avgMinSalePrice;
+            window.avgMaxSalePrice = avgMaxSalePrice;
+            
+            const avgMinRentPrice = minUnitPriceForRent.length > 0 ? 
+                Math.round((minUnitPriceForRent.reduce((sum, val) => sum + parseFloat(val), 0) / minUnitPriceForRent.length) * 100) / 100 : 0;
+            const avgMaxRentPrice = maxUnitPriceForRent.length > 0 ? 
+                Math.round((maxUnitPriceForRent.reduce((sum, val) => sum + parseFloat(val), 0) / maxUnitPriceForRent.length) * 100) / 100 : 0;
+            
+            window.avgMinRentPrice = avgMinRentPrice;
+            window.avgMaxRentPrice = avgMaxRentPrice;
+            
+            const avgSaleArea = comparableAreaForSale.length > 0 ? 
+                Math.round(comparableAreaForSale.reduce((sum, val) => sum + parseFloat(val), 0) / comparableAreaForSale.length) : 0;
+            const avgRentArea = comparableAreaForRent.length > 0 ? 
+                Math.round(comparableAreaForRent.reduce((sum, val) => sum + parseFloat(val), 0) / comparableAreaForRent.length) : 0;
+            
+            window.avgSaleArea = avgSaleArea;
+            window.avgRentArea = avgRentArea;
+            
+            const salePeriod = summary.listing_period_for_sale || { min: 0, max: 0 };
+            const rentPeriod = summary.listing_period_for_rent || { min: 0, max: 0 };
+            
+            let html = '<div class="detailed-table-section">';
+            html += `<h4>${getText('detailedIndicatorsTitle')}</h4>`;
+            html += '<table style="width:100%; border-collapse:collapse; margin:15px 0;">';
+            
+            html += '<thead><tr>';
+            html += `<th style="border:1px solid #ddd; padding:8px; background:#28a745; color:white;">${getText('indicatorNameLabel')}</th>`;
+            html += `<th style="border:1px solid #ddd; padding:8px; background:#28a745; color:white;">${getText('saleColumnLabel')}</th>`;
+            html += `<th style="border:1px solid #ddd; padding:8px; background:#28a745; color:white;">${getText('rentColumnLabel')}</th>`;
+            html += '</tr></thead>';
+            
+            html += '<tbody>';
+            
+            if (avgSaleArea > 0 || avgRentArea > 0) {
+                html += '<tr>';
+                html += `<td style="border:1px solid #ddd; padding:8px;">${getText('areaRowLabel')}</td>`;
+                html += `<td style="border:1px solid #ddd; padding:8px;">${avgSaleArea > 0 ? avgSaleArea + ' м²' : '-'}</td>`;
+                html += `<td style="border:1px solid #ddd; padding:8px;">${avgRentArea > 0 ? avgRentArea + ' м²' : '-'}</td>`;
+                html += '</tr>';
+            }
+            
+            if (salePeriod.min > 0 || rentPeriod.min > 0) {
+                html += '<tr>';
+                html += `<td style="border:1px solid #ddd; padding:8px;">${getText('periodMinRowLabel')}</td>`;
+                html += `<td style="border:1px solid #ddd; padding:8px;">${salePeriod.min > 0 ? salePeriod.min + ' ' + getText('daysUnit') : '-'}</td>`;
+                html += `<td style="border:1px solid #ddd; padding:8px;">${rentPeriod.min > 0 ? rentPeriod.min + ' ' + getText('daysUnit') : '-'}</td>`;
+                html += '</tr>';
+            }
+            
+            if (salePeriod.max > 0 || rentPeriod.max > 0) {
+                html += '<tr>';
+                html += `<td style="border:1px solid #ddd; padding:8px;">${getText('periodMaxRowLabel')}</td>`;
+                html += `<td style="border:1px solid #ddd; padding:8px;">${salePeriod.max > 0 ? salePeriod.max + ' ' + getText('daysUnit') : '-'}</td>`;
+                html += `<td style="border:1px solid #ddd; padding:8px;">${rentPeriod.max > 0 ? rentPeriod.max + ' ' + getText('daysUnit') : '-'}</td>`;
+                html += '</tr>';
+            }
+            
+            if (avgMinSalePrice > 0 || avgMinRentPrice > 0) {
+                html += '<tr>';
+                html += `<td style="border:1px solid #ddd; padding:8px;">${getText('priceMinRowLabel')}</td>`;
+                html += `<td style="border:1px solid #ddd; padding:8px;">${avgMinSalePrice > 0 ? formatValue(avgMinSalePrice, 'price') : '-'}</td>`;
+                html += `<td style="border:1px solid #ddd; padding:8px;">${avgMinRentPrice > 0 ? formatValue(avgMinRentPrice, 'price') : '-'}</td>`;
+                html += '</tr>';
+            }
+            
+            if (avgMaxSalePrice > 0 || avgMaxRentPrice > 0) {
+                html += '<tr>';
+                html += `<td style="border:1px solid #ddd; padding:8px;">${getText('priceMaxRowLabel')}</td>`;
+                html += `<td style="border:1px solid #ddd; padding:8px;">${avgMaxSalePrice > 0 ? formatValue(avgMaxSalePrice, 'price') : '-'}</td>`;
+                html += `<td style="border:1px solid #ddd; padding:8px;">${avgMaxRentPrice > 0 ? formatValue(avgMaxRentPrice, 'price') : '-'}</td>`;
+                html += '</tr>';
+            }
+            
+            html += '</tbody></table>';
+            html += '</div>';
+            
+            return html;
+        }
+
+        function generateMarketAnalysisText(summary) {
+            const avgSaleArea = window.avgSaleArea || 60;
+            const avgRentArea = window.avgRentArea || 65;
+            const avgMinSalePrice = window.avgMinSalePrice || 0;
+            const avgMaxSalePrice = window.avgMaxSalePrice || 0;
+            const avgMinRentPrice = window.avgMinRentPrice || 0;
+            const avgMaxRentPrice = window.avgMaxRentPrice || 0;
+            
+            const salePeriod = summary.listing_period_for_sale || { min: 0, max: 0 };
+            const rentPeriod = summary.listing_period_for_rent || { min: 0, max: 0 };
+            
+            let html = '<div style="margin:15px 0; padding:15px; background:white; border-radius:8px; box-shadow:0 2px 4px rgba(0,0,0,0.1); border:1px solid #e0e0e0;">';
+            html += `<h4 style="margin-top:0; color:#333; text-align:center;">${getText('marketAnalysisTitle')}</h4>`;
+            html += '<div style="line-height:1.6; color:#333; font-size:14px;">';
+            
+            if (avgSaleArea > 0 && avgMinSalePrice > 0 && avgMaxSalePrice > 0 && salePeriod.min > 0 && salePeriod.max > 0) {
+                const saleText = getText('saleAnalysisText')
+                    .replace('{area}', avgSaleArea)
+                    .replace('{minPrice}', formatValue(avgMinSalePrice, 'price'))
+                    .replace('{minDays}', salePeriod.min)
+                    .replace('{maxPrice}', formatValue(avgMaxSalePrice, 'price'))
+                    .replace('{maxDays}', salePeriod.max);
+                html += `<p>${saleText}</p>`;
+            }
+            
+            if (avgRentArea > 0 && avgMinRentPrice > 0 && avgMaxRentPrice > 0 && rentPeriod.min > 0 && rentPeriod.max > 0) {
+                const rentText = getText('rentAnalysisText')
+                    .replace('{area}', avgRentArea)
+                    .replace('{minPrice}', formatValue(avgMinRentPrice, 'price'))
+                    .replace('{minDays}', rentPeriod.min)
+                    .replace('{maxPrice}', formatValue(avgMaxRentPrice, 'price'))
+                    .replace('{maxDays}', rentPeriod.max);
+                html += `<p>${rentText}</p>`;
+            }
+            
+            html += '</div></div>';
+            
+            return html;
+        }
+
+        function testDetailedIndicators() {
+            const result = generateDetailedIndicatorsTable(mockData, mockSummary);
+            document.getElementById('detailedIndicatorsResult').innerHTML = result;
+        }
+
+        function testMarketAnalysis() {
+            const result = generateMarketAnalysisText(mockSummary);
+            document.getElementById('marketAnalysisResult').innerHTML = result;
+        }
+
+        function checkGlobalVariables() {
+            const variables = {
+                'avgSaleArea': window.avgSaleArea,
+                'avgRentArea': window.avgRentArea,
+                'avgMinSalePrice': window.avgMinSalePrice,
+                'avgMaxSalePrice': window.avgMaxSalePrice,
+                'avgMinRentPrice': window.avgMinRentPrice,
+                'avgMaxRentPrice': window.avgMaxRentPrice
+            };
+            
+            let html = '<div class="result">';
+            html += '<h4>Глобальные переменные:</h4>';
+            html += '<ul>';
+            for (const [key, value] of Object.entries(variables)) {
+                html += `<li><strong>${key}:</strong> ${value !== undefined ? value : 'не определено'}</li>`;
+            }
+            html += '</ul>';
+            html += '</div>';
+            
+            document.getElementById('globalVariablesResult').innerHTML = html;
+        }
+    </script>
+</body>
+</html>
