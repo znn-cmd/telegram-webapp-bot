@@ -579,7 +579,7 @@
             
             /* Мобильные стили для блока "Анализ рынка" */
             .market-analysis-text-block {
-                margin: 12px 0;
+                margin: 24px 0;
                 padding: 22px;
                 border-radius: 14px;
             }
@@ -619,7 +619,7 @@
             
             /* Мобильные стили для блока "Вывод по объекту" */
             .object-summary-section {
-                margin: 12px 0;
+                margin: 24px 0;
                 padding: 22px;
                 border-radius: 14px;
             }
@@ -664,7 +664,7 @@
             
             /* Мобильные стили для блока "Анализ рынка" */
             .market-analysis-text-block {
-                margin: 10px 0;
+                margin: 20px 0;
                 padding: 20px;
                 border-radius: 12px;
             }
@@ -704,7 +704,7 @@
             
             /* Мобильные стили для блока "Вывод по объекту" */
             .object-summary-section {
-                margin: 10px 0;
+                margin: 20px 0;
                 padding: 20px;
                 border-radius: 12px;
             }
@@ -728,7 +728,7 @@
         
         /* Стили для блока "Вывод по объекту" в стиле "Вывод по тренду" */
         .object-summary-section {
-            margin: 15px 0;
+            margin: 30px 0;
             padding: 25px;
             background: white;
             border-radius: 16px;
@@ -766,7 +766,7 @@
         
         /* Стили для блока "Анализ рынка" в стиле "Вывод по тренду" */
         .market-analysis-text-block {
-            margin: 8px 0;
+            margin: 30px 0;
             padding: 25px;
             background: white;
             border-radius: 16px;
@@ -800,14 +800,6 @@
         .market-analysis-text-content strong {
             color: #1a202c;
             font-weight: 700;
-        }
-        
-        .no-data-message {
-            color: #888;
-            font-style: italic;
-            text-align: center;
-            padding: 20px;
-            font-size: 14px;
         }
         
         /* Стили для объединенного анализа рынка в стиле "Вывод прогноза" */
@@ -989,7 +981,7 @@
             }
             
             .block-spacing {
-                height: 15px;
+                height: 30px;
             }
             
             .section-spacing {
@@ -1015,7 +1007,7 @@
             }
             
             .block-spacing {
-                height: 12px;
+                height: 25px;
             }
             
             .section-spacing {
@@ -2470,7 +2462,7 @@
             align-items: center;
             justify-content: center;
             width: 50px;
-            height: 20px;
+            height: 40px;
             border: 2px solid #e0e0e0;
             border-radius: 6px;
             background: white;
@@ -2686,73 +2678,6 @@
                 font-size: 13px;
             }
         }
-        
-        /* Стили для селектора языка */
-        .language-selector {
-            background: white;
-            padding: 20px;
-            border-radius: 16px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-            border: 1px solid rgba(0, 0, 0, 0.05);
-            margin: 20px 0;
-            text-align: center;
-        }
-        
-        .language-selector label {
-            display: block;
-            font-size: 16px;
-            font-weight: 600;
-            color: #333333;
-            margin-bottom: 12px;
-        }
-        
-        .language-selector select {
-            width: 200px;
-            padding: 12px 16px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 14px;
-            color: #333333;
-            background: white;
-            cursor: pointer;
-            transition: border-color 0.3s ease;
-        }
-        
-        .language-selector select:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-        
-        .language-selector select:hover {
-            border-color: #667eea;
-        }
-        
-        /* Мобильные стили для селектора языка */
-        @media (max-width: 768px) {
-            .language-selector {
-                padding: 16px;
-                margin: 16px 0;
-            }
-            
-            .language-selector select {
-                width: 180px;
-                padding: 10px 14px;
-                font-size: 13px;
-            }
-        }
-        
-        @media (max-width: 480px) {
-            .language-selector {
-                padding: 14px;
-                margin: 14px 0;
-            }
-            
-            .language-selector select {
-                width: 160px;
-                padding: 8px 12px;
-                font-size: 12px;
-            }
-        }
     </style>
 </head>
 <body>
@@ -2766,18 +2691,6 @@
         <!-- Заголовок страницы -->
         <div class="page-title" id="pageTitle">Оценка объекта</div>
         <div class="page-description" id="pageDescription">Получите профессиональную оценку стоимости недвижимости в выбранном регионе</div>
-        
-        <!-- Language Selector -->
-        <div class="language-selector">
-            <label for="languageSelect" id="languageLabel">Язык:</label>
-            <select id="languageSelect" onchange="changeLanguage()">
-                <option value="ru" id="ruOption">Русский</option>
-                <option value="en" id="enOption">English</option>
-                <option value="de" id="deOption">Deutsch</option>
-                <option value="fr" id="frOption">Français</option>
-                <option value="tr" id="trOption">Türkçe</option>
-            </select>
-        </div>
 
         <!-- Форма выбора локации -->
         <div class="location-form" id="locationForm">
@@ -2963,7 +2876,6 @@
         const locales = {
             'ru': {
                 'slogan': 'Инсайты рынка недвижимости',
-                'languageLabel': 'Язык:',
                 'pageTitle': 'Оценка объекта',
                 'pageDescription': 'Получите профессиональную оценку стоимости недвижимости в выбранном регионе',
                 'countryLabel': 'Страна:',
@@ -3110,7 +3022,6 @@
             },
             'en': {
                 'slogan': 'Real Estate Market Insights',
-                'languageLabel': 'Language:',
                 'pageTitle': 'Object Evaluation',
                 'pageDescription': 'Get a professional property valuation in the selected region',
                 'countryLabel': 'Country:',
@@ -3318,10 +3229,10 @@
                 'priceMaxRowLabel': 'Preis max',
                 'daysUnit': 'Tage',
                 
-                // Keys for market analysis text
+                // Market analysis text localization keys
                 'marketAnalysisTitle': 'Marktanalyse',
-                'saleAnalysisText': 'Verkauf: Bei einer Fläche von {area} m² (Durchschnittswert für verkaufte Objekte) und einem Mindestpreis von {minPrice}/m² beträgt die Verkaufsdauer ~{minDays} Tage; bei einem Höchstpreis von {maxPrice}/m² beträgt die Verkaufsdauer bis zu {maxDays} Tage.',
-                'rentAnalysisText': 'Vermietung: Bei einer Fläche von {area} m² (Durchschnittswert für vermietete Objekte) Mindestpreis {minPrice}/m², Mietdauer ~{minDays} Tage; bei einem Höchstpreis von {maxPrice}/m² Dauer bis zu {maxDays} Tage.'
+                'saleAnalysisText': 'Verkauf: bei einer Fläche von {area} m² (Durchschnittswert für verkaufte Immobilien) und einem Mindestpreis von {minPrice}/m² beträgt die Verkaufsdauer ~{minDays} Tage; bei einem Höchstpreis von {maxPrice}/m² - die Verkaufsdauer bis zu {maxDays} Tagen.',
+                'rentAnalysisText': 'Vermietung: bei einer Fläche von {area} m² (Durchschnittswert für vermietete Immobilien) Mindestpreis {minPrice}/m², Mietdauer ~{minDays} Tage; bei einem Höchstpreis von {maxPrice}/m² Dauer bis zu {maxDays} Tagen.'
             },
             'fr': {
                 'slogan': 'Aperçus du marché immobilier',
@@ -3379,7 +3290,12 @@
                 'periodMaxRowLabel': 'Période max',
                 'priceMinRowLabel': 'Prix min',
                 'priceMaxRowLabel': 'Prix max',
-                'daysUnit': 'jours'
+                'daysUnit': 'jours',
+                
+                // Market analysis text localization keys
+                'marketAnalysisTitle': 'Analyse du marché',
+                'saleAnalysisText': 'Vente : avec une surface de {area} m² (valeur moyenne pour les propriétés vendues) et un prix minimum de {minPrice}/m², la période de vente est de ~{minDays} jours ; avec un prix maximum de {maxPrice}/m² - la période de vente est jusqu\'à {maxDays} jours.',
+                'rentAnalysisText': 'Location : avec une surface de {area} m² (valeur moyenne pour les propriétés louées) prix minimum {minPrice}/m², période de location ~{minDays} jours ; avec un prix maximum de {maxPrice}/m² période jusqu\'à {maxDays} jours.'
             },
             'tr': {
                 'slogan': 'Gayrimenkul Piyasa İçgörüleri',
@@ -3482,7 +3398,36 @@
                 'yieldLabel': 'Rendite',
                 'insightsTitle': 'Zusammenfassung',
                 'insightsLoading': 'Daten werden analysiert...',
-                'insightsError': 'Fehler bei der Datenanalyse'
+                'insightsError': 'Fehler bei der Datenanalyse',
+                
+                // Keys for trends chart
+                'chart_title': 'Trend-Diagramm',
+                'sale_button': 'Verkaufspreis pro m²',
+                'rent_button': 'Mietpreis pro m²',
+                'chart_info': 'Daten werden bis zum aktuellen Monat und einen Monat voraus angezeigt',
+                
+                // Keys for forecast chart
+                'forecast_chart_title': 'Preis- und Mietprognose-Diagramm',
+                'forecast_chart_info': 'Prognose basierend auf aktuellen und zukünftigen Monaten',
+                
+                // Object summary localization keys
+                'objectSummaryTitle': 'Objektzusammenfassung',
+                'objectPricePerM2Label': 'Preis pro m² Ihres Objekts:',
+                'objectCurrencyLabel': 'Objektwährung:',
+                'objectAreaLabel': 'Objektfläche:',
+                'exchangeRateLabel': 'Wechselkurs:',
+                
+                // Keys for subscription message
+                'subscriptionRequiredTitle': 'Die langfristige Objektwertprognose-Funktion ist nur für Benutzer mit aktivem Abonnement verfügbar.',
+                'subscriptionBenefits': 'Was das Abonnement bietet:',
+                'subscriptionBenefit1': 'Objektpreisprognose für 12 Monate im Voraus',
+                'subscriptionBenefit2': 'Zusätzliche analytische Daten',
+                'subscriptionBenefit3': 'Zusätzliche Servicefunktionen',
+                'howToSubscribe': 'Wie man abonniert:',
+                'subscribeInstructions': 'Gehen Sie zum Bot @Aaadviser_pay_bot',
+                'followInstructions': 'Befolgen Sie die Verbindungsanweisungen',
+                'needHelp': 'Brauchen Sie Hilfe?',
+                'contactSupport': 'Kontaktieren Sie unseren Support: @Aaadviser_support_bot'
             },
             'fr': {
                 'slogan': 'Aperçus du marché immobilier',
@@ -3524,10 +3469,34 @@
                 'insightsLoading': 'Analyse des données...',
                 'insightsError': 'Erreur lors de l\'analyse des données',
                 
-                // Keys for market analysis text
-                'marketAnalysisTitle': 'Analyse du marché',
-                'saleAnalysisText': 'Vente : avec une superficie de {area} m² (valeur moyenne pour les propriétés vendues) et un prix minimum de {minPrice}/m², la période de vente est d\'environ {minDays} jours ; avec un prix maximum de {maxPrice}/m², la période de vente s\'étend jusqu\'à {maxDays} jours.',
-                'rentAnalysisText': 'Location : avec une superficie de {area} m² (valeur moyenne pour les propriétés louées) prix minimum {minPrice}/m², période de location ~{minDays} jours ; avec un prix maximum de {maxPrice}/m², période jusqu\'à {maxDays} jours.'
+                // Keys for trends chart
+                'chart_title': 'Graphique des tendances',
+                'sale_button': 'Prix de vente par m²',
+                'rent_button': 'Prix de location par m²',
+                'chart_info': 'Données affichées jusqu\'au mois actuel et un mois à l\'avance',
+                
+                // Keys for forecast chart
+                'forecast_chart_title': 'Graphique de prévision des prix et de la location',
+                'forecast_chart_info': 'Prévision basée sur les mois actuels et futurs',
+                
+                // Object summary localization keys
+                'objectSummaryTitle': 'Résumé de l\'objet',
+                'objectPricePerM2Label': 'Prix par m² de votre objet:',
+                'objectCurrencyLabel': 'Devise de l\'objet:',
+                'objectAreaLabel': 'Surface de l\'objet:',
+                'exchangeRateLabel': 'Taux de change:',
+                
+                // Keys for subscription message
+                'subscriptionRequiredTitle': 'La fonction de prévision à long terme de la valeur des biens n\'est disponible que pour les utilisateurs avec un abonnement actif.',
+                'subscriptionBenefits': 'Ce que l\'abonnement vous donne:',
+                'subscriptionBenefit1': 'Prévision du prix des biens pour 12 mois à l\'avance',
+                'subscriptionBenefit2': 'Données analytiques supplémentaires',
+                'subscriptionBenefit3': 'Capacités de service supplémentaires',
+                'howToSubscribe': 'Comment s\'abonner:',
+                'subscribeInstructions': 'Allez au bot @Aaadviser_pay_bot',
+                'followInstructions': 'Suivez les instructions de connexion',
+                'needHelp': 'Besoin d\'aide?',
+                'contactSupport': 'Contactez notre support: @Aaadviser_support_bot'
             },
             'tr': {
                 'slogan': 'Gayrimenkul Piyasa İçgörüleri',
@@ -3616,11 +3585,6 @@
                 'indicatorLabel': 'Gösterge',
                 'minValueLabel': 'Minimum değer',
                 'maxValueLabel': 'Maksimum değer',
-                
-                // Keys for market analysis text
-                'marketAnalysisTitle': 'Piyasa Analizi',
-                'saleAnalysisText': 'Satış: {area} m² alan (satılan mülklerin ortalama değeri) ve {minPrice}/m² minimum fiyat ile satış süresi ~{minDays} gün; {maxPrice}/m² maksimum fiyat ile satış süresi {maxDays} güne kadar.',
-                'rentAnalysisText': 'Kiralama: {area} m² alan (kiralanan mülklerin ortalama değeri) {minPrice}/m² minimum fiyat, kiralama süresi ~{minDays} gün; {maxPrice}/m² maksimum fiyat ile süre {maxDays} güne kadar.',
                 'comparableAreaForSaleLabel': 'Karşılaştırılabilir alan',
                 'countForSaleLabel': 'Satış için sayı',
                 'listingPeriodForSaleLabel': 'Satışa kadar süre',
@@ -3628,7 +3592,26 @@
                 'comparableAreaForRentLabel': 'Karşılaştırılabilir alan',
                 'countForRentLabel': 'Kiralama için sayı',
                 'listingPeriodForRentLabel': 'Kiralamaya kadar süre',
-                'unitPriceForRentLabel': 'Birim fiyat'
+                'unitPriceForRentLabel': 'Birim fiyat',
+                
+                // Object summary localization keys
+                'objectSummaryTitle': 'Nesne Özeti',
+                'objectPricePerM2Label': 'Nesnenizin m² başına fiyatı:',
+                'objectCurrencyLabel': 'Nesne para birimi:',
+                'objectAreaLabel': 'Nesne alanı:',
+                'exchangeRateLabel': 'Döviz kuru:',
+                
+                // Keys for subscription message
+                'subscriptionRequiredTitle': 'Uzun vadeli mülk değeri tahmin fonksiyonu yalnızca aktif aboneliği olan kullanıcılar için kullanılabilir.',
+                'subscriptionBenefits': 'Abonelik size ne verir:',
+                'subscriptionBenefit1': '12 ay öncesine kadar mülk fiyat tahmini',
+                'subscriptionBenefit2': 'Ek analitik veriler',
+                'subscriptionBenefit3': 'Ek servis özellikleri',
+                'howToSubscribe': 'Nasıl abone olunur:',
+                'subscribeInstructions': '@Aaadviser_pay_bot botuna gidin',
+                'followInstructions': 'Bağlantı talimatlarını takip edin',
+                'needHelp': 'Yardıma mı ihtiyacınız var?',
+                'contactSupport': 'Destek ekibimizle iletişime geçin: @Aaadviser_support_bot'
             }
         };
 
@@ -3636,66 +3619,12 @@
         function getText(key) {
             return locales[currentLanguage][key] || key;
         }
-        
-        // Change language function
-        function changeLanguage() {
-            const languageSelect = document.getElementById('languageSelect');
-            const selectedLanguage = languageSelect.value;
-            
-            if (selectedLanguage && locales[selectedLanguage]) {
-                currentLanguage = selectedLanguage;
-                updatePageText();
-                
-                // Update language selector options with localized text
-                const languageLabels = {
-                    'ru': 'Русский',
-                    'en': 'English',
-                    'de': 'Deutsch',
-                    'fr': 'Français',
-                    'tr': 'Türkçe'
-                };
-                
-                // Update all options
-                Object.keys(languageLabels).forEach(lang => {
-                    const option = document.getElementById(lang + 'Option');
-                    if (option) {
-                        option.textContent = languageLabels[lang];
-                    }
-                });
-                
-                // Update market analysis text if it exists
-                if (window.currentSummaryData) {
-                    const summaryContainer = document.getElementById('summaryDataContent');
-                    if (summaryContainer) {
-                        // Regenerate the summary table with new language
-                        generateSummaryTable(window.currentSummaryData);
-                    }
-                }
-                
-                console.log(`🌐 Language changed to: ${currentLanguage}`);
-            }
-        }
 
         // Update page text based on current language
         function updatePageText() {
             document.getElementById('slogan').textContent = getText('slogan');
             document.getElementById('pageTitle').textContent = getText('pageTitle');
             document.getElementById('pageDescription').textContent = getText('pageDescription');
-            
-            // Update language selector
-            const languageLabel = document.getElementById('languageLabel');
-            if (languageLabel) {
-                // Use hardcoded labels for now since not all languages have languageLabel
-                const languageLabels = {
-                    'ru': 'Язык:',
-                    'en': 'Language:',
-                    'de': 'Sprache:',
-                    'fr': 'Langue:',
-                    'tr': 'Dil:'
-                };
-                languageLabel.textContent = languageLabels[currentLanguage] || 'Язык:';
-            }
-            
             document.getElementById('countryLabel').textContent = getText('countryLabel');
             document.getElementById('cityLabel').textContent = getText('cityLabel');
             document.getElementById('countyLabel').textContent = getText('countyLabel');
@@ -5086,58 +5015,48 @@
             return analysis;
         }
 
-        // Generate market analysis text block
+        // Generate market analysis text block using data from detailed indicators table
         function generateMarketAnalysisText(summary) {
             if (!summary || Object.keys(summary).length === 0) {
                 return '';
             }
             
-            // Get data from detailed indicators table
-            const avgSaleArea = summary.comparable_area_for_sale ? 
-                Math.round((summary.comparable_area_for_sale.min + summary.comparable_area_for_sale.max) / 2) : 0;
-            const avgRentArea = summary.comparable_area_for_rent ? 
-                Math.round((summary.comparable_area_for_rent.min + summary.comparable_area_for_rent.max) / 2) : 0;
+            // Get data from detailed indicators table (calculated in generateDetailedIndicatorsTable)
+            const avgSaleArea = window.avgSaleArea || 60;
+            const avgRentArea = window.avgRentArea || 65;
+            const avgMinSalePrice = window.avgMinSalePrice || 0;
+            const avgMaxSalePrice = window.avgMaxSalePrice || 0;
+            const avgMinRentPrice = window.avgMinRentPrice || 0;
+            const avgMaxRentPrice = window.avgMaxRentPrice || 0;
             
-            // Get min/max prices and periods from summary
-            const saleMinPrice = summary.unit_price_for_sale ? summary.unit_price_for_sale.min : 0;
-            const saleMaxPrice = summary.unit_price_for_sale ? summary.unit_price_for_sale.max : 0;
-            const saleMinPeriod = summary.listing_period_for_sale ? summary.listing_period_for_sale.min : 0;
-            const saleMaxPeriod = summary.listing_period_for_sale ? summary.listing_period_for_sale.max : 0;
-            
-            const rentMinPrice = summary.unit_price_for_rent ? summary.unit_price_for_rent.min : 0;
-            const rentMaxPrice = summary.unit_price_for_rent ? summary.unit_price_for_rent.max : 0;
-            const rentMinPeriod = summary.listing_period_for_rent ? summary.listing_period_for_rent.min : 0;
-            const rentMaxPeriod = summary.listing_period_for_rent ? summary.listing_period_for_rent.max : 0;
+            // Get sale and rent periods from summary
+            const salePeriod = summary.listing_period_for_sale || { min: 0, max: 0 };
+            const rentPeriod = summary.listing_period_for_rent || { min: 0, max: 0 };
             
             let html = '<div class="market-analysis-text-block">';
             html += `<h4 class="market-analysis-text-title">${getText('marketAnalysisTitle')}</h4>`;
             html += '<div class="market-analysis-text-content">';
             
-            // Sale analysis using data from detailed indicators table
-            if (avgSaleArea > 0 && saleMinPrice > 0 && saleMaxPrice > 0 && saleMinPeriod > 0 && saleMaxPeriod > 0) {
+            // Sale analysis using actual data from detailed indicators
+            if (avgSaleArea > 0 && avgMinSalePrice > 0 && avgMaxSalePrice > 0 && salePeriod.min > 0 && salePeriod.max > 0) {
                 const saleText = getText('saleAnalysisText')
                     .replace('{area}', avgSaleArea)
-                    .replace('{minPrice}', formatValue(saleMinPrice, 'price'))
-                    .replace('{minDays}', saleMinPeriod)
-                    .replace('{maxPrice}', formatValue(saleMaxPrice, 'price'))
-                    .replace('{maxDays}', saleMaxPeriod);
+                    .replace('{minPrice}', formatValue(avgMinSalePrice, 'price'))
+                    .replace('{minDays}', salePeriod.min)
+                    .replace('{maxPrice}', formatValue(avgMaxSalePrice, 'price'))
+                    .replace('{maxDays}', salePeriod.max);
                 html += `<p>${saleText}</p>`;
             }
             
-            // Rent analysis using data from detailed indicators table
-            if (avgRentArea > 0 && rentMinPrice > 0 && rentMaxPrice > 0 && rentMinPeriod > 0 && rentMaxPeriod > 0) {
+            // Rent analysis using actual data from detailed indicators
+            if (avgRentArea > 0 && avgMinRentPrice > 0 && avgMaxRentPrice > 0 && rentPeriod.min > 0 && rentPeriod.max > 0) {
                 const rentText = getText('rentAnalysisText')
-                    .replace('{minPrice}', formatValue(rentMinPrice, 'price'))
-                    .replace('{minDays}', rentMinPeriod)
-                    .replace('{maxPrice}', formatValue(rentMaxPrice, 'price'))
-                    .replace('{maxDays}', rentMaxPeriod);
+                    .replace('{area}', avgRentArea)
+                    .replace('{minPrice}', formatValue(avgMinRentPrice, 'price'))
+                    .replace('{minDays}', rentPeriod.min)
+                    .replace('{maxPrice}', formatValue(avgMaxRentPrice, 'price'))
+                    .replace('{maxDays}', rentPeriod.max);
                 html += `<p>${rentText}</p>`;
-            }
-            
-            // Show message if no data available
-            if ((avgSaleArea === 0 || saleMinPrice === 0 || saleMaxPrice === 0 || saleMinPeriod === 0 || saleMaxPeriod === 0) &&
-                (avgRentArea === 0 || rentMinPrice === 0 || rentMaxPrice === 0 || rentMinPeriod === 0 || rentMaxPeriod === 0)) {
-                html += `<p class="no-data-message">${getText('noDataAvailable')}</p>`;
             }
             
             html += '</div></div>';
@@ -5202,11 +5121,19 @@
             const avgMaxRentPrice = maxUnitPriceForRent.length > 0 ? 
                 Math.round((maxUnitPriceForRent.reduce((sum, val) => sum + parseFloat(val), 0) / maxUnitPriceForRent.length) * 100) / 100 : 0;
             
+            // Save average rent price values globally for use in market analysis
+            window.avgMinRentPrice = avgMinRentPrice;
+            window.avgMaxRentPrice = avgMaxRentPrice;
+            
             // Calculate average area values (single value instead of range)
             const avgSaleArea = comparableAreaForSale.length > 0 ? 
                 Math.round(comparableAreaForSale.reduce((sum, val) => sum + parseFloat(val), 0) / comparableAreaForSale.length) : 0;
             const avgRentArea = comparableAreaForRent.length > 0 ? 
                 Math.round(comparableAreaForRent.reduce((sum, val) => sum + parseFloat(val), 0) / comparableAreaForRent.length) : 0;
+            
+            // Save average area values globally for use in market analysis
+            window.avgSaleArea = avgSaleArea;
+            window.avgRentArea = avgRentArea;
             
             // Get sale and rent periods from existing summary
             const salePeriod = summary.listing_period_for_sale || { min: 0, max: 0 };
@@ -5802,11 +5729,15 @@
             }
         }
 
-                // НОВАЯ ЛОГИКА: Показываем ВСЕ записи из property_trends для соответствующих локаций
+                // Filter trends to show 6 months before current month and 1 month after
         function filterTrendsByDateRange(trends) {
             if (!trends || trends.length === 0) return [];
             
-            console.log(`🔍 Показываем ВСЕ тренды для локации пользователя: ${trends.length} записей`);
+            const currentYear = new Date().getFullYear();
+            const currentMonth = new Date().getMonth() + 1; // getMonth() returns 0-11
+            
+            console.log(`🔍 Filtering trends: current date = ${currentYear}-${currentMonth}`);
+            console.log(`🔍 Total trends = ${trends.length}`);
             
             // Сортируем тренды по property_year и property_month (новые сначала)
             const sortedTrends = trends.sort((a, b) => {
@@ -5816,14 +5747,90 @@
                 return b.property_month - a.property_month;
             });
             
-            console.log(`🔍 Отсортированные тренды (новые сначала):`);
+            console.log(`🔍 Sorted trends by property_year/property_month (newest first):`);
             sortedTrends.forEach((trend, index) => {
-                console.log(`  ${index}: ${trend.property_year}-${trend.property_month} - Продажа: ${trend.price_change_sale}%, Аренда: ${trend.price_change_rent}%`);
+                console.log(`  ${index}: ${trend.property_year}-${trend.property_month} (${trend.date})`);
             });
             
-            // Возвращаем ВСЕ тренды без ограничений по месяцам
-            console.log(`✅ Возвращаем все ${sortedTrends.length} трендов для отображения`);
-            return sortedTrends;
+            // Фильтруем тренды за текущий год (2025)
+            const currentYearTrends = sortedTrends.filter(trend => trend.property_year === currentYear);
+            console.log(`🔍 Current year trends: ${currentYearTrends.length}`);
+            
+            if (currentYearTrends.length === 0) {
+                console.log(`⚠️ No trends for current year ${currentYear}, returning first 8 from all`);
+                return sortedTrends.slice(0, 8);
+            }
+            
+            // Вычисляем диапазон месяцев: 6 месяцев назад от текущего + 1 месяц вперед
+            const startMonth = currentMonth - 6;
+            const endMonth = currentMonth + 1;
+            
+            console.log(`🔍 Target month range: ${startMonth} to ${endMonth}`);
+            
+            // Фильтруем тренды по диапазону месяцев
+            const filteredTrends = currentYearTrends.filter(trend => {
+                const month = trend.property_month;
+                
+                // Обрабатываем переход через год (например, если текущий месяц август, то февраль = -4)
+                if (startMonth <= 0) {
+                    // Если startMonth отрицательный, берем месяцы с конца предыдущего года
+                    return month >= (12 + startMonth) || month <= endMonth;
+                } else {
+                    // Обычный случай
+                    return month >= startMonth && month <= endMonth;
+                }
+            });
+            
+            console.log(`🔍 Filtered trends by month range: ${filteredTrends.length}`);
+            
+            // Сортируем по месяцу (будущие месяцы сверху, текущий в середине, прошедшие снизу)
+            filteredTrends.sort((a, b) => {
+                const monthA = a.property_month;
+                const monthB = b.property_month;
+                
+                // Если оба месяца в будущем (больше текущего)
+                if (monthA > currentMonth && monthB > currentMonth) {
+                    return monthA - monthB; // По возрастанию (сентябрь перед октябрем)
+                }
+                // Если оба месяца в прошлом (меньше текущего)
+                else if (monthA < currentMonth && monthB < currentMonth) {
+                    return monthB - monthA; // По убыванию (июль перед июнем)
+                }
+                // Если один в будущем, а другой - текущий
+                else if (monthA > currentMonth && monthB === currentMonth) {
+                    return -1; // Будущий месяц идет перед текущим
+                }
+                else if (monthA === currentMonth && monthB > currentMonth) {
+                    return 1; // Текущий месяц идет после будущего
+                }
+                // Если один в будущем, а другой в прошлом
+                else if (monthA > currentMonth && monthB < currentMonth) {
+                    return -1; // Будущий месяц идет первым
+                }
+                else if (monthA < currentMonth && monthB > currentMonth) {
+                    return 1; // Прошедший месяц идет последним
+                }
+                // Если один из месяцев - текущий, а другой в прошлом
+                else if (monthA === currentMonth && monthB < currentMonth) {
+                    return -1; // Текущий месяц идет перед прошедшим
+                }
+                else if (monthA < currentMonth && monthB === currentMonth) {
+                    return 1; // Прошедший месяц идет после текущего
+                }
+                
+                return 0;
+            });
+            
+            if (filteredTrends.length >= 8) {
+                // Берем первые 8 трендов из отфильтрованного диапазона
+                const selectedTrends = filteredTrends.slice(0, 8);
+                console.log(`✅ Selected ${selectedTrends.length} trends from month range`);
+                return selectedTrends;
+            } else {
+                // Если мало трендов в диапазоне, возвращаем все отфильтрованные
+                console.log(`⚠️ Few trends in month range, returning all ${filteredTrends.length}`);
+                return filteredTrends;
+            }
         }
 
         // Generate detailed trends table
@@ -5835,218 +5842,13 @@
                 return '<div class="no-data">Нет данных для отображения</div>';
             }
             
-            // Показываем ВСЕ тренды, включая те, где проценты изменения могут быть 0 или null
-            console.log(`📊 Обрабатываем все ${trends.length} трендов для отображения`);
+            // Фильтруем тренды по диапазону дат
+            const filteredTrends = filterTrendsByDateRange(trends);
+            console.log('🔍 Filtered trends for table:', filteredTrends.length, 'records');
             
-            // Проверяем, есть ли вообще данные
-            if (trends.length === 0) {
-                console.log('⚠️ Нет данных о трендах');
-                return '<div class="no-data">Нет данных о трендах</div>';
-            }
-            
-            // Получаем средние цены для текущего месяца
-            let avgSalePrice = window.avgMinSalePrice && window.avgMaxSalePrice ? 
-                Math.round((window.avgMinSalePrice + window.avgMaxSalePrice) / 2) : 0;
-            let avgRentPrice = window.avgMinRentPrice && window.avgMaxRentPrice ? 
-                Math.round((window.avgMinRentPrice + window.avgMaxRentPrice) * 100) / 100 : 0;
-            
-            console.log('💰 Базовые цены для текущего месяца:');
-            console.log(`   Продажа: (${window.avgMinSalePrice} + ${window.avgMaxSalePrice}) / 2 = ${avgSalePrice} ₺/м²`);
-            console.log(`   Аренда: (${window.avgMinRentPrice} + ${window.avgMaxRentPrice}) / 2 = ${avgRentPrice} ₺/м²`);
-            
-            // Проверяем, что базовые цены не равны 0
-            if (avgSalePrice === 0) {
-                console.log('⚠️ Базовая цена продажи равна 0, используем fallback значение');
-                // Используем fallback значение из первого тренда с ценой продажи
-                const firstTrendWithPrice = trends.find(t => t.unit_price_for_sale && t.unit_price_for_sale > 0);
-                if (firstTrendWithPrice) {
-                    avgSalePrice = parseFloat(firstTrendWithPrice.unit_price_for_sale);
-                    console.log(`   Fallback цена продажи: ${avgSalePrice} ₺/м²`);
-                }
-            }
-            
-            if (avgRentPrice === 0) {
-                console.log('⚠️ Базовая цена аренды равна 0, используем fallback значение');
-                // Используем fallback значение из первого тренда с ценой аренды
-                const firstTrendWithRent = trends.find(t => t.unit_price_for_rent && t.unit_price_for_rent > 0);
-                if (firstTrendWithRent) {
-                    avgRentPrice = parseFloat(firstTrendWithRent.unit_price_for_rent);
-                    console.log(`   Fallback цена аренды: ${avgRentPrice} ₺/м²`);
-                }
-            }
-            
-            // Если все еще нет базовых цен, используем примерные значения
-            if (avgSalePrice === 0) {
-                avgSalePrice = 60000; // Примерная цена за м² в Турции
-                console.log(`   Используем примерную цену продажи: ${avgSalePrice} ₺/м²`);
-            }
-            
-            if (avgRentPrice === 0) {
-                avgRentPrice = 300; // Примерная цена аренды за м² в Турции
-                console.log(`   Используем примерную цену аренды: ${avgRentPrice} ₺/м²`);
-            }
-            
-            // Сортируем тренды по дате (новые сначала)
-            const sortedTrends = trends.sort((a, b) => {
-                if (a.property_year !== b.property_year) {
-                    return b.property_year - a.property_year;
-                }
-                return b.property_month - a.property_month;
-            });
-            
-            // Получаем текущую дату
-            const currentDate = new Date();
-            const currentYear = currentDate.getFullYear();
-            const currentMonth = currentDate.getMonth() + 1;
-            
-            // НОВАЯ ЛОГИКА РАСЧЕТА - простой и понятный подход
-            console.log('🔄 Начинаем расчет цен для всех месяцев...');
-            
-            // Создаем объект для хранения рассчитанных цен
-            const calculatedTrends = [];
-            
-            // Сортируем тренды по дате (от старых к новым) для правильного расчета
-            const sortedTrendsForCalculation = trends.sort((a, b) => {
-                if (a.property_year !== b.property_year) {
-                    return a.property_year - b.property_year;
-                }
-                return a.property_month - b.property_month;
-            });
-            
-            console.log('📅 Тренды отсортированы для расчета (от старых к новым):');
-            sortedTrendsForCalculation.forEach((trend, index) => {
-                console.log(`   ${index}: ${trend.property_month}/${trend.property_year} - Продажа: ${trend.price_change_sale}%, Аренда: ${trend.price_change_rent}%`);
-            });
-            
-            // Находим текущий месяц в отсортированном массиве
-            const currentMonthIndex = sortedTrendsForCalculation.findIndex(trend => 
-                trend.property_year === currentYear && trend.property_month === currentMonth
-            );
-            
-            console.log(`🎯 Текущий месяц ${currentMonth}/${currentYear} найден на позиции: ${currentMonthIndex}`);
-            
-            if (currentMonthIndex === -1) {
-                console.log('⚠️ Текущий месяц не найден в отсортированных трендах');
-                return '<div class="no-data">Текущий месяц не найден в данных</div>';
-            }
-            
-            // ШАГ 1: Устанавливаем базовые цены для текущего месяца
-            let currentSalePrice = avgSalePrice;
-            let currentRentPrice = avgRentPrice;
-            
-            console.log(`💰 Базовые цены для ${currentMonth}/${currentYear}: Продажа=${currentSalePrice} ₺/м², Аренда=${currentRentPrice} ₺/м²`);
-            
-            // ШАГ 2: Рассчитываем цены для будущих месяцев (от текущего к будущему)
-            console.log('📈 Рассчитываем будущие месяцы...');
-            for (let i = currentMonthIndex + 1; i < sortedTrendsForCalculation.length; i++) {
-                const trend = sortedTrendsForCalculation[i];
-                const salePercentage = parseFloat(trend.price_change_sale) || 0;
-                const rentPercentage = parseFloat(trend.price_change_rent) || 0;
-                
-                // Если есть проценты изменения, рассчитываем цены
-                if (salePercentage !== 0 || rentPercentage !== 0) {
-                    // Формула: предыдущая_цена × (1 + процент_изменения)
-                    const newSalePrice = currentSalePrice * (1 + salePercentage / 100);
-                    const newRentPrice = currentRentPrice * (1 + rentPercentage / 100);
-                    
-                    console.log(`   ${trend.property_month}/${trend.property_year}:`);
-                    console.log(`     Продажа: ${currentSalePrice} × (1 + ${salePercentage}%) = ${newSalePrice.toFixed(2)} ₺/м²`);
-                    console.log(`     Аренда: ${currentRentPrice} × (1 + ${rentPercentage}%) = ${newRentPrice.toFixed(2)} ₺/м²`);
-                    
-                    // Обновляем текущие цены для следующего месяца
-                    currentSalePrice = newSalePrice;
-                    currentRentPrice = newRentPrice;
-                    
-                    // Добавляем в массив результатов
-                    calculatedTrends.push({
-                        ...trend,
-                        calculatedSalePrice: Math.round(newSalePrice),
-                        calculatedRentPrice: Math.round(newRentPrice * 100) / 100,
-                        calculatedYield: Math.round((newRentPrice / newSalePrice) * 100 * 12 * 100) / 100
-                    });
-                } else {
-                    // Если нет процентов изменения, используем базовые цены
-                    console.log(`   ${trend.property_month}/${trend.property_year}: Нет процентов изменения, используем базовые цены`);
-                    calculatedTrends.push({
-                        ...trend,
-                        calculatedSalePrice: Math.round(avgSalePrice),
-                        calculatedRentPrice: Math.round(avgRentPrice * 100) / 100,
-                        calculatedYield: Math.round((avgRentPrice / avgSalePrice) * 100 * 12 * 100) / 100
-                    });
-                }
-            }
-            
-            // ШАГ 3: Рассчитываем цены для прошлых месяцев (от текущего к прошлому)
-            console.log('📉 Рассчитываем прошлые месяцы...');
-            currentSalePrice = avgSalePrice; // Возвращаемся к базовым ценам
-            currentRentPrice = avgRentPrice;
-            
-            for (let i = currentMonthIndex - 1; i >= 0; i--) {
-                const trend = sortedTrendsForCalculation[i];
-                const salePercentage = parseFloat(trend.price_change_sale) || 0;
-                const rentPercentage = parseFloat(trend.price_change_rent) || 0;
-                
-                // Если есть проценты изменения, рассчитываем цены
-                if (salePercentage !== 0 || rentPercentage !== 0) {
-                    // Формула: следующая_цена ÷ (1 + процент_изменения)
-                    const newSalePrice = currentSalePrice / (1 + salePercentage / 100);
-                    const newRentPrice = currentRentPrice / (1 + rentPercentage / 100);
-                    
-                    console.log(`   ${trend.property_month}/${trend.property_year}:`);
-                    console.log(`     Продажа: ${currentSalePrice} ÷ (1 + ${salePercentage}%) = ${newSalePrice.toFixed(2)} ₺/м²`);
-                    console.log(`     Аренда: ${currentRentPrice} ÷ (1 + ${rentPercentage}%) = ${newRentPrice.toFixed(2)} ₺/м²`);
-                    
-                    // Обновляем текущие цены для следующего месяца назад
-                    currentSalePrice = newSalePrice;
-                    currentRentPrice = newRentPrice;
-                    
-                    // Добавляем в массив результатов
-                    calculatedTrends.push({
-                        ...trend,
-                        calculatedSalePrice: Math.round(newSalePrice),
-                        calculatedRentPrice: Math.round(newRentPrice * 100) / 100,
-                        calculatedYield: Math.round((newRentPrice / newSalePrice) * 100 * 12 * 100) / 100
-                    });
-                } else {
-                    // Если нет процентов изменения, используем базовые цены
-                    console.log(`   ${trend.property_month}/${trend.property_year}: Нет процентов изменения, используем базовые цены`);
-                    calculatedTrends.push({
-                        ...trend,
-                        calculatedSalePrice: Math.round(avgSalePrice),
-                        calculatedRentPrice: Math.round(avgRentPrice * 100) / 100,
-                        calculatedYield: Math.round((avgRentPrice / avgSalePrice) * 100 * 12 * 100) / 100
-                    });
-                }
-            }
-            
-            // ШАГ 4: Добавляем текущий месяц в результаты
-            const currentTrend = sortedTrendsForCalculation[currentMonthIndex];
-            calculatedTrends.push({
-                ...currentTrend,
-                calculatedSalePrice: Math.round(avgSalePrice),
-                calculatedRentPrice: Math.round(avgRentPrice * 100) / 100,
-                calculatedYield: Math.round((avgRentPrice / avgSalePrice) * 100 * 12 * 100) / 100
-            });
-            
-            // Сортируем по дате (новые сначала) для отображения
-            calculatedTrends.sort((a, b) => {
-                if (a.property_year !== b.property_year) {
-                    return b.property_year - a.property_year;
-                }
-                return b.property_month - a.property_month;
-            });
-            
-            console.log('📊 Финальные рассчитанные цены (от новых к старым):');
-            calculatedTrends.forEach((trend, index) => {
-                console.log(`   ${index}: ${trend.property_month}/${trend.property_year} - Продажа: ${trend.calculatedSalePrice} ₺/м², Аренда: ${trend.calculatedRentPrice} ₺/м², Доходность: ${trend.calculatedYield}%`);
-            });
-            
-            // Показываем ВСЕ рассчитанные тренды без фильтрации
-            console.log('🔍 Показываем все рассчитанные тренды:', calculatedTrends.length, 'записей');
-            
-            if (calculatedTrends.length === 0) {
-                console.log('⚠️ Нет рассчитанных трендов для отображения');
-                return '<div class="no-data">Нет данных для отображения</div>';
+            if (filteredTrends.length === 0) {
+                console.log('⚠️ No trends in date range for trends table');
+                return '<div class="no-data">Нет данных для отображения в выбранном диапазоне</div>';
             }
             
             let html = '<table class="trends-table">';
@@ -6059,13 +5861,16 @@
             html += '<th>Доходность</th>';
             html += '</tr></thead><tbody>';
             
-            // Добавляем информацию о количестве записей
+            // Добавляем информацию о фильтрации
+            const currentDate = new Date();
+            const currentYear = currentDate.getFullYear();
+            const currentMonth = currentDate.getMonth() + 1;
             
             html += `<tr class="filter-info"><td colspan="6" style="text-align: center; font-size: 11px; color: #666; background: #f8f9fa; padding: 4px;">
-                Показано ${calculatedTrends.length} из ${trends.length} трендов
+                Показано ${filteredTrends.length} из ${trends.length} трендов
             </td></tr>`;
             
-            calculatedTrends.forEach((trend, index) => {
+            filteredTrends.forEach((trend, index) => {
                 // Проверяем, является ли этот тренд текущим месяцем
                 const isCurrentMonth = trend.property_year === currentYear && trend.property_month === currentMonth;
                 const isFutureMonth = trend.property_year > currentYear || (trend.property_year === currentYear && trend.property_month > currentMonth);
@@ -6083,11 +5888,11 @@
                 
                 html += `<tr class="${rowClass}" style="${rowStyle}">`;
                 html += `<td>${formatTrendDateShort(trend.date)}</td>`;
-                html += `<td>${formatTrendValue(trend.calculatedSalePrice, 'price')}</td>`;
+                html += `<td>${formatTrendValue(trend.unit_price_for_sale, 'price')}</td>`;
                 html += `<td>${formatPercentage(trend.price_change_sale)}</td>`;
-                html += `<td>${formatTrendValue(trend.calculatedRentPrice, 'price')}</td>`;
+                html += `<td>${formatTrendValue(trend.unit_price_for_rent, 'price')}</td>`;
                 html += `<td>${formatPercentage(trend.price_change_rent)}</td>`;
-                html += `<td>${formatTrendValue(trend.calculatedYield, 'percentage')}</td>`;
+                html += `<td>${formatTrendValue(trend.yield, 'percentage')}</td>`;
                 html += '</tr>';
             });
             
@@ -6117,16 +5922,16 @@
             `;
             
             // Добавляем блок "Вывод по тренду"
-            html += await generateTrendsAnalysis(filteredTrends);
+            html += await generateTrendsAnalysis(trends);
             
             // Инициализируем график прогноза после добавления HTML
             setTimeout(() => {
-                // Находим данные прогноза для графика из рассчитанных трендов
+                // Находим данные прогноза для графика
                 const currentDate = new Date();
                 const currentYear = currentDate.getFullYear();
                 const currentMonth = currentDate.getMonth() + 1;
                 
-                const forecastTrends = filteredTrends.filter(trend => {
+                const forecastTrends = trends.filter(trend => {
                     if (trend.property_year > currentYear) {
                         return true; // Будущие годы
                     } else if (trend.property_year === currentYear) {
@@ -6136,7 +5941,7 @@
                 });
                 
                 if (forecastTrends.length > 0) {
-                    console.log('📊 Initializing forecast chart with calculated data:', forecastTrends.length, 'records');
+                    console.log('📊 Initializing forecast chart with filtered data:', forecastTrends.length, 'records');
                     initializeForecastChart(forecastTrends);
                 }
             }, 100);
@@ -6172,17 +5977,17 @@
             }
             
             // Рассчитываем общий рост цен на продажу
-            const firstSalePrice = parseFloat(firstMonth.calculatedSalePrice) || 0;
-            const lastSalePrice = parseFloat(lastMonth.calculatedSalePrice) || 0;
+            const firstSalePrice = parseFloat(firstMonth.unit_price_for_sale) || 0;
+            const lastSalePrice = parseFloat(lastMonth.unit_price_for_sale) || 0;
             const salePriceGrowth = firstSalePrice > 0 ? ((lastSalePrice - firstSalePrice) / firstSalePrice * 100) : 0;
             
             // Рассчитываем общий рост цен на аренду
-            const firstRentPrice = parseFloat(firstMonth.calculatedRentPrice) || 0;
-            const lastRentPrice = parseFloat(lastMonth.calculatedRentPrice) || 0;
+            const firstRentPrice = parseFloat(firstMonth.unit_price_for_rent) || 0;
+            const lastRentPrice = parseFloat(lastMonth.unit_price_for_rent) || 0;
             const rentPriceGrowth = firstRentPrice > 0 ? ((lastRentPrice - firstRentPrice) / firstRentPrice * 100) : 0;
             
             // Анализируем диапазон доходности
-            const yields = trends.map(t => parseFloat(t.calculatedYield) || 0).filter(y => y > 0);
+            const yields = trends.map(t => parseFloat(t.yield) || 0).filter(y => y > 0);
             const minYield = yields.length > 0 ? Math.min(...yields) : 0;
             const maxYield = yields.length > 0 ? Math.max(...yields) : 0;
             
@@ -6261,21 +6066,7 @@
             }
             
             // Добавляем таблицу "Прогноз цены и аренды"
-            // Используем рассчитанные тренды для прогноза
-            const currentDate = new Date();
-            const currentYear = currentDate.getFullYear();
-            const currentMonth = currentDate.getMonth() + 1;
-            
-            const forecastTrends = trends.filter(trend => {
-                if (trend.property_year > currentYear) {
-                    return true; // Будущие годы
-                } else if (trend.property_year === currentYear) {
-                    return trend.property_month >= currentMonth; // Текущий месяц и будущие
-                }
-                return false;
-            });
-            
-            analysis += await generateForecastTable(forecastTrends);
+            analysis += await generateForecastTable(trends);
             
             return analysis;
         }
@@ -6535,9 +6326,9 @@
                 
                 forecastHtml += `<tr class="${rowClass}" style="${rowStyle}">`;
                 forecastHtml += `<td>${formatTrendDateShort(trend.date)}</td>`;
-                forecastHtml += `<td>${formatTrendValue(trend.calculatedSalePrice, 'price')}</td>`;
-                forecastHtml += `<td>${formatTrendValue(trend.calculatedRentPrice, 'price')}</td>`;
-                forecastHtml += `<td>${formatTrendValue(trend.calculatedYield, 'percentage')}</td>`;
+                forecastHtml += `<td>${formatTrendValue(trend.unit_price_for_sale, 'price')}</td>`;
+                forecastHtml += `<td>${formatTrendValue(trend.unit_price_for_rent, 'price')}</td>`;
+                forecastHtml += `<td>${formatTrendValue(trend.yield, 'percentage')}</td>`;
                 forecastHtml += '</tr>';
             });
             
@@ -6605,17 +6396,17 @@
             }
             
             // Рассчитываем рост цен на продажу
-            const firstSalePrice = parseFloat(firstMonth.calculatedSalePrice) || 0;
-            const lastSalePrice = parseFloat(lastMonth.calculatedSalePrice) || 0;
+            const firstSalePrice = parseFloat(firstMonth.unit_price_for_sale) || 0;
+            const lastSalePrice = parseFloat(lastMonth.unit_price_for_sale) || 0;
             const salePriceGrowth = firstSalePrice > 0 ? ((lastSalePrice - firstSalePrice) / firstSalePrice * 100) : 0;
             
             // Рассчитываем рост цен на аренду
-            const firstRentPrice = parseFloat(firstMonth.calculatedRentPrice) || 0;
-            const lastRentPrice = parseFloat(lastMonth.calculatedRentPrice) || 0;
+            const firstRentPrice = parseFloat(firstMonth.unit_price_for_rent) || 0;
+            const lastRentPrice = parseFloat(lastMonth.unit_price_for_rent) || 0;
             const rentPriceGrowth = firstRentPrice > 0 ? ((lastRentPrice - firstRentPrice) / firstRentPrice * 100) : 0;
             
             // Анализируем диапазон доходности
-            const yields = forecastTrends.map(t => parseFloat(t.calculatedYield) || 0).filter(y => y > 0);
+            const yields = forecastTrends.map(t => parseFloat(t.yield) || 0).filter(y => y > 0);
             const minYield = yields.length > 0 ? Math.min(...yields) : 0;
             const maxYield = yields.length > 0 ? Math.max(...yields) : 0;
             
@@ -6763,12 +6554,12 @@
             
             // Рассчитываем прогнозную цену продажи для объекта пользователя
             // Цена продажи = площадь объекта × прогноз цены продажи последнего месяца
-            const futureSalePricePerM2 = parseFloat(futureTrend.calculatedSalePrice) || 0;
+            const futureSalePricePerM2 = parseFloat(futureTrend.unit_price_for_sale) || 0;
             const forecastSalePrice = userArea * futureSalePricePerM2;
             
             // Рассчитываем прогнозную ставку аренды
             // Ставка аренды = площадь объекта × прогноз аренды последнего месяца
-            const futureRentPricePerM2 = parseFloat(futureTrend.calculatedRentPrice) || 0;
+            const futureRentPricePerM2 = parseFloat(futureTrend.unit_price_for_rent) || 0;
             const forecastRentPriceInTRY = userArea * futureRentPricePerM2; // В лирах
             
             // Получаем актуальный курс валют из таблицы currency
@@ -7642,9 +7433,9 @@
             
             const data = sortedTrends.map(trend => {
                 if (chartType === 'sale') {
-                    return parseFloat(trend.calculatedSalePrice) || 0;
+                    return parseFloat(trend.unit_price_for_sale) || 0;
                 } else {
-                    return parseFloat(trend.calculatedRentPrice) || 0;
+                    return parseFloat(trend.unit_price_for_rent) || 0;
                 }
             });
             
@@ -7885,9 +7676,9 @@
             
             const data = sortedTrends.map(trend => {
                 if (chartType === 'sale') {
-                    return parseFloat(trend.calculatedSalePrice) || 0;
+                    return parseFloat(trend.unit_price_for_sale) || 0;
                 } else {
-                    return parseFloat(trend.calculatedRentPrice) || 0;
+                    return parseFloat(trend.unit_price_for_rent) || 0;
                 }
             });
             
