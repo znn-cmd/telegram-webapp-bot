@@ -5745,7 +5745,7 @@
             }
         }
 
-                // Filter trends to show 18 months before current month and 1 month after
+                // Filter trends to show 24 months before current month and 1 month after
         function filterTrendsByDateRange(trends) {
             if (!trends || trends.length === 0) return [];
             
@@ -5777,8 +5777,8 @@
                 return sortedTrends.slice(0, 8);
             }
             
-            // Вычисляем диапазон месяцев: 18 месяцев назад от текущего + 1 месяц вперед
-            const startMonth = currentMonth - 18;
+            // Вычисляем диапазон месяцев: 24 месяца назад от текущего + 1 месяц вперед
+            const startMonth = currentMonth - 24;
             const endMonth = currentMonth + 1;
             
             console.log(`🔍 Target month range: ${startMonth} to ${endMonth}`);
@@ -5787,9 +5787,9 @@
             const filteredTrends = currentYearTrends.filter(trend => {
                 const month = trend.property_month;
                 
-                // Обрабатываем переход через год (например, если текущий месяц август, то startMonth = -10)
+                // Обрабатываем переход через год (например, если текущий месяц август, то февраль = -22)
                 if (startMonth <= 0) {
-                    // Если startMonth отрицательный, берем месяцы с конца предыдущего года
+                    // Если startMonth отрицательный, берем месяцы с конца предыдущих лет
                     return month >= (12 + startMonth) || month <= endMonth;
                 } else {
                     // Обычный случай
@@ -5837,10 +5837,10 @@
                 return 0;
             });
             
-            if (filteredTrends.length >= 19) {
-                // Берем первые 8 трендов из отфильтрованного диапазона (18 месяцев назад + 1 месяц вперед)
-                const selectedTrends = filteredTrends.slice(0, 19);
-                console.log(`✅ Selected ${selectedTrends.length} trends from month range (18 months back + 1 month forward)`);
+            if (filteredTrends.length >= 25) {
+                // Берем первые 25 трендов из отфильтрованного диапазона
+                const selectedTrends = filteredTrends.slice(0, 25);
+                console.log(`✅ Selected ${selectedTrends.length} trends from month range (24 months back + current + 1 forward)`);
                 return selectedTrends;
             } else {
                 // Если мало трендов в диапазоне, возвращаем все отфильтрованные
@@ -5909,6 +5909,7 @@
         //    между avgMinSalePrice/avgMaxSalePrice и avgMinRentPrice/avgMaxRentPrice
         // 2. Для исторических месяцев используются оригинальные значения из трендов
         // 3. Для будущих месяцев (прогноз) используются оригинальные значения из трендов
+        // 4. Отображается максимум 25 трендов: 24 месяца назад + текущий + 1 вперед
         async function generateTrendsTable(trends) {
             console.log('📊 Generating trends table with trends:', trends.length, 'records');
             
@@ -5972,7 +5973,7 @@
             const currentMonth = currentDate.getMonth() + 1;
             
             html += `<tr class="filter-info"><td colspan="6" style="text-align: center; font-size: 10.5px; color: #666; background: #f8f9fa; padding: 4px;">
-                Показано ${filteredTrends.length} из ${trends.length} трендов (диапазон: 18 месяцев назад + 1 месяц вперед)
+                Показано ${filteredTrends.length} из ${trends.length} трендов (24 месяца назад + текущий + 1 вперед)
             </td></tr>`;
             
             filteredTrends.forEach((trend, index) => {
