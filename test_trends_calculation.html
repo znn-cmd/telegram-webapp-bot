@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест расчета средних цен для трендов</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .result { background: #f0f8ff; padding: 10px; margin: 10px 0; border-radius: 3px; }
+        .error { background: #ffe6e6; color: #cc0000; }
+        .success { background: #e6ffe6; color: #006600; }
+        table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+    </style>
+</head>
+<body>
+    <h1>Тест расчета средних цен для таблицы трендов</h1>
+    
+    <div class="test-section">
+        <h2>1. Тест глобальных переменных</h2>
+        <button onclick="testGlobalVariables()">Проверить глобальные переменные</button>
+        <div id="globalVarsResult" class="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>2. Тест расчета средних цен</h2>
+        <button onclick="testAverageCalculation()">Рассчитать средние цены</button>
+        <div id="averageCalcResult" class="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>3. Тест определения текущего месяца</h2>
+        <button onclick="testCurrentMonthDetection()">Проверить определение текущего месяца</button>
+        <div id="currentMonthResult" class="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>4. Тест данных трендов</h2>
+        <button onclick="testTrendsData()">Проверить данные трендов</button>
+        <div id="trendsDataResult" class="result"></div>
+    </div>
+
+    <script>
+        // Имитируем глобальные переменные
+        window.avgMinSalePrice = 35000;
+        window.avgMaxSalePrice = 40000;
+        window.avgMinRentPrice = 200;
+        window.avgMaxRentPrice = 250;
+        
+        // Имитируем данные трендов
+        const mockTrends = [
+            {
+                date: '2025-02-01',
+                unit_price_for_sale: 32752,
+                unit_price_for_rent: 213.23,
+                price_change_sale: 0.0395,
+                price_change_rent: 0.0223,
+                yield: 0.0781
+            },
+            {
+                date: '2025-03-01',
+                unit_price_for_sale: 33806,
+                unit_price_for_rent: 215.33,
+                price_change_sale: 0.0322,
+                price_change_rent: 0.0098,
+                yield: 0.0764
+            },
+            {
+                date: '2025-04-01',
+                unit_price_for_sale: 34937,
+                unit_price_for_rent: 219.14,
+                price_change_sale: 0.0335,
+                price_change_rent: 0.0177,
+                yield: 0.0753
+            },
+            {
+                date: '2025-05-01',
+                unit_price_for_sale: 35740,
+                unit_price_for_rent: 222.20,
+                price_change_sale: 0.0230,
+                price_change_rent: 0.0140,
+                yield: 0.0746
+            },
+            {
+                date: '2025-06-01',
+                unit_price_for_sale: 36505,
+                unit_price_for_rent: 227.62,
+                price_change_sale: 0.0214,
+                price_change_rent: 0.0244,
+                yield: 0.0748
+            },
+            {
+                date: '2025-07-01',
+                unit_price_for_sale: 37000,
+                unit_price_for_rent: 232.16,
+                price_change_sale: 0.0136,
+                price_change_rent: 0.0199,
+                yield: 0.0753
+            },
+            {
+                date: '2025-08-01',
+                unit_price_for_sale: 37613,
+                unit_price_for_rent: 238.29,
+                price_change_sale: 0.0166,
+                price_change_rent: 0.0264,
+                yield: 0.0760
+            },
+            {
+                date: '2025-09-01',
+                unit_price_for_sale: 38041,
+                unit_price_for_rent: 245.40,
+                price_change_sale: 0.0114,
+                price_change_rent: 0.0298,
+                yield: 0.0774
+            }
+        ];
+        
+        function testGlobalVariables() {
+            const result = document.getElementById('globalVarsResult');
+            const vars = {
+                avgMinSalePrice: window.avgMinSalePrice,
+                avgMaxSalePrice: window.avgMaxSalePrice,
+                avgMinRentPrice: window.avgMinRentPrice,
+                avgMaxRentPrice: window.avgMaxRentPrice
+            };
+            
+            let html = '<h3>Глобальные переменные:</h3>';
+            html += '<table><tr><th>Переменная</th><th>Значение</th></tr>';
+            
+            for (const [key, value] of Object.entries(vars)) {
+                const status = value ? 'success' : 'error';
+                html += `<tr><td>${key}</td><td class="${status}">${value || 'не установлена'}</td></tr>`;
+            }
+            
+            html += '</table>';
+            result.innerHTML = html;
+        }
+        
+        function testAverageCalculation() {
+            const result = document.getElementById('averageCalcResult');
+            
+            // Логика из generateTrendsTable
+            const averagePrices = {
+                avgSalePrice: window.avgMinSalePrice && window.avgMaxSalePrice ? 
+                    Math.round((window.avgMinSalePrice + window.avgMaxSalePrice) / 2) : null,
+                avgRentPrice: window.avgMinRentPrice && window.avgMaxRentPrice ? 
+                    Math.round((window.avgMinRentPrice + window.avgMaxRentPrice) / 2) : null
+            };
+            
+            let html = '<h3>Расчет средних цен:</h3>';
+            html += '<table><tr><th>Параметр</th><th>Значение</th></tr>';
+            html += `<tr><td>Минимальная цена продажи</td><td>${window.avgMinSalePrice}</td></tr>`;
+            html += `<tr><td>Максимальная цена продажи</td><td>${window.avgMaxSalePrice}</td></tr>`;
+            html += `<tr><td>Средняя цена продажи</td><td>${averagePrices.avgSalePrice}</td></tr>`;
+            html += `<tr><td>Минимальная цена аренды</td><td>${window.avgMinRentPrice}</td></tr>`;
+            html += `<tr><td>Максимальная цена аренды</td><td>${window.avgMaxRentPrice}</td></tr>`;
+            html += `<tr><td>Средняя цена аренды</td><td>${averagePrices.avgRentPrice}</td></tr>`;
+            html += '</table>';
+            
+            if (averagePrices.avgSalePrice && averagePrices.avgRentPrice) {
+                html += '<p class="success">✅ Средние цены рассчитаны успешно</p>';
+            } else {
+                html += '<p class="error">❌ Ошибка при расчете средних цен</p>';
+            }
+            
+            result.innerHTML = html;
+        }
+        
+        function testCurrentMonthDetection() {
+            const result = document.getElementById('currentMonthResult');
+            const currentDate = new Date();
+            const currentYear = currentDate.getFullYear();
+            const currentMonth = currentDate.getMonth() + 1;
+            
+            let html = '<h3>Определение текущего месяца:</h3>';
+            html += `<p><strong>Текущая дата:</strong> ${currentDate.toLocaleDateString('ru-RU')}</p>`;
+            html += `<p><strong>Текущий год:</strong> ${currentYear}</p>`;
+            html += `<p><strong>Текущий месяц:</strong> ${currentMonth}</p>`;
+            
+            // Тестируем на данных трендов
+            html += '<h4>Анализ дат трендов:</h4>';
+            html += '<table><tr><th>Дата тренда</th><th>Год</th><th>Месяц</th><th>Текущий месяц?</th><th>Будущий месяц?</th></tr>';
+            
+            mockTrends.forEach(trend => {
+                const trendDate = new Date(trend.date);
+                const trendYear = trendDate.getFullYear();
+                const trendMonth = trendDate.getMonth() + 1;
+                
+                const isCurrentMonth = trendYear === currentYear && trendMonth === currentMonth;
+                const isFutureMonth = trendYear > currentYear || (trendYear === currentYear && trendMonth > currentMonth);
+                
+                const currentMonthClass = isCurrentMonth ? 'success' : '';
+                const futureMonthClass = isFutureMonth ? 'success' : '';
+                
+                html += `<tr>
+                    <td>${trend.date}</td>
+                    <td>${trendYear}</td>
+                    <td>${trendMonth}</td>
+                    <td class="${currentMonthClass}">${isCurrentMonth ? 'Да' : 'Нет'}</td>
+                    <td class="${futureMonthClass}">${isFutureMonth ? 'Да' : 'Нет'}</td>
+                </tr>`;
+            });
+            
+            html += '</table>';
+            result.innerHTML = html;
+        }
+        
+        function testTrendsData() {
+            const result = document.getElementById('trendsDataResult');
+            
+            // Имитируем логику generateTrendsTable
+            const currentDate = new Date();
+            const currentYear = currentDate.getFullYear();
+            const currentMonth = currentDate.getMonth() + 1;
+            
+            const averagePrices = {
+                avgSalePrice: window.avgMinSalePrice && window.avgMaxSalePrice ? 
+                    Math.round((window.avgMinSalePrice + window.avgMaxSalePrice) / 2) : null,
+                avgRentPrice: window.avgMinRentPrice && window.avgMaxRentPrice ? 
+                    Math.round((window.avgMinRentPrice + window.avgMaxRentPrice) / 2) : null
+            };
+            
+            let html = '<h3>Тест данных трендов с обновленными ценами:</h3>';
+            html += '<table><tr><th>Дата</th><th>Продажа (₺/м²)</th><th>Аренда (₺/м²)</th><th>Тип</th></tr>';
+            
+            mockTrends.forEach(trend => {
+                const trendDate = new Date(trend.date);
+                const trendYear = trendDate.getFullYear();
+                const trendMonth = trendDate.getMonth() + 1;
+                
+                const isCurrentMonth = trendYear === currentYear && trendMonth === currentMonth;
+                const isFutureMonth = trendYear > currentYear || (trendYear === currentYear && trendMonth > currentMonth);
+                
+                let salePrice = trend.unit_price_for_sale;
+                let rentPrice = trend.unit_price_for_rent;
+                let rowClass = '';
+                let type = 'Исторический';
+                
+                if (isCurrentMonth) {
+                    rowClass = 'current-month-row';
+                    type = 'Текущий месяц';
+                    
+                    // Для текущего месяца используем средние цены
+                    if (averagePrices && averagePrices.avgSalePrice && averagePrices.avgRentPrice) {
+                        salePrice = averagePrices.avgSalePrice;
+                        rentPrice = averagePrices.avgRentPrice;
+                    }
+                } else if (isFutureMonth) {
+                    rowClass = 'forecast-row';
+                    type = 'Прогноз';
+                }
+                
+                const rowStyle = isCurrentMonth ? 'background-color: #e8f4fd;' : 
+                               isFutureMonth ? 'background-color: #f0f8ff;' : '';
+                
+                html += `<tr class="${rowClass}" style="${rowStyle}">
+                    <td>${trend.date}</td>
+                    <td>${salePrice.toLocaleString('ru-RU', {minimumFractionDigits: 2})}</td>
+                    <td>${rentPrice.toLocaleString('ru-RU', {minimumFractionDigits: 2})}</td>
+                    <td>${type}</td>
+                </tr>`;
+            });
+            
+            html += '</table>';
+            
+            if (averagePrices.avgSalePrice && averagePrices.avgRentPrice) {
+                html += `<p class="success">✅ Средние цены для текущего месяца: продажа ${averagePrices.avgSalePrice.toLocaleString('ru-RU')} ₺/м², аренда ${averagePrices.avgRentPrice.toLocaleString('ru-RU')} ₺/м²</p>`;
+            } else {
+                html += '<p class="error">❌ Средние цены не рассчитаны</p>';
+            }
+            
+            result.innerHTML = html;
+        }
+    </script>
+</body>
+</html>

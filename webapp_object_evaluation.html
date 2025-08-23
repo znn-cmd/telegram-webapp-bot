@@ -1761,14 +1761,6 @@
             font-style: italic;
         }
         
-        /* Стили для информационной строки о расчете цен */
-        .trends-table .calculation-info td {
-            border: none;
-            font-weight: 500;
-            color: #28a745;
-            background: #d4edda;
-        }
-        
         /* Стили для графика трендов */
         .trends-chart-section {
             margin-top: 20px;
@@ -5896,11 +5888,9 @@
                 
                 if (data.success) {
                     console.log('✅ Average prices fetched successfully:', data);
-                    console.log('📊 Calculation method: Среднее арифметическое между минимальной и максимальной ценой из всех таблиц данных (age_data, floor_segment_data, heating_data, house_type_data)');
                     return {
                         avgSalePrice: data.avg_sale_price,
-                        avgRentPrice: data.avg_rent_price,
-                        calculationMethod: 'Среднее арифметическое между минимальной и максимальной ценой из всех таблиц данных (age_data, floor_segment_data, heating_data, house_type_data)'
+                        avgRentPrice: data.avg_rent_price
                     };
                 } else {
                     console.log('⚠️ Failed to fetch average prices:', data.message);
@@ -5914,6 +5904,11 @@
         }
 
         // Generate detailed trends table
+        // Логика работы:
+        // 1. Для текущего месяца цены продажи и аренды рассчитываются как среднее значение
+        //    между avgMinSalePrice/avgMaxSalePrice и avgMinRentPrice/avgMaxRentPrice
+        // 2. Для исторических месяцев используются оригинальные значения из трендов
+        // 3. Для будущих месяцев (прогноз) используются оригинальные значения из трендов
         async function generateTrendsTable(trends) {
             console.log('📊 Generating trends table with trends:', trends.length, 'records');
             
@@ -5931,14 +5926,34 @@
                 return '<div class="no-data">Нет данных для отображения в выбранном диапазоне</div>';
             }
             
-            // Получаем средние цены для текущего месяца
-            const averagePrices = await getAveragePricesFromDataTables();
-            console.log('📊 Полученные средние цены:', averagePrices);
+            // Получаем средние цены для текущего месяца из глобальных переменных
+            const averagePrices = {
+                avgSalePrice: window.avgMinSalePrice && window.avgMaxSalePrice ? 
+                    Math.round((window.avgMinSalePrice + window.avgMaxSalePrice) / 2) : null,
+                avgRentPrice: window.avgMinRentPrice && window.avgMaxRentPrice ? 
+                    Math.round((window.avgMinRentPrice + window.avgMaxRentPrice) / 2) : null
+            };
             
-            // Проверяем, есть ли у нас данные о локации для получения средних цен
-            const currentLocation = selectedLocation || {};
-            if (!currentLocation.country_id || !currentLocation.city_id || !currentLocation.county_id || !currentLocation.district_id) {
-                console.log('⚠️ Location not selected, cannot fetch average prices');
+            console.log('📊 Global variables for average prices:', {
+                avgMinSalePrice: window.avgMinSalePrice,
+                avgMaxSalePrice: window.avgMaxSalePrice,
+                avgMinRentPrice: window.avgMinRentPrice,
+                avgMaxRentPrice: window.avgMaxRentPrice,
+                calculatedAvgSale: averagePrices.avgSalePrice,
+                calculatedAvgRent: averagePrices.avgRentPrice
+            });
+            
+            // Если глобальные переменные недоступны, пытаемся получить через API
+            if (!averagePrices.avgSalePrice || !averagePrices.avgRentPrice) {
+                console.log('🔄 Global variables not available, trying API...');
+                const apiPrices = await getAveragePricesFromDataTables();
+                if (apiPrices) {
+                    averagePrices.avgSalePrice = apiPrices.avgSalePrice;
+                    averagePrices.avgRentPrice = apiPrices.avgRentPrice;
+                    console.log('✅ API prices fetched:', apiPrices);
+                } else {
+                    console.log('❌ API prices not available');
+                }
             }
             
             let html = '<table class="trends-table">';
@@ -5960,17 +5975,25 @@
                 Показано ${filteredTrends.length} из ${trends.length} трендов
             </td></tr>`;
             
-            // Добавляем информацию о том, что цены текущего месяца рассчитываются из таблиц данных
-            if (averagePrices && averagePrices.avgSalePrice > 0 && averagePrices.avgRentPrice > 0) {
-                html += `<tr class="calculation-info"><td colspan="6" style="text-align: center; font-size: 10.5px; color: #28a745; background: #d4edda; padding: 4px; font-weight: 500;">
-                    💡 Цены текущего месяца рассчитаны как среднее между минимальной и максимальной ценой из таблиц: age_data, floor_segment_data, heating_data, house_type_data
-                </td></tr>`;
-            }
-            
             filteredTrends.forEach((trend, index) => {
                 // Проверяем, является ли этот тренд текущим месяцем
-                const isCurrentMonth = trend.property_year === currentYear && trend.property_month === currentMonth;
-                const isFutureMonth = trend.property_year > currentYear || (trend.property_year === currentYear && trend.property_month > currentMonth);
+                // Используем поле date для определения текущего месяца
+                const trendDate = new Date(trend.date);
+                const trendYear = trendDate.getFullYear();
+                const trendMonth = trendDate.getMonth() + 1;
+                
+                const isCurrentMonth = trendYear === currentYear && trendMonth === currentMonth;
+                const isFutureMonth = trendYear > currentYear || (trendYear === currentYear && trendMonth > currentMonth);
+                
+                console.log('📅 Trend date analysis:', {
+                    trendDate: trend.date,
+                    trendYear,
+                    trendMonth,
+                    currentYear,
+                    currentMonth,
+                    isCurrentMonth,
+                    isFutureMonth
+                });
                 
                 let rowClass = '';
                 let rowStyle = '';
@@ -5982,12 +6005,21 @@
                     rowStyle = 'background-color: #e8f4fd;';
                     
                     // Для текущего месяца используем средние цены из таблиц данных
-                    if (averagePrices && averagePrices.avgSalePrice > 0 && averagePrices.avgRentPrice > 0) {
+                    if (averagePrices && averagePrices.avgSalePrice && averagePrices.avgRentPrice) {
                         salePrice = averagePrices.avgSalePrice;
                         rentPrice = averagePrices.avgRentPrice;
-                        console.log('✅ Используем рассчитанные средние цены для текущего месяца:', { salePrice, rentPrice });
+                        console.log('📊 Current month prices updated:', { 
+                            originalSale: trend.unit_price_for_sale, 
+                            newSale: salePrice,
+                            originalRent: trend.unit_price_for_rent, 
+                            newRent: rentPrice,
+                            avgMinSalePrice: window.avgMinSalePrice,
+                            avgMaxSalePrice: window.avgMaxSalePrice,
+                            avgMinRentPrice: window.avgMinRentPrice,
+                            avgMaxRentPrice: window.avgMaxRentPrice
+                        });
                     } else {
-                        console.log('⚠️ Средние цены не найдены, используем данные из тренда');
+                        console.log('⚠️ No average prices available for current month:', averagePrices);
                     }
                 } else if (isFutureMonth) {
                     rowClass = 'forecast-row';
@@ -6040,10 +6072,14 @@
                 const currentMonth = currentDate.getMonth() + 1;
                 
                 const forecastTrends = trends.filter(trend => {
-                    if (trend.property_year > currentYear) {
+                    const trendDate = new Date(trend.date);
+                    const trendYear = trendDate.getFullYear();
+                    const trendMonth = trendDate.getMonth() + 1;
+                    
+                    if (trendYear > currentYear) {
                         return true; // Будущие годы
-                    } else if (trend.property_year === currentYear) {
-                        return trend.property_month >= currentMonth; // Текущий месяц и будущие
+                    } else if (trendYear === currentYear) {
+                        return trendMonth >= currentMonth; // Текущий месяц и будущие
                     }
                     return false;
                 });
