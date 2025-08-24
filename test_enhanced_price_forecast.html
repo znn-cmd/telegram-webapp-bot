@@ -459,6 +459,8 @@
             overflow: hidden;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
             margin-bottom: 20px;
+            table-layout: fixed;
+            font-size: 11px;
         }
         
         .price-forecast-table th {
@@ -474,27 +476,28 @@
         }
         
         .price-forecast-header-category {
-            width: 35%;
+            width: 30%;
             text-align: left !important;
             padding-left: 8px !important;
         }
         
         .price-forecast-header-current {
-            width: 23%;
+            width: 25%;
         }
         
         .price-forecast-header-future {
-            width: 23%;
+            width: 25%;
         }
         
         .price-forecast-header-growth {
-            width: 19%;
+            width: 20%;
         }
         
         .price-forecast-table td {
             padding: 6px 4px;
             border-bottom: 1px solid #f1f3f4;
             vertical-align: middle;
+            word-wrap: break-word;
         }
         
         .price-forecast-table tr:last-child td {
@@ -595,15 +598,9 @@
                 font-size: 10px;
             }
             
-            .price-forecast-table th {
-                padding: 6px 2px;
-                font-size: 9px;
-                letter-spacing: 0.2px;
-            }
-            
+            .price-forecast-table th,
             .price-forecast-table td {
                 padding: 4px 2px;
-                font-size: 10px;
             }
             
             .price-forecast-category {
@@ -627,28 +624,12 @@
                 padding: 1px 2px;
                 margin-top: 1px;
             }
-        }
-        
-        @media (max-width: 480px) {
-            .price-forecast-table-content {
-                padding: 8px 4px;
-                overflow-x: auto;
-            }
             
-            .price-forecast-table {
-                min-width: 320px;
-                margin: 0;
-            }
-            
-            .price-forecast-table th,
-            .price-forecast-table td {
-                white-space: nowrap;
-                min-width: 60px;
-            }
-            
-            .price-forecast-header-category {
-                min-width: 90px;
-            }
+            /* Адаптируем ширины столбцов на мобильных */
+            .price-forecast-header-category { width: 32%; }
+            .price-forecast-header-current { width: 24%; }
+            .price-forecast-header-future { width: 24%; }
+            .price-forecast-header-growth { width: 20%; }
         }
         
         .price-forecast-date {
@@ -820,8 +801,8 @@
                             <thead>
                                 <tr>
                                     <th class="price-forecast-header-category">Показатель</th>
-                                    <th class="price-forecast-header-current">Текущая стоимость</th>
-                                    <th class="price-forecast-header-future">Прогнозная стоимость</th>
+                                    <th class="price-forecast-header-current">Текущая<br>стоимость</th>
+                                    <th class="price-forecast-header-future">Прогнозная<br>стоимость</th>
                                     <th class="price-forecast-header-growth">Прирост</th>
                                 </tr>
                             </thead>
@@ -879,14 +860,14 @@
                 </div>
                 
                 <div style="margin-top: 15px; font-size: 14px; color: #666;">
-                    <strong>✅ Исправления v2.0 - максимальная компактность:</strong>
+                    <strong>✅ Исправления v3.0 - адаптивность как в "Прогноз цены и аренды":</strong>
                     <ul style="margin: 5px 0; padding-left: 20px;">
-                        <li>✅ <strong>Светло-серые заголовки:</strong> Убран градиент, используется #f8f9fa как в остальном приложении</li>
-                        <li>✅ <strong>Уменьшенные отступы:</strong> padding: 6px 4px (было 10px 8px)</li>
-                        <li>✅ <strong>Компактные шрифты:</strong> 11px для категорий, 12px для значений</li>
-                        <li>✅ <strong>Оптимизированные столбцы:</strong> 35% | 23% | 23% | 19%</li>
-                        <li>✅ <strong>Адаптивность:</strong> Автоматическое уменьшение на мобильных до 9px</li>
-                        <li>✅ <strong>Горизонтальная прокрутка:</strong> На экранах < 480px</li>
+                        <li>✅ <strong>table-layout: fixed:</strong> Фиксированные ширины столбцов как в других таблицах</li>
+                        <li>✅ <strong>word-wrap: break-word:</strong> Автоперенос длинного текста</li>
+                        <li>✅ <strong>Сбалансированные столбцы:</strong> 30% | 25% | 25% | 20%</li>
+                        <li>✅ <strong>Короткие заголовки:</strong> "Текущая<br>стоимость" вместо длинных названий</li>
+                        <li>✅ <strong>Простая адаптивность:</strong> Без сложной горизонтальной прокрутки</li>
+                        <li>✅ <strong>Мобильные ширины:</strong> 32% | 24% | 24% | 20%</li>
                     </ul>
                 </div>
             </div>
