@@ -7842,6 +7842,7 @@ def api_save_report():
 def generate_report_html(data):
     """Генерация HTML контента для сохраненного отчета"""
     try:
+        from datetime import datetime
         # Извлекаем данные из запроса
         location = data.get('parameters', {}).get('location', {})
         listing_types = data.get('parameters', {}).get('listingTypes', {})
@@ -8287,7 +8288,7 @@ def generate_report_html(data):
             
             <div style="margin-top: 30px; padding: 20px; background: #fff3cd; border-radius: 12px; text-align: center;">
                 <p style="margin: 0; color: #856404; font-style: italic;">
-                    Отчет создан {new Date().toLocaleDateString('ru-RU')} с помощью Aaadviser
+                    Отчет создан {datetime.now().strftime('%d.%m.%Y')} с помощью Aaadviser
                 </p>
             </div>
         </div>
