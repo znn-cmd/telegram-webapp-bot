@@ -701,6 +701,38 @@
                 margin-top: 6px;
             }
             
+            /* Mobile styles for share modal */
+            .modal-content {
+                width: 95%;
+                margin: 10px;
+            }
+            
+            .modal-header {
+                padding: 15px 20px;
+            }
+            
+            .modal-header h3 {
+                font-size: 16px;
+            }
+            
+            .modal-body {
+                padding: 15px 20px;
+            }
+            
+            .share-link-container {
+                flex-direction: column;
+                gap: 8px;
+            }
+            
+            .copy-link-button {
+                width: 100%;
+                padding: 12px;
+            }
+            
+            .modal-footer {
+                padding: 12px 20px 15px 20px;
+            }
+            
             /* Мобильные стили для блока "Анализ рынка" */
             .market-analysis-text-block {
                 margin: 20px 0;
@@ -2607,7 +2639,7 @@
         .forecast-cell-growth.negative {
             background: #f8d7da;
             color: #721c24;
-        }
+                }
 
         /* Share Report Button Styles */
         .share-report-section {
@@ -2785,8 +2817,8 @@
         .modal-button:hover {
             background: #218838;
         }
-        
-        /* Metrics block for price forecast */
+         
+         /* Metrics block for price forecast */
         .forecast-metrics-compact-section {
             margin-top: 20px;
             padding: 15px 25px;
@@ -3151,38 +3183,6 @@
                 font-size: 10px;
                 padding: 8px;
                 margin-top: 8px;
-            }
-            
-            /* Mobile styles for share modal */
-            .modal-content {
-                width: 95%;
-                margin: 10px;
-            }
-            
-            .modal-header {
-                padding: 15px 20px;
-            }
-            
-            .modal-header h3 {
-                font-size: 16px;
-            }
-            
-            .modal-body {
-                padding: 15px 20px;
-            }
-            
-            .share-link-container {
-                flex-direction: column;
-                gap: 8px;
-            }
-            
-            .copy-link-button {
-                width: 100%;
-                padding: 12px;
-            }
-            
-            .modal-footer {
-                padding: 12px 20px 15px 20px;
             }
             
             .forecast-metrics-compact-section {
@@ -3869,42 +3869,42 @@
         <div class="error-state" id="errorState" style="display: none;">
             <div class="error-icon">❌</div>
             <div class="error-text" id="errorText">Ошибка загрузки данных</div>
-                  </div>
- 
-          <!-- Share Report Button (only for users with valid period_end) -->
-          <div class="share-report-section" id="shareReportSection" style="display: none;">
-              <button class="share-report-button" id="shareReportButton" onclick="shareReport()">
-                  📄 Поделиться отчетом
-              </button>
-          </div>
+                 </div>
 
-          <!-- Back Button -->
-          <a href="/webapp_main" class="back-button" id="backButton">← Вернуться в главное меню</a>
+         <!-- Share Report Button (only for users with valid period_end) -->
+         <div class="share-report-section" id="shareReportSection" style="display: none;">
+             <button class="share-report-button" id="shareReportButton" onclick="shareReport()">
+                 📄 Поделиться отчетом
+             </button>
+         </div>
 
-          <!-- Share Report Modal -->
-          <div class="modal-overlay" id="shareModalOverlay" style="display: none;" onclick="closeShareModal()">
-              <div class="modal-content" onclick="event.stopPropagation()">
-                  <div class="modal-header">
-                      <h3>📄 Отчет сохранен</h3>
-                      <button class="modal-close" onclick="closeShareModal()">×</button>
-                  </div>
-                  <div class="modal-body">
-                      <p>Ваш отчет был успешно сохранен и готов к отправке:</p>
-                      <div class="share-link-container">
-                          <input type="text" id="shareLink" class="share-link-input" readonly>
-                          <button class="copy-link-button" onclick="copyShareLink()">📋 Копировать</button>
-                      </div>
-                      <div class="share-info">
-                          <p><strong>Название:</strong> <span id="shareReportTitle"></span></p>
-                          <p><strong>Создан:</strong> <span id="shareReportDate"></span></p>
-                      </div>
-                  </div>
-                  <div class="modal-footer">
-                      <button class="modal-button" onclick="closeShareModal()">Закрыть</button>
-                  </div>
-              </div>
-          </div>
-    </div>
+         <!-- Back Button -->
+         <a href="/webapp_main" class="back-button" id="backButton">← Вернуться в главное меню</a>
+
+         <!-- Share Report Modal -->
+         <div class="modal-overlay" id="shareModalOverlay" style="display: none;" onclick="closeShareModal()">
+             <div class="modal-content" onclick="event.stopPropagation()">
+                 <div class="modal-header">
+                     <h3>📄 Отчет сохранен</h3>
+                     <button class="modal-close" onclick="closeShareModal()">×</button>
+                 </div>
+                 <div class="modal-body">
+                     <p>Ваш отчет был успешно сохранен и готов к отправке:</p>
+                     <div class="share-link-container">
+                         <input type="text" id="shareLink" class="share-link-input" readonly>
+                         <button class="copy-link-button" onclick="copyShareLink()">📋 Копировать</button>
+                     </div>
+                     <div class="share-info">
+                         <p><strong>Название:</strong> <span id="shareReportTitle"></span></p>
+                         <p><strong>Создан:</strong> <span id="shareReportDate"></span></p>
+                     </div>
+                 </div>
+                 <div class="modal-footer">
+                     <button class="modal-button" onclick="closeShareModal()">Закрыть</button>
+                 </div>
+             </div>
+         </div>
+     </div>
 
     <script>
         // Telegram WebApp initialization

@@ -7710,832 +7710,339 @@ def api_test_api_keys():
         logger.error(f"❌ Traceback: {traceback.format_exc()}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
+# API endpoint to check user's share access based on period_end
 @app.route('/api/user/check-share-access', methods=['POST'])
-def api_check_share_access():
-    """Проверка доступа пользователя к функции шаринга отчетов"""
+def check_share_access():
     try:
         data = request.json or {}
         telegram_id = data.get('telegram_id')
         
         if not telegram_id:
             return jsonify({'error': 'telegram_id required'}), 400
-            
-        logger.info(f"🔍 Проверка доступа к шарингу для telegram_id: {telegram_id}")
         
-        # Получаем пользователя и проверяем period_end
-        result = supabase.table('users').select('id, period_end').eq('telegram_id', telegram_id).execute()
+        # Get user from database
+        user_result = supabase.table('users').select('*').eq('telegram_id', telegram_id).execute()
+        if not user_result.data:
+            return jsonify({'hasShareAccess': False, 'reason': 'User not found'}), 200
         
-        if not result.data:
-            return jsonify({'hasShareAccess': False, 'reason': 'User not found'})
-        
-        user = result.data[0]
+        user = user_result.data[0]
         period_end = user.get('period_end')
         
         if not period_end:
-            return jsonify({'hasShareAccess': False, 'reason': 'No period_end set'})
+            return jsonify({'hasShareAccess': False, 'reason': 'No period_end set'}), 200
         
-        # Проверяем, не истек ли период
-        from datetime import datetime
+        # Parse period_end and compare with current date
+        from datetime import datetime, timezone
         try:
-            period_end_date = datetime.fromisoformat(period_end.replace('Z', '+00:00'))
-            current_date = datetime.now(period_end_date.tzinfo)
+            # Handle different date formats
+            if isinstance(period_end, str):
+                # Try different date formats
+                for fmt in ['%Y-%m-%d', '%Y-%m-%dT%H:%M:%S', '%Y-%m-%dT%H:%M:%S.%fZ', '%Y-%m-%dT%H:%M:%S%z']:
+                    try:
+                        period_end_date = datetime.strptime(period_end.replace('Z', '+00:00'), fmt)
+                        if period_end_date.tzinfo is None:
+                            period_end_date = period_end_date.replace(tzinfo=timezone.utc)
+                        break
+                    except ValueError:
+                        continue
+                else:
+                    logger.error(f"Unable to parse period_end: {period_end}")
+                    return jsonify({'hasShareAccess': False, 'reason': 'Invalid period_end format'}), 200
+            else:
+                period_end_date = period_end
+                if period_end_date.tzinfo is None:
+                    period_end_date = period_end_date.replace(tzinfo=timezone.utc)
             
+            current_date = datetime.now(timezone.utc)
             has_access = period_end_date >= current_date
             
-            logger.info(f"✅ Проверка доступа к шарингу: period_end={period_end_date}, current={current_date}, access={has_access}")
+            logger.info(f"Share access check: telegram_id={telegram_id}, period_end={period_end_date}, current={current_date}, has_access={has_access}")
             
             return jsonify({
                 'hasShareAccess': has_access,
-                'period_end': period_end,
-                'reason': 'Access granted' if has_access else 'Period expired'
-            })
+                'period_end': period_end_date.isoformat(),
+                'current_date': current_date.isoformat(),
+                'reason': 'Access granted' if has_access else 'Subscription expired'
+            }), 200
             
-        except Exception as date_error:
-            logger.error(f"❌ Ошибка парсинга даты period_end: {date_error}")
-            return jsonify({'hasShareAccess': False, 'reason': 'Invalid period_end format'})
-            
+        except Exception as e:
+            logger.error(f"Error parsing period_end: {e}")
+            return jsonify({'hasShareAccess': False, 'reason': 'Date parsing error'}), 200
+        
     except Exception as e:
-        logger.error(f"❌ Ошибка проверки доступа к шарингу: {e}")
-        return jsonify({'hasShareAccess': False, 'error': str(e)}), 500
+        logger.error(f"Error checking share access: {e}")
+        return jsonify({'error': 'Internal server error'}), 500
 
+# API endpoint to save reports
 @app.route('/api/reports/save', methods=['POST'])
-def api_save_report():
-    """Сохранение отчета в формате HTML и базе данных"""
+def save_report():
     try:
         data = request.json or {}
         telegram_id = data.get('telegram_id')
         
         if not telegram_id:
             return jsonify({'error': 'telegram_id required'}), 400
-            
-        logger.info(f"📄 Сохранение отчета для telegram_id: {telegram_id}")
         
-        # Получаем user_id по telegram_id
-        user_result = supabase.table('users').select('id').eq('telegram_id', telegram_id).execute()
-        
+        # Get user from database
+        user_result = supabase.table('users').select('*').eq('telegram_id', telegram_id).execute()
         if not user_result.data:
             return jsonify({'error': 'User not found'}), 404
-            
-        user_id = user_result.data[0]['id']
         
-        # Генерируем уникальный ID для отчета
+        user = user_result.data[0]
+        user_id = user['id']
+        
+        # Generate unique filename for HTML report
         import uuid
         report_id = str(uuid.uuid4())
-        
-        # Создаем HTML контент отчета
-        html_content = generate_report_html(data)
-        
-        # Сохраняем HTML файл
-        reports_dir = os.path.join(os.getcwd(), 'reports')
-        if not os.path.exists(reports_dir):
-            os.makedirs(reports_dir)
-            
         html_filename = f"report_{report_id}.html"
-        html_filepath = os.path.join(reports_dir, html_filename)
+        html_filepath = os.path.join('reports', html_filename)
         
+        # Create reports directory if it doesn't exist
+        os.makedirs('reports', exist_ok=True)
+        
+        # Generate complete HTML report with header and footer
+        report_html = generate_complete_report_html(data)
+        
+        # Save HTML file
         with open(html_filepath, 'w', encoding='utf-8') as f:
-            f.write(html_content)
-            
-        # Формируем URL для доступа к отчету
-        report_url = f"/reports/{html_filename}"
+            f.write(report_html)
         
-        # Сохраняем информацию в базу данных
+        logger.info(f"Report HTML saved to: {html_filepath}")
+        
+        # Prepare data for database
         report_data = {
             'user_id': user_id,
             'report_type': data.get('report_type', 'object_evaluation'),
             'title': data.get('title', 'Отчет по оценке объекта'),
             'description': data.get('description', ''),
             'parameters': data.get('parameters', {}),
-            'address': data.get('address', ''),
+            'address': data.get('address'),
             'latitude': data.get('latitude'),
             'longitude': data.get('longitude'),
             'bedrooms': data.get('bedrooms'),
             'price': data.get('price'),
             'area': data.get('area'),
             'full_report': data.get('full_report', {}),
-            'report_url': report_url
+            'report_url': f'/reports/{html_filename}'
         }
         
-        db_result = supabase.table('user_reports').insert(report_data).execute()
+        # Save to database
+        result = supabase.table('user_reports').insert(report_data).execute()
         
-        if db_result.data:
-            saved_report = db_result.data[0]
-            logger.info(f"✅ Отчет сохранен с ID: {saved_report['id']}")
+        if result.data:
+            saved_report = result.data[0]
+            logger.info(f"Report saved to database with ID: {saved_report['id']}")
             
             return jsonify({
                 'success': True,
                 'report_id': saved_report['id'],
-                'report_url': report_url,
-                'shareUrl': report_url,
+                'report_url': saved_report['report_url'],
                 'title': saved_report['title'],
-                'created_at': saved_report['created_at']
-            })
+                'created_at': saved_report['created_at'],
+                'shareUrl': saved_report['report_url']
+            }), 200
         else:
             return jsonify({'error': 'Failed to save report to database'}), 500
-            
+        
     except Exception as e:
-        logger.error(f"❌ Ошибка сохранения отчета: {e}")
+        logger.error(f"Error saving report: {e}")
         import traceback
-        logger.error(f"❌ Traceback: {traceback.format_exc()}")
-        return jsonify({'error': str(e)}), 500
+        logger.error(f"Traceback: {traceback.format_exc()}")
+        return jsonify({'error': 'Internal server error'}), 500
 
-def generate_report_html(data):
-    """Генерация HTML контента для сохраненного отчета"""
+# Route to serve saved reports
+@app.route('/reports/<filename>')
+def serve_report(filename):
     try:
-        from datetime import datetime
-        from bs4 import BeautifulSoup
+        # Security check - only allow files in reports directory
+        if '..' in filename or '/' in filename:
+            return "Invalid filename", 400
         
-        # Извлекаем данные из запроса
+        filepath = os.path.join('reports', filename)
+        if not os.path.exists(filepath):
+            return "Report not found", 404
+        
+        return send_file(filepath, mimetype='text/html')
+        
+    except Exception as e:
+        logger.error(f"Error serving report: {e}")
+        return "Internal server error", 500
+
+def generate_complete_report_html(data):
+    """Generate complete HTML report with header, footer and full functionality"""
+    try:
+        # Get the original HTML content
+        original_html = data.get('full_report', {}).get('html', '')
         location = data.get('parameters', {}).get('location', {})
-        listing_types = data.get('parameters', {}).get('listingTypes', {})
-        market_data = data.get('parameters', {}).get('marketData', {})
-        trends_data = data.get('parameters', {}).get('trendsData', [])
         
-        # Извлекаем HTML контент отчета из переданных данных
-        full_report_html = data.get('full_report', {}).get('html', '')
-        report_content_html = ''
+        # Extract location information
+        location_name = data.get('address', 'Локация не указана')
         
-        if full_report_html:
-            try:
-                # Парсим HTML и извлекаем контент отчета
-                soup = BeautifulSoup(full_report_html, 'html.parser')
-                
-                # Ищем блок с данными отчета (после кнопки "Подтвердить" до кнопки "Поделиться")
-                summary_content = soup.find('div', {'id': 'summaryDataContent'})
-                price_forecast_section = soup.find('div', {'id': 'priceForecastSection'})
-                trends_chart_container = soup.find('div', {'id': 'trendsChartContainer'})
-                
-                # Собираем все найденные секции
-                content_parts = []
-                
-                if summary_content:
-                    content_parts.append(str(summary_content))
-                    
-                if price_forecast_section:
-                    content_parts.append(str(price_forecast_section))
-                    
-                # Добавляем другие найденные блоки данных
-                for section in soup.find_all('div', class_='data-section'):
-                    content_parts.append(str(section))
-                
-                report_content_html = ''.join(content_parts)
-                
-            except Exception as e:
-                logger.error(f"❌ Ошибка парсинга HTML: {e}")
-                report_content_html = ''
+        # Extract the body content from original HTML (everything inside <body>)
+        import re
+        body_match = re.search(r'<body[^>]*>(.*?)</body>', original_html, re.DOTALL | re.IGNORECASE)
+        body_content = body_match.group(1) if body_match else ''
         
-        # Формируем название локации
-        location_name = ''
-        if location.get('country_name'):
-            location_name = location['country_name']
-        if location.get('city_name'):
-            location_name += f", {location['city_name']}"
-        if location.get('county_name'):
-            location_name += f", {location['county_name']}"
-        if location.get('district_name'):
-            location_name += f", {location['district_name']}"
-            
-        if not location_name:
-            location_name = data.get('address', 'Адрес не указан')
-            
-        # Формируем информацию об объекте
-        property_info = ''
-        if listing_types.get('area'):
-            property_info += f"{listing_types['area']} м²"
-        if listing_types.get('price'):
-            if property_info:
-                property_info += ", "
-            property_info += f"{listing_types['price']} {listing_types.get('currency', 'EUR')}"
-        if listing_types.get('bedrooms'):
-            if property_info:
-                property_info += ", "
-            property_info += f"{listing_types['bedrooms']} спален"
-            
-        # Преобразуем данные трендов в JSON для JavaScript
-        import json
-        trends_json = json.dumps(trends_data) if trends_data else '[]'
+        # Clean up the body content - remove script tags with Telegram WebApp
+        body_content = re.sub(r'<script[^>]*>.*?let tg = window\.Telegram\.WebApp.*?</script>', '', body_content, flags=re.DOTALL)
         
-        # Экранируем HTML контент для безопасной вставки в JavaScript
-        report_content_html_escaped = report_content_html.replace('`', '\\`').replace('${', '\\${').replace('\\', '\\\\')
+        # Extract the main content (everything after the loading state and before scripts)
+        content_match = re.search(r'<div class="container">(.*?)(?=<script|$)', body_content, re.DOTALL)
+        main_content = content_match.group(1) if content_match else body_content
         
-        # Формируем HTML
-        html_content = f'''<!DOCTYPE html>
+        # Extract styles from original HTML
+        style_match = re.search(r'<style[^>]*>(.*?)</style>', original_html, re.DOTALL)
+        original_styles = style_match.group(1) if style_match else ''
+        
+        # Generate complete standalone HTML
+        complete_html = f'''<!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Отчет по оценке недвижимости - {location_name}</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <title>{data.get('title', 'Отчет по оценке объекта')}</title>
     <style>
-        * {{
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }}
-
-        body {{
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            line-height: 1.6;
-            color: #333;
-            background: #f8f9fa;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }}
-
-        .report-container {{
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 15px;
-            flex: 1;
-        }}
-
-        /* Header */
+        {original_styles}
+        
+        /* Additional styles for shared report */
         .report-header {{
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 30px 0;
-            margin-bottom: 30px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-        }}
-
-        .header-content {{
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 15px;
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }}
-
-        .logo {{
-            width: 60px;
-            height: 60px;
-            background: white;
+            padding: 20px;
+            margin-bottom: 20px;
             border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            text-align: center;
+        }}
+        
+        .report-header h1 {{
+            margin: 0 0 10px 0;
             font-size: 24px;
-            font-weight: bold;
-            color: #667eea;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-        }}
-
-        .header-info h1 {{
-            font-size: 28px;
             font-weight: 700;
-            margin-bottom: 8px;
         }}
-
-        .header-info .subtitle {{
+        
+        .report-header .location {{
             font-size: 16px;
             opacity: 0.9;
-            font-weight: 400;
         }}
-
-        .header-info .location {{
-            font-size: 18px;
-            margin-top: 5px;
-            opacity: 0.95;
+        
+        .report-header .logo {{
+            margin-bottom: 15px;
         }}
-
-        .header-info .property-details {{
-            font-size: 14px;
-            margin-top: 5px;
-            opacity: 0.8;
+        
+        .report-header .logo img {{
+            height: 60px;
+            width: auto;
         }}
-
-        /* Main content */
-        .report-content {{
-            background: white;
-            border-radius: 16px;
-            padding: 30px;
-            margin-bottom: 30px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-        }}
-
-        /* Market indicators table styles */
-        .market-indicators-table {{ margin-top: 20px; }}
-        .market-data-table {{
-            width: 100%;
+        
+        .report-footer {{
             background: #f8f9fa;
-            border-radius: 16px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-            border: 1px solid rgba(0, 0, 0, 0.05);
-            border-collapse: collapse;
-        }}
-        .market-data-table thead {{ background: linear-gradient(90deg, #4CAF50, #45a049); }}
-        .category-header {{
-            padding: 20px 25px;
-            color: white;
-            font-size: 18px;
-            font-weight: 700;
-            text-align: center;
-            border: none;
-            width: 50%;
-        }}
-        .data-cell {{
-            padding: 20px 25px;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-            background: white;
-        }}
-        .data-cell:last-child {{ border-bottom: none; }}
-        .cell-label {{
-            font-size: 14px;
-            color: #666;
-            margin-bottom: 8px;
-            font-weight: 500;
-        }}
-        .cell-value {{
-            font-size: 16px;
-            font-weight: 700;
-            color: #333;
-            line-height: 1.2;
-        }}
-
-        /* Price forecast styles */
-        .price-forecast-market-table {{
-            width: 100%;
-            background: #f8f9fa;
-            border-radius: 16px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-            border: 1px solid rgba(0, 0, 0, 0.05);
-            border-collapse: collapse;
-            margin: 20px 0;
-        }}
-        .price-forecast-market-table thead {{
-            background: linear-gradient(90deg, #4CAF50, #45a049);
-        }}
-        .forecast-category-header {{
-            padding: 20px 25px;
-            color: white;
-            font-size: 18px;
-            font-weight: 700;
-            text-align: center;
-            border: none;
-            width: 50%;
-        }}
-        .forecast-data-cell {{
-            padding: 20px 25px;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-            background: white;
-        }}
-        .forecast-cell-label {{
-            font-size: 14px;
-            color: #666;
-            margin-bottom: 8px;
-            font-weight: 500;
-        }}
-        .forecast-cell-value {{
-            font-size: 16px;
-            font-weight: 700;
-            color: #333;
-            line-height: 1.2;
-        }}
-        .forecast-cell-value.user-price {{ color: #007bff; }}
-        .forecast-cell-value.market-price {{ color: #6f42c1; }}
-        .forecast-cell-growth {{
-            font-size: 12px;
-            margin-top: 4px;
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-weight: 600;
-            display: inline-block;
-        }}
-        .forecast-cell-growth.positive {{
-            background: #d4edda;
-            color: #155724;
-        }}
-        .forecast-cell-growth.negative {{
-            background: #f8d7da;
-            color: #721c24;
-        }}
-
-        /* Trends styles */
-        .data-section {{
-            margin: 30px 0;
-            background: white;
+            padding: 20px;
+            margin-top: 30px;
             border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+            border-top: 3px solid #667eea;
         }}
-        .data-section-title {{
+        
+        .report-footer .logo {{
+            margin-bottom: 15px;
+        }}
+        
+        .report-footer .logo img {{
+            height: 40px;
+            width: auto;
+        }}
+        
+        .report-footer .bot-link {{
+            display: inline-block;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 20px 25px;
-            margin: 0;
-            font-size: 20px;
-            font-weight: 600;
-        }}
-        .data-section-content {{ padding: 25px; }}
-        .trends-table {{ width: 100%; border-collapse: collapse; margin: 15px 0; }}
-        .trends-table th {{
-            background: #28a745;
-            color: white;
-            padding: 12px 8px;
-            text-align: center;
-            font-weight: 600;
-            font-size: 12px;
-        }}
-        .trends-table td {{
-            padding: 10px 8px;
-            text-align: center;
-            border-bottom: 1px solid #dee2e6;
-            font-size: 11px;
-        }}
-        .trends-table tr:nth-child(even) {{ background: #f8f9fa; }}
-
-        /* Chart styles */
-        .chart-container {{
-            margin: 20px 0;
-            background: white;
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            min-height: 450px;
-        }}
-        .chart-title {{
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 15px;
-            color: #333;
-            text-align: center;
-        }}
-        .chart-controls {{
-            text-align: center;
-            margin-bottom: 15px;
-        }}
-        .chart-button {{
-            background: #007bff;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            margin: 0 5px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 12px;
-            transition: background-color 0.3s ease;
-        }}
-        .chart-button.active {{
-            background: #28a745;
-        }}
-        .chart-button:hover {{
-            opacity: 0.9;
-        }}
-
-        /* Footer */
-        .report-footer {{
-            background: #2c3e50;
-            color: white;
-            padding: 25px 0;
-            text-align: center;
-            margin-top: auto;
-        }}
-
-        .footer-content {{
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 15px;
-        }}
-
-        .footer-logo {{
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 10px;
-            color: #3498db;
-        }}
-
-        .footer-text {{
-            margin-bottom: 15px;
-            opacity: 0.9;
-        }}
-
-        .telegram-button {{
-            display: inline-block;
-            background: linear-gradient(135deg, #0088cc, #006ba8);
-            color: white;
-            padding: 12px 24px;
-            border-radius: 25px;
+            padding: 10px 20px;
+            border-radius: 8px;
             text-decoration: none;
             font-weight: 600;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0,136,204,0.3);
+            margin-top: 10px;
+            transition: transform 0.3s ease;
         }}
-
-        .telegram-button:hover {{
+        
+        .report-footer .bot-link:hover {{
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0,136,204,0.4);
             color: white;
             text-decoration: none;
         }}
-
-        /* Responsive design */
-        @media (max-width: 768px) {{
-            .header-content {{
-                flex-direction: column;
-                text-align: center;
-                gap: 15px;
-            }}
-
-            .header-info h1 {{
-                font-size: 22px;
-            }}
-
-            .report-content {{
-                padding: 20px;
-                margin-bottom: 20px;
-            }}
-
-            .report-container {{
-                padding: 0 10px;
-            }}
-            
-            .category-header, .forecast-category-header {{
-                padding: 16px 20px;
-                font-size: 16px;
-            }}
-            
-            .data-cell, .forecast-data-cell {{
-                padding: 16px 20px;
-            }}
-            
-            .chart-container {{
-                padding: 15px;
-                min-height: 350px;
-            }}
-            
-            .chart-button {{
-                padding: 6px 12px;
-                font-size: 11px;
-                margin: 2px;
-            }}
+        
+        .report-disclaimer {{
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+            font-size: 14px;
+            color: #856404;
         }}
-
-        @media (max-width: 480px) {{
-            .header-info h1 {{
+        
+        /* Mobile responsive */
+        @media (max-width: 768px) {{
+            .report-header h1 {{
                 font-size: 20px;
             }}
-
-            .report-content {{
-                padding: 15px;
-            }}
             
-            .category-header, .forecast-category-header {{
-                padding: 14px 16px;
+            .report-header .location {{
                 font-size: 14px;
             }}
             
-            .data-cell, .forecast-data-cell {{
-                padding: 14px 16px;
+            .report-header .logo img {{
+                height: 50px;
             }}
             
-            .chart-container {{
-                padding: 10px;
-                min-height: 300px;
-            }}
-            
-            .chart-button {{
-                padding: 5px 10px;
-                font-size: 10px;
-                margin: 1px;
-            }}
-            
-            .chart-title {{
-                font-size: 16px;
-            }}
-        }}
-
-        /* Ensure full width on all devices */
-        @media (min-width: 1200px) {{
-            .report-container,
-            .header-content,
-            .footer-content {{
-                max-width: 100%;
-                padding: 0 30px;
+            .report-footer .logo img {{
+                height: 35px;
             }}
         }}
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <div class="report-header">
-        <div class="header-content">
-            <div class="logo">🏠</div>
-            <div class="header-info">
-                <h1>Aaadviser</h1>
-                <div class="subtitle">Инсайты рынка недвижимости</div>
-                <div class="location">{location_name}</div>
-                <div class="property-details">{property_info}</div>
+    <div class="container">
+        <!-- Report Header -->
+        <div class="report-header">
+            <div class="logo">
+                <img src="/logo-sqv.png" alt="Aaadviser Logo">
+            </div>
+            <h1>{data.get('title', 'Отчет по оценке объекта')}</h1>
+            <div class="location">{location_name}</div>
+        </div>
+        
+        <!-- Report Disclaimer -->
+        <div class="report-disclaimer">
+            <strong>📄 Общий отчет по оценке недвижимости</strong><br>
+            Данный отчет предоставляет анализ рынка недвижимости на основе актуальных данных. 
+            Все расчеты выполнены с использованием современных методов анализа и актуальных рыночных данных.
+            Отчет создан {datetime.now().strftime('%d.%m.%Y в %H:%M')}.
+        </div>
+        
+        {main_content}
+        
+        <!-- Report Footer -->
+        <div class="report-footer">
+            <div class="logo">
+                <img src="/logo-flt.png" alt="Aaadviser Logo">
+            </div>
+            <div>
+                <p><strong>Aaadviser</strong> - профессиональная аналитика недвижимости</p>
+                <a href="https://t.me/YourBotName" class="bot-link" target="_blank">
+                    🤖 Получить свой отчет в Telegram боте
+                </a>
             </div>
         </div>
     </div>
-
-    <div class="report-container">
-        <div class="report-content">
-            <div id="reportContent">
-                <!-- Содержимое отчета будет добавлено через JavaScript -->
-                <div style="text-align: center; padding: 40px;">
-                    <p>Загрузка данных отчета...</p>
-                </div>
-            </div>
-            
-            <!-- Chart Container -->
-            <div class="chart-container">
-                <div class="chart-title">График трендов цен</div>
-                <div class="chart-controls">
-                    <button class="chart-button active" onclick="switchChart('sale')">Цена м² продажи</button>
-                    <button class="chart-button" onclick="switchChart('rent')">Цена м² аренды</button>
-                </div>
-                <canvas id="trendsChart" style="height: 400px; max-height: 400px;"></canvas>
-            </div>
-            
-            <div style="margin-top: 30px; padding: 20px; background: #fff3cd; border-radius: 12px; text-align: center;">
-                <p style="margin: 0; color: #856404; font-style: italic;">
-                    Отчет создан {datetime.now().strftime('%d.%m.%Y')} с помощью Aaadviser
-                </p>
-            </div>
-        </div>
-    </div>
-
-    <div class="report-footer">
-        <div class="footer-content">
-            <div class="footer-logo">🏠 Aaadviser</div>
-            <div class="footer-text">
-                Профессиональная аналитика недвижимости с AI-прогнозами
-            </div>
-            <a href="https://t.me/Aaadviser_bot?start=webapp" class="telegram-button">
-                📱 Открыть приложение в Telegram
-            </a>
-        </div>
-    </div>
-
-    <script>
-        // Trends data from the app
-        const trendsData = {trends_json};
-        const marketData = {json.dumps(market_data) if market_data else '{}'};
-        let currentChart = null;
-        let currentChartType = 'sale';
-
-        // Initialize on page load
-        document.addEventListener('DOMContentLoaded', function() {{
-            loadReportContent();
-            createTrendsChart(trendsData, 'sale');
-        }});
-
-        function loadReportContent() {{
-            // Вставляем предварительно сгенерированный контент отчета
-            const contentDiv = document.getElementById('reportContent');
-            const reportHTML = `{report_content_html_escaped}`;
-            
-            if (reportHTML.trim()) {{
-                contentDiv.innerHTML = reportHTML;
-            }} else {{
-                contentDiv.innerHTML = '<p style="text-align: center; color: #666;">Данные отчета недоступны</p>';
-            }}
-        }}
-
-        // Старые функции генерации HTML удалены - теперь используется контент из основного приложения
-
-        function createTrendsChart(trends, type) {{
-            const ctx = document.getElementById('trendsChart').getContext('2d');
-            
-            if (currentChart) {{
-                currentChart.destroy();
-            }}
-
-            if (!trends || trends.length === 0) {{
-                return;
-            }}
-
-            const sortedTrends = trends.sort((a, b) => {{
-                if (a.property_year !== b.property_year) {{
-                    return a.property_year - b.property_year;
-                }}
-                return a.property_month - b.property_month;
-            }});
-
-            const labels = sortedTrends.map(trend => {{
-                const monthNames = ['янв', 'фев', 'мар', 'апр', 'май', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек'];
-                return monthNames[trend.property_month - 1] + ' ' + trend.property_year;
-            }});
-
-            let data, label, borderColor, backgroundColor;
-
-            if (type === 'sale') {{
-                data = sortedTrends.map(trend => {{
-                    return trend.is_price_calculated ? trend.calculated_sale_price : trend.unit_price_for_sale;
-                }});
-                label = 'Цена продажи (₺/м²)';
-                borderColor = '#007bff';
-                backgroundColor = 'rgba(0, 123, 255, 0.1)';
-            }} else {{
-                data = sortedTrends.map(trend => {{
-                    return trend.is_price_calculated ? trend.calculated_rent_price : trend.unit_price_for_rent;
-                }});
-                label = 'Цена аренды (₺/м²)';
-                borderColor = '#28a745';
-                backgroundColor = 'rgba(40, 167, 69, 0.1)';
-            }}
-
-            currentChart = new Chart(ctx, {{
-                type: 'line',
-                data: {{
-                    labels: labels,
-                    datasets: [{{
-                        label: label,
-                        data: data,
-                        borderColor: borderColor,
-                        backgroundColor: backgroundColor,
-                        borderWidth: 3,
-                        fill: true,
-                        tension: 0.4,
-                        pointBackgroundColor: borderColor,
-                        pointBorderColor: '#fff',
-                        pointBorderWidth: 2,
-                        pointRadius: 6,
-                        pointHoverRadius: 8
-                    }}]
-                }},
-                options: {{
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    aspectRatio: 2,
-                    plugins: {{
-                        legend: {{
-                            display: true,
-                            position: 'top'
-                        }}
-                    }},
-                    scales: {{
-                        y: {{
-                            beginAtZero: false,
-                            grid: {{
-                                color: 'rgba(0,0,0,0.1)'
-                            }},
-                            ticks: {{
-                                callback: function(value) {{
-                                    return '₺' + value.toLocaleString('ru-RU');
-                                }}
-                            }}
-                        }},
-                        x: {{
-                            grid: {{
-                                color: 'rgba(0,0,0,0.1)'
-                            }}
-                        }}
-                    }},
-                    elements: {{
-                        point: {{
-                            hoverBackgroundColor: borderColor
-                        }}
-                    }}
-                }}
-            }});
-        }}
-
-        function switchChart(type) {{
-            // Update button states
-            document.querySelectorAll('.chart-button').forEach(btn => {{
-                btn.classList.remove('active');
-            }});
-            event.target.classList.add('active');
-            
-            // Update chart
-            currentChartType = type;
-            createTrendsChart(trendsData, type);
-        }}
-    </script>
 </body>
 </html>'''
         
-        return html_content
+        return complete_html
         
     except Exception as e:
-        logger.error(f"❌ Ошибка генерации HTML отчета: {e}")
-        # Возвращаем простой HTML в случае ошибки
-        return f'''<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <title>Ошибка генерации отчета</title>
-</head>
-<body>
-    <h1>Ошибка генерации отчета</h1>
-    <p>Произошла ошибка при создании отчета: {str(e)}</p>
-</body>
-</html>'''
-
-@app.route('/reports/<filename>')
-def serve_report(filename):
-    """Отдача сохраненных HTML отчетов"""
-    try:
-        reports_dir = os.path.join(os.getcwd(), 'reports')
-        return send_from_directory(reports_dir, filename)
-    except Exception as e:
-        logger.error(f"❌ Ошибка отдачи отчета {filename}: {e}")
-        return "Отчет не найден", 404
+        logger.error(f"Error generating complete report HTML: {e}")
+        return f"<html><body><h1>Error generating report</h1><p>{str(e)}</p></body></html>"
 
 
 if __name__ == '__main__':
