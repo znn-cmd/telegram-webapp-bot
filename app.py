@@ -1236,6 +1236,46 @@ def api_currency_test():
         logger.error(f"❌ Ошибка при тестировании валюты: {e}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
+@app.route('/api/currency/latest', methods=['GET'])
+def api_currency_latest():
+    """Получение последних курсов валют"""
+    try:
+        # Получаем последний курс EUR -> TRY из базы данных
+        today = datetime.now().date()
+        currency_result = supabase.table('currency').select('*').gte('created_at', f"{today}T00:00:00").lt('created_at', f"{today}T23:59:59").limit(1).execute()
+        
+        if currency_result.data and len(currency_result.data) > 0:
+            latest_rate = currency_result.data[0]
+            return jsonify({
+                'success': True,
+                'eur_try': latest_rate.get('eur_try'),
+                'usd_try': latest_rate.get('usd_try'),
+                'created_at': latest_rate.get('created_at'),
+                'source': 'database'
+            })
+        else:
+            # Если нет данных в базе, пытаемся получить через API
+            try:
+                current_rate = get_current_currency_rate('EUR', 'TRY')
+                return jsonify({
+                    'success': True,
+                    'eur_try': current_rate,
+                    'usd_try': None,
+                    'created_at': datetime.now().isoformat(),
+                    'source': 'api'
+                })
+            except Exception as api_error:
+                logger.error(f"❌ Ошибка получения курса через API: {api_error}")
+                return jsonify({
+                    'success': False,
+                    'error': 'No currency data available',
+                    'message': 'Курсы валют недоступны'
+                }), 404
+                
+    except Exception as e:
+        logger.error(f"❌ Ошибка получения последних курсов валют: {e}")
+        return jsonify({'error': str(e)}), 500
+
 @app.route('/api/check_admin_status', methods=['POST'])
 def api_check_admin_status():
     """Проверка статуса администратора пользователя и подписки"""
@@ -1253,9 +1293,27 @@ def api_check_admin_status():
         return jsonify({'error': 'Invalid telegram_id'}), 400
     
     try:
-        # Проверяем пользователя в базе
+        # Проверяем пользователя в базе с таймаутом
         logger.info(f"🔍 Поиск пользователя в базе для telegram_id: {telegram_id}")
-        user_result = supabase.table('users').select('user_status, period_end').eq('telegram_id', telegram_id).execute()
+        
+        # Добавляем таймаут для Supabase запроса
+        import asyncio
+        import concurrent.futures
+        
+        def execute_supabase_query():
+            return supabase.table('users').select('user_status, period_end').eq('telegram_id', telegram_id).execute()
+        
+        # Выполняем запрос с таймаутом
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            future = executor.submit(execute_supabase_query)
+            try:
+                user_result = future.result(timeout=10)  # 10 секунд таймаут
+            except concurrent.futures.TimeoutError:
+                logger.error("❌ Таймаут при запросе к базе данных")
+                return jsonify({'error': 'Database timeout'}), 408
+            except Exception as e:
+                logger.error(f"❌ Ошибка при выполнении запроса к базе: {e}")
+                return jsonify({'error': 'Database error'}), 500
         
         logger.info(f"📊 Результат поиска: {len(user_result.data) if user_result.data else 0} записей")
         
