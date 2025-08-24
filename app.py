@@ -8117,6 +8117,7 @@ def generate_report_html(data):
             border-radius: 12px;
             padding: 20px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            min-height: 450px;
         }}
         .chart-title {{
             font-size: 18px;
@@ -8222,6 +8223,17 @@ def generate_report_html(data):
             .data-cell, .forecast-data-cell {{
                 padding: 16px 20px;
             }}
+            
+            .chart-container {{
+                padding: 15px;
+                min-height: 350px;
+            }}
+            
+            .chart-button {{
+                padding: 6px 12px;
+                font-size: 11px;
+                margin: 2px;
+            }}
         }}
 
         @media (max-width: 480px) {{
@@ -8240,6 +8252,21 @@ def generate_report_html(data):
             
             .data-cell, .forecast-data-cell {{
                 padding: 14px 16px;
+            }}
+            
+            .chart-container {{
+                padding: 10px;
+                min-height: 300px;
+            }}
+            
+            .chart-button {{
+                padding: 5px 10px;
+                font-size: 10px;
+                margin: 1px;
+            }}
+            
+            .chart-title {{
+                font-size: 16px;
             }}
         }}
 
@@ -8283,7 +8310,7 @@ def generate_report_html(data):
                     <button class="chart-button active" onclick="switchChart('sale')">Цена м² продажи</button>
                     <button class="chart-button" onclick="switchChart('rent')">Цена м² аренды</button>
                 </div>
-                <canvas id="trendsChart" width="400" height="200"></canvas>
+                <canvas id="trendsChart" style="height: 400px; max-height: 400px;"></canvas>
             </div>
             
             <div style="margin-top: 30px; padding: 20px; background: #fff3cd; border-radius: 12px; text-align: center;">
@@ -8331,6 +8358,12 @@ def generate_report_html(data):
         }}
 
         function generateMarketDataHTML(data) {{
+            if (!data || !data.general_data || data.general_data.length === 0) {{
+                return '<p style="text-align: center; color: #666;">Данные отчета недоступны</p>';
+            }}
+            
+            const general = data.general_data[0];
+            
             // Генерируем HTML для показателей рынка
             let html = '<div class="market-indicators-table">';
             html += '<table class="market-data-table">';
@@ -8342,17 +8375,75 @@ def generate_report_html(data):
             html += '</thead>';
             html += '<tbody>';
             
-            // Добавляем строки с данными
+            // Сопоставимая площадь
             html += '<tr>';
             html += '<td class="data-cell">';
             html += '<div class="cell-label">Сопоставимая площадь:</div>';
-            html += '<div class="cell-value">-</div>';
+            html += '<div class="cell-value">' + (general.comparable_area_for_sale || '-') + ' м²</div>';
             html += '</td>';
             html += '<td class="data-cell">';
             html += '<div class="cell-label">Сопоставимая площадь:</div>';
-            html += '<div class="cell-value">-</div>';
+            html += '<div class="cell-value">' + (general.comparable_area_for_rent || '-') + ' м²</div>';
             html += '</td>';
             html += '</tr>';
+            
+            // Цена за м²
+            html += '<tr>';
+            html += '<td class="data-cell">';
+            html += '<div class="cell-label">Цена за м²:</div>';
+            html += '<div class="cell-value">' + (general.unit_price_for_sale ? '₺' + general.unit_price_for_sale.toLocaleString('ru-RU') : '-') + '</div>';
+            html += '</td>';
+            html += '<td class="data-cell">';
+            html += '<div class="cell-label">Цена за м²:</div>';
+            html += '<div class="cell-value">' + (general.unit_price_for_rent ? '₺' + general.unit_price_for_rent.toLocaleString('ru-RU') : '-') + '</div>';
+            html += '</td>';
+            html += '</tr>';
+            
+            // Количество объявлений
+            html += '<tr>';
+            html += '<td class="data-cell">';
+            html += '<div class="cell-label">Количество объявлений:</div>';
+            html += '<div class="cell-value">' + (general.count_for_sale || '-') + '</div>';
+            html += '</td>';
+            html += '<td class="data-cell">';
+            html += '<div class="cell-label">Количество объявлений:</div>';
+            html += '<div class="cell-value">' + (general.count_for_rent || '-') + '</div>';
+            html += '</td>';
+            html += '</tr>';
+            
+            // Средний возраст
+            html += '<tr>';
+            html += '<td class="data-cell">';
+            html += '<div class="cell-label">Средний возраст:</div>';
+            html += '<div class="cell-value">' + (general.average_age_for_sale || '-') + ' лет</div>';
+            html += '</td>';
+            html += '<td class="data-cell">';
+            html += '<div class="cell-label">Средний возраст:</div>';
+            html += '<div class="cell-value">' + (general.average_age_for_rent || '-') + ' лет</div>';
+            html += '</td>';
+            html += '</tr>';
+            
+            // Период листинга
+            html += '<tr>';
+            html += '<td class="data-cell">';
+            html += '<div class="cell-label">Период листинга:</div>';
+            html += '<div class="cell-value">' + (general.listing_period_for_sale || '-') + ' дней</div>';
+            html += '</td>';
+            html += '<td class="data-cell">';
+            html += '<div class="cell-label">Период листинга:</div>';
+            html += '<div class="cell-value">' + (general.listing_period_for_rent || '-') + ' дней</div>';
+            html += '</td>';
+            html += '</tr>';
+            
+            // Доходность
+            if (general.yield) {{
+                html += '<tr>';
+                html += '<td class="data-cell" colspan="2">';
+                html += '<div class="cell-label">Доходность:</div>';
+                html += '<div class="cell-value">' + general.yield.toFixed(2) + '%</div>';
+                html += '</td>';
+                html += '</tr>';
+            }}
             
             html += '</tbody>';
             html += '</table>';
@@ -8424,6 +8515,7 @@ def generate_report_html(data):
                 options: {{
                     responsive: true,
                     maintainAspectRatio: false,
+                    aspectRatio: 2,
                     plugins: {{
                         legend: {{
                             display: true,
