@@ -7890,9 +7890,61 @@ def generate_complete_report_html(data):
         content_match = re.search(r'<div class="container">(.*?)(?=<script|$)', body_content, re.DOTALL)
         main_content = content_match.group(1) if content_match else body_content
         
+        # Clean up main_content for shared report: remove unwanted elements
+        # 1. Remove location-form div
+        main_content = re.sub(r'<div class="location-form"[^>]*>.*?</div>', '', main_content, flags=re.DOTALL)
+        
+        # 2. Remove share-report-section div  
+        main_content = re.sub(r'<div class="share-report-section"[^>]*>.*?</div>', '', main_content, flags=re.DOTALL)
+        
+        # 3. Remove back-button link
+        main_content = re.sub(r'<a[^>]*class="back-button"[^>]*>.*?</a>', '', main_content, flags=re.DOTALL)
+        
+        # 4. Remove logo block with slogan (the flex div with logo and "Инсайты рынка недвижимости")
+        main_content = re.sub(r'<div style="display:flex;flex-direction:column;align-items:center;margin-top:18px;margin-bottom:10px;">.*?</div>', '', main_content, flags=re.DOTALL)
+        
+        # 5. Remove share modal overlay
+        main_content = re.sub(r'<div class="modal-overlay"[^>]*>.*?</div>', '', main_content, flags=re.DOTALL)
+        
         # Extract styles from original HTML
         style_match = re.search(r'<style[^>]*>(.*?)</style>', original_html, re.DOTALL)
         original_styles = style_match.group(1) if style_match else ''
+        
+        # Modify original styles for full-width container
+        # Override container styles for shared report
+        modified_styles = original_styles
+        
+        # Add container override styles for full width
+        container_override = '''
+        
+        /* Override container styles for shared report - full width */
+        .container {
+            width: 100% !important;
+            max-width: none !important;
+            margin: 0 !important;
+            padding: 20px !important;
+            background: white !important;
+            min-height: 100vh !important;
+            box-shadow: none !important;
+        }
+        
+        /* Responsive design for shared reports */
+        @media (min-width: 769px) {
+            .container {
+                max-width: 1200px !important;
+                margin: 0 auto !important;
+                padding: 40px !important;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px !important;
+            }
+        }
+        '''
+        
+        modified_styles += container_override
         
         # Generate complete standalone HTML
         complete_html = f'''<!DOCTYPE html>
@@ -7902,7 +7954,7 @@ def generate_complete_report_html(data):
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{data.get('title', 'Отчет по оценке объекта')}</title>
     <style>
-        {original_styles}
+        {modified_styles}
         
         /* Additional styles for shared report */
         .report-header {{
