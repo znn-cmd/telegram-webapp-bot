@@ -23,10 +23,6 @@ import io
 import base64
 from PIL import Image
 import numpy as np
-import ssl
-import urllib3
-from requests.adapters import HTTPAdapter
-from urllib3.util.retry import Retry
 
 # Загружаем переменные окружения
 load_dotenv()
@@ -61,120 +57,12 @@ except ImportError:
 # Инициализация Flask приложения
 app = Flask(__name__)
 
-# Настройки SSL и сетевых соединений
-ssl_context = ssl.create_default_context()
-ssl_context.check_hostname = False
-ssl_context.verify_mode = ssl.CERT_NONE
-
-# Настройки urllib3 для отключения предупреждений о SSL
-urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
-
-# Настройки retry для requests
-retry_strategy = Retry(
-    total=3,
-    backoff_factor=1,
-    status_forcelist=[429, 500, 502, 503, 504],
-    allowed_methods=["HEAD", "GET", "OPTIONS", "POST", "PUT", "DELETE"]
-)
-
-# Создаем адаптер с retry логикой
-adapter = HTTPAdapter(max_retries=retry_strategy)
-
-# Настройки для Supabase клиента
-supabase_config = {
-    'url': os.getenv("SUPABASE_URL"),
-    'key': os.getenv("SUPABASE_ANON_KEY"),
-    'options': {
-        'headers': {
-            'User-Agent': 'Aaadviser/1.0'
-        }
-    }
-}
-
-if not supabase_config['url'] or not supabase_config['key']:
+# Инициализация Supabase
+supabase_url = os.getenv("SUPABASE_URL")
+supabase_key = os.getenv("SUPABASE_ANON_KEY")
+if not supabase_url or not supabase_key:
     raise RuntimeError("SUPABASE_URL и SUPABASE_ANON_KEY должны быть заданы в переменных окружения!")
-
-# Инициализация Supabase с настройками
-try:
-    supabase: Client = create_client(supabase_config['url'], supabase_config['key'])
-    logger.info("✅ Supabase клиент успешно инициализирован")
-except Exception as e:
-    logger.error(f"❌ Ошибка инициализации Supabase клиента: {e}")
-    raise
-
-def check_supabase_connection():
-    """Проверка состояния соединения с Supabase"""
-    try:
-        # Простой запрос для проверки соединения
-        result = supabase.table('users').select('id').limit(1).execute()
-        return True
-    except Exception as e:
-        logger.error(f"❌ Ошибка проверки соединения с Supabase: {e}")
-        return False
-
-def get_supabase_health_status():
-    """Получение статуса здоровья Supabase соединения"""
-    try:
-        if check_supabase_connection():
-            return {
-                'status': 'healthy',
-                'message': 'Supabase connection is working',
-                'timestamp': datetime.now().isoformat()
-            }
-        else:
-            return {
-                'status': 'unhealthy',
-                'message': 'Supabase connection failed',
-                'timestamp': datetime.now().isoformat()
-            }
-    except Exception as e:
-        return {
-            'status': 'error',
-            'message': f'Health check failed: {str(e)}',
-            'timestamp': datetime.now().isoformat()
-        }
-
-def execute_supabase_query(query_func, max_retries=None, retry_delay=None):
-    """
-    Выполнение Supabase запроса с retry логикой
-    
-    Args:
-        query_func: Функция, которая выполняет Supabase запрос
-        max_retries: Максимум попыток (по умолчанию из настроек)
-        retry_delay: Задержка между попытками (по умолчанию из настроек)
-    
-    Returns:
-        Результат запроса или None при ошибке
-    """
-    if max_retries is None:
-        max_retries = SUPABASE_MAX_RETRIES
-    if retry_delay is None:
-        retry_delay = SUPABASE_RETRY_DELAY
-    
-    for attempt in range(max_retries):
-        try:
-            return query_func()
-        except Exception as e:
-            error_msg = str(e)
-            logger.error(f"❌ Supabase запрос не удался (попытка {attempt + 1}/{max_retries}): {error_msg}")
-            
-            # Проверяем тип ошибки
-            if "SSL" in error_msg.upper() or "handshake" in error_msg.lower() or "timeout" in error_msg.lower():
-                if attempt < max_retries - 1:
-                    logger.warning(f"🔄 SSL/Timeout ошибка, повторная попытка через {retry_delay} сек...")
-                    import time
-                    time.sleep(retry_delay)
-                    retry_delay *= 2  # Увеличиваем задержку
-                    continue
-                else:
-                    logger.error("❌ Все попытки исчерпаны для SSL/Timeout ошибки")
-                    return None
-            else:
-                # Для других ошибок не повторяем
-                logger.error(f"❌ Критическая ошибка, не повторяем: {error_msg}")
-                return None
-    
-    return None
+supabase: Client = create_client(supabase_url, supabase_key)
 
 # Токен бота
 TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
@@ -192,11 +80,6 @@ ENABLE_NOMINATIM = os.getenv('ENABLE_NOMINATIM', 'true').lower() == 'true'
 NOMINATIM_TIMEOUT = int(os.getenv('NOMINATIM_TIMEOUT', '15'))
 ENABLE_GOOGLE_MAPS = os.getenv('ENABLE_GOOGLE_MAPS', 'true').lower() == 'true'  # Google Maps API включен по умолчанию
 GOOGLE_MAPS_TIMEOUT = int(os.getenv('GOOGLE_MAPS_TIMEOUT', '30'))  # Увеличен таймаут для стабильности
-
-# Настройки Supabase
-SUPABASE_TIMEOUT = int(os.getenv('SUPABASE_TIMEOUT', '30'))
-SUPABASE_MAX_RETRIES = int(os.getenv('SUPABASE_MAX_RETRIES', '3'))
-SUPABASE_RETRY_DELAY = int(os.getenv('SUPABASE_RETRY_DELAY', '2'))
 
 # async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 #     """Обработчик команды /start"""
@@ -336,15 +219,6 @@ def webapp_object_evaluation():
 def health():
     """Эндпоинт для проверки здоровья приложения"""
     return jsonify({"status": "ok", "message": "Telegram WebApp Bot is running"})
-
-@app.route('/health/supabase')
-def health_supabase():
-    """Эндпоинт для проверки здоровья Supabase соединения"""
-    health_status = get_supabase_health_status()
-    if health_status['status'] == 'healthy':
-        return jsonify(health_status), 200
-    else:
-        return jsonify(health_status), 503
 
 @app.route('/logo-sqv.png')
 def serve_logo():
@@ -492,70 +366,36 @@ def api_menu():
 @app.route('/api/locations/countries', methods=['GET'])
 def api_locations_countries():
     """Получение списка стран из таблицы locations"""
-    max_retries = 3
-    retry_delay = 2
-    
-    for attempt in range(max_retries):
-        try:
-            logger.info(f"🔍 Запрос списка стран (попытка {attempt + 1}/{max_retries})")
-            
-            # Добавляем таймаут для запроса
-            result = supabase.table('locations').select('country_id, country_name').execute()
-            
-            logger.info(f"📊 Получено записей: {len(result.data) if result.data else 0}")
-            
-            if result.data:
-                # Убираем дубликаты, фильтруем None значения и сортируем
-                countries = []
-                seen = set()
-                for item in result.data:
-                    if item['country_id'] is not None and item['country_name'] is not None:
-                        country_tuple = (item['country_id'], item['country_name'])
-                        if country_tuple not in seen:
-                            countries.append(country_tuple)
-                            seen.add(country_tuple)
-                    else:
-                        logger.warning(f"⚠️ Пропущена запись с None значениями: {item}")
-                
-                logger.info(f"✅ Отфильтровано стран: {len(countries)}")
-                
-                # Сортируем по названию, игнорируя None
-                countries.sort(key=lambda x: x[1] if x[1] is not None else '')
-                return jsonify({'success': True, 'countries': countries})
-            else:
-                logger.warning("⚠️ Страны не найдены")
-                return jsonify({'success': False, 'error': 'No countries found'})
-                
-        except Exception as e:
-            error_msg = str(e)
-            logger.error(f"❌ Ошибка при получении стран (попытка {attempt + 1}/{max_retries}): {error_msg}")
-            
-            # Проверяем тип ошибки
-            if "SSL" in error_msg.upper() or "handshake" in error_msg.lower() or "timeout" in error_msg.lower():
-                if attempt < max_retries - 1:
-                    logger.warning(f"🔄 SSL/Timeout ошибка, повторная попытка через {retry_delay} сек...")
-                    import time
-                    time.sleep(retry_delay)
-                    retry_delay *= 2  # Увеличиваем задержку
-                    continue
+    try:
+        logger.info("🔍 Запрос списка стран")
+        result = supabase.table('locations').select('country_id, country_name').execute()
+        
+        logger.info(f"📊 Получено записей: {len(result.data) if result.data else 0}")
+        
+        if result.data:
+            # Убираем дубликаты, фильтруем None значения и сортируем
+            countries = []
+            seen = set()
+            for item in result.data:
+                if item['country_id'] is not None and item['country_name'] is not None:
+                    country_tuple = (item['country_id'], item['country_name'])
+                    if country_tuple not in seen:
+                        countries.append(country_tuple)
+                        seen.add(country_tuple)
                 else:
-                    logger.error("❌ Все попытки исчерпаны для SSL/Timeout ошибки")
-                    return jsonify({
-                        'success': False, 
-                        'error': 'SSL connection timeout. Please try again later.',
-                        'retry_after': 30
-                    }), 503
-            else:
-                # Для других ошибок не повторяем
-                logger.error(f"❌ Критическая ошибка, не повторяем: {error_msg}")
-                return jsonify({'success': False, 'error': str(e)}), 500
-    
-    # Если все попытки исчерпаны
-    return jsonify({
-        'success': False, 
-        'error': 'Maximum retry attempts exceeded',
-        'retry_after': 60
-    }), 503
+                    logger.warning(f"⚠️ Пропущена запись с None значениями: {item}")
+            
+            logger.info(f"✅ Отфильтровано стран: {len(countries)}")
+            
+            # Сортируем по названию, игнорируя None
+            countries.sort(key=lambda x: x[1] if x[1] is not None else '')
+            return jsonify({'success': True, 'countries': countries})
+        else:
+            logger.warning("⚠️ Страны не найдены")
+            return jsonify({'success': False, 'error': 'No countries found'})
+    except Exception as e:
+        logger.error(f"❌ Ошибка при получении стран: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 @app.route('/api/locations/cities', methods=['POST'])
 def api_locations_cities():
@@ -566,69 +406,37 @@ def api_locations_cities():
     if not country_id:
         return jsonify({'error': 'country_id required'}), 400
     
-    max_retries = 3
-    retry_delay = 2
-    
-    for attempt in range(max_retries):
-        try:
-            logger.info(f"🔍 Запрос городов для country_id: {country_id} (попытка {attempt + 1}/{max_retries})")
-            result = supabase.table('locations').select('city_id, city_name').eq('country_id', country_id).execute()
-            
-            logger.info(f"📊 Получено записей: {len(result.data) if result.data else 0}")
-            
-            if result.data:
-                # Убираем дубликаты, фильтруем None значения и сортируем
-                cities = []
-                seen = set()
-                for item in result.data:
-                    if item['city_id'] is not None and item['city_name'] is not None:
-                        city_tuple = (item['city_id'], item['city_name'])
-                        if city_tuple not in seen:
-                            cities.append(city_tuple)
-                            seen.add(city_tuple)
-                    else:
-                        logger.warning(f"⚠️ Пропущена запись с None значениями: {item}")
-                
-                logger.info(f"✅ Отфильтровано городов: {len(cities)}")
-                
-                # Сортируем по названию, игнорируя None
-                cities.sort(key=lambda x: x[1] if x[1] is not None else '')
-                return jsonify({'success': True, 'cities': cities})
-            else:
-                logger.warning(f"⚠️ Города для country_id {country_id} не найдены")
-                return jsonify({'success': False, 'error': 'No cities found'})
-                
-        except Exception as e:
-            error_msg = str(e)
-            logger.error(f"❌ Ошибка при получении городов (попытка {attempt + 1}/{max_retries}): {error_msg}")
-            logger.error(f"📋 Данные запроса: country_id={country_id}")
-            
-            # Проверяем тип ошибки
-            if "SSL" in error_msg.upper() or "handshake" in error_msg.lower() or "timeout" in error_msg.lower():
-                if attempt < max_retries - 1:
-                    logger.warning(f"🔄 SSL/Timeout ошибка, повторная попытка через {retry_delay} сек...")
-                    import time
-                    time.sleep(retry_delay)
-                    retry_delay *= 2  # Увеличиваем задержку
-                    continue
+    try:
+        logger.info(f"🔍 Запрос городов для country_id: {country_id}")
+        result = supabase.table('locations').select('city_id, city_name').eq('country_id', country_id).execute()
+        
+        logger.info(f"📊 Получено записей: {len(result.data) if result.data else 0}")
+        
+        if result.data:
+            # Убираем дубликаты, фильтруем None значения и сортируем
+            cities = []
+            seen = set()
+            for item in result.data:
+                if item['city_id'] is not None and item['city_name'] is not None:
+                    city_tuple = (item['city_id'], item['city_name'])
+                    if city_tuple not in seen:
+                        cities.append(city_tuple)
+                        seen.add(city_tuple)
                 else:
-                    logger.error("❌ Все попытки исчерпаны для SSL/Timeout ошибки")
-                    return jsonify({
-                        'success': False, 
-                        'error': 'SSL connection timeout. Please try again later.',
-                        'retry_after': 30
-                    }), 503
-            else:
-                # Для других ошибок не повторяем
-                logger.error(f"❌ Критическая ошибка, не повторяем: {error_msg}")
-                return jsonify({'success': False, 'error': str(e)}), 500
-    
-    # Если все попытки исчерпаны
-    return jsonify({
-        'success': False, 
-        'error': 'Maximum retry attempts exceeded',
-        'retry_after': 60
-    }), 503
+                    logger.warning(f"⚠️ Пропущена запись с None значениями: {item}")
+            
+            logger.info(f"✅ Отфильтровано городов: {len(cities)}")
+            
+            # Сортируем по названию, игнорируя None
+            cities.sort(key=lambda x: x[1] if x[1] is not None else '')
+            return jsonify({'success': True, 'cities': cities})
+        else:
+            logger.warning(f"⚠️ Города для country_id {country_id} не найдены")
+            return jsonify({'success': False, 'error': 'No cities found'})
+    except Exception as e:
+        logger.error(f"❌ Ошибка при получении городов: {e}")
+        logger.error(f"📋 Данные запроса: country_id={country_id}")
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 @app.route('/api/locations/counties', methods=['POST'])
 def api_locations_counties():

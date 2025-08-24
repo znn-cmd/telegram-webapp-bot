@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест таблицы трендов - district_id 2279</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .test-section {
+            margin-bottom: 40px;
+            padding: 20px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            background: #f8f9fa;
+        }
+
+        .test-section h2 {
+            color: #495057;
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+
+        .test-button {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 10px 10px 10px 0;
+            transition: background 0.3s ease;
+        }
+
+        .test-button:hover {
+            background: #218838;
+        }
+
+        .test-button.secondary {
+            background: #6c757d;
+        }
+
+        .test-button.secondary:hover {
+            background: #5a6268;
+        }
+
+        .test-button.danger {
+            background: #dc3545;
+        }
+
+        .test-button.danger:hover {
+            background: #c82333;
+        }
+
+        .result-area {
+            margin-top: 20px;
+            padding: 15px;
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            min-height: 100px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            white-space: pre-wrap;
+            overflow-x: auto;
+        }
+
+        .trends-data-table-section {
+            margin-top: 25px;
+            margin-bottom: 20px;
+        }
+
+        .trends-data-table-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .trends-data-table-info {
+            background: #f8f9fa;
+            border-radius: 6px;
+            padding: 8px 12px;
+            margin-bottom: 15px;
+            border: 1px solid #e9ecef;
+            text-align: center;
+            font-size: 12px;
+            color: #666;
+            line-height: 1.4;
+        }
+
+        .trends-data-table-info strong {
+            color: #495057;
+            font-weight: 600;
+        }
+
+        .trends-data-table-container {
+            overflow-x: auto;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            background: white;
+            min-width: 400px;
+        }
+
+        .trends-data-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            font-size: 12px;
+            table-layout: fixed;
+        }
+
+        .trends-data-table th {
+            background: #17a2b8;
+            color: white;
+            padding: 10px 8px;
+            text-align: center;
+            font-weight: 600;
+            line-height: 1.2;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .trends-data-table td {
+            padding: 8px 6px;
+            text-align: center;
+            border: 1px solid #dee2e6;
+            vertical-align: middle;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .trends-data-table tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+
+        .trends-data-table tr:hover {
+            background: #e9ecef;
+        }
+
+        .trends-data-table th:nth-child(1) { width: 20%; }
+        .trends-data-table th:nth-child(2) { width: 18%; }
+        .trends-data-table th:nth-child(3) { width: 18%; }
+        .trends-data-table th:nth-child(4) { width: 18%; }
+        .trends-data-table th:nth-child(5) { width: 18%; }
+        .trends-data-table th:nth-child(6) { width: 8%; }
+
+        .trends-data-table td:nth-child(2),
+        .trends-data-table td:nth-child(3) {
+            width: 18%;
+        }
+
+        .trends-data-table td:nth-child(4),
+        .trends-data-table td:nth-child(5) {
+            width: 18%;
+        }
+
+        .trends-data-table td:nth-child(6) {
+            width: 8%;
+        }
+
+        .trends-data-table .current-month-row {
+            background-color: #e8f4fd !important;
+        }
+
+        .trends-data-table .future-month-row {
+            background-color: #f0f8ff !important;
+        }
+
+        .trends-data-table .past-month-row {
+            background-color: #f8f9fa !important;
+        }
+
+        .trends-data-table .current-month-row:hover,
+        .trends-data-table .future-month-row:hover,
+        .trends-data-table .past-month-row:hover {
+            background-color: #e9ecef !important;
+        }
+
+        .trends-data-table td:first-child {
+            position: relative;
+        }
+
+        .trends-data-table td:first-child:hover::after {
+            content: attr(title);
+            position: absolute;
+            left: 50%;
+            top: -40px;
+            transform: translateX(-50%);
+            background: #333;
+            color: white;
+            padding: 5px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            white-space: nowrap;
+            z-index: 1000;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+
+        .status {
+            padding: 10px 15px;
+            border-radius: 6px;
+            margin: 10px 0;
+            font-weight: 500;
+        }
+
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .status.warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        @media (max-width: 768px) {
+            .trends-data-table {
+                font-size: 10px;
+            }
+            
+            .trends-data-table th,
+            .trends-data-table td {
+                padding: 6px 4px;
+            }
+            
+            .trends-data-table-title {
+                font-size: 16px;
+                margin-bottom: 12px;
+            }
+            
+            .trends-data-table-info {
+                font-size: 11px;
+                padding: 6px 10px;
+                margin-bottom: 12px;
+                line-height: 1.3;
+            }
+            
+            .trends-data-table-container {
+                min-width: 320px;
+            }
+            
+            .trends-data-table td:first-child:hover::after {
+                display: none;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .trends-data-table {
+                font-size: 9px;
+            }
+            
+            .trends-data-table th,
+            .trends-data-table td {
+                padding: 4px 3px;
+            }
+            
+            .trends-data-table-title {
+                font-size: 14px;
+                margin-bottom: 10px;
+            }
+            
+            .trends-data-table-info {
+                font-size: 10px;
+                padding: 5px 8px;
+                margin-bottom: 10px;
+                line-height: 1.2;
+            }
+            
+            .trends-data-table-container {
+                min-width: 280px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔍 Тест таблицы трендов</h1>
+            <p>Проверка данных для district_id 2279</p>
+        </div>
+
+        <div class="content">
+            <div class="test-section">
+                <h2>1. Тестирование данных</h2>
+                <p>Нажмите кнопки для тестирования различных аспектов таблицы трендов:</p>
+                
+                <button class="test-button" onclick="testMockData()">Тест с мок-данными</button>
+                <button class="test-button secondary" onclick="testTableGeneration()">Тест генерации таблицы</button>
+                <button class="test-button danger" onclick="clearResults()">Очистить результаты</button>
+                
+                <div id="testResults" class="result-area">
+                    Нажмите кнопку для начала тестирования...
+                </div>
+            </div>
+
+            <div class="test-section">
+                <h2>2. Отображение таблицы</h2>
+                <p>Здесь будет отображаться сгенерированная таблица трендов:</p>
+                
+                <div id="tableContainer">
+                    <!-- Таблица будет добавлена сюда -->
+                </div>
+            </div>
+
+            <div class="test-section">
+                <h2>3. Информация о тестировании</h2>
+                <div class="status info">
+                    <strong>Цель тестирования:</strong> Проверить, что таблица трендов корректно отображает все доступные данные для district_id 2279 без фильтрации по датам.
+                </div>
+                
+                <div class="status warning">
+                    <strong>Ожидаемый результат:</strong> Таблица должна показывать все записи из базы данных, включая данные за 2024, 2025, 2026 годы.
+                </div>
+                
+                <div class="status success">
+                    <strong>Текущий статус:</strong> Готов к тестированию
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Мок-данные для тестирования (имитация данных из базы)
+        const mockTrendsData = [
+            {
+                property_year: 2026,
+                property_month: 6,
+                unit_price_for_sale: 71107.00,
+                price_change_sale: 0.0193,
+                unit_price_for_rent: 355.43,
+                price_change_rent: 0.0215,
+                yield: 6.0
+            },
+            {
+                property_year: 2026,
+                property_month: 5,
+                unit_price_for_sale: 69763.00,
+                price_change_sale: 0.0186,
+                unit_price_for_rent: 347.95,
+                price_change_rent: 0.0146,
+                yield: 5.9
+            },
+            {
+                property_year: 2026,
+                property_month: 4,
+                unit_price_for_sale: 68486.00,
+                price_change_sale: 0.0163,
+                unit_price_for_rent: 342.95,
+                price_change_rent: 0.0107,
+                yield: 6.0
+            },
+            {
+                property_year: 2026,
+                property_month: 3,
+                unit_price_for_sale: 67345.00,
+                price_change_sale: 0.0150,
+                unit_price_for_rent: 339.50,
+                price_change_rent: 0.0090,
+                yield: 5.9
+            },
+            {
+                property_year: 2026,
+                property_month: 2,
+                unit_price_for_sale: 66350.00,
+                price_change_sale: 0.0130,
+                unit_price_for_rent: 336.50,
+                price_change_rent: 0.0070,
+                yield: 6.0
+            },
+            {
+                property_year: 2026,
+                property_month: 1,
+                unit_price_for_sale: 65500.00,
+                price_change_sale: 0.0120,
+                unit_price_for_rent: 334.00,
+                price_change_rent: 0.0060,
+                yield: 5.9
+            },
+            {
+                property_year: 2025,
+                property_month: 12,
+                unit_price_for_sale: 64700.00,
+                price_change_sale: 0.0110,
+                unit_price_for_rent: 332.00,
+                price_change_rent: 0.0050,
+                yield: 6.0
+            },
+            {
+                property_year: 2025,
+                property_month: 11,
+                unit_price_for_sale: 64000.00,
+                price_change_sale: 0.0100,
+                unit_price_for_rent: 330.00,
+                price_change_rent: 0.0040,
+                yield: 5.9
+            },
+            {
+                property_year: 2025,
+                property_month: 10,
+                unit_price_for_sale: 63400.00,
+                price_change_sale: 0.0090,
+                unit_price_for_rent: 328.00,
+                price_change_rent: 0.0030,
+                yield: 6.0
+            },
+            {
+                property_year: 2025,
+                property_month: 9,
+                unit_price_for_sale: 62900.00,
+                price_change_sale: 0.0080,
+                unit_price_for_rent: 327.00,
+                price_change_rent: 0.0020,
+                yield: 5.9
+            },
+            {
+                property_year: 2025,
+                property_month: 8,
+                unit_price_for_sale: 62500.00,
+                price_change_sale: 0.0070,
+                unit_price_for_rent: 326.00,
+                price_change_rent: 0.0010,
+                yield: 6.0
+            },
+            {
+                property_year: 2025,
+                property_month: 7,
+                unit_price_for_sale: 62200.00,
+                price_change_sale: 0.0060,
+                unit_price_for_rent: 325.00,
+                price_change_rent: 0.0000,
+                yield: 5.9
+            },
+            {
+                property_year: 2025,
+                property_month: 6,
+                unit_price_for_sale: 62000.00,
+                price_change_sale: 0.0050,
+                unit_price_for_rent: 325.00,
+                price_change_rent: 0.0000,
+                yield: 6.0
+            },
+            {
+                property_year: 2025,
+                property_month: 5,
+                unit_price_for_sale: 61800.00,
+                price_change_sale: 0.0040,
+                unit_price_for_rent: 324.00,
+                price_change_rent: 0.0000,
+                yield: 5.9
+            },
+            {
+                property_year: 2025,
+                property_month: 4,
+                unit_price_for_sale: 61600.00,
+                price_change_sale: 0.0030,
+                unit_price_for_rent: 324.00,
+                price_change_rent: 0.0000,
+                yield: 6.0
+            },
+            {
+                property_year: 2025,
+                property_month: 3,
+                unit_price_for_sale: 61500.00,
+                price_change_sale: 0.0020,
+                unit_price_for_rent: 323.00,
+                price_change_rent: 0.0000,
+                yield: 5.9
+            },
+            {
+                property_year: 2025,
+                property_month: 2,
+                unit_price_for_sale: 61400.00,
+                price_change_sale: 0.0010,
+                unit_price_for_rent: 323.00,
+                price_change_rent: 0.0000,
+                yield: 6.0
+            },
+            {
+                property_year: 2025,
+                property_month: 1,
+                unit_price_for_sale: 61300.00,
+                price_change_sale: 0.0000,
+                unit_price_for_rent: 322.00,
+                price_change_rent: 0.0000,
+                yield: 5.9
+            },
+            {
+                property_year: 2024,
+                property_month: 12,
+                unit_price_for_sale: 61200.00,
+                price_change_sale: 0.0000,
+                unit_price_for_rent: 322.00,
+                price_change_rent: 0.0000,
+                yield: 6.0
+            },
+            {
+                property_year: 2024,
+                property_month: 11,
+                unit_price_for_sale: 61100.00,
+                price_change_sale: 0.0000,
+                unit_price_for_rent: 321.00,
+                price_change_rent: 0.0000,
+                yield: 5.9
+            },
+            {
+                property_year: 2024,
+                property_month: 10,
+                unit_price_for_sale: 61000.00,
+                price_change_sale: 0.0000,
+                unit_price_for_rent: 321.00,
+                price_change_rent: 0.0000,
+                yield: 6.0
+            },
+            {
+                property_year: 2024,
+                property_month: 9,
+                unit_price_for_sale: 60900.00,
+                price_change_sale: 0.0000,
+                unit_price_for_rent: 320.00,
+                price_change_rent: 0.0000,
+                yield: 5.9
+            },
+            {
+                property_year: 2024,
+                property_month: 8,
+                unit_price_for_sale: 60800.00,
+                price_change_sale: 0.0000,
+                unit_price_for_rent: 320.00,
+                price_change_rent: 0.0000,
+                yield: 6.0
+            },
+            {
+                property_year: 2024,
+                property_month: 7,
+                unit_price_for_sale: 60700.00,
+                price_change_sale: 0.0000,
+                unit_price_for_rent: 319.00,
+                price_change_rent: 0.0000,
+                yield: 5.9
+            },
+            {
+                property_year: 2024,
+                property_month: 6,
+                unit_price_for_sale: 60600.00,
+                price_change_sale: 0.0000,
+                unit_price_for_rent: 319.00,
+                price_change_rent: 0.0000,
+                yield: 6.0
+            },
+            {
+                property_year: 2024,
+                property_month: 5,
+                unit_price_for_sale: 60500.00,
+                price_change_sale: 0.0000,
+                unit_price_for_rent: 318.00,
+                price_change_rent: 0.0000,
+                yield: 5.9
+            },
+            {
+                property_year: 2024,
+                property_month: 4,
+                unit_price_for_sale: 60400.00,
+                price_change_sale: 0.0000,
+                unit_price_for_rent: 318.00,
+                price_change_rent: 0.0000,
+                yield: 6.0
+            },
+            {
+                property_year: 2024,
+                property_month: 3,
+                unit_price_for_sale: 60300.00,
+                price_change_sale: 0.0000,
+                unit_price_for_rent: 317.00,
+                price_change_rent: 0.0000,
+                yield: 5.9
+            },
+            {
+                property_year: 2024,
+                property_month: 2,
+                unit_price_for_sale: 60200.00,
+                price_change_sale: 0.0000,
+                unit_price_for_rent: 317.00,
+                price_change_rent: 0.0000,
+                yield: 6.0
+            },
+            {
+                property_year: 2024,
+                property_month: 1,
+                unit_price_for_sale: 60100.00,
+                price_change_sale: 0.0000,
+                unit_price_for_rent: 316.00,
+                price_change_rent: 0.0000,
+                yield: 5.9
+            }
+        ];
+
+        // Функция для тестирования с мок-данными
+        function testMockData() {
+            const results = document.getElementById('testResults');
+            results.innerHTML = '🧪 Тестирование с мок-данными...\n\n';
+            
+            try {
+                // Проверяем структуру данных
+                results.innerHTML += '📊 Проверка структуры данных:\n';
+                results.innerHTML += `   Всего записей: ${mockTrendsData.length}\n`;
+                
+                const years = [...new Set(mockTrendsData.map(t => t.property_year))].sort((a, b) => b - a);
+                results.innerHTML += `   Годы: ${years.join(', ')}\n`;
+                
+                const months = [...new Set(mockTrendsData.map(t => t.property_month))].sort((a, b) => a - b);
+                results.innerHTML += `   Месяцы: ${months.join(', ')}\n\n`;
+                
+                // Проверяем диапазон дат
+                const minYear = Math.min(...mockTrendsData.map(t => t.property_year));
+                const maxYear = Math.max(...mockTrendsData.map(t => t.property_year));
+                results.innerHTML += `📅 Диапазон лет: ${minYear} - ${maxYear}\n`;
+                
+                // Проверяем наличие всех полей
+                const requiredFields = ['property_year', 'property_month', 'unit_price_for_sale', 'price_change_sale', 'unit_price_for_rent', 'price_change_rent', 'yield'];
+                const missingFields = [];
+                
+                for (const field of requiredFields) {
+                    if (!mockTrendsData[0].hasOwnProperty(field)) {
+                        missingFields.push(field);
+                    }
+                }
+                
+                if (missingFields.length === 0) {
+                    results.innerHTML += '✅ Все обязательные поля присутствуют\n';
+                } else {
+                    results.innerHTML += `❌ Отсутствуют поля: ${missingFields.join(', ')}\n`;
+                }
+                
+                // Проверяем типы данных
+                results.innerHTML += '\n🔍 Проверка типов данных:\n';
+                const sample = mockTrendsData[0];
+                for (const [field, value] of Object.entries(sample)) {
+                    results.innerHTML += `   ${field}: ${typeof value} (${value})\n`;
+                }
+                
+                results.innerHTML += '\n✅ Тест с мок-данными завершен успешно!';
+                
+            } catch (error) {
+                results.innerHTML += `❌ Ошибка при тестировании: ${error.message}\n`;
+                console.error('Test error:', error);
+            }
+        }
+
+        // Функция для тестирования генерации таблицы
+        function testTableGeneration() {
+            const results = document.getElementById('testResults');
+            const tableContainer = document.getElementById('tableContainer');
+            
+            results.innerHTML = '🧪 Тестирование генерации таблицы...\n\n';
+            
+            try {
+                // Генерируем таблицу
+                const tableHTML = generateTrendsDataTable(mockTrendsData);
+                tableContainer.innerHTML = tableHTML;
+                
+                results.innerHTML += '✅ Таблица успешно сгенерирована\n';
+                results.innerHTML += `📊 Отображено ${mockTrendsData.length} записей\n`;
+                
+                // Проверяем, что все данные отображаются
+                const tableRows = document.querySelectorAll('.trends-data-table tbody tr');
+                results.innerHTML += `🔍 Найдено ${tableRows.length} строк в таблице\n`;
+                
+                if (tableRows.length === mockTrendsData.length) {
+                    results.innerHTML += '✅ Количество строк соответствует данным\n';
+                } else {
+                    results.innerHTML += `❌ Несоответствие: ${tableRows.length} строк вместо ${mockTrendsData.length}\n`;
+                }
+                
+                results.innerHTML += '\n✅ Тест генерации таблицы завершен!';
+                
+            } catch (error) {
+                results.innerHTML += `❌ Ошибка при генерации таблицы: ${error.message}\n`;
+                console.error('Table generation error:', error);
+            }
+        }
+
+        // Функция для очистки результатов
+        function clearResults() {
+            document.getElementById('testResults').innerHTML = 'Результаты очищены...';
+            document.getElementById('tableContainer').innerHTML = '';
+        }
+
+        // Функция генерации таблицы трендов (копия из основного файла)
+        function generateTrendsDataTable(trends) {
+            console.log('📊 Generating trends data table with trends:', trends.length, 'records');
+            
+            if (!trends || trends.length === 0) {
+                console.log('⚠️ No trends data for trends data table');
+                return '<div class="no-data">Нет данных для отображения</div>';
+            }
+            
+            // Сортируем тренды по дате (новые сначала) - БЕЗ ФИЛЬТРАЦИИ
+            const sortedTrends = trends.sort((a, b) => {
+                if (a.property_year !== b.property_year) {
+                    return b.property_year - a.property_year;
+                }
+                return b.property_month - a.property_month;
+            });
+            
+            console.log(`📊 Trends data table will show ALL ${sortedTrends.length} trends without date filtering`);
+            
+            // Определяем диапазон дат для отображения
+            const firstTrend = sortedTrends[sortedTrends.length - 1];
+            const lastTrend = sortedTrends[0];
+            const dateRange = `${firstTrend.property_month}/${firstTrend.property_year} - ${lastTrend.property_month}/${lastTrend.property_year}`;
+            
+            let html = '<div class="trends-data-table-section">';
+            html += '<h4 class="trends-data-table-title">Данные трендов по месяцам</h4>';
+            html += `<div class="trends-data-table-info">
+                Показано ${sortedTrends.length} трендов для выбранной локации (все доступные данные без фильтрации)
+                <br><strong>Диапазон: ${dateRange}</strong>
+            </div>`;
+            html += '<div class="trends-data-table-container">';
+            html += '<table class="trends-data-table">';
+            
+            // Заголовок таблицы
+            html += '<thead><tr>';
+            html += '<th>Месяц/Год</th>';
+            html += '<th>Цена продажи<br>(₺/м²)</th>';
+            html += '<th>Изменение цены<br>продажи</th>';
+            html += '<th>Цена аренды<br>(₺/м²)</th>';
+            html += '<th>Изменение цены<br>аренды</th>';
+            html += '<th>Доходность (%)</th>';
+            html += '</tr></thead><tbody>';
+            
+            // Добавляем строки с данными
+            sortedTrends.forEach((trend, index) => {
+                const monthNames = [
+                    'Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
+                    'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'
+                ];
+                
+                const monthName = monthNames[trend.property_month - 1] || trend.property_month;
+                const year = trend.property_year;
+                
+                // Логируем каждую строку для отладки
+                console.log(`📊 Row ${index + 1}: ${monthName} ${year} - Sale: ${trend.unit_price_for_sale}, Rent: ${trend.unit_price_for_rent}`);
+                
+                // Определяем тип строки для стилизации
+                const currentDate = new Date();
+                const currentYear = currentDate.getFullYear();
+                const currentMonth = currentDate.getMonth() + 1;
+                
+                let rowClass = '';
+                let rowStyle = '';
+                
+                if (year === currentYear && trend.property_month === currentMonth) {
+                    rowClass = 'current-month-row';
+                    rowStyle = 'background-color: #e8f4fd;';
+                } else if (year > currentYear || (year === currentYear && trend.property_month > currentMonth)) {
+                    rowClass = 'future-month-row';
+                    rowStyle = 'background-color: #f0f8ff;';
+                } else {
+                    rowClass = 'past-month-row';
+                    rowStyle = 'background-color: #f8f9fa;';
+                }
+                
+                html += `<tr class="${rowClass}" style="${rowStyle}">`;
+                html += `<td title="${monthName} ${year}"><strong>${monthName} ${year}</strong></td>`;
+                html += `<td>${formatTrendValue(trend.unit_price_for_sale, 'price')}</td>`;
+                html += `<td>${formatPercentage(trend.price_change_sale)}</td>`;
+                html += `<td>${formatTrendValue(trend.unit_price_for_rent, 'price')}</td>`;
+                html += `<td>${formatPercentage(trend.price_change_rent)}</td>`;
+                html += `<td>${formatTrendValue(trend.yield, 'percentage')}</td>`;
+                html += '</tr>';
+            });
+            
+            html += '</tbody></table>';
+            html += '</div></div>';
+            
+            return html;
+        }
+
+        // Вспомогательные функции
+        function formatTrendValue(value, type) {
+            if (value === null || value === undefined) return '-';
+            const numValue = parseFloat(value);
+            if (isNaN(numValue)) return '-';
+            
+            if (type === 'price') {
+                return `₺${numValue.toLocaleString('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            } else if (type === 'percentage') {
+                return `${numValue.toFixed(1)}%`;
+            }
+            return numValue.toString();
+        }
+
+        function formatPercentage(value) {
+            if (value === null || value === undefined) return '-';
+            const numValue = parseFloat(value);
+            if (isNaN(numValue)) return '-';
+            const sign = numValue >= 0 ? '+' : '';
+            return `${sign}${(numValue * 100).toFixed(2)}%`;
+        }
+
+        // Инициализация при загрузке страницы
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Страница тестирования загружена');
+            console.log('📊 Мок-данные загружены:', mockTrendsData.length, 'записей');
+        });
+    </script>
+</body>
+</html>
