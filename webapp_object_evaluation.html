@@ -8268,12 +8268,23 @@
                     console.log('💾 Stored window.userHasShareAccess =', window.userHasShareAccess);
                     return data.hasShareAccess;
                 } else {
-                    console.log('⚠️ Failed to check share access, status:', response.status);
+                    const errorData = await response.json().catch(() => ({}));
+                    
+                    if (errorData.error_type === 'timeout') {
+                        console.log('⚠️ Timeout checking share access - will retry later');
+                    } else {
+                        console.log('⚠️ Failed to check share access, status:', response.status);
+                    }
+                    
                     window.userHasShareAccess = false;
                     return false;
                 }
             } catch (error) {
-                console.error('❌ Error checking share access:', error);
+                if (error.message.includes('fetch') || error.name === 'TypeError') {
+                    console.error('🌐 Network error checking share access:', error);
+                } else {
+                    console.error('❌ Error checking share access:', error);
+                }
                 window.userHasShareAccess = false;
                 return false;
             }
@@ -8373,11 +8384,29 @@
                     showShareModal(result);
                 } else {
                     const error = await response.json();
-                    throw new Error(error.message || 'Ошибка сохранения отчета');
+                    let errorMessage = 'Ошибка сохранения отчета';
+                    
+                    // Handle specific error types
+                    if (error.error_type === 'timeout') {
+                        errorMessage = '⚠️ Таймаут сети: Не удалось подключиться к серверу. Повторите попытку через несколько секунд.';
+                    } else if (error.error) {
+                        errorMessage = error.error;
+                    } else if (error.message) {
+                        errorMessage = error.message;
+                    }
+                    
+                    throw new Error(errorMessage);
                 }
             } catch (error) {
                 console.error('❌ Error sharing report:', error);
-                alert('Ошибка сохранения отчета: ' + error.message);
+                
+                // Show user-friendly error message
+                let userMessage = error.message;
+                if (error.message.includes('fetch')) {
+                    userMessage = '🌐 Проблема сети: Проверьте подключение к интернету и повторите попытку.';
+                }
+                
+                alert(userMessage);
             } finally {
                 const shareButton = document.getElementById('shareReportButton');
                 shareButton.disabled = false;

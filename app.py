@@ -7720,8 +7720,11 @@ def check_share_access():
         if not telegram_id:
             return jsonify({'error': 'telegram_id required'}), 400
         
-        # Get user from database
-        user_result = supabase.table('users').select('*').eq('telegram_id', telegram_id).execute()
+        # Get user from database with retry
+        def get_user_for_access():
+            return supabase.table('users').select('*').eq('telegram_id', telegram_id).execute()
+        
+        user_result = supabase_retry_operation(get_user_for_access)
         if not user_result.data:
             return jsonify({'hasShareAccess': False, 'reason': 'User not found'}), 200
         
@@ -7770,10 +7773,46 @@ def check_share_access():
             return jsonify({'hasShareAccess': False, 'reason': 'Date parsing error'}), 200
         
     except Exception as e:
-        logger.error(f"Error checking share access: {e}")
-        return jsonify({'error': 'Internal server error'}), 500
+        error_message = str(e)
+        
+        # Check for specific timeout errors
+        if any(timeout_error in error_message.lower() for timeout_error in ['timeout', 'timed out', 'connecttimeout']):
+            logger.error(f"⚠️ Network timeout checking share access: {e}")
+            return jsonify({
+                'hasShareAccess': False, 
+                'error': 'Network timeout: Unable to verify access. Please try again.',
+                'error_type': 'timeout'
+            }), 408
+        else:
+            logger.error(f"❌ Error checking share access: {e}")
+            return jsonify({
+                'hasShareAccess': False,
+                'error': 'Unable to verify access. Please try again later.',
+                'error_type': 'server_error'
+            }), 500
 
 # API endpoint to save reports
+def supabase_retry_operation(operation, max_retries=3, delay=1):
+    """Retry Supabase operations with exponential backoff"""
+    import time
+    from httpx import ConnectTimeout, ReadTimeout, TimeoutException
+    from httpcore import ConnectTimeout as HttpCoreConnectTimeout
+    
+    for attempt in range(max_retries):
+        try:
+            return operation()
+        except (ConnectTimeout, ReadTimeout, TimeoutException, HttpCoreConnectTimeout) as e:
+            if attempt == max_retries - 1:
+                print(f"❌ Supabase operation failed after {max_retries} attempts: {str(e)}")
+                raise e
+            
+            wait_time = delay * (2 ** attempt)  # Exponential backoff
+            print(f"⚠️ Supabase timeout on attempt {attempt + 1}, retrying in {wait_time}s...")
+            time.sleep(wait_time)
+        except Exception as e:
+            print(f"❌ Unexpected Supabase error: {str(e)}")
+            raise e
+
 @app.route('/api/reports/save', methods=['POST'])
 def save_report():
     try:
@@ -7783,8 +7822,11 @@ def save_report():
         if not telegram_id:
             return jsonify({'error': 'telegram_id required'}), 400
         
-        # Get user from database
-        user_result = supabase.table('users').select('*').eq('telegram_id', telegram_id).execute()
+        # Get user from database with retry
+        def get_user():
+            return supabase.table('users').select('*').eq('telegram_id', telegram_id).execute()
+        
+        user_result = supabase_retry_operation(get_user)
         if not user_result.data:
             return jsonify({'error': 'User not found'}), 404
         
@@ -7826,8 +7868,11 @@ def save_report():
             'report_url': f'/reports/{html_filename}'
         }
         
-        # Save to database
-        result = supabase.table('user_reports').insert(report_data).execute()
+        # Save to database with retry
+        def save_report_to_db():
+            return supabase.table('user_reports').insert(report_data).execute()
+        
+        result = supabase_retry_operation(save_report_to_db)
         
         if result.data:
             saved_report = result.data[0]
@@ -7845,10 +7890,26 @@ def save_report():
             return jsonify({'error': 'Failed to save report to database'}), 500
         
     except Exception as e:
-        logger.error(f"Error saving report: {e}")
+        error_message = str(e)
         import traceback
-        logger.error(f"Traceback: {traceback.format_exc()}")
-        return jsonify({'error': 'Internal server error'}), 500
+        
+        # Check for specific timeout errors
+        if any(timeout_error in error_message.lower() for timeout_error in ['timeout', 'timed out', 'connecttimeout']):
+            logger.error(f"⚠️ Network timeout error while saving report: {e}")
+            logger.error(f"Timeout traceback: {traceback.format_exc()}")
+            return jsonify({
+                'success': False, 
+                'error': 'Network timeout: Unable to connect to the database. Please try again in a few moments.',
+                'error_type': 'timeout'
+            }), 408  # Request Timeout
+        else:
+            logger.error(f"❌ Unexpected error saving report: {e}")
+            logger.error(f"Full traceback: {traceback.format_exc()}")
+            return jsonify({
+                'success': False, 
+                'error': 'Internal server error. Please try again later.',
+                'error_type': 'server_error'
+            }), 500
 
 # Route to serve saved reports
 @app.route('/reports/<filename>')
