@@ -462,36 +462,37 @@
         }
         
         .price-forecast-table th {
-            background: linear-gradient(135deg, #495057 0%, #6c757d 100%);
-            color: white;
-            padding: 12px 8px;
+            background: #f8f9fa;
+            color: #495057;
+            padding: 8px 6px;
             text-align: center;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            border-bottom: 2px solid #dee2e6;
         }
         
         .price-forecast-header-category {
-            width: 30%;
+            width: 35%;
             text-align: left !important;
-            padding-left: 15px !important;
+            padding-left: 8px !important;
         }
         
         .price-forecast-header-current {
-            width: 25%;
+            width: 23%;
         }
         
         .price-forecast-header-future {
-            width: 25%;
+            width: 23%;
         }
         
         .price-forecast-header-growth {
-            width: 20%;
+            width: 19%;
         }
         
         .price-forecast-table td {
-            padding: 10px 8px;
+            padding: 6px 4px;
             border-bottom: 1px solid #f1f3f4;
             vertical-align: middle;
         }
@@ -501,18 +502,20 @@
         }
         
         .price-forecast-category {
-            font-size: 12px;
+            font-size: 11px;
             color: #495057;
             font-weight: 600;
-            padding-left: 15px !important;
+            padding-left: 8px !important;
             text-align: left !important;
+            line-height: 1.3;
         }
         
         .price-forecast-current-value,
         .price-forecast-future-value {
-            font-size: 14px;
+            font-size: 12px;
             font-weight: 700;
             text-align: center;
+            line-height: 1.3;
         }
         
         .price-forecast-current-value.user {
@@ -575,6 +578,77 @@
         
         .price-forecast-rent-row {
             background: rgba(111, 66, 193, 0.02);
+        }
+        
+        /* Mobile styles for table */
+        @media (max-width: 768px) {
+            .price-forecast-table-content {
+                padding: 10px 8px;
+            }
+            
+            .price-forecast-table-title {
+                font-size: 14px;
+                margin-bottom: 12px;
+            }
+            
+            .price-forecast-table {
+                font-size: 10px;
+            }
+            
+            .price-forecast-table th {
+                padding: 6px 2px;
+                font-size: 9px;
+                letter-spacing: 0.2px;
+            }
+            
+            .price-forecast-table td {
+                padding: 4px 2px;
+                font-size: 10px;
+            }
+            
+            .price-forecast-category {
+                font-size: 9px;
+                padding-left: 4px !important;
+                line-height: 1.2;
+            }
+            
+            .price-forecast-current-value,
+            .price-forecast-future-value {
+                font-size: 10px;
+                line-height: 1.2;
+            }
+            
+            .price-forecast-growth {
+                font-size: 9px;
+            }
+            
+            .price-comparison-inline {
+                font-size: 8px;
+                padding: 1px 2px;
+                margin-top: 1px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .price-forecast-table-content {
+                padding: 8px 4px;
+                overflow-x: auto;
+            }
+            
+            .price-forecast-table {
+                min-width: 320px;
+                margin: 0;
+            }
+            
+            .price-forecast-table th,
+            .price-forecast-table td {
+                white-space: nowrap;
+                min-width: 60px;
+            }
+            
+            .price-forecast-header-category {
+                min-width: 90px;
+            }
         }
         
         .price-forecast-date {
@@ -805,14 +879,14 @@
                 </div>
                 
                 <div style="margin-top: 15px; font-size: 14px; color: #666;">
-                    <strong>Преимущества табличного формата:</strong>
+                    <strong>✅ Исправления v2.0 - максимальная компактность:</strong>
                     <ul style="margin: 5px 0; padding-left: 20px;">
-                        <li>✅ <strong>Максимальная компактность:</strong> Все данные в одной таблице</li>
-                        <li>✅ <strong>Легкое сравнение:</strong> Все цены и приросты в одном месте</li>
-                        <li>✅ <strong>Цветовое кодирование:</strong> Синий (пользователь), серый (рынок), фиолетовый (аренда)</li>
-                        <li>✅ <strong>Структурированность:</strong> Четкие столбцы и строки</li>
-                        <li>✅ <strong>Экономия места:</strong> Занимает на 40% меньше места по высоте</li>
-                        <li>✅ <strong>Профессиональный вид:</strong> Таблица как в финансовых отчетах</li>
+                        <li>✅ <strong>Светло-серые заголовки:</strong> Убран градиент, используется #f8f9fa как в остальном приложении</li>
+                        <li>✅ <strong>Уменьшенные отступы:</strong> padding: 6px 4px (было 10px 8px)</li>
+                        <li>✅ <strong>Компактные шрифты:</strong> 11px для категорий, 12px для значений</li>
+                        <li>✅ <strong>Оптимизированные столбцы:</strong> 35% | 23% | 23% | 19%</li>
+                        <li>✅ <strong>Адаптивность:</strong> Автоматическое уменьшение на мобильных до 9px</li>
+                        <li>✅ <strong>Горизонтальная прокрутка:</strong> На экранах < 480px</li>
                     </ul>
                 </div>
             </div>
