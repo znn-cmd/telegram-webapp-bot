@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест улучшенного блока "Вывод по объекту"</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 20px; 
+            background: #f0f2f5;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+        }
+        
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .old-version, .new-version {
+            border: 2px solid #ddd;
+            border-radius: 12px;
+            padding: 20px;
+        }
+        
+        .old-version {
+            border-color: #dc3545;
+        }
+        
+        .new-version {
+            border-color: #28a745;
+        }
+        
+        .version-title {
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-align: center;
+            padding: 10px;
+            border-radius: 8px;
+        }
+        
+        .old-version .version-title {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .new-version .version-title {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        /* Стили для старой версии */
+        .old-object-summary {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        
+        .old-object-summary h4 {
+            font-size: 16px;
+            font-weight: 700;
+            color: #333333;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .old-object-summary p {
+            margin: 0 0 10px 0;
+            color: #333333;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        
+        .old-object-summary strong {
+            color: #1a202c;
+            font-weight: 700;
+        }
+        
+        /* Стили для новой версии */
+        .object-summary-section {
+            background: white;
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        
+        .object-summary-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #333333;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .object-comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 0;
+        }
+        
+        .comparison-label {
+            padding: 8px 0;
+            font-weight: 500;
+            color: #333333;
+            font-size: 14px;
+            width: 60%;
+        }
+        
+        .comparison-value {
+            padding: 8px 0;
+            text-align: right;
+            font-size: 14px;
+            color: #333333;
+        }
+        
+        .comparison-higher {
+            color: #28a745 !important;
+            font-weight: 600;
+        }
+        
+        .comparison-lower {
+            color: #dc3545 !important;
+            font-weight: 600;
+        }
+        
+        .rental-estimate .comparison-label {
+            border-top: 1px solid #dee2e6;
+            padding-top: 12px;
+            font-weight: 600;
+        }
+        
+        .rental-estimate .comparison-value {
+            border-top: 1px solid #dee2e6;
+            padding-top: 12px;
+            color: #4CAF50 !important;
+        }
+        
+        .features {
+            background: #e8f5e8;
+            padding: 20px;
+            border-radius: 12px;
+            border-left: 5px solid #28a745;
+            margin-bottom: 30px;
+        }
+        
+        .features h3 {
+            color: #155724;
+            margin-top: 0;
+        }
+        
+        .features ul {
+            color: #155724;
+            margin: 0;
+        }
+        
+        .features li {
+            margin: 8px 0;
+        }
+        
+        @media (max-width: 768px) {
+            .comparison {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .comparison-label,
+            .comparison-value {
+                font-size: 12px;
+                padding: 6px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔄 Улучшенный блок "Вывод по объекту"</h1>
+        
+        <div class="comparison">
+            <div class="old-version">
+                <div class="version-title">❌ Старая версия</div>
+                
+                <div class="old-object-summary">
+                    <h4>Вывод по объекту</h4>
+                    <p>Цена за м² вашего объекта: <strong>₺57917.96</strong></p>
+                    <p>Валюта объекта: <strong>EUR</strong></p>
+                    <p>Площадь объекта: <strong>55 м²</strong></p>
+                    <p>Курс конвертации: <strong>1 EUR = 48.2650 TRY</strong></p>
+                </div>
+                
+                <div style="margin-top: 15px; font-size: 14px; color: #666;">
+                    <strong>Проблемы:</strong>
+                    <ul style="margin: 5px 0; padding-left: 20px;">
+                        <li>🚫 Нет сравнения с рынком</li>
+                        <li>🚫 Много места занимает</li>
+                        <li>🚫 Нет расчета аренды</li>
+                        <li>🚫 Только технические данные</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="new-version">
+                <div class="version-title">✅ Новая версия</div>
+                
+                <div class="object-summary-section">
+                    <h4 class="object-summary-title">Вывод по объекту</h4>
+                    <div class="object-summary-content">
+                        <table class="object-comparison-table">
+                            <tbody>
+                                <!-- Основные данные -->
+                                <tr>
+                                    <td class="comparison-label">Цена за м²:</td>
+                                    <td class="comparison-value"><strong>₺57,917.96</strong></td>
+                                </tr>
+                                <tr>
+                                    <td class="comparison-label">Площадь:</td>
+                                    <td class="comparison-value"><strong>55 м²</strong></td>
+                                </tr>
+                                
+                                <!-- Сравнения с рынком -->
+                                <tr>
+                                    <td class="comparison-label">vs. мин. цена рынка:</td>
+                                    <td class="comparison-value comparison-lower">-1.8%</td>
+                                </tr>
+                                <tr>
+                                    <td class="comparison-label">vs. макс. цена рынка:</td>
+                                    <td class="comparison-value comparison-lower">-20.7%</td>
+                                </tr>
+                                <tr>
+                                    <td class="comparison-label">vs. средняя площадь:</td>
+                                    <td class="comparison-value comparison-lower">-44.4%</td>
+                                </tr>
+                                
+                                <!-- Расчет аренды -->
+                                <tr class="rental-estimate">
+                                    <td class="comparison-label">Примерная аренда:</td>
+                                    <td class="comparison-value"><strong>₺15,278 – ₺19,643</strong></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 15px; font-size: 14px; color: #666;">
+                    <strong>Преимущества:</strong>
+                    <ul style="margin: 5px 0; padding-left: 20px;">
+                        <li>✅ Компактная таблица</li>
+                        <li>✅ Сравнение с рыночными ценами</li>
+                        <li>✅ Сравнение площади</li>
+                        <li>✅ Расчет примерной аренды</li>
+                        <li>✅ Цветовая индикация (+/-)</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="features">
+            <h3>🚀 Новые возможности блока "Вывод по объекту":</h3>
+            <ul>
+                <li><strong>Компактность:</strong> Данные в виде таблицы занимают меньше места</li>
+                <li><strong>Сравнение с минимальной ценой рынка:</strong> Показывает насколько ваш объект дороже/дешевле минимальной цены</li>
+                <li><strong>Сравнение с максимальной ценой рынка:</strong> Показывает позицию относительно максимальной цены</li>
+                <li><strong>Сравнение площади:</strong> Сравнение с средней площадью рынка в процентах</li>
+                <li><strong>Расчет примерной аренды:</strong> Умножение площади объекта на мин/макс ставки аренды</li>
+                <li><strong>Цветовая индикация:</strong> Зеленый для превышения, красный для отставания</li>
+                <li><strong>Адаптивность:</strong> Корректно отображается на мобильных устройствах</li>
+            </ul>
+        </div>
+        
+        <div style="background: #fff3cd; padding: 15px; border-radius: 8px; border: 1px solid #ffc107; margin-top: 20px;">
+            <h4 style="color: #856404; margin-top: 0;">📊 Пример расчетов:</h4>
+            <div style="color: #856404; font-size: 14px;">
+                <p><strong>Сравнение с минимальной ценой:</strong> ((57,917.96 - 58,990.00) / 58,990.00) × 100 = -1.8%</p>
+                <p><strong>Сравнение площади:</strong> ((55 - 99) / 99) × 100 = -44.4%</p>
+                <p><strong>Примерная аренда:</strong> 55 м² × (277.78 – 357.14) ₺/м² = 15,278 – 19,643 ₺</p>
+            </div>
+        </div>
+        
+        <div style="text-align: center; margin-top: 30px; color: #666; font-size: 14px;">
+            🎯 Теперь пользователи получают полную картину своего объекта относительно рынка!
+        </div>
+    </div>
+</body>
+</html>

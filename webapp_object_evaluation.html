@@ -481,100 +481,84 @@
             color: #495057;
         }
         
-        /* Стили для объединенной карточки показателей рынка в стиле консолидированной оценки */
-        .market-indicators-unified {
+        /* Стили для таблицы показателей рынка */
+        .market-indicators-table {
             margin-top: 20px;
         }
         
-        .unified-indicator-card {
+        .market-data-table {
+            width: 100%;
             background: #f8f9fa;
             border-radius: 16px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
             overflow: hidden;
-            position: relative;
             border: 1px solid rgba(0, 0, 0, 0.05);
+            border-collapse: collapse;
         }
         
-        .unified-indicator-card::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            width: 6px;
-            background: #28a745;
+        .market-data-table thead {
+            background: linear-gradient(90deg, #4CAF50, #45a049);
         }
         
-        .indicator-section {
-            padding: 25px 30px;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-        }
-        
-        .indicator-section:last-child {
-            border-bottom: none;
-        }
-        
-        .section-title {
+        .category-header {
+            padding: 20px 25px;
+            color: white;
             font-size: 18px;
             font-weight: 700;
-            color: #333333;
-            margin-bottom: 20px;
             text-align: center;
+            border: none;
+            width: 50%;
         }
         
-        .indicator-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 16px 0;
-            margin-bottom: 12px;
+        .data-cell {
+            padding: 20px 25px;
             border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+            vertical-align: top;
         }
         
-        .indicator-item:last-child {
-            margin-bottom: 0;
+        .market-data-table tbody tr:last-child .data-cell {
             border-bottom: none;
         }
         
-        .indicator-label {
+        .cell-label {
             color: #333333;
             font-weight: 500;
             font-size: 15px;
+            margin-bottom: 8px;
         }
         
-        .indicator-value {
+        .cell-value {
             color: #4CAF50;
             font-weight: 600;
-            font-size: 15px;
+            font-size: 16px;
         }
         
-        /* Мобильные устройства для объединенной карточки показателей рынка */
+        /* Мобильные устройства для таблицы показателей рынка */
         @media (max-width: 768px) {
-            .market-indicators-unified {
+            .market-indicators-table {
                 margin-top: 16px;
             }
             
-            .unified-indicator-card {
+            .market-data-table {
                 border-radius: 12px;
             }
             
-            .indicator-section {
-                padding: 16px 20px 16px 26px;
+            .category-header {
+                padding: 16px 20px;
+                font-size: 16px;
             }
             
-            .section-title {
-                font-size: 15px;
-                margin-bottom: 14px;
+            .data-cell {
+                padding: 16px 20px;
             }
             
-            .indicator-item {
-                padding: 10px 0;
+            .cell-label {
+                font-size: 14px;
                 margin-bottom: 6px;
             }
             
-            .indicator-label,
-            .indicator-value {
-                font-size: 13px;
+            .cell-value {
+                font-size: 14px;
             }
             
             /* Мобильные стили для блока "Анализ рынка" */
@@ -627,30 +611,29 @@
         }
         
         @media (max-width: 480px) {
-            .market-indicators-unified {
+            .market-indicators-table {
                 margin-top: 14px;
             }
             
-            .unified-indicator-card {
+            .market-data-table {
                 border-radius: 10px;
             }
             
-            .indicator-section {
-                padding: 14px 18px 14px 24px;
-            }
-            
-            .section-title {
+            .category-header {
+                padding: 14px 16px;
                 font-size: 14px;
-                margin-bottom: 12px;
             }
             
-            .indicator-item {
-                padding: 8px 0;
+            .data-cell {
+                padding: 14px 16px;
+            }
+            
+            .cell-label {
+                font-size: 12px;
                 margin-bottom: 4px;
             }
             
-            .indicator-label,
-            .indicator-value {
+            .cell-value {
                 font-size: 12px;
             }
             
@@ -701,6 +684,12 @@
             .object-summary-content {
                 font-size: 13px;
             }
+            
+            .comparison-label,
+            .comparison-value {
+                font-size: 12px;
+                padding: 6px 0;
+            }
         }
         
         /* Пустое место между блоками */
@@ -746,6 +735,50 @@
         .object-summary-content strong {
             color: #1a202c;
             font-weight: 700;
+        }
+        
+        /* Стили для компактной таблицы сравнения объекта */
+        .object-comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 0;
+        }
+        
+        .comparison-label {
+            padding: 8px 0;
+            font-weight: 500;
+            color: #333333;
+            font-size: 14px;
+            width: 60%;
+        }
+        
+        .comparison-value {
+            padding: 8px 0;
+            text-align: right;
+            font-size: 14px;
+            color: #333333;
+        }
+        
+        .comparison-higher {
+            color: #28a745 !important;
+            font-weight: 600;
+        }
+        
+        .comparison-lower {
+            color: #dc3545 !important;
+            font-weight: 600;
+        }
+        
+        .rental-estimate .comparison-label {
+            border-top: 1px solid #dee2e6;
+            padding-top: 12px;
+            font-weight: 600;
+        }
+        
+        .rental-estimate .comparison-value {
+            border-top: 1px solid #dee2e6;
+            padding-top: 12px;
+            color: #4CAF50 !important;
         }
         
         /* Стили для блока "Анализ рынка" в стиле "Вывод по тренду" */
@@ -2743,6 +2776,9 @@
             county_name: '',
             district_name: ''
         };
+        
+        // Global variable for market summary data
+        let marketSummaryData = null;
 
         // User language
         let userLanguage = 'ru';
@@ -4842,75 +4878,94 @@
                 }
             });
             
-            // Generate market indicators in unified card format (like "Тренд цен")
-            let html = '<div class="market-indicators-unified">';
-            html += '<div class="unified-indicator-card">';
+            // Store summary data globally for use in object comparison
+            marketSummaryData = summary;
+            console.log('💾 Stored market summary data globally:', summary);
             
-            // Sale Section
-            if (summary.comparable_area_for_sale || summary.listing_period_for_sale || summary.unit_price_for_sale) {
-                html += '<div class="indicator-section sale-section">';
-                html += `<div class="section-title">${getText('saleHeader')}</div>`;
-                
+            // Generate market indicators in table format
+            let html = '<div class="market-indicators-table">';
+            
+            // Create table with sale and rent data side by side
+            html += '<table class="market-data-table">';
+            html += '<thead>';
+            html += '<tr>';
+            html += `<th class="category-header">${getText('saleHeader')}</th>`;
+            html += `<th class="category-header">${getText('rentHeader')}</th>`;
+            html += '</tr>';
+            html += '</thead>';
+            html += '<tbody>';
+            
+            // Row 1: Comparable Area (single value - average)
+            html += '<tr>';
+            html += '<td class="data-cell">';
+            html += `<div class="cell-label">${getText('comparableAreaForSaleLabel')}:</div>`;
                 if (summary.comparable_area_for_sale) {
                     const area = summary.comparable_area_for_sale;
-                    html += `<div class="indicator-item">
-                        <span class="indicator-label">${getText('comparableAreaForSaleLabel')}:</span>
-                        <span class="indicator-value">${area.min} – ${area.max} м²</span>
-                    </div>`;
-                }
-                
-                if (summary.listing_period_for_sale) {
-                    const period = summary.listing_period_for_sale;
-                    html += `<div class="indicator-item">
-                        <span class="indicator-label">${getText('listingPeriodForSaleLabel')}:</span>
-                        <span class="indicator-value">${period.min} – ${period.max} дней</span>
-                </div>`;
-                }
-                
-                if (summary.unit_price_for_sale) {
-                    const price = summary.unit_price_for_sale;
-                    html += `<div class="indicator-item">
-                        <span class="indicator-label">${getText('unitPriceForSaleLabel')}:</span>
-                        <span class="indicator-value">${formatValue(price.min, 'price')} – ${formatValue(price.max, 'price')}</span>
-                    </div>`;
-                }
-                
-                html += '</div>';
+                const avgArea = Math.round((area.min + area.max) / 2);
+                html += `<div class="cell-value">${avgArea} м²</div>`;
+            } else {
+                html += '<div class="cell-value">-</div>';
             }
-            
-            // Rent Section
-            if (summary.comparable_area_for_rent || summary.listing_period_for_rent || summary.unit_price_for_rent) {
-                html += '<div class="indicator-section rent-section">';
-                html += `<div class="section-title">${getText('rentHeader')}</div>`;
-                
+            html += '</td>';
+            html += '<td class="data-cell">';
+            html += `<div class="cell-label">${getText('comparableAreaForRentLabel')}:</div>`;
                 if (summary.comparable_area_for_rent) {
                     const area = summary.comparable_area_for_rent;
-                    html += `<div class="indicator-item">
-                        <span class="indicator-label">${getText('comparableAreaForRentLabel')}:</span>
-                        <span class="indicator-value">${area.min} – ${area.max} м²</span>
-                    </div>`;
-                }
-                
+                const avgArea = Math.round((area.min + area.max) / 2);
+                html += `<div class="cell-value">${avgArea} м²</div>`;
+            } else {
+                html += '<div class="cell-value">-</div>';
+            }
+            html += '</td>';
+            html += '</tr>';
+            
+            // Row 2: Listing Period
+            html += '<tr>';
+            html += '<td class="data-cell">';
+            html += `<div class="cell-label">${getText('listingPeriodForSaleLabel')}:</div>`;
+            if (summary.listing_period_for_sale) {
+                const period = summary.listing_period_for_sale;
+                html += `<div class="cell-value">${period.min} – ${period.max} дней</div>`;
+            } else {
+                html += '<div class="cell-value">-</div>';
+            }
+            html += '</td>';
+            html += '<td class="data-cell">';
+            html += `<div class="cell-label">${getText('listingPeriodForRentLabel')}:</div>`;
                 if (summary.listing_period_for_rent) {
                     const period = summary.listing_period_for_rent;
-                    html += `<div class="indicator-item">
-                        <span class="indicator-label">${getText('listingPeriodForRentLabel')}:</span>
-                        <span class="indicator-value">${period.min} – ${period.max} дней</span>
-                    </div>`;
-                }
-                
+                html += `<div class="cell-value">${period.min} – ${period.max} дней</div>`;
+            } else {
+                html += '<div class="cell-value">-</div>';
+            }
+            html += '</td>';
+            html += '</tr>';
+            
+            // Row 3: Unit Price
+            html += '<tr>';
+            html += '<td class="data-cell">';
+            html += `<div class="cell-label">${getText('unitPriceForSaleLabel')}:</div>`;
+            if (summary.unit_price_for_sale) {
+                const price = summary.unit_price_for_sale;
+                html += `<div class="cell-value">${formatValue(price.min, 'price')} – ${formatValue(price.max, 'price')}</div>`;
+            } else {
+                html += '<div class="cell-value">-</div>';
+            }
+            html += '</td>';
+            html += '<td class="data-cell">';
+            html += `<div class="cell-label">${getText('unitPriceForRentLabel')}:</div>`;
                 if (summary.unit_price_for_rent) {
                     const price = summary.unit_price_for_rent;
-                    html += `<div class="indicator-item">
-                        <span class="indicator-label">${getText('unitPriceForRentLabel')}:</span>
-                        <span class="indicator-value">${formatValue(price.min, 'price')} – ${formatValue(price.max, 'price')}</span>
-                    </div>`;
-                }
-                
-            html += '</div>';
+                html += `<div class="cell-value">${formatValue(price.min, 'price')} – ${formatValue(price.max, 'price')}</div>`;
+            } else {
+                html += '<div class="cell-value">-</div>';
             }
+            html += '</td>';
+            html += '</tr>';
             
-            html += '</div></div>';
+            html += '</tbody>';
+            html += '</table>';
+            html += '</div>';
             
             // Add spacing between blocks
             html += '<div class="block-spacing"></div>';
@@ -5907,36 +5962,66 @@
                 return '';
             }
             
-            // Сортируем тренды по дате для правильного анализа
-            const sortedTrends = trends.sort((a, b) => {
+            // Подготавливаем тренды с рассчитанными ценами (как в таблице)
+            const trendsWithCalculatedPrices = await prepareTrendsWithHistoricalPrices(trends);
+            
+            // Получаем текущую дату для определения периода анализа
+            const currentDate = new Date();
+            const currentYear = currentDate.getFullYear();
+            const currentMonth = currentDate.getMonth() + 1; // JavaScript месяцы начинаются с 0
+            
+            console.log('🗓️ Current date for analysis:', currentYear, currentMonth);
+            
+            // Фильтруем только исторические данные (до текущего месяца включительно)
+            const historicalTrends = trendsWithCalculatedPrices.filter(trend => {
+                const trendDate = new Date(trend.property_year, trend.property_month - 1);
+                const currentDateObj = new Date(currentYear, currentMonth - 1);
+                return trendDate <= currentDateObj;
+            });
+            
+            // Сортируем по дате (от старых к новым)
+            const sortedTrends = historicalTrends.sort((a, b) => {
                 if (a.property_year !== b.property_year) {
                     return a.property_year - b.property_year;
                 }
                 return a.property_month - b.property_month;
             });
             
-            console.log('🔍 Sorted trends for analysis:', sortedTrends.length, 'records');
+            // Ограничиваем анализ последними 12 месяцами
+            const last12MonthsTrends = sortedTrends.slice(-12);
             
-            // Находим первый и последний месяц для анализа
-            const firstMonth = sortedTrends[0];
-            const lastMonth = sortedTrends[sortedTrends.length - 1];
+            console.log('🔍 Historical trends for analysis:', last12MonthsTrends.length, 'records');
+            console.log('📅 Analysis period:', 
+                last12MonthsTrends.length > 0 ? `${last12MonthsTrends[0].property_year}-${last12MonthsTrends[0].property_month}` : 'N/A',
+                'to',
+                last12MonthsTrends.length > 0 ? `${last12MonthsTrends[last12MonthsTrends.length - 1].property_year}-${last12MonthsTrends[last12MonthsTrends.length - 1].property_month}` : 'N/A'
+            );
+            
+            if (last12MonthsTrends.length < 2) {
+                console.log('⚠️ Insufficient data for trends analysis (need at least 2 months)');
+                return '';
+            }
+            
+            // Находим первый и последний месяц для анализа (из последних 12 месяцев)
+            const firstMonth = last12MonthsTrends[0];
+            const lastMonth = last12MonthsTrends[last12MonthsTrends.length - 1];
             
             if (!firstMonth || !lastMonth) {
                 return '';
             }
             
-            // Используем рассчитанные цены для анализа
-            const firstSalePrice = parseFloat(firstMonth.is_price_calculated ? firstMonth.calculated_sale_price : firstMonth.unit_price_for_sale) || 0;
-            const lastSalePrice = parseFloat(lastMonth.is_price_calculated ? lastMonth.calculated_sale_price : lastMonth.unit_price_for_sale) || 0;
+            // Используем РАССЧИТАННЫЕ цены из таблицы (приоритет calculated_*_price)
+            const firstSalePrice = parseFloat(firstMonth.calculated_sale_price || firstMonth.unit_price_for_sale) || 0;
+            const lastSalePrice = parseFloat(lastMonth.calculated_sale_price || lastMonth.unit_price_for_sale) || 0;
             const salePriceGrowth = firstSalePrice > 0 ? ((lastSalePrice - firstSalePrice) / firstSalePrice * 100) : 0;
             
             // Рассчитываем общий рост цен на аренду
-            const firstRentPrice = parseFloat(firstMonth.is_price_calculated ? firstMonth.calculated_rent_price : firstMonth.unit_price_for_rent) || 0;
-            const lastRentPrice = parseFloat(lastMonth.is_price_calculated ? lastMonth.calculated_rent_price : lastMonth.unit_price_for_rent) || 0;
+            const firstRentPrice = parseFloat(firstMonth.calculated_rent_price || firstMonth.unit_price_for_rent) || 0;
+            const lastRentPrice = parseFloat(lastMonth.calculated_rent_price || lastMonth.unit_price_for_rent) || 0;
             const rentPriceGrowth = firstRentPrice > 0 ? ((lastRentPrice - firstRentPrice) / firstRentPrice * 100) : 0;
             
-            // Анализируем диапазон доходности
-            const yields = trends.map(t => parseFloat(t.yield) || 0).filter(y => y > 0);
+            // Анализируем диапазон доходности (только для последних 12 месяцев)
+            const yields = last12MonthsTrends.map(t => parseFloat(t.yield) || 0).filter(y => y > 0);
             const minYield = yields.length > 0 ? Math.min(...yields) : 0;
             const maxYield = yields.length > 0 ? Math.max(...yields) : 0;
             
@@ -6004,7 +6089,7 @@
             
             // Добавляем блок "Вывод по объекту"
             console.log('🔍 Adding object summary to analysis...');
-            const objectSummary = await generateObjectSummary();
+            const objectSummary = await generateObjectSummary(marketSummaryData);
             console.log('📊 Object summary result:', objectSummary);
             
             if (objectSummary) {
@@ -6097,7 +6182,7 @@
             // Find the object summary section and update it
             const objectSummarySection = document.querySelector('.object-summary-section');
             if (objectSummarySection) {
-                const newSummary = await generateObjectSummary();
+                const newSummary = await generateObjectSummary(marketSummaryData);
                 if (newSummary) {
                     objectSummarySection.outerHTML = newSummary;
                     console.log('✅ Object summary updated with new currency');
@@ -6105,10 +6190,10 @@
             }
         }
         
-        // Generate object summary block
-        async function generateObjectSummary() {
+        // Generate object summary block with market comparison
+        async function generateObjectSummary(marketSummary = null) {
             try {
-                console.log('🔍 Generating object summary...');
+                console.log('🔍 Generating enhanced object summary...');
                 
                 // Получаем данные объекта из формы
                 const objectPrice = parseFloat(document.getElementById('priceObjectInput')?.value) || 0;
@@ -6126,78 +6211,111 @@
                     currency: objectCurrency
                 });
                 
-                console.log('🔍 Currency button state:', {
-                    selectedButton: selectedCurrencyButton,
-                    activeButtons: document.querySelectorAll('.currency-button.active'),
-                    allButtons: document.querySelectorAll('.currency-button')
-                });
-                
                 if (!objectPrice || !objectArea || !selectedCountry) {
-                    console.log('⚠️ Missing required data for object summary:', {
-                        objectPrice: !!objectPrice,
-                        objectArea: !!objectArea,
-                        selectedCountry: !!selectedCountry
-                    });
+                    console.log('⚠️ Missing required data for object summary');
                     return '';
                 }
-                
-                // Дополнительная проверка данных
-                console.log('✅ All required data present, proceeding with calculation...');
                 
                 // Рассчитываем цену за м²
                 const pricePerM2 = objectPrice / objectArea;
                 
-                // Определяем валюту объекта из формы
-                
-                // Получаем курс валюты
-                let exchangeRate = 1; // По умолчанию 1 (если валюта уже в нужной)
+                // Определяем целевую валюту
                 let targetCurrency = '';
-                
                 if (selectedCountry.toLowerCase().includes('türkiye') || selectedCountry.toLowerCase().includes('turkey')) {
-                    targetCurrency = 'TRY'; // Турецкая лира
+                    targetCurrency = 'TRY';
                 } else {
-                    targetCurrency = 'EUR'; // Евро для других стран
+                    targetCurrency = 'EUR';
                 }
                 
-                console.log('💱 Currency conversion:', {
-                    objectCurrency: objectCurrency,
-                    targetCurrency: targetCurrency,
-                    needsConversion: objectCurrency !== targetCurrency
-                });
-                
-                if (objectCurrency !== targetCurrency) {
                     // Получаем курс валюты
-                    console.log(`🔄 Getting exchange rate for ${objectCurrency} -> ${targetCurrency}`);
+                let exchangeRate = 1;
+                if (objectCurrency !== targetCurrency) {
                     exchangeRate = await getExchangeRate(objectCurrency, targetCurrency);
-                    console.log(`💱 Exchange rate received: ${exchangeRate}`);
-                } else {
-                    console.log(`✅ No conversion needed, using rate: ${exchangeRate}`);
                 }
                 
                 // Конвертируем цену
                 const convertedPricePerM2 = pricePerM2 * exchangeRate;
-                console.log(`💰 Price conversion: ${pricePerM2} ${objectCurrency} * ${exchangeRate} = ${convertedPricePerM2} ${targetCurrency}`);
-                
-                // Форматируем валюту для отображения
                 const currencySymbol = targetCurrency === 'TRY' ? '₺' : '€';
                 
+                // Начинаем создание компактного HTML
                 let html = '<div class="object-summary-section">';
                 html += `<h4 class="object-summary-title">${getText('objectSummaryTitle')}</h4>`;
                 html += '<div class="object-summary-content">';
-                html += `<p>${getText('objectPricePerM2Label')} <strong>${currencySymbol}${convertedPricePerM2.toFixed(2)}</strong></p>`;
-                html += `<p>${getText('objectCurrencyLabel')} <strong>${objectCurrency}</strong></p>`;
-                html += `<p>${getText('objectAreaLabel')} <strong>${objectArea} м²</strong></p>`;
                 
-                if (objectCurrency !== targetCurrency) {
-                    html += `<p>${getText('exchangeRateLabel')} <strong>1 ${objectCurrency} = ${exchangeRate.toFixed(4)} ${targetCurrency}</strong></p>`;
+                // Создаем компактную таблицу с основными данными и сравнениями
+                html += '<table class="object-comparison-table">';
+                html += '<tbody>';
+                
+                // Строка 1: Цена за м²
+                html += '<tr>';
+                html += '<td class="comparison-label">Цена за м²:</td>';
+                html += `<td class="comparison-value"><strong>${currencySymbol}${convertedPricePerM2.toFixed(2)}</strong></td>`;
+                html += '</tr>';
+                
+                // Строка 2: Площадь объекта
+                html += '<tr>';
+                html += '<td class="comparison-label">Площадь:</td>';
+                html += `<td class="comparison-value"><strong>${objectArea} м²</strong></td>`;
+                html += '</tr>';
+                
+                // Если есть данные рынка, добавляем сравнения
+                if (marketSummary) {
+                    console.log('📊 Adding market comparisons with summary:', marketSummary);
+                    
+                    // Сравнение цены продажи
+                    if (marketSummary.unit_price_for_sale) {
+                        const minPrice = marketSummary.unit_price_for_sale.min;
+                        const maxPrice = marketSummary.unit_price_for_sale.max;
+                        
+                        // Расчет отклонения от минимальной цены
+                        const minDiff = ((convertedPricePerM2 - minPrice) / minPrice * 100);
+                        const maxDiff = ((convertedPricePerM2 - maxPrice) / maxPrice * 100);
+                        
+                        html += '<tr>';
+                        html += '<td class="comparison-label">vs. мин. цена рынка:</td>';
+                        html += `<td class="comparison-value ${minDiff >= 0 ? 'comparison-higher' : 'comparison-lower'}">`;
+                        html += `${minDiff >= 0 ? '+' : ''}${minDiff.toFixed(1)}%</td>`;
+                        html += '</tr>';
+                        
+                        html += '<tr>';
+                        html += '<td class="comparison-label">vs. макс. цена рынка:</td>';
+                        html += `<td class="comparison-value ${maxDiff >= 0 ? 'comparison-higher' : 'comparison-lower'}">`;
+                        html += `${maxDiff >= 0 ? '+' : ''}${maxDiff.toFixed(1)}%</td>`;
+                        html += '</tr>';
+                    }
+                    
+                    // Сравнение площади
+                    if (marketSummary.comparable_area_for_sale) {
+                        const avgMarketArea = Math.round((marketSummary.comparable_area_for_sale.min + marketSummary.comparable_area_for_sale.max) / 2);
+                        const areaDiff = ((objectArea - avgMarketArea) / avgMarketArea * 100);
+                        
+                        html += '<tr>';
+                        html += '<td class="comparison-label">vs. средняя площадь:</td>';
+                        html += `<td class="comparison-value ${areaDiff >= 0 ? 'comparison-higher' : 'comparison-lower'}">`;
+                        html += `${areaDiff >= 0 ? '+' : ''}${areaDiff.toFixed(1)}%</td>`;
+                        html += '</tr>';
+                    }
+                    
+                    // Расчет примерной аренды
+                    if (marketSummary.unit_price_for_rent) {
+                        const minRent = marketSummary.unit_price_for_rent.min * objectArea;
+                        const maxRent = marketSummary.unit_price_for_rent.max * objectArea;
+                        
+                        html += '<tr class="rental-estimate">';
+                        html += '<td class="comparison-label">Примерная аренда:</td>';
+                        html += `<td class="comparison-value"><strong>${currencySymbol}${minRent.toFixed(0)} – ${currencySymbol}${maxRent.toFixed(0)}</strong></td>`;
+                        html += '</tr>';
+                    }
                 }
                 
+                html += '</tbody>';
+                html += '</table>';
                 html += '</div></div>';
                 
-                console.log('📝 Generated HTML for object summary:', html);
+                console.log('📝 Generated enhanced HTML for object summary');
                 return html;
             } catch (error) {
-                console.error('Error generating object summary:', error);
+                console.error('Error generating enhanced object summary:', error);
                 return '';
             }
         }
