@@ -8265,27 +8265,33 @@
                     
                     // Store access status globally for use after report generation
                     window.userHasShareAccess = data.hasShareAccess;
+                    console.log('💾 Stored window.userHasShareAccess =', window.userHasShareAccess);
                     return data.hasShareAccess;
                 } else {
-                    console.log('⚠️ Failed to check share access');
+                    console.log('⚠️ Failed to check share access, status:', response.status);
+                    window.userHasShareAccess = false;
                     return false;
                 }
             } catch (error) {
                 console.error('❌ Error checking share access:', error);
+                window.userHasShareAccess = false;
                 return false;
             }
         }
 
         // Show share button after report is generated
         function showShareButtonIfAllowed() {
+            console.log('🔍 Checking if share button should be shown...', window.userHasShareAccess);
             if (window.userHasShareAccess) {
                 const shareSection = document.getElementById('shareReportSection');
                 if (shareSection) {
                     shareSection.style.display = 'block';
                     console.log('✅ Share button shown after report generation');
+                } else {
+                    console.log('❌ Share section element not found');
                 }
             } else {
-                console.log('⚠️ User does not have share access');
+                console.log('⚠️ User does not have share access, window.userHasShareAccess =', window.userHasShareAccess);
             }
         }
         
@@ -8978,7 +8984,17 @@
             
             // После завершения генерации отчета показываем кнопку "Поделиться", если доступ разрешен
             console.log('📋 Report generation complete, checking share button access...');
-            showShareButtonIfAllowed();
+            console.log('🔍 Before showShareButtonIfAllowed: window.userHasShareAccess =', window.userHasShareAccess);
+            
+            // Если доступ еще не проверен, проверяем сейчас
+            if (typeof window.userHasShareAccess === 'undefined') {
+                console.log('⏳ Share access not checked yet, checking now...');
+                checkShareReportAccess().then(() => {
+                    showShareButtonIfAllowed();
+                });
+            } else {
+                showShareButtonIfAllowed();
+            }
         }
         
         // Создание графика трендов
