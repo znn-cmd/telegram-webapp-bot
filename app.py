@@ -1238,43 +1238,50 @@ def api_currency_test():
 
 @app.route('/api/currency/latest', methods=['GET'])
 def api_currency_latest():
-    """Получение последних курсов валют"""
+    """Получение последних курсов валют из таблицы currency"""
     try:
-        # Получаем последний курс EUR -> TRY из базы данных
-        today = datetime.now().date()
-        currency_result = supabase.table('currency').select('*').gte('created_at', f"{today}T00:00:00").lt('created_at', f"{today}T23:59:59").limit(1).execute()
+        logger.info("🔍 Запрос последних курсов валют")
+        
+        # Получаем последнюю запись из таблицы currency (отсортированную по created_at DESC)
+        currency_result = supabase.table('currency').select('*').order('created_at', desc=True).limit(1).execute()
         
         if currency_result.data and len(currency_result.data) > 0:
             latest_rate = currency_result.data[0]
-            return jsonify({
+            logger.info(f"✅ Найдена последняя запись валют: {latest_rate.get('created_at')}")
+            
+            # Формируем ответ с данными в правильной структуре
+            response_data = {
                 'success': True,
-                'eur_try': latest_rate.get('eur_try'),
-                'usd_try': latest_rate.get('usd_try'),
+                'data': {
+                    'euro': latest_rate.get('euro'),
+                    'try': latest_rate.get('try'), 
+                    'usd': latest_rate.get('usd'),
+                    'rub': latest_rate.get('rub'),
+                    'aed': latest_rate.get('aed'),
+                    'thb': latest_rate.get('thb')
+                },
                 'created_at': latest_rate.get('created_at'),
                 'source': 'database'
-            })
+            }
+            
+            logger.info(f"💱 Возвращаем курсы: EUR={latest_rate.get('euro')}, TRY={latest_rate.get('try')}")
+            return jsonify(response_data)
         else:
-            # Если нет данных в базе, пытаемся получить через API
-            try:
-                current_rate = get_current_currency_rate('EUR', 'TRY')
-                return jsonify({
-                    'success': True,
-                    'eur_try': current_rate,
-                    'usd_try': None,
-                    'created_at': datetime.now().isoformat(),
-                    'source': 'api'
-                })
-            except Exception as api_error:
-                logger.error(f"❌ Ошибка получения курса через API: {api_error}")
-                return jsonify({
-                    'success': False,
-                    'error': 'No currency data available',
-                    'message': 'Курсы валют недоступны'
-                }), 404
+            # Если нет данных в базе, возвращаем ошибку
+            logger.warning("⚠️ Нет записей в таблице currency")
+            return jsonify({
+                'success': False,
+                'error': 'No currency data available',
+                'message': 'Курсы валют недоступны в базе данных'
+            }), 404
                 
     except Exception as e:
         logger.error(f"❌ Ошибка получения последних курсов валют: {e}")
-        return jsonify({'error': str(e)}), 500
+        return jsonify({
+            'success': False, 
+            'error': str(e),
+            'message': 'Ошибка при получении курсов валют'
+        }), 500
 
 @app.route('/api/check_admin_status', methods=['POST'])
 def api_check_admin_status():
