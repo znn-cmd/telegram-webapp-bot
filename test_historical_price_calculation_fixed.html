@@ -89,7 +89,7 @@
             background-color: #f0f8ff !important;
         }
         .historical-row {
-            background-color: #f8f9fa !important;
+            background-color: transparent !important;
         }
         .info-box {
             background: #e7f3ff;
@@ -382,7 +382,7 @@
             // Сортируем по дате для правильного отображения:
             // 1. Будущие месяцы (новые сначала)
             // 2. Текущий месяц
-            // 3. Исторические месяцы (старые сначала)
+            // 3. Исторические месяцы (хронологически: январь выше, декабрь ниже)
             const sortedForDisplay = sortedTrends.sort((a, b) => {
                 const yearA = a.property_year;
                 const monthA = a.property_month;
@@ -402,9 +402,9 @@
                 // Если оба месяца в прошлом (меньше текущего)
                 else if (yearA < currentYear || (yearA === currentYear && monthA < currentMonth)) {
                     if (yearB < currentYear || (yearB === currentYear && monthB < currentMonth)) {
-                        // Оба исторические - сортируем по убыванию (июль перед июнем)
-                        if (yearA !== yearB) return yearB - yearA;
-                        return monthB - monthA;
+                        // Оба исторические - сортируем по убыванию лет, затем по возрастанию месяцев
+                        if (yearA !== yearB) return yearB - yearA; // Годы по убыванию (2025 выше 2024)
+                        return monthA - monthB; // Месяцы по возрастанию (январь выше декабря)
                     } else {
                         return 1; // A в прошлом, B нет
                     }
