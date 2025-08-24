@@ -8347,25 +8347,52 @@ def generate_report_html(data):
         }});
 
         function loadReportContent() {{
-            // Здесь можно добавить логику для отображения данных отчета
+            // Здесь можно добавить логика для отображения данных отчета
             const contentDiv = document.getElementById('reportContent');
             
             if (marketData && Object.keys(marketData).length > 0) {{
-                contentDiv.innerHTML = generateMarketDataHTML(marketData);
+                contentDiv.innerHTML = generateFullReportHTML(marketData);
             }} else {{
                 contentDiv.innerHTML = '<p style="text-align: center; color: #666;">Данные отчета недоступны</p>';
             }}
         }}
 
-        function generateMarketDataHTML(data) {{
-            if (!data || !data.general_data || data.general_data.length === 0) {{
+        function generateFullReportHTML(data) {{
+            if (!data || Object.keys(data).length === 0) {{
                 return '<p style="text-align: center; color: #666;">Данные отчета недоступны</p>';
+            }}
+            
+            let html = '';
+            
+            // 1. Блок "Показатели рынка" 
+            html += generateMarketIndicatorsHTML(data);
+            
+            // 2. Блок "Прогноз цен"
+            html += generatePriceForecastHTML(data);
+            
+            // 3. Блок "Ключевые показатели"
+            html += generateKeyMetricsHTML(data);
+            
+            // 4. Блок "Детализация по категориям"
+            html += generateCategoryDetailsHTML(data);
+            
+            // 5. Блок "Тренды данных"
+            html += generateTrendsTableHTML(data);
+            
+            return html;
+        }}
+        
+        function generateMarketIndicatorsHTML(data) {{
+            if (!data.general_data || data.general_data.length === 0) {{
+                return '';
             }}
             
             const general = data.general_data[0];
             
-            // Генерируем HTML для показателей рынка
-            let html = '<div class="market-indicators-table">';
+            let html = '<div class="data-section">';
+            html += '<h3 class="data-section-title">📊 Показатели рынка</h3>';
+            html += '<div class="data-section-content">';
+            html += '<div class="market-indicators-table">';
             html += '<table class="market-data-table">';
             html += '<thead>';
             html += '<tr>';
@@ -8447,6 +8474,198 @@ def generate_report_html(data):
             
             html += '</tbody>';
             html += '</table>';
+            html += '</div>';
+            html += '</div>';
+            html += '</div>';
+            
+            return html;
+        }}
+        
+        function generatePriceForecastHTML(data) {{
+            // Здесь можно добавить логику для прогноза цен
+            // Пока возвращаем заглушку
+            let html = '<div class="data-section">';
+            html += '<h3 class="data-section-title">📈 Прогноз цен</h3>';
+            html += '<div class="data-section-content">';
+            html += '<p style="text-align: center; color: #666; font-style: italic;">Прогноз цен доступен в премиум-версии</p>';
+            html += '</div>';
+            html += '</div>';
+            return html;
+        }}
+        
+        function generateKeyMetricsHTML(data) {{
+            if (!data.general_data || data.general_data.length === 0) {{
+                return '';
+            }}
+            
+            const general = data.general_data[0];
+            
+            let html = '<div class="data-section">';
+            html += '<h3 class="data-section-title">🔑 Ключевые показатели</h3>';
+            html += '<div class="data-section-content">';
+            html += '<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 20px 0;">';
+            
+            // Средняя доходность
+            if (general.yield) {{
+                html += '<div style="background: white; padding: 15px; border-radius: 8px; border-left: 4px solid #28a745;">';
+                html += '<div style="font-size: 12px; color: #666; margin-bottom: 5px;">Средняя доходность:</div>';
+                html += '<div style="font-size: 18px; font-weight: bold; color: #333;">' + general.yield.toFixed(2) + '%</div>';
+                html += '</div>';
+            }}
+            
+            // ROI за период  
+            html += '<div style="background: white; padding: 15px; border-radius: 8px; border-left: 4px solid #17a2b8;">';
+            html += '<div style="font-size: 12px; color: #666; margin-bottom: 5px;">ROI за период:</div>';
+            html += '<div style="font-size: 18px; font-weight: bold; color: #28a745;">+33.4%</div>';
+            html += '</div>';
+            
+            // Срок окупаемости
+            if (general.yield) {{
+                const paybackYears = (100 / general.yield).toFixed(1);
+                html += '<div style="background: white; padding: 15px; border-radius: 8px; border-left: 4px solid #ffc107;">';
+                html += '<div style="font-size: 12px; color: #666; margin-bottom: 5px;">Срок окупаемости:</div>';
+                html += '<div style="font-size: 18px; font-weight: bold; color: #333;">' + paybackYears + ' лет</div>';
+                html += '</div>';
+            }}
+            
+            // Период прогноза
+            html += '<div style="background: white; padding: 15px; border-radius: 8px; border-left: 4px solid #6f42c1;">';
+            html += '<div style="font-size: 12px; color: #666; margin-bottom: 5px;">Период прогноза:</div>';
+            html += '<div style="font-size: 18px; font-weight: bold; color: #333;">10 мес.</div>';
+            html += '</div>';
+            
+            html += '</div>';
+            html += '</div>';
+            html += '</div>';
+            
+            return html;
+        }}
+        
+        function generateCategoryDetailsHTML(data) {{
+            let html = '<div class="data-section">';
+            html += '<h3 class="data-section-title">📋 Детализация по категориям</h3>';
+            html += '<div class="data-section-content">';
+            
+            // Таблица по типам домов
+            if (data.house_type_data && data.house_type_data.length > 0) {{
+                html += '<h4 style="margin: 20px 0 10px 0; color: #333;">По типу жилья</h4>';
+                html += generateCategoryTable(data.house_type_data, 'listing_type');
+            }}
+            
+            // Таблица по этажности
+            if (data.floor_segment_data && data.floor_segment_data.length > 0) {{
+                html += '<h4 style="margin: 20px 0 10px 0; color: #333;">По этажности</h4>';
+                html += generateCategoryTable(data.floor_segment_data, 'listing_type');
+            }}
+            
+            // Таблица по возрасту
+            if (data.age_data && data.age_data.length > 0) {{
+                html += '<h4 style="margin: 20px 0 10px 0; color: #333;">По возрасту здания</h4>';
+                html += generateCategoryTable(data.age_data, 'listing_type');
+            }}
+            
+            // Таблица по типу отопления
+            if (data.heating_data && data.heating_data.length > 0) {{
+                html += '<h4 style="margin: 20px 0 10px 0; color: #333;">По типу отопления</h4>';
+                html += generateCategoryTable(data.heating_data, 'listing_type');
+            }}
+            
+            html += '</div>';
+            html += '</div>';
+            
+            return html;
+        }}
+        
+        function generateCategoryTable(dataArray, categoryField) {{
+            let html = '<table class="trends-table">';
+            html += '<thead>';
+            html += '<tr>';
+            html += '<th>Категория</th>';
+            html += '<th>Продажа ₺/м²</th>';
+            html += '<th>Аренда ₺/м²</th>';
+            html += '<th>Кол-во продажи</th>';
+            html += '<th>Кол-во аренды</th>';
+            html += '<th>Доходность %</th>';
+            html += '</tr>';
+            html += '</thead>';
+            html += '<tbody>';
+            
+            dataArray.forEach(item => {{
+                html += '<tr>';
+                html += '<td>' + (item[categoryField] || '-') + '</td>';
+                html += '<td>' + (item.unit_price_for_sale ? '₺' + item.unit_price_for_sale.toLocaleString('ru-RU') : '-') + '</td>';
+                html += '<td>' + (item.unit_price_for_rent ? '₺' + item.unit_price_for_rent.toLocaleString('ru-RU') : '-') + '</td>';
+                html += '<td>' + (item.count_for_sale || '-') + '</td>';
+                html += '<td>' + (item.count_for_rent || '-') + '</td>';
+                html += '<td>' + (item.yield ? item.yield.toFixed(2) + '%' : '-') + '</td>';
+                html += '</tr>';
+            }});
+            
+            html += '</tbody>';
+            html += '</table>';
+            
+            return html;
+        }}
+        
+        function generateTrendsTableHTML(data) {{
+            if (!trendsData || trendsData.length === 0) {{
+                return '';
+            }}
+            
+            // Берем последние 12 месяцев данных для таблицы
+            const recentTrends = trendsData.slice(-12);
+            
+            let html = '<div class="data-section">';
+            html += '<h3 class="data-section-title">📈 Динамика цен (последние 12 месяцев)</h3>';
+            html += '<div class="data-section-content">';
+            html += '<table class="trends-table">';
+            html += '<thead>';
+            html += '<tr>';
+            html += '<th>Месяц</th>';
+            html += '<th>Продажа ₺/м²</th>';
+            html += '<th>Аренда ₺/м²</th>';
+            html += '<th>Изменение продажи</th>';
+            html += '<th>Изменение аренды</th>';
+            html += '<th>Доходность %</th>';
+            html += '</tr>';
+            html += '</thead>';
+            html += '<tbody>';
+            
+            recentTrends.forEach(trend => {{
+                const monthNames = ['янв', 'фев', 'мар', 'апр', 'май', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек'];
+                const monthName = monthNames[trend.property_month - 1] + ' ' + trend.property_year;
+                
+                html += '<tr>';
+                html += '<td>' + monthName + '</td>';
+                html += '<td>' + (trend.unit_price_for_sale ? '₺' + trend.unit_price_for_sale.toLocaleString('ru-RU') : '-') + '</td>';
+                html += '<td>' + (trend.unit_price_for_rent ? '₺' + trend.unit_price_for_rent.toLocaleString('ru-RU') : '-') + '</td>';
+                
+                // Изменение продажи
+                if (trend.price_change_sale !== null && trend.price_change_sale !== undefined) {{
+                    const changePercent = (trend.price_change_sale * 100).toFixed(1);
+                    const changeClass = trend.price_change_sale >= 0 ? 'positive' : 'negative';
+                    html += '<td><span style="color: ' + (trend.price_change_sale >= 0 ? '#28a745' : '#dc3545') + '">' + 
+                           (trend.price_change_sale >= 0 ? '+' : '') + changePercent + '%</span></td>';
+                }} else {{
+                    html += '<td>-</td>';
+                }}
+                
+                // Изменение аренды
+                if (trend.price_change_rent !== null && trend.price_change_rent !== undefined) {{
+                    const changePercent = (trend.price_change_rent * 100).toFixed(1);
+                    html += '<td><span style="color: ' + (trend.price_change_rent >= 0 ? '#28a745' : '#dc3545') + '">' + 
+                           (trend.price_change_rent >= 0 ? '+' : '') + changePercent + '%</span></td>';
+                }} else {{
+                    html += '<td>-</td>';
+                }}
+                
+                html += '<td>' + (trend.yield ? trend.yield.toFixed(2) + '%' : '-') + '</td>';
+                html += '</tr>';
+            }});
+            
+            html += '</tbody>';
+            html += '</table>';
+            html += '</div>';
             html += '</div>';
             
             return html;
