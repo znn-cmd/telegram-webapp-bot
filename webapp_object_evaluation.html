@@ -688,7 +688,13 @@
             .comparison-label,
             .comparison-value {
                 font-size: 12px;
-                padding: 6px 0;
+                padding: 2px 0;
+            }
+            
+            .object-analysis-text {
+                font-size: 12px;
+                padding: 8px;
+                margin-top: 10px;
             }
         }
         
@@ -745,7 +751,7 @@
         }
         
         .comparison-label {
-            padding: 8px 0;
+            padding: 4px 0;
             font-weight: 500;
             color: #333333;
             font-size: 14px;
@@ -753,7 +759,7 @@
         }
         
         .comparison-value {
-            padding: 8px 0;
+            padding: 4px 0;
             text-align: right;
             font-size: 14px;
             color: #333333;
@@ -769,6 +775,28 @@
             font-weight: 600;
         }
         
+        /* Новые классы для цены (дешевле = хорошо) */
+        .comparison-cheaper {
+            color: #28a745 !important;
+            font-weight: 600;
+        }
+        
+        .comparison-expensive {
+            color: #dc3545 !important;
+            font-weight: 600;
+        }
+        
+        /* Новые классы для площади (больше = хорошо) */
+        .comparison-larger {
+            color: #28a745 !important;
+            font-weight: 600;
+        }
+        
+        .comparison-smaller {
+            color: #dc3545 !important;
+            font-weight: 600;
+        }
+        
         .rental-estimate .comparison-label {
             border-top: 1px solid #dee2e6;
             padding-top: 12px;
@@ -779,6 +807,19 @@
             border-top: 1px solid #dee2e6;
             padding-top: 12px;
             color: #4CAF50 !important;
+        }
+        
+        /* Стили для текстового анализа */
+        .object-analysis-text {
+            margin-top: 15px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #007bff;
+            color: #495057;
+            font-size: 14px;
+            line-height: 1.5;
+            font-style: italic;
         }
         
         /* Стили для блока "Анализ рынка" в стиле "Вывод по тренду" */
@@ -6273,13 +6314,15 @@
                         
                         html += '<tr>';
                         html += '<td class="comparison-label">vs. мин. цена рынка:</td>';
-                        html += `<td class="comparison-value ${minDiff >= 0 ? 'comparison-higher' : 'comparison-lower'}">`;
+                        // Для цены: дешевле (отрицательное) = зеленый, дороже (положительное) = красный
+                        html += `<td class="comparison-value ${minDiff < 0 ? 'comparison-cheaper' : 'comparison-expensive'}">`;
                         html += `${minDiff >= 0 ? '+' : ''}${minDiff.toFixed(1)}%</td>`;
                         html += '</tr>';
                         
                         html += '<tr>';
                         html += '<td class="comparison-label">vs. макс. цена рынка:</td>';
-                        html += `<td class="comparison-value ${maxDiff >= 0 ? 'comparison-higher' : 'comparison-lower'}">`;
+                        // Для цены: дешевле (отрицательное) = зеленый, дороже (положительное) = красный
+                        html += `<td class="comparison-value ${maxDiff < 0 ? 'comparison-cheaper' : 'comparison-expensive'}">`;
                         html += `${maxDiff >= 0 ? '+' : ''}${maxDiff.toFixed(1)}%</td>`;
                         html += '</tr>';
                     }
@@ -6291,7 +6334,8 @@
                         
                         html += '<tr>';
                         html += '<td class="comparison-label">vs. средняя площадь:</td>';
-                        html += `<td class="comparison-value ${areaDiff >= 0 ? 'comparison-higher' : 'comparison-lower'}">`;
+                        // Для площади: меньше (отрицательное) = красный, больше (положительное) = зеленый
+                        html += `<td class="comparison-value ${areaDiff >= 0 ? 'comparison-larger' : 'comparison-smaller'}">`;
                         html += `${areaDiff >= 0 ? '+' : ''}${areaDiff.toFixed(1)}%</td>`;
                         html += '</tr>';
                     }
@@ -6310,6 +6354,48 @@
                 
                 html += '</tbody>';
                 html += '</table>';
+                
+                // Добавляем текстовый вывод под таблицей
+                if (marketSummary) {
+                    let textSummary = '';
+                    
+                    // Анализируем цену
+                    let priceAnalysis = '';
+                    if (marketSummary.unit_price_for_sale) {
+                        const minPrice = marketSummary.unit_price_for_sale.min;
+                        const maxPrice = marketSummary.unit_price_for_sale.max;
+                        const minDiff = ((convertedPricePerM2 - minPrice) / minPrice * 100);
+                        const maxDiff = ((convertedPricePerM2 - maxPrice) / maxPrice * 100);
+                        
+                        if (minDiff < 0 && maxDiff < 0) {
+                            priceAnalysis = 'дешевле как минимальной, так и максимальной цены рынка';
+                        } else if (minDiff >= 0 && maxDiff < 0) {
+                            priceAnalysis = 'дороже минимальной, но дешевле максимальной цены рынка';
+                        } else {
+                            priceAnalysis = 'дороже как минимальной, так и максимальной цены рынка';
+                        }
+                    }
+                    
+                    // Анализируем площадь
+                    let areaAnalysis = '';
+                    if (marketSummary.comparable_area_for_sale) {
+                        const avgMarketArea = Math.round((marketSummary.comparable_area_for_sale.min + marketSummary.comparable_area_for_sale.max) / 2);
+                        const areaDiff = ((objectArea - avgMarketArea) / avgMarketArea * 100);
+                        
+                        if (areaDiff >= 0) {
+                            areaAnalysis = 'имеет большую площадь чем большинство объектов на рынке';
+                        } else {
+                            areaAnalysis = 'имеет меньшую площадь чем большинство объектов на рынке';
+                        }
+                    }
+                    
+                    if (priceAnalysis && areaAnalysis) {
+                        textSummary = `<div class="object-analysis-text">Ваш объект ${priceAnalysis} и ${areaAnalysis}.</div>`;
+                    }
+                    
+                    html += textSummary;
+                }
+                
                 html += '</div></div>';
                 
                 console.log('📝 Generated enhanced HTML for object summary');
