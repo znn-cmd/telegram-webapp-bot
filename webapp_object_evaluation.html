@@ -8247,7 +8247,7 @@
                 
                 if (!telegramId) {
                     console.log('⚠️ No telegram_id found, cannot check share access');
-                    return;
+                    return false;
                 }
 
                 const response = await fetch('/api/user/check-access', {
@@ -8264,18 +8264,29 @@
                     const data = await response.json();
                     console.log('📊 Share access check:', data);
                     
-                    // Show share button only if user has valid period_end
-                    if (data.hasShareAccess) {
-                        const shareSection = document.getElementById('shareReportSection');
-                        if (shareSection) {
-                            shareSection.style.display = 'block';
-                        }
-                    }
+                    // Store access status globally for use after report generation
+                    window.userHasShareAccess = data.hasShareAccess;
+                    return data.hasShareAccess;
                 } else {
                     console.log('⚠️ Failed to check share access');
+                    return false;
                 }
             } catch (error) {
                 console.error('❌ Error checking share access:', error);
+                return false;
+            }
+        }
+
+        // Show share button after report is generated
+        function showShareButtonIfAllowed() {
+            if (window.userHasShareAccess) {
+                const shareSection = document.getElementById('shareReportSection');
+                if (shareSection) {
+                    shareSection.style.display = 'block';
+                    console.log('✅ Share button shown after report generation');
+                }
+            } else {
+                console.log('⚠️ User does not have share access');
             }
         }
 
@@ -8437,7 +8448,7 @@
             updatePageText();
             loadCountries();
             
-            // Check share report access after a short delay
+            // Check share report access but don't show button yet
             setTimeout(() => {
                 checkShareReportAccess();
             }, 1000);
@@ -8946,6 +8957,10 @@
             
             // Создаем график с отфильтрованными данными (с учетом статуса админа)
             createTrendsChart(filteredTrends, currentChartType, isAdmin);
+            
+            // После завершения генерации отчета показываем кнопку "Поделиться", если доступ разрешен
+            console.log('📋 Report generation complete, checking share button access...');
+            showShareButtonIfAllowed();
         }
         
         // Создание графика трендов
