@@ -5437,8 +5437,9 @@
         function calculateHistoricalPrice(basePrice, percentageChange) {
             if (!basePrice || !percentageChange) return basePrice;
             
-            const changeMultiplier = 1 + (percentageChange / 100);
-            return Math.round(basePrice / changeMultiplier);
+            // percentageChange уже в формате 0.0225 (2.25%), не нужно делить на 100
+            const changeMultiplier = 1 + percentageChange;
+            return basePrice / changeMultiplier;
         }
 
         // Prepare trends data with calculated historical prices
@@ -5515,7 +5516,7 @@
                     let prevMonthKey = null;
                     if (month === 1) {
                         prevMonthKey = `${year - 1}-12`;
-                    } else {
+                } else {
                         prevMonthKey = `${year}-${month - 1}`;
                     }
                     
@@ -5683,7 +5684,7 @@
                     let nextMonthKey = null;
                     if (month === 12) {
                         nextMonthKey = `${year + 1}-1`;
-                    } else {
+            } else {
                         nextMonthKey = `${year}-${month + 1}`;
                     }
                     
