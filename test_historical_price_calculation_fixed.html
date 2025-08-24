@@ -379,6 +379,15 @@
             // Теперь показываем ВСЕ тренды без ограничений по месяцам
             console.log(`🔍 Showing ALL trends without month restrictions`);
             
+            // Фильтруем тренды для отображения (симуляция ограничений для обычных пользователей)
+            // В тесте показываем все данные, но с пометкой о том, что для обычных пользователей будет ограничение
+            const currentYear = new Date().getFullYear();
+            const currentMonth = new Date().getMonth() + 1;
+            
+            console.log(`🧪 Test: Current date = ${currentYear}-${currentMonth}`);
+            console.log(`🧪 Test: For regular users, table would show only 10 records (8 months back + current + 1 forward)`);
+            console.log(`🧪 Test: Range would be ${currentYear}-${currentMonth-8} to ${currentYear}-${currentMonth+1}`);
+            
             // Обратная хронологическая сортировка: новые даты вверху, старые внизу
             const sortedForDisplay = sortedTrends.sort((a, b) => {
                 const yearA = a.property_year;

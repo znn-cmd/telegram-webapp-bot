@@ -5375,14 +5375,28 @@
                 console.log(`👑 Admin access: showing ALL trends including future data`);
                 filteredTrends = sortedTrends;
             } else {
-                // Обычные пользователи видят только текущий месяц и прошлые
-                console.log(`👤 Regular user: hiding future data`);
+                // Обычные пользователи видят ограниченный диапазон: 8 месяцев назад + текущий + 1 месяц вперед
+                console.log(`👤 Regular user: showing limited range (8 months back + current + 1 month forward)`);
+                
+                // Создаем диапазон дат: от 8 месяцев назад до 1 месяца вперед
+                const startDate = new Date(currentYear, currentMonth - 1 - 8, 1); // 8 месяцев назад
+                const endDate = new Date(currentYear, currentMonth - 1 + 1, 1);   // 1 месяц вперед
+                
+                const startYear = startDate.getFullYear();
+                const startMonth = startDate.getMonth() + 1;
+                const endYear = endDate.getFullYear();
+                const endMonth = endDate.getMonth() + 1;
+                
+                console.log(`📅 Table date range: ${startYear}-${startMonth} to ${endYear}-${endMonth}`);
+                
                 filteredTrends = sortedTrends.filter(trend => {
-                    const isCurrentOrPast = trend.property_year < currentYear || 
-                                          (trend.property_year === currentYear && trend.property_month <= currentMonth);
-                    return isCurrentOrPast;
+                    // Проверяем, что тренд попадает в диапазон
+                    const trendDate = new Date(trend.property_year, trend.property_month - 1, 1);
+                    const isInRange = trendDate >= startDate && trendDate <= endDate;
+                    return isInRange;
                 });
-                console.log(`🔒 Filtered ${sortedTrends.length} trends to ${filteredTrends.length} (removed future data)`);
+                
+                console.log(`🔒 Filtered ${sortedTrends.length} trends to ${filteredTrends.length} (limited range for table)`);
             }
             
             // Обратная хронологическая сортировка: новые даты вверху, старые внизу
