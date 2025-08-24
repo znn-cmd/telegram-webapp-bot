@@ -220,6 +220,148 @@ def health():
     """Эндпоинт для проверки здоровья приложения"""
     return jsonify({"status": "ok", "message": "Telegram WebApp Bot is running"})
 
+@app.route('/api/user/check-access', methods=['POST'])
+def check_user_access():
+    """Проверка доступа пользователя к функции поделиться отчетом"""
+    try:
+        data = request.json or {}
+        telegram_id = data.get('telegram_id')
+        
+        if not telegram_id:
+            return jsonify({'error': 'telegram_id required'}), 400
+        
+        # Получаем данные пользователя из базы
+        user_result = supabase.table('users').select('period_end').eq('telegram_id', int(telegram_id)).execute()
+        
+        if not user_result.data:
+            return jsonify({'hasShareAccess': False, 'reason': 'User not found'}), 200
+        
+        user = user_result.data[0]
+        period_end = user.get('period_end')
+        
+        if not period_end:
+            return jsonify({'hasShareAccess': False, 'reason': 'No period_end set'}), 200
+        
+        # Проверяем, что period_end больше или равен текущей дате
+        from datetime import datetime
+        current_date = datetime.now()
+        period_end_date = datetime.fromisoformat(period_end.replace('Z', '+00:00'))
+        
+        has_access = period_end_date >= current_date
+        
+        return jsonify({
+            'hasShareAccess': has_access,
+            'period_end': period_end,
+            'current_date': current_date.isoformat(),
+            'reason': 'Valid access' if has_access else 'Period expired'
+        }), 200
+        
+    except Exception as e:
+        logger.error(f"Error checking user access: {e}")
+        return jsonify({'error': 'Internal server error', 'hasShareAccess': False}), 500
+
+@app.route('/api/reports/save', methods=['POST'])
+def save_report():
+    """Сохранение отчета в HTML файл и базу данных"""
+    try:
+        data = request.json or {}
+        telegram_id = data.get('telegram_id')
+        
+        if not telegram_id:
+            return jsonify({'error': 'telegram_id required'}), 400
+        
+        # Получаем пользователя
+        user_result = supabase.table('users').select('id, period_end').eq('telegram_id', int(telegram_id)).execute()
+        
+        if not user_result.data:
+            return jsonify({'error': 'User not found'}), 404
+        
+        user = user_result.data[0]
+        user_id = user.get('id')
+        period_end = user.get('period_end')
+        
+        # Проверяем доступ
+        if not period_end:
+            return jsonify({'error': 'No access to share reports'}), 403
+        
+        from datetime import datetime
+        current_date = datetime.now()
+        period_end_date = datetime.fromisoformat(period_end.replace('Z', '+00:00'))
+        
+        if period_end_date < current_date:
+            return jsonify({'error': 'Access period expired'}), 403
+        
+        # Генерируем уникальное имя файла
+        import uuid
+        report_id = str(uuid.uuid4())
+        filename = f"report_{report_id}.html"
+        
+        # Сохраняем HTML файл
+        html_content = data.get('full_report', {}).get('html', '')
+        if not html_content:
+            return jsonify({'error': 'No HTML content provided'}), 400
+        
+        # Создаем папку reports если не существует
+        import os
+        reports_dir = 'reports'
+        if not os.path.exists(reports_dir):
+            os.makedirs(reports_dir)
+        
+        file_path = os.path.join(reports_dir, filename)
+        with open(file_path, 'w', encoding='utf-8') as f:
+            f.write(html_content)
+        
+        # Сохраняем в базу данных
+        report_data = {
+            'user_id': user_id,
+            'report_type': data.get('report_type', 'object_evaluation'),
+            'title': data.get('title', 'Отчет по недвижимости'),
+            'description': data.get('description'),
+            'parameters': data.get('parameters'),
+            'address': data.get('address'),
+            'latitude': data.get('latitude'),
+            'longitude': data.get('longitude'),
+            'bedrooms': data.get('bedrooms'),
+            'price_range_min': data.get('price'),
+            'price_range_max': data.get('price'),
+            'price': data.get('price'),
+            'area': data.get('area'),
+            'full_report': data.get('full_report'),
+            'report_url': f"/reports/{filename}",
+            'created_at': datetime.now().isoformat(),
+            'updated_at': datetime.now().isoformat()
+        }
+        
+        insert_result = supabase.table('user_reports').insert(report_data).execute()
+        
+        if insert_result.data:
+            saved_report = insert_result.data[0]
+            
+            # Формируем полную ссылку
+            host = request.host_url.rstrip('/')
+            full_url = f"{host}/reports/{filename}"
+            
+            return jsonify({
+                'success': True,
+                'report_id': saved_report.get('id'),
+                'report_url': full_url,
+                'shareUrl': full_url,
+                'title': saved_report.get('title'),
+                'created_at': saved_report.get('created_at'),
+                'filename': filename
+            }), 200
+        else:
+            return jsonify({'error': 'Failed to save report to database'}), 500
+        
+    except Exception as e:
+        logger.error(f"Error saving report: {e}")
+        return jsonify({'error': 'Internal server error'}), 500
+
+@app.route('/reports/<filename>')
+def serve_report(filename):
+    """Обслуживание сохраненных отчетов"""
+    return send_from_directory('reports', filename)
+
 @app.route('/logo-sqv.png')
 def serve_logo():
     return send_from_directory('.', 'logo-sqv.png')
