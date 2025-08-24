@@ -220,148 +220,6 @@ def health():
     """Эндпоинт для проверки здоровья приложения"""
     return jsonify({"status": "ok", "message": "Telegram WebApp Bot is running"})
 
-@app.route('/api/user/check-access', methods=['POST'])
-def check_user_access():
-    """Проверка доступа пользователя к функции поделиться отчетом"""
-    try:
-        data = request.json or {}
-        telegram_id = data.get('telegram_id')
-        
-        if not telegram_id:
-            return jsonify({'error': 'telegram_id required'}), 400
-        
-        # Получаем данные пользователя из базы
-        user_result = supabase.table('users').select('period_end').eq('telegram_id', int(telegram_id)).execute()
-        
-        if not user_result.data:
-            return jsonify({'hasShareAccess': False, 'reason': 'User not found'}), 200
-        
-        user = user_result.data[0]
-        period_end = user.get('period_end')
-        
-        if not period_end:
-            return jsonify({'hasShareAccess': False, 'reason': 'No period_end set'}), 200
-        
-        # Проверяем, что period_end больше или равен текущей дате
-        from datetime import datetime
-        current_date = datetime.now()
-        period_end_date = datetime.fromisoformat(period_end.replace('Z', '+00:00'))
-        
-        has_access = period_end_date >= current_date
-        
-        return jsonify({
-            'hasShareAccess': has_access,
-            'period_end': period_end,
-            'current_date': current_date.isoformat(),
-            'reason': 'Valid access' if has_access else 'Period expired'
-        }), 200
-        
-    except Exception as e:
-        logger.error(f"Error checking user access: {e}")
-        return jsonify({'error': 'Internal server error', 'hasShareAccess': False}), 500
-
-@app.route('/api/reports/save', methods=['POST'])
-def save_report():
-    """Сохранение отчета в HTML файл и базу данных"""
-    try:
-        data = request.json or {}
-        telegram_id = data.get('telegram_id')
-        
-        if not telegram_id:
-            return jsonify({'error': 'telegram_id required'}), 400
-        
-        # Получаем пользователя
-        user_result = supabase.table('users').select('id, period_end').eq('telegram_id', int(telegram_id)).execute()
-        
-        if not user_result.data:
-            return jsonify({'error': 'User not found'}), 404
-        
-        user = user_result.data[0]
-        user_id = user.get('id')
-        period_end = user.get('period_end')
-        
-        # Проверяем доступ
-        if not period_end:
-            return jsonify({'error': 'No access to share reports'}), 403
-        
-        from datetime import datetime
-        current_date = datetime.now()
-        period_end_date = datetime.fromisoformat(period_end.replace('Z', '+00:00'))
-        
-        if period_end_date < current_date:
-            return jsonify({'error': 'Access period expired'}), 403
-        
-        # Генерируем уникальное имя файла
-        import uuid
-        report_id = str(uuid.uuid4())
-        filename = f"report_{report_id}.html"
-        
-        # Сохраняем HTML файл
-        html_content = data.get('full_report', {}).get('html', '')
-        if not html_content:
-            return jsonify({'error': 'No HTML content provided'}), 400
-        
-        # Создаем папку reports если не существует
-        import os
-        reports_dir = 'reports'
-        if not os.path.exists(reports_dir):
-            os.makedirs(reports_dir)
-        
-        file_path = os.path.join(reports_dir, filename)
-        with open(file_path, 'w', encoding='utf-8') as f:
-            f.write(html_content)
-        
-        # Сохраняем в базу данных
-        report_data = {
-            'user_id': user_id,
-            'report_type': data.get('report_type', 'object_evaluation'),
-            'title': data.get('title', 'Отчет по недвижимости'),
-            'description': data.get('description'),
-            'parameters': data.get('parameters'),
-            'address': data.get('address'),
-            'latitude': data.get('latitude'),
-            'longitude': data.get('longitude'),
-            'bedrooms': data.get('bedrooms'),
-            'price_range_min': data.get('price'),
-            'price_range_max': data.get('price'),
-            'price': data.get('price'),
-            'area': data.get('area'),
-            'full_report': data.get('full_report'),
-            'report_url': f"/reports/{filename}",
-            'created_at': datetime.now().isoformat(),
-            'updated_at': datetime.now().isoformat()
-        }
-        
-        insert_result = supabase.table('user_reports').insert(report_data).execute()
-        
-        if insert_result.data:
-            saved_report = insert_result.data[0]
-            
-            # Формируем полную ссылку
-            host = request.host_url.rstrip('/')
-            full_url = f"{host}/reports/{filename}"
-            
-            return jsonify({
-                'success': True,
-                'report_id': saved_report.get('id'),
-                'report_url': full_url,
-                'shareUrl': full_url,
-                'title': saved_report.get('title'),
-                'created_at': saved_report.get('created_at'),
-                'filename': filename
-            }), 200
-        else:
-            return jsonify({'error': 'Failed to save report to database'}), 500
-        
-    except Exception as e:
-        logger.error(f"Error saving report: {e}")
-        return jsonify({'error': 'Internal server error'}), 500
-
-@app.route('/reports/<filename>')
-def serve_report(filename):
-    """Обслуживание сохраненных отчетов"""
-    return send_from_directory('reports', filename)
-
 @app.route('/logo-sqv.png')
 def serve_logo():
     return send_from_directory('.', 'logo-sqv.png')
@@ -7851,6 +7709,794 @@ def api_test_api_keys():
         import traceback
         logger.error(f"❌ Traceback: {traceback.format_exc()}")
         return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/user/check-share-access', methods=['POST'])
+def api_check_share_access():
+    """Проверка доступа пользователя к функции шаринга отчетов"""
+    try:
+        data = request.json or {}
+        telegram_id = data.get('telegram_id')
+        
+        if not telegram_id:
+            return jsonify({'error': 'telegram_id required'}), 400
+            
+        logger.info(f"🔍 Проверка доступа к шарингу для telegram_id: {telegram_id}")
+        
+        # Получаем пользователя и проверяем period_end
+        result = supabase.table('users').select('id, period_end').eq('telegram_id', telegram_id).execute()
+        
+        if not result.data:
+            return jsonify({'hasShareAccess': False, 'reason': 'User not found'})
+        
+        user = result.data[0]
+        period_end = user.get('period_end')
+        
+        if not period_end:
+            return jsonify({'hasShareAccess': False, 'reason': 'No period_end set'})
+        
+        # Проверяем, не истек ли период
+        from datetime import datetime
+        try:
+            period_end_date = datetime.fromisoformat(period_end.replace('Z', '+00:00'))
+            current_date = datetime.now(period_end_date.tzinfo)
+            
+            has_access = period_end_date >= current_date
+            
+            logger.info(f"✅ Проверка доступа к шарингу: period_end={period_end_date}, current={current_date}, access={has_access}")
+            
+            return jsonify({
+                'hasShareAccess': has_access,
+                'period_end': period_end,
+                'reason': 'Access granted' if has_access else 'Period expired'
+            })
+            
+        except Exception as date_error:
+            logger.error(f"❌ Ошибка парсинга даты period_end: {date_error}")
+            return jsonify({'hasShareAccess': False, 'reason': 'Invalid period_end format'})
+            
+    except Exception as e:
+        logger.error(f"❌ Ошибка проверки доступа к шарингу: {e}")
+        return jsonify({'hasShareAccess': False, 'error': str(e)}), 500
+
+@app.route('/api/reports/save', methods=['POST'])
+def api_save_report():
+    """Сохранение отчета в формате HTML и базе данных"""
+    try:
+        data = request.json or {}
+        telegram_id = data.get('telegram_id')
+        
+        if not telegram_id:
+            return jsonify({'error': 'telegram_id required'}), 400
+            
+        logger.info(f"📄 Сохранение отчета для telegram_id: {telegram_id}")
+        
+        # Получаем user_id по telegram_id
+        user_result = supabase.table('users').select('id').eq('telegram_id', telegram_id).execute()
+        
+        if not user_result.data:
+            return jsonify({'error': 'User not found'}), 404
+            
+        user_id = user_result.data[0]['id']
+        
+        # Генерируем уникальный ID для отчета
+        import uuid
+        report_id = str(uuid.uuid4())
+        
+        # Создаем HTML контент отчета
+        html_content = generate_report_html(data)
+        
+        # Сохраняем HTML файл
+        reports_dir = os.path.join(os.getcwd(), 'reports')
+        if not os.path.exists(reports_dir):
+            os.makedirs(reports_dir)
+            
+        html_filename = f"report_{report_id}.html"
+        html_filepath = os.path.join(reports_dir, html_filename)
+        
+        with open(html_filepath, 'w', encoding='utf-8') as f:
+            f.write(html_content)
+            
+        # Формируем URL для доступа к отчету
+        report_url = f"/reports/{html_filename}"
+        
+        # Сохраняем информацию в базу данных
+        report_data = {
+            'user_id': user_id,
+            'report_type': data.get('report_type', 'object_evaluation'),
+            'title': data.get('title', 'Отчет по оценке объекта'),
+            'description': data.get('description', ''),
+            'parameters': data.get('parameters', {}),
+            'address': data.get('address', ''),
+            'latitude': data.get('latitude'),
+            'longitude': data.get('longitude'),
+            'bedrooms': data.get('bedrooms'),
+            'price': data.get('price'),
+            'area': data.get('area'),
+            'full_report': data.get('full_report', {}),
+            'report_url': report_url
+        }
+        
+        db_result = supabase.table('user_reports').insert(report_data).execute()
+        
+        if db_result.data:
+            saved_report = db_result.data[0]
+            logger.info(f"✅ Отчет сохранен с ID: {saved_report['id']}")
+            
+            return jsonify({
+                'success': True,
+                'report_id': saved_report['id'],
+                'report_url': report_url,
+                'shareUrl': report_url,
+                'title': saved_report['title'],
+                'created_at': saved_report['created_at']
+            })
+        else:
+            return jsonify({'error': 'Failed to save report to database'}), 500
+            
+    except Exception as e:
+        logger.error(f"❌ Ошибка сохранения отчета: {e}")
+        import traceback
+        logger.error(f"❌ Traceback: {traceback.format_exc()}")
+        return jsonify({'error': str(e)}), 500
+
+def generate_report_html(data):
+    """Генерация HTML контента для сохраненного отчета"""
+    try:
+        # Извлекаем данные из запроса
+        location = data.get('parameters', {}).get('location', {})
+        listing_types = data.get('parameters', {}).get('listingTypes', {})
+        market_data = data.get('parameters', {}).get('marketData', {})
+        trends_data = data.get('parameters', {}).get('trendsData', [])
+        
+        # Формируем название локации
+        location_name = ''
+        if location.get('country_name'):
+            location_name = location['country_name']
+        if location.get('city_name'):
+            location_name += f", {location['city_name']}"
+        if location.get('county_name'):
+            location_name += f", {location['county_name']}"
+        if location.get('district_name'):
+            location_name += f", {location['district_name']}"
+            
+        if not location_name:
+            location_name = data.get('address', 'Адрес не указан')
+            
+        # Формируем информацию об объекте
+        property_info = ''
+        if listing_types.get('area'):
+            property_info += f"{listing_types['area']} м²"
+        if listing_types.get('price'):
+            if property_info:
+                property_info += ", "
+            property_info += f"{listing_types['price']} {listing_types.get('currency', 'EUR')}"
+        if listing_types.get('bedrooms'):
+            if property_info:
+                property_info += ", "
+            property_info += f"{listing_types['bedrooms']} спален"
+            
+        # Преобразуем данные трендов в JSON для JavaScript
+        import json
+        trends_json = json.dumps(trends_data) if trends_data else '[]'
+        
+        # Формируем HTML
+        html_content = f'''<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Отчет по оценке недвижимости - {location_name}</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {{
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }}
+
+        body {{
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f8f9fa;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }}
+
+        .report-container {{
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 15px;
+            flex: 1;
+        }}
+
+        /* Header */
+        .report-header {{
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px 0;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }}
+
+        .header-content {{
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 15px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }}
+
+        .logo {{
+            width: 60px;
+            height: 60px;
+            background: white;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }}
+
+        .header-info h1 {{
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }}
+
+        .header-info .subtitle {{
+            font-size: 16px;
+            opacity: 0.9;
+            font-weight: 400;
+        }}
+
+        .header-info .location {{
+            font-size: 18px;
+            margin-top: 5px;
+            opacity: 0.95;
+        }}
+
+        .header-info .property-details {{
+            font-size: 14px;
+            margin-top: 5px;
+            opacity: 0.8;
+        }}
+
+        /* Main content */
+        .report-content {{
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }}
+
+        /* Market indicators table styles */
+        .market-indicators-table {{ margin-top: 20px; }}
+        .market-data-table {{
+            width: 100%;
+            background: #f8f9fa;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            border-collapse: collapse;
+        }}
+        .market-data-table thead {{ background: linear-gradient(90deg, #4CAF50, #45a049); }}
+        .category-header {{
+            padding: 20px 25px;
+            color: white;
+            font-size: 18px;
+            font-weight: 700;
+            text-align: center;
+            border: none;
+            width: 50%;
+        }}
+        .data-cell {{
+            padding: 20px 25px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+            background: white;
+        }}
+        .data-cell:last-child {{ border-bottom: none; }}
+        .cell-label {{
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }}
+        .cell-value {{
+            font-size: 16px;
+            font-weight: 700;
+            color: #333;
+            line-height: 1.2;
+        }}
+
+        /* Price forecast styles */
+        .price-forecast-market-table {{
+            width: 100%;
+            background: #f8f9fa;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            border-collapse: collapse;
+            margin: 20px 0;
+        }}
+        .price-forecast-market-table thead {{
+            background: linear-gradient(90deg, #4CAF50, #45a049);
+        }}
+        .forecast-category-header {{
+            padding: 20px 25px;
+            color: white;
+            font-size: 18px;
+            font-weight: 700;
+            text-align: center;
+            border: none;
+            width: 50%;
+        }}
+        .forecast-data-cell {{
+            padding: 20px 25px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+            background: white;
+        }}
+        .forecast-cell-label {{
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }}
+        .forecast-cell-value {{
+            font-size: 16px;
+            font-weight: 700;
+            color: #333;
+            line-height: 1.2;
+        }}
+        .forecast-cell-value.user-price {{ color: #007bff; }}
+        .forecast-cell-value.market-price {{ color: #6f42c1; }}
+        .forecast-cell-growth {{
+            font-size: 12px;
+            margin-top: 4px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 600;
+            display: inline-block;
+        }}
+        .forecast-cell-growth.positive {{
+            background: #d4edda;
+            color: #155724;
+        }}
+        .forecast-cell-growth.negative {{
+            background: #f8d7da;
+            color: #721c24;
+        }}
+
+        /* Trends styles */
+        .data-section {{
+            margin: 30px 0;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }}
+        .data-section-title {{
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 25px;
+            margin: 0;
+            font-size: 20px;
+            font-weight: 600;
+        }}
+        .data-section-content {{ padding: 25px; }}
+        .trends-table {{ width: 100%; border-collapse: collapse; margin: 15px 0; }}
+        .trends-table th {{
+            background: #28a745;
+            color: white;
+            padding: 12px 8px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 12px;
+        }}
+        .trends-table td {{
+            padding: 10px 8px;
+            text-align: center;
+            border-bottom: 1px solid #dee2e6;
+            font-size: 11px;
+        }}
+        .trends-table tr:nth-child(even) {{ background: #f8f9fa; }}
+
+        /* Chart styles */
+        .chart-container {{
+            margin: 20px 0;
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }}
+        .chart-title {{
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #333;
+            text-align: center;
+        }}
+        .chart-controls {{
+            text-align: center;
+            margin-bottom: 15px;
+        }}
+        .chart-button {{
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            margin: 0 5px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: background-color 0.3s ease;
+        }}
+        .chart-button.active {{
+            background: #28a745;
+        }}
+        .chart-button:hover {{
+            opacity: 0.9;
+        }}
+
+        /* Footer */
+        .report-footer {{
+            background: #2c3e50;
+            color: white;
+            padding: 25px 0;
+            text-align: center;
+            margin-top: auto;
+        }}
+
+        .footer-content {{
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }}
+
+        .footer-logo {{
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #3498db;
+        }}
+
+        .footer-text {{
+            margin-bottom: 15px;
+            opacity: 0.9;
+        }}
+
+        .telegram-button {{
+            display: inline-block;
+            background: linear-gradient(135deg, #0088cc, #006ba8);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,136,204,0.3);
+        }}
+
+        .telegram-button:hover {{
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,136,204,0.4);
+            color: white;
+            text-decoration: none;
+        }}
+
+        /* Responsive design */
+        @media (max-width: 768px) {{
+            .header-content {{
+                flex-direction: column;
+                text-align: center;
+                gap: 15px;
+            }}
+
+            .header-info h1 {{
+                font-size: 22px;
+            }}
+
+            .report-content {{
+                padding: 20px;
+                margin-bottom: 20px;
+            }}
+
+            .report-container {{
+                padding: 0 10px;
+            }}
+            
+            .category-header, .forecast-category-header {{
+                padding: 16px 20px;
+                font-size: 16px;
+            }}
+            
+            .data-cell, .forecast-data-cell {{
+                padding: 16px 20px;
+            }}
+        }}
+
+        @media (max-width: 480px) {{
+            .header-info h1 {{
+                font-size: 20px;
+            }}
+
+            .report-content {{
+                padding: 15px;
+            }}
+            
+            .category-header, .forecast-category-header {{
+                padding: 14px 16px;
+                font-size: 14px;
+            }}
+            
+            .data-cell, .forecast-data-cell {{
+                padding: 14px 16px;
+            }}
+        }}
+
+        /* Ensure full width on all devices */
+        @media (min-width: 1200px) {{
+            .report-container,
+            .header-content,
+            .footer-content {{
+                max-width: 100%;
+                padding: 0 30px;
+            }}
+        }}
+    </style>
+</head>
+<body>
+    <div class="report-header">
+        <div class="header-content">
+            <div class="logo">🏠</div>
+            <div class="header-info">
+                <h1>Aaadviser</h1>
+                <div class="subtitle">Инсайты рынка недвижимости</div>
+                <div class="location">{location_name}</div>
+                <div class="property-details">{property_info}</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="report-container">
+        <div class="report-content">
+            <div id="reportContent">
+                <!-- Содержимое отчета будет добавлено через JavaScript -->
+                <div style="text-align: center; padding: 40px;">
+                    <p>Загрузка данных отчета...</p>
+                </div>
+            </div>
+            
+            <!-- Chart Container -->
+            <div class="chart-container">
+                <div class="chart-title">График трендов цен</div>
+                <div class="chart-controls">
+                    <button class="chart-button active" onclick="switchChart('sale')">Цена м² продажи</button>
+                    <button class="chart-button" onclick="switchChart('rent')">Цена м² аренды</button>
+                </div>
+                <canvas id="trendsChart" width="400" height="200"></canvas>
+            </div>
+            
+            <div style="margin-top: 30px; padding: 20px; background: #fff3cd; border-radius: 12px; text-align: center;">
+                <p style="margin: 0; color: #856404; font-style: italic;">
+                    Отчет создан {new Date().toLocaleDateString('ru-RU')} с помощью Aaadviser
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="report-footer">
+        <div class="footer-content">
+            <div class="footer-logo">🏠 Aaadviser</div>
+            <div class="footer-text">
+                Профессиональная аналитика недвижимости с AI-прогнозами
+            </div>
+            <a href="https://t.me/Aaadviser_bot?start=webapp" class="telegram-button">
+                📱 Открыть приложение в Telegram
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // Trends data from the app
+        const trendsData = {trends_json};
+        const marketData = {json.dumps(market_data) if market_data else '{}'};
+        let currentChart = null;
+        let currentChartType = 'sale';
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {{
+            loadReportContent();
+            createTrendsChart(trendsData, 'sale');
+        }});
+
+        function loadReportContent() {{
+            // Здесь можно добавить логику для отображения данных отчета
+            const contentDiv = document.getElementById('reportContent');
+            
+            if (marketData && Object.keys(marketData).length > 0) {{
+                contentDiv.innerHTML = generateMarketDataHTML(marketData);
+            }} else {{
+                contentDiv.innerHTML = '<p style="text-align: center; color: #666;">Данные отчета недоступны</p>';
+            }}
+        }}
+
+        function generateMarketDataHTML(data) {{
+            // Генерируем HTML для показателей рынка
+            let html = '<div class="market-indicators-table">';
+            html += '<table class="market-data-table">';
+            html += '<thead>';
+            html += '<tr>';
+            html += '<th class="category-header">Продажа</th>';
+            html += '<th class="category-header">Аренда</th>';
+            html += '</tr>';
+            html += '</thead>';
+            html += '<tbody>';
+            
+            // Добавляем строки с данными
+            html += '<tr>';
+            html += '<td class="data-cell">';
+            html += '<div class="cell-label">Сопоставимая площадь:</div>';
+            html += '<div class="cell-value">-</div>';
+            html += '</td>';
+            html += '<td class="data-cell">';
+            html += '<div class="cell-label">Сопоставимая площадь:</div>';
+            html += '<div class="cell-value">-</div>';
+            html += '</td>';
+            html += '</tr>';
+            
+            html += '</tbody>';
+            html += '</table>';
+            html += '</div>';
+            
+            return html;
+        }}
+
+        function createTrendsChart(trends, type) {{
+            const ctx = document.getElementById('trendsChart').getContext('2d');
+            
+            if (currentChart) {{
+                currentChart.destroy();
+            }}
+
+            if (!trends || trends.length === 0) {{
+                return;
+            }}
+
+            const sortedTrends = trends.sort((a, b) => {{
+                if (a.property_year !== b.property_year) {{
+                    return a.property_year - b.property_year;
+                }}
+                return a.property_month - b.property_month;
+            }});
+
+            const labels = sortedTrends.map(trend => {{
+                const monthNames = ['янв', 'фев', 'мар', 'апр', 'май', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек'];
+                return monthNames[trend.property_month - 1] + ' ' + trend.property_year;
+            }});
+
+            let data, label, borderColor, backgroundColor;
+
+            if (type === 'sale') {{
+                data = sortedTrends.map(trend => {{
+                    return trend.is_price_calculated ? trend.calculated_sale_price : trend.unit_price_for_sale;
+                }});
+                label = 'Цена продажи (₺/м²)';
+                borderColor = '#007bff';
+                backgroundColor = 'rgba(0, 123, 255, 0.1)';
+            }} else {{
+                data = sortedTrends.map(trend => {{
+                    return trend.is_price_calculated ? trend.calculated_rent_price : trend.unit_price_for_rent;
+                }});
+                label = 'Цена аренды (₺/м²)';
+                borderColor = '#28a745';
+                backgroundColor = 'rgba(40, 167, 69, 0.1)';
+            }}
+
+            currentChart = new Chart(ctx, {{
+                type: 'line',
+                data: {{
+                    labels: labels,
+                    datasets: [{{
+                        label: label,
+                        data: data,
+                        borderColor: borderColor,
+                        backgroundColor: backgroundColor,
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: borderColor,
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                        pointRadius: 6,
+                        pointHoverRadius: 8
+                    }}]
+                }},
+                options: {{
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {{
+                        legend: {{
+                            display: true,
+                            position: 'top'
+                        }}
+                    }},
+                    scales: {{
+                        y: {{
+                            beginAtZero: false,
+                            grid: {{
+                                color: 'rgba(0,0,0,0.1)'
+                            }},
+                            ticks: {{
+                                callback: function(value) {{
+                                    return '₺' + value.toLocaleString('ru-RU');
+                                }}
+                            }}
+                        }},
+                        x: {{
+                            grid: {{
+                                color: 'rgba(0,0,0,0.1)'
+                            }}
+                        }}
+                    }},
+                    elements: {{
+                        point: {{
+                            hoverBackgroundColor: borderColor
+                        }}
+                    }}
+                }}
+            }});
+        }}
+
+        function switchChart(type) {{
+            // Update button states
+            document.querySelectorAll('.chart-button').forEach(btn => {{
+                btn.classList.remove('active');
+            }});
+            event.target.classList.add('active');
+            
+            // Update chart
+            currentChartType = type;
+            createTrendsChart(trendsData, type);
+        }}
+    </script>
+</body>
+</html>'''
+        
+        return html_content
+        
+    except Exception as e:
+        logger.error(f"❌ Ошибка генерации HTML отчета: {e}")
+        # Возвращаем простой HTML в случае ошибки
+        return f'''<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Ошибка генерации отчета</title>
+</head>
+<body>
+    <h1>Ошибка генерации отчета</h1>
+    <p>Произошла ошибка при создании отчета: {str(e)}</p>
+</body>
+</html>'''
+
+@app.route('/reports/<filename>')
+def serve_report(filename):
+    """Отдача сохраненных HTML отчетов"""
+    try:
+        reports_dir = os.path.join(os.getcwd(), 'reports')
+        return send_from_directory(reports_dir, filename)
+    except Exception as e:
+        logger.error(f"❌ Ошибка отдачи отчета {filename}: {e}")
+        return "Отчет не найден", 404
 
 
 if __name__ == '__main__':

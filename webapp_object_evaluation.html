@@ -2608,6 +2608,183 @@
             background: #f8d7da;
             color: #721c24;
         }
+
+        /* Share Report Button Styles */
+        .share-report-section {
+            margin: 20px 0 10px 0;
+        }
+        
+        .share-report-button {
+            display: block;
+            width: 100%;
+            padding: 15px 20px;
+            background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+        
+        .share-report-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(23, 162, 184, 0.3);
+        }
+        
+        .share-report-button:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 10px rgba(23, 162, 184, 0.3);
+        }
+        
+        .share-report-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        /* Share Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 25px;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .modal-header h3 {
+            margin: 0;
+            color: #333;
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: #666;
+            cursor: pointer;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background-color 0.3s ease;
+        }
+        
+        .modal-close:hover {
+            background: #f8f9fa;
+        }
+        
+        .modal-body {
+            padding: 20px 25px;
+        }
+        
+        .modal-body p {
+            margin: 0 0 15px 0;
+            color: #666;
+            line-height: 1.5;
+        }
+        
+        .share-link-container {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+        }
+        
+        .share-link-input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            background: #f8f9fa;
+            color: #333;
+        }
+        
+        .copy-link-button {
+            padding: 12px 16px;
+            background: #17a2b8;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: background-color 0.3s ease;
+        }
+        
+        .copy-link-button:hover {
+            background: #138496;
+        }
+        
+        .share-info {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+        
+        .share-info p {
+            margin: 5px 0;
+            font-size: 14px;
+        }
+        
+        .share-info strong {
+            color: #333;
+        }
+        
+        .modal-footer {
+            padding: 15px 25px 20px 25px;
+            text-align: right;
+            border-top: 1px solid #e9ecef;
+        }
+        
+        .modal-button {
+            padding: 10px 20px;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        
+        .modal-button:hover {
+            background: #218838;
+        }
         
         /* Metrics block for price forecast */
         .forecast-metrics-compact-section {
@@ -2976,6 +3153,38 @@
                 margin-top: 8px;
             }
             
+            /* Mobile styles for share modal */
+            .modal-content {
+                width: 95%;
+                margin: 10px;
+            }
+            
+            .modal-header {
+                padding: 15px 20px;
+            }
+            
+            .modal-header h3 {
+                font-size: 16px;
+            }
+            
+            .modal-body {
+                padding: 15px 20px;
+            }
+            
+            .share-link-container {
+                flex-direction: column;
+                gap: 8px;
+            }
+            
+            .copy-link-button {
+                width: 100%;
+                padding: 12px;
+            }
+            
+            .modal-footer {
+                padding: 12px 20px 15px 20px;
+            }
+            
             .forecast-metrics-compact-section {
                 padding: 12px;
                 margin-bottom: 12px;
@@ -3086,210 +3295,6 @@
             color: #721c24;
         }
 
-        /* Share Report Button Styles */
-        .share-report-section {
-            margin: 20px 0 10px 0;
-        }
-        
-        .share-report-button {
-            display: block;
-            width: 100%;
-            padding: 15px 20px;
-            background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
-            color: white;
-            border: none;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-align: center;
-        }
-        
-        .share-report-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(23, 162, 184, 0.3);
-        }
-        
-        .share-report-button:active {
-            transform: translateY(0);
-            box-shadow: 0 2px 10px rgba(23, 162, 184, 0.3);
-        }
-        
-        /* Share Modal Styles */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
-        }
-        
-        .modal-content {
-            background: white;
-            border-radius: 16px;
-            width: 90%;
-            max-width: 500px;
-            max-height: 80vh;
-            overflow-y: auto;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-        }
-        
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px 25px;
-            border-bottom: 1px solid #e9ecef;
-        }
-        
-        .modal-header h3 {
-            margin: 0;
-            color: #333;
-            font-size: 18px;
-            font-weight: 600;
-        }
-        
-        .modal-close {
-            background: none;
-            border: none;
-            font-size: 24px;
-            color: #666;
-            cursor: pointer;
-            padding: 0;
-            width: 30px;
-            height: 30px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            transition: background-color 0.3s ease;
-        }
-        
-        .modal-close:hover {
-            background: #f8f9fa;
-        }
-        
-        .modal-body {
-            padding: 20px 25px;
-        }
-        
-        .modal-body p {
-            margin: 0 0 15px 0;
-            color: #666;
-            line-height: 1.5;
-        }
-        
-        .share-link-container {
-            display: flex;
-            gap: 10px;
-            margin: 20px 0;
-        }
-        
-        .share-link-input {
-            flex: 1;
-            padding: 12px 15px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            font-size: 14px;
-            background: #f8f9fa;
-            color: #333;
-        }
-        
-        .copy-link-button {
-            padding: 12px 16px;
-            background: #17a2b8;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            white-space: nowrap;
-            transition: background-color 0.3s ease;
-        }
-        
-        .copy-link-button:hover {
-            background: #138496;
-        }
-        
-        .share-info {
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 8px;
-            margin-top: 15px;
-        }
-        
-        .share-info p {
-            margin: 5px 0;
-            font-size: 14px;
-        }
-        
-        .share-info strong {
-            color: #333;
-        }
-        
-        .modal-footer {
-            padding: 15px 25px 20px 25px;
-            text-align: right;
-            border-top: 1px solid #e9ecef;
-        }
-        
-        .modal-button {
-            padding: 10px 20px;
-            background: #28a745;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-        
-        .modal-button:hover {
-            background: #218838;
-        }
-        
-        /* Mobile styles for share modal */
-        @media (max-width: 768px) {
-            .modal-content {
-                width: 95%;
-                margin: 10px;
-            }
-            
-            .modal-header {
-                padding: 15px 20px;
-            }
-            
-            .modal-header h3 {
-                font-size: 16px;
-            }
-            
-            .modal-body {
-                padding: 15px 20px;
-            }
-            
-            .share-link-container {
-                flex-direction: column;
-                gap: 8px;
-            }
-            
-            .copy-link-button {
-                width: 100%;
-                padding: 12px;
-            }
-            
-            .modal-footer {
-                padding: 12px 20px 15px 20px;
-            }
-        }
-
         /* Back Button Styles */
         .back-button {
             display: block;
@@ -3302,7 +3307,7 @@
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
-            margin: 10px 0 20px 0;
+            margin: 20px 0;
             transition: all 0.3s ease;
             text-decoration: none;
             text-align: center;
@@ -3864,41 +3869,41 @@
         <div class="error-state" id="errorState" style="display: none;">
             <div class="error-icon">❌</div>
             <div class="error-text" id="errorText">Ошибка загрузки данных</div>
-        </div>
+                  </div>
+ 
+          <!-- Share Report Button (only for users with valid period_end) -->
+          <div class="share-report-section" id="shareReportSection" style="display: none;">
+              <button class="share-report-button" id="shareReportButton" onclick="shareReport()">
+                  📄 Поделиться отчетом
+              </button>
+          </div>
 
-        <!-- Share Report Button (only for users with valid period_end) -->
-        <div class="share-report-section" id="shareReportSection" style="display: none;">
-            <button class="share-report-button" id="shareReportButton" onclick="shareReport()">
-                📄 Поделиться отчетом
-            </button>
-        </div>
+          <!-- Back Button -->
+          <a href="/webapp_main" class="back-button" id="backButton">← Вернуться в главное меню</a>
 
-        <!-- Back Button -->
-        <a href="/webapp_main" class="back-button" id="backButton">← Вернуться в главное меню</a>
-        
-        <!-- Share Report Modal -->
-        <div class="modal-overlay" id="shareModalOverlay" style="display: none;" onclick="closeShareModal()">
-            <div class="modal-content" onclick="event.stopPropagation()">
-                <div class="modal-header">
-                    <h3>📄 Отчет сохранен</h3>
-                    <button class="modal-close" onclick="closeShareModal()">×</button>
-                </div>
-                <div class="modal-body">
-                    <p>Ваш отчет был успешно сохранен и готов к отправке:</p>
-                    <div class="share-link-container">
-                        <input type="text" id="shareLink" class="share-link-input" readonly>
-                        <button class="copy-link-button" onclick="copyShareLink()">📋 Копировать</button>
-                    </div>
-                    <div class="share-info">
-                        <p><strong>Название:</strong> <span id="shareReportTitle"></span></p>
-                        <p><strong>Создан:</strong> <span id="shareReportDate"></span></p>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button class="modal-button" onclick="closeShareModal()">Закрыть</button>
-                </div>
-            </div>
-        </div>
+          <!-- Share Report Modal -->
+          <div class="modal-overlay" id="shareModalOverlay" style="display: none;" onclick="closeShareModal()">
+              <div class="modal-content" onclick="event.stopPropagation()">
+                  <div class="modal-header">
+                      <h3>📄 Отчет сохранен</h3>
+                      <button class="modal-close" onclick="closeShareModal()">×</button>
+                  </div>
+                  <div class="modal-body">
+                      <p>Ваш отчет был успешно сохранен и готов к отправке:</p>
+                      <div class="share-link-container">
+                          <input type="text" id="shareLink" class="share-link-input" readonly>
+                          <button class="copy-link-button" onclick="copyShareLink()">📋 Копировать</button>
+                      </div>
+                      <div class="share-info">
+                          <p><strong>Название:</strong> <span id="shareReportTitle"></span></p>
+                          <p><strong>Создан:</strong> <span id="shareReportDate"></span></p>
+                      </div>
+                  </div>
+                  <div class="modal-footer">
+                      <button class="modal-button" onclick="closeShareModal()">Закрыть</button>
+                  </div>
+              </div>
+          </div>
     </div>
 
     <script>
@@ -4543,12 +4548,6 @@
             document.getElementById('backButton').textContent = getText('backButton');
             document.getElementById('selectedLocationTitle').textContent = getText('selectedLocationTitle');
             document.getElementById('adminIdsTitle').textContent = getText('adminIdsTitle');
-            
-            // Update share report button text
-            const shareReportButton = document.getElementById('shareReportButton');
-            if (shareReportButton) {
-                shareReportButton.textContent = getText('shareReportButton');
-            }
             
             // Update new data section elements
             const dataSectionTitle = document.getElementById('dataSectionTitle');
@@ -5411,11 +5410,15 @@
             }
         }
 
-        // Get location display name for sharing
-        function getLocationDisplayName() {
-            if (!selectedLocation) return 'Адрес не указан';
+        // Display selected location
+        async function displaySelectedLocation() {
+            const selectedLocationDiv = document.getElementById('selectedLocation');
+            const locationDetails = document.getElementById('locationDetails');
+            const adminIdsBlock = document.getElementById('adminIdsBlock');
+            const adminIdsDetails = document.getElementById('adminIdsDetails');
             
-            let locationString = selectedLocation.country_name || '';
+            // Build location string
+            let locationString = selectedLocation.country_name;
             if (selectedLocation.city_name) {
                 locationString += `, ${selectedLocation.city_name}`;
             }
@@ -5426,18 +5429,6 @@
                 locationString += `, ${selectedLocation.district_name}`;
             }
             
-            return locationString || 'Адрес не указан';
-        }
-
-        // Display selected location
-        async function displaySelectedLocation() {
-            const selectedLocationDiv = document.getElementById('selectedLocation');
-            const locationDetails = document.getElementById('locationDetails');
-            const adminIdsBlock = document.getElementById('adminIdsBlock');
-            const adminIdsDetails = document.getElementById('adminIdsDetails');
-            
-            // Build location string
-            const locationString = getLocationDisplayName();
             locationDetails.textContent = locationString;
             
             // Update selected property types display
@@ -8258,7 +8249,7 @@
                     return false;
                 }
 
-                const response = await fetch('/api/user/check-access', {
+                const response = await fetch('/api/user/check-share-access', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -8296,6 +8287,24 @@
             } else {
                 console.log('⚠️ User does not have share access');
             }
+        }
+        
+        // Get location display name for sharing
+        function getLocationDisplayName() {
+            if (!selectedLocation) return 'Адрес не указан';
+            
+            let locationString = selectedLocation.country_name || '';
+            if (selectedLocation.city_name) {
+                locationString += `, ${selectedLocation.city_name}`;
+            }
+            if (selectedLocation.county_name) {
+                locationString += `, ${selectedLocation.county_name}`;
+            }
+            if (selectedLocation.district_name) {
+                locationString += `, ${selectedLocation.district_name}`;
+            }
+            
+            return locationString || 'Адрес не указан';
         }
 
         // Share report function
@@ -8337,7 +8346,7 @@
                     area: selectedListingTypes?.area,
                     // Get cleaned HTML content for sharing
                     full_report: {
-                        html: generateCleanReportHTML(),
+                        html: document.documentElement.outerHTML,
                         timestamp: new Date().toISOString()
                     }
                 };
@@ -8378,7 +8387,8 @@
             const shareDate = document.getElementById('shareReportDate');
             
             // Set modal content
-            shareLink.value = reportData.report_url || reportData.shareUrl;
+            const baseUrl = window.location.origin;
+            shareLink.value = baseUrl + (reportData.report_url || reportData.shareUrl);
             shareTitle.textContent = reportData.title;
             shareDate.textContent = new Date(reportData.created_at).toLocaleString('ru-RU');
             
@@ -8417,387 +8427,6 @@
                 alert('Ссылка скопирована в буфер обмена!');
             }
         }
-
-        // Generate clean HTML for report sharing
-        function generateCleanReportHTML() {
-            try {
-                // Get only the data content sections
-                const summaryContent = document.getElementById('summaryDataContent')?.innerHTML || '';
-                const propertyTrendsSection = document.getElementById('propertyTrendsSection')?.innerHTML || '';
-                
-                // Get location info
-                const locationName = getLocationDisplayName();
-                const propertyInfo = (selectedListingTypes?.area || 'N/A') + ' м², ' + (selectedListingTypes?.price || 'N/A') + ' ' + (selectedListingTypes?.currency || 'EUR');
-                
-                // Generate clean HTML structure
-                const htmlHead = `<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Отчет по оценке недвижимости - ` + locationName + `</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            line-height: 1.6;
-            color: #333;
-            background: #f8f9fa;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .report-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 15px;
-            flex: 1;
-        }
-
-        /* Header */
-        .report-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 30px 0;
-            margin-bottom: 30px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-        }
-
-        .header-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 15px;
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-
-        .logo {
-            width: 60px;
-            height: 60px;
-            background: white;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            font-weight: bold;
-            color: #667eea;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-        }
-
-        .header-info h1 {
-            font-size: 28px;
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
-
-        .header-info .subtitle {
-            font-size: 16px;
-            opacity: 0.9;
-            font-weight: 400;
-        }
-
-        .header-info .location {
-            font-size: 18px;
-            margin-top: 5px;
-            opacity: 0.95;
-        }
-
-        .header-info .property-details {
-            font-size: 14px;
-            margin-top: 5px;
-            opacity: 0.8;
-        }
-
-        /* Main content */
-        .report-content {
-            background: white;
-            border-radius: 16px;
-            padding: 30px;
-            margin-bottom: 30px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-        }
-
-        /* Market indicators table styles */
-        .market-indicators-table { margin-top: 20px; }
-        .market-data-table {
-            width: 100%;
-            background: #f8f9fa;
-            border-radius: 16px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-            border: 1px solid rgba(0, 0, 0, 0.05);
-            border-collapse: collapse;
-        }
-        .market-data-table thead { background: linear-gradient(90deg, #4CAF50, #45a049); }
-        .category-header {
-            padding: 20px 25px;
-            color: white;
-            font-size: 18px;
-            font-weight: 700;
-            text-align: center;
-            border: none;
-            width: 50%;
-        }
-        .data-cell {
-            padding: 20px 25px;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-            background: white;
-        }
-        .data-cell:last-child { border-bottom: none; }
-        .cell-label {
-            font-size: 14px;
-            color: #666;
-            margin-bottom: 8px;
-            font-weight: 500;
-        }
-        .cell-value {
-            font-size: 16px;
-            font-weight: 700;
-            color: #333;
-            line-height: 1.2;
-        }
-
-        /* Price forecast styles */
-        .price-forecast-market-table {
-            width: 100%;
-            background: #f8f9fa;
-            border-radius: 16px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-            border: 1px solid rgba(0, 0, 0, 0.05);
-            border-collapse: collapse;
-            margin: 20px 0;
-        }
-        .price-forecast-market-table thead {
-            background: linear-gradient(90deg, #4CAF50, #45a049);
-        }
-        .forecast-category-header {
-            padding: 20px 25px;
-            color: white;
-            font-size: 18px;
-            font-weight: 700;
-            text-align: center;
-            border: none;
-            width: 50%;
-        }
-        .forecast-data-cell {
-            padding: 20px 25px;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-            background: white;
-        }
-        .forecast-cell-label {
-            font-size: 14px;
-            color: #666;
-            margin-bottom: 8px;
-            font-weight: 500;
-        }
-        .forecast-cell-value {
-            font-size: 16px;
-            font-weight: 700;
-            color: #333;
-            line-height: 1.2;
-        }
-        .forecast-cell-value.user-price { color: #007bff; }
-        .forecast-cell-value.market-price { color: #6f42c1; }
-        .forecast-cell-growth {
-            font-size: 12px;
-            margin-top: 4px;
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-weight: 600;
-            display: inline-block;
-        }
-        .forecast-cell-growth.positive {
-            background: #d4edda;
-            color: #155724;
-        }
-        .forecast-cell-growth.negative {
-            background: #f8d7da;
-            color: #721c24;
-        }
-
-        /* Trends styles */
-        .data-section {
-            margin: 30px 0;
-            background: white;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        .data-section-title {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 20px 25px;
-            margin: 0;
-            font-size: 20px;
-            font-weight: 600;
-        }
-        .data-section-content { padding: 25px; }
-        .trends-table { width: 100%; border-collapse: collapse; margin: 15px 0; }
-        .trends-table th {
-            background: #28a745;
-            color: white;
-            padding: 12px 8px;
-            text-align: center;
-            font-weight: 600;
-            font-size: 12px;
-        }
-        .trends-table td {
-            padding: 10px 8px;
-            text-align: center;
-            border-bottom: 1px solid #dee2e6;
-            font-size: 11px;
-        }
-        .trends-table tr:nth-child(even) { background: #f8f9fa; }
-
-        /* Footer */
-        .report-footer {
-            background: #2c3e50;
-            color: white;
-            padding: 25px 0;
-            text-align: center;
-            margin-top: auto;
-        }
-
-        .footer-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 15px;
-        }
-
-        .footer-logo {
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 10px;
-            color: #3498db;
-        }
-
-        .footer-text {
-            margin-bottom: 15px;
-            opacity: 0.9;
-        }
-
-        .telegram-button {
-            display: inline-block;
-            background: linear-gradient(135deg, #0088cc, #006ba8);
-            color: white;
-            padding: 12px 24px;
-            border-radius: 25px;
-            text-decoration: none;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0,136,204,0.3);
-        }
-
-        .telegram-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0,136,204,0.4);
-            color: white;
-            text-decoration: none;
-        }
-
-        /* Responsive design */
-        @media (max-width: 768px) {
-            .header-content {
-                flex-direction: column;
-                text-align: center;
-                gap: 15px;
-            }
-
-            .header-info h1 {
-                font-size: 22px;
-            }
-
-            .report-content {
-                padding: 20px;
-                margin-bottom: 20px;
-            }
-
-            .report-container {
-                padding: 0 10px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .header-info h1 {
-                font-size: 20px;
-            }
-
-            .report-content {
-                padding: 15px;
-            }
-        }
-
-        /* Ensure full width on all devices */
-        @media (min-width: 1200px) {
-            .report-container,
-            .header-content,
-            .footer-content {
-                max-width: 100%;
-                padding: 0 30px;
-            }
-        }
-    </style>
-</head>`;
-
-                const htmlBody = `<body>
-    <div class="report-header">
-        <div class="header-content">
-            <div class="logo">🏠</div>
-            <div class="header-info">
-                <h1>Aaadviser</h1>
-                <div class="subtitle">Инсайты рынка недвижимости</div>
-                <div class="location">` + locationName + `</div>
-                <div class="property-details">` + propertyInfo + `</div>
-            </div>
-        </div>
-    </div>
-
-    <div class="report-container">
-        <div class="report-content">
-            ` + summaryContent + `
-            ` + (propertyTrendsSection ? '<div class="trends-section">' + propertyTrendsSection + '</div>' : '') + `
-            
-            <div style="margin-top: 30px; padding: 20px; background: #fff3cd; border-radius: 12px; text-align: center;">
-                <p style="margin: 0; color: #856404; font-style: italic;">
-                    Отчет создан ` + new Date().toLocaleDateString('ru-RU') + ` с помощью Aaadviser
-                </p>
-            </div>
-        </div>
-    </div>
-
-    <div class="report-footer">
-        <div class="footer-content">
-            <div class="footer-logo">🏠 Aaadviser</div>
-            <div class="footer-text">
-                Профессиональная аналитика недвижимости с AI-прогнозами
-            </div>
-            <a href="https://t.me/Aaadviser_bot?start=webapp" class="telegram-button">
-                📱 Открыть приложение в Telegram
-            </a>
-        </div>
-    </div>
-</body>
-</html>`;
-
-                const cleanHTML = htmlHead + htmlBody;
-                return cleanHTML;
-            } catch (error) {
-                console.error('Error generating clean report HTML:', error);
-                return document.documentElement.outerHTML; // Fallback to original
-            }
-        }
-
-
 
         // Function to convert currency to EUR (base currency)
         async function convertToEUR(amount, fromCurrency) {
