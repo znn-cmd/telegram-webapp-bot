@@ -637,6 +637,70 @@
                 font-size: 12px;
             }
             
+            /* Price Forecast Extra Small Screens */
+            .price-forecast-market-table {
+                border-radius: 10px;
+            }
+            
+            .forecast-category-header {
+                padding: 14px 16px;
+                font-size: 14px;
+            }
+            
+            .forecast-data-cell {
+                padding: 14px 16px;
+            }
+            
+            .forecast-cell-label {
+                font-size: 12px;
+                margin-bottom: 4px;
+            }
+            
+            .forecast-cell-value {
+                font-size: 12px;
+            }
+            
+            .forecast-cell-growth {
+                font-size: 10px;
+                margin-top: 2px;
+                padding: 1px 3px;
+            }
+            
+            .forecast-metrics-compact-section {
+                margin-top: 12px;
+                padding: 10px 12px;
+            }
+            
+            .forecast-metrics-compact-title {
+                font-size: 12px;
+                margin-bottom: 10px;
+            }
+            
+            .forecast-metrics-compact-grid {
+                gap: 8px;
+                grid-template-columns: 1fr; /* На очень маленьких экранах в одну колонку */
+            }
+            
+            .metric-compact-label,
+            .metric-compact-value {
+                font-size: 11px;
+            }
+            
+            .price-forecast-date {
+                font-size: 11px;
+                margin-top: 10px;
+            }
+            
+            .price-forecast-currency-info {
+                font-size: 9px;
+            }
+            
+            .price-forecast-disclaimer {
+                font-size: 9px;
+                padding: 6px;
+                margin-top: 6px;
+            }
+            
             /* Мобильные стили для блока "Анализ рынка" */
             .market-analysis-text-block {
                 margin: 20px 0;
@@ -2457,125 +2521,172 @@
             color: #dc3545;
         }
         
-        /* Table Price Forecast Block Styles */
+        /* Price Forecast Block Styles - Market Indicators Style */
         .price-forecast-table-block {
             margin-top: 20px;
-            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        }
+        
+        .price-forecast-market-table {
+            width: 100%;
+            background: #f8f9fa;
             border-radius: 16px;
-            border: 1px solid rgba(0, 0, 0, 0.05);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
             overflow: hidden;
-            position: relative;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            border-collapse: collapse;
         }
         
-        .price-forecast-table-content {
+        .price-forecast-market-table thead {
+            background: linear-gradient(90deg, #4CAF50, #45a049);
+        }
+        
+        .forecast-category-header {
             padding: 20px 25px;
-            position: relative;
-        }
-        
-        .price-forecast-table-content::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            width: 6px;
-            background: linear-gradient(45deg, #28a745, #20c997);
-        }
-        
-        .price-forecast-table-title {
+            color: white;
             font-size: 18px;
             font-weight: 700;
-            color: #333333;
-            margin-bottom: 20px;
             text-align: center;
+            border: none;
+            width: 50%;
         }
         
-        .price-forecast-table {
-            width: 100%;
-            border-collapse: collapse;
+        .forecast-data-cell {
+            padding: 20px 25px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.08);
             background: white;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-            margin-bottom: 20px;
-            table-layout: fixed;
-            font-size: 11px;
         }
         
-        .price-forecast-table th {
-            background: #f8f9fa;
-            color: #495057;
-            padding: 8px 6px;
-            text-align: center;
-            font-size: 11px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            border-bottom: 2px solid #dee2e6;
-        }
-        
-        .price-forecast-header-category {
-            width: 30%;
-            text-align: left !important;
-            padding-left: 8px !important;
-        }
-        
-        .price-forecast-header-current {
-            width: 25%;
-        }
-        
-        .price-forecast-header-future {
-            width: 25%;
-        }
-        
-        .price-forecast-header-growth {
-            width: 20%;
-        }
-        
-        .price-forecast-table td {
-            padding: 6px 4px;
-            border-bottom: 1px solid #f1f3f4;
-            vertical-align: middle;
-            word-wrap: break-word;
-        }
-        
-        .price-forecast-table tr:last-child td {
+        .forecast-data-cell:last-child {
             border-bottom: none;
         }
         
-        .price-forecast-category {
-            font-size: 11px;
-            color: #495057;
-            font-weight: 600;
-            padding-left: 8px !important;
-            text-align: left !important;
-            line-height: 1.3;
+        .forecast-cell-label {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 8px;
+            font-weight: 500;
         }
         
-        .price-forecast-current-value,
-        .price-forecast-future-value {
-            font-size: 12px;
+        .forecast-cell-value {
+            font-size: 16px;
             font-weight: 700;
-            text-align: center;
-            line-height: 1.3;
+            color: #333;
+            line-height: 1.2;
         }
         
-        .price-forecast-current-value.user {
+        .forecast-cell-value.positive {
+            color: #28a745;
+        }
+        
+        .forecast-cell-value.negative {
+            color: #dc3545;
+        }
+        
+        .forecast-cell-value.user-price {
             color: #007bff;
         }
         
-        .price-forecast-current-value.market {
-            color: #495057;
-        }
-        
-        .price-forecast-current-value.rent {
+        .forecast-cell-value.market-price {
             color: #6f42c1;
         }
         
-        .price-forecast-future-value {
+        .forecast-cell-growth {
+            font-size: 12px;
+            margin-top: 4px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 600;
+            display: inline-block;
+        }
+        
+        .forecast-cell-growth.positive {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .forecast-cell-growth.negative {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        /* Metrics block for price forecast */
+        .forecast-metrics-compact-section {
+            margin-top: 20px;
+            padding: 15px 25px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        
+        .forecast-metrics-compact-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .forecast-metrics-compact-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .metric-compact-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+        }
+        
+        .metric-compact-label {
+            font-size: 14px;
+            color: #666;
+            font-weight: 500;
+        }
+        
+        .metric-compact-value {
+            font-size: 14px;
+            font-weight: 700;
+            color: #333;
+        }
+        
+        .metric-compact-value.positive {
             color: #28a745;
         }
+        
+        .metric-compact-value.negative {
+            color: #dc3545;
+        }
+        
+        /* Footer info styles */
+        .price-forecast-date {
+            margin-top: 15px;
+            text-align: center;
+            font-size: 14px;
+            color: #666;
+            font-weight: 600;
+        }
+        
+        .price-forecast-currency-info {
+            margin-top: 5px;
+            text-align: center;
+            font-size: 12px;
+            color: #888;
+        }
+        
+        .price-forecast-disclaimer {
+            margin-top: 10px;
+            padding: 10px;
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            font-size: 11px;
+            color: #856404;
+            text-align: center;
+            font-style: italic;
+        }
+
         
         .price-forecast-growth {
             text-align: center;
@@ -2798,56 +2909,72 @@
                 padding: 1px 4px;
             }
             
-            /* Table Price Forecast Mobile Styles */
+            /* Price Forecast Mobile Styles - Market Style */
             .price-forecast-table-block {
+                margin-top: 16px;
+            }
+            
+            .price-forecast-market-table {
+                border-radius: 12px;
+            }
+            
+            .forecast-category-header {
+                padding: 16px 20px;
+                font-size: 16px;
+            }
+            
+            .forecast-data-cell {
+                padding: 16px 20px;
+            }
+            
+            .forecast-cell-label {
+                font-size: 14px;
+                margin-bottom: 6px;
+            }
+            
+            .forecast-cell-value {
+                font-size: 14px;
+            }
+            
+            .forecast-cell-growth {
+                font-size: 11px;
+                margin-top: 3px;
+                padding: 1px 4px;
+            }
+            
+            .forecast-metrics-compact-section {
                 margin-top: 15px;
+                padding: 12px 16px;
             }
             
-            .price-forecast-table-content {
-                padding: 10px 8px;
-            }
-            
-            .price-forecast-table-title {
+            .forecast-metrics-compact-title {
                 font-size: 14px;
                 margin-bottom: 12px;
             }
             
-            .price-forecast-table {
+            .forecast-metrics-compact-grid {
+                gap: 10px;
+            }
+            
+            .metric-compact-label,
+            .metric-compact-value {
+                font-size: 12px;
+            }
+            
+            .price-forecast-date {
+                font-size: 12px;
+                margin-top: 12px;
+            }
+            
+            .price-forecast-currency-info {
                 font-size: 10px;
             }
             
-            .price-forecast-table th,
-            .price-forecast-table td {
-                padding: 4px 2px;
-            }
-            
-            .price-forecast-category {
-                font-size: 9px;
-                padding-left: 4px !important;
-                line-height: 1.2;
-            }
-            
-            .price-forecast-current-value,
-            .price-forecast-future-value {
+            .price-forecast-disclaimer {
                 font-size: 10px;
-                line-height: 1.2;
+                padding: 8px;
+                margin-top: 8px;
             }
-            
-            .price-forecast-growth {
-                font-size: 9px;
-            }
-            
-            .price-comparison-inline {
-                font-size: 8px;
-                padding: 1px 2px;
-                margin-top: 1px;
-            }
-            
-            /* Адаптируем ширины столбцов на мобильных */
-            .price-forecast-header-category { width: 32%; }
-            .price-forecast-header-current { width: 24%; }
-            .price-forecast-header-future { width: 24%; }
-            .price-forecast-header-growth { width: 20%; }
             
             .forecast-metrics-compact-section {
                 padding: 12px;
@@ -7669,48 +7796,57 @@
             
             const texts = forecastTexts[currentLanguage] || forecastTexts['ru'];
             
-            // Формируем HTML для табличного блока прогноза цен
+            // Формируем HTML для блока прогноза цен в стиле "Показатели рынка"
             let forecastHtml = '<div class="price-forecast-table-block">';
-            forecastHtml += '<div class="price-forecast-table-content">';
-            forecastHtml += `<h4 class="price-forecast-table-title">${texts.title}</h4>`;
             
-            // Основная таблица с ценами
-            forecastHtml += '<table class="price-forecast-table">';
+            // Основная таблица в стиле показателей рынка
+            forecastHtml += '<table class="price-forecast-market-table">';
             forecastHtml += '<thead>';
             forecastHtml += '<tr>';
-            forecastHtml += '<th class="price-forecast-header-category">Показатель</th>';
-            forecastHtml += '<th class="price-forecast-header-current">Текущая<br>стоимость</th>';
-            forecastHtml += '<th class="price-forecast-header-future">Прогнозная<br>стоимость</th>';
-            forecastHtml += '<th class="price-forecast-header-growth">Прирост</th>';
+            forecastHtml += `<th class="forecast-category-header">${texts.currentPrice}</th>`;
+            forecastHtml += `<th class="forecast-category-header">${texts.futurePrice}</th>`;
             forecastHtml += '</tr>';
             forecastHtml += '</thead>';
             forecastHtml += '<tbody>';
             
-            // Строка: Цена продажи пользователя
-            forecastHtml += '<tr class="price-forecast-user-row">';
-            forecastHtml += `<td class="price-forecast-category">${texts.userSaleLabel}</td>`;
-            forecastHtml += `<td class="price-forecast-current-value user">€${userPriceInEUR.toLocaleString('ru-RU', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</td>`;
-            forecastHtml += `<td class="price-forecast-future-value">€${forecastSalePriceInEUR.toLocaleString('ru-RU', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</td>`;
-            forecastHtml += `<td class="price-forecast-growth ${userPriceGrowth >= 0 ? 'positive' : 'negative'}">${userPriceGrowth >= 0 ? '+' : ''}${userPriceGrowth.toFixed(1)}%</td>`;
-            forecastHtml += '</tr>';
-            
-            // Строка: Рыночная цена
-            forecastHtml += '<tr class="price-forecast-market-row">';
-            forecastHtml += `<td class="price-forecast-category">${texts.marketSaleLabel}</td>`;
-            forecastHtml += '<td class="price-forecast-current-value market">';
-            forecastHtml += `€${marketSalePriceInEUR.toLocaleString('ru-RU', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
-            forecastHtml += `<div class="price-comparison-inline ${userVsMarketDiff >= 0 ? 'market-higher' : 'market-lower'}">${userVsMarketDiff >= 0 ? '+' : ''}${userVsMarketDiff.toFixed(1)}%</div>`;
+            // Строка 1: Цена продажи
+            forecastHtml += '<tr>';
+            forecastHtml += '<td class="forecast-data-cell">';
+            forecastHtml += `<div class="forecast-cell-label">${texts.userSaleLabel}:</div>`;
+            forecastHtml += `<div class="forecast-cell-value user-price">€${userPriceInEUR.toLocaleString('ru-RU', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</div>`;
             forecastHtml += '</td>';
-            forecastHtml += `<td class="price-forecast-future-value">€${forecastSalePriceInEUR.toLocaleString('ru-RU', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</td>`;
-            forecastHtml += `<td class="price-forecast-growth ${marketSalePriceGrowth >= 0 ? 'positive' : 'negative'}">${marketSalePriceGrowth >= 0 ? '+' : ''}${marketSalePriceGrowth.toFixed(1)}%</td>`;
+            forecastHtml += '<td class="forecast-data-cell">';
+            forecastHtml += `<div class="forecast-cell-label">${texts.userSaleLabel}:</div>`;
+            forecastHtml += `<div class="forecast-cell-value">€${forecastSalePriceInEUR.toLocaleString('ru-RU', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</div>`;
+            forecastHtml += `<div class="forecast-cell-growth ${userPriceGrowth >= 0 ? 'positive' : 'negative'}">${userPriceGrowth >= 0 ? '+' : ''}${userPriceGrowth.toFixed(1)}%</div>`;
+            forecastHtml += '</td>';
             forecastHtml += '</tr>';
             
-            // Строка: Ставка аренды
-            forecastHtml += '<tr class="price-forecast-rent-row">';
-            forecastHtml += `<td class="price-forecast-category">${texts.rentLabel}</td>`;
-            forecastHtml += `<td class="price-forecast-current-value rent">€${marketRentPriceInEUR.toLocaleString('ru-RU', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}/мес</td>`;
-            forecastHtml += `<td class="price-forecast-future-value">€${forecastRentPriceInEUR.toLocaleString('ru-RU', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}/мес</td>`;
-            forecastHtml += `<td class="price-forecast-growth ${rentPriceGrowth >= 0 ? 'positive' : 'negative'}">${rentPriceGrowth >= 0 ? '+' : ''}${rentPriceGrowth.toFixed(1)}%</td>`;
+            // Строка 2: Рыночная цена
+            forecastHtml += '<tr>';
+            forecastHtml += '<td class="forecast-data-cell">';
+            forecastHtml += `<div class="forecast-cell-label">${texts.marketSaleLabel}:</div>`;
+            forecastHtml += `<div class="forecast-cell-value market-price">€${marketSalePriceInEUR.toLocaleString('ru-RU', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</div>`;
+            forecastHtml += `<div class="forecast-cell-growth ${userVsMarketDiff >= 0 ? 'positive' : 'negative'}">к вашей цене: ${userVsMarketDiff >= 0 ? '+' : ''}${userVsMarketDiff.toFixed(1)}%</div>`;
+            forecastHtml += '</td>';
+            forecastHtml += '<td class="forecast-data-cell">';
+            forecastHtml += `<div class="forecast-cell-label">${texts.marketSaleLabel}:</div>`;
+            forecastHtml += `<div class="forecast-cell-value">€${forecastSalePriceInEUR.toLocaleString('ru-RU', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</div>`;
+            forecastHtml += `<div class="forecast-cell-growth ${marketSalePriceGrowth >= 0 ? 'positive' : 'negative'}">${marketSalePriceGrowth >= 0 ? '+' : ''}${marketSalePriceGrowth.toFixed(1)}%</div>`;
+            forecastHtml += '</td>';
+            forecastHtml += '</tr>';
+            
+            // Строка 3: Ставка аренды
+            forecastHtml += '<tr>';
+            forecastHtml += '<td class="forecast-data-cell">';
+            forecastHtml += `<div class="forecast-cell-label">${texts.rentLabel}:</div>`;
+            forecastHtml += `<div class="forecast-cell-value">€${marketRentPriceInEUR.toLocaleString('ru-RU', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}/мес</div>`;
+            forecastHtml += '</td>';
+            forecastHtml += '<td class="forecast-data-cell">';
+            forecastHtml += `<div class="forecast-cell-label">${texts.rentLabel}:</div>`;
+            forecastHtml += `<div class="forecast-cell-value">€${forecastRentPriceInEUR.toLocaleString('ru-RU', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}/мес</div>`;
+            forecastHtml += `<div class="forecast-cell-growth ${rentPriceGrowth >= 0 ? 'positive' : 'negative'}">${rentPriceGrowth >= 0 ? '+' : ''}${rentPriceGrowth.toFixed(1)}%</div>`;
+            forecastHtml += '</td>';
             forecastHtml += '</tr>';
             
             forecastHtml += '</tbody>';
@@ -7760,7 +7896,7 @@
             
             const disclaimerText = disclaimerTexts[currentLanguage] || disclaimerTexts['ru'];
             forecastHtml += `<div class="price-forecast-disclaimer">${disclaimerText}</div>`;
-            forecastHtml += '</div></div>';
+            forecastHtml += '</div>'; // Закрываем price-forecast-table-block
             
             return forecastHtml;
         }
