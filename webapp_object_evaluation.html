@@ -5541,7 +5541,7 @@
                             const data = await response.json();
                             console.log('👤 Admin status check result:', data);
                             return data.is_admin === true;
-                        } else {
+            } else {
                             console.error('❌ Failed to check admin status:', response.status);
                             return false;
                         }
@@ -5618,7 +5618,7 @@
                 }                     else if (isHistoricalMonth) {
                         rowClass = 'historical-row';
                         rowStyle = '';
-                    }
+                }
                 
                 // Используем рассчитанные цены для исторических месяцев
                 const salePrice = trend.is_price_calculated ? trend.calculated_sale_price : trend.unit_price_for_sale;
@@ -5676,7 +5676,10 @@
                     if (trend.property_year > currentYear) {
                         return true; // Будущие годы
                     } else if (trend.property_year === currentYear) {
-                        return trend.property_month >= currentMonth; // Текущий месяц и будущие
+                        return trend.property_month >= currentMonth - 1; // 1 месяц до текущего + текущий + будущие
+                    } else if (trend.property_year === currentYear - 1) {
+                        // Для случая, когда текущий месяц - январь, а предыдущий - декабрь прошлого года
+                        return currentMonth === 1 && trend.property_month === 12;
                     }
                     return false;
                 });
@@ -6023,17 +6026,20 @@
             
             console.log('📅 Current date:', currentYear, currentMonth);
             
-            // Фильтруем тренды: только БУДУЩИЕ месяцы (следующие за текущим)
+            // Фильтруем тренды: 1 месяц до текущего + текущий + будущие месяцы
             const forecastTrends = trendsWithHistoricalPrices.filter(trend => {
                 if (trend.property_year > currentYear) {
                     return true; // Будущие годы
                 } else if (trend.property_year === currentYear) {
-                    return trend.property_month > currentMonth; // Только месяцы ПОСЛЕ текущего
+                    return trend.property_month >= currentMonth - 1; // 1 месяц до текущего + текущий + будущие
+                } else if (trend.property_year === currentYear - 1) {
+                    // Для случая, когда текущий месяц - январь, а предыдущий - декабрь прошлого года
+                    return currentMonth === 1 && trend.property_month === 12;
                 }
                 return false;
             });
             
-            console.log('🔮 Filtered forecast trends (future months only):', forecastTrends.length, 'records');
+            console.log('🔮 Filtered forecast trends (1 previous + current + future):', forecastTrends.length, 'records');
             
             if (forecastTrends.length === 0) {
                 return '';
@@ -6061,20 +6067,34 @@
             
             // Добавляем информацию о прогнозе
             forecastHtml += `<tr class="forecast-info"><td colspan="4" style="text-align: center; font-size: 11px; color: #666; background: #f8f9fa; padding: 4px;">
-                Прогноз на основе ${forecastTrends.length} месяцев (будущие)
+                Прогноз на основе ${forecastTrends.length} месяцев (предыдущий + текущий + будущие)
             </td></tr>`;
             
             forecastTrends.forEach((trend, index) => {
-                // Все месяцы в прогнозе - будущие, так как мы исключили текущий
-                const rowClass = 'forecast-row';
-                const rowStyle = '';
+                // Определяем тип месяца для стилизации
+                const isCurrentMonth = trend.property_year === currentYear && trend.property_month === currentMonth;
+                const isPreviousMonth = (trend.property_year === currentYear && trend.property_month === currentMonth - 1) ||
+                                      (currentMonth === 1 && trend.property_year === currentYear - 1 && trend.property_month === 12);
+                const isFutureMonth = trend.property_year > currentYear || 
+                                    (trend.property_year === currentYear && trend.property_month > currentMonth);
+                
+                let rowClass = 'forecast-row';
+                let rowStyle = '';
+                
+                if (isCurrentMonth) {
+                    rowClass = 'current-month-row';
+                    rowStyle = 'background-color: #e8f4fd; font-weight: bold;';
+                } else if (isPreviousMonth) {
+                    rowClass = 'previous-month-row';
+                    rowStyle = 'background-color: #f8f9fa;';
+                } // Будущие месяцы остаются без дополнительного стиля
                 
                 // Используем рассчитанные цены если они есть, иначе исходные
                 const salePrice = trend.is_price_calculated ? trend.calculated_sale_price : trend.unit_price_for_sale;
                 const rentPrice = trend.is_price_calculated ? trend.calculated_rent_price : trend.unit_price_for_rent;
                 const yieldValue = trend.yield;
                 
-                console.log(`🔮 Forecast row ${index + 1}: ${formatTrendDateShort(trend.date)} - Sale: ${salePrice}, Rent: ${rentPrice}, Calculated: ${trend.is_price_calculated}`);
+                console.log(`🔮 Forecast row ${index + 1}: ${formatTrendDateShort(trend.date)} - Sale: ${salePrice}, Rent: ${rentPrice}, Type: ${isCurrentMonth ? 'current' : isPreviousMonth ? 'previous' : 'future'}`);
                 
                 forecastHtml += `<tr class="${rowClass}" style="${rowStyle}">`;
                 forecastHtml += `<td>${formatTrendDateShort(trend.date)}</td>`;
