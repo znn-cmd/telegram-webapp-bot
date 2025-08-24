@@ -231,6 +231,192 @@
             color: #dc3545;
         }
         
+        /* Compact Price Forecast Block Styles */
+        .price-forecast-compact-block {
+            margin-top: 20px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 16px;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .price-forecast-compact-content {
+            padding: 20px 25px;
+            position: relative;
+        }
+        
+        .price-forecast-compact-content::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 6px;
+            background: linear-gradient(45deg, #28a745, #20c997);
+        }
+        
+        .price-forecast-compact-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #333333;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .price-forecast-compact-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .price-forecast-compact-column {
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            position: relative;
+        }
+        
+        .price-forecast-compact-column.current {
+            border-left: 4px solid #6c757d;
+        }
+        
+        .price-forecast-compact-column.future {
+            border-left: 4px solid #28a745;
+        }
+        
+        .price-column-compact-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 12px;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .price-forecast-compact-section {
+            margin-bottom: 10px;
+        }
+        
+        .price-forecast-compact-section:last-child {
+            margin-bottom: 0;
+        }
+        
+        .price-forecast-compact-label {
+            font-size: 11px;
+            color: #6c757d;
+            margin-bottom: 3px;
+            font-weight: 500;
+        }
+        
+        .price-forecast-compact-value {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 3px;
+        }
+        
+        .price-forecast-compact-value.user {
+            color: #007bff;
+        }
+        
+        .price-forecast-compact-value.market {
+            color: #495057;
+        }
+        
+        .price-forecast-compact-value.rent {
+            color: #6f42c1;
+        }
+        
+        .price-forecast-compact-value.future {
+            color: #28a745;
+        }
+        
+        .price-comparison {
+            font-size: 11px;
+            font-weight: 600;
+            padding: 2px 6px;
+            border-radius: 8px;
+            display: inline-block;
+        }
+        
+        .price-comparison.market-higher {
+            background: rgba(40, 167, 69, 0.1);
+            color: #28a745;
+        }
+        
+        .price-comparison.market-lower {
+            background: rgba(220, 53, 69, 0.1);
+            color: #dc3545;
+        }
+        
+        .price-growth-dual {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        
+        .price-growth-dual .price-growth {
+            font-size: 10px;
+            font-weight: 600;
+            padding: 2px 6px;
+            border-radius: 8px;
+        }
+        
+        .forecast-metrics-compact-section {
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .forecast-metrics-compact-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #333333;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+        
+        .forecast-metrics-compact-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+        
+        .metric-compact-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 10px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, 0.05);
+        }
+        
+        .metric-compact-label {
+            font-size: 11px;
+            color: #6c757d;
+            font-weight: 500;
+        }
+        
+        .metric-compact-value {
+            font-size: 13px;
+            font-weight: 700;
+            color: #333333;
+        }
+        
+        .metric-compact-value.positive {
+            color: #28a745;
+        }
+        
+        .metric-compact-value.negative {
+            color: #dc3545;
+        }
+        
         .price-forecast-date {
             font-size: 14px;
             color: #666666;
@@ -352,7 +538,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>🚀 Комплексное улучшение блока "Прогноз цен"</h1>
+        <h1>📊 Компактный блок "Прогноз цен" с ценой пользователя</h1>
         
         <div class="comparison">
             <div class="old-style">
@@ -390,58 +576,71 @@
             </div>
             
             <div class="new-style">
-                <div class="style-title">✅ Новый расширенный блок</div>
+                <div class="style-title">✅ Новый компактный блок</div>
                 
-                <div class="price-forecast-enhanced-block">
-                    <div class="price-forecast-enhanced-content">
-                        <h4 class="price-forecast-enhanced-title">Прогноз цен</h4>
+                <div class="price-forecast-compact-block">
+                    <div class="price-forecast-compact-content">
+                        <h4 class="price-forecast-compact-title">Прогноз цен</h4>
                         
-                        <div class="price-forecast-grid">
-                            <div class="price-forecast-column current">
-                                <div class="price-column-title">Текущая стоимость</div>
-                                <div class="price-forecast-value-section">
-                                    <div class="price-forecast-label">Цена продажи</div>
-                                    <div class="price-forecast-value current">€3 324 250</div>
+                        <div class="price-forecast-compact-grid">
+                            <div class="price-forecast-compact-column current">
+                                <div class="price-column-compact-title">Текущая стоимость</div>
+                                
+                                <div class="price-forecast-compact-section">
+                                    <div class="price-forecast-compact-label">Цена продажи</div>
+                                    <div class="price-forecast-compact-value user">€69 312</div>
                                 </div>
-                                <div class="price-forecast-value-section">
-                                    <div class="price-forecast-label">Ставка аренды</div>
-                                    <div class="price-forecast-value current">€16 621/мес</div>
+                                
+                                <div class="price-forecast-compact-section">
+                                    <div class="price-forecast-compact-label">Расчетная цена текущего рынка</div>
+                                    <div class="price-forecast-compact-value market">€69 312</div>
+                                    <div class="price-comparison market-higher">+16.9%</div>
+                                </div>
+                                
+                                <div class="price-forecast-compact-section">
+                                    <div class="price-forecast-compact-label">Ставка аренды</div>
+                                    <div class="price-forecast-compact-value rent">€348/мес</div>
                                 </div>
                             </div>
                             
-                            <div class="price-forecast-column future">
-                                <div class="price-column-title">Прогнозная стоимость</div>
-                                <div class="price-forecast-value-section">
-                                    <div class="price-forecast-label">Цена продажи</div>
-                                    <div class="price-forecast-value future">€3 910 885</div>
-                                    <div class="price-growth positive">+17.6%</div>
+                            <div class="price-forecast-compact-column future">
+                                <div class="price-column-compact-title">Прогнозная стоимость</div>
+                                
+                                <div class="price-forecast-compact-section">
+                                    <div class="price-forecast-compact-label">Цена продажи</div>
+                                    <div class="price-forecast-compact-value future">€81 029</div>
+                                    <div class="price-growth-dual">
+                                        <div class="price-growth positive">от пользователя: +16.9%</div>
+                                        <div class="price-growth positive">от рынка: +16.9%</div>
+                                    </div>
                                 </div>
-                                <div class="price-forecast-value-section">
-                                    <div class="price-forecast-label">Ставка аренды</div>
-                                    <div class="price-forecast-value future">€19 549/мес</div>
-                                    <div class="price-growth positive">+17.6%</div>
+                                
+                                <div class="price-forecast-compact-section">
+                                    <div class="price-forecast-compact-label">Ставка аренды</div>
+                                    <div class="price-forecast-compact-value future">€405/мес</div>
+                                    <div class="price-growth positive">+16.2%</div>
                                 </div>
                             </div>
                         </div>
                         
-                        <div class="forecast-metrics-section">
-                            <h5 class="forecast-metrics-title">Ключевые показатели</h5>
-                            <div class="forecast-metrics-grid">
-                                <div class="metric-item">
-                                    <div class="metric-label">Средняя доходность</div>
-                                    <div class="metric-value">6.0%</div>
+                        <div class="forecast-metrics-compact-section">
+                            <h5 class="forecast-metrics-compact-title">Ключевые показатели</h5>
+                            <div class="forecast-metrics-compact-grid">
+                                <div class="metric-compact-item">
+                                    <span class="metric-compact-label">Средняя доходность:</span>
+                                    <span class="metric-compact-value">5.9%</span>
                                 </div>
-                                <div class="metric-item">
-                                    <div class="metric-label">ROI за период</div>
-                                    <div class="metric-value positive">+17.6%</div>
+                                <div class="metric-compact-item">
+                                    <span class="metric-compact-label">ROI за период:</span>
+                                    <span class="metric-compact-value positive">+16.9%</span>
                                 </div>
-                                <div class="metric-item">
-                                    <div class="metric-label">Срок окупаемости</div>
-                                    <div class="metric-value">16.7 лет</div>
+                                <div class="metric-compact-item">
+                                    <span class="metric-compact-label">Срок окупаемости:</span>
+                                    <span class="metric-compact-value">16.7 лет</span>
                                 </div>
-                                <div class="metric-item">
-                                    <div class="metric-label">Период прогноза</div>
-                                    <div class="metric-value">12 мес.</div>
+                                <div class="metric-compact-item">
+                                    <span class="metric-compact-label">Период прогноза:</span>
+                                    <span class="metric-compact-value">10 мес.</span>
                                 </div>
                             </div>
                         </div>
@@ -455,12 +654,12 @@
                 <div style="margin-top: 15px; font-size: 14px; color: #666;">
                     <strong>Преимущества:</strong>
                     <ul style="margin: 5px 0; padding-left: 20px;">
-                        <li>✅ Динамика: текущая → прогнозная стоимость</li>
-                        <li>✅ Ключевые метрики: ROI, доходность, окупаемость</li>
-                        <li>✅ Курс из реальной БД currency</li>
-                        <li>✅ Современный responsive дизайн</li>
-                        <li>✅ Рассчитанные цены вместо базовых</li>
-                        <li>✅ Дисклеймер о прогнозе</li>
+                        <li>✅ <strong>Цена пользователя:</strong> Показывает цену объекта от пользователя</li>
+                        <li>✅ <strong>Рыночная цена:</strong> "Расчетная цена текущего рынка"</li>
+                        <li>✅ <strong>Сравнение:</strong> Разница между ценой пользователя и рынком в %</li>
+                        <li>✅ <strong>Двойной прирост:</strong> % от цены пользователя И от рыночной цены</li>
+                        <li>✅ <strong>Компактность:</strong> Более плотная подача информации</li>
+                        <li>✅ <strong>Метрики в 2 столбца:</strong> ROI, доходность, окупаемость</li>
                     </ul>
                 </div>
             </div>
@@ -469,13 +668,13 @@
         <div class="features">
             <h3>🎯 Реализованные улучшения:</h3>
             <ul>
-                <li><strong>✅ Исправлен API currency:</strong> Теперь использует реальную структуру таблицы (euro, try, rub, usd, aed, thb)</li>
-                <li><strong>✅ Рассчитанные цены:</strong> Использует prepareTrendsWithHistoricalPrices() для точных прогнозов</li>
-                <li><strong>✅ Детальный анализ:</strong> Показывает динамику роста, а не только конечную цену</li>
-                <li><strong>✅ Ключевые метрики:</strong> ROI, средняя доходность, срок окупаемости, период прогноза</li>
-                <li><strong>✅ Современный UI:</strong> Сетка с текущими/прогнозными ценами, метрики в отдельном блоке</li>
-                <li><strong>✅ Дисклеймер:</strong> Информация о точности прогноза и актуальной дате</li>
-                <li><strong>✅ Мобильная адаптация:</strong> Адаптивный дизайн для всех устройств</li>
+                <li><strong>✅ Компактность:</strong> Уменьшены отступы, более плотная подача информации</li>
+                <li><strong>✅ Цена пользователя:</strong> Добавлена "Цена продажи" от пользователя в текущей стоимости</li>
+                <li><strong>✅ Переименование:</strong> "Цена продажи" → "Расчетная цена текущего рынка"</li>
+                <li><strong>✅ Сравнение с рынком:</strong> Показывает разницу между ценой пользователя и рынком в %</li>
+                <li><strong>✅ Двойной прирост:</strong> Показывает % прироста от цены пользователя И от рыночной цены</li>
+                <li><strong>✅ Компактные метрики:</strong> Блок "Ключевые показатели" в 2 столбца</li>
+                <li><strong>✅ Цветовое кодирование:</strong> Синий (пользователь), серый (рынок), фиолетовый (аренда), зеленый (прогноз)</li>
             </ul>
         </div>
         
