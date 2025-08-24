@@ -5345,7 +5345,7 @@
         }
 
                 // Filter trends to show all historical data without month restrictions
-        function filterTrendsByDateRange(trends) {
+        function filterTrendsByDateRange(trends, isAdmin = false) {
             if (!trends || trends.length === 0) return [];
             
             const currentYear = new Date().getFullYear();
@@ -5353,6 +5353,7 @@
             
             console.log(`🔍 Filtering trends: current date = ${currentYear}-${currentMonth}`);
             console.log(`🔍 Total trends = ${trends.length}`);
+            console.log(`👤 User is admin: ${isAdmin}`);
             
             // Сортируем тренды по property_year и property_month (новые сначала)
             const sortedTrends = trends.sort((a, b) => {
@@ -5367,24 +5368,38 @@
                 console.log(`  ${index}: ${trend.property_year}-${trend.property_month} (${trend.date})`);
             });
             
-            // Теперь показываем ВСЕ тренды без ограничений по месяцам
-            console.log(`🔍 Showing ALL trends without month restrictions`);
+            // Фильтруем тренды в зависимости от статуса пользователя
+            let filteredTrends;
+            if (isAdmin) {
+                // Админы видят все данные (включая будущие)
+                console.log(`👑 Admin access: showing ALL trends including future data`);
+                filteredTrends = sortedTrends;
+            } else {
+                // Обычные пользователи видят только текущий месяц и прошлые
+                console.log(`👤 Regular user: hiding future data`);
+                filteredTrends = sortedTrends.filter(trend => {
+                    const isCurrentOrPast = trend.property_year < currentYear || 
+                                          (trend.property_year === currentYear && trend.property_month <= currentMonth);
+                    return isCurrentOrPast;
+                });
+                console.log(`🔒 Filtered ${sortedTrends.length} trends to ${filteredTrends.length} (removed future data)`);
+            }
             
-            // Простая хронологическая сортировка: старые даты вверху, новые внизу
-            const sortedForDisplay = sortedTrends.sort((a, b) => {
+            // Обратная хронологическая сортировка: новые даты вверху, старые внизу
+            const sortedForDisplay = filteredTrends.sort((a, b) => {
                 const yearA = a.property_year;
                 const monthA = a.property_month;
                 const yearB = b.property_year;
                 const monthB = b.property_month;
                 
-                // Сортируем по возрастанию (старые даты сначала)
+                // Сортируем по убыванию (новые даты сначала)
                 if (yearA !== yearB) {
-                    return yearA - yearB; // 2022 перед 2023, 2023 перед 2024, и т.д.
+                    return yearB - yearA; // 2026 перед 2025, 2025 перед 2024, и т.д.
                 }
-                return monthA - monthB; // Январь перед февралем, февраль перед мартом, и т.д.
+                return monthB - monthA; // Декабрь перед ноябрем, ноябрь перед октябрем, и т.д.
             });
             
-            console.log(`✅ Returning all ${sortedForDisplay.length} trends without restrictions`);
+            console.log(`✅ Returning ${sortedForDisplay.length} trends for ${isAdmin ? 'admin' : 'regular'} user`);
             return sortedForDisplay;
         }
 
@@ -5493,6 +5508,39 @@
             return updatedTrends;
         }
 
+        // Check if current user has admin status
+        async function checkUserAdminStatus() {
+            try {
+                if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe && window.Telegram.WebApp.initDataUnsafe.user) {
+                    const user = window.Telegram.WebApp.initDataUnsafe.user;
+                    if (user && user.id) {
+                        // Check if user is admin via API
+                        const response = await fetch('/api/check_admin_status', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({ telegram_id: user.id })
+                        });
+                        
+                        if (response.ok) {
+                            const data = await response.json();
+                            console.log('👤 Admin status check result:', data);
+                            return data.is_admin === true;
+                        } else {
+                            console.error('❌ Failed to check admin status:', response.status);
+                            return false;
+                        }
+                    }
+                }
+                console.log('⚠️ No user data available for admin check');
+                return false;
+            } catch (error) {
+                console.error('❌ Error checking admin status:', error);
+                return false;
+            }
+        }
+
         // Generate detailed trends table
         async function generateTrendsTable(trends) {
             console.log('📊 Generating trends table with trends:', trends.length, 'records');
@@ -5502,12 +5550,16 @@
                 return '<div class="no-data">Нет данных для отображения</div>';
             }
             
+            // Проверяем статус админа пользователя
+            const isAdmin = await checkUserAdminStatus();
+            console.log(`👤 User admin status: ${isAdmin}`);
+            
             // Подготавливаем тренды с рассчитанными историческими ценами
             const trendsWithHistoricalPrices = prepareTrendsWithHistoricalPrices(trends);
             console.log('🔢 Тренды с историческими ценами подготовлены:', trendsWithHistoricalPrices.length, 'записей');
             
-            // Фильтруем тренды по диапазону дат
-            const filteredTrends = filterTrendsByDateRange(trendsWithHistoricalPrices);
+            // Фильтруем тренды по диапазону дат (с учетом статуса админа)
+            const filteredTrends = filterTrendsByDateRange(trendsWithHistoricalPrices, isAdmin);
             console.log('🔍 Filtered trends for table:', filteredTrends.length, 'records');
             
             if (filteredTrends.length === 0) {
