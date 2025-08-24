@@ -7719,12 +7719,9 @@ def check_share_access():
         
         if not telegram_id:
             return jsonify({'error': 'telegram_id required'}), 400
-        
-        # Get user from database with retry
-        def get_user_for_access():
-            return supabase.table('users').select('*').eq('telegram_id', telegram_id).execute()
-        
-        user_result = supabase_retry_operation(get_user_for_access)
+            
+        # Get user from database
+        user_result = supabase.table('users').select('*').eq('telegram_id', telegram_id).execute()
         if not user_result.data:
             return jsonify({'hasShareAccess': False, 'reason': 'User not found'}), 200
         
@@ -7771,48 +7768,12 @@ def check_share_access():
         except Exception as e:
             logger.error(f"Error parsing period_end: {e}")
             return jsonify({'hasShareAccess': False, 'reason': 'Date parsing error'}), 200
-        
+            
     except Exception as e:
-        error_message = str(e)
-        
-        # Check for specific timeout errors
-        if any(timeout_error in error_message.lower() for timeout_error in ['timeout', 'timed out', 'connecttimeout']):
-            logger.error(f"⚠️ Network timeout checking share access: {e}")
-            return jsonify({
-                'hasShareAccess': False, 
-                'error': 'Network timeout: Unable to verify access. Please try again.',
-                'error_type': 'timeout'
-            }), 408
-        else:
-            logger.error(f"❌ Error checking share access: {e}")
-            return jsonify({
-                'hasShareAccess': False,
-                'error': 'Unable to verify access. Please try again later.',
-                'error_type': 'server_error'
-            }), 500
+        logger.error(f"Error checking share access: {e}")
+        return jsonify({'error': 'Internal server error'}), 500
 
 # API endpoint to save reports
-def supabase_retry_operation(operation, max_retries=3, delay=1):
-    """Retry Supabase operations with exponential backoff"""
-    import time
-    from httpx import ConnectTimeout, ReadTimeout, TimeoutException
-    from httpcore import ConnectTimeout as HttpCoreConnectTimeout
-    
-    for attempt in range(max_retries):
-        try:
-            return operation()
-        except (ConnectTimeout, ReadTimeout, TimeoutException, HttpCoreConnectTimeout) as e:
-            if attempt == max_retries - 1:
-                print(f"❌ Supabase operation failed after {max_retries} attempts: {str(e)}")
-                raise e
-            
-            wait_time = delay * (2 ** attempt)  # Exponential backoff
-            print(f"⚠️ Supabase timeout on attempt {attempt + 1}, retrying in {wait_time}s...")
-            time.sleep(wait_time)
-        except Exception as e:
-            print(f"❌ Unexpected Supabase error: {str(e)}")
-            raise e
-
 @app.route('/api/reports/save', methods=['POST'])
 def save_report():
     try:
@@ -7821,15 +7782,12 @@ def save_report():
         
         if not telegram_id:
             return jsonify({'error': 'telegram_id required'}), 400
-        
-        # Get user from database with retry
-        def get_user():
-            return supabase.table('users').select('*').eq('telegram_id', telegram_id).execute()
-        
-        user_result = supabase_retry_operation(get_user)
+            
+        # Get user from database
+        user_result = supabase.table('users').select('*').eq('telegram_id', telegram_id).execute()
         if not user_result.data:
             return jsonify({'error': 'User not found'}), 404
-        
+            
         user = user_result.data[0]
         user_id = user['id']
         
@@ -7848,7 +7806,7 @@ def save_report():
         # Save HTML file
         with open(html_filepath, 'w', encoding='utf-8') as f:
             f.write(report_html)
-        
+            
         logger.info(f"Report HTML saved to: {html_filepath}")
         
         # Prepare data for database
@@ -7868,11 +7826,8 @@ def save_report():
             'report_url': f'/reports/{html_filename}'
         }
         
-        # Save to database with retry
-        def save_report_to_db():
-            return supabase.table('user_reports').insert(report_data).execute()
-        
-        result = supabase_retry_operation(save_report_to_db)
+        # Save to database
+        result = supabase.table('user_reports').insert(report_data).execute()
         
         if result.data:
             saved_report = result.data[0]
@@ -7888,28 +7843,12 @@ def save_report():
             }), 200
         else:
             return jsonify({'error': 'Failed to save report to database'}), 500
-        
+            
     except Exception as e:
-        error_message = str(e)
+        logger.error(f"Error saving report: {e}")
         import traceback
-        
-        # Check for specific timeout errors
-        if any(timeout_error in error_message.lower() for timeout_error in ['timeout', 'timed out', 'connecttimeout']):
-            logger.error(f"⚠️ Network timeout error while saving report: {e}")
-            logger.error(f"Timeout traceback: {traceback.format_exc()}")
-            return jsonify({
-                'success': False, 
-                'error': 'Network timeout: Unable to connect to the database. Please try again in a few moments.',
-                'error_type': 'timeout'
-            }), 408  # Request Timeout
-        else:
-            logger.error(f"❌ Unexpected error saving report: {e}")
-            logger.error(f"Full traceback: {traceback.format_exc()}")
-            return jsonify({
-                'success': False, 
-                'error': 'Internal server error. Please try again later.',
-                'error_type': 'server_error'
-            }), 500
+        logger.error(f"Traceback: {traceback.format_exc()}")
+        return jsonify({'error': 'Internal server error'}), 500
 
 # Route to serve saved reports
 @app.route('/reports/<filename>')
@@ -7924,7 +7863,7 @@ def serve_report(filename):
             return "Report not found", 404
         
         return send_file(filepath, mimetype='text/html')
-        
+                
     except Exception as e:
         logger.error(f"Error serving report: {e}")
         return "Internal server error", 500
@@ -7952,13 +7891,13 @@ def generate_complete_report_html(data):
         main_content = content_match.group(1) if content_match else body_content
         
         # Clean up main_content for shared report: remove unwanted elements
-        # 1. Remove location-form div
+        # 1. Remove location-form div (блок с выпадающими списками)
         main_content = re.sub(r'<div class="location-form"[^>]*>.*?</div>', '', main_content, flags=re.DOTALL)
         
-        # 2. Remove share-report-section div  
+        # 2. Remove share-report-section div (кнопка "Поделиться отчетом")
         main_content = re.sub(r'<div class="share-report-section"[^>]*>.*?</div>', '', main_content, flags=re.DOTALL)
         
-        # 3. Remove back-button link
+        # 3. Remove back-button link (кнопка "Вернуться в главное меню")
         main_content = re.sub(r'<a[^>]*class="back-button"[^>]*>.*?</a>', '', main_content, flags=re.DOTALL)
         
         # 4. Remove logo block with slogan (the flex div with logo and "Инсайты рынка недвижимости")
@@ -8032,7 +7971,7 @@ def generate_complete_report_html(data):
             font-size: 24px;
             font-weight: 700;
         }}
-        
+
         .report-header .location {{
             font-size: 16px;
             opacity: 0.9;
@@ -8076,13 +8015,13 @@ def generate_complete_report_html(data):
             margin-top: 10px;
             transition: transform 0.3s ease;
         }}
-        
+
         .report-footer .bot-link:hover {{
             transform: translateY(-2px);
             color: white;
             text-decoration: none;
         }}
-        
+
         .report-disclaimer {{
             background: #fff3cd;
             border: 1px solid #ffeaa7;
@@ -8100,7 +8039,7 @@ def generate_complete_report_html(data):
             }}
             
             .report-header .location {{
-                font-size: 14px;
+            font-size: 14px;
             }}
             
             .report-header .logo img {{
@@ -8117,26 +8056,26 @@ def generate_complete_report_html(data):
 <body>
     <div class="container">
         <!-- Report Header -->
-        <div class="report-header">
+    <div class="report-header">
             <div class="logo">
                 <img src="/logo-sqv.png" alt="Aaadviser Logo">
             </div>
             <h1>{data.get('title', 'Отчет по оценке объекта')}</h1>
-            <div class="location">{location_name}</div>
-        </div>
-        
+                <div class="location">{location_name}</div>
+    </div>
+
         <!-- Report Disclaimer -->
         <div class="report-disclaimer">
             <strong>📄 Общий отчет по оценке недвижимости</strong><br>
             Данный отчет предоставляет анализ рынка недвижимости на основе актуальных данных. 
             Все расчеты выполнены с использованием современных методов анализа и актуальных рыночных данных.
             Отчет создан {datetime.now().strftime('%d.%m.%Y в %H:%M')}.
-        </div>
-        
+            </div>
+            
         {main_content}
         
         <!-- Report Footer -->
-        <div class="report-footer">
+    <div class="report-footer">
             <div class="logo">
                 <img src="/logo-flt.png" alt="Aaadviser Logo">
             </div>
@@ -8144,9 +8083,9 @@ def generate_complete_report_html(data):
                 <p><strong>Aaadviser</strong> - профессиональная аналитика недвижимости</p>
                 <a href="https://t.me/YourBotName" class="bot-link" target="_blank">
                     🤖 Получить свой отчет в Telegram боте
-                </a>
-            </div>
+            </a>
         </div>
+    </div>
     </div>
 </body>
 </html>'''
