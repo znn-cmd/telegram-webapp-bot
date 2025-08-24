@@ -7153,6 +7153,112 @@ def get_market_comparison_data(age_id, floor_id, heating_id, area, price, locati
         return {}
 
 
+@app.route('/api/base_prices', methods=['POST'])
+def api_base_prices():
+    """
+    API endpoint для получения базовых цен из таблиц age_data, floor_segment_data, heating_data, house_type_data
+    Возвращает средние значения min и max цен для расчета базовой цены текущего месяца
+    """
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({'error': 'Missing request data'}), 400
+        
+        country_id = data.get('country_id')
+        city_id = data.get('city_id')
+        county_id = data.get('county_id')
+        district_id = data.get('district_id')
+        
+        if not all([country_id, city_id, county_id, district_id]):
+            return jsonify({'error': 'Missing required location parameters'}), 400
+        
+        logger.info(f"💰 Запрос базовых цен для локации: country_id={country_id}, city_id={city_id}, county_id={county_id}, district_id={district_id}")
+        
+        # Определяем таблицы для запроса базовых цен
+        tables = ['age_data', 'floor_segment_data', 'heating_data', 'house_type_data']
+        
+        min_sale_prices = []
+        max_sale_prices = []
+        min_rent_prices = []
+        max_rent_prices = []
+        
+        # Получаем данные из каждой таблицы
+        for table_name in tables:
+            try:
+                logger.info(f"🔍 Запрос данных из таблицы: {table_name}")
+                
+                response = supabase.table(table_name).select(
+                    'min_unit_price_for_sale, max_unit_price_for_sale, min_unit_price_for_rent, max_unit_price_for_rent'
+                ).eq('country_id', country_id).eq('city_id', city_id).eq('county_id', county_id).eq('district_id', district_id).execute()
+                
+                if response.data and len(response.data) > 0:
+                    # Берем средние значения из всех записей в таблице
+                    table_data = response.data
+                    
+                    # Собираем все min/max цены из таблицы
+                    table_min_sale = [record.get('min_unit_price_for_sale') for record in table_data if record.get('min_unit_price_for_sale') is not None]
+                    table_max_sale = [record.get('max_unit_price_for_sale') for record in table_data if record.get('max_unit_price_for_sale') is not None]
+                    table_min_rent = [record.get('min_unit_price_for_rent') for record in table_data if record.get('min_unit_price_for_rent') is not None]
+                    table_max_rent = [record.get('max_unit_price_for_rent') for record in table_data if record.get('max_unit_price_for_rent') is not None]
+                    
+                    # Рассчитываем средние для этой таблицы
+                    if table_min_sale:
+                        min_sale_prices.append(sum(table_min_sale) / len(table_min_sale))
+                    if table_max_sale:
+                        max_sale_prices.append(sum(table_max_sale) / len(table_max_sale))
+                    if table_min_rent:
+                        min_rent_prices.append(sum(table_min_rent) / len(table_min_rent))
+                    if table_max_rent:
+                        max_rent_prices.append(sum(table_max_rent) / len(table_max_rent))
+                    
+                    logger.info(f"✅ Данные из {table_name}: записей={len(table_data)}")
+                else:
+                    logger.warning(f"⚠️ Нет данных в таблице {table_name} для указанной локации")
+                    
+            except Exception as table_error:
+                logger.error(f"❌ Ошибка при запросе таблицы {table_name}: {table_error}")
+                continue
+        
+        # Проверяем, что у нас есть данные
+        if not min_sale_prices or not max_sale_prices or not min_rent_prices or not max_rent_prices:
+            logger.warning(f"⚠️ Недостаточно данных для расчета базовых цен")
+            return jsonify({'error': 'Insufficient data for base price calculation'}), 404
+        
+        # Рассчитываем средние значения по всем таблицам
+        avg_min_sale_price = sum(min_sale_prices) / len(min_sale_prices)
+        avg_max_sale_price = sum(max_sale_prices) / len(max_sale_prices)
+        avg_min_rent_price = sum(min_rent_prices) / len(min_rent_prices)
+        avg_max_rent_price = sum(max_rent_prices) / len(max_rent_prices)
+        
+        # Рассчитываем финальные базовые цены (среднее между min и max)
+        base_sale_price = (avg_min_sale_price + avg_max_sale_price) / 2
+        base_rent_price = (avg_min_rent_price + avg_max_rent_price) / 2
+        
+        logger.info(f"💰 Рассчитанные базовые цены:")
+        logger.info(f"  - Базовая цена продажи: {base_sale_price:.2f}")
+        logger.info(f"  - Базовая цена аренды: {base_rent_price:.2f}")
+        logger.info(f"  - Источник: {len(min_sale_prices)} таблиц")
+        
+        return jsonify({
+            'success': True,
+            'base_prices': {
+                'sale_price': base_sale_price,
+                'rent_price': base_rent_price,
+                'calculation_details': {
+                    'avg_min_sale_price': avg_min_sale_price,
+                    'avg_max_sale_price': avg_max_sale_price,
+                    'avg_min_rent_price': avg_min_rent_price,
+                    'avg_max_rent_price': avg_max_rent_price,
+                    'tables_used': len(min_sale_prices),
+                    'tables_requested': tables
+                }
+            }
+        })
+        
+    except Exception as e:
+        logger.error(f"❌ Ошибка при получении базовых цен: {e}")
+        return jsonify({'error': str(e)}), 500
+
 @app.route('/api/property_trends', methods=['POST'])
 def api_property_trends():
     """
