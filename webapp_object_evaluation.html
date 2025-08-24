@@ -1739,6 +1739,15 @@
             background-color: #f0f8ff;
         }
         
+        /* Стили для исторических строк в таблице трендов */
+        .trends-table .historical-row {
+            background-color: #fff3cd;
+        }
+        
+        .trends-table .historical-row td {
+            color: #856404;
+        }
+        
         /* Мобильные устройства */
         @media (max-width: 768px) {
             .trends-table {
@@ -5335,7 +5344,7 @@
             }
         }
 
-                // Filter trends to show 6 months before current month and 1 month after
+                // Filter trends to show all historical data without month restrictions
         function filterTrendsByDateRange(trends) {
             if (!trends || trends.length === 0) return [];
             
@@ -5358,85 +5367,160 @@
                 console.log(`  ${index}: ${trend.property_year}-${trend.property_month} (${trend.date})`);
             });
             
-            // Фильтруем тренды за текущий год (2025)
-            const currentYearTrends = sortedTrends.filter(trend => trend.property_year === currentYear);
-            console.log(`🔍 Current year trends: ${currentYearTrends.length}`);
+            // Теперь показываем ВСЕ тренды без ограничений по месяцам
+            console.log(`🔍 Showing ALL trends without month restrictions`);
             
-            if (currentYearTrends.length === 0) {
-                console.log(`⚠️ No trends for current year ${currentYear}, returning first 8 from all`);
-                return sortedTrends.slice(0, 8);
-            }
-            
-            // Вычисляем диапазон месяцев: 6 месяцев назад от текущего + 1 месяц вперед
-            const startMonth = currentMonth - 6;
-            const endMonth = currentMonth + 1;
-            
-            console.log(`🔍 Target month range: ${startMonth} to ${endMonth}`);
-            
-            // Фильтруем тренды по диапазону месяцев
-            const filteredTrends = currentYearTrends.filter(trend => {
-                const month = trend.property_month;
-                
-                // Обрабатываем переход через год (например, если текущий месяц август, то февраль = -4)
-                if (startMonth <= 0) {
-                    // Если startMonth отрицательный, берем месяцы с конца предыдущего года
-                    return month >= (12 + startMonth) || month <= endMonth;
-                } else {
-                    // Обычный случай
-                    return month >= startMonth && month <= endMonth;
-                }
-            });
-            
-            console.log(`🔍 Filtered trends by month range: ${filteredTrends.length}`);
-            
-            // Сортируем по месяцу (будущие месяцы сверху, текущий в середине, прошедшие снизу)
-            filteredTrends.sort((a, b) => {
+            // Сортируем по дате для правильного отображения:
+            // 1. Будущие месяцы (новые сначала)
+            // 2. Текущий месяц
+            // 3. Исторические месяцы (старые сначала)
+            const sortedForDisplay = sortedTrends.sort((a, b) => {
+                const yearA = a.property_year;
                 const monthA = a.property_month;
+                const yearB = b.property_year;
                 const monthB = b.property_month;
                 
                 // Если оба месяца в будущем (больше текущего)
-                if (monthA > currentMonth && monthB > currentMonth) {
-                    return monthA - monthB; // По возрастанию (сентябрь перед октябрем)
+                if (yearA > currentYear || (yearA === currentYear && monthA > currentMonth)) {
+                    if (yearB > currentYear || (yearB === currentYear && monthB > currentMonth)) {
+                        // Оба будущие - сортируем по возрастанию (сентябрь перед октябрем)
+                        if (yearA !== yearB) return yearA - yearB;
+                        return monthA - monthB;
+                    } else {
+                        return -1; // A в будущем, B нет
+                    }
                 }
                 // Если оба месяца в прошлом (меньше текущего)
-                else if (monthA < currentMonth && monthB < currentMonth) {
-                    return monthB - monthA; // По убыванию (июль перед июнем)
+                else if (yearA < currentYear || (yearA === currentYear && monthA < currentMonth)) {
+                    if (yearB < currentYear || (yearB === currentYear && monthB < currentMonth)) {
+                        // Оба исторические - сортируем по убыванию (июль перед июнем)
+                        if (yearA !== yearB) return yearB - yearA;
+                        return monthB - monthA;
+                    } else {
+                        return 1; // A в прошлом, B нет
+                    }
                 }
-                // Если один в будущем, а другой - текущий
-                else if (monthA > currentMonth && monthB === currentMonth) {
-                    return -1; // Будущий месяц идет перед текущим
-                }
-                else if (monthA === currentMonth && monthB > currentMonth) {
-                    return 1; // Текущий месяц идет после будущего
-                }
-                // Если один в будущем, а другой в прошлом
-                else if (monthA > currentMonth && monthB < currentMonth) {
-                    return -1; // Будущий месяц идет первым
-                }
-                else if (monthA < currentMonth && monthB > currentMonth) {
-                    return 1; // Прошедший месяц идет последним
-                }
-                // Если один из месяцев - текущий, а другой в прошлом
-                else if (monthA === currentMonth && monthB < currentMonth) {
-                    return -1; // Текущий месяц идет перед прошедшим
-                }
-                else if (monthA < currentMonth && monthB === currentMonth) {
-                    return 1; // Прошедший месяц идет после текущего
+                // Если один из месяцев - текущий
+                else if (yearA === currentYear && monthA === currentMonth) {
+                    if (yearB === currentYear && monthB === currentMonth) {
+                        return 0; // Оба текущие
+                    } else {
+                        return -1; // A текущий, B нет
+                    }
+                } else if (yearB === currentYear && monthB === currentMonth) {
+                    return 1; // B текущий, A нет
                 }
                 
                 return 0;
             });
             
-            if (filteredTrends.length >= 8) {
-                // Берем первые 8 трендов из отфильтрованного диапазона
-                const selectedTrends = filteredTrends.slice(0, 8);
-                console.log(`✅ Selected ${selectedTrends.length} trends from month range`);
-                return selectedTrends;
-            } else {
-                // Если мало трендов в диапазоне, возвращаем все отфильтрованные
-                console.log(`⚠️ Few trends in month range, returning all ${filteredTrends.length}`);
-                return filteredTrends;
+            console.log(`✅ Returning all ${sortedForDisplay.length} trends without restrictions`);
+            return sortedForDisplay;
+        }
+
+        // Calculate historical prices based on percentage changes
+        function calculateHistoricalPrice(basePrice, percentageChange) {
+            if (!basePrice || !percentageChange) return basePrice;
+            
+            const changeMultiplier = 1 + (percentageChange / 100);
+            return Math.round(basePrice / changeMultiplier);
+        }
+
+        // Prepare trends data with calculated historical prices
+        function prepareTrendsWithHistoricalPrices(trends) {
+            if (!trends || trends.length === 0) return [];
+            
+            // Сортируем тренды по дате (новые сначала)
+            const sortedTrends = trends.sort((a, b) => {
+                if (a.property_year !== b.property_year) {
+                    return b.property_year - a.property_year;
+                }
+                return b.property_month - a.property_month;
+            });
+            
+            const currentDate = new Date();
+            const currentYear = currentDate.getFullYear();
+            const currentMonth = currentDate.getMonth() + 1;
+            
+            // Создаем кэш для рассчитанных цен
+            const priceCache = new Map();
+            
+            // Обрабатываем тренды в обратном порядке (от новых к старым)
+            for (let i = 0; i < sortedTrends.length; i++) {
+                const trend = sortedTrends[i];
+                const year = trend.property_year;
+                const month = trend.property_month;
+                const cacheKey = `${year}-${month}`;
+                
+                // Определяем тип месяца
+                const isCurrentMonth = year === currentYear && month === currentMonth;
+                const isFutureMonth = year > currentYear || (year === currentYear && month > currentMonth);
+                const isHistoricalMonth = year < currentYear || (year === currentYear && month < currentMonth);
+                
+                if (isCurrentMonth || isFutureMonth) {
+                    // Для текущего и будущих месяцев используем оригинальные цены
+                    priceCache.set(cacheKey, {
+                        salePrice: parseFloat(trend.unit_price_for_sale) || 0,
+                        rentPrice: parseFloat(trend.unit_price_for_rent) || 0,
+                        isCalculated: false
+                    });
+                } else if (isHistoricalMonth) {
+                    // Для исторических месяцев рассчитываем цены
+                    let calculatedSalePrice = parseFloat(trend.unit_price_for_sale) || 0;
+                    let calculatedRentPrice = parseFloat(trend.unit_price_for_rent) || 0;
+                    
+                    // Ищем следующий месяц для расчета
+                    let nextMonthKey = null;
+                    if (month === 12) {
+                        nextMonthKey = `${year + 1}-1`;
+                    } else {
+                        nextMonthKey = `${year}-${month + 1}`;
+                    }
+                    
+                    const nextMonthData = priceCache.get(nextMonthKey);
+                    if (nextMonthData && trend.price_change_sale && trend.price_change_rent) {
+                        // Рассчитываем цены на основе следующего месяца
+                        calculatedSalePrice = calculateHistoricalPrice(
+                            nextMonthData.salePrice, 
+                            trend.price_change_sale
+                        );
+                        calculatedRentPrice = calculateHistoricalPrice(
+                            nextMonthData.rentPrice, 
+                            trend.price_change_rent
+                        );
+                        
+                        console.log(`🔢 Расчет цен для ${year}-${month}: продажа ${calculatedSalePrice} ₺/м², аренда ${calculatedRentPrice} ₺/м²`);
+                    }
+                    
+                    priceCache.set(cacheKey, {
+                        salePrice: calculatedSalePrice,
+                        rentPrice: calculatedRentPrice,
+                        isCalculated: true
+                    });
+                }
             }
+            
+            // Обновляем тренды с рассчитанными ценами
+            const updatedTrends = sortedTrends.map(trend => {
+                const year = trend.property_year;
+                const month = trend.property_month;
+                const cacheKey = `${year}-${month}`;
+                const cachedData = priceCache.get(cacheKey);
+                
+                if (cachedData) {
+                    return {
+                        ...trend,
+                        calculated_sale_price: cachedData.salePrice,
+                        calculated_rent_price: cachedData.rentPrice,
+                        is_price_calculated: cachedData.isCalculated
+                    };
+                }
+                
+                return trend;
+            });
+            
+            console.log('📊 Тренды с рассчитанными историческими ценами:', updatedTrends.length, 'записей');
+            return updatedTrends;
         }
 
         // Generate detailed trends table
@@ -5448,8 +5532,12 @@
                 return '<div class="no-data">Нет данных для отображения</div>';
             }
             
+            // Подготавливаем тренды с рассчитанными историческими ценами
+            const trendsWithHistoricalPrices = prepareTrendsWithHistoricalPrices(trends);
+            console.log('🔢 Тренды с историческими ценами подготовлены:', trendsWithHistoricalPrices.length, 'записей');
+            
             // Фильтруем тренды по диапазону дат
-            const filteredTrends = filterTrendsByDateRange(trends);
+            const filteredTrends = filterTrendsByDateRange(trendsWithHistoricalPrices);
             console.log('🔍 Filtered trends for table:', filteredTrends.length, 'records');
             
             if (filteredTrends.length === 0) {
@@ -5480,6 +5568,7 @@
                 // Проверяем, является ли этот тренд текущим месяцем
                 const isCurrentMonth = trend.property_year === currentYear && trend.property_month === currentMonth;
                 const isFutureMonth = trend.property_year > currentYear || (trend.property_year === currentYear && trend.property_month > currentMonth);
+                const isHistoricalMonth = trend.property_year < currentYear || (trend.property_year === currentYear && trend.property_month < currentMonth);
                 
                 let rowClass = '';
                 let rowStyle = '';
@@ -5490,13 +5579,20 @@
                 } else if (isFutureMonth) {
                     rowClass = 'forecast-row';
                     rowStyle = 'background-color: #f0f8ff;';
+                } else if (isHistoricalMonth) {
+                    rowClass = 'historical-row';
+                    rowStyle = 'background-color: #fff3cd;';
                 }
+                
+                // Используем рассчитанные цены для исторических месяцев
+                const salePrice = trend.is_price_calculated ? trend.calculated_sale_price : trend.unit_price_for_sale;
+                const rentPrice = trend.is_price_calculated ? trend.calculated_rent_price : trend.unit_price_for_rent;
                 
                 html += `<tr class="${rowClass}" style="${rowStyle}">`;
                 html += `<td>${formatTrendDateShort(trend.date)}</td>`;
-                html += `<td>${formatTrendValue(trend.unit_price_for_sale, 'price')}</td>`;
+                html += `<td>${formatTrendValue(salePrice, 'price')}</td>`;
                 html += `<td>${formatPercentage(trend.price_change_sale)}</td>`;
-                html += `<td>${formatTrendValue(trend.unit_price_for_rent, 'price')}</td>`;
+                html += `<td>${formatTrendValue(rentPrice, 'price')}</td>`;
                 html += `<td>${formatPercentage(trend.price_change_rent)}</td>`;
                 html += `<td>${formatTrendValue(trend.yield, 'percentage')}</td>`;
                 html += '</tr>';
@@ -5582,14 +5678,14 @@
                 return '';
             }
             
-            // Рассчитываем общий рост цен на продажу
-            const firstSalePrice = parseFloat(firstMonth.unit_price_for_sale) || 0;
-            const lastSalePrice = parseFloat(lastMonth.unit_price_for_sale) || 0;
+            // Используем рассчитанные цены для анализа
+            const firstSalePrice = parseFloat(firstMonth.is_price_calculated ? firstMonth.calculated_sale_price : firstMonth.unit_price_for_sale) || 0;
+            const lastSalePrice = parseFloat(lastMonth.is_price_calculated ? lastMonth.calculated_sale_price : lastMonth.unit_price_for_sale) || 0;
             const salePriceGrowth = firstSalePrice > 0 ? ((lastSalePrice - firstSalePrice) / firstSalePrice * 100) : 0;
             
             // Рассчитываем общий рост цен на аренду
-            const firstRentPrice = parseFloat(firstMonth.unit_price_for_rent) || 0;
-            const lastRentPrice = parseFloat(lastMonth.unit_price_for_rent) || 0;
+            const firstRentPrice = parseFloat(firstMonth.is_price_calculated ? firstMonth.calculated_rent_price : firstMonth.unit_price_for_rent) || 0;
+            const lastRentPrice = parseFloat(lastMonth.is_price_calculated ? lastMonth.calculated_rent_price : lastMonth.unit_price_for_rent) || 0;
             const rentPriceGrowth = firstRentPrice > 0 ? ((lastRentPrice - firstRentPrice) / firstRentPrice * 100) : 0;
             
             // Анализируем диапазон доходности
@@ -7057,9 +7153,11 @@
             
             const data = sortedTrends.map(trend => {
                 if (chartType === 'sale') {
-                    return parseFloat(trend.unit_price_for_sale) || 0;
+                    // Используем рассчитанные цены для исторических месяцев
+                    return parseFloat(trend.is_price_calculated ? trend.calculated_sale_price : trend.unit_price_for_sale) || 0;
                 } else {
-                    return parseFloat(trend.unit_price_for_rent) || 0;
+                    // Используем рассчитанные цены для исторических месяцев
+                    return parseFloat(trend.is_price_calculated ? trend.calculated_rent_price : trend.unit_price_for_rent) || 0;
                 }
             });
             
