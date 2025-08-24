@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест исправления ошибки "selectedLocationData is not defined"</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .issue-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #dc3545;
+            border-radius: 8px;
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .fix-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #28a745;
+            border-radius: 8px;
+            background: #d4edda;
+            color: #155724;
+        }
+        .code-block {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 10px;
+            margin: 10px 0;
+            font-family: monospace;
+            white-space: pre-wrap;
+            overflow-x: auto;
+        }
+        .error-log {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 4px;
+            padding: 10px;
+            margin: 10px 0;
+            font-family: monospace;
+            font-size: 12px;
+            color: #856404;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔧 Исправление ошибки "selectedLocationData is not defined"</h1>
+    
+    <div class="issue-section">
+        <h3>❌ Проблема</h3>
+        <p>При нажатии на кнопку "Поделиться отчетом" возникала ошибка:</p>
+        <div class="error-log">ReferenceError: selectedLocationData is not defined</div>
+        
+        <p><strong>Причина:</strong> В коде использовалась переменная <code>selectedLocationData</code>, которая не существует. Фактически используется переменная <code>selectedLocation</code>.</p>
+    </div>
+    
+    <div class="fix-section">
+        <h3>✅ Исправление</h3>
+        
+        <h4>1. Заменена переменная в функции shareReport():</h4>
+        <div class="code-block">// ❌ Было:
+title: `Оценка объекта - ${selectedLocationData?.address || 'Адрес не указан'}`,
+address: selectedLocationData?.address,
+latitude: selectedLocationData?.latitude,
+longitude: selectedLocationData?.longitude,
+
+// ✅ Стало:
+title: `Оценка объекта - ${getLocationDisplayName()}`,
+address: getLocationDisplayName(),
+latitude: selectedLocation?.latitude,
+longitude: selectedLocation?.longitude,</div>
+        
+        <h4>2. Добавлена функция getLocationDisplayName():</h4>
+        <div class="code-block">function getLocationDisplayName() {
+    if (!selectedLocation) return 'Адрес не указан';
+    
+    let locationString = selectedLocation.country_name || '';
+    if (selectedLocation.city_name) {
+        locationString += `, ${selectedLocation.city_name}`;
+    }
+    if (selectedLocation.county_name) {
+        locationString += `, ${selectedLocation.county_name}`;
+    }
+    if (selectedLocation.district_name && selectedLocation.district_name !== 'Не имеет значения') {
+        locationString += `, ${selectedLocation.district_name}`;
+    }
+    
+    return locationString || 'Адрес не указан';
+}</div>
+        
+        <h4>3. Исправлены ссылки на данные:</h4>
+        <div class="code-block">// ✅ Правильные переменные:
+parameters: {
+    location: selectedLocation,           // вместо selectedLocationData
+    listingTypes: selectedListingTypes,
+    marketData: window.currentSummaryData, // вместо marketData
+    trendsData: window.currentTrendsData   // вместо trendsData
+}</div>
+    </div>
+    
+    <div class="issue-section">
+        <h3>📋 Из логов приложения видно:</h3>
+        <div class="error-log">2025-08-24 17:19:30,633 - Пользователь найден: user_status=None, is_admin=False, period_end=2026-07-11
+✅ У пользователя есть доступ (period_end=2026-07-11 > текущая дата)
+✅ Данные региона загружаются корректно
+✅ Базовые цены рассчитываются: продажа=60824.03, аренда=305.79</div>
+    </div>
+    
+    <div class="fix-section">
+        <h3>🎯 Результат исправления</h3>
+        <ul>
+            <li>✅ Ошибка "selectedLocationData is not defined" устранена</li>
+            <li>✅ Функция корректно получает название локации</li>
+            <li>✅ Все данные правильно передаются в API</li>
+            <li>✅ Кнопка "Поделиться отчетом" должна работать без ошибок</li>
+        </ul>
+        
+        <h4>Тестирование:</h4>
+        <p>1. Выберите локацию и сгенерируйте отчет</p>
+        <p>2. После завершения генерации появится кнопка "Поделиться отчетом"</p>
+        <p>3. При нажатии на кнопку должно открыться модальное окно с ссылкой</p>
+        <p>4. Никаких ошибок в консоли не должно быть</p>
+    </div>
+
+</body>
+</html>

@@ -5411,15 +5411,11 @@
             }
         }
 
-        // Display selected location
-        async function displaySelectedLocation() {
-            const selectedLocationDiv = document.getElementById('selectedLocation');
-            const locationDetails = document.getElementById('locationDetails');
-            const adminIdsBlock = document.getElementById('adminIdsBlock');
-            const adminIdsDetails = document.getElementById('adminIdsDetails');
+        // Get location display name for sharing
+        function getLocationDisplayName() {
+            if (!selectedLocation) return 'Адрес не указан';
             
-            // Build location string
-            let locationString = selectedLocation.country_name;
+            let locationString = selectedLocation.country_name || '';
             if (selectedLocation.city_name) {
                 locationString += `, ${selectedLocation.city_name}`;
             }
@@ -5430,6 +5426,18 @@
                 locationString += `, ${selectedLocation.district_name}`;
             }
             
+            return locationString || 'Адрес не указан';
+        }
+
+        // Display selected location
+        async function displaySelectedLocation() {
+            const selectedLocationDiv = document.getElementById('selectedLocation');
+            const locationDetails = document.getElementById('locationDetails');
+            const adminIdsBlock = document.getElementById('adminIdsBlock');
+            const adminIdsDetails = document.getElementById('adminIdsDetails');
+            
+            // Build location string
+            const locationString = getLocationDisplayName();
             locationDetails.textContent = locationString;
             
             // Update selected property types display
@@ -8313,17 +8321,17 @@
                 const reportData = {
                     telegram_id: telegramId,
                     report_type: 'object_evaluation',
-                    title: `Оценка объекта - ${selectedLocationData?.address || 'Адрес не указан'}`,
+                    title: `Оценка объекта - ${getLocationDisplayName()}`,
                     description: `Отчет по оценке недвижимости`,
                     parameters: {
-                        location: selectedLocationData,
+                        location: selectedLocation,
                         listingTypes: selectedListingTypes,
-                        marketData: marketData,
-                        trendsData: trendsData
+                        marketData: window.currentSummaryData,
+                        trendsData: window.currentTrendsData
                     },
-                    address: selectedLocationData?.address,
-                    latitude: selectedLocationData?.latitude,
-                    longitude: selectedLocationData?.longitude,
+                    address: getLocationDisplayName(),
+                    latitude: selectedLocation?.latitude,
+                    longitude: selectedLocation?.longitude,
                     bedrooms: selectedListingTypes?.bedrooms,
                     price: selectedListingTypes?.price,
                     area: selectedListingTypes?.area,
