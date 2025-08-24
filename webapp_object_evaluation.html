@@ -4826,23 +4826,15 @@
             html += `<h4 class="market-analysis-text-title">${getText('marketAnalysisTitle')}</h4>`;
             html += '<div class="market-analysis-text-content">';
             
-            // Sale analysis
-            const saleText = getText('saleAnalysisText')
-                .replace('{area}', avgSaleArea)
-                .replace('{minPrice}', formatValue(saleMinPrice, 'price'))
-                .replace('{minDays}', saleMinPeriod)
-                .replace('{maxPrice}', formatValue(saleMaxPrice, 'price'))
-                .replace('{maxDays}', saleMaxPeriod);
-            html += `<p>${saleText}</p>`;
+            // Sale analysis in unified style (like "Вывод прогноза")
+            html += `<p><strong>Продажа:</strong> при площади ${avgSaleArea} м² (среднее значение по проданным объектам) `;
+            html += `и минимальной цене ${formatValue(saleMinPrice, 'price')}/м² срок продажи составляет ~${saleMinPeriod} дней; `;
+            html += `при максимальной цене ${formatValue(saleMaxPrice, 'price')}/м² - срок продажи до ${saleMaxPeriod} дней.</p>`;
             
-            // Rent analysis
-            const rentText = getText('rentAnalysisText')
-                .replace('{area}', avgRentArea)
-                .replace('{minPrice}', formatValue(rentMinPrice, 'price'))
-                .replace('{minDays}', rentMinPeriod)
-                .replace('{maxPrice}', formatValue(rentMaxPrice, 'price'))
-                .replace('{maxDays}', rentMaxPeriod);
-            html += `<p>${rentText}</p>`;
+            // Rent analysis in unified style (like "Вывод прогноза")  
+            html += `<p><strong>Аренда:</strong> при площади ${avgRentArea} м² (среднее значение по сданным в аренду объектам) `;
+            html += `минимальная цена ${formatValue(rentMinPrice, 'price')}/м² срок сдачи ~${rentMinPeriod} дней; `;
+            html += `при максимальной цене ${formatValue(rentMaxPrice, 'price')}/м² срок до ${rentMaxPeriod} дней.</p>`;
             
             html += '</div></div>';
             
