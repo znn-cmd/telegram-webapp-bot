@@ -379,48 +379,18 @@
             // Теперь показываем ВСЕ тренды без ограничений по месяцам
             console.log(`🔍 Showing ALL trends without month restrictions`);
             
-            // Сортируем по дате для правильного отображения:
-            // 1. Будущие месяцы (новые сначала)
-            // 2. Текущий месяц
-            // 3. Исторические месяцы (хронологически: январь выше, декабрь ниже)
+            // Простая хронологическая сортировка: старые даты вверху, новые внизу
             const sortedForDisplay = sortedTrends.sort((a, b) => {
                 const yearA = a.property_year;
                 const monthA = a.property_month;
                 const yearB = b.property_year;
                 const monthB = b.property_month;
                 
-                // Если оба месяца в будущем (больше текущего)
-                if (yearA > currentYear || (yearA === currentYear && monthA > currentMonth)) {
-                    if (yearB > currentYear || (yearB === currentYear && monthB > currentMonth)) {
-                        // Оба будущие - сортируем по возрастанию (сентябрь перед октябрем)
-                        if (yearA !== yearB) return yearA - yearB;
-                        return monthA - monthB;
-                    } else {
-                        return -1; // A в будущем, B нет
-                    }
+                // Сортируем по возрастанию (старые даты сначала)
+                if (yearA !== yearB) {
+                    return yearA - yearB; // 2022 перед 2023, 2023 перед 2024, и т.д.
                 }
-                // Если оба месяца в прошлом (меньше текущего)
-                else if (yearA < currentYear || (yearA === currentYear && monthA < currentMonth)) {
-                    if (yearB < currentYear || (yearB === currentYear && monthB < currentMonth)) {
-                        // Оба исторические - сортируем по убыванию лет, затем по возрастанию месяцев
-                        if (yearA !== yearB) return yearB - yearA; // Годы по убыванию (2025 выше 2024)
-                        return monthA - monthB; // Месяцы по возрастанию (январь выше декабря)
-                    } else {
-                        return 1; // A в прошлом, B нет
-                    }
-                }
-                // Если один из месяцев - текущий
-                else if (yearA === currentYear && monthA === currentMonth) {
-                    if (yearB === currentYear && monthB === currentMonth) {
-                        return 0; // Оба текущие
-                    } else {
-                        return -1; // A текущий, B нет
-                    }
-                } else if (yearB === currentYear && monthB === currentMonth) {
-                    return 1; // B текущий, A нет
-                }
-                
-                return 0;
+                return monthA - monthB; // Январь перед февралем, февраль перед мартом, и т.д.
             });
             
             console.log(`✅ Returning all ${sortedForDisplay.length} trends without restrictions`);
