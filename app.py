@@ -7116,7 +7116,7 @@ def api_property_trends():
         logger.info(f"📊 Запрос трендов недвижимости для локации: country_id={country_id}, city_id={city_id}, county_id={county_id}, district_id={district_id}")
         
         # Запрос к таблице property_trends
-        query = supabase.table('property_trends').select('*').eq('country_id', country_id).eq('city_id', city_id).eq('county_id', county_id).eq('district_id', district_id).order('property_date', desc=True).limit(20)
+        query = supabase.table('property_trends').select('*').eq('country_id', country_id).eq('city_id', city_id).eq('county_id', county_id).eq('district_id', district_id).order('property_date', desc=True)
         
         response = query.execute()
         
