@@ -6989,13 +6989,17 @@
         let currentChartType = 'sale';
         
         // Инициализация графика трендов
-        function initializeTrendsChart(trends) {
+        async function initializeTrendsChart(trends) {
             if (!trends || trends.length === 0) {
                 console.log('⚠️ No trends data for chart initialization');
                 return;
             }
             
             console.log('📊 Initializing trends chart with data:', trends.length, 'records');
+            
+            // Проверяем статус админа для графика
+            const isAdmin = await checkUserAdminStatus();
+            console.log(`📊 Chart admin status: ${isAdmin}`);
             
             // Сортируем тренды по дате
             const sortedTrends = trends.sort((a, b) => {
@@ -7026,12 +7030,12 @@
             console.log('📊 Filtered trends for chart:', filteredTrends.length, 'records');
             console.log('📅 Chart date range: up to', oneMonthAheadMonth, oneMonthAheadYear);
             
-            // Создаем график с отфильтрованными данными
-            createTrendsChart(filteredTrends, currentChartType);
+            // Создаем график с отфильтрованными данными (с учетом статуса админа)
+            createTrendsChart(filteredTrends, currentChartType, isAdmin);
         }
         
         // Создание графика трендов
-        function createTrendsChart(trends, chartType) {
+        function createTrendsChart(trends, chartType, isAdmin = false) {
             const ctx = document.getElementById('trendsChart');
             if (!ctx) {
                 console.log('⚠️ Chart canvas not found');
@@ -7043,8 +7047,25 @@
                 trendsChart.destroy();
             }
             
+            // Фильтруем данные для графика в зависимости от статуса пользователя
+            let filteredTrends;
+            if (isAdmin) {
+                // Админы видят все данные
+                console.log(`👑 Admin chart access: showing ALL trend data`);
+                filteredTrends = trends;
+            } else {
+                // Обычные пользователи видят данные с января 2021 года
+                console.log(`👤 Regular user chart: filtering data from January 2021`);
+                filteredTrends = trends.filter(trend => {
+                    const isFromJan2021OrLater = trend.property_year > 2021 || 
+                                               (trend.property_year === 2021 && trend.property_month >= 1);
+                    return isFromJan2021OrLater;
+                });
+                console.log(`📊 Chart data filtered: ${trends.length} → ${filteredTrends.length} trends (from Jan 2021+)`);
+            }
+            
             // Подготавливаем данные для графика
-            const chartData = prepareChartData(trends, chartType);
+            const chartData = prepareChartData(filteredTrends, chartType);
             
             // Создаем новый график
             trendsChart = new Chart(ctx, {
@@ -7205,7 +7226,7 @@
         }
         
         // Переключение типа графика
-        function switchChartType(chartType) {
+        async function switchChartType(chartType) {
             console.log('🔄 Switching chart type to:', chartType);
             
             // Обновляем активную кнопку
@@ -7219,6 +7240,10 @@
             
             // Пересоздаем график с отфильтрованными данными
             if (window.currentTrendsData) {
+                // Проверяем статус админа для переключения графика
+                const isAdmin = await checkUserAdminStatus();
+                console.log(`📊 Chart switch admin status: ${isAdmin}`);
+                
                 // Применяем ту же фильтрацию, что и при инициализации
                 const sortedTrends = window.currentTrendsData.sort((a, b) => {
                     if (a.property_year !== b.property_year) {
@@ -7239,7 +7264,7 @@
                     return trendDate <= filterEndDate;
                 });
                 
-                createTrendsChart(filteredTrends, chartType);
+                createTrendsChart(filteredTrends, chartType, isAdmin);
             }
         }
         
