@@ -9264,10 +9264,76 @@
             // Clone the content to avoid modifying the original
             const clonedContent = dataContent.cloneNode(true);
             
+            // Сохраняем данные графиков перед удалением интерактивных элементов
+            const chartData = extractChartData();
+            
             // Remove interactive elements but preserve charts
             removeInteractiveElementsPreserveCharts(clonedContent);
             
+            // Добавляем скрытые данные графиков для использования в экспортируемом отчете
+            const chartDataContainer = document.createElement('div');
+            chartDataContainer.id = 'chartDataContainer';
+            chartDataContainer.style.display = 'none';
+            chartDataContainer.innerHTML = '<script>window.chartData = ' + JSON.stringify(chartData) + ';</script>';
+            
+            clonedContent.appendChild(chartDataContainer);
+            
             return clonedContent.innerHTML;
+        }
+        
+        function extractChartData() {
+            const chartData = {};
+            
+            // Извлекаем данные из таблиц трендов
+            const trendsTable = document.querySelector('.trends-table');
+            if (trendsTable) {
+                chartData.trends = extractTableData(trendsTable);
+            }
+            
+            // Извлекаем данные из таблиц прогноза
+            const forecastTable = document.querySelector('.forecast-table');
+            if (forecastTable) {
+                chartData.forecast = extractTableData(forecastTable);
+            }
+            
+            // Извлекаем данные из других таблиц
+            const marketTable = document.querySelector('.market-data-table');
+            if (marketTable) {
+                chartData.market = extractTableData(marketTable);
+            }
+            
+            return chartData;
+        }
+        
+        function extractTableData(table) {
+            const data = {
+                headers: [],
+                rows: []
+            };
+            
+            // Извлекаем заголовки
+            const headerRow = table.querySelector('thead tr');
+            if (headerRow) {
+                const headers = headerRow.querySelectorAll('th');
+                headers.forEach(header => {
+                    data.headers.push(header.textContent.trim());
+                });
+            }
+            
+            // Извлекаем строки данных
+            const dataRows = table.querySelectorAll('tbody tr:not(.filter-info)');
+            dataRows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                const rowData = [];
+                cells.forEach(cell => {
+                    rowData.push(cell.textContent.trim());
+                });
+                if (rowData.length > 0) {
+                    data.rows.push(rowData);
+                }
+            });
+            
+            return data;
         }
 
         function removeInteractiveElementsPreserveCharts(element) {
@@ -9294,38 +9360,30 @@
                 input.parentNode.replaceChild(span, input);
             });
             
-            // Convert charts to static images using chart data
+            // PRESERVE CHARTS - Keep canvas elements and add Chart.js for interactivity
             const canvasElements = element.querySelectorAll('canvas');
             canvasElements.forEach(canvas => {
-                // Try to extract chart as image
-                try {
-                    const imageData = canvas.toDataURL('image/png');
-                    const img = document.createElement('img');
-                    img.src = imageData;
-                    img.style.maxWidth = '100%';
-                    img.style.height = 'auto';
-                    img.alt = 'График данных';
-                    canvas.parentNode.replaceChild(img, canvas);
-                } catch (error) {
-                    // Fallback to placeholder if chart extraction fails
-                    const placeholder = document.createElement('div');
-                    placeholder.className = 'chart-placeholder';
-                    
-                    const chartType = canvas.id.includes('trends') ? 'трендов' : 'прогноза';
-                    placeholder.innerHTML = `
-                        <div style="font-size: 16px; font-weight: 600; margin-bottom: 10px;">
-                            📊 График ${chartType}
-                        </div>
-                        <div style="font-size: 13px; color: #6c757d;">
-                            Данные для построения графика представлены в таблицах выше
-                        </div>
-                    `;
-                    
-                    canvas.parentNode.replaceChild(placeholder, canvas);
-                }
+                // Keep the canvas element but ensure it has proper styling
+                canvas.style.maxWidth = '100%';
+                canvas.style.height = 'auto';
+                canvas.style.border = '1px solid #dee2e6';
+                canvas.style.borderRadius = '8px';
+                canvas.style.backgroundColor = '#ffffff';
+                
+                // Add a note that chart will be interactive
+                const chartNote = document.createElement('div');
+                chartNote.style.fontSize = '12px';
+                chartNote.style.color = '#6c757d';
+                chartNote.style.fontStyle = 'italic';
+                chartNote.style.textAlign = 'center';
+                chartNote.style.marginTop = '8px';
+                chartNote.textContent = 'Интерактивный график - используйте Chart.js для отображения';
+                
+                // Insert note after canvas
+                canvas.parentNode.insertBefore(chartNote, canvas.nextSibling);
             });
             
-            // Remove chart controls
+            // Remove chart controls but keep chart functionality
             const chartControls = element.querySelectorAll('.chart-controls, .chart-type-buttons');
             chartControls.forEach(control => control.remove());
             

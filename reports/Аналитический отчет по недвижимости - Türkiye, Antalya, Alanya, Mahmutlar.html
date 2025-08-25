@@ -645,6 +645,53 @@
             margin: 15px 0;
         }
 
+        /* Location and Object Info */
+        .location-object-info {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            margin: 0;
+            padding: 25px 30px;
+        }
+        
+        .location-info-section {
+            margin-bottom: 20px;
+        }
+        
+        .info-section-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 8px;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+        }
+        
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .info-label {
+            font-weight: 600;
+            color: #495057;
+        }
+        
+        .info-value {
+            color: #2c3e50;
+            font-weight: 500;
+            text-align: right;
+        }
+
         /* Корпоративный футер */
         .corporate-footer {
             background: #f8f9fa;
@@ -731,7 +778,7 @@
                 <div>
                     <div class="metadata-item">
                         <span class="metadata-label">Номер отчета:</span>
-                        <span class="metadata-value">RPT-20250825_071607-5710</span>
+                        <span class="metadata-value">RPT-20250825_080454-37244</span>
                     </div>
                     <div class="metadata-item">
                         <span class="metadata-label">Дата формирования:</span>
@@ -739,7 +786,7 @@
                     </div>
                     <div class="metadata-item">
                         <span class="metadata-label">Время формирования:</span>
-                        <span class="metadata-value">07:16:07 UTC</span>
+                        <span class="metadata-value">08:04:54 UTC</span>
                     </div>
                 </div>
                 <div>
@@ -769,6 +816,47 @@
             </div>
         </div>
         
+        <!-- Информация о локации и объекте -->
+        <div class="location-object-info">
+            <div class="location-info-section">
+                <h3 class="info-section-title">Информация о локации</h3>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="info-label">Регион:</span>
+                        <span class="info-value">Türkiye, Antalya, Alanya, Mahmutlar</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Тип анализа:</span>
+                        <span class="info-value">Оценка объекта недвижимости</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Количество спален:</span>
+                        <span class="info-value">3+1</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Этаж:</span>
+                        <span class="info-value">Ara Kat</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Возраст объекта:</span>
+                        <span class="info-value">5-10</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Тип отопления:</span>
+                        <span class="info-value">Yok</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Цена объекта:</span>
+                        <span class="info-value">160000 EUR</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Площадь объекта:</span>
+                        <span class="info-value">150 м²</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Основной контент отчета -->
         <div class="report-content">
             
@@ -783,11 +871,11 @@
                         
                                 <div class="trend-card trend-card-price_trend">
                                     <div class="trend-title">Тренд цен</div>
-                                    <div class="trend-value">₺54&nbsp;132,96</div>
+                                    <div class="trend-value">₺60&nbsp;824,03</div>
                                     <div class="trend-details">
                                         <div class="trend-change">
-                                            Продажа: +4.47%
-                                            Аренда: +2.71%
+                                            Продажа: +2.25%
+                                            Аренда: +2.38%
                                             август 2025
                                         </div>
                                     </div>
@@ -800,19 +888,12 @@
                         <h4 class="trends-table-title">Детальные данные трендов</h4>
                         <div class="trends-table-container" id="trendsTableContainer"><table class="trends-table"><thead><tr><th>Дата</th><th>Продажа<br>(₺/м²)</th><th>Изм-ие цены<br>продажи</th><th>Аренда<br>(₺/м²)</th><th>Изм-ие цены<br>аренды</th><th>Доходность</th></tr></thead><tbody><tr class="filter-info"><td colspan="6" style="text-align: center; font-size: 11px; color: #666; background: #f8f9fa; padding: 4px;">
                 Показано 10 из 102 трендов
-            </td></tr><tr class="forecast-row" style="background-color: #f0f8ff;"><td>сен. 2025</td><td>₺50&nbsp;836,00</td><td>+1.30%</td><td>₺199,54</td><td>+1.56%</td><td>4.71%</td></tr><tr class="current-month-row" style="background-color: #e8f4fd;"><td>авг. 2025</td><td>₺53&nbsp;190,02</td><td>+4.47%</td><td>₺204,81</td><td>+2.71%</td><td>4.70%</td></tr><tr class="historical-row" style=""><td>июл. 2025</td><td>₺50&nbsp;933,66</td><td>+4.43%</td><td>₺197,06</td><td>+3.93%</td><td>4.78%</td></tr><tr class="historical-row" style=""><td>июн. 2025</td><td>₺49&nbsp;097,42</td><td>+3.74%</td><td>₺189,87</td><td>+3.79%</td><td>4.80%</td></tr><tr class="historical-row" style=""><td>май. 2025</td><td>₺47&nbsp;519,76</td><td>+3.32%</td><td>₺186,14</td><td>+2.00%</td><td>4.80%</td></tr><tr class="historical-row" style=""><td>апр. 2025</td><td>₺46&nbsp;478,64</td><td>+2.24%</td><td>₺183,01</td><td>+1.71%</td><td>4.86%</td></tr><tr class="historical-row" style=""><td>мар. 2025</td><td>₺45&nbsp;836,92</td><td>+1.40%</td><td>₺179,16</td><td>+2.15%</td><td>4.89%</td></tr><tr class="historical-row" style=""><td>фев. 2025</td><td>₺45&nbsp;882,81</td><td>-0.10%</td><td>₺176,97</td><td>+1.24%</td><td>4.85%</td></tr><tr class="historical-row" style=""><td>янв. 2025</td><td>₺46&nbsp;131,92</td><td>-0.54%</td><td>₺174,15</td><td>+1.62%</td><td>4.79%</td></tr><tr class="historical-row" style=""><td>дек. 2024</td><td>₺47&nbsp;193,78</td><td>-2.25%</td><td>₺171,20</td><td>+1.72%</td><td>4.68%</td></tr></tbody></table>
+            </td></tr><tr class="forecast-row" style="background-color: #f0f8ff;"><td>сен. 2025</td><td>₺62&nbsp;794,00</td><td>+1.60%</td><td>₺310,37</td><td>+2.51%</td><td>5.93%</td></tr><tr class="current-month-row" style="background-color: #e8f4fd;"><td>авг. 2025</td><td>₺60&nbsp;824,03</td><td>+2.25%</td><td>₺305,79</td><td>+2.38%</td><td>5.88%</td></tr><tr class="historical-row" style=""><td>июл. 2025</td><td>₺59&nbsp;363,68</td><td>+2.46%</td><td>₺298,22</td><td>+2.54%</td><td>5.87%</td></tr><tr class="historical-row" style=""><td>июн. 2025</td><td>₺57&nbsp;825,53</td><td>+2.66%</td><td>₺289,59</td><td>+2.98%</td><td>5.87%</td></tr><tr class="historical-row" style=""><td>май. 2025</td><td>₺56&nbsp;272,41</td><td>+2.76%</td><td>₺283,91</td><td>+2.00%</td><td>5.85%</td></tr><tr class="historical-row" style=""><td>апр. 2025</td><td>₺54&nbsp;670,56</td><td>+2.93%</td><td>₺279,30</td><td>+1.65%</td><td>5.89%</td></tr><tr class="historical-row" style=""><td>мар. 2025</td><td>₺53&nbsp;535,60</td><td>+2.12%</td><td>₺273,02</td><td>+2.30%</td><td>5.97%</td></tr><tr class="historical-row" style=""><td>фев. 2025</td><td>₺52&nbsp;383,18</td><td>+2.20%</td><td>₺267,56</td><td>+2.04%</td><td>5.96%</td></tr><tr class="historical-row" style=""><td>янв. 2025</td><td>₺50&nbsp;803,20</td><td>+3.11%</td><td>₺261,93</td><td>+2.15%</td><td>5.97%</td></tr><tr class="historical-row" style=""><td>дек. 2024</td><td>₺49&nbsp;855,93</td><td>+1.90%</td><td>₺254,47</td><td>+2.93%</td><td>6.02%</td></tr></tbody></table>
                 <div class="trends-chart-section">
                     <h4 class="trends-chart-title">График трендов</h4>
                     
                     <div class="chart-container">
-                        <div class="chart-placeholder">
-                    <div style="font-size: 16px; font-weight: 600; margin-bottom: 10px;">
-                        📊 График трендов
-                    </div>
-                    <div style="font-size: 13px; color: #6c757d;">
-                        Данные для построения графика представлены в таблицах выше
-                    </div>
-                </div>
+                        <img src="data:image/png;base64,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" alt="График данных" style="max-width: 100%; height: auto;">
                     </div>
                     <div class="chart-info">
                         <small style="color: #6c757d; font-style: italic; text-align: center; display: block; margin-top: 10px;">
@@ -820,21 +901,14 @@
                         </small>
                     </div>
                 </div>
-            <div class="trends-analysis-section"><h4 class="trends-analysis-title">Вывод по тренду</h4><div class="trends-analysis-content">Рынок недвижимости демонстрирует устойчивый рост как в продажах, так и в аренде. С сентябрь по август 2024 года цены на продажу выросли примерно на 14.6%, аренда — на 28.8%. Доходность держится в диапазоне 4.3–4.9%, показывая привлекательность инвестиций. Текущий тренд указывает на стабильность доходности, но сохраняется положительная динамика.</div></div><div class="object-summary-section"><h4 class="object-summary-title">Вывод по объекту</h4><div class="object-summary-content"><table class="object-comparison-table"><tbody><tr><td class="comparison-label">Цена за м²:</td><td class="comparison-value"><strong>₺51192.25</strong></td></tr><tr><td class="comparison-label">Площадь:</td><td class="comparison-value"><strong>150 м²</strong></td></tr><tr><td class="comparison-label">vs. мин. цена рынка:</td><td class="comparison-value comparison-expensive">+22.2%</td></tr><tr><td class="comparison-label">vs. макс. цена рынка:</td><td class="comparison-value comparison-expensive">+5.1%</td></tr><tr><td class="comparison-label">vs. средняя площадь:</td><td class="comparison-value comparison-smaller">-6.3%</td></tr><tr class="rental-estimate"><td class="comparison-label">Примерная аренда:</td><td class="comparison-value"><strong>₺23078 – ₺30000</strong></td></tr></tbody></table><div class="object-analysis-text">Ваш объект дороже как минимальной, так и максимальной цены рынка и имеет меньшую площадь чем большинство объектов на рынке.</div></div></div><div class="forecast-table-section"><h4 class="forecast-table-title">Прогноз цены и аренды</h4><div class="forecast-table-container"><table class="forecast-table"><thead><tr><th>Дата</th><th>Прогноз продажи<br>(₺/м²)</th><th>Прогноз аренды<br>(₺/м²)</th><th>Прогноз доходности</th></tr></thead><tbody><tr class="forecast-info"><td colspan="4" style="text-align: center; font-size: 11px; color: #666; background: #f8f9fa; padding: 4px;">
+            <div class="trends-analysis-section"><h4 class="trends-analysis-title">Вывод по тренду</h4><div class="trends-analysis-content">Рынок недвижимости демонстрирует устойчивый рост как в продажах, так и в аренде. С сентябрь по август 2024 года цены на продажу выросли примерно на 26.2%, аренда — на 36.0%. Доходность держится в диапазоне 5.6–6.0%, показывая привлекательность инвестиций. Текущий тренд указывает на стабильность доходности, но сохраняется положительная динамика.</div></div><div class="forecast-table-section"><h4 class="forecast-table-title">Прогноз цены и аренды</h4><div class="forecast-table-container"><table class="forecast-table"><thead><tr><th>Дата</th><th>Прогноз продажи<br>(₺/м²)</th><th>Прогноз аренды<br>(₺/м²)</th><th>Прогноз доходности</th></tr></thead><tbody><tr class="forecast-info"><td colspan="4" style="text-align: center; font-size: 11px; color: #666; background: #f8f9fa; padding: 4px;">
                 Прогноз на основе 12 месяцев (предыдущий + текущий + будущие)
-            </td></tr><tr class="previous-month-row" style="background-color: #f8f9fa;"><td>июл. 2025</td><td>₺50&nbsp;933,66</td><td>₺197,06</td><td>4.78%</td></tr><tr class="current-month-row" style="background-color: #e8f4fd; font-weight: bold;"><td>авг. 2025</td><td>₺53&nbsp;190,02</td><td>₺204,81</td><td>4.70%</td></tr><tr class="forecast-row" style=""><td>сен. 2025</td><td>₺50&nbsp;836,00</td><td>₺199,54</td><td>4.71%</td></tr><tr class="forecast-row" style=""><td>окт. 2025</td><td>₺50&nbsp;807,00</td><td>₺202,44</td><td>4.78%</td></tr><tr class="forecast-row" style=""><td>ноя. 2025</td><td>₺50&nbsp;728,00</td><td>₺205,13</td><td>4.85%</td></tr><tr class="forecast-row" style=""><td>дек. 2025</td><td>₺49&nbsp;749,00</td><td>₺206,52</td><td>4.98%</td></tr><tr class="forecast-row" style=""><td>янв. 2026</td><td>₺49&nbsp;551,00</td><td>₺207,22</td><td>5.02%</td></tr><tr class="forecast-row" style=""><td>фев. 2026</td><td>₺49&nbsp;549,00</td><td>₺208,21</td><td>5.04%</td></tr><tr class="forecast-row" style=""><td>мар. 2026</td><td>₺50&nbsp;171,00</td><td>₺209,80</td><td>5.02%</td></tr><tr class="forecast-row" style=""><td>апр. 2026</td><td>₺51&nbsp;165,00</td><td>₺211,99</td><td>4.97%</td></tr><tr class="forecast-row" style=""><td>май. 2026</td><td>₺52&nbsp;655,00</td><td>₺214,54</td><td>4.89%</td></tr><tr class="forecast-row" style=""><td>июн. 2026</td><td>₺54&nbsp;399,00</td><td>₺218,66</td><td>4.82%</td></tr></tbody></table></div></div>
+            </td></tr><tr class="previous-month-row" style="background-color: #f8f9fa;"><td>июл. 2025</td><td>₺59&nbsp;363,68</td><td>₺298,22</td><td>5.87%</td></tr><tr class="current-month-row" style="background-color: #e8f4fd; font-weight: bold;"><td>авг. 2025</td><td>₺60&nbsp;824,03</td><td>₺305,79</td><td>5.88%</td></tr><tr class="forecast-row" style=""><td>сен. 2025</td><td>₺62&nbsp;794,00</td><td>₺310,37</td><td>5.93%</td></tr><tr class="forecast-row" style=""><td>окт. 2025</td><td>₺63&nbsp;567,00</td><td>₺316,58</td><td>5.98%</td></tr><tr class="forecast-row" style=""><td>ноя. 2025</td><td>₺64&nbsp;226,00</td><td>₺322,12</td><td>6.02%</td></tr><tr class="forecast-row" style=""><td>дек. 2025</td><td>₺64&nbsp;904,00</td><td>₺327,45</td><td>6.05%</td></tr><tr class="forecast-row" style=""><td>янв. 2026</td><td>₺65&nbsp;852,00</td><td>₺331,43</td><td>6.04%</td></tr><tr class="forecast-row" style=""><td>фев. 2026</td><td>₺66&nbsp;577,00</td><td>₺335,06</td><td>6.04%</td></tr><tr class="forecast-row" style=""><td>мар. 2026</td><td>₺67&nbsp;385,00</td><td>₺339,32</td><td>6.04%</td></tr><tr class="forecast-row" style=""><td>апр. 2026</td><td>₺68&nbsp;486,00</td><td>₺342,95</td><td>6.01%</td></tr><tr class="forecast-row" style=""><td>май. 2026</td><td>₺69&nbsp;763,00</td><td>₺347,95</td><td>5.99%</td></tr><tr class="forecast-row" style=""><td>июн. 2026</td><td>₺71&nbsp;107,00</td><td>₺355,43</td><td>6.00%</td></tr></tbody></table></div></div>
                 <div class="forecast-chart-section" id="forecastChartSection">
                     <h4 class="forecast-chart-title">График прогноза цен и аренды</h4>
                     
                     <div class="chart-container">
-                        <div class="chart-placeholder">
-                    <div style="font-size: 16px; font-weight: 600; margin-bottom: 10px;">
-                        📊 График прогноза
-                    </div>
-                    <div style="font-size: 13px; color: #6c757d;">
-                        Данные для построения графика представлены в таблицах выше
-                    </div>
-                </div>
+                        <img src="data:image/png;base64,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" alt="График данных" style="max-width: 100%; height: auto;">
                     </div>
                     <div class="chart-info">
                         <small style="color: #6c757d; font-style: italic; text-align: center; display: block; margin-top: 10px;">
@@ -842,7 +916,7 @@
                         </small>
                     </div>
                 </div>
-            <div class="forecast-analysis-section"><h4 class="forecast-analysis-title">Вывод прогноза</h4><div class="forecast-analysis-content"><p><strong>Продажа:</strong>  ожидается стабильный рост цен с ₺48&nbsp;035,00/м² в июль 2025 до ₺54&nbsp;399,00/м² в июнь 2026 (+13.2% за 12 месяцев).</p><p><strong>Аренда:</strong>  прогнозируется увеличение с ₺191,30/м² до ₺218,66/м² (+14.3%).</p><p><strong>Доходность:</strong>  остаётся на уровне 4.7–5.0%, с лёгким изменением к июнь 2026 года.</p></div></div><div class="price-forecast-table-block"><table class="price-forecast-market-table"><thead><tr><th class="forecast-category-header">Текущая стоимость</th><th class="forecast-category-header">Прогнозная стоимость</th></tr></thead><tbody><tr><td class="forecast-data-cell"><div class="forecast-cell-label">Цена продажи:</div><div class="forecast-cell-value user-price">€160&nbsp;000</div></td><td class="forecast-data-cell"><div class="forecast-cell-label">Цена продажи:</div><div class="forecast-cell-value">€170&nbsp;023</div><div class="forecast-cell-growth positive">+6.3%</div></td></tr><tr><td class="forecast-data-cell"><div class="forecast-cell-label">Расчетная цена текущего рынка:</div><div class="forecast-cell-value market-price">€166&nbsp;244</div><div class="forecast-cell-growth positive">к вашей цене: +3.9%</div></td><td class="forecast-data-cell"><div class="forecast-cell-label">Расчетная цена текущего рынка:</div><div class="forecast-cell-value">€170&nbsp;023</div><div class="forecast-cell-growth positive">+2.3%</div></td></tr><tr><td class="forecast-data-cell"><div class="forecast-cell-label">Ставка аренды:</div><div class="forecast-cell-value">€640/мес</div></td><td class="forecast-data-cell"><div class="forecast-cell-label">Ставка аренды:</div><div class="forecast-cell-value">€683/мес</div><div class="forecast-cell-growth positive">+6.8%</div></td></tr></tbody></table><div class="forecast-metrics-compact-section"><h5 class="forecast-metrics-compact-title">Ключевые показатели</h5><div class="forecast-metrics-compact-grid"><div class="metric-compact-item"><span class="metric-compact-label">Средняя доходность:</span><span class="metric-compact-value">4.8%</span></div><div class="metric-compact-item"><span class="metric-compact-label">ROI за период:</span><span class="metric-compact-value positive">+6.3%</span></div><div class="metric-compact-item"><span class="metric-compact-label">Срок окупаемости:</span><span class="metric-compact-value">19.5 лет</span></div><div class="metric-compact-item"><span class="metric-compact-label">Период прогноза:</span><span class="metric-compact-value">10 мес.</span></div></div></div><div class="price-forecast-date">июнь 2026</div><div class="price-forecast-currency-info">Курс: 1 EUR = ₺47.99</div><div class="price-forecast-disclaimer">прогноз сделан на основании текущей динамики и очищен от инфляции и курсовых разниц, актуален на 25.08.2025</div></div></div>
+            <div class="forecast-analysis-section"><h4 class="forecast-analysis-title">Вывод прогноза</h4><div class="forecast-analysis-content"><p><strong>Продажа:</strong>  ожидается стабильный рост цен с ₺60&nbsp;441,00/м² в июль 2025 до ₺71&nbsp;107,00/м² в июнь 2026 (+17.6% за 12 месяцев).</p><p><strong>Аренда:</strong>  прогнозируется увеличение с ₺295,72/м² до ₺355,43/м² (+20.2%).</p><p><strong>Доходность:</strong>  остаётся на уровне 5.9–6.1%, с лёгким изменением к июнь 2026 года.</p></div></div></div>
                     </div>
                     
                     <!-- График трендов будет добавлен в generateTrendsTable -->
@@ -864,13 +938,13 @@
                 <div class="verification-title">Проверка актуальности данных</div>
                 <div>
                     Для проверки актуальности данных и верификации отчета перейдите по ссылке: 
-                    <a href="http://aaadvisor-zaicevn.amvera.io/reports/Отчет_по_оценке_объекта_Türkiye-Antalya-Alanya-Mahmutlar_20250825_071607.html" class="verification-link" target="_blank">http://aaadvisor-zaicevn.amvera.io/reports/Отчет_по_оценке_объекта_Türkiye-Antalya-Alanya-Mahmutlar_20250825_071607.html</a>
+                    <a href="http://aaadvisor-zaicevn.amvera.io/reports/Report_1952374904_20250825_080454_37244_Türkiye-Antalya-Alanya-Mahmutl.html" class="verification-link" target="_blank">http://aaadvisor-zaicevn.amvera.io/reports/Report_1952374904_20250825_080454_37244_Türkiye-Antalya-Alanya-Mahmutl.html</a>
                 </div>
             </div>
             
             <div class="footer-info">
                 <strong>Aaadviser</strong> - Система аналитики недвижимости<br>
-                Отчет №RPT-20250825_071607-5710 | Сформирован 25.08.2025 в 07:16:07<br>
+                Отчет №RPT-20250825_080454-37244 | Сформирован 25.08.2025 в 08:04:54<br>
                 © 2024 Aaadviser. Все права защищены.
             </div>
         </div>
