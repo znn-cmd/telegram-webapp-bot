@@ -4788,8 +4788,9 @@ def api_save_html_report():
         return jsonify({'error': 'Report content required'}), 400
     
     try:
-        # Генерируем уникальное имя файла
+        # Генерируем уникальные данные для экспортируемого отчета
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        report_id = f"RPT-{timestamp}-{random.randint(1000, 9999)}"
         safe_location = re.sub(r'[^\w\s-]', '', location_info).strip()
         safe_location = re.sub(r'[-\s]+', '-', safe_location)
         if len(safe_location) > 50:
@@ -4798,13 +4799,17 @@ def api_save_html_report():
         filename = f"Отчет_по_оценке_объекта_{safe_location}_{timestamp}.html"
         file_path = os.path.join('reports', filename)
         
-        # Создаем статичную HTML страницу без интерактивных элементов
+        # Генерируем QR-код с ссылкой на отчет
+        base_url = request.host_url.rstrip('/')
+        report_url_for_qr = f"{base_url}/reports/{filename}"
+        
+        # Создаем корпоративный HTML шаблон для экспортируемого отчета
         html_template = f"""<!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Отчет по оценке объекта - {location_info}</title>
+    <title>Аналитический отчет по недвижимости - {location_info}</title>
     <style>
         * {{
             margin: 0;
@@ -4813,93 +4818,304 @@ def api_save_html_report():
         }}
 
         body {{
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #f5f5f5;
-            color: #333;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #ffffff;
+            color: #2c3e50;
             line-height: 1.6;
+            font-size: 14px;
         }}
 
-        .container {{
-            max-width: 800px;
+        .document {{
+            max-width: 900px;
             margin: 0 auto;
-            padding: 20px;
             background: white;
             min-height: 100vh;
-            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            border: 1px solid #e0e0e0;
         }}
 
-        .header {{
+        /* Корпоративный заголовок */
+        .corporate-header {{
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 40px 30px;
             text-align: center;
-            margin-bottom: 30px;
-            padding-bottom: 20px;
-            border-bottom: 2px solid #667eea;
+            border-bottom: 4px solid #3498db;
         }}
 
-        .logo {{
-            width: 120px;
+        .company-logo {{
+            width: 100px;
             height: auto;
+            margin-bottom: 20px;
+            filter: brightness(0) invert(1);
+        }}
+
+        .document-title {{
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }}
+
+        .document-subtitle {{
+            font-size: 16px;
+            opacity: 0.9;
             margin-bottom: 15px;
         }}
 
-        .report-title {{
-            font-size: 28px;
-            font-weight: bold;
-            color: #333;
+        /* Метаданные отчета */
+        .report-metadata {{
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            margin: 0;
+            padding: 25px 30px;
+        }}
+
+        .metadata-grid {{
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }}
+
+        .metadata-item {{
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #e9ecef;
+        }}
+
+        .metadata-label {{
+            font-weight: 600;
+            color: #495057;
+        }}
+
+        .metadata-value {{
+            color: #6c757d;
+            text-align: right;
+        }}
+
+        .qr-section {{
+            text-align: center;
+            margin-top: 20px;
+            padding: 15px;
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+        }}
+
+        .qr-code {{
+            margin: 10px 0;
+        }}
+
+        .qr-label {{
+            font-size: 12px;
+            color: #6c757d;
+            margin-top: 5px;
+        }}
+
+        /* Основной контент */
+        .report-content {{
+            padding: 30px;
+        }}
+
+        /* Переопределяем стили таблиц для корпоративного вида */
+        .summary-table {{ 
+            width: 100%; 
+            border-collapse: collapse; 
+            margin: 25px 0; 
+            border: 1px solid #dee2e6;
+            font-size: 13px;
+        }}
+        .summary-table th {{ 
+            background: #2c3e50; 
+            color: white; 
+            padding: 15px 12px; 
+            font-weight: 600; 
+            text-align: left;
+            border: 1px solid #34495e;
+        }}
+        .summary-table td {{ 
+            padding: 12px; 
+            border: 1px solid #dee2e6; 
+            background: #ffffff;
+        }}
+        .summary-table tr:nth-child(even) td {{ 
+            background: #f8f9fa; 
+        }}
+
+        .trend-card {{ 
+            background: #ffffff; 
+            border: 1px solid #dee2e6; 
+            border-left: 4px solid #3498db;
+            padding: 20px; 
+            margin: 15px 0; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }}
+        
+        .trend-title {{ 
+            font-weight: 600; 
+            margin-bottom: 10px; 
+            color: #2c3e50;
+        }}
+        
+        .trend-value {{ 
+            font-size: 18px; 
+            font-weight: 700; 
+            color: #27ae60; 
+        }}
+
+        /* Корпоративный футер */
+        .corporate-footer {{
+            background: #f8f9fa;
+            border-top: 3px solid #3498db;
+            padding: 30px;
+            margin-top: 40px;
+        }}
+
+        .disclaimer {{
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-left: 4px solid #f39c12;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }}
+
+        .disclaimer-title {{
+            font-weight: 700;
+            color: #856404;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }}
+
+        .disclaimer-text {{
+            color: #856404;
+            font-size: 13px;
+            line-height: 1.5;
+        }}
+
+        .verification-section {{
+            background: #e8f5e8;
+            border: 1px solid #c3e6c3;
+            border-left: 4px solid #28a745;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }}
+
+        .verification-title {{
+            font-weight: 700;
+            color: #155724;
             margin-bottom: 10px;
         }}
 
-        .report-subtitle {{
-            font-size: 16px;
-            color: #666;
-            margin-bottom: 5px;
+        .verification-link {{
+            color: #0066cc;
+            text-decoration: none;
+            font-weight: 500;
         }}
 
-        .report-date {{
-            font-size: 14px;
-            color: #888;
+        .verification-link:hover {{
+            text-decoration: underline;
         }}
 
-        .report-content {{
+        .footer-info {{
+            text-align: center;
+            color: #6c757d;
+            font-size: 12px;
             margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #dee2e6;
         }}
 
-        /* Копируем стили из основного файла для совместимости */
-        .summary-table {{ width: 100%; border-collapse: collapse; margin: 20px 0; }}
-        .summary-table th, .summary-table td {{ padding: 12px; border: 1px solid #ddd; text-align: left; }}
-        .summary-table th {{ background: #f8f9fa; font-weight: 600; }}
-        .trend-card {{ background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 8px; padding: 15px; margin: 10px 0; }}
-        .trend-title {{ font-weight: 600; margin-bottom: 8px; }}
-        .trend-value {{ font-size: 18px; font-weight: 700; color: #28a745; }}
-        .market-indicators-table {{ width: 100%; background: #f8f9fa; border-radius: 16px; overflow: hidden; margin: 20px 0; }}
-        .price-forecast-table {{ width: 100%; background: #f8f9fa; border-radius: 16px; overflow: hidden; margin: 20px 0; }}
-        .consolidated-assessment-section {{ margin: 20px 0; background: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }}
-        .assessment-category {{ background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 8px; padding: 15px; margin: 10px 0; }}
-        
         @media print {{
             body {{ background: white; }}
-            .container {{ box-shadow: none; }}
+            .document {{ border: none; box-shadow: none; }}
+            .corporate-header {{ background: #2c3e50 !important; }}
         }}
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <img src="logo-flt.png" alt="Aaadviser Logo" class="logo" />
-            <div class="report-title">Отчет по оценке объекта</div>
-            <div class="report-subtitle">{location_info}</div>
-            <div class="report-date">Сформирован: {datetime.now().strftime("%d.%m.%Y в %H:%M")}</div>
+    <div class="document">
+        <!-- Корпоративный заголовок -->
+        <div class="corporate-header">
+            <img src="logo-flt.png" alt="Aaadviser" class="company-logo" />
+            <div class="document-title">Аналитический отчет по недвижимости</div>
+            <div class="document-subtitle">{location_info}</div>
+        </div>
+
+        <!-- Метаданные отчета -->
+        <div class="report-metadata">
+            <div class="metadata-grid">
+                <div>
+                    <div class="metadata-item">
+                        <span class="metadata-label">Номер отчета:</span>
+                        <span class="metadata-value">{report_id}</span>
+                    </div>
+                    <div class="metadata-item">
+                        <span class="metadata-label">Дата формирования:</span>
+                        <span class="metadata-value">{datetime.now().strftime("%d.%m.%Y")}</span>
+                    </div>
+                    <div class="metadata-item">
+                        <span class="metadata-label">Время формирования:</span>
+                        <span class="metadata-value">{datetime.now().strftime("%H:%M:%S UTC")}</span>
+                    </div>
+                </div>
+                <div>
+                    <div class="metadata-item">
+                        <span class="metadata-label">Система анализа:</span>
+                        <span class="metadata-value">Aaadviser v2.0</span>
+                    </div>
+                    <div class="metadata-item">
+                        <span class="metadata-label">Тип отчета:</span>
+                        <span class="metadata-value">Оценка объекта недвижимости</span>
+                    </div>
+                    <div class="metadata-item">
+                        <span class="metadata-label">Статус:</span>
+                        <span class="metadata-value">Автоматически сгенерирован</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="qr-section">
+                <div class="qr-code">
+                    <svg width="80" height="80" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="25" height="25" fill="white"/>
+                        <path d="M1 1h3v3H1V1zm5 0h1v1H6V1zm2 0h3v1H8V1zm5 0h1v1h-1V1zm2 0h3v3h-2V1zm5 0h3v3h-3V1zM1 2h1v1H1V2zm3 0h1v1H4V2zm5 0h1v1H9V2zm2 0h1v1h-1V2zm7 0h1v1h-1V2zM1 3h1v1H1V3zm3 0h1v1H4V3zm7 0h1v1h-1V3zm3 0h1v1h-1V3zm5 0h1v1h-1V3zM1 5h3v3H1V5zm5 0h1v1H6V5zm3 0h1v1H9V5zm2 0h1v1h-1V5zm3 0h1v1h-1V5zm6 0h3v3h-3V5zM1 6h1v1H1V6zm3 0h1v1H4V6zm5 0h3v1H9V6zm4 0h1v1h-1V6zm7 0h1v1h-1V6zM1 7h1v1H1V7zm3 0h1v1H4V7zm8 0h1v1h-1V7zm3 0h1v1h-1V7zm5 0h1v1h-1V7zM6 9h1v1H6V9zm2 0h1v1H8V9zm3 0h1v1h-1V9zm2 0h1v1h-1V9zm3 0h1v1h-1V9zm3 0h1v1h-1V9zM1 10h1v1H1v-1zm2 0h1v1H3v-1zm4 0h1v1H7v-1zm4 0h3v1h-3v-1zm5 0h1v1h-1v-1zm3 0h1v1h-1v-1zM2 11h1v1H2v-1zm2 0h3v1H4v-1zm3 0h1v1H7v-1zm3 0h1v1h-1v-1zm4 0h1v1h-1v-1zm3 0h1v1h-1v-1zM1 12h1v1H1v-1zm4 0h1v1H5v-1zm2 0h1v1H7v-1zm4 0h1v1h-1v-1zm2 0h1v1h-1v-1zm4 0h1v1h-1v-1zm3 0h1v1h-1v-1zM3 13h1v1H3v-1zm2 0h1v1H5v-1zm3 0h1v1H8v-1zm4 0h1v1h-1v-1zm3 0h1v1h-1v-1zm3 0h1v1h-1v-1zM1 14h1v1H1v-1zm3 0h1v1H4v-1zm2 0h1v1H6v-1zm3 0h1v1H9v-1zm2 0h1v1h-1v-1zm5 0h1v1h-1v-1zm3 0h1v1h-1v-1zM2 15h1v1H2v-1zm2 0h1v1H4v-1zm3 0h1v1H7v-1zm3 0h1v1h-1v-1zm3 0h1v1h-1v-1zm4 0h1v1h-1v-1zM1 17h3v3H1v-3zm5 0h1v1H6v-1zm3 0h1v1H9v-1zm2 0h1v1h-1v-1zm3 0h1v1h-1v-1zm4 0h1v1h-1v-1zM1 18h1v1H1v-1zm3 0h1v1H4v-1zm5 0h1v1H9v-1zm3 0h1v1h-1v-1zm3 0h1v1h-1v-1zm4 0h1v1h-1v-1zM1 19h1v1H1v-1zm3 0h1v1H4v-1zm6 0h1v1h-1v-1zm2 0h1v1h-1v-1zm4 0h3v1h-3v-1zm4 0h1v1h-1v-1zM6 21h1v1H6v-1zm3 0h1v1H9v-1zm2 0h1v1h-1v-1zm3 0h1v1h-1v-1zm3 0h1v1h-1v-1zm3 0h1v1h-1v-1zM1 22h1v1H1v-1zm2 0h1v1H3v-1zm3 0h1v1H6v-1zm3 0h1v1h-1v-1zm3 0h1v1h-1v-1zm4 0h1v1h-1v-1zm4 0h1v1h-1v-1zM2 23h3v1H2v-1zm3 0h1v1H5v-1zm3 0h1v1H8v-1zm3 0h1v1h-1v-1zm3 0h1v1h-1v-1zm3 0h1v1h-1v-1z" fill="#2c3e50"/>
+                    </svg>
+                </div>
+                <div class="qr-label">QR-код для верификации отчета</div>
+            </div>
         </div>
         
+        <!-- Основной контент отчета -->
         <div class="report-content">
             {report_content}
         </div>
         
-        <div style="margin-top: 40px; padding: 20px; background: #f8f9fa; border-radius: 8px; text-align: center; border: 1px solid #e0e0e0;">
-            <p style="font-size: 14px; color: #666; margin: 0;">
-                Отчет сформирован системой <strong>Aaadviser</strong><br>
-                <em>Инсайты рынка недвижимости</em><br>
-                {datetime.now().strftime("%d.%m.%Y")}
-            </p>
+        <!-- Дисклеймер и информация -->
+        <div class="corporate-footer">
+            <div class="disclaimer">
+                <div class="disclaimer-title">Важная информация</div>
+                <div class="disclaimer-text">
+                    Данный отчет автоматически сгенерирован системой Aaadviser на основании анализа исторических данных и текущего предложения, экономических данных региона и открытой статистики продаж. Анализ носит рекомендательный характер и не является официальной оценкой недвижимости. Для принятия инвестиционных решений рекомендуется консультация со специалистами.
+                </div>
+            </div>
+            
+            <div class="verification-section">
+                <div class="verification-title">Проверка актуальности данных</div>
+                <div>
+                    Для проверки актуальности данных и верификации отчета перейдите по ссылке: 
+                    <a href="{report_url_for_qr}" class="verification-link" target="_blank">{report_url_for_qr}</a>
+                </div>
+            </div>
+            
+            <div class="footer-info">
+                <strong>Aaadviser</strong> - Система аналитики недвижимости<br>
+                Отчет №{report_id} | Сформирован {datetime.now().strftime("%d.%m.%Y в %H:%M:%S")}<br>
+                © 2024 Aaadviser. Все права защищены.
+            </div>
         </div>
     </div>
 </body>

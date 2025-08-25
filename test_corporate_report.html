@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Аналитический отчет по недвижимости - Türkiye, Antalya, Kepez</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #ffffff;
+            color: #2c3e50;
+            line-height: 1.6;
+            font-size: 14px;
+        }
+
+        .document {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            min-height: 100vh;
+            border: 1px solid #e0e0e0;
+        }
+
+        /* Корпоративный заголовок */
+        .corporate-header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+            border-bottom: 4px solid #3498db;
+        }
+
+        .company-logo {
+            width: 100px;
+            height: auto;
+            margin-bottom: 20px;
+            filter: brightness(0) invert(1);
+        }
+
+        .document-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .document-subtitle {
+            font-size: 16px;
+            opacity: 0.9;
+            margin-bottom: 15px;
+        }
+
+        /* Метаданные отчета */
+        .report-metadata {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            margin: 0;
+            padding: 25px 30px;
+        }
+
+        .metadata-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .metadata-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .metadata-label {
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .metadata-value {
+            color: #6c757d;
+            text-align: right;
+        }
+
+        .qr-section {
+            text-align: center;
+            margin-top: 20px;
+            padding: 15px;
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+        }
+
+        .qr-code {
+            margin: 10px 0;
+        }
+
+        .qr-label {
+            font-size: 12px;
+            color: #6c757d;
+            margin-top: 5px;
+        }
+
+        /* Основной контент */
+        .report-content {
+            padding: 30px;
+        }
+
+        /* Переопределяем стили таблиц для корпоративного вида */
+        .summary-table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            margin: 25px 0; 
+            border: 1px solid #dee2e6;
+            font-size: 13px;
+        }
+        .summary-table th { 
+            background: #2c3e50; 
+            color: white; 
+            padding: 15px 12px; 
+            font-weight: 600; 
+            text-align: left;
+            border: 1px solid #34495e;
+        }
+        .summary-table td { 
+            padding: 12px; 
+            border: 1px solid #dee2e6; 
+            background: #ffffff;
+        }
+        .summary-table tr:nth-child(even) td { 
+            background: #f8f9fa; 
+        }
+
+        .trend-card { 
+            background: #ffffff; 
+            border: 1px solid #dee2e6; 
+            border-left: 4px solid #3498db;
+            padding: 20px; 
+            margin: 15px 0; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        .trend-title { 
+            font-weight: 600; 
+            margin-bottom: 10px; 
+            color: #2c3e50;
+        }
+        
+        .trend-value { 
+            font-size: 18px; 
+            font-weight: 700; 
+            color: #27ae60; 
+        }
+
+        /* Корпоративный футер */
+        .corporate-footer {
+            background: #f8f9fa;
+            border-top: 3px solid #3498db;
+            padding: 30px;
+            margin-top: 40px;
+        }
+
+        .disclaimer {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-left: 4px solid #f39c12;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        .disclaimer-title {
+            font-weight: 700;
+            color: #856404;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .disclaimer-text {
+            color: #856404;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .verification-section {
+            background: #e8f5e8;
+            border: 1px solid #c3e6c3;
+            border-left: 4px solid #28a745;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        .verification-title {
+            font-weight: 700;
+            color: #155724;
+            margin-bottom: 10px;
+        }
+
+        .verification-link {
+            color: #0066cc;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .verification-link:hover {
+            text-decoration: underline;
+        }
+
+        .footer-info {
+            text-align: center;
+            color: #6c757d;
+            font-size: 12px;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #dee2e6;
+        }
+
+        @media print {
+            body { background: white; }
+            .document { border: none; box-shadow: none; }
+            .corporate-header { background: #2c3e50 !important; }
+        }
+    </style>
+</head>
+<body>
+    <div class="document">
+        <!-- Корпоративный заголовок -->
+        <div class="corporate-header">
+            <img src="logo-flt.png" alt="Aaadviser" class="company-logo" />
+            <div class="document-title">Аналитический отчет по недвижимости</div>
+            <div class="document-subtitle">Türkiye, Antalya, Kepez</div>
+        </div>
+
+        <!-- Метаданные отчета -->
+        <div class="report-metadata">
+            <div class="metadata-grid">
+                <div>
+                    <div class="metadata-item">
+                        <span class="metadata-label">Номер отчета:</span>
+                        <span class="metadata-value">RPT-20250103_153025-4721</span>
+                    </div>
+                    <div class="metadata-item">
+                        <span class="metadata-label">Дата формирования:</span>
+                        <span class="metadata-value">03.01.2025</span>
+                    </div>
+                    <div class="metadata-item">
+                        <span class="metadata-label">Время формирования:</span>
+                        <span class="metadata-value">15:30:25 UTC</span>
+                    </div>
+                </div>
+                <div>
+                    <div class="metadata-item">
+                        <span class="metadata-label">Система анализа:</span>
+                        <span class="metadata-value">Aaadviser v2.0</span>
+                    </div>
+                    <div class="metadata-item">
+                        <span class="metadata-label">Тип отчета:</span>
+                        <span class="metadata-value">Оценка объекта недвижимости</span>
+                    </div>
+                    <div class="metadata-item">
+                        <span class="metadata-label">Статус:</span>
+                        <span class="metadata-value">Автоматически сгенерирован</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="qr-section">
+                <div class="qr-code">
+                    <svg width="80" height="80" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="25" height="25" fill="white"/>
+                        <path d="M1 1h3v3H1V1zm5 0h1v1H6V1zm2 0h3v1H8V1zm5 0h1v1h-1V1zm2 0h3v3h-2V1zm5 0h3v3h-3V1zM1 2h1v1H1V2zm3 0h1v1H4V2zm5 0h1v1H9V2zm2 0h1v1h-1V2zm7 0h1v1h-1V2zM1 3h1v1H1V3zm3 0h1v1H4V3zm7 0h1v1h-1V3zm3 0h1v1h-1V3zm5 0h1v1h-1V3zM1 5h3v3H1V5zm5 0h1v1H6V5zm3 0h1v1H9V5zm2 0h1v1h-1V5zm3 0h1v1h-1V5zm6 0h3v3h-3V5zM1 6h1v1H1V6zm3 0h1v1H4V6zm5 0h3v1H9V6zm4 0h1v1h-1V6zm7 0h1v1h-1V6zM1 7h1v1H1V7zm3 0h1v1H4V7zm8 0h1v1h-1V7zm3 0h1v1h-1V7zm5 0h1v1h-1V7zM6 9h1v1H6V9zm2 0h1v1H8V9zm3 0h1v1h-1V9zm2 0h1v1h-1V9zm3 0h1v1h-1V9zm3 0h1v1h-1V9zM1 10h1v1H1v-1zm2 0h1v1H3v-1zm4 0h1v1H7v-1zm4 0h3v1h-3v-1zm5 0h1v1h-1v-1zm3 0h1v1h-1v-1zM2 11h1v1H2v-1zm2 0h3v1H4v-1zm3 0h1v1H7v-1zm3 0h1v1h-1v-1zm4 0h1v1h-1v-1zm3 0h1v1h-1v-1zM1 12h1v1H1v-1zm4 0h1v1H5v-1zm2 0h1v1H7v-1zm4 0h1v1h-1v-1zm2 0h1v1h-1v-1zm4 0h1v1h-1v-1zm3 0h1v1h-1v-1zM3 13h1v1H3v-1zm2 0h1v1H5v-1zm3 0h1v1H8v-1zm4 0h1v1h-1v-1zm3 0h1v1h-1v-1zm3 0h1v1h-1v-1zM1 14h1v1H1v-1zm3 0h1v1H4v-1zm2 0h1v1H6v-1zm3 0h1v1H9v-1zm2 0h1v1h-1v-1zm5 0h1v1h-1v-1zm3 0h1v1h-1v-1zM2 15h1v1H2v-1zm2 0h1v1H4v-1zm3 0h1v1H7v-1zm3 0h1v1h-1v-1zm3 0h1v1h-1v-1zm4 0h1v1h-1v-1zM1 17h3v3H1v-3zm5 0h1v1H6v-1zm3 0h1v1H9v-1zm2 0h1v1h-1v-1zm3 0h1v1h-1v-1zm4 0h1v1h-1v-1zM1 18h1v1H1v-1zm3 0h1v1H4v-1zm5 0h1v1H9v-1zm3 0h1v1h-1v-1zm3 0h1v1h-1v-1zm4 0h1v1h-1v-1zM1 19h1v1H1v-1zm3 0h1v1H4v-1zm6 0h1v1h-1v-1zm2 0h1v1h-1v-1zm4 0h3v1h-3v-1zm4 0h1v1h-1v-1zM6 21h1v1H6v-1zm3 0h1v1H9v-1zm2 0h1v1h-1v-1zm3 0h1v1h-1v-1zm3 0h1v1h-1v-1zm3 0h1v1h-1v-1zM1 22h1v1H1v-1zm2 0h1v1H3v-1zm3 0h1v1H6v-1zm3 0h1v1h-1v-1zm3 0h1v1h-1v-1zm4 0h1v1h-1v-1zm4 0h1v1h-1v-1zM2 23h3v1H2v-1zm3 0h1v1H5v-1zm3 0h1v1H8v-1zm3 0h1v1h-1v-1zm3 0h1v1h-1v-1zm3 0h1v1h-1v-1z" fill="#2c3e50"/>
+                    </svg>
+                </div>
+                <div class="qr-label">QR-код для верификации отчета</div>
+            </div>
+        </div>
+        
+        <!-- Основной контент отчета -->
+        <div class="report-content">
+            <h3>Показатели рынка недвижимости</h3>
+            
+            <table class="summary-table">
+                <thead>
+                    <tr>
+                        <th>Показатель</th>
+                        <th>Продажа</th>
+                        <th>Аренда</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Средняя цена за м²</td>
+                        <td>€1,245</td>
+                        <td>€12.50</td>
+                    </tr>
+                    <tr>
+                        <td>Количество объектов</td>
+                        <td>143</td>
+                        <td>87</td>
+                    </tr>
+                    <tr>
+                        <td>Средний период размещения</td>
+                        <td>45 дней</td>
+                        <td>21 день</td>
+                    </tr>
+                    <tr>
+                        <td>Средняя доходность</td>
+                        <td colspan="2">7.8%</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="trend-card">
+                <div class="trend-title">Прогноз изменения стоимости</div>
+                <div class="trend-value">+12.5% в течение 12 месяцев</div>
+                <div style="margin-top: 10px; font-size: 13px; color: #6c757d;">
+                    На основе анализа исторических данных и текущих рыночных тенденций
+                </div>
+            </div>
+
+            <div class="trend-card">
+                <div class="trend-title">Рыночная активность</div>
+                <div class="trend-value">Высокая</div>
+                <div style="margin-top: 10px; font-size: 13px; color: #6c757d;">
+                    Количество сделок выросло на 23% по сравнению с предыдущим периодом
+                </div>
+            </div>
+        </div>
+        
+        <!-- Дисклеймер и информация -->
+        <div class="corporate-footer">
+            <div class="disclaimer">
+                <div class="disclaimer-title">Важная информация</div>
+                <div class="disclaimer-text">
+                    Данный отчет автоматически сгенерирован системой Aaadviser на основании анализа исторических данных и текущего предложения, экономических данных региона и открытой статистики продаж. Анализ носит рекомендательный характер и не является официальной оценкой недвижимости. Для принятия инвестиционных решений рекомендуется консультация со специалистами.
+                </div>
+            </div>
+            
+            <div class="verification-section">
+                <div class="verification-title">Проверка актуальности данных</div>
+                <div>
+                    Для проверки актуальности данных и верификации отчета перейдите по ссылке: 
+                    <a href="https://aaadvisor-zaicevn.amvera.io/reports/test_report.html" class="verification-link" target="_blank">https://aaadvisor-zaicevn.amvera.io/reports/test_report.html</a>
+                </div>
+            </div>
+            
+            <div class="footer-info">
+                <strong>Aaadviser</strong> - Система аналитики недвижимости<br>
+                Отчет №RPT-20250103_153025-4721 | Сформирован 03.01.2025 в 15:30:25<br>
+                © 2024 Aaadviser. Все права защищены.
+            </div>
+        </div>
+    </div>
+</body>
+</html>
