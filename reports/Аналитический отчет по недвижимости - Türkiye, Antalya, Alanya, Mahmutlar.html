@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Аналитический отчет по недвижимости - Türkiye, Antalya, Alanya, Mahmutlar</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         * {
             margin: 0;
@@ -778,7 +779,7 @@
                 <div>
                     <div class="metadata-item">
                         <span class="metadata-label">Номер отчета:</span>
-                        <span class="metadata-value">RPT-20250825_084139-56166</span>
+                        <span class="metadata-value">RPT-20250825_091423-71947</span>
                     </div>
                     <div class="metadata-item">
                         <span class="metadata-label">Дата формирования:</span>
@@ -786,7 +787,7 @@
                     </div>
                     <div class="metadata-item">
                         <span class="metadata-label">Время формирования:</span>
-                        <span class="metadata-value">08:41:39 UTC</span>
+                        <span class="metadata-value">09:14:23 UTC</span>
                     </div>
                 </div>
                 <div>
@@ -893,7 +894,7 @@
                     <h4 class="trends-chart-title">График трендов</h4>
                     
                     <div class="chart-container">
-                        <img src="data:image/png;base64,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" alt="График данных" style="max-width: 100%; height: auto;">
+                        <canvas id="trendsChart" width="509" height="253" style="display: block; box-sizing: border-box; height: 145px; width: 291px;" data-chart-data="{&quot;type&quot;:&quot;line&quot;}" data-chart-type="line" data-chart-id="trendsChart"></canvas>
                     </div>
                     <div class="chart-info">
                         <small style="color: #6c757d; font-style: italic; text-align: center; display: block; margin-top: 10px;">
@@ -908,7 +909,7 @@
                     <h4 class="forecast-chart-title">График прогноза цен и аренды</h4>
                     
                     <div class="chart-container">
-                        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAf0AAAFeCAYAAACPRMbIAAAQAElEQVR4AezVi47cOA5A0cb+/0fvII3J9IP1sC1LJHUWi0yaXWVLhwHu/z78jwABAgQIENhCQPS3WLNLEiBAgACBj484+mQIECBAgACBdgKi326lLkSAAAECBGKBI9GPn2BKgAABAgQIlBAQ/RJrckgCBAgQIHBd4Hr0r5/BEwgQIECAAIEJAqI/AdkrCBAgQIBABoG7op/hbs5AgAABAgQIfBEQ/S8Y/kqAAAECBDoLzI1+Z0l3I0CAAAECyQVEP/mCHI8AAQIECIwSyBD9UXfxHAIECBAgQOCJgOg/wfErAgQIECDQSSBv9DspuwsBAgQIEEggIPoJluAIBAgQIEBghkC16M8w8Q4CBAgQINBSQPRbrtWlCBAgQIDAb4Ee0f99LxMCBAgQIEDgh4Do/wDxIwECBAgQ6CrQOfpdd+ZeBAgQIEDglIDon2LzJQIECBAgUE9gv+jX25ETEyBAgACBIQKiP4TRQwgQIECAQH4B0f/ckT8JECBAgEB7AdFvv2IXJECAAAECnwKi/+kQ/2lKgAABAgQaCYh+o2W6CgECBAgQeCYg+s904t+ZEiBAgACBkgKiX3JtDk2AAAECBI4LiP5xs/gbpgQIECBAILmA6CdfkOMRIECAAIFRAqI/SjJ+jikBAgQIEEgjIPppVuEgBAgQIEDgXgHRv9c3fropAQIECBBYICD6C9C9kgABAgQIrBAQ/RXq8TtNCRAgQIDArQKifyuvhxMgQIAAgTwCop9nF/FJTAkQIECAwCAB0R8E6TEECBAgQCC7gOhn31B8PlMCBAgQIHBYQPQPk/kCAQIECBCoKSD6NfcWn9qUAAECBAg8ERD9Jzh+RYAAAQIEOgmIfqdtxncxJUCAAAECfwRE/w+DPwgQIECAQH8B0e+/4/iGpgQIECCwnYDob7dyFyZAgACBXQVEf9fNx/c2JUCAAIHGAqLfeLmuRoAAAQIEvgqI/lcNf48FTAkQIECghYDot1ijSxAgQIAAgdcCov/ayCdiAVMCBAgQKCYg+sUW5rgECBAgQOCsgOiflfO9WMCUAAECBNIKiH7a1TgYAQIECBAYKyD6Yz09LRYwJUCAAIEEAqKfYAmOQIAAAQIEZgiI/gxl74gFTAkQIEBgqoDoT+X2MgIECBAgsE5A9NfZe3MsYEqAAAECNwmI/k2wHkuAAAECBLIJiH62jThPLGBKgAABApcFRP8yoQcQIECAAIEaAqJfY09OGQuYEiBAgMABAdE/gOWjBAgQIECgsoDoV96es8cCpgQIECAQCoh+yGJIgAABAgT6CYh+v526USxgSoAAge0FRH/7fwIACBAgQGAXAdHfZdPuGQuYEiBAYCMB0d9o2a5KgAABAnsLiP7e+3f7WMCUAAECLQVEv+VaXYoAAQIECPwWEP3fJiYEYgFTAgQIFBcQ/eILdHwCBAgQIPCugOi/K+VzBGIBUwIECJQREP0yq3JQAgQIECBwTUD0r/n5NoFYwJQAAQIJBUQ/4VIciQABAgQI3CEg+neoeiaBWMCUAAECSwVEfym/lxMgQIAAgXkCoj/P2psIxAKmBAgQmCQg+pOgvYYAAQIECKwWEP3VG/B+ArGAKQECBIYLiP5wUg8kQIAAAQI5BUQ/516cikAsYEqAAIELAqJ/Ac9XCRAgQIBAJQHRr7QtZyUQC5gSIEDgLQHRf4vJhwgQIECAQH0B0a+/QzcgEAuYEiBA4IeA6P8A8SMBAgQIEOgqIPpdN+teBGIBUwIENhYQ/Y2X7+oECBAgsJeA6O+1b7clEAuYEiCwhYDob7FmlyRAgAABAh8fou9fAQECjwTMCRBoJiD6zRbqOgQIECBA4JGA6D+SMSdAIBYwJUCgrIDol12dgxMgQIAAgWMCon/My6cJEIgFTAkQKCAg+gWW5IgECBAgQGCEgOiPUPQMAgRiAVMCBFIJiH6qdTgMAQIECBC4T0D077P1ZAIEYgFTAgQWCYj+InivJUCAAAECswVEf7a49xEgEAuYEiBwu4Do307sBQQIECBAIIeA6OfYg1MQIBALmBIgMFBA9AdiehQBAgQIEMgsIPqZt+NsBAjEAqYECJwSEP1TbL5EgAABAgTqCYh+vZ05MQECsYApAQIvBET/BZBfEyBAgACBLgKi32WT7kGAQCxgSoDAXwHR/0vhLwQIECBAoLeA6Pfer9sRIBALmBLYUkD0t1y7SxMgQIDAjgKiv+PW3ZkAgVjAlEBzAdFvvmDXI0CAAAEC/wqI/r8S/kuAAIFYwJRAGwHRb7NKFyFAgAABAs8FRP+5j98SIEAgFjAlUFBA9AsuzZEJECBAgMAZAdE/o+Y7BAgQiAVMCaQWEP3U63E4AgQIECAwTkD0x1l6EgECBGIBUwJJBEQ/ySIcgwABAgQI3C0g+ncLez4BAgRiAVMC0wVEfzq5FxIgQIAAgTUCor/G3VsJECAQC5gSuFFA9G/E9WgCBAgQIJBJQPQzbcNZCBAgEAuYEhgiIPpDGD2EAAECBAjkFxD9/DtyQgIECMQCpgQOCoj+QTAfJ0CAAAECVQVEv+rmnJsAAQKxgCmBhwKi/5DGLwgQIECAQC8B0e+1T7chQIBALGBK4B8B0f8Hwf8JECBAgMAOAqK/w5bdkQABArGA6WYCor/Zwl2XAAECBPYVEP19d+/mBAgQiAVM2wqIftvVuhgBAgQIEPguIPrfPfxEgAABArGAaQMB0W+wRFcgQIAAAQLvCIj+O0o+Q4AAAQKxgGkpAdEvtS6HJUCAAAEC5wVE/7ydbxIgQIBALGCaVED0ky7GsQgQIECAwGgB0R8t6nkECBAgEAuYLhcQ/eUrcAACBAgQIDBHQPTnOHsLAQIECMQCphMFRH8itlcRIECAAIGVAqK/Ut+7CRAgQCAWML1FQPRvYfVQAgQIECCQT0D08+3EiQgQIEAgFjC9KCD6FwF9nQABAgQIVBEQ/Sqbck4CBAgQiAVM3xYQ/bepfJAAAQIECNQWEP3a+3N6AgQIEIgFTAMB0Q9QjAgQIECAQEcB0e+4VXciQIAAgVhg86nob/4PwPUJECBAYB8B0d9n125KgAABArHANlPR32bVLkqAAAECuwuI/u7/AtyfAAECBGKBhlPRb7hUVyJAgAABApGA6EcqZgQIECBAIBYoPRX90utzeAIECBAg8L6A6L9v5ZMECBAgQCAWKDIV/SKLckwCBAgQIHBVQPSvCvo+AQIECBCIBdJNRT/dShyIAAECBAjcIyD697h6KgECBAgQiAUWTkV/Ib5XEyBAgACBmQKiP1PbuwgQIECAQCwwZSr6U5i9hAABAgQIrBcQ/fU7cAICBAgQIBALDJ6K/mBQjyNAgAABAlkFRD/rZpyLAAECBAjEAqenon+azhcJECBAgEAtAdGvtS+nJUCAAAECscAbU9F/A8lHCBAgQIBABwHR77BFdyBAgAABArHAt6nof+PwAwECBAgQ6Csg+n1362YECBAgQOCbwN/of5v6gQABAgQIEGgnIPrtVupCBAgQIEAgFngR/fhLpgQIECBAgEA9AdGvtzMnJkCAAAECpwRORf/Um3yJAAECBAgQWCog+kv5vZwAAQIECMwTGBj9eYf2JgIECBAgQOC4gOgfN/MNAgQIECBQUuD26JdUcWgCBAgQINBQQPQbLtWVCBAgQIBAJLAo+tFRzAgQIECAAIE7BUT/Tl3PJkCAAAECiQRSRT+Ri6MQIECAAIF2AqLfbqUuRIAAAQIEYoEC0Y8PbkqAAAECBAgcExD9Y14+TYAAAQIEygqUjX5ZcQcnQIAAAQKLBER/EbzXEiBAgACB2QLNoj+bz/sIECBAgEAdAdGvsysnJUCAAAEClwS2iP4lIV8mQIAAAQJNBES/ySJdgwABAgQIvBLYOPqvaPyeAAECBAj0EhD9Xvt0GwIECBAg8FBA9H/Q+JEAAQIECHQVEP2um3UvAgQIECDwQ0D0f4DEP5oSIECAAIH6AqJff4duQIAAAQIE3hIQ/beY4g+ZEiBAgACBSgKiX2lbzkqAAAECBC4IiP4FvPirpgQIECBAIKeA6Ofci1MRIECAAIHhAqI/nDR+oCkBAgQIEFgtIPqrN+D9BAgQIEBgkoDoT4KOX2NKgAABAgTmCYj+PGtvIkCAAAECSwVEfyl//HJTAgQIECBwh4Do36HqmQQIECBAIKGA6CdcSnwkUwIECBAgcE1A9K/5+TYBAgQIECgjIPplVhUf1JQAAQIECLwrIPrvSvkcAQIECBAoLiD6xRcYH9+UAAECBAj8FhD93yYmBAgQIECgpYDot1xrfClTAgQIENhbQPT33r/bEyBAgMBGAqK/0bLjq5oSIECAwC4Cor/Lpt2TAAECBLYXEP3t/wnEAKYECBAg0E9A9Pvt1I0IECBAgEAoIPohi2EsYEqAAAEClQVEv/L2nJ0AAQIECBwQEP0DWD4aC5gSIECAQA0B0a+xJ6ckQIAAAQKXBUT/MqEHxAKmBAgQIJBNQPSzbcR5CBAgQIDATQKifxOsx8YCpgQIECCwTkD019l7MwECBAgQmCog+lO5vSwWMCVAgACBGQKiP0PZOwgQIECAQAIB0U+wBEeIBUwJECBAYKyA6I/19DQCBAgQIJBWQPTTrsbBYgFTAgQIEDgrIPpn5XyPAAECBAgUExD9Ygtz3FjAlAABAgReC4j+ayOfIECAAAECLQREv8UaXSIWMCVAgACBrwKi/1XD3wkQIECAQGMB0W+8XFeLBUwJECCwq4Do77p59yZAgACB7QREf7uVu3AsYEqAAIH+AqLff8duSIAAAQIE/giI/h8GfxCIBUwJECDQSUD0O23TXQgQIECAwBMB0X+C41cEYgFTAgQI1BQQ/Zp7c2oCBAgQIHBYQPQPk/kCgVjAlAABAtkFRD/7hpyPAAECBAgMEhD9QZAeQyAWMCVAgEAeAdHPswsnIUCAAAECtwqI/q28Hk4gFjAlQIDACgHRX6HunQQIECBAYIGA6C9A90oCsYApAQIE7hUQ/Xt9PZ0AAQIECKQREP00q3AQArGAKQECBEYJiP4oSc8hQIAAAQLJBUQ/+YIcj0AsYEqAAIHjAqJ/3Mw3CBAgQIBASQHRL7k2hyYQC5gSIEDgmYDoP9PxOwIECBAg0EhA9Bst01UIxAKmBAgQ+BQQ/U8HfxIgQIAAgfYCot9+xS5IIBYwJUBgPwHR32/nbkyAAAECmwqI/qaLd20CsYApAQKdBUS/83bdjQABAgQIfBEQ/S8Y/kqAQCxgSoBADwHR77FHtyBAgAABAi8FRP8lkQ8QIBALmBIgUE1A9KttzHkJECBAgMBJAdE/CedrBAjEAqYECOQVEP28u3EyAgQIECAwVED0h3J6GAECsYApAQIZBEQ/wxacgQABAgQITBAQ/QnIXkGAQCxgSoDAXAHRn+vtbQQIECBAYJmA6C+j92ICBGIBUwIE7hIQ/btkPZcAAQIECCQTEP1kC3EcAgRiAVMCxV7DRAAAAupJREFUBK4LiP51Q08gQIAAAQIlBES/xJockgCBWMCUAIEjAqJ/RMtnCRAgQIBAYQHRL7w8RydAIBYwJUAgFhD92MWUAAECBAi0ExD9dit1IQIEYgFTAgRE378BAgQIECCwiYDob7Jo1yRAIBYwJbCTgOjvtG13JUCAAIGtBUR/6/W7PAECsYApgZ4Cot9zr25FgAABAgR+CYj+LxIDAgQIxAKmBKoLiH71DTo/AQIECBB4U0D034TyMQIECMQCpgTqCIh+nV05KQECBAgQuCQg+pf4fJkAAQKxgCmBjAKin3ErzkSAAAECBG4QEP0bUD2SAAECsYApgbUCor/W39sJECBAgMA0AdGfRu1FBAgQiAVMCcwSEP1Z0t5DgAABAgQWC4j+4gV4PQECBGIBUwLjBUR/vKknEiBAgACBlAKin3ItDkWAAIFYwJTAFQHRv6LnuwQIECBAoJCA6BdalqMSIEAgFjAl8J6A6L/n5FMECBAgQKC8gOiXX6ELECBAIBYwJfBTQPR/iviZAAECBAg0FRD9pot1LQIECMQCpjsLiP7O23d3AgQIENhKQPS3WrfLEiBAIBYw3UNA9PfYs1sSIECAAIEP0fePgAABAgQeCBh3ExD9bht1HwIECBAg8EBA9B/AGBMgQIBALGBaV0D06+7OyQkQIECAwCEB0T/E5cMECBAgEAuYVhAQ/QpbckYCBAgQIDBAQPQHIHoEAQIECMQCprkERD/XPpyGAAECBAjcJiD6t9F6MAECBAjEAqarBER/lbz3EiBAgACByQKiPxnc6wgQIEAgFjC9X0D07zf2BgIECBAgkEJA9FOswSEIECBAIBYwHSkg+iM1PYsAAQIECCQWEP3Ey3E0AgQIEIgFTM8JiP45N98iQIAAAQLlBES/3MocmAABAgRiAdNXAqL/SsjvCRAgQIBAEwHRb7JI1yBAgACBWMD0PwHR/8/C3wgQIECAQGsB0W+9XpcjQIAAgVhgz+n/AQAA//+xGdWCAAAABklEQVQDADKqAr2/SS5BAAAAAElFTkSuQmCC" alt="График данных" style="max-width: 100%; height: auto;">
+                        <canvas id="forecastChart" width="509" height="350" style="display: block; box-sizing: border-box; height: 200px; width: 291px;" data-chart-data="{&quot;type&quot;:&quot;line&quot;}" data-chart-type="line" data-chart-id="forecastChart"></canvas>
                     </div>
                     <div class="chart-info">
                         <small style="color: #6c757d; font-style: italic; text-align: center; display: block; margin-top: 10px;">
@@ -938,16 +939,123 @@
                 <div class="verification-title">Проверка актуальности данных</div>
                 <div>
                     Для проверки актуальности данных и верификации отчета перейдите по ссылке: 
-                    <a href="http://aaadvisor-zaicevn.amvera.io/reports/Report_1952374904_20250825_084139_56166_Türkiye-Antalya-Alanya-Mahmutl.html" class="verification-link" target="_blank">http://aaadvisor-zaicevn.amvera.io/reports/Report_1952374904_20250825_084139_56166_Türkiye-Antalya-Alanya-Mahmutl.html</a>
+                    <a href="http://aaadvisor-zaicevn.amvera.io/reports/Report_1952374904_20250825_091423_71947_Türkiye-Antalya-Alanya-Mahmutl.html" class="verification-link" target="_blank">http://aaadvisor-zaicevn.amvera.io/reports/Report_1952374904_20250825_091423_71947_Türkiye-Antalya-Alanya-Mahmutl.html</a>
                 </div>
             </div>
             
             <div class="footer-info">
                 <strong>Aaadviser</strong> - Система аналитики недвижимости<br>
-                Отчет №RPT-20250825_084139-56166 | Сформирован 25.08.2025 в 08:41:39<br>
+                Отчет №RPT-20250825_091423-71947 | Сформирован 25.08.2025 в 09:14:23<br>
                 © 2024 Aaadviser. Все права защищены.
             </div>
         </div>
     </div>
+    
+    <script>
+        // Функция для восстановления интерактивных графиков в экспортируемом отчете
+        document.addEventListener('DOMContentLoaded', function() {
+            restoreCharts();
+        });
+        
+        function restoreCharts() {
+            // Находим все canvas элементы с данными графиков
+            const canvasElements = document.querySelectorAll('canvas[data-chart-data]');
+            
+            canvasElements.forEach(canvas => {
+                try {
+                    const chartData = JSON.parse(canvas.getAttribute('data-chart-data'));
+                    const chartType = canvas.getAttribute('data-chart-type') || 'line';
+                    const chartId = canvas.getAttribute('data-chart-id') || 'chart';
+                    
+                    // Восстанавливаем график
+                    if (chartData && chartData.data) {
+                        const ctx = canvas.getContext('2d');
+                        
+                        // Создаем новый график с сохраненными данными
+                        new Chart(ctx, {
+                            type: chartType,
+                            data: chartData.data,
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: {
+                                    legend: {
+                                        position: 'top',
+                                        labels: {
+                                            font: {
+                                                size: 12
+                                            },
+                                            color: '#2c3e50'
+                                        }
+                                    },
+                                    title: {
+                                        display: true,
+                                        text: getChartTitle(chartId),
+                                        color: '#2c3e50',
+                                        font: {
+                                            size: 16,
+                                            weight: 'bold'
+                                        }
+                                    }
+                                },
+                                scales: {
+                                    x: {
+                                        grid: {
+                                            color: '#e9ecef'
+                                        },
+                                        ticks: {
+                                            color: '#6c757d',
+                                            font: {
+                                                size: 11
+                                            }
+                                        }
+                                    },
+                                    y: {
+                                        grid: {
+                                            color: '#e9ecef'
+                                        },
+                                        ticks: {
+                                            color: '#6c757d',
+                                            font: {
+                                                size: 11
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        });
+                    }
+                } catch (error) {
+                    console.error('Error restoring chart:', error);
+                    // В случае ошибки показываем placeholder
+                    showChartPlaceholder(canvas);
+                }
+            });
+        }
+        
+        function getChartTitle(chartId) {
+            const titles = {
+                'trendsChart': 'График трендов цен на недвижимость',
+                'forecastChart': 'Прогноз цен на недвижимость',
+                'priceChart': 'Динамика цен',
+                'default': 'График данных'
+            };
+            return titles[chartId] || titles['default'];
+        }
+        
+        function showChartPlaceholder(canvas) {
+            const placeholder = document.createElement('div');
+            placeholder.className = 'chart-placeholder';
+            placeholder.innerHTML = `
+                <div style="font-size: 16px; font-weight: 600; margin-bottom: 10px;">
+                    📊 График данных
+                </div>
+                <div style="font-size: 13px; color: #6c757d;">
+                    Данные для построения графика представлены в таблицах выше
+                </div>
+            `;
+            canvas.parentNode.replaceChild(placeholder, canvas);
+        }
+    </script>
 </body>
 </html>
