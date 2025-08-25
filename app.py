@@ -2895,7 +2895,7 @@ def create_economic_chart_data(economic_data):
             {
                 'label': f'Рост ВВП (%) - {country_name}',
                 'data': [d['value'] for d in gdp_data],  # Рост ВВП в процентах
-                'borderColor': '#667eea',
+                'borderColor': '\#667eea',
                 'backgroundColor': 'rgba(102, 126, 234, 0.1)',
                 'tension': 0.4,
                 'fill': False
@@ -2910,7 +2910,7 @@ def create_economic_chart_data(economic_data):
             {
                 'label': f'Инфляция (%) - {country_name}',
                 'data': [d['value'] for d in inflation_data],  # Уровень инфляции в процентах
-                'borderColor': '#dc3545',
+                'borderColor': '\#dc3545',
                 'backgroundColor': 'rgba(220, 53, 69, 0.1)',
                 'tension': 0.4,
                 'fill': False
@@ -4809,12 +4809,12 @@ def api_save_html_report():
         report_url_for_qr = f"{base_url}/reports/{filename}"
         
         # Создаем корпоративный HTML шаблон для экспортируемого отчета
-        html_template = f"""<!DOCTYPE html>
+        html_template = """<!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Аналитический отчет по недвижимости - {location_info}</title>
+    <title>Аналитический отчет по недвижимости - """ + location_info + """</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         * {
@@ -4825,8 +4825,8 @@ def api_save_html_report():
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #ffffff;
-            color: #2c3e50;
+            background: \#ffffff;
+            color: \#2c3e50;
             line-height: 1.6;
             font-size: 14px;
         }
@@ -4836,16 +4836,16 @@ def api_save_html_report():
             margin: 0 auto;
             background: white;
             min-height: 100vh;
-            border: 1px solid #e0e0e0;
+            border: 1px solid \#e0e0e0;
         }
 
-        /* Корпоративный заголовок */
+        <!-- Корпоративный заголовок -->
         .corporate-header {
-            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            background: linear-gradient(135deg, \#2c3e50 0%, \#34495e 100%);
             color: white;
             padding: 40px 30px;
             text-align: center;
-            border-bottom: 4px solid #3498db;
+            border-bottom: 4px solid \#3498db;
         }
 
         .company-logo {
@@ -4869,10 +4869,10 @@ def api_save_html_report():
             margin-bottom: 15px;
         }
 
-        /* Метаданные отчета */
+        <!-- Метаданные отчета -->
         .report-metadata {
-            background: #f8f9fa;
-            border: 1px solid #e9ecef;
+            background: \#f8f9fa;
+            border: 1px solid \#e9ecef;
             margin: 0;
             padding: 25px 30px;
         }
@@ -4888,16 +4888,16 @@ def api_save_html_report():
             display: flex;
             justify-content: space-between;
             padding: 8px 0;
-            border-bottom: 1px solid #e9ecef;
+            border-bottom: 1px solid \#e9ecef;
         }
 
         .metadata-label {
             font-weight: 600;
-            color: #495057;
+            color: \#495057;
         }
 
         .metadata-value {
-            color: #6c757d;
+            color: \#6c757d;
             text-align: right;
         }
 
@@ -4906,7 +4906,7 @@ def api_save_html_report():
             margin-top: 20px;
             padding: 15px;
             background: white;
-            border: 1px solid #e9ecef;
+            border: 1px solid \#e9ecef;
             border-radius: 8px;
         }
 
@@ -4916,33 +4916,33 @@ def api_save_html_report():
 
         .qr-label {
             font-size: 12px;
-            color: #6c757d;
+            color: \#6c757d;
             margin-top: 5px;
         }
 
-        /* Основной контент */
+        <!-- Основной контент -->
         .report-content {
             padding: 30px;
         }
 
-        /* Корпоративные стили для всех элементов отчета */
+        <!-- Корпоративные стили для всех элементов отчета -->
         
-        /* Заголовки секций */
+        <!-- Заголовки секций -->
         .data-section-title {
             font-size: 18px;
             font-weight: 700;
-            color: #2c3e50;
+            color: \#2c3e50;
             margin: 25px 0 15px 0;
             padding: 10px 0;
-            border-bottom: 2px solid #3498db;
+            border-bottom: 2px solid \#3498db;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
         
-        /* Market Indicators Table */
+        <!-- Market Indicators Table -->
         .market-indicators-table {
             margin: 20px 0;
-            border: 1px solid #dee2e6;
+            border: 1px solid \#dee2e6;
             border-radius: 8px;
             overflow: hidden;
             box-shadow: 0 2px 8px rgba(0,0,0,0.05);
@@ -4955,7 +4955,7 @@ def api_save_html_report():
         }
         
         .market-data-table .category-header {
-            background: #2c3e50;
+            background: \#2c3e50;
             color: white;
             padding: 15px;
             font-weight: 700;
@@ -4967,33 +4967,33 @@ def api_save_html_report():
         
         .market-data-table .data-cell {
             padding: 15px;
-            border-bottom: 1px solid #dee2e6;
-            background: #ffffff;
+            border-bottom: 1px solid \#dee2e6;
+            background: \#ffffff;
             vertical-align: top;
         }
         
         .market-data-table tr:nth-child(even) .data-cell {
-            background: #f8f9fa;
+            background: \#f8f9fa;
         }
         
         .cell-label {
             font-weight: 600;
-            color: #495057;
+            color: \#495057;
             margin-bottom: 5px;
             font-size: 12px;
         }
         
         .cell-value {
             font-weight: 700;
-            color: #2c3e50;
+            color: \#2c3e50;
             font-size: 14px;
         }
         
-        /* Market Analysis Text Block */
+        <!-- Market Analysis Text Block -->
         .market-analysis-text-block {
-            background: #f8f9fa;
-            border: 1px solid #dee2e6;
-            border-left: 4px solid #3498db;
+            background: \#f8f9fa;
+            border: 1px solid \#dee2e6;
+            border-left: 4px solid \#3498db;
             padding: 20px;
             margin: 20px 0;
             border-radius: 4px;
@@ -5002,7 +5002,7 @@ def api_save_html_report():
         .market-analysis-text-title {
             font-size: 16px;
             font-weight: 700;
-            color: #2c3e50;
+            color: \#2c3e50;
             margin-bottom: 15px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
@@ -5011,16 +5011,16 @@ def api_save_html_report():
         .market-analysis-text-content p {
             margin-bottom: 10px;
             line-height: 1.6;
-            color: #495057;
+            color: \#495057;
             font-size: 13px;
         }
         
         .market-analysis-text-content strong {
-            color: #2c3e50;
+            color: \#2c3e50;
             font-weight: 700;
         }
         
-        /* Trends Grid */
+        <!-- Trends Grid -->
         .trends-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -5029,22 +5029,22 @@ def api_save_html_report():
         }
         
         .trend-card {
-            background: #ffffff;
-            border: 1px solid #dee2e6;
-            border-left: 4px solid #27ae60;
+            background: \#ffffff;
+            border: 1px solid \#dee2e6;
+            border-left: 4px solid \#27ae60;
             padding: 20px;
             border-radius: 4px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         }
         
         .trend-card-price_trend {
-            border-left-color: #3498db;
+            border-left-color: \#3498db;
         }
         
         .trend-title {
             font-size: 14px;
             font-weight: 700;
-            color: #2c3e50;
+            color: \#2c3e50;
             margin-bottom: 10px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
@@ -5053,17 +5053,17 @@ def api_save_html_report():
         .trend-value {
             font-size: 20px;
             font-weight: 700;
-            color: #27ae60;
+            color: \#27ae60;
             margin-bottom: 10px;
         }
         
         .trend-change {
             font-size: 12px;
-            color: #6c757d;
+            color: \#6c757d;
             line-height: 1.4;
         }
         
-        /* Trends Table */
+        <!-- Trends Table -->
         .trends-table-section {
             margin: 30px 0;
         }
@@ -5071,7 +5071,7 @@ def api_save_html_report():
         .trends-table-title {
             font-size: 16px;
             font-weight: 700;
-            color: #2c3e50;
+            color: \#2c3e50;
             margin-bottom: 15px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
@@ -5080,7 +5080,7 @@ def api_save_html_report():
         .trends-table {
             width: 100%;
             border-collapse: collapse;
-            border: 1px solid #dee2e6;
+            border: 1px solid \#dee2e6;
             border-radius: 8px;
             overflow: hidden;
             box-shadow: 0 2px 8px rgba(0,0,0,0.05);
@@ -5088,7 +5088,7 @@ def api_save_html_report():
         }
         
         .trends-table th {
-            background: #2c3e50;
+            background: \#2c3e50;
             color: white;
             padding: 12px 8px;
             font-weight: 700;
@@ -5101,30 +5101,30 @@ def api_save_html_report():
         .trends-table td {
             padding: 10px 8px;
             text-align: center;
-            border-bottom: 1px solid #dee2e6;
-            background: #ffffff;
+            border-bottom: 1px solid \#dee2e6;
+            background: \#ffffff;
         }
         
         .trends-table .current-month-row {
-            background: #e3f2fd !important;
+            background: \#e3f2fd !important;
             font-weight: 700;
         }
         
         .trends-table .forecast-row {
-            background: #f0f8ff !important;
+            background: \#f0f8ff !important;
         }
         
         .trends-table .filter-info {
-            background: #f8f9fa !important;
+            background: \#f8f9fa !important;
             font-style: italic;
-            color: #6c757d;
+            color: \#6c757d;
         }
         
-        /* Object Summary */
+        <!-- Object Summary -->
         .object-summary-section {
-            background: #f8f9fa;
-            border: 1px solid #dee2e6;
-            border-left: 4px solid #e74c3c;
+            background: \#f8f9fa;
+            border: 1px solid \#dee2e6;
+            border-left: 4px solid \#e74c3c;
             padding: 20px;
             margin: 25px 0;
             border-radius: 4px;
@@ -5133,7 +5133,7 @@ def api_save_html_report():
         .object-summary-title {
             font-size: 16px;
             font-weight: 700;
-            color: #2c3e50;
+            color: \#2c3e50;
             margin-bottom: 15px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
@@ -5146,45 +5146,45 @@ def api_save_html_report():
         
         .object-comparison-table td {
             padding: 8px 0;
-            border-bottom: 1px solid #dee2e6;
+            border-bottom: 1px solid \#dee2e6;
         }
         
         .comparison-label {
             font-weight: 600;
-            color: #495057;
+            color: \#495057;
             width: 60%;
         }
         
         .comparison-value {
             font-weight: 700;
-            color: #2c3e50;
+            color: \#2c3e50;
             text-align: right;
         }
         
         .comparison-expensive {
-            color: #e74c3c;
+            color: \#e74c3c;
         }
         
         .comparison-cheaper {
-            color: #27ae60;
+            color: \#27ae60;
         }
         
         .comparison-smaller {
-            color: #f39c12;
+            color: \#f39c12;
         }
         
         .object-analysis-text {
             margin-top: 15px;
             padding: 15px;
-            background: #fff3cd;
-            border: 1px solid #ffeaa7;
+            background: \#fff3cd;
+            border: 1px solid \#ffeaa7;
             border-radius: 4px;
             font-size: 13px;
-            color: #856404;
+            color: \#856404;
             line-height: 1.5;
         }
         
-        /* Forecast Tables */
+        <!-- Forecast Tables -->
         .forecast-table-section {
             margin: 30px 0;
         }
@@ -5192,7 +5192,7 @@ def api_save_html_report():
         .forecast-table-title {
             font-size: 16px;
             font-weight: 700;
-            color: #2c3e50;
+            color: \#2c3e50;
             margin-bottom: 15px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
@@ -5201,7 +5201,7 @@ def api_save_html_report():
         .forecast-table {
             width: 100%;
             border-collapse: collapse;
-            border: 1px solid #dee2e6;
+            border: 1px solid \#dee2e6;
             border-radius: 8px;
             overflow: hidden;
             box-shadow: 0 2px 8px rgba(0,0,0,0.05);
@@ -5209,7 +5209,7 @@ def api_save_html_report():
         }
         
         .forecast-table th {
-            background: #2c3e50;
+            background: \#2c3e50;
             color: white;
             padding: 12px 8px;
             font-weight: 700;
@@ -5222,24 +5222,24 @@ def api_save_html_report():
         .forecast-table td {
             padding: 10px 8px;
             text-align: center;
-            border-bottom: 1px solid #dee2e6;
-            background: #ffffff;
+            border-bottom: 1px solid \#dee2e6;
+            background: \#ffffff;
         }
         
         .forecast-table .current-month-row {
-            background: #e3f2fd !important;
+            background: \#e3f2fd !important;
             font-weight: 700;
         }
         
         .forecast-table .forecast-row {
-            background: #f0f8ff !important;
+            background: \#f0f8ff !important;
         }
         
-        /* Price Forecast Market Table */
+        <!-- Price Forecast Market Table -->
         .price-forecast-market-table {
             width: 100%;
             border-collapse: collapse;
-            border: 1px solid #dee2e6;
+            border: 1px solid \#dee2e6;
             border-radius: 8px;
             overflow: hidden;
             box-shadow: 0 2px 8px rgba(0,0,0,0.05);
@@ -5247,7 +5247,7 @@ def api_save_html_report():
         }
         
         .forecast-category-header {
-            background: #2c3e50;
+            background: \#2c3e50;
             color: white;
             padding: 15px;
             font-weight: 700;
@@ -5259,31 +5259,31 @@ def api_save_html_report():
         
         .forecast-data-cell {
             padding: 20px;
-            border-bottom: 1px solid #dee2e6;
-            background: #ffffff;
+            border-bottom: 1px solid \#dee2e6;
+            background: \#ffffff;
             vertical-align: top;
         }
         
         .forecast-cell-label {
             font-weight: 600;
-            color: #495057;
+            color: \#495057;
             margin-bottom: 8px;
             font-size: 13px;
         }
         
         .forecast-cell-value {
             font-weight: 700;
-            color: #2c3e50;
+            color: \#2c3e50;
             font-size: 16px;
             margin-bottom: 5px;
         }
         
         .forecast-cell-value.user-price {
-            color: #3498db;
+            color: \#3498db;
         }
         
         .forecast-cell-value.market-price {
-            color: #9b59b6;
+            color: \#9b59b6;
         }
         
         .forecast-cell-growth {
@@ -5295,21 +5295,21 @@ def api_save_html_report():
         }
         
         .forecast-cell-growth.positive {
-            background: #d4edda;
-            color: #155724;
+            background: \#d4edda;
+            color: \#155724;
         }
         
         .forecast-cell-growth.negative {
-            background: #f8d7da;
-            color: #721c24;
+            background: \#f8d7da;
+            color: \#721c24;
         }
         
-        /* Analysis Sections */
+        <!-- Analysis Sections -->
         .trends-analysis-section,
         .forecast-analysis-section {
-            background: #e8f5e8;
-            border: 1px solid #c3e6c3;
-            border-left: 4px solid #28a745;
+            background: \#e8f5e8;
+            border: 1px solid \#c3e6c3;
+            border-left: 4px solid \#28a745;
             padding: 20px;
             margin: 25px 0;
             border-radius: 4px;
@@ -5319,7 +5319,7 @@ def api_save_html_report():
         .forecast-analysis-title {
             font-size: 16px;
             font-weight: 700;
-            color: #155724;
+            color: \#155724;
             margin-bottom: 15px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
@@ -5327,7 +5327,7 @@ def api_save_html_report():
         
         .trends-analysis-content,
         .forecast-analysis-content {
-            color: #155724;
+            color: \#155724;
             line-height: 1.6;
             font-size: 13px;
         }
@@ -5342,19 +5342,19 @@ def api_save_html_report():
             font-weight: 700;
         }
         
-        /* Key Metrics */
+        <!-- Key Metrics -->
         .forecast-metrics-compact-section {
             margin: 20px 0;
             padding: 20px;
-            background: #f8f9fa;
-            border: 1px solid #dee2e6;
+            background: \#f8f9fa;
+            border: 1px solid \#dee2e6;
             border-radius: 8px;
         }
         
         .forecast-metrics-compact-title {
             font-size: 14px;
             font-weight: 700;
-            color: #2c3e50;
+            color: \#2c3e50;
             margin-bottom: 15px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
@@ -5370,33 +5370,33 @@ def api_save_html_report():
             display: flex;
             justify-content: space-between;
             padding: 8px 0;
-            border-bottom: 1px solid #dee2e6;
+            border-bottom: 1px solid \#dee2e6;
         }
         
         .metric-compact-label {
             font-weight: 600;
-            color: #495057;
+            color: \#495057;
             font-size: 12px;
         }
         
         .metric-compact-value {
             font-weight: 700;
-            color: #2c3e50;
+            color: \#2c3e50;
             font-size: 12px;
         }
         
         .metric-compact-value.positive {
-            color: #27ae60;
+            color: \#27ae60;
         }
         
         .metric-compact-value.negative {
-            color: #e74c3c;
+            color: \#e74c3c;
         }
         
-        /* Chart Replacements */
+        <!-- Chart Replacements -->
         .chart-container {
-            background: #f8f9fa;
-            border: 1px solid #dee2e6;
+            background: \#f8f9fa;
+            border: 1px solid \#dee2e6;
             border-radius: 8px;
             padding: 40px;
             text-align: center;
@@ -5404,23 +5404,23 @@ def api_save_html_report():
         }
         
         .chart-placeholder {
-            background: #ffffff;
-            border: 2px dashed #3498db;
+            background: \#ffffff;
+            border: 2px dashed \#3498db;
             border-radius: 8px;
             padding: 40px;
-            color: #6c757d;
+            color: \#6c757d;
             font-style: italic;
         }
         
         .chart-info {
             margin-top: 10px;
             font-size: 11px;
-            color: #6c757d;
+            color: \#6c757d;
             font-style: italic;
             text-align: center;
         }
         
-        /* Additional spacing */
+        <!-- Additional spacing -->
         .block-spacing {
             height: 20px;
         }
@@ -5429,11 +5429,11 @@ def api_save_html_report():
             height: 10px;
         }
         
-        /* Price forecast info */
+        <!-- Price forecast info -->
         .price-forecast-date {
             text-align: center;
             font-weight: 700;
-            color: #2c3e50;
+            color: \#2c3e50;
             margin: 15px 0;
             font-size: 14px;
         }
@@ -5441,26 +5441,26 @@ def api_save_html_report():
         .price-forecast-currency-info {
             text-align: center;
             font-size: 12px;
-            color: #6c757d;
+            color: \#6c757d;
             margin: 10px 0;
         }
         
         .price-forecast-disclaimer {
-            background: #fff3cd;
-            border: 1px solid #ffeaa7;
+            background: \#fff3cd;
+            border: 1px solid \#ffeaa7;
             border-radius: 4px;
             padding: 15px;
             font-size: 11px;
-            color: #856404;
+            color: \#856404;
             text-align: center;
             font-style: italic;
             margin: 15px 0;
         }
 
-        /* Location and Object Info */
+        <!-- Location and Object Info -->
         .location-object-info {
-            background: #f8f9fa;
-            border: 1px solid #dee2e6;
+            background: \#f8f9fa;
+            border: 1px solid \#dee2e6;
             margin: 0;
             padding: 25px 30px;
         }
@@ -5472,11 +5472,11 @@ def api_save_html_report():
         .info-section-title {
             font-size: 16px;
             font-weight: 700;
-            color: #2c3e50;
+            color: \#2c3e50;
             margin-bottom: 15px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            border-bottom: 2px solid #3498db;
+            border-bottom: 2px solid \#3498db;
             padding-bottom: 8px;
         }
         
@@ -5490,32 +5490,32 @@ def api_save_html_report():
             display: flex;
             justify-content: space-between;
             padding: 10px 0;
-            border-bottom: 1px solid #dee2e6;
+            border-bottom: 1px solid \#dee2e6;
         }
         
         .info-label {
             font-weight: 600;
-            color: #495057;
+            color: \#495057;
         }
         
         .info-value {
-            color: #2c3e50;
+            color: \#2c3e50;
             font-weight: 500;
             text-align: right;
         }
 
-        /* Корпоративный футер */
+        <!-- Корпоративный футер -->
         .corporate-footer {
-            background: #f8f9fa;
-            border-top: 3px solid #3498db;
+            background: \#f8f9fa;
+            border-top: 3px solid \#3498db;
             padding: 30px;
             margin-top: 40px;
         }
 
         .disclaimer {
-            background: #fff3cd;
-            border: 1px solid #ffeaa7;
-            border-left: 4px solid #f39c12;
+            background: \#fff3cd;
+            border: 1px solid \#ffeaa7;
+            border-left: 4px solid \#f39c12;
             padding: 20px;
             margin: 20px 0;
             border-radius: 4px;
@@ -5523,21 +5523,21 @@ def api_save_html_report():
 
         .disclaimer-title {
             font-weight: 700;
-            color: #856404;
+            color: \#856404;
             margin-bottom: 10px;
             font-size: 16px;
         }
 
         .disclaimer-text {
-            color: #856404;
+            color: \#856404;
             font-size: 13px;
             line-height: 1.5;
         }
 
         .verification-section {
-            background: #e8f5e8;
-            border: 1px solid #c3e6c3;
-            border-left: 4px solid #28a745;
+            background: \#e8f5e8;
+            border: 1px solid \#c3e6c3;
+            border-left: 4px solid \#28a745;
             padding: 20px;
             margin: 20px 0;
             border-radius: 4px;
@@ -5545,12 +5545,12 @@ def api_save_html_report():
 
         .verification-title {
             font-weight: 700;
-            color: #155724;
+            color: \#155724;
             margin-bottom: 10px;
         }
 
         .verification-link {
-            color: #0066cc;
+            color: \#0066cc;
             text-decoration: none;
             font-weight: 500;
         }
@@ -5561,17 +5561,17 @@ def api_save_html_report():
 
         .footer-info {
             text-align: center;
-            color: #6c757d;
+            color: \#6c757d;
             font-size: 12px;
             margin-top: 20px;
             padding-top: 20px;
-            border-top: 1px solid #dee2e6;
+            border-top: 1px solid \#dee2e6;
         }
 
         @media print {
             body { background: white; }
             .document { border: none; box-shadow: none; }
-            .corporate-header { background: #2c3e50 !important; }
+            .corporate-header { background: \#2c3e50 !important; }
         }
     </style>
 </head>
@@ -5590,15 +5590,15 @@ def api_save_html_report():
                 <div>
                     <div class="metadata-item">
                         <span class="metadata-label">Номер отчета:</span>
-                        <span class="metadata-value">""" + report_id + """</span>
+                        <span class="metadata-value">{report_id}</span>
                     </div>
                     <div class="metadata-item">
                         <span class="metadata-label">Дата формирования:</span>
-                        <span class="metadata-value">""" + datetime.now().strftime("%d.%m.%Y") + """</span>
+                        <span class="metadata-value">{datetime.now().strftime("%d.%m.%Y")}</span>
                     </div>
                     <div class="metadata-item">
                         <span class="metadata-label">Время формирования:</span>
-                        <span class="metadata-value">""" + datetime.now().strftime("%H:%M:%S UTC") + """</span>
+                        <span class="metadata-value">{datetime.now().strftime("%H:%M:%S UTC")}</span>
                     </div>
                 </div>
                 <div>
@@ -5621,7 +5621,7 @@ def api_save_html_report():
                 <div class="qr-code">
                     <svg width="80" height="80" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <rect width="25" height="25" fill="white"/>
-                        <path d="M1 1h3v3H1V1zm5 0h1v1H6V1zm2 0h3v1H8V1zm5 0h1v1h-1V1zm2 0h3v3h-2V1zm5 0h3v3h-3V1zM1 2h1v1H1V2zm3 0h1v1H4V2zm5 0h1v1H9V2zm2 0h1v1h-1V2zm7 0h1v1h-1V2zM1 3h1v1H1V3zm3 0h1v1H4V3zm7 0h1v1h-1V3zm3 0h1v1h-1V3zm5 0h1v1h-1V3zM1 5h3v3H1V5zm5 0h1v1H6V5zm3 0h1v1H9V5zm2 0h1v1h-1V5zm3 0h1v1h-1V5zm6 0h3v3h-3V5zM1 6h1v1H1V6zm3 0h1v1H4V6zm5 0h3v1H9V6zm4 0h1v1h-1V6zm7 0h1v1h-1V6zM1 7h1v1H1V7zm3 0h1v1H4V7zm8 0h1v1h-1V7zm3 0h1v1h-1V7zm5 0h1v1h-1V7zM6 9h1v1H6V9zm2 0h1v1H8V9zm3 0h1v1h-1V9zm2 0h1v1h-1V9zm3 0h1v1h-1V9zm3 0h1v1h-1V9zM1 10h1v1H1v-1zm2 0h1v1H3v-1zm4 0h1v1H7v-1zm4 0h3v1h-3v-1zm5 0h1v1h-1v-1zm3 0h1v1h-1v-1zM2 11h1v1H2v-1zm2 0h3v1H4v-1zm3 0h1v1H7v-1zm3 0h1v1h-1v-1zm4 0h1v1h-1v-1zm3 0h1v1h-1v-1zM1 12h1v1H1v-1zm4 0h1v1H5v-1zm2 0h1v1H7v-1zm4 0h1v1h-1v-1zm2 0h1v1h-1v-1zm4 0h1v1h-1v-1zm3 0h1v1h-1v-1zM3 13h1v1H3v-1zm2 0h1v1H5v-1zm3 0h1v1H8v-1zm4 0h1v1h-1v-1zm3 0h1v1h-1v-1zm3 0h1v1h-1v-1zM1 14h1v1H1v-1zm3 0h1v1H4v-1zm2 0h1v1H6v-1zm3 0h1v1H9v-1zm2 0h1v1h-1v-1zm5 0h1v1h-1v-1zm3 0h1v1h-1v-1zM2 15h1v1H2v-1zm2 0h1v1H4v-1zm3 0h1v1H7v-1zm3 0h1v1h-1v-1zm3 0h1v1h-1v-1zm4 0h1v1h-1v-1zM1 17h3v3H1v-3zm5 0h1v1H6v-1zm3 0h1v1H9v-1zm2 0h1v1h-1v-1zm3 0h1v1h-1v-1zm4 0h1v1h-1v-1zM1 18h1v1H1v-1zm3 0h1v1H4v-1zm5 0h1v1H9v-1zm3 0h1v1h-1v-1zm3 0h1v1h-1v-1zm4 0h1v1h-1v-1zM1 19h1v1H1v-1zm3 0h1v1H4v-1zm6 0h1v1h-1v-1zm2 0h1v1h-1v-1zm4 0h3v1h-3v-1zm4 0h1v1h-1v-1zM6 21h1v1H6v-1zm3 0h1v1H9v-1zm2 0h1v1h-1v-1zm3 0h1v1h-1v-1zm3 0h1v1h-1v-1zm3 0h1v1h-1v-1zM1 22h1v1H1v-1zm2 0h1v1H3v-1zm3 0h1v1H6v-1zm3 0h1v1h-1v-1zm3 0h1v1h-1v-1zm4 0h1v1h-1v-1zm4 0h1v1h-1v-1zM2 23h3v1H2v-1zm3 0h1v1H5v-1zm3 0h1v1H8v-1zm3 0h1v1h-1v-1zm3 0h1v1h-1v-1zm3 0h1v1h-1v-1z" fill="#2c3e50"/>
+                        <path d="M1 1h3v3H1V1zm5 0h1v1H6V1zm2 0h3v1H8V1zm5 0h1v1h-1V1zm2 0h3v3h-2V1zm5 0h3v3h-3V1zM1 2h1v1H1V2zm3 0h1v1H4V2zm5 0h1v1H9V2zm2 0h1v1h-1V2zm7 0h1v1h-1V2zM1 3h1v1H1V3zm3 0h1v1H4V3zm7 0h1v1h-1V3zm3 0h1v1h-1V3zm5 0h1v1h-1V3zM1 5h3v3H1V5zm5 0h1v1H6V5zm3 0h1v1H9V5zm2 0h1v1h-1V5zm3 0h1v1h-1V5zm6 0h3v3h-3V5zM1 6h1v1H1V6zm3 0h1v1H4V6zm5 0h3v1H9V6zm4 0h1v1h-1V6zm7 0h1v1h-1V6zM1 7h1v1H1V7zm3 0h1v1H4V7zm8 0h1v1h-1V7zm3 0h1v1h-1V7zm5 0h1v1h-1V7zM6 9h1v1H6V9zm2 0h1v1H8V9zm3 0h1v1h-1V9zm2 0h1v1h-1V9zm3 0h1v1h-1V9zm3 0h1v1h-1V9zM1 10h1v1H1v-1zm2 0h1v1H3v-1zm4 0h1v1H7v-1zm4 0h3v1h-3v-1zm5 0h1v1h-1v-1zm3 0h1v1h-1v-1zM2 11h1v1H2v-1zm2 0h3v1H4v-1zm3 0h1v1H7v-1zm3 0h1v1h-1v-1zm4 0h1v1h-1v-1zm3 0h1v1h-1v-1zM1 12h1v1H1v-1zm4 0h1v1H5v-1zm2 0h1v1H7v-1zm4 0h1v1h-1v-1zm2 0h1v1h-1v-1zm4 0h1v1h-1v-1zm3 0h1v1h-1v-1zM3 13h1v1H3v-1zm2 0h1v1H5v-1zm3 0h1v1H8v-1zm4 0h1v1h-1v-1zm3 0h1v1h-1v-1zm3 0h1v1h-1v-1zM1 14h1v1H1v-1zm3 0h1v1H4v-1zm2 0h1v1H6v-1zm3 0h1v1H9v-1zm2 0h1v1h-1v-1zm5 0h1v1h-1v-1zm3 0h1v1h-1v-1zM2 15h1v1H2v-1zm2 0h1v1H4v-1zm3 0h1v1H7v-1zm3 0h1v1h-1v-1zm3 0h1v1h-1v-1zm4 0h1v1h-1v-1zM1 17h3v3H1v-3zm5 0h1v1H6v-1zm3 0h1v1H9v-1zm2 0h1v1h-1v-1zm3 0h1v1h-1v-1zm4 0h1v1h-1v-1zM1 18h1v1H1v-1zm3 0h1v1H4v-1zm5 0h1v1H9v-1zm3 0h1v1h-1v-1zm3 0h1v1h-1v-1zm4 0h1v1h-1v-1zM1 19h1v1H1v-1zm3 0h1v1H4v-1zm6 0h1v1h-1v-1zm2 0h1v1h-1v-1zm4 0h3v1h-3v-1zm4 0h1v1h-1v-1zM6 21h1v1H6v-1zm3 0h1v1H9v-1zm2 0h1v1h-1v-1zm3 0h1v1h-1v-1zm3 0h1v1h-1v-1zm3 0h1v1h-1v-1zM1 22h1v1H1v-1zm2 0h1v1H3v-1zm3 0h1v1H6v-1zm3 0h1v1h-1v-1zm3 0h1v1h-1v-1zm4 0h1v1h-1v-1zm4 0h1v1h-1v-1zM2 23h3v1H2v-1zm3 0h1v1H5v-1zm3 0h1v1H8v-1zm3 0h1v1h-1v-1zm3 0h1v1h-1v-1zm3 0h1v1h-1v-1z" fill="\#2c3e50"/>
                     </svg>
                 </div>
                 <div class="qr-label">QR-код для верификации отчета</div>
@@ -5643,15 +5643,15 @@ def api_save_html_report():
                     </div>
                     <div class="info-item">
                         <span class="info-label">Количество спален:</span>
-                        <span class="info-value">""" + str(object_data.get('bedrooms', 'Не указано')) + """</span>
+                        <span class="info-value">{object_data.get('bedrooms', 'Не указано')}</span>
                     </div>
                     <div class="info-item">
                         <span class="info-label">Этаж:</span>
-                        <span class="info-value">""" + str(object_data.get('floor', 'Не указано')) + """</span>
+                        <span class="info-value">{object_data.get('floor', 'Не указано')}</span>
                     </div>
                     <div class="info-item">
                         <span class="info-label">Возраст объекта:</span>
-                        <span class="info-value">""" + str(object_data.get('age', 'Не указано')) + """</span>
+                        <span class="info-value">{object_data.get('age', 'Не указано')}</span>
                     </div>
                     <div class="info-item">
                         <span class="info-label">Тип отопления:</span>
@@ -5761,13 +5761,13 @@ def api_save_html_report():
                                 font: {
                                     size: 12
                                 },
-                                color: '#2c3e50'
+                                color: '\#2c3e50'
                             }
                         },
                         title: {
                             display: true,
                             text: getChartTitle(chartId),
-                            color: '#2c3e50',
+                            color: '\#2c3e50',
                             font: {
                                 size: 16,
                                 weight: 'bold'
@@ -5777,10 +5777,10 @@ def api_save_html_report():
                     scales: {
                         x: {
                             grid: {
-                                color: '#e9ecef'
+                                color: '\#e9ecef'
                             },
                             ticks: {
-                                color: '#6c757d',
+                                color: '\#6c757d',
                                 font: {
                                     size: 11
                                 }
@@ -5788,10 +5788,10 @@ def api_save_html_report():
                         },
                         y: {
                             grid: {
-                                color: '#e9ecef'
+                                color: '\#e9ecef'
                             },
                             ticks: {
-                                color: '#6c757d',
+                                color: '\#6c757d',
                                 font: {
                                     size: 11
                                 }
@@ -5875,7 +5875,7 @@ def api_save_html_report():
                             {
                                 label: 'Цена продажи (₺/м²)',
                                 data: salesData,
-                                borderColor: '#28a745',
+                                borderColor: '\#28a745',
                                 backgroundColor: 'rgba(40, 167, 69, 0.1)',
                                 tension: 0.4,
                                 borderWidth: 3,
@@ -5884,7 +5884,7 @@ def api_save_html_report():
                             {
                                 label: 'Цена аренды (₺/м²)',
                                 data: rentData,
-                                borderColor: '#ffc107',
+                                borderColor: '\#ffc107',
                                 backgroundColor: 'rgba(255, 193, 7, 0.1)',
                                 tension: 0.4,
                                 borderWidth: 3,
@@ -5951,7 +5951,7 @@ def api_save_html_report():
                             {
                                 label: 'Прогноз продажи (₺/м²)',
                                 data: salesData,
-                                borderColor: '#3498db',
+                                borderColor: '\#3498db',
                                 backgroundColor: 'rgba(52, 152, 219, 0.1)',
                                 tension: 0.4,
                                 borderWidth: 3,
@@ -5960,7 +5960,7 @@ def api_save_html_report():
                             {
                                 label: 'Прогноз аренды (₺/м²)',
                                 data: rentData,
-                                borderColor: '#e74c3c',
+                                borderColor: '\#e74c3c',
                                 backgroundColor: 'rgba(231, 76, 60, 0.1)',
                                 tension: 0.4,
                                 borderWidth: 3,
@@ -5993,7 +5993,7 @@ def api_save_html_report():
                 <div style="font-size: 16px; font-weight: 600; margin-bottom: 10px;">
                     📊 График данных
                 </div>
-                <div style="font-size: 13px; color: #6c757d;">
+                <div style="font-size: 13px; color: \#6c757d;">
                     Данные для построения графика представлены в таблицах выше
                 </div>
             `;
