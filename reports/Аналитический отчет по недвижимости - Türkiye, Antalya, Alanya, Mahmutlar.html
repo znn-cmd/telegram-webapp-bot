@@ -113,50 +113,536 @@
             padding: 30px;
         }
 
-        /* Переопределяем стили таблиц для корпоративного вида */
-        .summary-table { 
-            width: 100%; 
-            border-collapse: collapse; 
-            margin: 25px 0; 
+        /* Корпоративные стили для всех элементов отчета */
+        
+        /* Заголовки секций */
+        .data-section-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin: 25px 0 15px 0;
+            padding: 10px 0;
+            border-bottom: 2px solid #3498db;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        /* Market Indicators Table */
+        .market-indicators-table {
+            margin: 20px 0;
             border: 1px solid #dee2e6;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        .market-data-table {
+            width: 100%;
+            border-collapse: collapse;
             font-size: 13px;
         }
-        .summary-table th { 
-            background: #2c3e50; 
-            color: white; 
-            padding: 15px 12px; 
-            font-weight: 600; 
-            text-align: left;
-            border: 1px solid #34495e;
+        
+        .market-data-table .category-header {
+            background: #2c3e50;
+            color: white;
+            padding: 15px;
+            font-weight: 700;
+            text-align: center;
+            font-size: 16px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
-        .summary-table td { 
-            padding: 12px; 
-            border: 1px solid #dee2e6; 
+        
+        .market-data-table .data-cell {
+            padding: 15px;
+            border-bottom: 1px solid #dee2e6;
+            background: #ffffff;
+            vertical-align: top;
+        }
+        
+        .market-data-table tr:nth-child(even) .data-cell {
+            background: #f8f9fa;
+        }
+        
+        .cell-label {
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 5px;
+            font-size: 12px;
+        }
+        
+        .cell-value {
+            font-weight: 700;
+            color: #2c3e50;
+            font-size: 14px;
+        }
+        
+        /* Market Analysis Text Block */
+        .market-analysis-text-block {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-left: 4px solid #3498db;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        
+        .market-analysis-text-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .market-analysis-text-content p {
+            margin-bottom: 10px;
+            line-height: 1.6;
+            color: #495057;
+            font-size: 13px;
+        }
+        
+        .market-analysis-text-content strong {
+            color: #2c3e50;
+            font-weight: 700;
+        }
+        
+        /* Trends Grid */
+        .trends-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .trend-card {
+            background: #ffffff;
+            border: 1px solid #dee2e6;
+            border-left: 4px solid #27ae60;
+            padding: 20px;
+            border-radius: 4px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        .trend-card-price_trend {
+            border-left-color: #3498db;
+        }
+        
+        .trend-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .trend-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: #27ae60;
+            margin-bottom: 10px;
+        }
+        
+        .trend-change {
+            font-size: 12px;
+            color: #6c757d;
+            line-height: 1.4;
+        }
+        
+        /* Trends Table */
+        .trends-table-section {
+            margin: 30px 0;
+        }
+        
+        .trends-table-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .trends-table {
+            width: 100%;
+            border-collapse: collapse;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            font-size: 12px;
+        }
+        
+        .trends-table th {
+            background: #2c3e50;
+            color: white;
+            padding: 12px 8px;
+            font-weight: 700;
+            text-align: center;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        
+        .trends-table td {
+            padding: 10px 8px;
+            text-align: center;
+            border-bottom: 1px solid #dee2e6;
             background: #ffffff;
         }
-        .summary-table tr:nth-child(even) td { 
-            background: #f8f9fa; 
-        }
-
-        .trend-card { 
-            background: #ffffff; 
-            border: 1px solid #dee2e6; 
-            border-left: 4px solid #3498db;
-            padding: 20px; 
-            margin: 15px 0; 
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        
+        .trends-table .current-month-row {
+            background: #e3f2fd !important;
+            font-weight: 700;
         }
         
-        .trend-title { 
-            font-weight: 600; 
-            margin-bottom: 10px; 
+        .trends-table .forecast-row {
+            background: #f0f8ff !important;
+        }
+        
+        .trends-table .filter-info {
+            background: #f8f9fa !important;
+            font-style: italic;
+            color: #6c757d;
+        }
+        
+        /* Object Summary */
+        .object-summary-section {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-left: 4px solid #e74c3c;
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 4px;
+        }
+        
+        .object-summary-title {
+            font-size: 16px;
+            font-weight: 700;
             color: #2c3e50;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
         
-        .trend-value { 
-            font-size: 18px; 
-            font-weight: 700; 
-            color: #27ae60; 
+        .object-comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .object-comparison-table td {
+            padding: 8px 0;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .comparison-label {
+            font-weight: 600;
+            color: #495057;
+            width: 60%;
+        }
+        
+        .comparison-value {
+            font-weight: 700;
+            color: #2c3e50;
+            text-align: right;
+        }
+        
+        .comparison-expensive {
+            color: #e74c3c;
+        }
+        
+        .comparison-cheaper {
+            color: #27ae60;
+        }
+        
+        .comparison-smaller {
+            color: #f39c12;
+        }
+        
+        .object-analysis-text {
+            margin-top: 15px;
+            padding: 15px;
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #856404;
+            line-height: 1.5;
+        }
+        
+        /* Forecast Tables */
+        .forecast-table-section {
+            margin: 30px 0;
+        }
+        
+        .forecast-table-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .forecast-table {
+            width: 100%;
+            border-collapse: collapse;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            font-size: 12px;
+        }
+        
+        .forecast-table th {
+            background: #2c3e50;
+            color: white;
+            padding: 12px 8px;
+            font-weight: 700;
+            text-align: center;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        
+        .forecast-table td {
+            padding: 10px 8px;
+            text-align: center;
+            border-bottom: 1px solid #dee2e6;
+            background: #ffffff;
+        }
+        
+        .forecast-table .current-month-row {
+            background: #e3f2fd !important;
+            font-weight: 700;
+        }
+        
+        .forecast-table .forecast-row {
+            background: #f0f8ff !important;
+        }
+        
+        /* Price Forecast Market Table */
+        .price-forecast-market-table {
+            width: 100%;
+            border-collapse: collapse;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            margin: 20px 0;
+        }
+        
+        .forecast-category-header {
+            background: #2c3e50;
+            color: white;
+            padding: 15px;
+            font-weight: 700;
+            text-align: center;
+            font-size: 16px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .forecast-data-cell {
+            padding: 20px;
+            border-bottom: 1px solid #dee2e6;
+            background: #ffffff;
+            vertical-align: top;
+        }
+        
+        .forecast-cell-label {
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+        
+        .forecast-cell-value {
+            font-weight: 700;
+            color: #2c3e50;
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+        
+        .forecast-cell-value.user-price {
+            color: #3498db;
+        }
+        
+        .forecast-cell-value.market-price {
+            color: #9b59b6;
+        }
+        
+        .forecast-cell-growth {
+            font-size: 12px;
+            font-weight: 600;
+            padding: 2px 6px;
+            border-radius: 4px;
+            display: inline-block;
+        }
+        
+        .forecast-cell-growth.positive {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .forecast-cell-growth.negative {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        /* Analysis Sections */
+        .trends-analysis-section,
+        .forecast-analysis-section {
+            background: #e8f5e8;
+            border: 1px solid #c3e6c3;
+            border-left: 4px solid #28a745;
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 4px;
+        }
+        
+        .trends-analysis-title,
+        .forecast-analysis-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #155724;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .trends-analysis-content,
+        .forecast-analysis-content {
+            color: #155724;
+            line-height: 1.6;
+            font-size: 13px;
+        }
+        
+        .trends-analysis-content p,
+        .forecast-analysis-content p {
+            margin-bottom: 10px;
+        }
+        
+        .trends-analysis-content strong,
+        .forecast-analysis-content strong {
+            font-weight: 700;
+        }
+        
+        /* Key Metrics */
+        .forecast-metrics-compact-section {
+            margin: 20px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+        }
+        
+        .forecast-metrics-compact-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .forecast-metrics-compact-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        
+        .metric-compact-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .metric-compact-label {
+            font-weight: 600;
+            color: #495057;
+            font-size: 12px;
+        }
+        
+        .metric-compact-value {
+            font-weight: 700;
+            color: #2c3e50;
+            font-size: 12px;
+        }
+        
+        .metric-compact-value.positive {
+            color: #27ae60;
+        }
+        
+        .metric-compact-value.negative {
+            color: #e74c3c;
+        }
+        
+        /* Chart Replacements */
+        .chart-container {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 40px;
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .chart-placeholder {
+            background: #ffffff;
+            border: 2px dashed #3498db;
+            border-radius: 8px;
+            padding: 40px;
+            color: #6c757d;
+            font-style: italic;
+        }
+        
+        .chart-info {
+            margin-top: 10px;
+            font-size: 11px;
+            color: #6c757d;
+            font-style: italic;
+            text-align: center;
+        }
+        
+        /* Additional spacing */
+        .block-spacing {
+            height: 20px;
+        }
+        
+        .section-spacing {
+            height: 10px;
+        }
+        
+        /* Price forecast info */
+        .price-forecast-date {
+            text-align: center;
+            font-weight: 700;
+            color: #2c3e50;
+            margin: 15px 0;
+            font-size: 14px;
+        }
+        
+        .price-forecast-currency-info {
+            text-align: center;
+            font-size: 12px;
+            color: #6c757d;
+            margin: 10px 0;
+        }
+        
+        .price-forecast-disclaimer {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 4px;
+            padding: 15px;
+            font-size: 11px;
+            color: #856404;
+            text-align: center;
+            font-style: italic;
+            margin: 15px 0;
         }
 
         /* Корпоративный футер */
@@ -245,7 +731,7 @@
                 <div>
                     <div class="metadata-item">
                         <span class="metadata-label">Номер отчета:</span>
-                        <span class="metadata-value">RPT-20250825_070411-6767</span>
+                        <span class="metadata-value">RPT-20250825_071607-5710</span>
                     </div>
                     <div class="metadata-item">
                         <span class="metadata-label">Дата формирования:</span>
@@ -253,7 +739,7 @@
                     </div>
                     <div class="metadata-item">
                         <span class="metadata-label">Время формирования:</span>
-                        <span class="metadata-value">07:04:11 UTC</span>
+                        <span class="metadata-value">07:16:07 UTC</span>
                     </div>
                 </div>
                 <div>
@@ -297,7 +783,7 @@
                         
                                 <div class="trend-card trend-card-price_trend">
                                     <div class="trend-title">Тренд цен</div>
-                                    <div class="trend-value">₺53&nbsp;190,02</div>
+                                    <div class="trend-value">₺54&nbsp;132,96</div>
                                     <div class="trend-details">
                                         <div class="trend-change">
                                             Продажа: +4.47%
@@ -317,12 +803,16 @@
             </td></tr><tr class="forecast-row" style="background-color: #f0f8ff;"><td>сен. 2025</td><td>₺50&nbsp;836,00</td><td>+1.30%</td><td>₺199,54</td><td>+1.56%</td><td>4.71%</td></tr><tr class="current-month-row" style="background-color: #e8f4fd;"><td>авг. 2025</td><td>₺53&nbsp;190,02</td><td>+4.47%</td><td>₺204,81</td><td>+2.71%</td><td>4.70%</td></tr><tr class="historical-row" style=""><td>июл. 2025</td><td>₺50&nbsp;933,66</td><td>+4.43%</td><td>₺197,06</td><td>+3.93%</td><td>4.78%</td></tr><tr class="historical-row" style=""><td>июн. 2025</td><td>₺49&nbsp;097,42</td><td>+3.74%</td><td>₺189,87</td><td>+3.79%</td><td>4.80%</td></tr><tr class="historical-row" style=""><td>май. 2025</td><td>₺47&nbsp;519,76</td><td>+3.32%</td><td>₺186,14</td><td>+2.00%</td><td>4.80%</td></tr><tr class="historical-row" style=""><td>апр. 2025</td><td>₺46&nbsp;478,64</td><td>+2.24%</td><td>₺183,01</td><td>+1.71%</td><td>4.86%</td></tr><tr class="historical-row" style=""><td>мар. 2025</td><td>₺45&nbsp;836,92</td><td>+1.40%</td><td>₺179,16</td><td>+2.15%</td><td>4.89%</td></tr><tr class="historical-row" style=""><td>фев. 2025</td><td>₺45&nbsp;882,81</td><td>-0.10%</td><td>₺176,97</td><td>+1.24%</td><td>4.85%</td></tr><tr class="historical-row" style=""><td>янв. 2025</td><td>₺46&nbsp;131,92</td><td>-0.54%</td><td>₺174,15</td><td>+1.62%</td><td>4.79%</td></tr><tr class="historical-row" style=""><td>дек. 2024</td><td>₺47&nbsp;193,78</td><td>-2.25%</td><td>₺171,20</td><td>+1.72%</td><td>4.68%</td></tr></tbody></table>
                 <div class="trends-chart-section">
                     <h4 class="trends-chart-title">График трендов</h4>
-                    <div class="chart-controls">
-                        
-                        
-                    </div>
+                    
                     <div class="chart-container">
-                        <canvas id="trendsChart" width="509" height="253" style="display: block; box-sizing: border-box; height: 145px; width: 291px;"></canvas>
+                        <div class="chart-placeholder">
+                    <div style="font-size: 16px; font-weight: 600; margin-bottom: 10px;">
+                        📊 График трендов
+                    </div>
+                    <div style="font-size: 13px; color: #6c757d;">
+                        Данные для построения графика представлены в таблицах выше
+                    </div>
+                </div>
                     </div>
                     <div class="chart-info">
                         <small style="color: #6c757d; font-style: italic; text-align: center; display: block; margin-top: 10px;">
@@ -335,12 +825,16 @@
             </td></tr><tr class="previous-month-row" style="background-color: #f8f9fa;"><td>июл. 2025</td><td>₺50&nbsp;933,66</td><td>₺197,06</td><td>4.78%</td></tr><tr class="current-month-row" style="background-color: #e8f4fd; font-weight: bold;"><td>авг. 2025</td><td>₺53&nbsp;190,02</td><td>₺204,81</td><td>4.70%</td></tr><tr class="forecast-row" style=""><td>сен. 2025</td><td>₺50&nbsp;836,00</td><td>₺199,54</td><td>4.71%</td></tr><tr class="forecast-row" style=""><td>окт. 2025</td><td>₺50&nbsp;807,00</td><td>₺202,44</td><td>4.78%</td></tr><tr class="forecast-row" style=""><td>ноя. 2025</td><td>₺50&nbsp;728,00</td><td>₺205,13</td><td>4.85%</td></tr><tr class="forecast-row" style=""><td>дек. 2025</td><td>₺49&nbsp;749,00</td><td>₺206,52</td><td>4.98%</td></tr><tr class="forecast-row" style=""><td>янв. 2026</td><td>₺49&nbsp;551,00</td><td>₺207,22</td><td>5.02%</td></tr><tr class="forecast-row" style=""><td>фев. 2026</td><td>₺49&nbsp;549,00</td><td>₺208,21</td><td>5.04%</td></tr><tr class="forecast-row" style=""><td>мар. 2026</td><td>₺50&nbsp;171,00</td><td>₺209,80</td><td>5.02%</td></tr><tr class="forecast-row" style=""><td>апр. 2026</td><td>₺51&nbsp;165,00</td><td>₺211,99</td><td>4.97%</td></tr><tr class="forecast-row" style=""><td>май. 2026</td><td>₺52&nbsp;655,00</td><td>₺214,54</td><td>4.89%</td></tr><tr class="forecast-row" style=""><td>июн. 2026</td><td>₺54&nbsp;399,00</td><td>₺218,66</td><td>4.82%</td></tr></tbody></table></div></div>
                 <div class="forecast-chart-section" id="forecastChartSection">
                     <h4 class="forecast-chart-title">График прогноза цен и аренды</h4>
-                    <div class="chart-controls">
-                        
-                        
-                    </div>
+                    
                     <div class="chart-container">
-                        <canvas id="forecastChart" width="509" height="350" style="display: block; box-sizing: border-box; height: 200px; width: 291px;"></canvas>
+                        <div class="chart-placeholder">
+                    <div style="font-size: 16px; font-weight: 600; margin-bottom: 10px;">
+                        📊 График прогноза
+                    </div>
+                    <div style="font-size: 13px; color: #6c757d;">
+                        Данные для построения графика представлены в таблицах выше
+                    </div>
+                </div>
                     </div>
                     <div class="chart-info">
                         <small style="color: #6c757d; font-style: italic; text-align: center; display: block; margin-top: 10px;">
@@ -370,13 +864,13 @@
                 <div class="verification-title">Проверка актуальности данных</div>
                 <div>
                     Для проверки актуальности данных и верификации отчета перейдите по ссылке: 
-                    <a href="http://aaadvisor-zaicevn.amvera.io/reports/Отчет_по_оценке_объекта_Türkiye-Antalya-Alanya-Mahmutlar_20250825_070411.html" class="verification-link" target="_blank">http://aaadvisor-zaicevn.amvera.io/reports/Отчет_по_оценке_объекта_Türkiye-Antalya-Alanya-Mahmutlar_20250825_070411.html</a>
+                    <a href="http://aaadvisor-zaicevn.amvera.io/reports/Отчет_по_оценке_объекта_Türkiye-Antalya-Alanya-Mahmutlar_20250825_071607.html" class="verification-link" target="_blank">http://aaadvisor-zaicevn.amvera.io/reports/Отчет_по_оценке_объекта_Türkiye-Antalya-Alanya-Mahmutlar_20250825_071607.html</a>
                 </div>
             </div>
             
             <div class="footer-info">
                 <strong>Aaadviser</strong> - Система аналитики недвижимости<br>
-                Отчет №RPT-20250825_070411-6767 | Сформирован 25.08.2025 в 07:04:11<br>
+                Отчет №RPT-20250825_071607-5710 | Сформирован 25.08.2025 в 07:16:07<br>
                 © 2024 Aaadviser. Все права защищены.
             </div>
         </div>

@@ -4783,6 +4783,7 @@ def api_save_html_report():
     
     report_content = data.get('report_content')
     location_info = data.get('location_info', '')
+    object_data = data.get('object_data', {})
     
     if not report_content:
         return jsonify({'error': 'Report content required'}), 400
@@ -4790,13 +4791,17 @@ def api_save_html_report():
     try:
         # Генерируем уникальные данные для экспортируемого отчета
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        report_id = f"RPT-{timestamp}-{random.randint(1000, 9999)}"
+        unique_id = random.randint(10000, 99999)
+        report_id = f"RPT-{timestamp}-{unique_id}"
+        
+        # Создаем безопасное имя из локации
         safe_location = re.sub(r'[^\w\s-]', '', location_info).strip()
         safe_location = re.sub(r'[-\s]+', '-', safe_location)
-        if len(safe_location) > 50:
-            safe_location = safe_location[:50]
+        if len(safe_location) > 30:
+            safe_location = safe_location[:30]
         
-        filename = f"Отчет_по_оценке_объекта_{safe_location}_{timestamp}.html"
+        # Создаем уникальное имя файла с telegram_id, timestamp и случайным числом
+        filename = f"Report_{telegram_id}_{timestamp}_{unique_id}_{safe_location}.html"
         file_path = os.path.join('reports', filename)
         
         # Генерируем QR-код с ссылкой на отчет
@@ -5451,6 +5456,53 @@ def api_save_html_report():
             margin: 15px 0;
         }}
 
+        /* Location and Object Info */
+        .location-object-info {{
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            margin: 0;
+            padding: 25px 30px;
+        }}
+        
+        .location-info-section {{
+            margin-bottom: 20px;
+        }}
+        
+        .info-section-title {{
+            font-size: 16px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 8px;
+        }}
+        
+        .info-grid {{
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+        }}
+        
+        .info-item {{
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #dee2e6;
+        }}
+        
+        .info-label {{
+            font-weight: 600;
+            color: #495057;
+        }}
+        
+        .info-value {{
+            color: #2c3e50;
+            font-weight: 500;
+            text-align: right;
+        }}
+
         /* Корпоративный футер */
         .corporate-footer {{
             background: #f8f9fa;
@@ -5575,6 +5627,47 @@ def api_save_html_report():
             </div>
         </div>
         
+        <!-- Информация о локации и объекте -->
+        <div class="location-object-info">
+            <div class="location-info-section">
+                <h3 class="info-section-title">Информация о локации</h3>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="info-label">Регион:</span>
+                        <span class="info-value">{location_info}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Тип анализа:</span>
+                        <span class="info-value">Оценка объекта недвижимости</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Количество спален:</span>
+                        <span class="info-value">{object_data.get('bedrooms', 'Не указано')}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Этаж:</span>
+                        <span class="info-value">{object_data.get('floor', 'Не указано')}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Возраст объекта:</span>
+                        <span class="info-value">{object_data.get('age', 'Не указано')}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Тип отопления:</span>
+                        <span class="info-value">{object_data.get('heating', 'Не указано')}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Цена объекта:</span>
+                        <span class="info-value">{object_data.get('price', 'Не указано')} {object_data.get('currency', 'EUR')}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Площадь объекта:</span>
+                        <span class="info-value">{object_data.get('area', 'Не указано')} м²</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Основной контент отчета -->
         <div class="report-content">
             {report_content}
@@ -5615,15 +5708,170 @@ def api_save_html_report():
         base_url = request.host_url.rstrip('/')
         report_url = f"{base_url}/reports/{filename}"
         
+        # Сохраняем данные отчета в базу данных
+        try:
+            # Извлекаем координаты из location_info (если доступны)
+            latitude, longitude = extract_coordinates_from_location(location_info)
+            
+            # Подготавливаем данные для сохранения в БД
+            report_data = {
+                'user_id': telegram_id,
+                'report_type': 'object_evaluation',
+                'title': f"Оценка объекта - {location_info}",
+                'description': f"Автоматически сгенерированный отчет по оценке недвижимости в регионе {location_info}",
+                'parameters': object_data,  # JSON с параметрами объекта
+                'address': location_info,
+                'latitude': latitude,
+                'longitude': longitude,
+                'bedrooms': extract_bedrooms_count(object_data.get('bedrooms')),
+                'price_range_min': extract_price_value(object_data.get('price')),
+                'price_range_max': extract_price_value(object_data.get('price')),
+                'price': extract_price_value(object_data.get('price')),
+                'area': extract_area_value(object_data.get('area')),
+                'report_url': report_url,
+                'full_report': {
+                    'report_id': report_id,
+                    'content_summary': 'HTML отчет с анализом недвижимости',
+                    'generation_timestamp': timestamp,
+                    'filename': filename
+                }
+            }
+            
+            # Сохраняем в базу данных
+            save_report_to_database(report_data)
+            
+        except Exception as db_error:
+            logger.error(f"Error saving report to database: {db_error}")
+            # Продолжаем выполнение, даже если сохранение в БД не удалось
+        
         return jsonify({
             'success': True,
             'report_url': report_url,
-            'filename': filename
+            'filename': filename,
+            'report_id': report_id
         })
         
     except Exception as e:
         logger.error(f"Error saving HTML report: {e}")
         return jsonify({'error': 'Internal error'}), 500
+
+
+def extract_coordinates_from_location(location_info):
+    """Извлекает координаты из информации о локации"""
+    try:
+        # Попытаемся извлечь координаты из глобальной переменной selectedLocationCoords
+        # если она доступна в контексте Flask
+        if hasattr(g, 'location_coords') and g.location_coords:
+            return g.location_coords.get('lat'), g.location_coords.get('lng')
+        
+        # Возможные сопоставления городов с координатами для базовых случаев
+        location_coords_map = {
+            'antalya': (36.8969, 30.7133),
+            'istanbul': (41.0082, 28.9784),
+            'izmir': (38.4237, 27.1428),
+            'ankara': (39.9334, 32.8597),
+            'bodrum': (37.0344, 27.4305),
+            'alanya': (36.5439, 31.9956),
+            'kemer': (36.6024, 30.5596),
+            'kas': (36.2020, 29.6363),
+            'kalkan': (36.2645, 29.4117),
+            'fethiye': (36.6217, 29.1167),
+            'marmaris': (36.8547, 28.2737),
+            'didim': (37.3737, 27.2619),
+            'kusadasi': (37.8583, 27.2611),
+            'cesme': (38.3000, 26.3056)
+        }
+        
+        # Приводим location_info к нижнему регистру для поиска
+        location_lower = location_info.lower()
+        
+        # Ищем совпадения в названиях городов
+        for city, coords in location_coords_map.items():
+            if city in location_lower:
+                return coords
+        
+        # Если ничего не найдено, возвращаем None
+        return None, None
+        
+    except Exception as e:
+        logger.error(f"Error extracting coordinates: {e}")
+        return None, None
+
+
+def extract_bedrooms_count(bedrooms_str):
+    """Извлекает количество спален из строки"""
+    if not bedrooms_str or bedrooms_str == 'Не указано':
+        return None
+    
+    # Пытаемся извлечь число из строки типа "2+1", "3 спальни", "Studio", etc.
+    import re
+    numbers = re.findall(r'\d+', str(bedrooms_str))
+    if numbers:
+        return int(numbers[0])
+    
+    # Обработка специальных случаев
+    if 'studio' in str(bedrooms_str).lower():
+        return 0
+    
+    return None
+
+
+def extract_price_value(price_str):
+    """Извлекает числовое значение цены"""
+    if not price_str or price_str == 'Не указано':
+        return None
+    
+    # Удаляем все кроме цифр и точек/запятых
+    import re
+    price_clean = re.sub(r'[^\d.,]', '', str(price_str))
+    price_clean = price_clean.replace(',', '.')
+    
+    try:
+        return float(price_clean)
+    except (ValueError, TypeError):
+        return None
+
+
+def extract_area_value(area_str):
+    """Извлекает числовое значение площади"""
+    if not area_str or area_str == 'Не указано':
+        return None
+    
+    # Удаляем все кроме цифр и точек/запятых
+    import re
+    area_clean = re.sub(r'[^\d.,]', '', str(area_str))
+    area_clean = area_clean.replace(',', '.')
+    
+    try:
+        return float(area_clean)
+    except (ValueError, TypeError):
+        return None
+
+
+def save_report_to_database(report_data):
+    """Сохраняет данные отчета в базу данных"""
+    try:
+        # Преобразуем данные для Supabase (убираем None значения)
+        clean_data = {}
+        for key, value in report_data.items():
+            if value is not None:
+                clean_data[key] = value
+        
+        # Вставляем данные в таблицу user_reports используя Supabase клиент
+        result = supabase.table('user_reports').insert(clean_data).execute()
+        
+        if result.data and len(result.data) > 0:
+            report_id = result.data[0]['id']
+            logger.info(f"Report saved to database with ID: {report_id}")
+            return report_id
+        else:
+            logger.error("No data returned after inserting report")
+            return None
+        
+    except Exception as e:
+        logger.error(f"Database error while saving report: {e}")
+        # В случае ошибки БД, не прерываем выполнение - отчет все равно сохранен как файл
+        return None
 
 @app.route('/api/send_saved_report_pdf', methods=['POST'])
 def api_send_saved_report_pdf():

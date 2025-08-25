@@ -9218,6 +9218,9 @@
                     telegramId = window.Telegram.WebApp.initDataUnsafe.user?.id;
                 }
                 
+                // Get object data for the report
+                const objectData = getObjectData();
+                
                 // Save report via API
                 const response = await fetch('/api/save_html_report', {
                     method: 'POST',
@@ -9227,7 +9230,8 @@
                     body: JSON.stringify({
                         telegram_id: telegramId,
                         report_content: reportContent,
-                        location_info: locationInfo
+                        location_info: locationInfo,
+                        object_data: objectData
                     })
                 });
                 
@@ -9260,10 +9264,82 @@
             // Clone the content to avoid modifying the original
             const clonedContent = dataContent.cloneNode(true);
             
-            // Remove interactive elements
-            removeInteractiveElements(clonedContent);
+            // Remove interactive elements but preserve charts
+            removeInteractiveElementsPreserveCharts(clonedContent);
             
             return clonedContent.innerHTML;
+        }
+
+        function removeInteractiveElementsPreserveCharts(element) {
+            // Remove buttons
+            const buttons = element.querySelectorAll('button');
+            buttons.forEach(button => button.remove());
+            
+            // Remove select elements
+            const selects = element.querySelectorAll('select');
+            selects.forEach(select => {
+                const selectedText = select.options[select.selectedIndex]?.text || '';
+                const span = document.createElement('span');
+                span.textContent = selectedText;
+                span.className = 'static-value';
+                select.parentNode.replaceChild(span, select);
+            });
+            
+            // Remove input elements and replace with their values
+            const inputs = element.querySelectorAll('input');
+            inputs.forEach(input => {
+                const span = document.createElement('span');
+                span.textContent = input.value || '';
+                span.className = 'static-value';
+                input.parentNode.replaceChild(span, input);
+            });
+            
+            // Convert charts to static images using chart data
+            const canvasElements = element.querySelectorAll('canvas');
+            canvasElements.forEach(canvas => {
+                // Try to extract chart as image
+                try {
+                    const imageData = canvas.toDataURL('image/png');
+                    const img = document.createElement('img');
+                    img.src = imageData;
+                    img.style.maxWidth = '100%';
+                    img.style.height = 'auto';
+                    img.alt = 'График данных';
+                    canvas.parentNode.replaceChild(img, canvas);
+                } catch (error) {
+                    // Fallback to placeholder if chart extraction fails
+                    const placeholder = document.createElement('div');
+                    placeholder.className = 'chart-placeholder';
+                    
+                    const chartType = canvas.id.includes('trends') ? 'трендов' : 'прогноза';
+                    placeholder.innerHTML = `
+                        <div style="font-size: 16px; font-weight: 600; margin-bottom: 10px;">
+                            📊 График ${chartType}
+                        </div>
+                        <div style="font-size: 13px; color: #6c757d;">
+                            Данные для построения графика представлены в таблицах выше
+                        </div>
+                    `;
+                    
+                    canvas.parentNode.replaceChild(placeholder, canvas);
+                }
+            });
+            
+            // Remove chart controls
+            const chartControls = element.querySelectorAll('.chart-controls, .chart-type-buttons');
+            chartControls.forEach(control => control.remove());
+            
+            // Remove onclick attributes
+            const clickableElements = element.querySelectorAll('[onclick]');
+            clickableElements.forEach(el => el.removeAttribute('onclick'));
+            
+            // Remove event listeners by cloning elements
+            const elementsWithEvents = element.querySelectorAll('[onchange], [onfocus], [onblur]');
+            elementsWithEvents.forEach(el => {
+                el.removeAttribute('onchange');
+                el.removeAttribute('onfocus');
+                el.removeAttribute('onblur');
+            });
         }
 
         function removeInteractiveElements(element) {
@@ -9329,6 +9405,21 @@
         function getLocationInfo() {
             const locationDetails = document.getElementById('locationDetails');
             return locationDetails ? locationDetails.textContent.trim() : 'Локация не указана';
+        }
+
+        function getObjectData() {
+            // Get data from global variables
+            const data = {
+                bedrooms: selectedListingTypes.house_type || 'Не указано',
+                floor: selectedListingTypes.floor_segment || 'Не указано',
+                age: selectedListingTypes.age || 'Не указано',
+                heating: selectedListingTypes.heating || 'Не указано',
+                price: selectedListingTypes.price || 'Не указано',
+                area: document.getElementById('areaObjectInput')?.value || 'Не указано',
+                currency: selectedListingTypes.currency || 'EUR'
+            };
+            
+            return data;
         }
 
         function showShareModal(reportUrl) {
