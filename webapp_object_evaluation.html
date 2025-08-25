@@ -9264,76 +9264,10 @@
             // Clone the content to avoid modifying the original
             const clonedContent = dataContent.cloneNode(true);
             
-            // Сохраняем данные графиков перед удалением интерактивных элементов
-            const chartData = extractChartData();
-            
             // Remove interactive elements but preserve charts
             removeInteractiveElementsPreserveCharts(clonedContent);
             
-            // Добавляем скрытые данные графиков для использования в экспортируемом отчете
-            const chartDataContainer = document.createElement('div');
-            chartDataContainer.id = 'chartDataContainer';
-            chartDataContainer.style.display = 'none';
-            chartDataContainer.innerHTML = '<script>window.chartData = ' + JSON.stringify(chartData) + ';</script>';
-            
-            clonedContent.appendChild(chartDataContainer);
-            
             return clonedContent.innerHTML;
-        }
-        
-        function extractChartData() {
-            const chartData = {};
-            
-            // Извлекаем данные из таблиц трендов
-            const trendsTable = document.querySelector('.trends-table');
-            if (trendsTable) {
-                chartData.trends = extractTableData(trendsTable);
-            }
-            
-            // Извлекаем данные из таблиц прогноза
-            const forecastTable = document.querySelector('.forecast-table');
-            if (forecastTable) {
-                chartData.forecast = extractTableData(forecastTable);
-            }
-            
-            // Извлекаем данные из других таблиц
-            const marketTable = document.querySelector('.market-data-table');
-            if (marketTable) {
-                chartData.market = extractTableData(marketTable);
-            }
-            
-            return chartData;
-        }
-        
-        function extractTableData(table) {
-            const data = {
-                headers: [],
-                rows: []
-            };
-            
-            // Извлекаем заголовки
-            const headerRow = table.querySelector('thead tr');
-            if (headerRow) {
-                const headers = headerRow.querySelectorAll('th');
-                headers.forEach(header => {
-                    data.headers.push(header.textContent.trim());
-                });
-            }
-            
-            // Извлекаем строки данных
-            const dataRows = table.querySelectorAll('tbody tr:not(.filter-info)');
-            dataRows.forEach(row => {
-                const cells = row.querySelectorAll('td');
-                const rowData = [];
-                cells.forEach(cell => {
-                    rowData.push(cell.textContent.trim());
-                });
-                if (rowData.length > 0) {
-                    data.rows.push(rowData);
-                }
-            });
-            
-            return data;
         }
 
         function removeInteractiveElementsPreserveCharts(element) {
@@ -9360,30 +9294,20 @@
                 input.parentNode.replaceChild(span, input);
             });
             
-            // PRESERVE CHARTS - Keep canvas elements and add Chart.js for interactivity
+            // Preserve charts with data for export - don't convert to images
             const canvasElements = element.querySelectorAll('canvas');
             canvasElements.forEach(canvas => {
-                // Keep the canvas element but ensure it has proper styling
-                canvas.style.maxWidth = '100%';
-                canvas.style.height = 'auto';
-                canvas.style.border = '1px solid #dee2e6';
-                canvas.style.borderRadius = '8px';
-                canvas.style.backgroundColor = '#ffffff';
-                
-                // Add a note that chart will be interactive
-                const chartNote = document.createElement('div');
-                chartNote.style.fontSize = '12px';
-                chartNote.style.color = '#6c757d';
-                chartNote.style.fontStyle = 'italic';
-                chartNote.style.textAlign = 'center';
-                chartNote.style.marginTop = '8px';
-                chartNote.textContent = 'Интерактивный график - используйте Chart.js для отображения';
-                
-                // Insert note after canvas
-                canvas.parentNode.insertBefore(chartNote, canvas.nextSibling);
+                // Instead of converting to image, prepare chart data for export
+                const chartData = extractChartData(canvas);
+                if (chartData) {
+                    // Store chart data as data attribute for export
+                    canvas.setAttribute('data-chart-data', JSON.stringify(chartData));
+                    canvas.setAttribute('data-chart-type', chartData.type || 'line');
+                    canvas.setAttribute('data-chart-id', canvas.id || 'chart');
+                }
             });
             
-            // Remove chart controls but keep chart functionality
+            // Remove chart controls but keep chart containers
             const chartControls = element.querySelectorAll('.chart-controls, .chart-type-buttons');
             chartControls.forEach(control => control.remove());
             
@@ -9398,6 +9322,173 @@
                 el.removeAttribute('onfocus');
                 el.removeAttribute('onblur');
             });
+        }
+
+        function extractChartData(canvas) {
+            try {
+                // Try to get chart instance from Chart.js
+                const chartInstance = Chart.getChart(canvas);
+                if (chartInstance) {
+                    return {
+                        type: chartInstance.config.type,
+                        data: chartInstance.config.data,
+                        options: chartInstance.config.options
+                    };
+                }
+                
+                // Fallback: try to extract data from global chart variables
+                const chartId = canvas.id;
+                if (chartId === 'trendsChart' && window.trendsChart) {
+                    return {
+                        type: 'line',
+                        data: window.trendsChart.data,
+                        options: window.trendsChart.options
+                    };
+                }
+                
+                if (chartId === 'forecastChart' && window.forecastChart) {
+                    return {
+                        type: 'line',
+                        data: window.forecastChart.data,
+                        options: window.forecastChart.options
+                    };
+                }
+                
+                // Try to extract data from table if chart data not available
+                if (chartId === 'trendsChart') {
+                    return extractDataFromTrendsTable();
+                }
+                
+                if (chartId === 'forecastChart') {
+                    return extractDataFromForecastTable();
+                }
+                
+                // Fallback: return basic chart info
+                return {
+                    type: 'line',
+                    data: {
+                        labels: [],
+                        datasets: []
+                    },
+                    options: {}
+                };
+                
+            } catch (error) {
+                console.log('Could not extract chart data:', error);
+                return null;
+            }
+        }
+        
+        function extractDataFromTrendsTable() {
+            try {
+                const table = document.querySelector('.trends-table');
+                if (!table) return null;
+                
+                const rows = table.querySelectorAll('tbody tr:not(.filter-info)');
+                const labels = [];
+                const salesData = [];
+                const rentData = [];
+                
+                rows.forEach(row => {
+                    const cells = row.querySelectorAll('td');
+                    if (cells.length >= 4) {
+                        const date = cells[0].textContent.trim();
+                        const salesPrice = parseFloat(cells[1].textContent.replace(/[^\d.,]/g, '').replace(',', '.'));
+                        const rentPrice = parseFloat(cells[3].textContent.replace(/[^\d.,]/g, '').replace(',', '.'));
+                        
+                        if (date && !isNaN(salesPrice) && !isNaN(rentPrice)) {
+                            labels.push(date);
+                            salesData.push(salesPrice);
+                            rentData.push(rentPrice);
+                        }
+                    }
+                });
+                
+                return {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [
+                            {
+                                label: 'Цена продажи (₺/м²)',
+                                data: salesData,
+                                borderColor: '#28a745',
+                                backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                                tension: 0.4,
+                                borderWidth: 3
+                            },
+                            {
+                                label: 'Цена аренды (₺/м²)',
+                                data: rentData,
+                                borderColor: '#ffc107',
+                                backgroundColor: 'rgba(255, 193, 7, 0.1)',
+                                tension: 0.4,
+                                borderWidth: 3
+                            }
+                        ]
+                    },
+                    options: {}
+                };
+            } catch (error) {
+                console.log('Error extracting data from trends table:', error);
+                return null;
+            }
+        }
+        
+        function extractDataFromForecastTable() {
+            try {
+                const table = document.querySelector('.forecast-table');
+                if (!table) return null;
+                
+                const rows = table.querySelectorAll('tbody tr:not(.filter-info)');
+                const labels = [];
+                const salesData = [];
+                const rentData = [];
+                
+                rows.forEach(row => {
+                    const cells = row.querySelectorAll('td');
+                    if (cells.length >= 3) {
+                        const date = cells[0].textContent.trim();
+                        const salesPrice = parseFloat(cells[1].textContent.replace(/[^\d.,]/g, '').replace(',', '.'));
+                        const rentPrice = parseFloat(cells[2].textContent.replace(/[^\d.,]/g, '').replace(',', '.'));
+                        
+                        if (date && !isNaN(salesPrice) && !isNaN(rentPrice)) {
+                            labels.push(date);
+                            salesData.push(salesPrice);
+                            rentData.push(rentPrice);
+                        }
+                    }
+                });
+                
+                return {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [
+                            {
+                                label: 'Прогноз продажи (₺/м²)',
+                                data: salesData,
+                                borderColor: '#3498db',
+                                backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                                tension: 0.4,
+                                borderWidth: 3
+                            },
+                            {
+                                label: 'Прогноз аренды (₺/м²)',
+                                data: rentData,
+                                borderColor: '#e74c3c',
+                                backgroundColor: 'rgba(231, 76, 60, 0.1)',
+                                tension: 0.4,
+                                borderWidth: 3
+                            }
+                        ]
+                    },
+                    options: {}
+                };
+            } catch (error) {
+                console.log('Error extracting data from forecast table:', error);
+                return null;
+            }
         }
 
         function removeInteractiveElements(element) {

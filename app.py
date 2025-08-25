@@ -4810,13 +4810,13 @@ def api_save_html_report():
         
         # Создаем корпоративный HTML шаблон для экспортируемого отчета
         html_template = f"""<!DOCTYPE html>
-        <html lang="ru">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Аналитический отчет по недвижимости - {location_info}</title>
-            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-            <style>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Аналитический отчет по недвижимости - {location_info}</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
         * {{
             margin: 0;
             padding: 0;
@@ -5398,24 +5398,9 @@ def api_save_html_report():
             background: #f8f9fa;
             border: 1px solid #dee2e6;
             border-radius: 8px;
-            padding: 20px;
+            padding: 40px;
             text-align: center;
             margin: 20px 0;
-        }}
-        
-        .chart-wrapper {{
-            position: relative;
-            height: 400px;
-            width: 100%;
-            margin: 20px 0;
-        }}
-        
-        .chart-container canvas {{
-            max-width: 100%;
-            height: 400px !important;
-            border: 1px solid #dee2e6;
-            border-radius: 8px;
-            background-color: #ffffff;
         }}
         
         .chart-placeholder {{
@@ -5711,212 +5696,117 @@ def api_save_html_report():
                 Отчет №{report_id} | Сформирован {datetime.now().strftime("%d.%m.%Y в %H:%M:%S")}<br>
                 © 2024 Aaadviser. Все права защищены.
             </div>
-                               </div>
-                   </div>
-                   
-                   <script>
-                       // Инициализация интерактивных графиков
-                       document.addEventListener('DOMContentLoaded', function() {{
-                           // Находим все canvas элементы и инициализируем графики
-                           const canvasElements = document.querySelectorAll('canvas');
-                           
-                           canvasElements.forEach(canvas => {{
-                               // Определяем тип графика по ID или классу
-                               const chartType = determineChartType(canvas);
-                               
-                               if (chartType) {{
-                                   initializeChart(canvas, chartType);
-                               }}
-                           }});
-                       }});
-                       
-                       function determineChartType(canvas) {{
-                           const id = canvas.id || '';
-                           const className = canvas.className || '';
-                           
-                           if (id.includes('trends') || className.includes('trends')) {{
-                               return 'trends';
-                           }} else if (id.includes('forecast') || className.includes('forecast')) {{
-                               return 'forecast';
-                           }} else if (id.includes('price') || className.includes('price')) {{
-                               return 'price';
-                           }}
-                           
-                           return 'default';
-                       }}
-                       
-                       function initializeChart(canvas, chartType) {{
-                           const ctx = canvas.getContext('2d');
-                           
-                           // Базовые настройки для всех графиков
-                           const commonOptions = {{
-                               responsive: true,
-                               maintainAspectRatio: true,
-                               plugins: {{
-                                   legend: {{
-                                       position: 'top',
-                                       labels: {{
-                                           font: {{
-                                               size: 12
-                                           }},
-                                           color: '#2c3e50'
-                                       }}
-                                   }}
-                               }},
-                               scales: {{
-                                   x: {{
-                                       grid: {{
-                                           color: '#e9ecef'
-                                       }},
-                                       ticks: {{
-                                           color: '#6c757d',
-                                           font: {{
-                                               size: 11
-                                           }}
-                                       }}
-                                   }},
-                                   y: {{
-                                       grid: {{
-                                           color: '#e9ecef'
-                                       }},
-                                       ticks: {{
-                                           color: '#6c757d',
-                                           font: {{
-                                               size: 11
-                                           }}
-                                       }}
-                                   }}
-                               }}
-                           }};
-                           
-                           // Создаем график в зависимости от типа
-                           if (chartType === 'trends') {{
-                               createTrendsChart(ctx, commonOptions);
-                           }} else if (chartType === 'forecast') {{
-                               createForecastChart(ctx, commonOptions);
-                           }} else {{
-                               createDefaultChart(ctx, commonOptions);
-                           }}
-                       }}
-                       
-                       function createTrendsChart(ctx, options) {{
-                           // Создаем график трендов с данными из таблицы
-                           const table = document.querySelector('.trends-table');
-                           if (table) {{
-                               const data = extractDataFromTable(table);
-                               new Chart(ctx, {{
-                                   type: 'line',
-                                   data: data,
-                                   options: {{
-                                       ...options,
-                                       plugins: {{
-                                           ...options.plugins,
-                                           title: {{
-                                               display: true,
-                                               text: 'Тренды цен на недвижимость',
-                                               color: '#2c3e50',
-                                               font: {{
-                                                   size: 16,
-                                                   weight: 'bold'
-                                               }}
-                                           }}
-                                       }}
-                                   }}
-                               }});
-                           }}
-                       }}
-                       
-                       function createForecastChart(ctx, options) {{
-                           // Создаем график прогноза
-                           const table = document.querySelector('.forecast-table');
-                           if (table) {{
-                               const data = extractDataFromTable(table);
-                               new Chart(ctx, {{
-                                   type: 'line',
-                                   data: data,
-                                   options: {{
-                                       ...options,
-                                       plugins: {{
-                                           ...options.plugins,
-                                           title: {{
-                                               display: true,
-                                               text: 'Прогноз цен на недвижимость',
-                                               color: '#2c3e50',
-                                               font: {{
-                                                   size: 16,
-                                                   weight: 'bold'
-                                               }}
-                                           }}
-                                       }}
-                                   }}
-                               }});
-                           }}
-                       }}
-                       
-                       function createDefaultChart(ctx, options) {{
-                           // Создаем базовый график
-                           new Chart(ctx, {{
-                               type: 'line',
-                               data: {{
-                                   labels: ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн'],
-                                   datasets: [{{
-                                       label: 'Динамика цен',
-                                       data: [100, 105, 110, 108, 115, 120],
-                                       borderColor: '#3498db',
-                                       backgroundColor: 'rgba(52, 152, 219, 0.1)',
-                                       tension: 0.1
-                                   }}]
-                               }},
-                               options: options
-                           }});
-                       }}
-                       
-                       function extractDataFromTable(table) {{
-                           // Извлекаем данные из таблицы для построения графика
-                           const rows = table.querySelectorAll('tbody tr:not(.filter-info)');
-                           const labels = [];
-                           const salesData = [];
-                           const rentData = [];
-                           
-                           rows.forEach(row => {{
-                               const cells = row.querySelectorAll('td');
-                               if (cells.length >= 4) {{
-                                   const date = cells[0].textContent.trim();
-                                   const salesPrice = parseFloat(cells[1].textContent.replace(/[^\d.,]/g, '').replace(',', '.'));
-                                   const rentPrice = parseFloat(cells[3].textContent.replace(/[^\d.,]/g, '').replace(',', '.'));
-                                   
-                                   if (date && !isNaN(salesPrice) && !isNaN(rentPrice)) {{
-                                       labels.push(date);
-                                       salesData.push(salesPrice);
-                                       rentData.push(rentPrice);
-                                   }}
-                               }}
-                           }});
-                           
-                           return {{
-                               labels: labels,
-                               datasets: [
-                                   {{
-                                       label: 'Цена продажи (₺/м²)',
-                                       data: salesData,
-                                       borderColor: '#3498db',
-                                       backgroundColor: 'rgba(52, 152, 219, 0.1)',
-                                       tension: 0.1
-                                   }},
-                                   {{
-                                       label: 'Цена аренды (₺/м²)',
-                                       data: rentData,
-                                       borderColor: '#e74c3c',
-                                       backgroundColor: 'rgba(231, 76, 60, 0.1)',
-                                       tension: 0.1,
-                                       yAxisID: 'y1'
-                                   }}
-                               ]
-                           }};
-                       }}
-                   </script>
-               </body>
-               </html>"""
+        </div>
+    </div>
+    
+    <script>
+        // Функция для восстановления интерактивных графиков в экспортируемом отчете
+        document.addEventListener('DOMContentLoaded', function() {{
+            restoreCharts();
+        }});
+        
+        function restoreCharts() {{
+            // Находим все canvas элементы с данными графиков
+            const canvasElements = document.querySelectorAll('canvas[data-chart-data]');
+            
+            canvasElements.forEach(canvas => {{
+                try {{
+                    const chartData = JSON.parse(canvas.getAttribute('data-chart-data'));
+                    const chartType = canvas.getAttribute('data-chart-type') || 'line';
+                    const chartId = canvas.getAttribute('data-chart-id') || 'chart';
+                    
+                    // Восстанавливаем график
+                    if (chartData && chartData.data) {{
+                        const ctx = canvas.getContext('2d');
+                        
+                        // Создаем новый график с сохраненными данными
+                        new Chart(ctx, {{
+                            type: chartType,
+                            data: chartData.data,
+                            options: {{
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: {{
+                                    legend: {{
+                                        position: 'top',
+                                        labels: {{
+                                            font: {{
+                                                size: 12
+                                            }},
+                                            color: '#2c3e50'
+                                        }}
+                                    }},
+                                    title: {{
+                                        display: true,
+                                        text: getChartTitle(chartId),
+                                        color: '#2c3e50',
+                                        font: {{
+                                            size: 16,
+                                            weight: 'bold'
+                                        }}
+                                    }}
+                                }},
+                                scales: {{
+                                    x: {{
+                                        grid: {{
+                                            color: '#e9ecef'
+                                        }},
+                                        ticks: {{
+                                            color: '#6c757d',
+                                            font: {{
+                                                size: 11
+                                            }}
+                                        }}
+                                    }},
+                                    y: {{
+                                        grid: {{
+                                            color: '#e9ecef'
+                                        }},
+                                        ticks: {{
+                                            color: '#6c757d',
+                                            font: {{
+                                                size: 11
+                                            }}
+                                        }}
+                                    }}
+                                }}
+                            }}
+                        }});
+                    }}
+                }} catch (error) {{
+                    console.error('Error restoring chart:', error);
+                    // В случае ошибки показываем placeholder
+                    showChartPlaceholder(canvas);
+                }}
+            }});
+        }}
+        
+        function getChartTitle(chartId) {{
+            const titles = {{
+                'trendsChart': 'График трендов цен на недвижимость',
+                'forecastChart': 'Прогноз цен на недвижимость',
+                'priceChart': 'Динамика цен',
+                'default': 'График данных'
+            }};
+            return titles[chartId] || titles['default'];
+        }}
+        
+        function showChartPlaceholder(canvas) {{
+            const placeholder = document.createElement('div');
+            placeholder.className = 'chart-placeholder';
+            placeholder.innerHTML = `
+                <div style="font-size: 16px; font-weight: 600; margin-bottom: 10px;">
+                    📊 График данных
+                </div>
+                <div style="font-size: 13px; color: #6c757d;">
+                    Данные для построения графика представлены в таблицах выше
+                </div>
+            `;
+            canvas.parentNode.replaceChild(placeholder, canvas);
+        }}
+    </script>
+</body>
+</html>"""
         
         # Сохраняем файл
         with open(file_path, 'w', encoding='utf-8') as f:
