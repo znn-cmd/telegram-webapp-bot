@@ -228,6 +228,11 @@ def serve_logo():
 def serve_logo_flt():
     return send_from_directory('.', 'logo-flt.png')
 
+@app.route('/reports/<filename>')
+def serve_report(filename):
+    """Доступ к сохраненным отчетам"""
+    return send_from_directory('reports', filename)
+
 @app.route('/api/user', methods=['POST'])
 def api_user():
     data = request.json or {}
@@ -4762,6 +4767,160 @@ def api_save_user_report():
         return jsonify({'success': True, 'report_id': new_id})
     except Exception as e:
         logger.error(f"Error saving user report: {e}")
+        return jsonify({'error': 'Internal error'}), 500
+
+@app.route('/api/save_html_report', methods=['POST'])
+def api_save_html_report():
+    """Сохраняет отчет как HTML файл и возвращает ссылку"""
+    data = request.json or {}
+    telegram_id_raw = data.get('telegram_id')
+    if telegram_id_raw is None:
+        return jsonify({'error': 'Invalid telegram_id'}), 400
+    try:
+        telegram_id = int(telegram_id_raw)
+    except (TypeError, ValueError):
+        return jsonify({'error': 'Invalid telegram_id'}), 400
+    
+    report_content = data.get('report_content')
+    location_info = data.get('location_info', '')
+    
+    if not report_content:
+        return jsonify({'error': 'Report content required'}), 400
+    
+    try:
+        # Генерируем уникальное имя файла
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        safe_location = re.sub(r'[^\w\s-]', '', location_info).strip()
+        safe_location = re.sub(r'[-\s]+', '-', safe_location)
+        if len(safe_location) > 50:
+            safe_location = safe_location[:50]
+        
+        filename = f"Отчет_по_оценке_объекта_{safe_location}_{timestamp}.html"
+        file_path = os.path.join('reports', filename)
+        
+        # Создаем статичную HTML страницу без интерактивных элементов
+        html_template = f"""<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Отчет по оценке объекта - {location_info}</title>
+    <style>
+        * {{
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }}
+
+        body {{
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }}
+
+        .container {{
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: white;
+            min-height: 100vh;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }}
+
+        .header {{
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #667eea;
+        }}
+
+        .logo {{
+            width: 120px;
+            height: auto;
+            margin-bottom: 15px;
+        }}
+
+        .report-title {{
+            font-size: 28px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }}
+
+        .report-subtitle {{
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 5px;
+        }}
+
+        .report-date {{
+            font-size: 14px;
+            color: #888;
+        }}
+
+        .report-content {{
+            margin-top: 20px;
+        }}
+
+        /* Копируем стили из основного файла для совместимости */
+        .summary-table {{ width: 100%; border-collapse: collapse; margin: 20px 0; }}
+        .summary-table th, .summary-table td {{ padding: 12px; border: 1px solid #ddd; text-align: left; }}
+        .summary-table th {{ background: #f8f9fa; font-weight: 600; }}
+        .trend-card {{ background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 8px; padding: 15px; margin: 10px 0; }}
+        .trend-title {{ font-weight: 600; margin-bottom: 8px; }}
+        .trend-value {{ font-size: 18px; font-weight: 700; color: #28a745; }}
+        .market-indicators-table {{ width: 100%; background: #f8f9fa; border-radius: 16px; overflow: hidden; margin: 20px 0; }}
+        .price-forecast-table {{ width: 100%; background: #f8f9fa; border-radius: 16px; overflow: hidden; margin: 20px 0; }}
+        .consolidated-assessment-section {{ margin: 20px 0; background: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }}
+        .assessment-category {{ background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 8px; padding: 15px; margin: 10px 0; }}
+        
+        @media print {{
+            body {{ background: white; }}
+            .container {{ box-shadow: none; }}
+        }}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <img src="logo-flt.png" alt="Aaadviser Logo" class="logo" />
+            <div class="report-title">Отчет по оценке объекта</div>
+            <div class="report-subtitle">{location_info}</div>
+            <div class="report-date">Сформирован: {datetime.now().strftime("%d.%m.%Y в %H:%M")}</div>
+        </div>
+        
+        <div class="report-content">
+            {report_content}
+        </div>
+        
+        <div style="margin-top: 40px; padding: 20px; background: #f8f9fa; border-radius: 8px; text-align: center; border: 1px solid #e0e0e0;">
+            <p style="font-size: 14px; color: #666; margin: 0;">
+                Отчет сформирован системой <strong>Aaadviser</strong><br>
+                <em>Инсайты рынка недвижимости</em><br>
+                {datetime.now().strftime("%d.%m.%Y")}
+            </p>
+        </div>
+    </div>
+</body>
+</html>"""
+        
+        # Сохраняем файл
+        with open(file_path, 'w', encoding='utf-8') as f:
+            f.write(html_template)
+        
+        # Генерируем ссылку
+        base_url = request.host_url.rstrip('/')
+        report_url = f"{base_url}/reports/{filename}"
+        
+        return jsonify({
+            'success': True,
+            'report_url': report_url,
+            'filename': filename
+        })
+        
+    except Exception as e:
+        logger.error(f"Error saving HTML report: {e}")
         return jsonify({'error': 'Internal error'}), 500
 
 @app.route('/api/send_saved_report_pdf', methods=['POST'])

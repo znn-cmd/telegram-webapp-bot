@@ -3086,6 +3086,155 @@
             color: #721c24;
         }
 
+        /* Save and Share Button Styles */
+        .save-share-button {
+            display: none;
+            width: 100%;
+            padding: 15px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            text-align: center;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.2);
+        }
+
+        .save-share-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
+            background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
+        }
+
+        .save-share-button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            width: 90%;
+            max-width: 450px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-close:hover {
+            color: #333;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .modal-description {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .modal-link-container {
+            background: #f8f9fa;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            word-break: break-all;
+        }
+
+        .modal-link {
+            color: #667eea;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .modal-link:hover {
+            text-decoration: underline;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .modal-button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .modal-button-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .modal-button-primary:hover {
+            background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
+            transform: translateY(-1px);
+        }
+
+        .modal-button-secondary {
+            background: #f8f9fa;
+            color: #666;
+            border: 1px solid #e0e0e0;
+        }
+
+        .modal-button-secondary:hover {
+            background: #e9ecef;
+            color: #333;
+        }
+
         /* Back Button Styles */
         .back-button {
             display: block;
@@ -3656,6 +3805,11 @@
             </div>
         </div>
 
+        <!-- Save and Share Button -->
+        <button class="save-share-button" id="saveShareButton" onclick="saveAndShareReport()">
+            <span id="saveShareButtonText">💾 Сохранить и поделиться отчет</span>
+        </button>
+
         <!-- Error State -->
         <div class="error-state" id="errorState" style="display: none;">
             <div class="error-icon">❌</div>
@@ -3664,6 +3818,28 @@
 
         <!-- Back Button -->
         <a href="/webapp_main" class="back-button" id="backButton">← Вернуться в главное меню</a>
+
+        <!-- Modal for sharing report -->
+        <div class="modal-overlay" id="shareModal">
+            <div class="modal-content">
+                <button class="modal-close" onclick="closeShareModal()">×</button>
+                <div class="modal-title" id="modalTitle">Отчет сохранен</div>
+                <div class="modal-description" id="modalDescription">
+                    Ваш отчет успешно сохранен. Вы можете скопировать ссылку и поделиться ею с другими.
+                </div>
+                <div class="modal-link-container">
+                    <a id="modalLink" href="#" target="_blank" class="modal-link">Ссылка на отчет</a>
+                </div>
+                <div class="modal-actions">
+                    <button class="modal-button modal-button-primary" onclick="copyReportLink()">
+                        <span id="copyButtonText">📋 Копировать ссылку</span>
+                    </button>
+                    <button class="modal-button modal-button-secondary" onclick="closeShareModal()">
+                        <span id="closeButtonText">Закрыть</span>
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -3757,6 +3933,14 @@
                 'saleHeader': 'Продажа',
                 'rentHeader': 'Аренда',
                 'currencyTitle': 'Выберите валюту:',
+                'saveShareButtonText': '💾 Сохранить и поделиться отчет',
+                'modalTitle': 'Отчет сохранен',
+                'modalDescription': 'Ваш отчет успешно сохранен. Вы можете скопировать ссылку и поделиться ею с другими.',
+                'copyButtonText': '📋 Копировать ссылку',
+                'closeButtonText': 'Закрыть',
+                'linkCopied': 'Ссылка скопирована!',
+                'savingReport': 'Сохранение отчета...',
+                'errorSaving': 'Ошибка сохранения отчета',
                 'pricePlaceholder': 'Введите цену',
                 'areaPlaceholder': 'Введите площадь',
                 'trendsFilterInfo': 'Показано ${filteredCount} из ${totalCount} трендов',
@@ -3885,6 +4069,14 @@
                 'saleHeader': 'Sale',
                 'rentHeader': 'Rent',
                 'currencyTitle': 'Select currency:',
+                'saveShareButtonText': '💾 Save and share report',
+                'modalTitle': 'Report saved',
+                'modalDescription': 'Your report has been successfully saved. You can copy the link and share it with others.',
+                'copyButtonText': '📋 Copy link',
+                'closeButtonText': 'Close',
+                'linkCopied': 'Link copied!',
+                'savingReport': 'Saving report...',
+                'errorSaving': 'Error saving report',
                 'pricePlaceholder': 'Enter price',
                 'areaPlaceholder': 'Enter area',
                 'trendsFilterInfo': 'Showing ${filteredCount} of ${totalCount} trends',
@@ -4402,7 +4594,31 @@
                 }
             });
             
-
+            // Update save and share elements
+            const saveShareButtonText = document.getElementById('saveShareButtonText');
+            if (saveShareButtonText) {
+                saveShareButtonText.textContent = getText('saveShareButtonText');
+            }
+            
+            const modalTitle = document.getElementById('modalTitle');
+            if (modalTitle) {
+                modalTitle.textContent = getText('modalTitle');
+            }
+            
+            const modalDescription = document.getElementById('modalDescription');
+            if (modalDescription) {
+                modalDescription.textContent = getText('modalDescription');
+            }
+            
+            const copyButtonText = document.getElementById('copyButtonText');
+            if (copyButtonText) {
+                copyButtonText.textContent = getText('copyButtonText');
+            }
+            
+            const closeButtonText = document.getElementById('closeButtonText');
+            if (closeButtonText) {
+                closeButtonText.textContent = getText('closeButtonText');
+            }
         }
 
         // Load countries from API
@@ -5280,6 +5496,9 @@
             
             // Show data content
             document.getElementById('dataContent').style.display = 'block';
+            
+            // Show save button after data is loaded
+            showSaveButton();
         }
 
 
@@ -8976,6 +9195,190 @@
                 createForecastChart(currentForecastData, chartType);
             }
         }
+
+        // Save and Share Report Functions
+        async function saveAndShareReport() {
+            const saveButton = document.getElementById('saveShareButton');
+            const originalText = saveButton.innerHTML;
+            
+            try {
+                // Disable button and show loading
+                saveButton.disabled = true;
+                saveButton.innerHTML = `<span>${getText('savingReport')}</span>`;
+                
+                // Get report content
+                const reportContent = extractReportContent();
+                
+                // Get location info
+                const locationInfo = getLocationInfo();
+                
+                // Get telegram_id 
+                let telegramId = null;
+                if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe) {
+                    telegramId = window.Telegram.WebApp.initDataUnsafe.user?.id;
+                }
+                
+                // Save report via API
+                const response = await fetch('/api/save_html_report', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        telegram_id: telegramId,
+                        report_content: reportContent,
+                        location_info: locationInfo
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    // Show modal with link
+                    showShareModal(result.report_url);
+                } else {
+                    throw new Error(result.error || 'Unknown error');
+                }
+                
+            } catch (error) {
+                console.error('Error saving report:', error);
+                alert(getText('errorSaving'));
+            } finally {
+                // Re-enable button
+                saveButton.disabled = false;
+                saveButton.innerHTML = originalText;
+            }
+        }
+
+        function extractReportContent() {
+            // Get the main content section
+            const dataContent = document.getElementById('dataContent');
+            if (!dataContent) {
+                return '<p>Отчет не найден</p>';
+            }
+            
+            // Clone the content to avoid modifying the original
+            const clonedContent = dataContent.cloneNode(true);
+            
+            // Remove interactive elements
+            removeInteractiveElements(clonedContent);
+            
+            return clonedContent.innerHTML;
+        }
+
+        function removeInteractiveElements(element) {
+            // Remove buttons
+            const buttons = element.querySelectorAll('button');
+            buttons.forEach(button => button.remove());
+            
+            // Remove select elements
+            const selects = element.querySelectorAll('select');
+            selects.forEach(select => {
+                const selectedText = select.options[select.selectedIndex]?.text || '';
+                const span = document.createElement('span');
+                span.textContent = selectedText;
+                span.className = 'static-value';
+                select.parentNode.replaceChild(span, select);
+            });
+            
+            // Remove input elements and replace with their values
+            const inputs = element.querySelectorAll('input');
+            inputs.forEach(input => {
+                const span = document.createElement('span');
+                span.textContent = input.value || '';
+                span.className = 'static-value';
+                input.parentNode.replaceChild(span, input);
+            });
+            
+            // Remove onclick attributes
+            const clickableElements = element.querySelectorAll('[onclick]');
+            clickableElements.forEach(el => el.removeAttribute('onclick'));
+            
+            // Remove event listeners by cloning elements
+            const elementsWithEvents = element.querySelectorAll('[onchange], [onfocus], [onblur]');
+            elementsWithEvents.forEach(el => {
+                el.removeAttribute('onchange');
+                el.removeAttribute('onfocus');
+                el.removeAttribute('onblur');
+            });
+        }
+
+        function getLocationInfo() {
+            const locationDetails = document.getElementById('locationDetails');
+            return locationDetails ? locationDetails.textContent.trim() : 'Локация не указана';
+        }
+
+        function showShareModal(reportUrl) {
+            const modal = document.getElementById('shareModal');
+            const modalLink = document.getElementById('modalLink');
+            
+            modalLink.href = reportUrl;
+            modalLink.textContent = reportUrl;
+            
+            modal.style.display = 'flex';
+            
+            // Store the URL for copying
+            window.currentReportUrl = reportUrl;
+        }
+
+        function closeShareModal() {
+            const modal = document.getElementById('shareModal');
+            modal.style.display = 'none';
+        }
+
+        async function copyReportLink() {
+            const copyButton = document.querySelector('#shareModal .modal-button-primary');
+            const originalText = copyButton.innerHTML;
+            
+            try {
+                if (navigator.clipboard) {
+                    await navigator.clipboard.writeText(window.currentReportUrl);
+                } else {
+                    // Fallback for older browsers
+                    const textArea = document.createElement('textarea');
+                    textArea.value = window.currentReportUrl;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textArea);
+                }
+                
+                copyButton.innerHTML = `<span>${getText('linkCopied')}</span>`;
+                
+                setTimeout(() => {
+                    copyButton.innerHTML = originalText;
+                }, 2000);
+                
+            } catch (error) {
+                console.error('Error copying link:', error);
+                alert('Не удалось скопировать ссылку');
+            }
+        }
+
+        // Show save button when report is loaded
+        function showSaveButton() {
+            const saveButton = document.getElementById('saveShareButton');
+            if (saveButton) {
+                saveButton.style.display = 'block';
+            }
+        }
+
+
+
+        // Close modal when clicking outside
+        document.addEventListener('click', function(event) {
+            const modal = document.getElementById('shareModal');
+            if (event.target === modal) {
+                closeShareModal();
+            }
+        });
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeShareModal();
+            }
+        });
     </script>
 </body>
 </html>
