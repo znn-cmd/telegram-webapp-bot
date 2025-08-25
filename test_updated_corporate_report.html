@@ -113,50 +113,194 @@
             padding: 30px;
         }
 
-        /* Переопределяем стили таблиц для корпоративного вида */
-        .summary-table { 
-            width: 100%; 
-            border-collapse: collapse; 
-            margin: 25px 0; 
+        /* Заголовки секций */
+        .data-section-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin: 25px 0 15px 0;
+            padding: 10px 0;
+            border-bottom: 2px solid #3498db;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        /* Market Indicators Table */
+        .market-indicators-table {
+            margin: 20px 0;
             border: 1px solid #dee2e6;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        .market-data-table {
+            width: 100%;
+            border-collapse: collapse;
             font-size: 13px;
         }
-        .summary-table th { 
-            background: #2c3e50; 
-            color: white; 
-            padding: 15px 12px; 
-            font-weight: 600; 
-            text-align: left;
-            border: 1px solid #34495e;
+        
+        .market-data-table .category-header {
+            background: #2c3e50;
+            color: white;
+            padding: 15px;
+            font-weight: 700;
+            text-align: center;
+            font-size: 16px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
-        .summary-table td { 
-            padding: 12px; 
-            border: 1px solid #dee2e6; 
+        
+        .market-data-table .data-cell {
+            padding: 15px;
+            border-bottom: 1px solid #dee2e6;
             background: #ffffff;
+            vertical-align: top;
         }
-        .summary-table tr:nth-child(even) td { 
-            background: #f8f9fa; 
+        
+        .market-data-table tr:nth-child(even) .data-cell {
+            background: #f8f9fa;
+        }
+        
+        .cell-label {
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 5px;
+            font-size: 12px;
+        }
+        
+        .cell-value {
+            font-weight: 700;
+            color: #2c3e50;
+            font-size: 14px;
         }
 
-        .trend-card { 
-            background: #ffffff; 
-            border: 1px solid #dee2e6; 
+        /* Trends Grid */
+        .trends-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .trend-card {
+            background: #ffffff;
+            border: 1px solid #dee2e6;
             border-left: 4px solid #3498db;
-            padding: 20px; 
-            margin: 15px 0; 
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            padding: 20px;
+            border-radius: 4px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         }
         
-        .trend-title { 
-            font-weight: 600; 
-            margin-bottom: 10px; 
+        .trend-title {
+            font-size: 14px;
+            font-weight: 700;
             color: #2c3e50;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
         
-        .trend-value { 
-            font-size: 18px; 
-            font-weight: 700; 
-            color: #27ae60; 
+        .trend-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: #27ae60;
+            margin-bottom: 10px;
+        }
+        
+        .trend-change {
+            font-size: 12px;
+            color: #6c757d;
+            line-height: 1.4;
+        }
+
+        /* Chart Placeholders */
+        .chart-container {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 40px;
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .chart-placeholder {
+            background: #ffffff;
+            border: 2px dashed #3498db;
+            border-radius: 8px;
+            padding: 40px;
+            color: #6c757d;
+            font-style: italic;
+        }
+
+        /* Object Summary */
+        .object-summary-section {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-left: 4px solid #e74c3c;
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 4px;
+        }
+        
+        .object-summary-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .object-comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .object-comparison-table td {
+            padding: 8px 0;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .comparison-label {
+            font-weight: 600;
+            color: #495057;
+            width: 60%;
+        }
+        
+        .comparison-value {
+            font-weight: 700;
+            color: #2c3e50;
+            text-align: right;
+        }
+        
+        .comparison-expensive {
+            color: #e74c3c;
+        }
+
+        /* Analysis Sections */
+        .trends-analysis-section {
+            background: #e8f5e8;
+            border: 1px solid #c3e6c3;
+            border-left: 4px solid #28a745;
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 4px;
+        }
+        
+        .trends-analysis-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #155724;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .trends-analysis-content {
+            color: #155724;
+            line-height: 1.6;
+            font-size: 13px;
         }
 
         /* Корпоративный футер */
@@ -285,53 +429,96 @@
         
         <!-- Основной контент отчета -->
         <div class="report-content">
-            <h3>Показатели рынка недвижимости</h3>
+            <h3 class="data-section-title">Показатели рынка</h3>
             
-            <table class="summary-table">
-                <thead>
-                    <tr>
-                        <th>Показатель</th>
-                        <th>Продажа</th>
-                        <th>Аренда</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Средняя цена за м²</td>
-                        <td>€1,245</td>
-                        <td>€12.50</td>
-                    </tr>
-                    <tr>
-                        <td>Количество объектов</td>
-                        <td>143</td>
-                        <td>87</td>
-                    </tr>
-                    <tr>
-                        <td>Средний период размещения</td>
-                        <td>45 дней</td>
-                        <td>21 день</td>
-                    </tr>
-                    <tr>
-                        <td>Средняя доходность</td>
-                        <td colspan="2">7.8%</td>
-                    </tr>
-                </tbody>
-            </table>
+            <div class="market-indicators-table">
+                <table class="market-data-table">
+                    <thead>
+                        <tr>
+                            <th class="category-header">Продажа</th>
+                            <th class="category-header">Аренда</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="data-cell">
+                                <div class="cell-label">Средняя цена за м²:</div>
+                                <div class="cell-value">₺45,297,42</div>
+                            </td>
+                            <td class="data-cell">
+                                <div class="cell-label">Средняя цена за м²:</div>
+                                <div class="cell-value">₺176,96</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="data-cell">
+                                <div class="cell-label">Срок до продажи:</div>
+                                <div class="cell-value">64 – 126 дней</div>
+                            </td>
+                            <td class="data-cell">
+                                <div class="cell-label">Срок до аренды:</div>
+                                <div class="cell-value">54 – 67 дней</div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
 
-            <div class="trend-card">
-                <div class="trend-title">Прогноз изменения стоимости</div>
-                <div class="trend-value">+12.5% в течение 12 месяцев</div>
-                <div style="margin-top: 10px; font-size: 13px; color: #6c757d;">
-                    На основе анализа исторических данных и текущих рыночных тенденций
+            <h3 class="data-section-title">Тренды рынка</h3>
+            
+            <div class="trends-grid">
+                <div class="trend-card">
+                    <div class="trend-title">Тренд цен</div>
+                    <div class="trend-value">₺53,190,02</div>
+                    <div class="trend-change">
+                        Продажа: +4.47%<br>
+                        Аренда: +2.71%<br>
+                        август 2025
+                    </div>
                 </div>
             </div>
 
-            <div class="trend-card">
-                <div class="trend-title">Рыночная активность</div>
-                <div class="trend-value">Высокая</div>
-                <div style="margin-top: 10px; font-size: 13px; color: #6c757d;">
-                    Количество сделок выросло на 23% по сравнению с предыдущим периодом
+            <div class="chart-container">
+                <div class="chart-placeholder">
+                    <div style="font-size: 16px; font-weight: 600; margin-bottom: 10px;">
+                        📊 График трендов
+                    </div>
+                    <div style="font-size: 13px; color: #6c757d;">
+                        Данные для построения графика представлены в таблицах выше
+                    </div>
                 </div>
+            </div>
+
+            <div class="trends-analysis-section">
+                <div class="trends-analysis-title">Вывод по тренду</div>
+                <div class="trends-analysis-content">
+                    Рынок недвижимости демонстрирует устойчивый рост как в продажах, так и в аренде. 
+                    Текущий тренд указывает на стабильность доходности, но сохраняется положительная динамика.
+                </div>
+            </div>
+
+            <div class="object-summary-section">
+                <div class="object-summary-title">Вывод по объекту</div>
+                <table class="object-comparison-table">
+                    <tbody>
+                        <tr>
+                            <td class="comparison-label">Цена за м²:</td>
+                            <td class="comparison-value"><strong>₺51,192.25</strong></td>
+                        </tr>
+                        <tr>
+                            <td class="comparison-label">Площадь:</td>
+                            <td class="comparison-value"><strong>150 м²</strong></td>
+                        </tr>
+                        <tr>
+                            <td class="comparison-label">vs. мин. цена рынка:</td>
+                            <td class="comparison-value comparison-expensive">+22.2%</td>
+                        </tr>
+                        <tr>
+                            <td class="comparison-label">vs. макс. цена рынка:</td>
+                            <td class="comparison-value comparison-expensive">+5.1%</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
         

@@ -9290,6 +9290,29 @@
                 input.parentNode.replaceChild(span, input);
             });
             
+            // Replace charts with informative placeholders
+            const canvasElements = element.querySelectorAll('canvas');
+            canvasElements.forEach(canvas => {
+                const placeholder = document.createElement('div');
+                placeholder.className = 'chart-placeholder';
+                
+                const chartType = canvas.id.includes('trends') ? 'трендов' : 'прогноза';
+                placeholder.innerHTML = `
+                    <div style="font-size: 16px; font-weight: 600; margin-bottom: 10px;">
+                        📊 График ${chartType}
+                    </div>
+                    <div style="font-size: 13px; color: #6c757d;">
+                        Данные для построения графика представлены в таблицах выше
+                    </div>
+                `;
+                
+                canvas.parentNode.replaceChild(placeholder, canvas);
+            });
+            
+            // Remove chart controls
+            const chartControls = element.querySelectorAll('.chart-controls');
+            chartControls.forEach(control => control.remove());
+            
             // Remove onclick attributes
             const clickableElements = element.querySelectorAll('[onclick]');
             clickableElements.forEach(el => el.removeAttribute('onclick'));

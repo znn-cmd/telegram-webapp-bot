@@ -4919,50 +4919,536 @@ def api_save_html_report():
             padding: 30px;
         }}
 
-        /* Переопределяем стили таблиц для корпоративного вида */
-        .summary-table {{ 
-            width: 100%; 
-            border-collapse: collapse; 
-            margin: 25px 0; 
+        /* Корпоративные стили для всех элементов отчета */
+        
+        /* Заголовки секций */
+        .data-section-title {{
+            font-size: 18px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin: 25px 0 15px 0;
+            padding: 10px 0;
+            border-bottom: 2px solid #3498db;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }}
+        
+        /* Market Indicators Table */
+        .market-indicators-table {{
+            margin: 20px 0;
             border: 1px solid #dee2e6;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }}
+        
+        .market-data-table {{
+            width: 100%;
+            border-collapse: collapse;
             font-size: 13px;
         }}
-        .summary-table th {{ 
-            background: #2c3e50; 
-            color: white; 
-            padding: 15px 12px; 
-            font-weight: 600; 
-            text-align: left;
-            border: 1px solid #34495e;
+        
+        .market-data-table .category-header {{
+            background: #2c3e50;
+            color: white;
+            padding: 15px;
+            font-weight: 700;
+            text-align: center;
+            font-size: 16px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }}
-        .summary-table td {{ 
-            padding: 12px; 
-            border: 1px solid #dee2e6; 
+        
+        .market-data-table .data-cell {{
+            padding: 15px;
+            border-bottom: 1px solid #dee2e6;
+            background: #ffffff;
+            vertical-align: top;
+        }}
+        
+        .market-data-table tr:nth-child(even) .data-cell {{
+            background: #f8f9fa;
+        }}
+        
+        .cell-label {{
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 5px;
+            font-size: 12px;
+        }}
+        
+        .cell-value {{
+            font-weight: 700;
+            color: #2c3e50;
+            font-size: 14px;
+        }}
+        
+        /* Market Analysis Text Block */
+        .market-analysis-text-block {{
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-left: 4px solid #3498db;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }}
+        
+        .market-analysis-text-title {{
+            font-size: 16px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }}
+        
+        .market-analysis-text-content p {{
+            margin-bottom: 10px;
+            line-height: 1.6;
+            color: #495057;
+            font-size: 13px;
+        }}
+        
+        .market-analysis-text-content strong {{
+            color: #2c3e50;
+            font-weight: 700;
+        }}
+        
+        /* Trends Grid */
+        .trends-grid {{
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }}
+        
+        .trend-card {{
+            background: #ffffff;
+            border: 1px solid #dee2e6;
+            border-left: 4px solid #27ae60;
+            padding: 20px;
+            border-radius: 4px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }}
+        
+        .trend-card-price_trend {{
+            border-left-color: #3498db;
+        }}
+        
+        .trend-title {{
+            font-size: 14px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }}
+        
+        .trend-value {{
+            font-size: 20px;
+            font-weight: 700;
+            color: #27ae60;
+            margin-bottom: 10px;
+        }}
+        
+        .trend-change {{
+            font-size: 12px;
+            color: #6c757d;
+            line-height: 1.4;
+        }}
+        
+        /* Trends Table */
+        .trends-table-section {{
+            margin: 30px 0;
+        }}
+        
+        .trends-table-title {{
+            font-size: 16px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }}
+        
+        .trends-table {{
+            width: 100%;
+            border-collapse: collapse;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            font-size: 12px;
+        }}
+        
+        .trends-table th {{
+            background: #2c3e50;
+            color: white;
+            padding: 12px 8px;
+            font-weight: 700;
+            text-align: center;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }}
+        
+        .trends-table td {{
+            padding: 10px 8px;
+            text-align: center;
+            border-bottom: 1px solid #dee2e6;
             background: #ffffff;
         }}
-        .summary-table tr:nth-child(even) td {{ 
-            background: #f8f9fa; 
-        }}
-
-        .trend-card {{ 
-            background: #ffffff; 
-            border: 1px solid #dee2e6; 
-            border-left: 4px solid #3498db;
-            padding: 20px; 
-            margin: 15px 0; 
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        
+        .trends-table .current-month-row {{
+            background: #e3f2fd !important;
+            font-weight: 700;
         }}
         
-        .trend-title {{ 
-            font-weight: 600; 
-            margin-bottom: 10px; 
+        .trends-table .forecast-row {{
+            background: #f0f8ff !important;
+        }}
+        
+        .trends-table .filter-info {{
+            background: #f8f9fa !important;
+            font-style: italic;
+            color: #6c757d;
+        }}
+        
+        /* Object Summary */
+        .object-summary-section {{
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-left: 4px solid #e74c3c;
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 4px;
+        }}
+        
+        .object-summary-title {{
+            font-size: 16px;
+            font-weight: 700;
             color: #2c3e50;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }}
         
-        .trend-value {{ 
-            font-size: 18px; 
-            font-weight: 700; 
-            color: #27ae60; 
+        .object-comparison-table {{
+            width: 100%;
+            border-collapse: collapse;
+        }}
+        
+        .object-comparison-table td {{
+            padding: 8px 0;
+            border-bottom: 1px solid #dee2e6;
+        }}
+        
+        .comparison-label {{
+            font-weight: 600;
+            color: #495057;
+            width: 60%;
+        }}
+        
+        .comparison-value {{
+            font-weight: 700;
+            color: #2c3e50;
+            text-align: right;
+        }}
+        
+        .comparison-expensive {{
+            color: #e74c3c;
+        }}
+        
+        .comparison-cheaper {{
+            color: #27ae60;
+        }}
+        
+        .comparison-smaller {{
+            color: #f39c12;
+        }}
+        
+        .object-analysis-text {{
+            margin-top: 15px;
+            padding: 15px;
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #856404;
+            line-height: 1.5;
+        }}
+        
+        /* Forecast Tables */
+        .forecast-table-section {{
+            margin: 30px 0;
+        }}
+        
+        .forecast-table-title {{
+            font-size: 16px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }}
+        
+        .forecast-table {{
+            width: 100%;
+            border-collapse: collapse;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            font-size: 12px;
+        }}
+        
+        .forecast-table th {{
+            background: #2c3e50;
+            color: white;
+            padding: 12px 8px;
+            font-weight: 700;
+            text-align: center;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }}
+        
+        .forecast-table td {{
+            padding: 10px 8px;
+            text-align: center;
+            border-bottom: 1px solid #dee2e6;
+            background: #ffffff;
+        }}
+        
+        .forecast-table .current-month-row {{
+            background: #e3f2fd !important;
+            font-weight: 700;
+        }}
+        
+        .forecast-table .forecast-row {{
+            background: #f0f8ff !important;
+        }}
+        
+        /* Price Forecast Market Table */
+        .price-forecast-market-table {{
+            width: 100%;
+            border-collapse: collapse;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            margin: 20px 0;
+        }}
+        
+        .forecast-category-header {{
+            background: #2c3e50;
+            color: white;
+            padding: 15px;
+            font-weight: 700;
+            text-align: center;
+            font-size: 16px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }}
+        
+        .forecast-data-cell {{
+            padding: 20px;
+            border-bottom: 1px solid #dee2e6;
+            background: #ffffff;
+            vertical-align: top;
+        }}
+        
+        .forecast-cell-label {{
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 8px;
+            font-size: 13px;
+        }}
+        
+        .forecast-cell-value {{
+            font-weight: 700;
+            color: #2c3e50;
+            font-size: 16px;
+            margin-bottom: 5px;
+        }}
+        
+        .forecast-cell-value.user-price {{
+            color: #3498db;
+        }}
+        
+        .forecast-cell-value.market-price {{
+            color: #9b59b6;
+        }}
+        
+        .forecast-cell-growth {{
+            font-size: 12px;
+            font-weight: 600;
+            padding: 2px 6px;
+            border-radius: 4px;
+            display: inline-block;
+        }}
+        
+        .forecast-cell-growth.positive {{
+            background: #d4edda;
+            color: #155724;
+        }}
+        
+        .forecast-cell-growth.negative {{
+            background: #f8d7da;
+            color: #721c24;
+        }}
+        
+        /* Analysis Sections */
+        .trends-analysis-section,
+        .forecast-analysis-section {{
+            background: #e8f5e8;
+            border: 1px solid #c3e6c3;
+            border-left: 4px solid #28a745;
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 4px;
+        }}
+        
+        .trends-analysis-title,
+        .forecast-analysis-title {{
+            font-size: 16px;
+            font-weight: 700;
+            color: #155724;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }}
+        
+        .trends-analysis-content,
+        .forecast-analysis-content {{
+            color: #155724;
+            line-height: 1.6;
+            font-size: 13px;
+        }}
+        
+        .trends-analysis-content p,
+        .forecast-analysis-content p {{
+            margin-bottom: 10px;
+        }}
+        
+        .trends-analysis-content strong,
+        .forecast-analysis-content strong {{
+            font-weight: 700;
+        }}
+        
+        /* Key Metrics */
+        .forecast-metrics-compact-section {{
+            margin: 20px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+        }}
+        
+        .forecast-metrics-compact-title {{
+            font-size: 14px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }}
+        
+        .forecast-metrics-compact-grid {{
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }}
+        
+        .metric-compact-item {{
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #dee2e6;
+        }}
+        
+        .metric-compact-label {{
+            font-weight: 600;
+            color: #495057;
+            font-size: 12px;
+        }}
+        
+        .metric-compact-value {{
+            font-weight: 700;
+            color: #2c3e50;
+            font-size: 12px;
+        }}
+        
+        .metric-compact-value.positive {{
+            color: #27ae60;
+        }}
+        
+        .metric-compact-value.negative {{
+            color: #e74c3c;
+        }}
+        
+        /* Chart Replacements */
+        .chart-container {{
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 40px;
+            text-align: center;
+            margin: 20px 0;
+        }}
+        
+        .chart-placeholder {{
+            background: #ffffff;
+            border: 2px dashed #3498db;
+            border-radius: 8px;
+            padding: 40px;
+            color: #6c757d;
+            font-style: italic;
+        }}
+        
+        .chart-info {{
+            margin-top: 10px;
+            font-size: 11px;
+            color: #6c757d;
+            font-style: italic;
+            text-align: center;
+        }}
+        
+        /* Additional spacing */
+        .block-spacing {{
+            height: 20px;
+        }}
+        
+        .section-spacing {{
+            height: 10px;
+        }}
+        
+        /* Price forecast info */
+        .price-forecast-date {{
+            text-align: center;
+            font-weight: 700;
+            color: #2c3e50;
+            margin: 15px 0;
+            font-size: 14px;
+        }}
+        
+        .price-forecast-currency-info {{
+            text-align: center;
+            font-size: 12px;
+            color: #6c757d;
+            margin: 10px 0;
+        }}
+        
+        .price-forecast-disclaimer {{
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 4px;
+            padding: 15px;
+            font-size: 11px;
+            color: #856404;
+            text-align: center;
+            font-style: italic;
+            margin: 15px 0;
         }}
 
         /* Корпоративный футер */
