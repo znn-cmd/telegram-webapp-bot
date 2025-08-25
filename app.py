@@ -5706,79 +5706,274 @@ def api_save_html_report():
         }});
         
         function restoreCharts() {{
+            console.log('🔧 Starting chart restoration...');
+            
             // Находим все canvas элементы с данными графиков
             const canvasElements = document.querySelectorAll('canvas[data-chart-data]');
+            console.log(`📊 Found ${canvasElements.length} canvas elements to restore`);
             
-            canvasElements.forEach(canvas => {{
+            canvasElements.forEach((canvas, index) => {{
+                console.log(`🔍 Processing canvas ${index + 1}: ${canvas.id}`);
+                
                 try {{
                     const chartData = JSON.parse(canvas.getAttribute('data-chart-data'));
                     const chartType = canvas.getAttribute('data-chart-type') || 'line';
                     const chartId = canvas.getAttribute('data-chart-id') || 'chart';
                     
+                    console.log(`📊 Chart data for ${canvas.id}:`, chartData);
+                    
                     // Восстанавливаем график
-                    if (chartData && chartData.data) {{
-                        const ctx = canvas.getContext('2d');
-                        
-                        // Создаем новый график с сохраненными данными
-                        new Chart(ctx, {{
-                            type: chartType,
-                            data: chartData.data,
-                            options: {{
-                                responsive: true,
-                                maintainAspectRatio: false,
-                                plugins: {{
-                                    legend: {{
-                                        position: 'top',
-                                        labels: {{
-                                            font: {{
-                                                size: 12
-                                            }},
-                                            color: '#2c3e50'
-                                        }}
-                                    }},
-                                    title: {{
-                                        display: true,
-                                        text: getChartTitle(chartId),
-                                        color: '#2c3e50',
-                                        font: {{
-                                            size: 16,
-                                            weight: 'bold'
-                                        }}
-                                    }}
-                                }},
-                                scales: {{
-                                    x: {{
-                                        grid: {{
-                                            color: '#e9ecef'
-                                        }},
-                                        ticks: {{
-                                            color: '#6c757d',
-                                            font: {{
-                                                size: 11
-                                            }}
-                                        }}
-                                    }},
-                                    y: {{
-                                        grid: {{
-                                            color: '#e9ecef'
-                                        }},
-                                        ticks: {{
-                                            color: '#6c757d',
-                                            font: {{
-                                                size: 11
-                                            }}
-                                        }}
-                                    }}
-                                }}
-                            }}
-                        }});
+                    if (chartData && chartData.data && chartData.data.labels && chartData.data.labels.length > 0) {{
+                        console.log(`✅ Full chart data found for ${canvas.id}, creating chart...`);
+                        createChartFromData(canvas, chartData, chartType, chartId);
+                    }} else {{
+                        console.log(`⚠️ Incomplete chart data for ${canvas.id}, trying to create from table...`);
+                        createChartFromTable(canvas, chartId);
                     }}
                 }} catch (error) {{
-                    console.error('Error restoring chart:', error);
-                    // В случае ошибки показываем placeholder
-                    showChartPlaceholder(canvas);
+                    console.error(`❌ Error processing ${canvas.id}:`, error);
+                    // В случае ошибки пытаемся создать график из таблицы
+                    try {{
+                        const chartId = canvas.getAttribute('data-chart-id') || 'chart';
+                        createChartFromTable(canvas, chartId);
+                    }} catch (fallbackError) {{
+                        console.error(`❌ Fallback also failed for ${canvas.id}:`, fallbackError);
+                        showChartPlaceholder(canvas);
+                    }}
                 }}
             }});
+        }}
+        
+        function createChartFromData(canvas, chartData, chartType, chartId) {{
+            const ctx = canvas.getContext('2d');
+            
+            // Создаем новый график с сохраненными данными
+            new Chart(ctx, {{
+                type: chartType,
+                data: chartData.data,
+                options: {{
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {{
+                        legend: {{
+                            position: 'top',
+                            labels: {{
+                                font: {{
+                                    size: 12
+                                }},
+                                color: '#2c3e50'
+                            }}
+                        }},
+                        title: {{
+                            display: true,
+                            text: getChartTitle(chartId),
+                            color: '#2c3e50',
+                            font: {{
+                                size: 16,
+                                weight: 'bold'
+                            }}
+                        }}
+                    }},
+                    scales: {{
+                        x: {{
+                            grid: {{
+                                color: '#e9ecef'
+                            }},
+                            ticks: {{
+                                color: '#6c757d',
+                                font: {{
+                                    size: 11
+                                }}
+                            }}
+                        }},
+                        y: {{
+                            grid: {{
+                                color: '#e9ecef'
+                            }},
+                            ticks: {{
+                                color: '#6c757d',
+                                font: {{
+                                    size: 11
+                                }}
+                            }}
+                        }}
+                    }}
+                }}
+            }});
+            
+            console.log(`✅ Chart created from data for ${chartId}`);
+        }}
+        
+        function createChartFromTable(canvas, chartId) {{
+            console.log(`🔍 Creating chart from table for ${chartId}`);
+            
+            let chartData = null;
+            
+            if (chartId === 'trendsChart') {{
+                chartData = extractDataFromTrendsTable();
+            }} else if (chartId === 'forecastChart') {{
+                chartData = extractDataFromForecastTable();
+            }}
+            
+            if (chartData && chartData.data && chartData.data.labels && chartData.data.labels.length > 0) {{
+                console.log(`✅ Table data extracted for ${chartId}:`, chartData);
+                createChartFromData(canvas, chartData, chartData.type, chartId);
+            }} else {{
+                console.log(`⚠️ No table data found for ${chartId}, showing placeholder`);
+                showChartPlaceholder(canvas);
+            }}
+        }}
+        
+        function extractDataFromTrendsTable() {{
+            try {{
+                const table = document.querySelector('.trends-table');
+                if (!table) {{
+                    console.log('❌ Trends table not found');
+                    return null;
+                }}
+                
+                const rows = table.querySelectorAll('tbody tr:not(.filter-info)');
+                console.log(`🔍 Found ${rows.length} rows in trends table`);
+                
+                const labels = [];
+                const salesData = [];
+                const rentData = [];
+                
+                rows.forEach((row, index) => {{
+                    const cells = row.querySelectorAll('td');
+                    if (cells.length >= 4) {{
+                        const date = cells[0].textContent.trim();
+                        const salesPriceText = cells[1].textContent.trim();
+                        const rentPriceText = cells[3].textContent.trim();
+                        
+                        // Extract numeric values from price text
+                        const salesPrice = parseFloat(salesPriceText.replace(/[^\d.,]/g, '').replace(',', '.'));
+                        const rentPrice = parseFloat(rentPriceText.replace(/[^\d.,]/g, '').replace(',', '.'));
+                        
+                        console.log(`Row ${index}: Date=${date}, Sales=${salesPriceText}->${salesPrice}, Rent=${rentPriceText}->${rentPrice}`);
+                        
+                        if (date && !isNaN(salesPrice) && !isNaN(rentPrice)) {{
+                            labels.push(date);
+                            salesData.push(salesPrice);
+                            rentData.push(rentPrice);
+                        }}
+                    }}
+                }});
+                
+                console.log(`✅ Extracted trends data: ${labels.length} labels, ${salesData.length} sales, ${rentData.length} rent`);
+                
+                if (labels.length === 0) {{
+                    console.log('⚠️ No valid trends data extracted from table');
+                    return null;
+                }}
+                
+                return {{
+                    type: 'line',
+                    data: {{
+                        labels: labels,
+                        datasets: [
+                            {{
+                                label: 'Цена продажи (₺/м²)',
+                                data: salesData,
+                                borderColor: '#28a745',
+                                backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                                tension: 0.4,
+                                borderWidth: 3,
+                                fill: false
+                            }},
+                            {{
+                                label: 'Цена аренды (₺/м²)',
+                                data: rentData,
+                                borderColor: '#ffc107',
+                                backgroundColor: 'rgba(255, 193, 7, 0.1)',
+                                tension: 0.4,
+                                borderWidth: 3,
+                                fill: false
+                            }}
+                        ]
+                    }},
+                    options: {{}}
+                }};
+            }} catch (error) {{
+                console.log('❌ Error extracting trends data from table:', error);
+                return null;
+            }}
+        }}
+        
+        function extractDataFromForecastTable() {{
+            try {{
+                const table = document.querySelector('.forecast-table');
+                if (!table) {{
+                    console.log('❌ Forecast table not found');
+                    return null;
+                }}
+                
+                const rows = table.querySelectorAll('tbody tr:not(.filter-info)');
+                console.log(`🔍 Found ${rows.length} rows in forecast table`);
+                
+                const labels = [];
+                const salesData = [];
+                const rentData = [];
+                
+                rows.forEach((row, index) => {{
+                    const cells = row.querySelectorAll('td');
+                    if (cells.length >= 3) {{
+                        const date = cells[0].textContent.trim();
+                        const salesPriceText = cells[1].textContent.trim();
+                        const rentPriceText = cells[2].textContent.trim();
+                        
+                        // Extract numeric values from price text
+                        const salesPrice = parseFloat(salesPriceText.replace(/[^\d.,]/g, '').replace(',', '.'));
+                        const rentPrice = parseFloat(rentPriceText.replace(/[^\d.,]/g, '').replace(',', '.'));
+                        
+                        console.log(`Row ${index}: Date=${date}, Sales=${salesPriceText}->${salesPrice}, Rent=${rentPriceText}->${rentPrice}`);
+                        
+                        if (date && !isNaN(salesPrice) && !isNaN(rentPrice)) {{
+                            labels.push(date);
+                            salesData.push(salesPrice);
+                            rentData.push(rentPrice);
+                        }}
+                    }}
+                }});
+                
+                console.log(`✅ Extracted forecast data: ${labels.length} labels, ${salesData.length} sales, ${rentData.length} rent`);
+                
+                if (labels.length === 0) {{
+                    console.log('⚠️ No valid forecast data extracted from table');
+                    return null;
+                }}
+                
+                return {{
+                    type: 'line',
+                    data: {{
+                        labels: labels,
+                        datasets: [
+                            {{
+                                label: 'Прогноз продажи (₺/м²)',
+                                data: salesData,
+                                borderColor: '#3498db',
+                                backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                                tension: 0.4,
+                                borderWidth: 3,
+                                fill: false
+                            }},
+                            {{
+                                label: 'Прогноз аренды (₺/м²)',
+                                data: rentData,
+                                borderColor: '#e74c3c',
+                                backgroundColor: 'rgba(231, 76, 60, 0.1)',
+                                tension: 0.4,
+                                borderWidth: 3,
+                                fill: false
+                            }}
+                        ]
+                    }},
+                    options: {{}}
+                }};
+            }} catch (error) {{
+                console.log('❌ Error extracting forecast data from table:', error);
+                return null;
+            }}
         }}
         
         function getChartTitle(chartId) {{

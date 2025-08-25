@@ -9409,6 +9409,15 @@
                     }
                 }
                 
+                // 5. Try to create basic chart data from visible table data
+                if (chartId === 'trendsChart') {
+                    const basicData = createBasicChartDataFromVisibleTable();
+                    if (basicData) {
+                        console.log(`✅ Created basic chart data from visible table for ${chartId}:`, basicData);
+                        return basicData;
+                    }
+                }
+                
                 console.log(`⚠️ No chart data found for ${chartId}, using fallback`);
                 // Fallback: return basic chart info
                 return {
@@ -9422,6 +9431,118 @@
                 
             } catch (error) {
                 console.log('❌ Error extracting chart data:', error);
+                return null;
+            }
+        }
+        
+        function createBasicChartDataFromVisibleTable() {
+            try {
+                // Try to find any table with price data
+                const tables = document.querySelectorAll('table');
+                let bestTable = null;
+                let bestData = null;
+                
+                for (const table of tables) {
+                    const data = extractBasicDataFromTable(table);
+                    if (data && data.labels.length > 0) {
+                        if (!bestData || data.labels.length > bestData.labels.length) {
+                            bestData = data;
+                            bestTable = table;
+                        }
+                    }
+                }
+                
+                if (bestData) {
+                    console.log(`✅ Found best table data:`, bestData);
+                    return {
+                        type: 'line',
+                        data: bestData,
+                        options: {}
+                    };
+                }
+                
+                return null;
+            } catch (error) {
+                console.log('❌ Error creating basic chart data:', error);
+                return null;
+            }
+        }
+        
+        function extractBasicDataFromTable(table) {
+            try {
+                const rows = table.querySelectorAll('tbody tr');
+                if (rows.length === 0) return null;
+                
+                const labels = [];
+                const salesData = [];
+                const rentData = [];
+                
+                rows.forEach((row, index) => {
+                    const cells = row.querySelectorAll('td');
+                    if (cells.length >= 2) {
+                        const firstCell = cells[0].textContent.trim();
+                        
+                        // Check if first cell looks like a date
+                        if (firstCell.match(/[а-яё]+\.?\s*\d{4}/i) || firstCell.match(/\d{4}/)) {
+                            const date = firstCell;
+                            
+                            // Try to extract price data from different columns
+                            let salesPrice = null;
+                            let rentPrice = null;
+                            
+                            // Look for price data in cells
+                            for (let i = 1; i < cells.length; i++) {
+                                const cellText = cells[i].textContent.trim();
+                                if (cellText.includes('₺') || cellText.includes('€') || cellText.includes('$')) {
+                                    const price = parseFloat(cellText.replace(/[^\d.,]/g, '').replace(',', '.'));
+                                    if (!isNaN(price)) {
+                                        if (salesPrice === null) {
+                                            salesPrice = price;
+                                        } else if (rentPrice === null) {
+                                            rentPrice = price;
+                                        }
+                                    }
+                                }
+                            }
+                            
+                            if (date && (salesPrice !== null || rentPrice !== null)) {
+                                labels.push(date);
+                                salesData.push(salesPrice || 0);
+                                rentData.push(rentPrice || 0);
+                            }
+                        }
+                    }
+                });
+                
+                if (labels.length > 0) {
+                    return {
+                        labels: labels,
+                        datasets: [
+                            {
+                                label: 'Цена продажи (₺/м²)',
+                                data: salesData,
+                                borderColor: '#28a745',
+                                backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                                tension: 0.4,
+                                borderWidth: 3,
+                                fill: false
+                            },
+                            {
+                                label: 'Цена аренды (₺/м²)',
+                                data: rentData,
+                                borderColor: '#ffc107',
+                                backgroundColor: 'rgba(255, 193, 7, 0.1)',
+                                tension: 0.4,
+                                borderWidth: 3,
+                                fill: false
+                            }
+                        ]
+                    };
+                }
+                
+                return null;
+            } catch (error) {
+                console.log('❌ Error extracting basic data from table:', error);
                 return null;
             }
         }
