@@ -4817,118 +4817,118 @@ def api_save_html_report():
     <title>Аналитический отчет по недвижимости - {location_info}</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        * {{
+        * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-        }}
+        }
 
-        body {{
+        body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: #ffffff;
             color: #2c3e50;
             line-height: 1.6;
             font-size: 14px;
-        }}
+        }
 
-        .document {{
+        .document {
             max-width: 900px;
             margin: 0 auto;
             background: white;
             min-height: 100vh;
             border: 1px solid #e0e0e0;
-        }}
+        }
 
         /* Корпоративный заголовок */
-        .corporate-header {{
+        .corporate-header {
             background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
             color: white;
             padding: 40px 30px;
             text-align: center;
             border-bottom: 4px solid #3498db;
-        }}
+        }
 
-        .company-logo {{
+        .company-logo {
             width: 100px;
             height: auto;
             margin-bottom: 20px;
             filter: brightness(0) invert(1);
-        }}
+        }
 
-        .document-title {{
+        .document-title {
             font-size: 24px;
             font-weight: 700;
             margin-bottom: 10px;
             text-transform: uppercase;
             letter-spacing: 1px;
-        }}
+        }
 
-        .document-subtitle {{
+        .document-subtitle {
             font-size: 16px;
             opacity: 0.9;
             margin-bottom: 15px;
-        }}
+        }
 
         /* Метаданные отчета */
-        .report-metadata {{
+        .report-metadata {
             background: #f8f9fa;
             border: 1px solid #e9ecef;
             margin: 0;
             padding: 25px 30px;
-        }}
+        }
 
-        .metadata-grid {{
+        .metadata-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 20px;
             margin-bottom: 20px;
-        }}
+        }
 
-        .metadata-item {{
+        .metadata-item {
             display: flex;
             justify-content: space-between;
             padding: 8px 0;
             border-bottom: 1px solid #e9ecef;
-        }}
+        }
 
-        .metadata-label {{
+        .metadata-label {
             font-weight: 600;
             color: #495057;
-        }}
+        }
 
-        .metadata-value {{
+        .metadata-value {
             color: #6c757d;
             text-align: right;
-        }}
+        }
 
-        .qr-section {{
+        .qr-section {
             text-align: center;
             margin-top: 20px;
             padding: 15px;
             background: white;
             border: 1px solid #e9ecef;
             border-radius: 8px;
-        }}
+        }
 
-        .qr-code {{
+        .qr-code {
             margin: 10px 0;
-        }}
+        }
 
-        .qr-label {{
+        .qr-label {
             font-size: 12px;
             color: #6c757d;
             margin-top: 5px;
-        }}
+        }
 
         /* Основной контент */
-        .report-content {{
+        .report-content {
             padding: 30px;
-        }}
+        }
 
         /* Корпоративные стили для всех элементов отчета */
         
         /* Заголовки секций */
-        .data-section-title {{
+        .data-section-title {
             font-size: 18px;
             font-weight: 700;
             color: #2c3e50;
@@ -4937,24 +4937,24 @@ def api_save_html_report():
             border-bottom: 2px solid #3498db;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-        }}
+        }
         
         /* Market Indicators Table */
-        .market-indicators-table {{
+        .market-indicators-table {
             margin: 20px 0;
             border: 1px solid #dee2e6;
             border-radius: 8px;
             overflow: hidden;
             box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        }}
+        }
         
-        .market-data-table {{
+        .market-data-table {
             width: 100%;
             border-collapse: collapse;
             font-size: 13px;
-        }}
+        }
         
-        .market-data-table .category-header {{
+        .market-data-table .category-header {
             background: #2c3e50;
             color: white;
             padding: 15px;
@@ -4963,121 +4963,121 @@ def api_save_html_report():
             font-size: 16px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-        }}
+        }
         
-        .market-data-table .data-cell {{
+        .market-data-table .data-cell {
             padding: 15px;
             border-bottom: 1px solid #dee2e6;
             background: #ffffff;
             vertical-align: top;
-        }}
+        }
         
-        .market-data-table tr:nth-child(even) .data-cell {{
+        .market-data-table tr:nth-child(even) .data-cell {
             background: #f8f9fa;
-        }}
+        }
         
-        .cell-label {{
+        .cell-label {
             font-weight: 600;
             color: #495057;
             margin-bottom: 5px;
             font-size: 12px;
-        }}
+        }
         
-        .cell-value {{
+        .cell-value {
             font-weight: 700;
             color: #2c3e50;
             font-size: 14px;
-        }}
+        }
         
         /* Market Analysis Text Block */
-        .market-analysis-text-block {{
+        .market-analysis-text-block {
             background: #f8f9fa;
             border: 1px solid #dee2e6;
             border-left: 4px solid #3498db;
             padding: 20px;
             margin: 20px 0;
             border-radius: 4px;
-        }}
+        }
         
-        .market-analysis-text-title {{
+        .market-analysis-text-title {
             font-size: 16px;
             font-weight: 700;
             color: #2c3e50;
             margin-bottom: 15px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-        }}
+        }
         
-        .market-analysis-text-content p {{
+        .market-analysis-text-content p {
             margin-bottom: 10px;
             line-height: 1.6;
             color: #495057;
             font-size: 13px;
-        }}
+        }
         
-        .market-analysis-text-content strong {{
+        .market-analysis-text-content strong {
             color: #2c3e50;
             font-weight: 700;
-        }}
+        }
         
         /* Trends Grid */
-        .trends-grid {{
+        .trends-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 15px;
             margin: 20px 0;
-        }}
+        }
         
-        .trend-card {{
+        .trend-card {
             background: #ffffff;
             border: 1px solid #dee2e6;
             border-left: 4px solid #27ae60;
             padding: 20px;
             border-radius: 4px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        }}
+        }
         
-        .trend-card-price_trend {{
+        .trend-card-price_trend {
             border-left-color: #3498db;
-        }}
+        }
         
-        .trend-title {{
+        .trend-title {
             font-size: 14px;
             font-weight: 700;
             color: #2c3e50;
             margin-bottom: 10px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-        }}
+        }
         
-        .trend-value {{
+        .trend-value {
             font-size: 20px;
             font-weight: 700;
             color: #27ae60;
             margin-bottom: 10px;
-        }}
+        }
         
-        .trend-change {{
+        .trend-change {
             font-size: 12px;
             color: #6c757d;
             line-height: 1.4;
-        }}
+        }
         
         /* Trends Table */
-        .trends-table-section {{
+        .trends-table-section {
             margin: 30px 0;
-        }}
+        }
         
-        .trends-table-title {{
+        .trends-table-title {
             font-size: 16px;
             font-weight: 700;
             color: #2c3e50;
             margin-bottom: 15px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-        }}
+        }
         
-        .trends-table {{
+        .trends-table {
             width: 100%;
             border-collapse: collapse;
             border: 1px solid #dee2e6;
@@ -5085,9 +5085,9 @@ def api_save_html_report():
             overflow: hidden;
             box-shadow: 0 2px 8px rgba(0,0,0,0.05);
             font-size: 12px;
-        }}
+        }
         
-        .trends-table th {{
+        .trends-table th {
             background: #2c3e50;
             color: white;
             padding: 12px 8px;
@@ -5096,84 +5096,84 @@ def api_save_html_report():
             font-size: 11px;
             text-transform: uppercase;
             letter-spacing: 0.3px;
-        }}
+        }
         
-        .trends-table td {{
+        .trends-table td {
             padding: 10px 8px;
             text-align: center;
             border-bottom: 1px solid #dee2e6;
             background: #ffffff;
-        }}
+        }
         
-        .trends-table .current-month-row {{
+        .trends-table .current-month-row {
             background: #e3f2fd !important;
             font-weight: 700;
-        }}
+        }
         
-        .trends-table .forecast-row {{
+        .trends-table .forecast-row {
             background: #f0f8ff !important;
-        }}
+        }
         
-        .trends-table .filter-info {{
+        .trends-table .filter-info {
             background: #f8f9fa !important;
             font-style: italic;
             color: #6c757d;
-        }}
+        }
         
         /* Object Summary */
-        .object-summary-section {{
+        .object-summary-section {
             background: #f8f9fa;
             border: 1px solid #dee2e6;
             border-left: 4px solid #e74c3c;
             padding: 20px;
             margin: 25px 0;
             border-radius: 4px;
-        }}
+        }
         
-        .object-summary-title {{
+        .object-summary-title {
             font-size: 16px;
             font-weight: 700;
             color: #2c3e50;
             margin-bottom: 15px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-        }}
+        }
         
-        .object-comparison-table {{
+        .object-comparison-table {
             width: 100%;
             border-collapse: collapse;
-        }}
+        }
         
-        .object-comparison-table td {{
+        .object-comparison-table td {
             padding: 8px 0;
             border-bottom: 1px solid #dee2e6;
-        }}
+        }
         
-        .comparison-label {{
+        .comparison-label {
             font-weight: 600;
             color: #495057;
             width: 60%;
-        }}
+        }
         
-        .comparison-value {{
+        .comparison-value {
             font-weight: 700;
             color: #2c3e50;
             text-align: right;
-        }}
+        }
         
-        .comparison-expensive {{
+        .comparison-expensive {
             color: #e74c3c;
-        }}
+        }
         
-        .comparison-cheaper {{
+        .comparison-cheaper {
             color: #27ae60;
-        }}
+        }
         
-        .comparison-smaller {{
+        .comparison-smaller {
             color: #f39c12;
-        }}
+        }
         
-        .object-analysis-text {{
+        .object-analysis-text {
             margin-top: 15px;
             padding: 15px;
             background: #fff3cd;
@@ -5182,23 +5182,23 @@ def api_save_html_report():
             font-size: 13px;
             color: #856404;
             line-height: 1.5;
-        }}
+        }
         
         /* Forecast Tables */
-        .forecast-table-section {{
+        .forecast-table-section {
             margin: 30px 0;
-        }}
+        }
         
-        .forecast-table-title {{
+        .forecast-table-title {
             font-size: 16px;
             font-weight: 700;
             color: #2c3e50;
             margin-bottom: 15px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-        }}
+        }
         
-        .forecast-table {{
+        .forecast-table {
             width: 100%;
             border-collapse: collapse;
             border: 1px solid #dee2e6;
@@ -5206,9 +5206,9 @@ def api_save_html_report():
             overflow: hidden;
             box-shadow: 0 2px 8px rgba(0,0,0,0.05);
             font-size: 12px;
-        }}
+        }
         
-        .forecast-table th {{
+        .forecast-table th {
             background: #2c3e50;
             color: white;
             padding: 12px 8px;
@@ -5217,26 +5217,26 @@ def api_save_html_report():
             font-size: 11px;
             text-transform: uppercase;
             letter-spacing: 0.3px;
-        }}
+        }
         
-        .forecast-table td {{
+        .forecast-table td {
             padding: 10px 8px;
             text-align: center;
             border-bottom: 1px solid #dee2e6;
             background: #ffffff;
-        }}
+        }
         
-        .forecast-table .current-month-row {{
+        .forecast-table .current-month-row {
             background: #e3f2fd !important;
             font-weight: 700;
-        }}
+        }
         
-        .forecast-table .forecast-row {{
+        .forecast-table .forecast-row {
             background: #f0f8ff !important;
-        }}
+        }
         
         /* Price Forecast Market Table */
-        .price-forecast-market-table {{
+        .price-forecast-market-table {
             width: 100%;
             border-collapse: collapse;
             border: 1px solid #dee2e6;
@@ -5244,9 +5244,9 @@ def api_save_html_report():
             overflow: hidden;
             box-shadow: 0 2px 8px rgba(0,0,0,0.05);
             margin: 20px 0;
-        }}
+        }
         
-        .forecast-category-header {{
+        .forecast-category-header {
             background: #2c3e50;
             color: white;
             padding: 15px;
@@ -5255,197 +5255,197 @@ def api_save_html_report():
             font-size: 16px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-        }}
+        }
         
-        .forecast-data-cell {{
+        .forecast-data-cell {
             padding: 20px;
             border-bottom: 1px solid #dee2e6;
             background: #ffffff;
             vertical-align: top;
-        }}
+        }
         
-        .forecast-cell-label {{
+        .forecast-cell-label {
             font-weight: 600;
             color: #495057;
             margin-bottom: 8px;
             font-size: 13px;
-        }}
+        }
         
-        .forecast-cell-value {{
+        .forecast-cell-value {
             font-weight: 700;
             color: #2c3e50;
             font-size: 16px;
             margin-bottom: 5px;
-        }}
+        }
         
-        .forecast-cell-value.user-price {{
+        .forecast-cell-value.user-price {
             color: #3498db;
-        }}
+        }
         
-        .forecast-cell-value.market-price {{
+        .forecast-cell-value.market-price {
             color: #9b59b6;
-        }}
+        }
         
-        .forecast-cell-growth {{
+        .forecast-cell-growth {
             font-size: 12px;
             font-weight: 600;
             padding: 2px 6px;
             border-radius: 4px;
             display: inline-block;
-        }}
+        }
         
-        .forecast-cell-growth.positive {{
+        .forecast-cell-growth.positive {
             background: #d4edda;
             color: #155724;
-        }}
+        }
         
-        .forecast-cell-growth.negative {{
+        .forecast-cell-growth.negative {
             background: #f8d7da;
             color: #721c24;
-        }}
+        }
         
         /* Analysis Sections */
         .trends-analysis-section,
-        .forecast-analysis-section {{
+        .forecast-analysis-section {
             background: #e8f5e8;
             border: 1px solid #c3e6c3;
             border-left: 4px solid #28a745;
             padding: 20px;
             margin: 25px 0;
             border-radius: 4px;
-        }}
+        }
         
         .trends-analysis-title,
-        .forecast-analysis-title {{
+        .forecast-analysis-title {
             font-size: 16px;
             font-weight: 700;
             color: #155724;
             margin-bottom: 15px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-        }}
+        }
         
         .trends-analysis-content,
-        .forecast-analysis-content {{
+        .forecast-analysis-content {
             color: #155724;
             line-height: 1.6;
             font-size: 13px;
-        }}
+        }
         
         .trends-analysis-content p,
-        .forecast-analysis-content p {{
+        .forecast-analysis-content p {
             margin-bottom: 10px;
-        }}
+        }
         
         .trends-analysis-content strong,
-        .forecast-analysis-content strong {{
+        .forecast-analysis-content strong {
             font-weight: 700;
-        }}
+        }
         
         /* Key Metrics */
-        .forecast-metrics-compact-section {{
+        .forecast-metrics-compact-section {
             margin: 20px 0;
             padding: 20px;
             background: #f8f9fa;
             border: 1px solid #dee2e6;
             border-radius: 8px;
-        }}
+        }
         
-        .forecast-metrics-compact-title {{
+        .forecast-metrics-compact-title {
             font-size: 14px;
             font-weight: 700;
             color: #2c3e50;
             margin-bottom: 15px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-        }}
+        }
         
-        .forecast-metrics-compact-grid {{
+        .forecast-metrics-compact-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 15px;
-        }}
+        }
         
-        .metric-compact-item {{
+        .metric-compact-item {
             display: flex;
             justify-content: space-between;
             padding: 8px 0;
             border-bottom: 1px solid #dee2e6;
-        }}
+        }
         
-        .metric-compact-label {{
+        .metric-compact-label {
             font-weight: 600;
             color: #495057;
             font-size: 12px;
-        }}
+        }
         
-        .metric-compact-value {{
+        .metric-compact-value {
             font-weight: 700;
             color: #2c3e50;
             font-size: 12px;
-        }}
+        }
         
-        .metric-compact-value.positive {{
+        .metric-compact-value.positive {
             color: #27ae60;
-        }}
+        }
         
-        .metric-compact-value.negative {{
+        .metric-compact-value.negative {
             color: #e74c3c;
-        }}
+        }
         
         /* Chart Replacements */
-        .chart-container {{
+        .chart-container {
             background: #f8f9fa;
             border: 1px solid #dee2e6;
             border-radius: 8px;
             padding: 40px;
             text-align: center;
             margin: 20px 0;
-        }}
+        }
         
-        .chart-placeholder {{
+        .chart-placeholder {
             background: #ffffff;
             border: 2px dashed #3498db;
             border-radius: 8px;
             padding: 40px;
             color: #6c757d;
             font-style: italic;
-        }}
+        }
         
-        .chart-info {{
+        .chart-info {
             margin-top: 10px;
             font-size: 11px;
             color: #6c757d;
             font-style: italic;
             text-align: center;
-        }}
+        }
         
         /* Additional spacing */
-        .block-spacing {{
+        .block-spacing {
             height: 20px;
-        }}
+        }
         
-        .section-spacing {{
+        .section-spacing {
             height: 10px;
-        }}
+        }
         
         /* Price forecast info */
-        .price-forecast-date {{
+        .price-forecast-date {
             text-align: center;
             font-weight: 700;
             color: #2c3e50;
             margin: 15px 0;
             font-size: 14px;
-        }}
+        }
         
-        .price-forecast-currency-info {{
+        .price-forecast-currency-info {
             text-align: center;
             font-size: 12px;
             color: #6c757d;
             margin: 10px 0;
-        }}
+        }
         
-        .price-forecast-disclaimer {{
+        .price-forecast-disclaimer {
             background: #fff3cd;
             border: 1px solid #ffeaa7;
             border-radius: 4px;
@@ -5455,21 +5455,21 @@ def api_save_html_report():
             text-align: center;
             font-style: italic;
             margin: 15px 0;
-        }}
+        }
 
         /* Location and Object Info */
-        .location-object-info {{
+        .location-object-info {
             background: #f8f9fa;
             border: 1px solid #dee2e6;
             margin: 0;
             padding: 25px 30px;
-        }}
+        }
         
-        .location-info-section {{
+        .location-info-section {
             margin-bottom: 20px;
-        }}
+        }
         
-        .info-section-title {{
+        .info-section-title {
             font-size: 16px;
             font-weight: 700;
             color: #2c3e50;
@@ -5478,101 +5478,101 @@ def api_save_html_report():
             letter-spacing: 0.5px;
             border-bottom: 2px solid #3498db;
             padding-bottom: 8px;
-        }}
+        }
         
-        .info-grid {{
+        .info-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 15px;
-        }}
+        }
         
-        .info-item {{
+        .info-item {
             display: flex;
             justify-content: space-between;
             padding: 10px 0;
             border-bottom: 1px solid #dee2e6;
-        }}
+        }
         
-        .info-label {{
+        .info-label {
             font-weight: 600;
             color: #495057;
-        }}
+        }
         
-        .info-value {{
+        .info-value {
             color: #2c3e50;
             font-weight: 500;
             text-align: right;
-        }}
+        }
 
         /* Корпоративный футер */
-        .corporate-footer {{
+        .corporate-footer {
             background: #f8f9fa;
             border-top: 3px solid #3498db;
             padding: 30px;
             margin-top: 40px;
-        }}
+        }
 
-        .disclaimer {{
+        .disclaimer {
             background: #fff3cd;
             border: 1px solid #ffeaa7;
             border-left: 4px solid #f39c12;
             padding: 20px;
             margin: 20px 0;
             border-radius: 4px;
-        }}
+        }
 
-        .disclaimer-title {{
+        .disclaimer-title {
             font-weight: 700;
             color: #856404;
             margin-bottom: 10px;
             font-size: 16px;
-        }}
+        }
 
-        .disclaimer-text {{
+        .disclaimer-text {
             color: #856404;
             font-size: 13px;
             line-height: 1.5;
-        }}
+        }
 
-        .verification-section {{
+        .verification-section {
             background: #e8f5e8;
             border: 1px solid #c3e6c3;
             border-left: 4px solid #28a745;
             padding: 20px;
             margin: 20px 0;
             border-radius: 4px;
-        }}
+        }
 
-        .verification-title {{
+        .verification-title {
             font-weight: 700;
             color: #155724;
             margin-bottom: 10px;
-        }}
+        }
 
-        .verification-link {{
+        .verification-link {
             color: #0066cc;
             text-decoration: none;
             font-weight: 500;
-        }}
+        }
 
-        .verification-link:hover {{
+        .verification-link:hover {
             text-decoration: underline;
-        }}
+        }
 
-        .footer-info {{
+        .footer-info {
             text-align: center;
             color: #6c757d;
             font-size: 12px;
             margin-top: 20px;
             padding-top: 20px;
             border-top: 1px solid #dee2e6;
-        }}
+        }
 
-        @media print {{
-            body {{ background: white; }}
-            .document {{ border: none; box-shadow: none; }}
-            .corporate-header {{ background: #2c3e50 !important; }}
-        }}
+        @media print {
+            body { background: white; }
+            .document { border: none; box-shadow: none; }
+            .corporate-header { background: #2c3e50 !important; }
+        }
     </style>
 </head>
 <body>
@@ -5581,7 +5581,7 @@ def api_save_html_report():
         <div class="corporate-header">
             <img src="logo-flt.png" alt="Aaadviser" class="company-logo" />
             <div class="document-title">Аналитический отчет по недвижимости</div>
-            <div class="document-subtitle">{location_info}</div>
+            <div class="document-subtitle">""" + location_info + """</div>
         </div>
 
         <!-- Метаданные отчета -->
@@ -5590,15 +5590,15 @@ def api_save_html_report():
                 <div>
                     <div class="metadata-item">
                         <span class="metadata-label">Номер отчета:</span>
-                        <span class="metadata-value">{report_id}</span>
+                        <span class="metadata-value">""" + report_id + """</span>
                     </div>
                     <div class="metadata-item">
                         <span class="metadata-label">Дата формирования:</span>
-                        <span class="metadata-value">{datetime.now().strftime("%d.%m.%Y")}</span>
+                        <span class="metadata-value">""" + datetime.now().strftime("%d.%m.%Y") + """</span>
                     </div>
                     <div class="metadata-item">
                         <span class="metadata-label">Время формирования:</span>
-                        <span class="metadata-value">{datetime.now().strftime("%H:%M:%S UTC")}</span>
+                        <span class="metadata-value">""" + datetime.now().strftime("%H:%M:%S UTC") + """</span>
                     </div>
                 </div>
                 <div>
@@ -5635,7 +5635,7 @@ def api_save_html_report():
                 <div class="info-grid">
                     <div class="info-item">
                         <span class="info-label">Регион:</span>
-                        <span class="info-value">{location_info}</span>
+                        <span class="info-value">""" + location_info + """</span>
                     </div>
                     <div class="info-item">
                         <span class="info-label">Тип анализа:</span>
@@ -5643,15 +5643,15 @@ def api_save_html_report():
                     </div>
                     <div class="info-item">
                         <span class="info-label">Количество спален:</span>
-                        <span class="info-value">{object_data.get('bedrooms', 'Не указано')}</span>
+                        <span class="info-value">""" + str(object_data.get('bedrooms', 'Не указано')) + """</span>
                     </div>
                     <div class="info-item">
                         <span class="info-label">Этаж:</span>
-                        <span class="info-value">{object_data.get('floor', 'Не указано')}</span>
+                        <span class="info-value">""" + str(object_data.get('floor', 'Не указано')) + """</span>
                     </div>
                     <div class="info-item">
                         <span class="info-label">Возраст объекта:</span>
-                        <span class="info-value">{object_data.get('age', 'Не указано')}</span>
+                        <span class="info-value">""" + str(object_data.get('age', 'Не указано')) + """</span>
                     </div>
                     <div class="info-item">
                         <span class="info-label">Тип отопления:</span>
@@ -5701,21 +5701,21 @@ def api_save_html_report():
     
     <script>
         // Функция для восстановления интерактивных графиков в экспортируемом отчете
-        document.addEventListener('DOMContentLoaded', function() {{
+        document.addEventListener('DOMContentLoaded', function() {
             restoreCharts();
-        }});
+        });
         
-        function restoreCharts() {{
+        function restoreCharts() {
             console.log('🔧 Starting chart restoration...');
             
             // Находим все canvas элементы с данными графиков
             const canvasElements = document.querySelectorAll('canvas[data-chart-data]');
             console.log(`📊 Found ${canvasElements.length} canvas elements to restore`);
             
-            canvasElements.forEach((canvas, index) => {{
+            canvasElements.forEach((canvas, index) => {
                 console.log(`🔍 Processing canvas ${index + 1}: ${canvas.id}`);
                 
-                try {{
+                try {
                     const chartData = JSON.parse(canvas.getAttribute('data-chart-data'));
                     const chartType = canvas.getAttribute('data-chart-type') || 'line';
                     const chartId = canvas.getAttribute('data-chart-id') || 'chart';
@@ -5723,114 +5723,114 @@ def api_save_html_report():
                     console.log(`📊 Chart data for ${canvas.id}:`, chartData);
                     
                     // Восстанавливаем график
-                    if (chartData && chartData.data && chartData.data.labels && chartData.data.labels.length > 0) {{
+                    if (chartData && chartData.data && chartData.data.labels && chartData.data.labels.length > 0) {
                         console.log(`✅ Full chart data found for ${canvas.id}, creating chart...`);
                         createChartFromData(canvas, chartData, chartType, chartId);
-                    }} else {{
+                    } else {
                         console.log(`⚠️ Incomplete chart data for ${canvas.id}, trying to create from table...`);
                         createChartFromTable(canvas, chartId);
-                    }}
-                }} catch (error) {{
+                    }
+                } catch (error) {
                     console.error(`❌ Error processing ${canvas.id}:`, error);
                     // В случае ошибки пытаемся создать график из таблицы
-                    try {{
+                    try {
                         const chartId = canvas.getAttribute('data-chart-id') || 'chart';
                         createChartFromTable(canvas, chartId);
-                    }} catch (fallbackError) {{
+                    } catch (fallbackError) {
                         console.error(`❌ Fallback also failed for ${canvas.id}:`, fallbackError);
                         showChartPlaceholder(canvas);
-                    }}
-                }}
-            }});
-        }}
+                    }
+                }
+            });
+        }
         
-        function createChartFromData(canvas, chartData, chartType, chartId) {{
+        function createChartFromData(canvas, chartData, chartType, chartId) {
             const ctx = canvas.getContext('2d');
             
             // Создаем новый график с сохраненными данными
-            new Chart(ctx, {{
+            new Chart(ctx, {
                 type: chartType,
                 data: chartData.data,
-                options: {{
+                options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: {{
-                        legend: {{
+                    plugins: {
+                        legend: {
                             position: 'top',
-                            labels: {{
-                                font: {{
+                            labels: {
+                                font: {
                                     size: 12
-                                }},
+                                },
                                 color: '#2c3e50'
-                            }}
-                        }},
-                        title: {{
+                            }
+                        },
+                        title: {
                             display: true,
                             text: getChartTitle(chartId),
                             color: '#2c3e50',
-                            font: {{
+                            font: {
                                 size: 16,
                                 weight: 'bold'
-                            }}
-                        }}
-                    }},
-                    scales: {{
-                        x: {{
-                            grid: {{
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
                                 color: '#e9ecef'
-                            }},
-                            ticks: {{
+                            },
+                            ticks: {
                                 color: '#6c757d',
-                                font: {{
+                                font: {
                                     size: 11
-                                }}
-                            }}
-                        }},
-                        y: {{
-                            grid: {{
+                                }
+                            }
+                        },
+                        y: {
+                            grid: {
                                 color: '#e9ecef'
-                            }},
-                            ticks: {{
+                            },
+                            ticks: {
                                 color: '#6c757d',
-                                font: {{
+                                font: {
                                     size: 11
-                                }}
-                            }}
-                        }}
-                    }}
-                }}
-            }});
+                                }
+                            }
+                        }
+                    }
+                }
+            });
             
             console.log(`✅ Chart created from data for ${chartId}`);
-        }}
+        }
         
-        function createChartFromTable(canvas, chartId) {{
+        function createChartFromTable(canvas, chartId) {
             console.log(`🔍 Creating chart from table for ${chartId}`);
             
             let chartData = null;
             
-            if (chartId === 'trendsChart') {{
+            if (chartId === 'trendsChart') {
                 chartData = extractDataFromTrendsTable();
-            }} else if (chartId === 'forecastChart') {{
+            } else if (chartId === 'forecastChart') {
                 chartData = extractDataFromForecastTable();
-            }}
+            }
             
-            if (chartData && chartData.data && chartData.data.labels && chartData.data.labels.length > 0) {{
+            if (chartData && chartData.data && chartData.data.labels && chartData.data.labels.length > 0) {
                 console.log(`✅ Table data extracted for ${chartId}:`, chartData);
                 createChartFromData(canvas, chartData, chartData.type, chartId);
-            }} else {{
+            } else {
                 console.log(`⚠️ No table data found for ${chartId}, showing placeholder`);
                 showChartPlaceholder(canvas);
-            }}
-        }}
+            }
+        }
         
-        function extractDataFromTrendsTable() {{
-            try {{
+        function extractDataFromTrendsTable() {
+            try {
                 const table = document.querySelector('.trends-table');
-                if (!table) {{
+                if (!table) {
                     console.log('❌ Trends table not found');
                     return null;
-                }}
+                }
                 
                 const rows = table.querySelectorAll('tbody tr:not(.filter-info)');
                 console.log(`🔍 Found ${rows.length} rows in trends table`);
@@ -5839,9 +5839,9 @@ def api_save_html_report():
                 const salesData = [];
                 const rentData = [];
                 
-                rows.forEach((row, index) => {{
+                rows.forEach((row, index) => {
                     const cells = row.querySelectorAll('td');
-                    if (cells.length >= 4) {{
+                    if (cells.length >= 4) {
                         const date = cells[0].textContent.trim();
                         const salesPriceText = cells[1].textContent.trim();
                         const rentPriceText = cells[3].textContent.trim();
@@ -5852,27 +5852,27 @@ def api_save_html_report():
                         
                         console.log(`Row ${index}: Date=${date}, Sales=${salesPriceText}->${salesPrice}, Rent=${rentPriceText}->${rentPrice}`);
                         
-                        if (date && !isNaN(salesPrice) && !isNaN(rentPrice)) {{
+                        if (date && !isNaN(salesPrice) && !isNaN(rentPrice)) {
                             labels.push(date);
                             salesData.push(salesPrice);
                             rentData.push(rentPrice);
-                        }}
-                    }}
-                }});
+                        }
+                    }
+                });
                 
                 console.log(`✅ Extracted trends data: ${labels.length} labels, ${salesData.length} sales, ${rentData.length} rent`);
                 
-                if (labels.length === 0) {{
+                if (labels.length === 0) {
                     console.log('⚠️ No valid trends data extracted from table');
                     return null;
-                }}
+                }
                 
-                return {{
+                return {
                     type: 'line',
-                    data: {{
+                    data: {
                         labels: labels,
                         datasets: [
-                            {{
+                            {
                                 label: 'Цена продажи (₺/м²)',
                                 data: salesData,
                                 borderColor: '#28a745',
@@ -5880,8 +5880,8 @@ def api_save_html_report():
                                 tension: 0.4,
                                 borderWidth: 3,
                                 fill: false
-                            }},
-                            {{
+                            },
+                            {
                                 label: 'Цена аренды (₺/м²)',
                                 data: rentData,
                                 borderColor: '#ffc107',
@@ -5889,24 +5889,24 @@ def api_save_html_report():
                                 tension: 0.4,
                                 borderWidth: 3,
                                 fill: false
-                            }}
+                            }
                         ]
-                    }},
-                    options: {{}}
-                }};
-            }} catch (error) {{
+                    },
+                    options: {}
+                };
+            } catch (error) {
                 console.log('❌ Error extracting trends data from table:', error);
                 return null;
-            }}
-        }}
+            }
+        }
         
-        function extractDataFromForecastTable() {{
-            try {{
+        function extractDataFromForecastTable() {
+            try {
                 const table = document.querySelector('.forecast-table');
-                if (!table) {{
+                if (!table) {
                     console.log('❌ Forecast table not found');
                     return null;
-                }}
+                }
                 
                 const rows = table.querySelectorAll('tbody tr:not(.filter-info)');
                 console.log(`🔍 Found ${rows.length} rows in forecast table`);
@@ -5915,9 +5915,9 @@ def api_save_html_report():
                 const salesData = [];
                 const rentData = [];
                 
-                rows.forEach((row, index) => {{
+                rows.forEach((row, index) => {
                     const cells = row.querySelectorAll('td');
-                    if (cells.length >= 3) {{
+                    if (cells.length >= 3) {
                         const date = cells[0].textContent.trim();
                         const salesPriceText = cells[1].textContent.trim();
                         const rentPriceText = cells[2].textContent.trim();
@@ -5928,27 +5928,27 @@ def api_save_html_report():
                         
                         console.log(`Row ${index}: Date=${date}, Sales=${salesPriceText}->${salesPrice}, Rent=${rentPriceText}->${rentPrice}`);
                         
-                        if (date && !isNaN(salesPrice) && !isNaN(rentPrice)) {{
+                        if (date && !isNaN(salesPrice) && !isNaN(rentPrice)) {
                             labels.push(date);
                             salesData.push(salesPrice);
                             rentData.push(rentPrice);
-                        }}
-                    }}
-                }});
+                        }
+                    }
+                });
                 
                 console.log(`✅ Extracted forecast data: ${labels.length} labels, ${salesData.length} sales, ${rentData.length} rent`);
                 
-                if (labels.length === 0) {{
-                    console.log('⚠️ No valid forecast data extracted from table');
+                if (labels.length === 0) {
+                    console.log('❌ No valid forecast data extracted from table');
                     return null;
-                }}
+                }
                 
-                return {{
+                return {
                     type: 'line',
-                    data: {{
+                    data: {
                         labels: labels,
                         datasets: [
-                            {{
+                            {
                                 label: 'Прогноз продажи (₺/м²)',
                                 data: salesData,
                                 borderColor: '#3498db',
@@ -5956,8 +5956,8 @@ def api_save_html_report():
                                 tension: 0.4,
                                 borderWidth: 3,
                                 fill: false
-                            }},
-                            {{
+                            },
+                            {
                                 label: 'Прогноз аренды (₺/м²)',
                                 data: rentData,
                                 borderColor: '#e74c3c',
@@ -5965,28 +5965,28 @@ def api_save_html_report():
                                 tension: 0.4,
                                 borderWidth: 3,
                                 fill: false
-                            }}
+                            }
                         ]
-                    }},
-                    options: {{}}
-                }};
-            }} catch (error) {{
+                    },
+                    options: {}
+                };
+            } catch (error) {
                 console.log('❌ Error extracting forecast data from table:', error);
                 return null;
-            }}
-        }}
+            }
+        }
         
-        function getChartTitle(chartId) {{
-            const titles = {{
+        function getChartTitle(chartId) {
+            const titles = {
                 'trendsChart': 'График трендов цен на недвижимость',
                 'forecastChart': 'Прогноз цен на недвижимость',
                 'priceChart': 'Динамика цен',
                 'default': 'График данных'
-            }};
+            };
             return titles[chartId] || titles['default'];
-        }}
+        }
         
-        function showChartPlaceholder(canvas) {{
+        function showChartPlaceholder(canvas) {
             const placeholder = document.createElement('div');
             placeholder.className = 'chart-placeholder';
             placeholder.innerHTML = `
@@ -5998,7 +5998,7 @@ def api_save_html_report():
                 </div>
             `;
             canvas.parentNode.replaceChild(placeholder, canvas);
-        }}
+        }
     </script>
 </body>
 </html>"""

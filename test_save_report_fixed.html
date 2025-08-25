@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест исправленной функции сохранения отчета</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-button {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 10px 5px;
+        }
+        .test-button:hover {
+            background: #218838;
+        }
+        .result-section {
+            background: #e8f5e8;
+            border: 1px solid #c3e6c3;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        .error-section {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Тест исправленной функции сохранения отчета</h1>
+        
+        <p>Этот файл тестирует исправленную функцию сохранения HTML отчета.</p>
+        
+        <div>
+            <button class="test-button" onclick="testSaveReport()">Тест сохранения отчета</button>
+            <button class="test-button" onclick="clearResults()">Очистить результаты</button>
+        </div>
+        
+        <div id="resultSection" class="result-section" style="display: none;">
+            <h4>Результат тестирования:</h4>
+            <div id="resultOutput"></div>
+        </div>
+        
+        <div id="errorSection" class="error-section" style="display: none;">
+            <h4>Ошибка:</h4>
+            <div id="errorOutput"></div>
+        </div>
+    </div>
+
+    <script>
+        async function testSaveReport() {
+            const resultSection = document.getElementById('resultSection');
+            const errorSection = document.getElementById('errorSection');
+            const resultOutput = document.getElementById('resultOutput');
+            const errorOutput = document.getElementById('errorOutput');
+            
+            // Скрываем предыдущие результаты
+            resultSection.style.display = 'none';
+            errorSection.style.display = 'none';
+            
+            try {
+                // Тестовые данные
+                const testData = {
+                    telegram_id: '123456789',
+                    report_content: '<div>Тестовый отчет</div>',
+                    location_info: 'Türkiye, Antalya, Test District',
+                    object_data: {
+                        bedrooms: '2+1',
+                        floor: '3',
+                        age: '5',
+                        heating: 'Центральное',
+                        price: '150,000 EUR',
+                        area: '120 м²',
+                        currency: 'EUR'
+                    }
+                };
+                
+                console.log('🧪 Testing save report with data:', testData);
+                
+                const response = await fetch('/api/save_html_report', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(testData)
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    console.log('✅ Save report successful:', result);
+                    
+                    resultOutput.innerHTML = `
+                        <p><strong>✅ Отчет успешно сохранен!</strong></p>
+                        <p><strong>ID отчета:</strong> ${result.report_id}</p>
+                        <p><strong>Имя файла:</strong> ${result.filename}</p>
+                        <p><strong>Ссылка:</strong> <a href="${result.report_url}" target="_blank">${result.report_url}</a></p>
+                    `;
+                    resultSection.style.display = 'block';
+                } else {
+                    const errorText = await response.text();
+                    console.error('❌ Save report failed:', response.status, errorText);
+                    
+                    errorOutput.innerHTML = `
+                        <p><strong>❌ Ошибка сохранения отчета</strong></p>
+                        <p><strong>Статус:</strong> ${response.status}</p>
+                        <p><strong>Ответ:</strong> ${errorText}</p>
+                    `;
+                    errorSection.style.display = 'block';
+                }
+                
+            } catch (error) {
+                console.error('❌ Test failed with error:', error);
+                
+                errorOutput.innerHTML = `
+                    <p><strong>❌ Ошибка тестирования</strong></p>
+                    <p><strong>Сообщение:</strong> ${error.message}</p>
+                `;
+                errorSection.style.display = 'block';
+            }
+        }
+        
+        function clearResults() {
+            document.getElementById('resultSection').style.display = 'none';
+            document.getElementById('errorSection').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
