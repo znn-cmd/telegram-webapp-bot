@@ -6761,18 +6761,41 @@
                 const cachedData = priceCache.get(cacheKey);
                 
                 if (cachedData) {
-                    return {
+                    const updatedTrend = {
                         ...trend,
                         calculated_sale_price: cachedData.salePrice,
                         calculated_rent_price: cachedData.rentPrice,
                         is_price_calculated: cachedData.isCalculated
                     };
+                    
+                    // Логируем обновленные данные для отладки
+                    console.log(`💰 Updated trend ${month}/${year}:`, {
+                        original_sale: trend.unit_price_for_sale,
+                        calculated_sale: cachedData.salePrice,
+                        original_rent: trend.unit_price_for_rent,
+                        calculated_rent: cachedData.rentPrice,
+                        is_calculated: cachedData.isCalculated
+                    });
+                    
+                    return updatedTrend;
                 }
                 
                 return trend;
             });
             
             console.log('📊 Тренды с новой логикой расчета:', updatedTrends.length, 'записей');
+            
+            // Проверяем, что все тренды имеют рассчитанные цены
+            const trendsWithoutCalculatedPrices = updatedTrends.filter(trend => 
+                !trend.calculated_sale_price || !trend.calculated_rent_price
+            );
+            
+            if (trendsWithoutCalculatedPrices.length > 0) {
+                console.warn(`⚠️ Обнаружено ${trendsWithoutCalculatedPrices.length} трендов без рассчитанных цен:`, trendsWithoutCalculatedPrices);
+            } else {
+                console.log('✅ Все тренды имеют рассчитанные цены');
+            }
+            
             return updatedTrends;
         }
         
@@ -7578,10 +7601,28 @@
                     rowStyle = 'background-color: #f8f9fa;';
                 } // Будущие месяцы остаются без дополнительного стиля
                 
-                // Используем рассчитанные цены если они есть, иначе исходные
-                const salePrice = trend.is_price_calculated ? trend.calculated_sale_price : trend.unit_price_for_sale;
-                const rentPrice = trend.is_price_calculated ? trend.calculated_rent_price : trend.unit_price_for_rent;
+                // ВАЖНО: Используем ТОЛЬКО рассчитанные цены для синхронизации с графиком!
+                // calculated_sale_price и calculated_rent_price должны быть всегда доступны
+                let salePrice = parseFloat(trend.calculated_sale_price) || 0;
+                let rentPrice = parseFloat(trend.calculated_rent_price) || 0;
+                
+                // Проверяем, что рассчитанные цены действительно есть
+                if (!trend.calculated_sale_price && !trend.calculated_rent_price) {
+                    console.warn(`⚠️ Для ${trend.property_month}/${trend.property_year} отсутствуют рассчитанные цены!`);
+                }
+                
                 const yieldValue = trend.yield;
+                
+                // Детальное логирование для отладки расхождений между таблицей и графиком
+                console.log(`🔮 Table data for ${trend.property_month}/${trend.property_year}:`, {
+                    is_price_calculated: trend.is_price_calculated,
+                    calculated_sale_price: trend.calculated_sale_price,
+                    unit_price_for_sale: trend.unit_price_for_sale,
+                    final_sale_price: salePrice,
+                    row_index: index + 1,
+                    date: formatTrendDateShort(trend.date),
+                    type: isCurrentMonth ? 'current' : isPreviousMonth ? 'previous' : 'future'
+                });
                 
                 console.log(`🔮 Forecast row ${index + 1}: ${formatTrendDateShort(trend.date)} - Sale: ${salePrice}, Rent: ${rentPrice}, Type: ${isCurrentMonth ? 'current' : isPreviousMonth ? 'previous' : 'future'}`);
                 
@@ -7621,6 +7662,11 @@
             
             // Добавляем блок "Вывод прогноза"
             forecastHtml += await generateForecastAnalysis(forecastTrends);
+            
+            // Проверяем синхронизацию данных между таблицей и графиком
+            setTimeout(() => {
+                validateDataConsistency(forecastTrends);
+            }, 100);
             
             return forecastHtml;
         }
@@ -9148,11 +9194,24 @@
             
             const data = sortedTrends.map(trend => {
                 if (chartType === 'sale') {
-                    // Используем рассчитанные цены если они есть, иначе исходные
-                    return parseFloat(trend.is_price_calculated ? trend.calculated_sale_price : trend.unit_price_for_sale) || 0;
+                    // ВАЖНО: Используем ТОЛЬКО рассчитанные цены для синхронизации с таблицей!
+                    // calculated_sale_price должен быть всегда доступен
+                    const salePrice = parseFloat(trend.calculated_sale_price) || 0;
+                    
+                    // Детальное логирование для отладки расхождений
+                    console.log(`🔍 Chart data for ${trend.property_month}/${trend.property_year}:`, {
+                        calculated_sale_price: trend.calculated_sale_price,
+                        final_sale_price: salePrice,
+                        chartType: chartType
+                    });
+                    
+                    return salePrice;
                 } else {
-                    // Используем рассчитанные цены если они есть, иначе исходные
-                    return parseFloat(trend.is_price_calculated ? trend.calculated_rent_price : trend.unit_price_for_rent) || 0;
+                    // ВАЖНО: Используем ТОЛЬКО рассчитанные цены для синхронизации с таблицей!
+                    // calculated_rent_price должен быть всегда доступен
+                    const rentPrice = parseFloat(trend.calculated_rent_price) || 0;
+                    
+                    return rentPrice;
                 }
             });
             
@@ -9160,7 +9219,8 @@
                 chartType: chartType,
                 dataPoints: data.length,
                 dateRange: `${labels[0]} - ${labels[labels.length - 1]}`,
-                sampleData: data.slice(0, 3)
+                sampleData: data.slice(0, 3),
+                fullData: data
             });
             
             return {
@@ -9194,6 +9254,83 @@
             if (currentForecastData) {
                 createForecastChart(currentForecastData, chartType);
             }
+        }
+        
+        // Функция для проверки синхронизации данных между таблицей и графиком
+        function validateDataConsistency(forecastTrends) {
+            if (!forecastTrends || forecastTrends.length === 0) {
+                console.log('⚠️ No forecast data for validation');
+                return;
+            }
+            
+            console.log('🔍 Проверяем синхронизацию данных между таблицей и графиком...');
+            
+            const inconsistencies = [];
+            const missingCalculatedPrices = [];
+            
+            forecastTrends.forEach((trend, index) => {
+                const monthKey = `${trend.property_month}/${trend.property_year}`;
+                
+                // Проверяем наличие рассчитанных цен
+                if (!trend.calculated_sale_price || !trend.calculated_rent_price) {
+                    missingCalculatedPrices.push({
+                        month: monthKey,
+                        missing_sale: !trend.calculated_sale_price,
+                        missing_rent: !trend.calculated_rent_price,
+                        original_sale: trend.unit_price_for_sale,
+                        original_rent: trend.unit_price_for_rent
+                    });
+                }
+                
+                // Проверяем продажи (теперь оба используют calculated_sale_price)
+                const tableSalePrice = parseFloat(trend.calculated_sale_price) || 0;
+                const chartSalePrice = parseFloat(trend.calculated_sale_price) || 0;
+                
+                if (Math.abs(tableSalePrice - chartSalePrice) > 0.01) {
+                    inconsistencies.push({
+                        month: monthKey,
+                        type: 'sale',
+                        tablePrice: tableSalePrice,
+                        chartPrice: chartSalePrice,
+                        difference: Math.abs(tableSalePrice - chartSalePrice)
+                    });
+                }
+                
+                // Проверяем аренду (теперь оба используют calculated_rent_price)
+                const tableRentPrice = parseFloat(trend.calculated_rent_price) || 0;
+                const chartRentPrice = parseFloat(trend.calculated_rent_price) || 0;
+                
+                if (Math.abs(tableRentPrice - chartRentPrice) > 0.01) {
+                    inconsistencies.push({
+                        month: monthKey,
+                        type: 'rent',
+                        tablePrice: tableRentPrice,
+                        chartPrice: chartRentPrice,
+                        difference: Math.abs(tableRentPrice - chartRentPrice)
+                    });
+                }
+            });
+            
+            // Проверяем отсутствующие рассчитанные цены
+            if (missingCalculatedPrices.length > 0) {
+                console.warn(`⚠️ Обнаружено ${missingCalculatedPrices.length} записей без рассчитанных цен:`, missingCalculatedPrices);
+                missingCalculatedPrices.forEach(item => {
+                    console.warn(`   ${item.month}: отсутствует ${item.missing_sale ? 'sale_price' : ''}${item.missing_sale && item.missing_rent ? ', ' : ''}${item.missing_rent ? 'rent_price' : ''}`);
+                });
+            }
+            
+            if (inconsistencies.length === 0) {
+                console.log('✅ Все данные синхронизированы между таблицей и графиком');
+            } else {
+                console.warn(`⚠️ Обнаружено ${inconsistencies.length} расхождений:`, inconsistencies);
+                
+                // Выводим детальную информацию о расхождениях
+                inconsistencies.forEach(inconsistency => {
+                    console.warn(`   ${inconsistency.month} (${inconsistency.type}): таблица=${inconsistency.tablePrice}, график=${inconsistency.chartPrice}, разница=${inconsistency.difference}`);
+                });
+            }
+            
+            return { inconsistencies, missingCalculatedPrices };
         }
 
         // Save and Share Report Functions
