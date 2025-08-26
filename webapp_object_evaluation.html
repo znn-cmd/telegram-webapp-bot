@@ -6798,8 +6798,25 @@
                 }
             });
             
+            // КРИТИЧЕСКОЕ ИСПРАВЛЕНИЕ: Принудительно создаем рассчитанные цены для всех трендов
+            const finalTrends = updatedTrends.map(trend => {
+                // Если нет calculated_sale_price, создаем из unit_price_for_sale
+                if (!trend.calculated_sale_price && trend.unit_price_for_sale) {
+                    console.warn(`⚠️ КРИТИЧЕСКОЕ ИСПРАВЛЕНИЕ: Для ${trend.property_month}/${trend.property_year} отсутствует calculated_sale_price, создаем из unit_price_for_sale`);
+                    trend.calculated_sale_price = trend.unit_price_for_sale;
+                }
+                
+                // Если нет calculated_rent_price, создаем из unit_price_for_rent
+                if (!trend.calculated_rent_price && trend.unit_price_for_rent) {
+                    console.warn(`⚠️ КРИТИЧЕСКОЕ ИСПРАВЛЕНИЕ: Для ${trend.property_month}/${trend.property_year} отсутствует calculated_rent_price, создаем из unit_price_for_rent`);
+                    trend.calculated_rent_price = trend.unit_price_for_rent;
+                }
+                
+                return trend;
+            });
+            
             // Проверяем, что все тренды имеют рассчитанные цены
-            const trendsWithoutCalculatedPrices = updatedTrends.filter(trend => 
+            const trendsWithoutCalculatedPrices = finalTrends.filter(trend => 
                 !trend.calculated_sale_price || !trend.calculated_rent_price
             );
             
@@ -6809,8 +6826,8 @@
                 console.log('✅ Все тренды имеют рассчитанные цены');
             }
             
-            console.log('📊 Тренды с новой логикой расчета:', updatedTrends.length, 'записей');
-            return updatedTrends;
+            console.log('📊 Тренды с новой логикой расчета:', finalTrends.length, 'записей');
+            return finalTrends;
         }
         
         // Функция для получения текущей выбранной локации
@@ -7615,14 +7632,32 @@
                     rowStyle = 'background-color: #f8f9fa;';
                 } // Будущие месяцы остаются без дополнительного стиля
                 
-                // ВАЖНО: Используем ТОЛЬКО рассчитанные цены для синхронизации с графиком!
-                // calculated_sale_price и calculated_rent_price должны быть всегда доступны
-                let salePrice = parseFloat(trend.calculated_sale_price) || 0;
-                let rentPrice = parseFloat(trend.calculated_rent_price) || 0;
+                // КРИТИЧЕСКОЕ ИСПРАВЛЕНИЕ: Принудительно проверяем и исправляем данные
+                let salePrice = 0;
+                let rentPrice = 0;
                 
-                // Проверяем, что рассчитанные цены действительно есть
-                if (!trend.calculated_sale_price && !trend.calculated_rent_price) {
-                    console.warn(`⚠️ Для ${trend.property_month}/${trend.property_year} отсутствуют рассчитанные цены!`);
+                // Для продажи: приоритет calculated_sale_price
+                if (trend.calculated_sale_price !== undefined && trend.calculated_sale_price !== null) {
+                    salePrice = parseFloat(trend.calculated_sale_price);
+                } else if (trend.unit_price_for_sale !== undefined && trend.unit_price_for_sale !== null) {
+                    console.warn(`⚠️ КРИТИЧЕСКОЕ ИСПРАВЛЕНИЕ: Для ${trend.property_month}/${trend.property_year} отсутствует calculated_sale_price, используем unit_price_for_sale`);
+                    salePrice = parseFloat(trend.unit_price_for_sale);
+                    // Принудительно создаем calculated_sale_price для синхронизации
+                    trend.calculated_sale_price = trend.unit_price_for_sale;
+                } else {
+                    console.error(`❌ КРИТИЧЕСКАЯ ОШИБКА: Для ${trend.property_month}/${trend.property_year} нет данных о цене продажи!`);
+                }
+                
+                // Для аренды: приоритет calculated_rent_price
+                if (trend.calculated_rent_price !== undefined && trend.calculated_rent_price !== null) {
+                    rentPrice = parseFloat(trend.calculated_rent_price);
+                } else if (trend.unit_price_for_rent !== undefined && trend.unit_price_for_rent !== null) {
+                    console.warn(`⚠️ КРИТИЧЕСКОЕ ИСПРАВЛЕНИЕ: Для ${trend.property_month}/${trend.property_year} отсутствует calculated_rent_price, используем unit_price_for_rent`);
+                    rentPrice = parseFloat(trend.unit_price_for_rent);
+                    // Принудительно создаем calculated_rent_price для синхронизации
+                    trend.calculated_rent_price = trend.unit_price_for_rent;
+                } else {
+                    console.error(`❌ КРИТИЧЕСКАЯ ОШИБКА: Для ${trend.property_month}/${trend.property_year} нет данных о цене аренды!`);
                 }
                 
                 const yieldValue = trend.yield;
@@ -9201,16 +9236,40 @@
                 return a.property_month - b.property_month;
             });
             
-            const labels = sortedTrends.map(trend => {
+            // КРИТИЧЕСКОЕ ИСПРАВЛЕНИЕ: Принудительно проверяем и исправляем данные
+            const validatedTrends = sortedTrends.map(trend => {
+                // Если нет calculated_sale_price, но есть unit_price_for_sale, создаем calculated_sale_price
+                if (!trend.calculated_sale_price && trend.unit_price_for_sale) {
+                    console.warn(`⚠️ КРИТИЧЕСКОЕ ИСПРАВЛЕНИЕ: Для ${trend.property_month}/${trend.property_year} отсутствует calculated_sale_price, создаем из unit_price_for_sale`);
+                    trend.calculated_sale_price = trend.unit_price_for_sale;
+                }
+                
+                // Если нет calculated_rent_price, но есть unit_price_for_rent, создаем calculated_rent_price
+                if (!trend.calculated_rent_price && trend.unit_price_for_rent) {
+                    console.warn(`⚠️ КРИТИЧЕСКОЕ ИСПРАВЛЕНИЕ: Для ${trend.property_month}/${trend.property_year} отсутствует calculated_rent_price, создаем из unit_price_for_rent`);
+                    trend.calculated_rent_price = trend.unit_price_for_rent;
+                }
+                
+                return trend;
+            });
+            
+            const labels = validatedTrends.map(trend => {
                 const monthName = monthNames[trend.property_month - 1] || trend.property_month;
                 return `${monthName} ${trend.property_year}`;
             });
             
-            const data = sortedTrends.map(trend => {
+            const data = validatedTrends.map(trend => {
                 if (chartType === 'sale') {
-                    // ВАЖНО: Используем ТОЛЬКО рассчитанные цены для синхронизации с таблицей!
-                    // calculated_sale_price должен быть всегда доступен
-                    const salePrice = parseFloat(trend.calculated_sale_price) || 0;
+                    // КРИТИЧЕСКОЕ ИСПРАВЛЕНИЕ: Принудительно используем calculated_sale_price
+                    let salePrice = 0;
+                    
+                    if (trend.calculated_sale_price !== undefined && trend.calculated_sale_price !== null) {
+                        salePrice = parseFloat(trend.calculated_sale_price);
+                    } else {
+                        console.error(`❌ КРИТИЧЕСКАЯ ОШИБКА: Для ${trend.property_month}/${trend.property_year} нет calculated_sale_price!`);
+                        // Fallback на unit_price_for_sale только в крайнем случае
+                        salePrice = parseFloat(trend.unit_price_for_sale) || 0;
+                    }
                     
                     // Детальное логирование для отладки расхождений
                     console.log(`🔍 Chart data for ${trend.property_month}/${trend.property_year}:`, {
@@ -9218,14 +9277,22 @@
                         calculated_sale_price: trend.calculated_sale_price,
                         unit_price_for_sale: trend.unit_price_for_sale,
                         final_sale_price: salePrice,
-                        chartType: chartType
+                        chartType: chartType,
+                        source: trend.calculated_sale_price ? 'calculated_sale_price' : 'unit_price_for_sale (fallback)'
                     });
                     
                     return salePrice;
                 } else {
-                    // ВАЖНО: Используем ТОЛЬКО рассчитанные цены для синхронизации с таблицей!
-                    // calculated_rent_price должен быть всегда доступен
-                    const rentPrice = parseFloat(trend.calculated_rent_price) || 0;
+                    // КРИТИЧЕСКОЕ ИСПРАВЛЕНИЕ: Принудительно используем calculated_rent_price
+                    let rentPrice = 0;
+                    
+                    if (trend.calculated_rent_price !== undefined && trend.calculated_rent_price !== null) {
+                        rentPrice = parseFloat(trend.calculated_rent_price);
+                    } else {
+                        console.error(`❌ КРИТИЧЕСКАЯ ОШИБКА: Для ${trend.property_month}/${trend.property_year} нет calculated_rent_price!`);
+                        // Fallback на unit_price_for_rent только в крайнем случае
+                        rentPrice = parseFloat(trend.unit_price_for_rent) || 0;
+                    }
                     
                     return rentPrice;
                 }
