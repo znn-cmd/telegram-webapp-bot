@@ -6778,12 +6778,25 @@
                     });
                     
                     return updatedTrend;
+                } else {
+                    // ВАЖНО: Если нет рассчитанных цен, создаем их на основе исходных
+                    // Это гарантирует, что у всех трендов будут calculated_*_price
+                    const fallbackSalePrice = parseFloat(trend.unit_price_for_sale) || 0;
+                    const fallbackRentPrice = parseFloat(trend.unit_price_for_rent) || 0;
+                    
+                    console.warn(`⚠️ Для ${month}/${year} нет рассчитанных цен, используем fallback:`, {
+                        fallback_sale: fallbackSalePrice,
+                        fallback_rent: fallbackRentPrice
+                    });
+                    
+                    return {
+                        ...trend,
+                        calculated_sale_price: fallbackSalePrice,
+                        calculated_rent_price: fallbackRentPrice,
+                        is_price_calculated: false
+                    };
                 }
-                
-                return trend;
             });
-            
-            console.log('📊 Тренды с новой логикой расчета:', updatedTrends.length, 'записей');
             
             // Проверяем, что все тренды имеют рассчитанные цены
             const trendsWithoutCalculatedPrices = updatedTrends.filter(trend => 
@@ -6796,6 +6809,7 @@
                 console.log('✅ Все тренды имеют рассчитанные цены');
             }
             
+            console.log('📊 Тренды с новой логикой расчета:', updatedTrends.length, 'записей');
             return updatedTrends;
         }
         
@@ -9200,7 +9214,9 @@
                     
                     // Детальное логирование для отладки расхождений
                     console.log(`🔍 Chart data for ${trend.property_month}/${trend.property_year}:`, {
+                        is_price_calculated: trend.is_price_calculated,
                         calculated_sale_price: trend.calculated_sale_price,
+                        unit_price_for_sale: trend.unit_price_for_sale,
                         final_sale_price: salePrice,
                         chartType: chartType
                     });

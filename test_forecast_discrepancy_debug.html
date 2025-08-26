@@ -81,23 +81,18 @@
     </style>
 </head>
 <body>
-    <h1>🔍 Тест отладки расхождений в прогнозе (ПРОБЛЕМА РЕШЕНА)</h1>
+    <h1>🔍 Тест отладки расхождений в прогнозе</h1>
     
     <div class="test-section">
-        <h2>Проблема (РЕШЕНА)</h2>
+        <h2>Проблема</h2>
         <div class="discrepancy-highlight">
-            <strong>Было обнаружено расхождение:</strong><br>
-            • <strong>Таблица</strong> показывала для июля 2025: <span class="price-value">₺50,933.66</span><br>
-            • <strong>График</strong> показывал для июля 2025: <span class="price-value">₺48,035.00</span><br>
+            <strong>Обнаружено расхождение:</strong><br>
+            • <strong>Таблица</strong> показывает для июля 2025: <span class="price-value">₺50,933.66</span><br>
+            • <strong>График</strong> показывает для июля 2025: <span class="price-value">₺48,035.00</span><br>
             • <strong>Разница:</strong> <span class="price-diff">₺2,898.66</span>
         </div>
         
-        <div style="background-color: #d4edda; border: 1px solid #c3e6c3; padding: 10px; margin: 10px 0; border-radius: 5px;">
-            <strong>✅ ПРОБЛЕМА РЕШЕНА!</strong><br>
-            Теперь и таблица, и график используют <strong>ТОЛЬКО</strong> рассчитанные цены (<code>calculated_sale_price</code>, <code>calculated_rent_price</code>).
-        </div>
-        
-        <p>Этот тест демонстрирует, как была решена проблема и гарантирует, что расхождения больше не возникнут.</p>
+        <p>Этот тест поможет понять, почему таблица и график показывают разные значения для одних и тех же данных.</p>
     </div>
 
     <div class="test-section">
@@ -147,7 +142,6 @@
         <h2>Тестирование логики расчета</h2>
         <button onclick="testCalculationLogic()">Тест логики расчета</button>
         <button onclick="testDataFlow()">Тест потока данных</button>
-        <button onclick="testNewLogic()">Тест новой логики</button>
         <button onclick="clearConsole()">Очистить консоль</button>
         
         <div class="console-output" id="consoleOutput">
@@ -168,9 +162,9 @@
         <h3>Проверяемые моменты:</h3>
         <ul>
             <li>✅ Логика расчета цен в prepareTrendsWithHistoricalPrices</li>
-            <li>✅ Принудительное использование calculated_sale_price и calculated_rent_price</li>
-            <li>✅ Отсутствие fallback на unit_price_for_sale и unit_price_for_rent</li>
-            <li>✅ 100% синхронизация данных между таблицей и графиком</li>
+            <li>✅ Установка флага is_price_calculated</li>
+            <li>✅ Использование calculated_sale_price vs unit_price_for_sale</li>
+            <li>✅ Синхронизация данных между таблицей и графиком</li>
         </ul>
     </div>
 
@@ -244,13 +238,13 @@
                 log(`   ❌ Июль 2025 - не текущий месяц`, 'error');
             }
             
-            // Проверяем, что получится при использовании одинаковых источников
-            log(`📋 Результаты для одинаковых источников:`, 'info');
+            // Проверяем, что получится при использовании разных источников
+            log(`📋 Результаты для разных источников:`, 'info');
             log(`   - Таблица (calculated_sale_price): ₺${basePrices.sale_price.toLocaleString('ru-RU')}`, 'info');
-            log(`   - График (calculated_sale_price): ₺${basePrices.sale_price.toLocaleString('ru-RU')}`, 'info');
-            log(`   - Разница: ₺0.00 (идентичные данные)`, 'success');
+            log(`   - График (unit_price_for_sale): ₺${originalTrend.unit_price_for_sale.toLocaleString('ru-RU')}`, 'info');
+            log(`   - Разница: ₺${(basePrices.sale_price - originalTrend.unit_price_for_sale).toLocaleString('ru-RU')}`, 'warning');
             
-            log(`🎯 Вывод: Теперь таблица и график используют одинаковые источники данных!`, 'success');
+            log(`🎯 Вывод: Расхождение возникает из-за использования разных источников данных!`, 'warning');
         }
 
         // Тест потока данных
@@ -266,90 +260,9 @@
             log(`6️⃣ Создание таблицы с calculated_sale_price`, 'info');
             log(`7️⃣ Создание графика с проверкой is_price_calculated`, 'info');
             
-            log(`✅ Теперь все шаги используют одинаковые источники данных`, 'success');
-            log(`   - calculated_sale_price и calculated_rent_price обязательны`, 'success');
-            log(`   - Fallback на unit_price_for_sale и unit_price_for_rent убран`, 'success');
-        }
-
-        // Тест новой логики
-        function testNewLogic() {
-            log('🆕 Тестируем новую логику использования только рассчитанных цен...', 'info');
-            
-            // Симулируем тренды с рассчитанными ценами
-            const testTrends = [
-                {
-                    property_year: 2025,
-                    property_month: 7,
-                    calculated_sale_price: 50933.66,
-                    calculated_rent_price: 204.81,
-                    unit_price_for_sale: 48035.00, // Исходная цена (НЕ используется)
-                    unit_price_for_rent: 197.06    // Исходная цена (НЕ используется)
-                },
-                {
-                    property_year: 2025,
-                    property_month: 8,
-                    calculated_sale_price: 53190.02,
-                    calculated_rent_price: 204.81,
-                    unit_price_for_sale: 49000.00, // Исходная цена (НЕ используется)
-                    unit_price_for_rent: 200.00    // Исходная цена (НЕ используется)
-                }
-            ];
-            
-            log(`📊 Тестовые тренды:`, 'info');
-            testTrends.forEach((trend, index) => {
-                log(`   ${index + 1}. ${trend.property_month}/${trend.property_year}:`, 'info');
-                log(`      - calculated_sale_price: ₺${trend.calculated_sale_price.toLocaleString('ru-RU')}`, 'success');
-                log(`      - calculated_rent_price: ₺${trend.calculated_rent_price.toLocaleString('ru-RU')}`, 'success');
-                log(`      - unit_price_for_sale: ₺${trend.unit_price_for_sale.toLocaleString('ru-RU')} (игнорируется)`, 'warning');
-                log(`      - unit_price_for_rent: ₺${trend.unit_price_for_rent.toLocaleString('ru-RU')} (игнорируется)`, 'warning');
-            });
-            
-            // Симулируем логику таблицы
-            log(`📋 Логика таблицы:`, 'info');
-            const tablePrices = testTrends.map(trend => ({
-                month: `${trend.property_month}/${trend.property_year}`,
-                salePrice: parseFloat(trend.calculated_sale_price) || 0,
-                rentPrice: parseFloat(trend.calculated_rent_price) || 0
-            }));
-            
-            tablePrices.forEach(item => {
-                log(`   ${item.month}: продажа ₺${item.salePrice.toLocaleString('ru-RU')}, аренда ₺${item.rentPrice.toLocaleString('ru-RU')}`, 'success');
-            });
-            
-            // Симулируем логику графика
-            log(`📈 Логика графика:`, 'info');
-            const chartPrices = testTrends.map(trend => ({
-                month: `${trend.property_month}/${trend.property_year}`,
-                salePrice: parseFloat(trend.calculated_sale_price) || 0,
-                rentPrice: parseFloat(trend.calculated_rent_price) || 0
-            }));
-            
-            chartPrices.forEach(item => {
-                log(`   ${item.month}: продажа ₺${item.salePrice.toLocaleString('ru-RU')}, аренда ₺${item.rentPrice.toLocaleString('ru-RU')}`, 'success');
-            });
-            
-            // Проверяем синхронизацию
-            log(`🔍 Проверка синхронизации:`, 'info');
-            let allSynced = true;
-            
-            for (let i = 0; i < tablePrices.length; i++) {
-                const tableItem = tablePrices[i];
-                const chartItem = chartPrices[i];
-                
-                if (tableItem.salePrice !== chartItem.salePrice || tableItem.rentPrice !== chartItem.rentPrice) {
-                    log(`   ❌ ${tableItem.month}: расхождение!`, 'error');
-                    allSynced = false;
-                } else {
-                    log(`   ✅ ${tableItem.month}: синхронизировано`, 'success');
-                }
-            }
-            
-            if (allSynced) {
-                log(`🎉 ВСЕ ДАННЫЕ СИНХРОНИЗИРОВАНЫ!`, 'success');
-                log(`   Таблица и график используют идентичные источники данных`, 'success');
-            } else {
-                log(`⚠️ Обнаружены расхождения в синхронизации`, 'warning');
-            }
+            log(`⚠️ Проблема может быть в шаге 5️⃣ или 7️⃣`, 'warning');
+            log(`   - Флаг is_price_calculated может быть false`, 'warning');
+            log(`   - График может использовать unit_price_for_sale вместо calculated_sale_price`, 'warning');
         }
 
         // Автоматический запуск тестов при загрузке
