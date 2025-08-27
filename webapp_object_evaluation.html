@@ -7053,29 +7053,10 @@
             html += await generateTrendsAnalysis(trends);
             
             // Инициализируем график прогноза после добавления HTML
-            setTimeout(async () => {
-                // Подготавливаем тренды с рассчитанными историческими ценами (как в таблице)
-                const trendsWithHistoricalPrices = await prepareTrendsWithHistoricalPrices(trends);
-                
-                // Находим данные прогноза для графика
-                const currentDate = new Date();
-                const currentYear = currentDate.getFullYear();
-                const currentMonth = currentDate.getMonth() + 1;
-                
-                const forecastTrends = trendsWithHistoricalPrices.filter(trend => {
-                    if (trend.property_year > currentYear) {
-                        return true; // Будущие годы
-                    } else if (trend.property_year === currentYear) {
-                        return trend.property_month >= currentMonth - 1; // 1 месяц до текущего + текущий + будущие
-                    } else if (trend.property_year === currentYear - 1) {
-                        // Для случая, когда текущий месяц - январь, а предыдущий - декабрь прошлого года
-                        return currentMonth === 1 && trend.property_month === 12;
-                    }
-                    return false;
-                });
-                
+            // ВАЖНО: Используем те же данные forecastTrends, что и для таблицы
+            setTimeout(() => {
                 if (forecastTrends.length > 0) {
-                    console.log('📊 Initializing forecast chart with calculated prices:', forecastTrends.length, 'records');
+                    console.log('📊 Initializing forecast chart with the same data as table:', forecastTrends.length, 'records');
                     initializeForecastChart(forecastTrends);
                 }
             }, 100);
