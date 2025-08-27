@@ -57,12 +57,83 @@ except ImportError:
 # Инициализация Flask приложения
 app = Flask(__name__)
 
-# Инициализация Supabase
+# Инициализация Supabase с улучшенными настройками
 supabase_url = os.getenv("SUPABASE_URL")
 supabase_key = os.getenv("SUPABASE_ANON_KEY")
 if not supabase_url or not supabase_key:
     raise RuntimeError("SUPABASE_URL и SUPABASE_ANON_KEY должны быть заданы в переменных окружения!")
-supabase: Client = create_client(supabase_url, supabase_key)
+
+# Создаем клиент с настройками для решения проблем SSL
+import httpx
+from supabase.client import ClientOptions
+
+# Настройки HTTP клиента с увеличенным таймаутом
+# Проверяем переменную окружения для отключения SSL проверки (только для отладки!)
+ssl_verify = os.getenv("SUPABASE_SSL_VERIFY", "true").lower() == "true"
+if not ssl_verify:
+    logger.warning("⚠️ SSL верификация отключена! Это небезопасно для продакшена!")
+
+client_options = ClientOptions(
+    headers={
+        "x-my-custom-header": "my-app-name",
+    },
+    timeout=30,  # Увеличиваем таймаут до 30 секунд
+    httpx_client=httpx.Client(
+        timeout=httpx.Timeout(30.0, connect=10.0),  # 30 сек общий таймаут, 10 сек на подключение
+        verify=ssl_verify,  # Управляется переменной окружения
+        follow_redirects=True,
+        limits=httpx.Limits(max_keepalive_connections=5, max_connections=10),
+        # Добавляем настройки для лучшей совместимости
+        http2=True,  # Включаем HTTP/2
+    )
+)
+
+try:
+    supabase: Client = create_client(supabase_url, supabase_key, client_options)
+    logger.info("✅ Supabase клиент успешно инициализирован с улучшенными настройками")
+except Exception as e:
+    logger.error(f"❌ Ошибка при создании Supabase клиента: {e}")
+    raise
+
+# Функция для выполнения запросов к Supabase с повторными попытками
+def execute_with_retry(query_func, max_retries=3, initial_delay=1):
+    """
+    Выполняет запрос к Supabase с повторными попытками при ошибках
+    
+    Args:
+        query_func: Функция, которая выполняет запрос
+        max_retries: Максимальное количество попыток
+        initial_delay: Начальная задержка между попытками (секунды)
+    
+    Returns:
+        Результат выполнения запроса
+    """
+    import time
+    
+    for attempt in range(max_retries):
+        try:
+            result = query_func()
+            return result
+        except Exception as e:
+            error_msg = str(e)
+            logger.warning(f"⚠️ Попытка {attempt + 1}/{max_retries} не удалась: {error_msg}")
+            
+            # Проверяем тип ошибки
+            if "SSL" in error_msg or "handshake" in error_msg or "_ssl" in error_msg:
+                logger.info("🔄 Обнаружена SSL ошибка, пробуем переподключиться...")
+                
+                # Если это последняя попытка, выбрасываем исключение
+                if attempt == max_retries - 1:
+                    logger.error(f"❌ Все {max_retries} попытки исчерпаны")
+                    raise
+                
+                # Экспоненциальная задержка
+                delay = initial_delay * (2 ** attempt)
+                logger.info(f"⏳ Ожидание {delay} секунд перед следующей попыткой...")
+                time.sleep(delay)
+            else:
+                # Для других ошибок сразу выбрасываем исключение
+                raise
 
 # Токен бота
 TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
@@ -1315,17 +1386,15 @@ def api_check_admin_status():
         def execute_supabase_query():
             return supabase.table('users').select('user_status, period_end').eq('telegram_id', telegram_id).execute()
         
-        # Выполняем запрос с таймаутом
-        with concurrent.futures.ThreadPoolExecutor() as executor:
-            future = executor.submit(execute_supabase_query)
-            try:
-                user_result = future.result(timeout=10)  # 10 секунд таймаут
-            except concurrent.futures.TimeoutError:
-                logger.error("❌ Таймаут при запросе к базе данных")
-                return jsonify({'error': 'Database timeout'}), 408
-            except Exception as e:
-                logger.error(f"❌ Ошибка при выполнении запроса к базе: {e}")
-                return jsonify({'error': 'Database error'}), 500
+        # Используем функцию с повторными попытками
+        try:
+            user_result = execute_with_retry(execute_supabase_query, max_retries=3, initial_delay=2)
+        except Exception as e:
+            logger.error(f"❌ Ошибка при выполнении запроса к базе после всех попыток: {e}")
+            # Добавляем более подробное логирование
+            import traceback
+            logger.error(f"❌ Traceback: {traceback.format_exc()}")
+            return jsonify({'error': 'Database connection error', 'details': str(e)}), 500
         
         logger.info(f"📊 Результат поиска: {len(user_result.data) if user_result.data else 0} записей")
         
