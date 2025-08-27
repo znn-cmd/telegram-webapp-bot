@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест расчета цен - Отладка</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .correct {
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+        }
+        .incorrect {
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .formula {
+            background-color: #e9ecef;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+        .highlight {
+            background-color: yellow;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Тест расчета исторических цен</h1>
+        
+        <div class="test-section">
+            <h2>Данные со скриншота</h2>
+            <table id="screenshotData">
+                <thead>
+                    <tr>
+                        <th>Дата</th>
+                        <th>Продажа (₺/м²)</th>
+                        <th>Изм-ие цены продажи</th>
+                        <th>Аренда (₺/м²)</th>
+                        <th>Изм-ие цены аренды</th>
+                        <th>Доходность</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>сен. 2025</td>
+                        <td>₺50 836,00</td>
+                        <td>+1.30%</td>
+                        <td>₺199,54</td>
+                        <td>+1.56%</td>
+                        <td>4.71%</td>
+                    </tr>
+                    <tr>
+                        <td>авг. 2025</td>
+                        <td>₺50 184,00</td>
+                        <td>+4.47%</td>
+                        <td>₺196,48</td>
+                        <td>+2.71%</td>
+                        <td>4.70%</td>
+                    </tr>
+                    <tr>
+                        <td>июл. 2025</td>
+                        <td>₺48 035,00</td>
+                        <td>+4.43%</td>
+                        <td>₺191,30</td>
+                        <td>+3.93%</td>
+                        <td>4.78%</td>
+                    </tr>
+                    <tr>
+                        <td>июн. 2025</td>
+                        <td>₺53 190,02</td>
+                        <td>+3.74%</td>
+                        <td>₺204,81</td>
+                        <td>+3.79%</td>
+                        <td>4.80%</td>
+                    </tr>
+                    <tr>
+                        <td>май. 2025</td>
+                        <td>₺51 480,86</td>
+                        <td>+3.32%</td>
+                        <td>₺200,79</td>
+                        <td>+2.00%</td>
+                        <td>4.80%</td>
+                    </tr>
+                    <tr>
+                        <td>апр. 2025</td>
+                        <td>₺50 352,95</td>
+                        <td>+2.24%</td>
+                        <td>₺197,41</td>
+                        <td>+1.71%</td>
+                        <td>4.86%</td>
+                    </tr>
+                    <tr>
+                        <td>мар. 2025</td>
+                        <td>₺49 657,74</td>
+                        <td>+1.40%</td>
+                        <td>₺193,26</td>
+                        <td>+2.15%</td>
+                        <td>4.89%</td>
+                    </tr>
+                    <tr>
+                        <td>фев. 2025</td>
+                        <td>₺49 707,45</td>
+                        <td>-0.10%</td>
+                        <td>₺190,89</td>
+                        <td>+1.24%</td>
+                        <td>4.85%</td>
+                    </tr>
+                    <tr>
+                        <td>янв. 2025</td>
+                        <td>₺49 977,33</td>
+                        <td>-0.54%</td>
+                        <td>₺187,85</td>
+                        <td>+1.62%</td>
+                        <td>4.79%</td>
+                    </tr>
+                    <tr>
+                        <td>дек. 2024</td>
+                        <td>₺51 127,70</td>
+                        <td>-2.25%</td>
+                        <td>₺184,67</td>
+                        <td>+1.72%</td>
+                        <td>4.68%</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="test-section">
+            <h2>Анализ расчета</h2>
+            <div id="analysisResults"></div>
+        </div>
+        
+        <div class="test-section">
+            <h2>Правильный расчет</h2>
+            <div id="correctCalculation"></div>
+        </div>
+    </div>
+    
+    <script>
+        // Данные со скриншота
+        const screenshotData = [
+            { date: 'сен. 2025', salePrice: 50836.00, saleChange: 1.30, rentPrice: 199.54, rentChange: 1.56, yield: 4.71 },
+            { date: 'авг. 2025', salePrice: 50184.00, saleChange: 4.47, rentPrice: 196.48, rentChange: 2.71, yield: 4.70 },
+            { date: 'июл. 2025', salePrice: 48035.00, saleChange: 4.43, rentPrice: 191.30, rentChange: 3.93, yield: 4.78 },
+            { date: 'июн. 2025', salePrice: 53190.02, saleChange: 3.74, rentPrice: 204.81, rentChange: 3.79, yield: 4.80 },
+            { date: 'май. 2025', salePrice: 51480.86, saleChange: 3.32, rentPrice: 200.79, rentChange: 2.00, yield: 4.80 },
+            { date: 'апр. 2025', salePrice: 50352.95, saleChange: 2.24, rentPrice: 197.41, rentChange: 1.71, yield: 4.86 },
+            { date: 'мар. 2025', salePrice: 49657.74, saleChange: 1.40, rentPrice: 193.26, rentChange: 2.15, yield: 4.89 },
+            { date: 'фев. 2025', salePrice: 49707.45, saleChange: -0.10, rentPrice: 190.89, rentChange: 1.24, yield: 4.85 },
+            { date: 'янв. 2025', salePrice: 49977.33, saleChange: -0.54, rentPrice: 187.85, rentChange: 1.62, yield: 4.79 },
+            { date: 'дек. 2024', salePrice: 51127.70, saleChange: -2.25, rentPrice: 184.67, rentChange: 1.72, yield: 4.68 }
+        ];
+        
+        // Функция для расчета исторической цены (правильная формула)
+        function calculateHistoricalPrice(nextMonthPrice, percentageChange) {
+            // percentageChange уже в формате процентов (например, 2.25 для 2.25%)
+            const changeMultiplier = 1 + (percentageChange / 100);
+            return nextMonthPrice / changeMultiplier;
+        }
+        
+        // Функция для расчета будущей цены
+        function calculateFuturePrice(previousPrice, percentageChange) {
+            const changeMultiplier = 1 + (percentageChange / 100);
+            return previousPrice * changeMultiplier;
+        }
+        
+        function analyzeCalculations() {
+            const analysisDiv = document.getElementById('analysisResults');
+            let html = '<h3>Анализ текущих расчетов</h3>';
+            
+            // Проверяем расчеты для исторических месяцев
+            html += '<h4>Проверка исторических расчетов (от августа к июлю и далее)</h4>';
+            html += '<div class="formula">Формула: Цена_месяца = Цена_следующего_месяца ÷ (1 + процент_изменения_месяца)</div>';
+            
+            // Август 2025 - это базовый месяц
+            const augustIndex = 1;
+            const augustPrice = screenshotData[augustIndex].salePrice;
+            
+            // Проверяем июль 2025
+            const julyIndex = 2;
+            const julyData = screenshotData[julyIndex];
+            const expectedJulyPrice = calculateHistoricalPrice(augustPrice, julyData.saleChange);
+            
+            html += `<p><strong>Июль 2025:</strong></p>`;
+            html += `<p>Цена августа: ${augustPrice.toFixed(2)} ₺/м²</p>`;
+            html += `<p>Процент изменения июля: ${julyData.saleChange}%</p>`;
+            html += `<p>Ожидаемая цена июля: ${augustPrice.toFixed(2)} ÷ (1 + ${julyData.saleChange}/100) = ${expectedJulyPrice.toFixed(2)} ₺/м²</p>`;
+            html += `<p>Фактическая цена июля на скриншоте: ${julyData.salePrice.toFixed(2)} ₺/м²</p>`;
+            html += `<p class="${Math.abs(expectedJulyPrice - julyData.salePrice) < 1 ? 'correct' : 'incorrect'}">`;
+            html += `Разница: ${(julyData.salePrice - expectedJulyPrice).toFixed(2)} ₺/м²</p>`;
+            
+            // Проверяем расчет для будущих месяцев (сентябрь)
+            html += '<h4>Проверка расчета для будущих месяцев</h4>';
+            html += '<div class="formula">Формула: Цена_месяца = Цена_предыдущего_месяца × (1 + процент_изменения_месяца)</div>';
+            
+            const septemberIndex = 0;
+            const septemberData = screenshotData[septemberIndex];
+            const expectedSeptemberPrice = calculateFuturePrice(augustPrice, septemberData.saleChange);
+            
+            html += `<p><strong>Сентябрь 2025:</strong></p>`;
+            html += `<p>Цена августа: ${augustPrice.toFixed(2)} ₺/м²</p>`;
+            html += `<p>Процент изменения сентября: ${septemberData.saleChange}%</p>`;
+            html += `<p>Ожидаемая цена сентября: ${augustPrice.toFixed(2)} × (1 + ${septemberData.saleChange}/100) = ${expectedSeptemberPrice.toFixed(2)} ₺/м²</p>`;
+            html += `<p>Фактическая цена сентября на скриншоте: ${septemberData.salePrice.toFixed(2)} ₺/м²</p>`;
+            html += `<p class="${Math.abs(expectedSeptemberPrice - septemberData.salePrice) < 1 ? 'correct' : 'incorrect'}">`;
+            html += `Разница: ${(septemberData.salePrice - expectedSeptemberPrice).toFixed(2)} ₺/м²</p>`;
+            
+            analysisDiv.innerHTML = html;
+        }
+        
+        function calculateCorrectPrices() {
+            const correctDiv = document.getElementById('correctCalculation');
+            let html = '<h3>Правильный расчет всех цен</h3>';
+            
+            // Начинаем с августа как базового месяца
+            const augustIndex = 1;
+            let basePrices = {
+                sale: screenshotData[augustIndex].salePrice,
+                rent: screenshotData[augustIndex].rentPrice
+            };
+            
+            html += '<table>';
+            html += '<thead><tr><th>Дата</th><th>Цена продажи (расчет)</th><th>Цена продажи (скриншот)</th><th>Разница</th><th>Формула</th></tr></thead>';
+            html += '<tbody>';
+            
+            // Август - базовый месяц
+            html += `<tr class="highlight">`;
+            html += `<td>${screenshotData[augustIndex].date}</td>`;
+            html += `<td>${basePrices.sale.toFixed(2)} ₺/м²</td>`;
+            html += `<td>${screenshotData[augustIndex].salePrice.toFixed(2)} ₺/м²</td>`;
+            html += `<td>0.00</td>`;
+            html += `<td>Базовый месяц</td>`;
+            html += `</tr>`;
+            
+            // Рассчитываем будущие месяцы (сентябрь)
+            for (let i = augustIndex - 1; i >= 0; i--) {
+                const monthData = screenshotData[i];
+                const prevMonthPrice = (i === augustIndex - 1) ? basePrices.sale : calculatedPrices[i + 1];
+                const calculatedPrice = calculateFuturePrice(prevMonthPrice, monthData.saleChange);
+                
+                html += `<tr>`;
+                html += `<td>${monthData.date}</td>`;
+                html += `<td>${calculatedPrice.toFixed(2)} ₺/м²</td>`;
+                html += `<td>${monthData.salePrice.toFixed(2)} ₺/м²</td>`;
+                html += `<td>${(monthData.salePrice - calculatedPrice).toFixed(2)}</td>`;
+                html += `<td>${prevMonthPrice.toFixed(2)} × (1 + ${monthData.saleChange}%) = ${calculatedPrice.toFixed(2)}</td>`;
+                html += `</tr>`;
+            }
+            
+            // Рассчитываем исторические месяцы (июль и ранее)
+            let calculatedPrices = {};
+            calculatedPrices[augustIndex] = basePrices.sale;
+            
+            for (let i = augustIndex + 1; i < screenshotData.length; i++) {
+                const monthData = screenshotData[i];
+                const nextMonthPrice = calculatedPrices[i - 1] || screenshotData[i - 1].salePrice;
+                const calculatedPrice = calculateHistoricalPrice(nextMonthPrice, monthData.saleChange);
+                calculatedPrices[i] = calculatedPrice;
+                
+                html += `<tr>`;
+                html += `<td>${monthData.date}</td>`;
+                html += `<td>${calculatedPrice.toFixed(2)} ₺/м²</td>`;
+                html += `<td>${monthData.salePrice.toFixed(2)} ₺/м²</td>`;
+                html += `<td class="${Math.abs(monthData.salePrice - calculatedPrice) > 100 ? 'incorrect' : ''}">`;
+                html += `${(monthData.salePrice - calculatedPrice).toFixed(2)}</td>`;
+                html += `<td>${nextMonthPrice.toFixed(2)} ÷ (1 + ${monthData.saleChange}%) = ${calculatedPrice.toFixed(2)}</td>`;
+                html += `</tr>`;
+            }
+            
+            html += '</tbody></table>';
+            
+            html += '<h4>Вывод:</h4>';
+            html += '<p>Судя по анализу, в текущей реализации есть проблема с расчетом исторических цен. ';
+            html += 'Цены не соответствуют математической формуле обратного расчета через проценты изменения.</p>';
+            html += '<p><strong>Возможные причины:</strong></p>';
+            html += '<ul>';
+            html += '<li>Используется неправильная формула для расчета</li>';
+            html += '<li>Проценты изменения применяются некорректно</li>';
+            html += '<li>Базовая цена августа может быть рассчитана неверно</li>';
+            html += '</ul>';
+            
+            correctDiv.innerHTML = html;
+        }
+        
+        // Запускаем анализ при загрузке страницы
+        window.onload = function() {
+            analyzeCalculations();
+            calculateCorrectPrices();
+        };
+    </script>
+</body>
+</html>

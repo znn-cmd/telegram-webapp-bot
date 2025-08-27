@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Проверка формата процентов изменения</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-case {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .correct {
+            background-color: #d4edda;
+        }
+        .incorrect {
+            background-color: #f8d7da;
+        }
+        pre {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Проверка формата процентов изменения цен</h1>
+        
+        <div class="test-case">
+            <h2>Анализ данных со скриншота</h2>
+            <p>Проверяем какой формат процентов используется в системе</p>
+            
+            <h3>Данные со скриншота:</h3>
+            <ul>
+                <li>Август 2025: 50,184.00 ₺/м² (изменение +4.47%)</li>
+                <li>Июль 2025: 48,035.00 ₺/м² (изменение +4.43%)</li>
+            </ul>
+            
+            <h3>Проверка формата процентов:</h3>
+            <div id="formatTest"></div>
+        </div>
+        
+        <div class="test-case">
+            <h2>Сравнение формул расчета</h2>
+            <div id="formulaComparison"></div>
+        </div>
+        
+        <div class="test-case">
+            <h2>Рекомендации по исправлению</h2>
+            <div id="recommendations"></div>
+        </div>
+    </div>
+    
+    <script>
+        // Две возможные функции расчета
+        function calculateHistoricalPrice_Format1(nextMonthPrice, percentageChange) {
+            // Формат 1: percentageChange в виде 0.0447 (для 4.47%)
+            const changeMultiplier = 1 + percentageChange;
+            return nextMonthPrice / changeMultiplier;
+        }
+        
+        function calculateHistoricalPrice_Format2(nextMonthPrice, percentageChange) {
+            // Формат 2: percentageChange в виде 4.47 (для 4.47%)
+            const changeMultiplier = 1 + (percentageChange / 100);
+            return nextMonthPrice / changeMultiplier;
+        }
+        
+        function testFormats() {
+            const augustPrice = 50184.00;
+            const julyChange = 4.43; // Процент изменения июля
+            const actualJulyPrice = 48035.00;
+            
+            // Тест формата 1 (проценты как 0.0443)
+            const julyPrice_Format1 = calculateHistoricalPrice_Format1(augustPrice, 0.0443);
+            
+            // Тест формата 2 (проценты как 4.43)
+            const julyPrice_Format2 = calculateHistoricalPrice_Format2(augustPrice, julyChange);
+            
+            const formatTestDiv = document.getElementById('formatTest');
+            let html = '<table>';
+            html += '<tr><th>Формат данных</th><th>Формула</th><th>Расчет</th><th>Результат</th><th>Разница с фактом</th><th>Статус</th></tr>';
+            
+            // Формат 1
+            html += '<tr>';
+            html += '<td>Формат 1: 0.0443</td>';
+            html += '<td>nextPrice / (1 + 0.0443)</td>';
+            html += `<td>${augustPrice} / 1.0443</td>`;
+            html += `<td>${julyPrice_Format1.toFixed(2)} ₺/м²</td>`;
+            html += `<td>${Math.abs(actualJulyPrice - julyPrice_Format1).toFixed(2)}</td>`;
+            html += `<td class="${Math.abs(actualJulyPrice - julyPrice_Format1) < 10 ? 'correct' : 'incorrect'}">`;
+            html += `${Math.abs(actualJulyPrice - julyPrice_Format1) < 10 ? '✓ Правильно' : '✗ Неправильно'}</td>`;
+            html += '</tr>';
+            
+            // Формат 2
+            html += '<tr>';
+            html += '<td>Формат 2: 4.43</td>';
+            html += '<td>nextPrice / (1 + 4.43/100)</td>';
+            html += `<td>${augustPrice} / 1.0443</td>`;
+            html += `<td>${julyPrice_Format2.toFixed(2)} ₺/м²</td>`;
+            html += `<td>${Math.abs(actualJulyPrice - julyPrice_Format2).toFixed(2)}</td>`;
+            html += `<td class="${Math.abs(actualJulyPrice - julyPrice_Format2) < 10 ? 'correct' : 'incorrect'}">`;
+            html += `${Math.abs(actualJulyPrice - julyPrice_Format2) < 10 ? '✓ Правильно' : '✗ Неправильно'}</td>`;
+            html += '</tr>';
+            
+            html += '</table>';
+            
+            // Проверка что происходит сейчас
+            html += '<h3>Что происходит в текущем коде:</h3>';
+            html += '<pre>';
+            html += 'function calculateHistoricalPrice(basePrice, percentageChange) {\n';
+            html += '    // percentageChange уже в формате 0.0225 (2.25%), не нужно делить на 100\n';
+            html += '    const changeMultiplier = 1 + percentageChange;\n';
+            html += '    return basePrice / changeMultiplier;\n';
+            html += '}\n\n';
+            html += '// Но если данные приходят в формате 4.43, а не 0.0443, то:\n';
+            html += `// changeMultiplier = 1 + 4.43 = 5.43\n`;
+            html += `// Июль = ${augustPrice} / 5.43 = ${(augustPrice / 5.43).toFixed(2)} ₺/м² (совершенно неправильно!)`;
+            html += '</pre>';
+            
+            formatTestDiv.innerHTML = html;
+        }
+        
+        function compareFormulas() {
+            const comparisonDiv = document.getElementById('formulaComparison');
+            let html = '<h3>Полная таблица расчетов для всех месяцев</h3>';
+            
+            // Данные со скриншота
+            const data = [
+                { month: 'сен. 2025', price: 50836.00, change: 1.30 },
+                { month: 'авг. 2025', price: 50184.00, change: 4.47 },
+                { month: 'июл. 2025', price: 48035.00, change: 4.43 },
+                { month: 'июн. 2025', price: 53190.02, change: 3.74 },
+                { month: 'май. 2025', price: 51480.86, change: 3.32 },
+                { month: 'апр. 2025', price: 50352.95, change: 2.24 },
+                { month: 'мар. 2025', price: 49657.74, change: 1.40 },
+                { month: 'фев. 2025', price: 49707.45, change: -0.10 },
+                { month: 'янв. 2025', price: 49977.33, change: -0.54 }
+            ];
+            
+            html += '<table>';
+            html += '<tr><th>Месяц</th><th>Фактическая цена</th><th>% изменения</th><th>Расчет из августа</th><th>Разница</th></tr>';
+            
+            const augustPrice = 50184.00;
+            let calculatedPrice = augustPrice;
+            
+            // Для июля (исторический месяц)
+            const julyData = data[2];
+            calculatedPrice = calculateHistoricalPrice_Format2(augustPrice, julyData.change);
+            html += '<tr>';
+            html += `<td>${julyData.month}</td>`;
+            html += `<td>${julyData.price.toFixed(2)}</td>`;
+            html += `<td>${julyData.change}%</td>`;
+            html += `<td>${calculatedPrice.toFixed(2)}</td>`;
+            html += `<td class="${Math.abs(julyData.price - calculatedPrice) > 100 ? 'incorrect' : ''}">${(julyData.price - calculatedPrice).toFixed(2)}</td>`;
+            html += '</tr>';
+            
+            // Для июня и далее
+            for (let i = 3; i < data.length - 1; i++) {
+                const monthData = data[i];
+                const prevCalculated = calculatedPrice;
+                calculatedPrice = calculateHistoricalPrice_Format2(prevCalculated, monthData.change);
+                
+                html += '<tr>';
+                html += `<td>${monthData.month}</td>`;
+                html += `<td>${monthData.price.toFixed(2)}</td>`;
+                html += `<td>${monthData.change}%</td>`;
+                html += `<td>${calculatedPrice.toFixed(2)}</td>`;
+                html += `<td class="${Math.abs(monthData.price - calculatedPrice) > 100 ? 'incorrect' : ''}">${(monthData.price - calculatedPrice).toFixed(2)}</td>`;
+                html += '</tr>';
+            }
+            
+            html += '</table>';
+            comparisonDiv.innerHTML = html;
+        }
+        
+        function showRecommendations() {
+            const recDiv = document.getElementById('recommendations');
+            let html = '<h3>Проблема:</h3>';
+            html += '<p>В текущем коде функция <code>calculateHistoricalPrice</code> ожидает проценты в формате 0.0443 (для 4.43%), ';
+            html += 'но данные из базы приходят в формате 4.43. Это приводит к неправильным расчетам.</p>';
+            
+            html += '<h3>Решение:</h3>';
+            html += '<p>Нужно исправить функцию <code>calculateHistoricalPrice</code> в файле <code>webapp_object_evaluation.html</code>:</p>';
+            
+            html += '<pre>';
+            html += '// Текущая версия (НЕПРАВИЛЬНАЯ):\n';
+            html += 'function calculateHistoricalPrice(basePrice, percentageChange) {\n';
+            html += '    if (!basePrice || !percentageChange) return basePrice;\n';
+            html += '    \n';
+            html += '    // percentageChange уже в формате 0.0225 (2.25%), не нужно делить на 100\n';
+            html += '    const changeMultiplier = 1 + percentageChange;\n';
+            html += '    return basePrice / changeMultiplier;\n';
+            html += '}\n\n';
+            
+            html += '// Исправленная версия (ПРАВИЛЬНАЯ):\n';
+            html += 'function calculateHistoricalPrice(basePrice, percentageChange) {\n';
+            html += '    if (!basePrice || percentageChange === null || percentageChange === undefined) return basePrice;\n';
+            html += '    \n';
+            html += '    // percentageChange приходит в формате 2.25 (для 2.25%), нужно делить на 100\n';
+            html += '    const changeMultiplier = 1 + (percentageChange / 100);\n';
+            html += '    return basePrice / changeMultiplier;\n';
+            html += '}\n';
+            html += '</pre>';
+            
+            html += '<p>Также нужно проверить функцию <code>calculateFuturePrice</code> для единообразия.</p>';
+            
+            recDiv.innerHTML = html;
+        }
+        
+        // Запускаем тесты
+        window.onload = function() {
+            testFormats();
+            compareFormulas();
+            showRecommendations();
+        };
+    </script>
+</body>
+</html>
