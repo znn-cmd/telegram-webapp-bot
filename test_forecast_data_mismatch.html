@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест несоответствия данных между таблицей и графиком</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .section {
+            margin: 30px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 6px;
+        }
+        .table-container {
+            overflow-x: auto;
+            margin: 20px 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+        th, td {
+            padding: 8px 12px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+        th {
+            background: #667eea;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin: 20px 0;
+        }
+        .debug-info {
+            background: #e8f4fd;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 20px 0;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        .mismatch {
+            background: #fee;
+            color: #d00;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .match {
+            background: #efe;
+            color: #080;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Тест несоответствия данных: Таблица vs График</h1>
+        
+        <div class="section">
+            <h2>Тестовые данные (как на скриншоте)</h2>
+            <div class="table-container">
+                <table id="testTable">
+                    <thead>
+                        <tr>
+                            <th>Дата</th>
+                            <th>Прогноз продажи (₺/м²)</th>
+                            <th>Прогноз аренды (₺/м²)</th>
+                            <th>Прогноз доходности</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>июл. 2025</td>
+                            <td>₺50 933,66</td>
+                            <td>₺197,06</td>
+                            <td>4,78%</td>
+                        </tr>
+                        <tr style="background-color: #e8f4fd; font-weight: bold;">
+                            <td>авг. 2025</td>
+                            <td>₺53 190,02</td>
+                            <td>₺204,81</td>
+                            <td>4,70%</td>
+                        </tr>
+                        <tr>
+                            <td>сен. 2025</td>
+                            <td>₺50 836,00</td>
+                            <td>₺199,54</td>
+                            <td>4,71%</td>
+                        </tr>
+                        <tr>
+                            <td>окт. 2025</td>
+                            <td>₺50 807,00</td>
+                            <td>₺202,44</td>
+                            <td>4,78%</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>График (проблемный)</h2>
+            <div class="chart-container">
+                <canvas id="problemChart"></canvas>
+            </div>
+            <div class="debug-info" id="problemDebug"></div>
+        </div>
+
+        <div class="section">
+            <h2>График (исправленный)</h2>
+            <div class="chart-container">
+                <canvas id="fixedChart"></canvas>
+            </div>
+            <div class="debug-info" id="fixedDebug"></div>
+        </div>
+
+        <div class="section">
+            <h2>Анализ проблемы</h2>
+            <div id="analysis"></div>
+        </div>
+    </div>
+
+    <script>
+        // Данные из таблицы (правильные значения)
+        const tableData = [
+            { date: 'июл. 2025', sale: 50933.66, rent: 197.06, yield: 4.78 },
+            { date: 'авг. 2025', sale: 53190.02, rent: 204.81, yield: 4.70 },
+            { date: 'сен. 2025', sale: 50836.00, rent: 199.54, yield: 4.71 },
+            { date: 'окт. 2025', sale: 50807.00, rent: 202.44, yield: 4.78 }
+        ];
+
+        // Проблемные данные (как на графике из скриншота)
+        const problemData = [
+            { date: 'июл. 2025', sale: 48033.66, rent: 197.06 }, // Неправильное значение
+            { date: 'авг. 2025', sale: 53190.02, rent: 204.81 },
+            { date: 'сен. 2025', sale: 53881.493, rent: 199.54 }, // Неправильное значение!
+            { date: 'окт. 2025', sale: 50807.00, rent: 202.44 }
+        ];
+
+        // Функция для создания графика
+        function createChart(canvasId, data, title, debugId) {
+            const ctx = document.getElementById(canvasId).getContext('2d');
+            const labels = data.map(d => d.date);
+            const saleValues = data.map(d => d.sale);
+            
+            const chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Прогноз продажи',
+                        data: saleValues,
+                        borderColor: '#28a745',
+                        backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                        pointBackgroundColor: '#28a745',
+                        pointBorderColor: 'white',
+                        pointBorderWidth: 2,
+                        pointRadius: 4,
+                        pointHoverRadius: 6,
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: title
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `Прогноз продажи: ₺${context.parsed.y.toLocaleString('ru-RU', { minimumFractionDigits: 2 })}/м²`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            ticks: {
+                                callback: function(value) {
+                                    return '₺' + value.toLocaleString('ru-RU');
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Отладочная информация
+            const debugInfo = document.getElementById(debugId);
+            debugInfo.innerHTML = '<h4>Данные графика:</h4>';
+            data.forEach((d, i) => {
+                debugInfo.innerHTML += `${d.date}: ₺${d.sale.toFixed(2)}/м²<br>`;
+            });
+        }
+
+        // Создаем проблемный график
+        createChart('problemChart', problemData, 'Проблемный график (с неправильными данными)', 'problemDebug');
+
+        // Создаем исправленный график
+        createChart('fixedChart', tableData, 'Исправленный график (с правильными данными из таблицы)', 'fixedDebug');
+
+        // Анализ несоответствий
+        const analysisDiv = document.getElementById('analysis');
+        let analysisHTML = '<h3>Найденные несоответствия:</h3>';
+
+        tableData.forEach((tableRow, i) => {
+            const problemRow = problemData[i];
+            if (tableRow.sale !== problemRow.sale) {
+                analysisHTML += `
+                    <div class="mismatch">
+                        <strong>${tableRow.date}:</strong><br>
+                        Таблица: ₺${tableRow.sale.toFixed(2)}/м²<br>
+                        График: ₺${problemRow.sale.toFixed(2)}/м²<br>
+                        Разница: ₺${Math.abs(tableRow.sale - problemRow.sale).toFixed(2)}/м²
+                    </div>
+                `;
+            } else {
+                analysisHTML += `
+                    <div class="match">
+                        <strong>${tableRow.date}:</strong> Данные совпадают (₺${tableRow.sale.toFixed(2)}/м²)
+                    </div>
+                `;
+            }
+        });
+
+        analysisHTML += `
+            <h3>Вероятная причина проблемы:</h3>
+            <div class="debug-info">
+                <p><strong>Проблема:</strong> График использует неправильные данные, которые не соответствуют таблице.</p>
+                <p><strong>Возможные причины:</strong></p>
+                <ul>
+                    <li>График может использовать другой массив данных (не forecastTrends)</li>
+                    <li>Данные могут быть изменены после формирования таблицы</li>
+                    <li>Возможна проблема с фильтрацией или сортировкой данных</li>
+                    <li>Значение для сентября (53881.493) выглядит как случайное или вычисленное неправильно</li>
+                </ul>
+                <p><strong>Решение:</strong> Убедиться, что график использует те же данные, что и таблица (forecastTrends), и что эти данные не изменяются между генерацией таблицы и графика.</p>
+            </div>
+        `;
+
+        analysisDiv.innerHTML = analysisHTML;
+    </script>
+</body>
+</html>
