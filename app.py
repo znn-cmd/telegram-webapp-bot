@@ -2,8 +2,9 @@ import os
 import logging
 from flask import Flask, request, jsonify, send_file, send_from_directory
 from telegram import Update, WebAppInfo, KeyboardButton, ReplyKeyboardMarkup, Bot
-from supabase import create_client, Client
 from dotenv import load_dotenv
+# Импортируем новый модуль для подключения к Supabase
+from supabase_client import get_supabase_client
 import threading
 import asyncio
 from locales import locales
@@ -57,12 +58,16 @@ except ImportError:
 # Инициализация Flask приложения
 app = Flask(__name__)
 
-# Инициализация Supabase
-supabase_url = os.getenv("SUPABASE_URL")
-supabase_key = os.getenv("SUPABASE_ANON_KEY")
-if not supabase_url or not supabase_key:
-    raise RuntimeError("SUPABASE_URL и SUPABASE_ANON_KEY должны быть заданы в переменных окружения!")
-supabase: Client = create_client(supabase_url, supabase_key)
+# Инициализация Supabase с улучшенной обработкой ошибок
+try:
+    supabase = get_supabase_client()
+    logger.info("✅ Успешно подключились к Supabase")
+except Exception as e:
+    logger.error(f"❌ Ошибка при инициализации Supabase: {e}")
+    # Продолжаем работу приложения, но будем пытаться переподключиться при необходимости
+
+# Импортируем безопасные операции с БД
+from safe_db_operations import safe_select, safe_insert, safe_update, safe_upsert, safe_delete
 
 # Токен бота
 TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
@@ -250,9 +255,13 @@ def api_user():
     referal = data.get('referal')  # invite_code пригласившего, если есть
     if not telegram_id:
         return jsonify({'error': 'telegram_id required'}), 400
-    # Проверяем пользователя в базе
-    user_result = supabase.table('users').select('*').eq('telegram_id', telegram_id).execute()
-    user = user_result.data[0] if user_result.data else None
+    # Проверяем пользователя в базе с обработкой ошибок
+    try:
+        user_result = safe_select('users', filters={'telegram_id': telegram_id})
+        user = user_result[0] if user_result else None
+    except Exception as e:
+        logger.error(f"❌ Ошибка при проверке пользователя: {e}")
+        return jsonify({'error': 'Database connection error', 'details': str(e)}), 500
     if user is not None:
         lang = user.get('language') or (language_code[:2] if language_code[:2] in locales else 'en')
         return jsonify({
@@ -276,12 +285,20 @@ def api_user():
         # Генерация уникального invite_code
         def generate_invite_code():
             return ''.join(random.choices(string.ascii_uppercase + string.digits, k=8))
-        # Проверка уникальности invite_code
-        while True:
+        # Проверка уникальности invite_code с обработкой ошибок
+        max_attempts = 10
+        invite_code = None
+        for attempt in range(max_attempts):
             invite_code = generate_invite_code()
-            code_check = supabase.table('users').select('invite_code').eq('invite_code', invite_code).execute()
-            if not code_check.data:
-                break
+            try:
+                code_check = safe_select('users', columns='invite_code', filters={'invite_code': invite_code})
+                if not code_check:
+                    break
+            except Exception as e:
+                logger.error(f"❌ Ошибка при проверке invite_code: {e}")
+                if attempt == max_attempts - 1:
+                    return jsonify({'error': 'Failed to generate invite code'}), 500
+        
         user_data = {
             'telegram_id': telegram_id,
             'username': username,
@@ -293,7 +310,13 @@ def api_user():
         }
         if referal:
             user_data['referal'] = referal
-        supabase.table('users').insert(user_data).execute()
+        
+        # Вставка нового пользователя с обработкой ошибок
+        try:
+            safe_insert('users', user_data)
+        except Exception as e:
+            logger.error(f"❌ Ошибка при создании нового пользователя: {e}")
+            return jsonify({'error': 'Failed to create user', 'details': str(e)}), 500
         return jsonify({
             'exists': False,
             'is_new_user': True,
