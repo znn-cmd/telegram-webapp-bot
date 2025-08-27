@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Тест исправления графика трендов</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .success {
+            color: green;
+            font-weight: bold;
+        }
+        .error {
+            color: red;
+            font-weight: bold;
+        }
+        .info {
+            color: blue;
+        }
+        .code {
+            background: #f5f5f5;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 3px;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <h1>Тест исправления графика трендов</h1>
+    
+    <div class="test-section">
+        <h2>Описание проблемы</h2>
+        <p>В отчете по оценке объекта недвижимости график трендов показывал значения, отличные от тех, что отображались в таблице "Детальные данные трендов".</p>
+        <p>Например, для июля 2025 года:</p>
+        <ul>
+            <li>В таблице: ₺50 933,66</li>
+            <li>На графике: ₺48 035,00</li>
+        </ul>
+    </div>
+    
+    <div class="test-section">
+        <h2>Причина проблемы</h2>
+        <p>График использовал оригинальные данные из базы данных, в то время как таблица отображала рассчитанные значения с учетом процентов изменения.</p>
+        <div class="code">// Было:
+initializeTrendsChart(trends); // Оригинальные данные
+
+// Стало:
+const trendsWithHistoricalPrices = await prepareTrendsWithHistoricalPrices(trends);
+initializeTrendsChart(trendsWithHistoricalPrices); // Рассчитанные данные</div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Внесенные изменения</h2>
+        <ol>
+            <li class="success">✅ Обновлен вызов initializeTrendsChart для использования подготовленных данных</li>
+            <li class="success">✅ Обновлено сохранение данных в window.currentTrendsData</li>
+            <li class="success">✅ Данные теперь подготавливаются при загрузке трендов</li>
+            <li class="success">✅ Функция переключения типа графика уже использует правильные данные</li>
+        </ol>
+    </div>
+    
+    <div class="test-section">
+        <h2>Результат</h2>
+        <p>Теперь график трендов будет отображать те же значения, что и в таблице "Детальные данные трендов", поскольку оба компонента используют одни и те же рассчитанные данные.</p>
+        <p class="info">Для проверки исправления необходимо:</p>
+        <ol>
+            <li>Открыть отчет по оценке объекта недвижимости</li>
+            <li>Сравнить значения в таблице "Детальные данные трендов" со значениями на графике</li>
+            <li>Убедиться, что значения совпадают</li>
+        </ol>
+    </div>
+    
+    <div class="test-section">
+        <h2>Технические детали</h2>
+        <p>Изменения внесены в файл <strong>webapp_object_evaluation.html</strong>:</p>
+        <ul>
+            <li>Строки 6460-6471: Обновлен вызов при добавлении секции трендов</li>
+            <li>Строки 6323-6327: Обновлено сохранение данных при загрузке</li>
+            <li>Комментарий добавлен к строке 8985</li>
+        </ul>
+    </div>
+</body>
+</html>
