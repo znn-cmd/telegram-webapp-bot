@@ -58,34 +58,14 @@ except ImportError:
 # Инициализация Flask приложения
 app = Flask(__name__)
 
-# Инициализация Supabase с улучшенными настройками
+# Инициализация Supabase
 supabase_url = os.getenv("SUPABASE_URL")
 supabase_key = os.getenv("SUPABASE_ANON_KEY")
 if not supabase_url or not supabase_key:
     raise RuntimeError("SUPABASE_URL и SUPABASE_ANON_KEY должны быть заданы в переменных окружения!")
 
-# Создаем HTTP клиент с увеличенными таймаутами и retry логикой
-import httpx
-from httpx import TimeoutException, ConnectTimeout
-
-http_client = httpx.Client(
-    timeout=httpx.Timeout(
-        connect=30.0,  # Таймаут на установку соединения
-        read=60.0,     # Таймаут на чтение
-        write=30.0,    # Таймаут на запись
-        pool=30.0      # Таймаут пула соединений
-    ),
-    limits=httpx.Limits(
-        max_keepalive_connections=20,
-        max_connections=100
-    )
-)
-
-# Инициализация Supabase с кастомным клиентом
-supabase: Client = create_client(
-    supabase_url, 
-    supabase_key
-)
+# Инициализация Supabase клиента
+supabase: Client = create_client(supabase_url, supabase_key)
 
 # Токен бота
 TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
@@ -192,17 +172,14 @@ def safe_db_operation(operation, max_retries=3, retry_delay=2):
     for attempt in range(max_retries):
         try:
             return operation()
-        except (TimeoutException, ConnectTimeout) as e:
-            logger.warning(f"Database timeout on attempt {attempt + 1}/{max_retries}: {e}")
+        except Exception as e:
+            logger.warning(f"Database error on attempt {attempt + 1}/{max_retries}: {e}")
             if attempt < max_retries - 1:
                 time.sleep(retry_delay)
                 continue
             else:
                 logger.error(f"Database operation failed after {max_retries} attempts: {e}")
                 return None
-        except Exception as e:
-            logger.error(f"Database operation error: {e}")
-            return None
     return None
 
 # Flask маршруты для WebApp
