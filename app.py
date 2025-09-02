@@ -251,12 +251,8 @@ def api_user():
     if not telegram_id:
         return jsonify({'error': 'telegram_id required'}), 400
     # Проверяем пользователя в базе
-    try:
-        user_result = supabase.table('users').select('*').eq('telegram_id', telegram_id).execute()
-        user = user_result.data[0] if user_result.data else None
-    except Exception as e:
-        logger.error(f"Database connection error: {e}")
-        return jsonify({'error': 'Database connection error'}), 500
+    user_result = supabase.table('users').select('*').eq('telegram_id', telegram_id).execute()
+    user = user_result.data[0] if user_result.data else None
     if user is not None:
         lang = user.get('language') or (language_code[:2] if language_code[:2] in locales else 'en')
         return jsonify({
@@ -297,11 +293,7 @@ def api_user():
         }
         if referal:
             user_data['referal'] = referal
-        try:
-            supabase.table('users').insert(user_data).execute()
-        except Exception as e:
-            logger.error(f"Error creating new user: {e}")
-            return jsonify({'error': 'Database connection error'}), 500
+        supabase.table('users').insert(user_data).execute()
         return jsonify({
             'exists': False,
             'is_new_user': True,
@@ -4812,12 +4804,8 @@ def api_save_html_report():
         file_path = os.path.join('reports', filename)
         
         # Получаем user_id по telegram_id
-        try:
-            user_result = supabase.table('users').select('id').eq('telegram_id', telegram_id).execute()
-            user_id = user_result.data[0]['id'] if user_result.data else telegram_id
-        except Exception as e:
-            logger.error(f"Error getting user_id: {e}")
-            user_id = telegram_id  # Используем telegram_id как fallback
+        user_result = supabase.table('users').select('id').eq('telegram_id', telegram_id).execute()
+        user_id = user_result.data[0]['id'] if user_result.data else telegram_id
         
         # Подготавливаем данные для сохранения в БД
         db_report_data = {
@@ -4864,14 +4852,9 @@ def api_save_html_report():
             if db_report_data.get(field) is None:
                 db_report_data.pop(field, None)
         
-        # Сохраняем в базу данных с обработкой ошибок
-        try:
-            db_result = supabase.table('user_reports').insert(db_report_data).execute()
-            report_id = db_result.data[0]['id'] if db_result.data else None
-        except Exception as e:
-            logger.error(f"Error saving to database: {e}")
-            # Продолжаем без сохранения в БД
-            report_id = None
+        # Сохраняем в базу данных
+        db_result = supabase.table('user_reports').insert(db_report_data).execute()
+        report_id = db_result.data[0]['id'] if db_result.data else None
         
         # Генерируем QR-код для верификации
         verification_url = f"{request.host_url.rstrip('/')}/reports/{filename}"

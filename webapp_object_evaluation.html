@@ -9330,7 +9330,7 @@
             
             // Получаем данные из выбранных параметров
             if (selectedListingTypes) {
-                reportData.bedrooms = selectedListingTypes.house_type;
+                reportData.bedrooms = selectedListingTypes.house_type;  // Оставляем как есть - "2+1", "3+1" и т.д.
                 reportData.floor = selectedListingTypes.floor_segment;
                 reportData.age = selectedListingTypes.age;
                 reportData.heating = selectedListingTypes.heating;
