@@ -57,12 +57,34 @@ except ImportError:
 # Инициализация Flask приложения
 app = Flask(__name__)
 
-# Инициализация Supabase
+# Инициализация Supabase с улучшенными настройками
 supabase_url = os.getenv("SUPABASE_URL")
 supabase_key = os.getenv("SUPABASE_ANON_KEY")
 if not supabase_url or not supabase_key:
     raise RuntimeError("SUPABASE_URL и SUPABASE_ANON_KEY должны быть заданы в переменных окружения!")
-supabase: Client = create_client(supabase_url, supabase_key)
+
+# Создаем HTTP клиент с увеличенными таймаутами и retry логикой
+import httpx
+from httpx import TimeoutException, ConnectTimeout
+
+http_client = httpx.Client(
+    timeout=httpx.Timeout(
+        connect=30.0,  # Таймаут на установку соединения
+        read=60.0,     # Таймаут на чтение
+        write=30.0,    # Таймаут на запись
+        pool=30.0      # Таймаут пула соединений
+    ),
+    limits=httpx.Limits(
+        max_keepalive_connections=20,
+        max_connections=100
+    )
+)
+
+# Инициализация Supabase с кастомным клиентом
+supabase: Client = create_client(
+    supabase_url, 
+    supabase_key
+)
 
 # Токен бота
 TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
@@ -152,6 +174,35 @@ GOOGLE_MAPS_TIMEOUT = int(os.getenv('GOOGLE_MAPS_TIMEOUT', '30'))  # Увели�
 
 #     # Запускаем бота (закомментировано для WebApp)
 #     # application.run_polling(allowed_updates=Update.ALL_TYPES)
+
+# Функция для безопасного выполнения операций с базой данных
+def safe_db_operation(operation, max_retries=3, retry_delay=2):
+    """
+    Безопасно выполняет операцию с базой данных с retry логикой
+    
+    Args:
+        operation: Функция для выполнения
+        max_retries: Максимальное количество попыток
+        retry_delay: Задержка между попытками в секундах
+    
+    Returns:
+        Результат операции или None в случае ошибки
+    """
+    for attempt in range(max_retries):
+        try:
+            return operation()
+        except (TimeoutException, ConnectTimeout) as e:
+            logger.warning(f"Database timeout on attempt {attempt + 1}/{max_retries}: {e}")
+            if attempt < max_retries - 1:
+                time.sleep(retry_delay)
+                continue
+            else:
+                logger.error(f"Database operation failed after {max_retries} attempts: {e}")
+                return None
+        except Exception as e:
+            logger.error(f"Database operation error: {e}")
+            return None
+    return None
 
 # Flask маршруты для WebApp
 @app.route('/webapp')
@@ -251,8 +302,16 @@ def api_user():
     if not telegram_id:
         return jsonify({'error': 'telegram_id required'}), 400
     # Проверяем пользователя в базе
-    user_result = supabase.table('users').select('*').eq('telegram_id', telegram_id).execute()
-    user = user_result.data[0] if user_result.data else None
+    try:
+        user_result = safe_db_operation(
+            lambda: supabase.table('users').select('*').eq('telegram_id', telegram_id).execute()
+        )
+        if user_result is None:
+            return jsonify({'error': 'Database connection error'}), 500
+        user = user_result.data[0] if user_result.data else None
+    except Exception as e:
+        logger.error(f"Database connection error: {e}")
+        return jsonify({'error': 'Database connection error'}), 500
     if user is not None:
         lang = user.get('language') or (language_code[:2] if language_code[:2] in locales else 'en')
         return jsonify({
@@ -293,7 +352,15 @@ def api_user():
         }
         if referal:
             user_data['referal'] = referal
-        supabase.table('users').insert(user_data).execute()
+        try:
+            result = safe_db_operation(
+                lambda: supabase.table('users').insert(user_data).execute()
+            )
+            if result is None:
+                return jsonify({'error': 'Database connection error'}), 500
+        except Exception as e:
+            logger.error(f"Error creating new user: {e}")
+            return jsonify({'error': 'Database connection error'}), 500
         return jsonify({
             'exists': False,
             'is_new_user': True,
@@ -4751,8 +4818,16 @@ def api_save_user_report():
         return jsonify({'error': 'Missing required data'}), 400
     try:
         # Получаем user_id по telegram_id
-        user_result = supabase.table('users').select('id').eq('telegram_id', telegram_id).execute()
-        user_id = user_result.data[0]['id'] if user_result.data else telegram_id
+        try:
+            user_result = safe_db_operation(
+                lambda: supabase.table('users').select('id').eq('telegram_id', telegram_id).execute()
+            )
+            if user_result is None:
+                return jsonify({'error': 'Database connection error'}), 500
+            user_id = user_result.data[0]['id'] if user_result.data else telegram_id
+        except Exception as e:
+            logger.error(f"Error getting user_id: {e}")
+            return jsonify({'error': 'Database connection error'}), 500
         # Сохраняем отчет
         report_data = {
             'user_id': user_id,
@@ -4762,9 +4837,17 @@ def api_save_user_report():
             'created_at': datetime.now().isoformat(),
             'updated_at': datetime.now().isoformat()
         }
-        result = supabase.table('user_reports').insert(report_data).execute()
-        new_id = result.data[0]['id'] if hasattr(result, 'data') and result.data else None
-        return jsonify({'success': True, 'report_id': new_id})
+        try:
+            result = safe_db_operation(
+                lambda: supabase.table('user_reports').insert(report_data).execute()
+            )
+            if result is None:
+                return jsonify({'error': 'Database connection error'}), 500
+            new_id = result.data[0]['id'] if hasattr(result, 'data') and result.data else None
+            return jsonify({'success': True, 'report_id': new_id})
+        except Exception as e:
+            logger.error(f"Error saving report: {e}")
+            return jsonify({'error': 'Database connection error'}), 500
     except Exception as e:
         logger.error(f"Error saving user report: {e}")
         return jsonify({'error': 'Internal error'}), 500
@@ -4804,8 +4887,18 @@ def api_save_html_report():
         file_path = os.path.join('reports', filename)
         
         # Получаем user_id по telegram_id
-        user_result = supabase.table('users').select('id').eq('telegram_id', telegram_id).execute()
-        user_id = user_result.data[0]['id'] if user_result.data else telegram_id
+        try:
+            user_result = safe_db_operation(
+                lambda: supabase.table('users').select('id').eq('telegram_id', telegram_id).execute()
+            )
+            if user_result is None:
+                logger.error("Failed to get user_id from database")
+                user_id = telegram_id  # Используем telegram_id как fallback
+            else:
+                user_id = user_result.data[0]['id'] if user_result.data else telegram_id
+        except Exception as e:
+            logger.error(f"Error getting user_id: {e}")
+            user_id = telegram_id  # Используем telegram_id как fallback
         
         # Подготавливаем данные для сохранения в БД
         db_report_data = {
@@ -4835,7 +4928,6 @@ def api_save_html_report():
         if bedrooms_raw:
             try:
                 # Извлекаем первое число из строки "2+1" -> 2
-                import re
                 bedrooms_match = re.search(r'(\d+)', str(bedrooms_raw))
                 if bedrooms_match:
                     db_report_data['bedrooms'] = int(bedrooms_match.group(1))
@@ -4852,9 +4944,20 @@ def api_save_html_report():
             if db_report_data.get(field) is None:
                 db_report_data.pop(field, None)
         
-        # Сохраняем в базу данных
-        db_result = supabase.table('user_reports').insert(db_report_data).execute()
-        report_id = db_result.data[0]['id'] if db_result.data else None
+        # Сохраняем в базу данных с обработкой ошибок
+        try:
+            db_result = safe_db_operation(
+                lambda: supabase.table('user_reports').insert(db_report_data).execute()
+            )
+            if db_result is None:
+                logger.error("Failed to save report to database")
+                report_id = None
+            else:
+                report_id = db_result.data[0]['id'] if db_result.data else None
+        except Exception as e:
+            logger.error(f"Error saving to database: {e}")
+            # Продолжаем без сохранения в БД
+            report_id = None
         
         # Генерируем QR-код для верификации
         verification_url = f"{request.host_url.rstrip('/')}/reports/{filename}"
