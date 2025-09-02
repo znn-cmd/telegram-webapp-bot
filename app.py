@@ -251,8 +251,12 @@ def api_user():
     if not telegram_id:
         return jsonify({'error': 'telegram_id required'}), 400
     # Проверяем пользователя в базе
-    user_result = supabase.table('users').select('*').eq('telegram_id', telegram_id).execute()
-    user = user_result.data[0] if user_result.data else None
+    try:
+        user_result = supabase.table('users').select('*').eq('telegram_id', telegram_id).execute()
+        user = user_result.data[0] if user_result.data else None
+    except Exception as e:
+        logger.error(f"Database connection error: {e}")
+        return jsonify({'error': 'Database connection error'}), 500
     if user is not None:
         lang = user.get('language') or (language_code[:2] if language_code[:2] in locales else 'en')
         return jsonify({
@@ -293,7 +297,11 @@ def api_user():
         }
         if referal:
             user_data['referal'] = referal
-        supabase.table('users').insert(user_data).execute()
+        try:
+            supabase.table('users').insert(user_data).execute()
+        except Exception as e:
+            logger.error(f"Error creating new user: {e}")
+            return jsonify({'error': 'Database connection error'}), 500
         return jsonify({
             'exists': False,
             'is_new_user': True,
@@ -4804,8 +4812,12 @@ def api_save_html_report():
         file_path = os.path.join('reports', filename)
         
         # Получаем user_id по telegram_id
-        user_result = supabase.table('users').select('id').eq('telegram_id', telegram_id).execute()
-        user_id = user_result.data[0]['id'] if user_result.data else telegram_id
+        try:
+            user_result = supabase.table('users').select('id').eq('telegram_id', telegram_id).execute()
+            user_id = user_result.data[0]['id'] if user_result.data else telegram_id
+        except Exception as e:
+            logger.error(f"Error getting user_id: {e}")
+            user_id = telegram_id  # Используем telegram_id как fallback
         
         # Подготавливаем данные для сохранения в БД
         db_report_data = {
@@ -4817,7 +4829,6 @@ def api_save_html_report():
             'address': location_info,
             'latitude': report_data.get('latitude'),
             'longitude': report_data.get('longitude'),
-            'bedrooms': report_data.get('bedrooms'),
             'price_range_min': report_data.get('price_range_min'),
             'price_range_max': report_data.get('price_range_max'),
             'price': report_data.get('price'),
@@ -4831,9 +4842,36 @@ def api_save_html_report():
             }
         }
         
-        # Сохраняем в базу данных
-        db_result = supabase.table('user_reports').insert(db_report_data).execute()
-        report_id = db_result.data[0]['id'] if db_result.data else None
+        # Обрабатываем поле bedrooms - извлекаем число из строки "2+1"
+        bedrooms_raw = report_data.get('bedrooms')
+        if bedrooms_raw:
+            try:
+                # Извлекаем первое число из строки "2+1" -> 2
+                import re
+                bedrooms_match = re.search(r'(\d+)', str(bedrooms_raw))
+                if bedrooms_match:
+                    db_report_data['bedrooms'] = int(bedrooms_match.group(1))
+                else:
+                    db_report_data['bedrooms'] = None
+            except (ValueError, TypeError):
+                db_report_data['bedrooms'] = None
+        else:
+            db_report_data['bedrooms'] = None
+        
+        # Очищаем данные от None значений для числовых полей
+        numeric_fields = ['price_range_min', 'price_range_max', 'price', 'area', 'latitude', 'longitude', 'bedrooms']
+        for field in numeric_fields:
+            if db_report_data.get(field) is None:
+                db_report_data.pop(field, None)
+        
+        # Сохраняем в базу данных с обработкой ошибок
+        try:
+            db_result = supabase.table('user_reports').insert(db_report_data).execute()
+            report_id = db_result.data[0]['id'] if db_result.data else None
+        except Exception as e:
+            logger.error(f"Error saving to database: {e}")
+            # Продолжаем без сохранения в БД
+            report_id = None
         
         # Генерируем QR-код для верификации
         verification_url = f"{request.host_url.rstrip('/')}/reports/{filename}"
