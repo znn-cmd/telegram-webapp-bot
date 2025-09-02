@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aaadvisor – Инструмент для риэлторов</title>
+    <meta name="description" content="Закрывайте больше сделок: отчеты для клиентов с прогнозом цен и расчетом доходности недвижимости">
+    <link rel="stylesheet" href="styles/main.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="../logo-only.png">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <img src="../logo-only.png" alt="Aaadvisor" class="logo-img">
+                    <span class="logo-text">Aaadvisor</span>
+                </div>
+                <nav class="nav">
+                    <div class="language-selector">
+                        <button class="lang-btn active" data-lang="ru">🇷🇺 RU</button>
+                        <button class="lang-btn" data-lang="en">🇺🇸 EN</button>
+                        <button class="lang-btn" data-lang="de">🇩🇪 DE</button>
+                        <button class="lang-btn" data-lang="fr">🇫🇷 FR</button>
+                        <button class="lang-btn" data-lang="tr">🇹🇷 TR</button>
+                    </div>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-text">
+                    <h1 class="hero-title" data-i18n="hero.title">Закрывайте больше сделок с Aaadvisor</h1>
+                    <p class="hero-subtitle" data-i18n="hero.subtitle">
+                        Покажите клиенту точные цифры: стоимость объекта, прогноз роста цен и расчет доходности. 
+                        Профессиональный отчет за 1 минуту прямо в Telegram.
+                    </p>
+                    <div class="hero-features">
+                        <div class="feature-item">
+                            <span class="feature-icon">📊</span>
+                            <span data-i18n="hero.feature1">Аналитика рынка</span>
+                        </div>
+                        <div class="feature-item">
+                            <span class="feature-icon">💰</span>
+                            <span data-i18n="hero.feature2">Расчет доходности</span>
+                        </div>
+                        <div class="feature-item">
+                            <span class="feature-icon">📈</span>
+                            <span data-i18n="hero.feature3">Прогноз цен</span>
+                        </div>
+                    </div>
+                    <a href="https://t.me/your_bot_username" class="btn btn-primary btn-large">
+                        <span data-i18n="hero.cta">Получить отчет бесплатно</span>
+                    </a>
+                    <p class="hero-note" data-i18n="hero.note">Бесплатно • Без регистрации • Мгновенно</p>
+                </div>
+                <div class="hero-visual">
+                    <div class="app-preview">
+                        <img src="../logo-flt.png" alt="Aaadvisor отчет" class="preview-img">
+                        <div class="preview-overlay">
+                            <div class="preview-stats">
+                                <div class="stat-item">
+                                    <span class="stat-value">€450,000</span>
+                                    <span class="stat-label" data-i18n="preview.price">Стоимость</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-value">+12%</span>
+                                    <span class="stat-label" data-i18n="preview.growth">Рост за год</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-value">6.8%</span>
+                                    <span class="stat-label" data-i18n="preview.yield">Доходность</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Benefits Section -->
+    <section class="benefits">
+        <div class="container">
+            <h2 class="section-title" data-i18n="benefits.title">Почему риэлторы выбирают Aaadvisor</h2>
+            <p class="section-subtitle" data-i18n="benefits.subtitle">Инструмент, который помогает закрывать сделки быстрее и с большим доверием</p>
+            
+            <div class="benefits-grid">
+                <div class="benefit-card">
+                    <div class="benefit-icon">📊</div>
+                    <h3 data-i18n="benefits.card1.title">Покажите клиенту цифры</h3>
+                    <p data-i18n="benefits.card1.desc">Точная аналитика рынка с конкретными цифрами вместо общих фраз</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="benefit-icon">💬</div>
+                    <h3 data-i18n="benefits.card2.title">Убедите выгодой</h3>
+                    <p data-i18n="benefits.card2.desc">Обоснованные аргументы с расчетом доходности и прогнозом роста</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="benefit-icon">📈</div>
+                    <h3 data-i18n="benefits.card3.title">Прогноз роста стоимости</h3>
+                    <p data-i18n="benefits.card3.desc">Покажите клиенту потенциал роста инвестиций в недвижимость</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="benefit-icon">💰</div>
+                    <h3 data-i18n="benefits.card4.title">Доходность аренды</h3>
+                    <p data-i18n="benefits.card4.desc">Расчет рентабельности для инвесторов и арендодателей</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="benefit-icon">🎯</div>
+                    <h3 data-i18n="benefits.card5.title">Закрывайте сделки быстрее</h3>
+                    <p data-i18n="benefits.card5.desc">Профессиональные отчеты повышают доверие и ускоряют решения</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="benefit-icon">⚡</div>
+                    <h3 data-i18n="benefits.card6.title">Мгновенный результат</h3>
+                    <p data-i18n="benefits.card6.desc">Отчет готов за 1 минуту, без ожидания и сложных процедур</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Example Report Section -->
+    <section class="example-report">
+        <div class="container">
+            <div class="report-content">
+                <div class="report-text">
+                    <h2 class="section-title" data-i18n="report.title">Что увидит ваш клиент</h2>
+                    <p class="section-subtitle" data-i18n="report.subtitle">
+                        Профессиональный отчет с аналитикой рынка, прогнозом цен и расчетом доходности. 
+                        Такой отчет повышает доверие клиента и ускоряет принятие решения.
+                    </p>
+                    <div class="report-features">
+                        <div class="report-feature">
+                            <span class="feature-check">✓</span>
+                            <span data-i18n="report.feature1">Анализ рынка недвижимости</span>
+                        </div>
+                        <div class="report-feature">
+                            <span class="feature-check">✓</span>
+                            <span data-i18n="report.feature2">Прогноз роста цен на 1-3 года</span>
+                        </div>
+                        <div class="report-feature">
+                            <span class="feature-check">✓</span>
+                            <span data-i18n="report.feature3">Расчет доходности аренды</span>
+                        </div>
+                        <div class="report-feature">
+                            <span class="feature-check">✓</span>
+                            <span data-i18n="report.feature4">Сравнение с аналогичными объектами</span>
+                        </div>
+                        <div class="report-feature">
+                            <span class="feature-check">✓</span>
+                            <span data-i18n="report.feature5">Рекомендации по инвестициям</span>
+                        </div>
+                    </div>
+                    <a href="https://t.me/your_bot_username" class="btn btn-secondary">
+                        <span data-i18n="report.cta">Сделать такой же отчет</span>
+                    </a>
+                </div>
+                <div class="report-visual">
+                    <div class="report-mockup">
+                        <div class="mockup-header">
+                            <img src="../logo-only.png" alt="Aaadvisor" class="mockup-logo">
+                            <span class="mockup-title">Аналитический отчет</span>
+                        </div>
+                        <div class="mockup-content">
+                            <div class="mockup-section">
+                                <h4>Объект недвижимости</h4>
+                                <p>2-комнатная квартира, 75 м²</p>
+                                <p>Барселона, район Эшампле</p>
+                            </div>
+                            <div class="mockup-section">
+                                <h4>Рыночная стоимость</h4>
+                                <p class="mockup-price">€450,000</p>
+                                <p class="mockup-growth">+8.5% за год</p>
+                            </div>
+                            <div class="mockup-section">
+                                <h4>Доходность аренды</h4>
+                                <p class="mockup-yield">6.8% годовых</p>
+                                <p>€2,550/месяц</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Before/After Section -->
+    <section class="before-after">
+        <div class="container">
+            <h2 class="section-title" data-i18n="comparison.title">До и После Aaadvisor</h2>
+            <div class="comparison-grid">
+                <div class="comparison-card before">
+                    <div class="comparison-header">
+                        <span class="comparison-icon">❌</span>
+                        <h3 data-i18n="comparison.before.title">До</h3>
+                    </div>
+                    <ul class="comparison-list">
+                        <li data-i18n="comparison.before.item1">Объясняете устно, клиент сомневается</li>
+                        <li data-i18n="comparison.before.item2">Нет конкретных цифр и обоснований</li>
+                        <li data-i18n="comparison.before.item3">Сделка откладывается на неопределенный срок</li>
+                        <li data-i18n="comparison.before.item4">Клиент ищет альтернативы</li>
+                    </ul>
+                </div>
+                <div class="comparison-card after">
+                    <div class="comparison-header">
+                        <span class="comparison-icon">✅</span>
+                        <h3 data-i18n="comparison.after.title">После</h3>
+                    </div>
+                    <ul class="comparison-list">
+                        <li data-i18n="comparison.after.item1">Показываете профессиональный отчет с цифрами</li>
+                        <li data-i18n="comparison.after.item2">Клиент видит прогноз роста и доходность</li>
+                        <li data-i18n="comparison.after.item3">Решение принимается быстрее</li>
+                        <li data-i18n="comparison.after.item4">Повышается доверие к вам как к эксперту</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Social Proof Section -->
+    <section class="social-proof">
+        <div class="container">
+            <h2 class="section-title" data-i18n="social.title">Нам доверяют риэлторы</h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number">10,000+</div>
+                    <div class="stat-label" data-i18n="social.stats.objects">Объектов проанализировано</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">500+</div>
+                    <div class="stat-label" data-i18n="social.stats.realtors">Риэлторов используют</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">2x</div>
+                    <div class="stat-label" data-i18n="social.stats.faster">Быстрее закрываются сделки</div>
+                </div>
+            </div>
+            
+            <div class="testimonials">
+                <div class="testimonial-card">
+                    <div class="testimonial-content">
+                        <p data-i18n="social.testimonial1.text">"Теперь я показываю клиентам точные цифры и прогнозы. Сделки закрываются в 2 раза быстрее, а доверие клиентов выросло значительно."</p>
+                        <div class="testimonial-author">
+                            <div class="author-info">
+                                <strong data-i18n="social.testimonial1.name">Анна Петрова</strong>
+                                <span data-i18n="social.testimonial1.position">Риэлтор, Барселона</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial-card">
+                    <div class="testimonial-content">
+                        <p data-i18n="social.testimonial2.text">"Aaadvisor помогает обосновать цену объективно. Клиенты видят, что мы не просто продаем, а даем профессиональную консультацию."</p>
+                        <div class="testimonial-author">
+                            <div class="author-info">
+                                <strong data-i18n="social.testimonial2.name">Сергей Иванов</strong>
+                                <span data-i18n="social.testimonial2.position">Агентство недвижимости, Лиссабон</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <div class="container">
+            <div class="cta-content">
+                <h2 class="cta-title" data-i18n="cta.title">Покажите клиенту выгоду сделки уже сегодня</h2>
+                <p class="cta-subtitle" data-i18n="cta.subtitle">
+                    Получите бесплатный доступ к Aaadvisor и начните использовать профессиональные отчеты в работе
+                </p>
+                <div class="cta-features">
+                    <div class="cta-feature">
+                        <span class="cta-icon">🎁</span>
+                        <span data-i18n="cta.feature1">Бесплатно в тестовом режиме</span>
+                    </div>
+                    <div class="cta-feature">
+                        <span class="cta-icon">⚡</span>
+                        <span data-i18n="cta.feature2">Мгновенный результат</span>
+                    </div>
+                    <div class="cta-feature">
+                        <span class="cta-icon">📱</span>
+                        <span data-i18n="cta.feature3">Работает в Telegram</span>
+                    </div>
+                </div>
+                <a href="https://t.me/your_bot_username" class="btn btn-primary btn-large btn-glow">
+                    <span data-i18n="cta.button">Запустить в Telegram</span>
+                </a>
+                <p class="cta-note" data-i18n="cta.note">Без регистрации • Без ограничений • Сразу в работе</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-main">
+                    <div class="footer-logo">
+                        <img src="../logo-only.png" alt="Aaadvisor" class="footer-logo-img">
+                        <span class="footer-logo-text">Aaadvisor</span>
+                    </div>
+                    <p class="footer-description" data-i18n="footer.description">
+                        Профессиональные аналитические отчеты для риэлторов. 
+                        Закрывайте больше сделок с помощью точных цифр и прогнозов.
+                    </p>
+                </div>
+                <div class="footer-links">
+                    <div class="footer-section">
+                        <h4 data-i18n="footer.info.title">Информация</h4>
+                        <ul>
+                            <li><a href="#" data-i18n="footer.info.privacy">Политика конфиденциальности</a></li>
+                            <li><a href="#" data-i18n="footer.info.terms">Условия использования</a></li>
+                            <li><a href="#" data-i18n="footer.info.legal">Юридическая информация</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-section">
+                        <h4 data-i18n="footer.support.title">Поддержка</h4>
+                        <ul>
+                            <li><a href="https://t.me/your_support" data-i18n="footer.support.telegram">Telegram канал</a></li>
+                            <li><a href="#" data-i18n="footer.support.feedback">Отзывы и предложения</a></li>
+                            <li><a href="#" data-i18n="footer.support.help">Помощь</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 Aaadvisor. <span data-i18n="footer.rights">Все права защищены.</span></p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/i18n.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>

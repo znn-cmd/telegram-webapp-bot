@@ -6320,11 +6320,8 @@
                     console.log('✅ Property trends data received:', trendsData.trends);
                     console.log('🔍 First trend record:', trendsData.trends[0]);
                     
-                    // Подготавливаем тренды с рассчитанными историческими ценами
-                    const trendsWithHistoricalPrices = await prepareTrendsWithHistoricalPrices(trendsData.trends);
-                    
-                    // Сохраняем подготовленные данные глобально для переключения графиков
-                    window.currentTrendsData = trendsWithHistoricalPrices;
+                    // Сохраняем данные глобально для переключения графиков
+                    window.currentTrendsData = trendsData.trends;
                     
                     // Add property trends section below the summary table
                     addPropertyTrendsSection(trendsData.trends);
@@ -6460,18 +6457,12 @@
             // Асинхронно загружаем таблицу трендов
             const trendsTableContainer = document.getElementById('trendsTableContainer');
             if (trendsTableContainer) {
-                // Подготавливаем тренды с рассчитанными историческими ценами
-                const trendsWithHistoricalPrices = await prepareTrendsWithHistoricalPrices(trends);
-                
-                // Сохраняем подготовленные данные глобально для переключения графиков
-                window.currentTrendsData = trendsWithHistoricalPrices;
-                
                 const trendsTableHtml = await generateTrendsTable(trends);
                 trendsTableContainer.innerHTML = trendsTableHtml;
                 
-                // Инициализируем график трендов после добавления HTML с подготовленными данными
+                // Инициализируем график трендов после добавления HTML
                 setTimeout(() => {
-                    initializeTrendsChart(trendsWithHistoricalPrices);
+                    initializeTrendsChart(trends);
                 }, 100);
             }
         }
@@ -8981,7 +8972,6 @@
         }
         
         // Сохраняем данные трендов глобально для переключения графиков
-        // Сохраняем данные глобально для переключения графиков (с рассчитанными историческими ценами)
         window.currentTrendsData = null;
         
         // Глобальные переменные для графика прогноза
@@ -9222,14 +9212,14 @@
                 // Get location info
                 const locationInfo = getLocationInfo();
                 
+                // Get additional report data
+                const reportData = getReportData();
+                
                 // Get telegram_id 
                 let telegramId = null;
                 if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe) {
                     telegramId = window.Telegram.WebApp.initDataUnsafe.user?.id;
                 }
-                
-                // Get object data for the report
-                const objectData = getObjectData();
                 
                 // Save report via API
                 const response = await fetch('/api/save_html_report', {
@@ -9241,7 +9231,7 @@
                         telegram_id: telegramId,
                         report_content: reportContent,
                         location_info: locationInfo,
-                        object_data: objectData
+                        report_data: reportData
                     })
                 });
                 
@@ -9274,502 +9264,10 @@
             // Clone the content to avoid modifying the original
             const clonedContent = dataContent.cloneNode(true);
             
-            // Remove interactive elements but preserve charts
-            removeInteractiveElementsPreserveCharts(clonedContent);
+            // Remove interactive elements
+            removeInteractiveElements(clonedContent);
             
             return clonedContent.innerHTML;
-        }
-
-        function removeInteractiveElementsPreserveCharts(element) {
-            console.log('🔧 Starting removeInteractiveElementsPreserveCharts...');
-            
-            // Remove buttons
-            const buttons = element.querySelectorAll('button');
-            console.log(`🗑️ Removing ${buttons.length} buttons`);
-            buttons.forEach(button => button.remove());
-            
-            // Remove select elements
-            const selects = element.querySelectorAll('select');
-            console.log(`🗑️ Removing ${selects.length} select elements`);
-            selects.forEach(select => {
-                const selectedText = select.options[select.selectedIndex]?.text || '';
-                const span = document.createElement('span');
-                span.textContent = selectedText;
-                span.className = 'static-value';
-                select.parentNode.replaceChild(span, select);
-            });
-            
-            // Remove input elements and replace with their values
-            const inputs = element.querySelectorAll('input');
-            console.log(`🗑️ Removing ${inputs.length} input elements`);
-            inputs.forEach(input => {
-                const span = document.createElement('span');
-                span.textContent = input.value || '';
-                span.className = 'static-value';
-                input.parentNode.replaceChild(span, input);
-            });
-            
-            // Preserve charts with data for export - don't convert to images
-            const canvasElements = element.querySelectorAll('canvas');
-            console.log(`📊 Found ${canvasElements.length} canvas elements for charts`);
-            
-            canvasElements.forEach((canvas, index) => {
-                console.log(`🔍 Processing canvas ${index + 1}: ${canvas.id}`);
-                
-                // Instead of converting to image, prepare chart data for export
-                const chartData = extractChartData(canvas);
-                if (chartData) {
-                    console.log(`✅ Chart data extracted for ${canvas.id}:`, chartData);
-                    
-                    // Store chart data as data attribute for export
-                    canvas.setAttribute('data-chart-data', JSON.stringify(chartData));
-                    canvas.setAttribute('data-chart-type', chartData.type || 'line');
-                    canvas.setAttribute('data-chart-id', canvas.id || 'chart');
-                    
-                    console.log(`💾 Chart data saved to ${canvas.id}:`, {
-                        'data-chart-data': JSON.stringify(chartData),
-                        'data-chart-type': chartData.type || 'line',
-                        'data-chart-id': canvas.id || 'chart'
-                    });
-                } else {
-                    console.log(`⚠️ No chart data extracted for ${canvas.id}`);
-                }
-            });
-            
-            // Remove chart controls but keep chart containers
-            const chartControls = element.querySelectorAll('.chart-controls, .chart-type-buttons');
-            console.log(`🗑️ Removing ${chartControls.length} chart controls`);
-            chartControls.forEach(control => control.remove());
-            
-            // Remove onclick attributes
-            const clickableElements = element.querySelectorAll('[onclick]');
-            console.log(`🗑️ Removing ${clickableElements.length} onclick attributes`);
-            clickableElements.forEach(el => el.removeAttribute('onclick'));
-            
-            // Remove event listeners by cloning elements
-            const elementsWithEvents = element.querySelectorAll('[onchange], [onfocus], [onblur]');
-            console.log(`🗑️ Removing ${elementsWithEvents.length} event attributes`);
-            elementsWithEvents.forEach(el => {
-                el.removeAttribute('onchange');
-                el.removeAttribute('onfocus');
-                el.removeAttribute('onblur');
-            });
-            
-            console.log('✅ removeInteractiveElementsPreserveCharts completed');
-        }
-
-        function extractChartData(canvas) {
-            try {
-                const chartId = canvas.id;
-                console.log(`🔍 Extracting chart data for: ${chartId}`);
-                
-                // 1. Try to get chart instance from Chart.js
-                const chartInstance = Chart.getChart(canvas);
-                if (chartInstance && chartInstance.config && chartInstance.config.data) {
-                    console.log(`✅ Found Chart.js instance for ${chartId}:`, chartInstance.config.data);
-                    return {
-                        type: chartInstance.config.type,
-                        data: chartInstance.config.data,
-                        options: chartInstance.config.options
-                    };
-                }
-                
-                // 2. Try to extract data from global chart variables
-                if (chartId === 'trendsChart' && window.trendsChart) {
-                    console.log(`✅ Found global trendsChart for ${chartId}:`, window.trendsChart.data);
-                    return {
-                        type: 'line',
-                        data: window.trendsChart.data,
-                        options: window.trendsChart.options
-                    };
-                }
-                
-                if (chartId === 'forecastChart' && window.forecastChart) {
-                    console.log(`✅ Found global forecastChart for ${chartId}:`, window.forecastChart.data);
-                    return {
-                        type: 'line',
-                        data: window.forecastChart.data,
-                        options: window.forecastChart.options
-                    };
-                }
-                
-                // 3. Try to extract data from table if chart data not available
-                if (chartId === 'trendsChart') {
-                    const tableData = extractDataFromTrendsTable();
-                    if (tableData) {
-                        console.log(`✅ Extracted trends data from table for ${chartId}:`, tableData);
-                        return tableData;
-                    }
-                }
-                
-                if (chartId === 'forecastChart') {
-                    const tableData = extractDataFromForecastTable();
-                    if (tableData) {
-                        console.log(`✅ Extracted forecast data from table for ${chartId}:`, tableData);
-                        return tableData;
-                    }
-                }
-                
-                // 4. Try to get data from current trends data
-                if (chartId === 'trendsChart' && window.currentTrendsData) {
-                    const chartData = createChartDataFromTrends(window.currentTrendsData);
-                    if (chartData) {
-                        console.log(`✅ Created chart data from currentTrendsData for ${chartId}:`, chartData);
-                        return chartData;
-                    }
-                }
-                
-                // 5. Try to create basic chart data from visible table data
-                if (chartId === 'trendsChart') {
-                    const basicData = createBasicChartDataFromVisibleTable();
-                    if (basicData) {
-                        console.log(`✅ Created basic chart data from visible table for ${chartId}:`, basicData);
-                        return basicData;
-                    }
-                }
-                
-                console.log(`⚠️ No chart data found for ${chartId}, using fallback`);
-                // Fallback: return basic chart info
-                return {
-                    type: 'line',
-                    data: {
-                        labels: [],
-                        datasets: []
-                    },
-                    options: {}
-                };
-                
-            } catch (error) {
-                console.log('❌ Error extracting chart data:', error);
-                return null;
-            }
-        }
-        
-        function createBasicChartDataFromVisibleTable() {
-            try {
-                // Try to find any table with price data
-                const tables = document.querySelectorAll('table');
-                let bestTable = null;
-                let bestData = null;
-                
-                for (const table of tables) {
-                    const data = extractBasicDataFromTable(table);
-                    if (data && data.labels.length > 0) {
-                        if (!bestData || data.labels.length > bestData.labels.length) {
-                            bestData = data;
-                            bestTable = table;
-                        }
-                    }
-                }
-                
-                if (bestData) {
-                    console.log(`✅ Found best table data:`, bestData);
-                    return {
-                        type: 'line',
-                        data: bestData,
-                        options: {}
-                    };
-                }
-                
-                return null;
-            } catch (error) {
-                console.log('❌ Error creating basic chart data:', error);
-                return null;
-            }
-        }
-        
-        function extractBasicDataFromTable(table) {
-            try {
-                const rows = table.querySelectorAll('tbody tr');
-                if (rows.length === 0) return null;
-                
-                const labels = [];
-                const salesData = [];
-                const rentData = [];
-                
-                rows.forEach((row, index) => {
-                    const cells = row.querySelectorAll('td');
-                    if (cells.length >= 2) {
-                        const firstCell = cells[0].textContent.trim();
-                        
-                        // Check if first cell looks like a date
-                        if (firstCell.match(/[а-яё]+\.?\s*\d{4}/i) || firstCell.match(/\d{4}/)) {
-                            const date = firstCell;
-                            
-                            // Try to extract price data from different columns
-                            let salesPrice = null;
-                            let rentPrice = null;
-                            
-                            // Look for price data in cells
-                            for (let i = 1; i < cells.length; i++) {
-                                const cellText = cells[i].textContent.trim();
-                                if (cellText.includes('₺') || cellText.includes('€') || cellText.includes('$')) {
-                                    const price = parseFloat(cellText.replace(/[^\d.,]/g, '').replace(',', '.'));
-                                    if (!isNaN(price)) {
-                                        if (salesPrice === null) {
-                                            salesPrice = price;
-                                        } else if (rentPrice === null) {
-                                            rentPrice = price;
-                                        }
-                                    }
-                                }
-                            }
-                            
-                            if (date && (salesPrice !== null || rentPrice !== null)) {
-                                labels.push(date);
-                                salesData.push(salesPrice || 0);
-                                rentData.push(rentPrice || 0);
-                            }
-                        }
-                    }
-                });
-                
-                if (labels.length > 0) {
-                    return {
-                        labels: labels,
-                        datasets: [
-                            {
-                                label: 'Цена продажи (₺/м²)',
-                                data: salesData,
-                                borderColor: '#28a745',
-                                backgroundColor: 'rgba(40, 167, 69, 0.1)',
-                                tension: 0.4,
-                                borderWidth: 3,
-                                fill: false
-                            },
-                            {
-                                label: 'Цена аренды (₺/м²)',
-                                data: rentData,
-                                borderColor: '#ffc107',
-                                backgroundColor: 'rgba(255, 193, 7, 0.1)',
-                                tension: 0.4,
-                                borderWidth: 3,
-                                fill: false
-                            }
-                        ]
-                    };
-                }
-                
-                return null;
-            } catch (error) {
-                console.log('❌ Error extracting basic data from table:', error);
-                return null;
-            }
-        }
-        
-        function createChartDataFromTrends(trendsData) {
-            try {
-                if (!trendsData || trendsData.length === 0) return null;
-                
-                // Sort trends by date
-                const sortedTrends = trendsData.sort((a, b) => {
-                    if (a.property_year !== b.property_year) {
-                        return a.property_year - b.property_year;
-                    }
-                    return a.property_month - b.property_month;
-                });
-                
-                const monthNames = [
-                    'Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн',
-                    'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'
-                ];
-                
-                const labels = sortedTrends.map(trend => {
-                    const monthName = monthNames[trend.property_month - 1] || trend.property_month;
-                    return `${monthName} ${trend.property_year}`;
-                });
-                
-                const salesData = sortedTrends.map(trend => {
-                    return parseFloat(trend.is_price_calculated ? trend.calculated_sale_price : trend.unit_price_for_sale) || 0;
-                });
-                
-                const rentData = sortedTrends.map(trend => {
-                    return parseFloat(trend.is_price_calculated ? trend.calculated_rent_price : trend.unit_price_for_rent) || 0;
-                });
-                
-                return {
-                    type: 'line',
-                    data: {
-                        labels: labels,
-                        datasets: [
-                            {
-                                label: 'Цена продажи (₺/м²)',
-                                data: salesData,
-                                borderColor: '#28a745',
-                                backgroundColor: 'rgba(40, 167, 69, 0.1)',
-                                tension: 0.4,
-                                borderWidth: 3,
-                                fill: false
-                            },
-                            {
-                                label: 'Цена аренды (₺/м²)',
-                                data: rentData,
-                                borderColor: '#ffc107',
-                                backgroundColor: 'rgba(255, 193, 7, 0.1)',
-                                tension: 0.4,
-                                borderWidth: 3,
-                                fill: false
-                            }
-                        ]
-                    },
-                    options: {}
-                };
-            } catch (error) {
-                console.log('Error creating chart data from trends:', error);
-                return null;
-            }
-        }
-        
-        function extractDataFromTrendsTable() {
-            try {
-                const table = document.querySelector('.trends-table');
-                if (!table) {
-                    console.log('❌ Trends table not found');
-                    return null;
-                }
-                
-                const rows = table.querySelectorAll('tbody tr:not(.filter-info)');
-                console.log(`🔍 Found ${rows.length} rows in trends table`);
-                
-                const labels = [];
-                const salesData = [];
-                const rentData = [];
-                
-                rows.forEach((row, index) => {
-                    const cells = row.querySelectorAll('td');
-                    if (cells.length >= 4) {
-                        const date = cells[0].textContent.trim();
-                        const salesPriceText = cells[1].textContent.trim();
-                        const rentPriceText = cells[3].textContent.trim();
-                        
-                        // Extract numeric values from price text
-                        const salesPrice = parseFloat(salesPriceText.replace(/[^\d.,]/g, '').replace(',', '.'));
-                        const rentPrice = parseFloat(rentPriceText.replace(/[^\d.,]/g, '').replace(',', '.'));
-                        
-                        console.log(`Row ${index}: Date=${date}, Sales=${salesPriceText}->${salesPrice}, Rent=${rentPriceText}->${rentPrice}`);
-                        
-                        if (date && !isNaN(salesPrice) && !isNaN(rentPrice)) {
-                            labels.push(date);
-                            salesData.push(salesPrice);
-                            rentData.push(rentPrice);
-                        }
-                    }
-                });
-                
-                console.log(`✅ Extracted data: ${labels.length} labels, ${salesData.length} sales, ${rentData.length} rent`);
-                
-                if (labels.length === 0) {
-                    console.log('⚠️ No valid data extracted from table');
-                    return null;
-                }
-                
-                return {
-                    type: 'line',
-                    data: {
-                        labels: labels,
-                        datasets: [
-                            {
-                                label: 'Цена продажи (₺/м²)',
-                                data: salesData,
-                                borderColor: '#28a745',
-                                backgroundColor: 'rgba(40, 167, 69, 0.1)',
-                                tension: 0.4,
-                                borderWidth: 3,
-                                fill: false
-                            },
-                            {
-                                label: 'Цена аренды (₺/м²)',
-                                data: rentData,
-                                borderColor: '#ffc107',
-                                backgroundColor: 'rgba(255, 193, 7, 0.1)',
-                                tension: 0.4,
-                                borderWidth: 3,
-                                fill: false
-                            }
-                        ]
-                    },
-                    options: {}
-                };
-            } catch (error) {
-                console.log('❌ Error extracting data from trends table:', error);
-                return null;
-            }
-        }
-        
-        function extractDataFromForecastTable() {
-            try {
-                const table = document.querySelector('.forecast-table');
-                if (!table) {
-                    console.log('❌ Forecast table not found');
-                    return null;
-                }
-                
-                const rows = table.querySelectorAll('tbody tr:not(.filter-info)');
-                console.log(`🔍 Found ${rows.length} rows in forecast table`);
-                
-                const labels = [];
-                const salesData = [];
-                const rentData = [];
-                
-                rows.forEach((row, index) => {
-                    const cells = row.querySelectorAll('td');
-                    if (cells.length >= 3) {
-                        const date = cells[0].textContent.trim();
-                        const salesPriceText = cells[1].textContent.trim();
-                        const rentPriceText = cells[2].textContent.trim();
-                        
-                        // Extract numeric values from price text
-                        const salesPrice = parseFloat(salesPriceText.replace(/[^\d.,]/g, '').replace(',', '.'));
-                        const rentPrice = parseFloat(rentPriceText.replace(/[^\d.,]/g, '').replace(',', '.'));
-                        
-                        console.log(`Row ${index}: Date=${date}, Sales=${salesPriceText}->${salesPrice}, Rent=${rentPriceText}->${rentPrice}`);
-                        
-                        if (date && !isNaN(salesPrice) && !isNaN(rentPrice)) {
-                            labels.push(date);
-                            salesData.push(salesPrice);
-                            rentData.push(rentPrice);
-                        }
-                    }
-                });
-                
-                console.log(`✅ Extracted forecast data: ${labels.length} labels, ${salesData.length} sales, ${rentData.length} rent`);
-                
-                if (labels.length === 0) {
-                    console.log('⚠️ No valid forecast data extracted from table');
-                    return null;
-                }
-                
-                return {
-                    type: 'line',
-                    data: {
-                        labels: labels,
-                        datasets: [
-                            {
-                                label: 'Прогноз продажи (₺/м²)',
-                                data: salesData,
-                                borderColor: '#3498db',
-                                backgroundColor: 'rgba(52, 152, 219, 0.1)',
-                                tension: 0.4,
-                                borderWidth: 3,
-                                fill: false
-                            },
-                            {
-                                label: 'Прогноз аренды (₺/м²)',
-                                data: rentData,
-                                borderColor: '#e74c3c',
-                                backgroundColor: 'rgba(231, 76, 60, 0.1)',
-                                tension: 0.4,
-                                borderWidth: 3,
-                                fill: false
-                            }
-                        ]
-                    },
-                    options: {}
-                };
-            } catch (error) {
-                console.log('❌ Error extracting data from forecast table:', error);
-                return null;
-            }
         }
 
         function removeInteractiveElements(element) {
@@ -9796,29 +9294,6 @@
                 input.parentNode.replaceChild(span, input);
             });
             
-            // Replace charts with informative placeholders
-            const canvasElements = element.querySelectorAll('canvas');
-            canvasElements.forEach(canvas => {
-                const placeholder = document.createElement('div');
-                placeholder.className = 'chart-placeholder';
-                
-                const chartType = canvas.id.includes('trends') ? 'трендов' : 'прогноза';
-                placeholder.innerHTML = `
-                    <div style="font-size: 16px; font-weight: 600; margin-bottom: 10px;">
-                        📊 График ${chartType}
-                    </div>
-                    <div style="font-size: 13px; color: #6c757d;">
-                        Данные для построения графика представлены в таблицах выше
-                    </div>
-                `;
-                
-                canvas.parentNode.replaceChild(placeholder, canvas);
-            });
-            
-            // Remove chart controls
-            const chartControls = element.querySelectorAll('.chart-controls');
-            chartControls.forEach(control => control.remove());
-            
             // Remove onclick attributes
             const clickableElements = element.querySelectorAll('[onclick]');
             clickableElements.forEach(el => el.removeAttribute('onclick'));
@@ -9837,19 +9312,62 @@
             return locationDetails ? locationDetails.textContent.trim() : 'Локация не указана';
         }
 
-        function getObjectData() {
-            // Get data from global variables
-            const data = {
-                bedrooms: selectedListingTypes.house_type || 'Не указано',
-                floor: selectedListingTypes.floor_segment || 'Не указано',
-                age: selectedListingTypes.age || 'Не указано',
-                heating: selectedListingTypes.heating || 'Не указано',
-                price: selectedListingTypes.price || 'Не указано',
-                area: document.getElementById('areaObjectInput')?.value || 'Не указано',
-                currency: selectedListingTypes.currency || 'EUR'
+        function getReportData() {
+            // Собираем данные о выбранных параметрах объекта
+            const reportData = {
+                parameters: {},
+                bedrooms: null,
+                floor: null,
+                age: null,
+                heating: null,
+                price: null,
+                area: null,
+                latitude: null,
+                longitude: null,
+                price_range_min: null,
+                price_range_max: null
             };
             
-            return data;
+            // Получаем данные из выбранных параметров
+            if (selectedListingTypes) {
+                reportData.bedrooms = selectedListingTypes.house_type;
+                reportData.floor = selectedListingTypes.floor_segment;
+                reportData.age = selectedListingTypes.age;
+                reportData.heating = selectedListingTypes.heating;
+                reportData.parameters = { ...selectedListingTypes };
+            }
+            
+            // Получаем цену и площадь из полей ввода
+            const priceInput = document.getElementById('priceObjectInput');
+            if (priceInput && priceInput.value) {
+                reportData.price = parseFloat(priceInput.value);
+            }
+            
+            const areaInput = document.getElementById('areaObjectInput');
+            if (areaInput && areaInput.value) {
+                reportData.area = parseFloat(areaInput.value);
+            }
+            
+            // Получаем данные о локации
+            if (selectedLocation) {
+                reportData.latitude = selectedLocation.latitude;
+                reportData.longitude = selectedLocation.longitude;
+            }
+            
+            // Получаем данные о ценовом диапазоне из отчета (если есть)
+            const marketData = window.currentSummaryData;
+            if (marketData && marketData.market_indicators) {
+                const saleData = marketData.market_indicators.find(item => item.category === 'sale');
+                if (saleData) {
+                    const priceRange = saleData.price_range;
+                    if (priceRange) {
+                        reportData.price_range_min = parseFloat(priceRange.min);
+                        reportData.price_range_max = parseFloat(priceRange.max);
+                    }
+                }
+            }
+            
+            return reportData;
         }
 
         function showShareModal(reportUrl) {

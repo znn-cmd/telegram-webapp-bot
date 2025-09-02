@@ -2895,7 +2895,7 @@ def create_economic_chart_data(economic_data):
             {
                 'label': f'Рост ВВП (%) - {country_name}',
                 'data': [d['value'] for d in gdp_data],  # Рост ВВП в процентах
-                'borderColor': '\#667eea',
+                'borderColor': '#667eea',
                 'backgroundColor': 'rgba(102, 126, 234, 0.1)',
                 'tension': 0.4,
                 'fill': False
@@ -2910,7 +2910,7 @@ def create_economic_chart_data(economic_data):
             {
                 'label': f'Инфляция (%) - {country_name}',
                 'data': [d['value'] for d in inflation_data],  # Уровень инфляции в процентах
-                'borderColor': '\#dc3545',
+                'borderColor': '#dc3545',
                 'backgroundColor': 'rgba(220, 53, 69, 0.1)',
                 'tension': 0.4,
                 'fill': False
@@ -4771,7 +4771,7 @@ def api_save_user_report():
 
 @app.route('/api/save_html_report', methods=['POST'])
 def api_save_html_report():
-    """Сохраняет отчет как HTML файл и возвращает ссылку"""
+    """Сохраняет отчет как HTML файл в корпоративном стиле и возвращает ссылку"""
     data = request.json or {}
     telegram_id_raw = data.get('telegram_id')
     if telegram_id_raw is None:
@@ -4783,179 +4783,210 @@ def api_save_html_report():
     
     report_content = data.get('report_content')
     location_info = data.get('location_info', '')
-    object_data = data.get('object_data', {})
+    report_data = data.get('report_data', {})  # Дополнительные данные отчета
     
     if not report_content:
         return jsonify({'error': 'Report content required'}), 400
     
     try:
-        # Генерируем уникальные данные для экспортируемого отчета
+        # Генерируем уникальный номер отчета
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        unique_id = random.randint(10000, 99999)
-        report_id = f"RPT-{timestamp}-{unique_id}"
+        random_suffix = ''.join(random.choices(string.digits, k=5))
+        report_number = f"RPT-{timestamp}-{random_suffix}"
         
-        # Создаем безопасное имя из локации
+        # Генерируем уникальное имя файла
         safe_location = re.sub(r'[^\w\s-]', '', location_info).strip()
         safe_location = re.sub(r'[-\s]+', '-', safe_location)
-        if len(safe_location) > 30:
-            safe_location = safe_location[:30]
+        if len(safe_location) > 50:
+            safe_location = safe_location[:50]
         
-        # Создаем уникальное имя файла с telegram_id, timestamp и случайным числом
-        filename = f"Report_{telegram_id}_{timestamp}_{unique_id}_{safe_location}.html"
+        filename = f"Аналитический_отчет_по_недвижимости_{safe_location}_{timestamp}.html"
         file_path = os.path.join('reports', filename)
         
-        # Генерируем QR-код с ссылкой на отчет
-        base_url = request.host_url.rstrip('/')
-        report_url_for_qr = f"{base_url}/reports/{filename}"
+        # Получаем user_id по telegram_id
+        user_result = supabase.table('users').select('id').eq('telegram_id', telegram_id).execute()
+        user_id = user_result.data[0]['id'] if user_result.data else telegram_id
         
-        # Создаем корпоративный HTML шаблон для экспортируемого отчета
-        html_template = """<!DOCTYPE html>
+        # Подготавливаем данные для сохранения в БД
+        db_report_data = {
+            'user_id': user_id,
+            'report_type': 'property_evaluation',
+            'title': f'Аналитический отчет по недвижимости - {location_info}',
+            'description': f'Отчет по оценке объекта недвижимости в регионе {location_info}',
+            'parameters': report_data.get('parameters', {}),
+            'address': location_info,
+            'latitude': report_data.get('latitude'),
+            'longitude': report_data.get('longitude'),
+            'bedrooms': report_data.get('bedrooms'),
+            'price_range_min': report_data.get('price_range_min'),
+            'price_range_max': report_data.get('price_range_max'),
+            'price': report_data.get('price'),
+            'area': report_data.get('area'),
+            'report_url': f"/reports/{filename}",
+            'full_report': {
+                'content': report_content,
+                'location_info': location_info,
+                'report_number': report_number,
+                'generated_at': datetime.now().isoformat()
+            }
+        }
+        
+        # Сохраняем в базу данных
+        db_result = supabase.table('user_reports').insert(db_report_data).execute()
+        report_id = db_result.data[0]['id'] if db_result.data else None
+        
+        # Генерируем QR-код для верификации
+        verification_url = f"{request.host_url.rstrip('/')}/reports/{filename}"
+        qr_code_svg = generate_qr_code_svg(verification_url)
+        
+        # Создаем корпоративный HTML отчет
+        html_template = f"""<!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Аналитический отчет по недвижимости - """ + location_info + """</title>
+    <title>Аналитический отчет по недвижимости - {location_info}</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        * {
+        * {{
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-        }
+        }}
 
-        body {
+        body {{
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: \#ffffff;
-            color: \#2c3e50;
+            background: #ffffff;
+            color: #2c3e50;
             line-height: 1.6;
             font-size: 14px;
-        }
+        }}
 
-        .document {
+        .document {{
             max-width: 900px;
             margin: 0 auto;
             background: white;
             min-height: 100vh;
-            border: 1px solid \#e0e0e0;
-        }
+            border: 1px solid #e0e0e0;
+        }}
 
-        <!-- Корпоративный заголовок -->
-        .corporate-header {
-            background: linear-gradient(135deg, \#2c3e50 0%, \#34495e 100%);
+        /* Корпоративный заголовок */
+        .corporate-header {{
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
             color: white;
             padding: 40px 30px;
             text-align: center;
-            border-bottom: 4px solid \#3498db;
-        }
+            border-bottom: 4px solid #3498db;
+        }}
 
-        .company-logo {
+        .company-logo {{
             width: 100px;
             height: auto;
             margin-bottom: 20px;
             filter: brightness(0) invert(1);
-        }
+        }}
 
-        .document-title {
+        .document-title {{
             font-size: 24px;
             font-weight: 700;
             margin-bottom: 10px;
             text-transform: uppercase;
             letter-spacing: 1px;
-        }
+        }}
 
-        .document-subtitle {
+        .document-subtitle {{
             font-size: 16px;
             opacity: 0.9;
             margin-bottom: 15px;
-        }
+        }}
 
-        <!-- Метаданные отчета -->
-        .report-metadata {
-            background: \#f8f9fa;
-            border: 1px solid \#e9ecef;
+        /* Метаданные отчета */
+        .report-metadata {{
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
             margin: 0;
             padding: 25px 30px;
-        }
+        }}
 
-        .metadata-grid {
+        .metadata-grid {{
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 20px;
             margin-bottom: 20px;
-        }
+        }}
 
-        .metadata-item {
+        .metadata-item {{
             display: flex;
             justify-content: space-between;
             padding: 8px 0;
-            border-bottom: 1px solid \#e9ecef;
-        }
+            border-bottom: 1px solid #e9ecef;
+        }}
 
-        .metadata-label {
+        .metadata-label {{
             font-weight: 600;
-            color: \#495057;
-        }
+            color: #495057;
+        }}
 
-        .metadata-value {
-            color: \#6c757d;
+        .metadata-value {{
+            color: #6c757d;
             text-align: right;
-        }
+        }}
 
-        .qr-section {
+        .qr-section {{
             text-align: center;
             margin-top: 20px;
             padding: 15px;
             background: white;
-            border: 1px solid \#e9ecef;
+            border: 1px solid #e9ecef;
             border-radius: 8px;
-        }
+        }}
 
-        .qr-code {
+        .qr-code {{
             margin: 10px 0;
-        }
+        }}
 
-        .qr-label {
+        .qr-label {{
             font-size: 12px;
-            color: \#6c757d;
+            color: #6c757d;
             margin-top: 5px;
-        }
+        }}
 
-        <!-- Основной контент -->
-        .report-content {
+        /* Основной контент */
+        .report-content {{
             padding: 30px;
-        }
+        }}
 
-        <!-- Корпоративные стили для всех элементов отчета -->
+        /* Корпоративные стили для всех элементов отчета */
         
-        <!-- Заголовки секций -->
-        .data-section-title {
+        /* Заголовки секций */
+        .data-section-title {{
             font-size: 18px;
             font-weight: 700;
-            color: \#2c3e50;
+            color: #2c3e50;
             margin: 25px 0 15px 0;
             padding: 10px 0;
-            border-bottom: 2px solid \#3498db;
+            border-bottom: 2px solid #3498db;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-        }
+        }}
         
-        <!-- Market Indicators Table -->
-        .market-indicators-table {
+        /* Market Indicators Table */
+        .market-indicators-table {{
             margin: 20px 0;
-            border: 1px solid \#dee2e6;
+            border: 1px solid #dee2e6;
             border-radius: 8px;
             overflow: hidden;
             box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        }
+        }}
         
-        .market-data-table {
+        .market-data-table {{
             width: 100%;
             border-collapse: collapse;
             font-size: 13px;
-        }
+        }}
         
-        .market-data-table .category-header {
-            background: \#2c3e50;
+        .market-data-table .category-header {{
+            background: #2c3e50;
             color: white;
             padding: 15px;
             font-weight: 700;
@@ -4963,132 +4994,132 @@ def api_save_html_report():
             font-size: 16px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-        }
+        }}
         
-        .market-data-table .data-cell {
+        .market-data-table .data-cell {{
             padding: 15px;
-            border-bottom: 1px solid \#dee2e6;
-            background: \#ffffff;
+            border-bottom: 1px solid #dee2e6;
+            background: #ffffff;
             vertical-align: top;
-        }
+        }}
         
-        .market-data-table tr:nth-child(even) .data-cell {
-            background: \#f8f9fa;
-        }
+        .market-data-table tr:nth-child(even) .data-cell {{
+            background: #f8f9fa;
+        }}
         
-        .cell-label {
+        .cell-label {{
             font-weight: 600;
-            color: \#495057;
+            color: #495057;
             margin-bottom: 5px;
             font-size: 12px;
-        }
+        }}
         
-        .cell-value {
+        .cell-value {{
             font-weight: 700;
-            color: \#2c3e50;
+            color: #2c3e50;
             font-size: 14px;
-        }
+        }}
         
-        <!-- Market Analysis Text Block -->
-        .market-analysis-text-block {
-            background: \#f8f9fa;
-            border: 1px solid \#dee2e6;
-            border-left: 4px solid \#3498db;
+        /* Market Analysis Text Block */
+        .market-analysis-text-block {{
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-left: 4px solid #3498db;
             padding: 20px;
             margin: 20px 0;
             border-radius: 4px;
-        }
+        }}
         
-        .market-analysis-text-title {
+        .market-analysis-text-title {{
             font-size: 16px;
             font-weight: 700;
-            color: \#2c3e50;
+            color: #2c3e50;
             margin-bottom: 15px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-        }
+        }}
         
-        .market-analysis-text-content p {
+        .market-analysis-text-content p {{
             margin-bottom: 10px;
             line-height: 1.6;
-            color: \#495057;
+            color: #495057;
             font-size: 13px;
-        }
+        }}
         
-        .market-analysis-text-content strong {
-            color: \#2c3e50;
+        .market-analysis-text-content strong {{
+            color: #2c3e50;
             font-weight: 700;
-        }
+        }}
         
-        <!-- Trends Grid -->
-        .trends-grid {
+        /* Trends Grid */
+        .trends-grid {{
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 15px;
             margin: 20px 0;
-        }
+        }}
         
-        .trend-card {
-            background: \#ffffff;
-            border: 1px solid \#dee2e6;
-            border-left: 4px solid \#27ae60;
+        .trend-card {{
+            background: #ffffff;
+            border: 1px solid #dee2e6;
+            border-left: 4px solid #27ae60;
             padding: 20px;
             border-radius: 4px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        }
+        }}
         
-        .trend-card-price_trend {
-            border-left-color: \#3498db;
-        }
+        .trend-card-price_trend {{
+            border-left-color: #3498db;
+        }}
         
-        .trend-title {
+        .trend-title {{
             font-size: 14px;
             font-weight: 700;
-            color: \#2c3e50;
+            color: #2c3e50;
             margin-bottom: 10px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-        }
+        }}
         
-        .trend-value {
+        .trend-value {{
             font-size: 20px;
             font-weight: 700;
-            color: \#27ae60;
+            color: #27ae60;
             margin-bottom: 10px;
-        }
+        }}
         
-        .trend-change {
+        .trend-change {{
             font-size: 12px;
-            color: \#6c757d;
+            color: #6c757d;
             line-height: 1.4;
-        }
+        }}
         
-        <!-- Trends Table -->
-        .trends-table-section {
+        /* Trends Table */
+        .trends-table-section {{
             margin: 30px 0;
-        }
+        }}
         
-        .trends-table-title {
+        .trends-table-title {{
             font-size: 16px;
             font-weight: 700;
-            color: \#2c3e50;
+            color: #2c3e50;
             margin-bottom: 15px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-        }
+        }}
         
-        .trends-table {
+        .trends-table {{
             width: 100%;
             border-collapse: collapse;
-            border: 1px solid \#dee2e6;
+            border: 1px solid #dee2e6;
             border-radius: 8px;
             overflow: hidden;
             box-shadow: 0 2px 8px rgba(0,0,0,0.05);
             font-size: 12px;
-        }
+        }}
         
-        .trends-table th {
-            background: \#2c3e50;
+        .trends-table th {{
+            background: #2c3e50;
             color: white;
             padding: 12px 8px;
             font-weight: 700;
@@ -5096,120 +5127,120 @@ def api_save_html_report():
             font-size: 11px;
             text-transform: uppercase;
             letter-spacing: 0.3px;
-        }
+        }}
         
-        .trends-table td {
+        .trends-table td {{
             padding: 10px 8px;
             text-align: center;
-            border-bottom: 1px solid \#dee2e6;
-            background: \#ffffff;
-        }
+            border-bottom: 1px solid #dee2e6;
+            background: #ffffff;
+        }}
         
-        .trends-table .current-month-row {
-            background: \#e3f2fd !important;
+        .trends-table .current-month-row {{
+            background: #e3f2fd !important;
             font-weight: 700;
-        }
+        }}
         
-        .trends-table .forecast-row {
-            background: \#f0f8ff !important;
-        }
+        .trends-table .forecast-row {{
+            background: #f0f8ff !important;
+        }}
         
-        .trends-table .filter-info {
-            background: \#f8f9fa !important;
+        .trends-table .filter-info {{
+            background: #f8f9fa !important;
             font-style: italic;
-            color: \#6c757d;
-        }
+            color: #6c757d;
+        }}
         
-        <!-- Object Summary -->
-        .object-summary-section {
-            background: \#f8f9fa;
-            border: 1px solid \#dee2e6;
-            border-left: 4px solid \#e74c3c;
+        /* Object Summary */
+        .object-summary-section {{
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-left: 4px solid #e74c3c;
             padding: 20px;
             margin: 25px 0;
             border-radius: 4px;
-        }
+        }}
         
-        .object-summary-title {
+        .object-summary-title {{
             font-size: 16px;
             font-weight: 700;
-            color: \#2c3e50;
+            color: #2c3e50;
             margin-bottom: 15px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-        }
+        }}
         
-        .object-comparison-table {
+        .object-comparison-table {{
             width: 100%;
             border-collapse: collapse;
-        }
+        }}
         
-        .object-comparison-table td {
+        .object-comparison-table td {{
             padding: 8px 0;
-            border-bottom: 1px solid \#dee2e6;
-        }
+            border-bottom: 1px solid #dee2e6;
+        }}
         
-        .comparison-label {
+        .comparison-label {{
             font-weight: 600;
-            color: \#495057;
+            color: #495057;
             width: 60%;
-        }
+        }}
         
-        .comparison-value {
+        .comparison-value {{
             font-weight: 700;
-            color: \#2c3e50;
+            color: #2c3e50;
             text-align: right;
-        }
+        }}
         
-        .comparison-expensive {
-            color: \#e74c3c;
-        }
+        .comparison-expensive {{
+            color: #e74c3c;
+        }}
         
-        .comparison-cheaper {
-            color: \#27ae60;
-        }
+        .comparison-cheaper {{
+            color: #27ae60;
+        }}
         
-        .comparison-smaller {
-            color: \#f39c12;
-        }
+        .comparison-smaller {{
+            color: #f39c12;
+        }}
         
-        .object-analysis-text {
+        .object-analysis-text {{
             margin-top: 15px;
             padding: 15px;
-            background: \#fff3cd;
-            border: 1px solid \#ffeaa7;
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
             border-radius: 4px;
             font-size: 13px;
-            color: \#856404;
+            color: #856404;
             line-height: 1.5;
-        }
+        }}
         
-        <!-- Forecast Tables -->
-        .forecast-table-section {
+        /* Forecast Tables */
+        .forecast-table-section {{
             margin: 30px 0;
-        }
+        }}
         
-        .forecast-table-title {
+        .forecast-table-title {{
             font-size: 16px;
             font-weight: 700;
-            color: \#2c3e50;
+            color: #2c3e50;
             margin-bottom: 15px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-        }
+        }}
         
-        .forecast-table {
+        .forecast-table {{
             width: 100%;
             border-collapse: collapse;
-            border: 1px solid \#dee2e6;
+            border: 1px solid #dee2e6;
             border-radius: 8px;
             overflow: hidden;
             box-shadow: 0 2px 8px rgba(0,0,0,0.05);
             font-size: 12px;
-        }
+        }}
         
-        .forecast-table th {
-            background: \#2c3e50;
+        .forecast-table th {{
+            background: #2c3e50;
             color: white;
             padding: 12px 8px;
             font-weight: 700;
@@ -5217,37 +5248,37 @@ def api_save_html_report():
             font-size: 11px;
             text-transform: uppercase;
             letter-spacing: 0.3px;
-        }
+        }}
         
-        .forecast-table td {
+        .forecast-table td {{
             padding: 10px 8px;
             text-align: center;
-            border-bottom: 1px solid \#dee2e6;
-            background: \#ffffff;
-        }
+            border-bottom: 1px solid #dee2e6;
+            background: #ffffff;
+        }}
         
-        .forecast-table .current-month-row {
-            background: \#e3f2fd !important;
+        .forecast-table .current-month-row {{
+            background: #e3f2fd !important;
             font-weight: 700;
-        }
+        }}
         
-        .forecast-table .forecast-row {
-            background: \#f0f8ff !important;
-        }
+        .forecast-table .forecast-row {{
+            background: #f0f8ff !important;
+        }}
         
-        <!-- Price Forecast Market Table -->
-        .price-forecast-market-table {
+        /* Price Forecast Market Table */
+        .price-forecast-market-table {{
             width: 100%;
             border-collapse: collapse;
-            border: 1px solid \#dee2e6;
+            border: 1px solid #dee2e6;
             border-radius: 8px;
             overflow: hidden;
             box-shadow: 0 2px 8px rgba(0,0,0,0.05);
             margin: 20px 0;
-        }
+        }}
         
-        .forecast-category-header {
-            background: \#2c3e50;
+        .forecast-category-header {{
+            background: #2c3e50;
             color: white;
             padding: 15px;
             font-weight: 700;
@@ -5255,324 +5286,324 @@ def api_save_html_report():
             font-size: 16px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-        }
+        }}
         
-        .forecast-data-cell {
+        .forecast-data-cell {{
             padding: 20px;
-            border-bottom: 1px solid \#dee2e6;
-            background: \#ffffff;
+            border-bottom: 1px solid #dee2e6;
+            background: #ffffff;
             vertical-align: top;
-        }
+        }}
         
-        .forecast-cell-label {
+        .forecast-cell-label {{
             font-weight: 600;
-            color: \#495057;
+            color: #495057;
             margin-bottom: 8px;
             font-size: 13px;
-        }
+        }}
         
-        .forecast-cell-value {
+        .forecast-cell-value {{
             font-weight: 700;
-            color: \#2c3e50;
+            color: #2c3e50;
             font-size: 16px;
             margin-bottom: 5px;
-        }
+        }}
         
-        .forecast-cell-value.user-price {
-            color: \#3498db;
-        }
+        .forecast-cell-value.user-price {{
+            color: #3498db;
+        }}
         
-        .forecast-cell-value.market-price {
-            color: \#9b59b6;
-        }
+        .forecast-cell-value.market-price {{
+            color: #9b59b6;
+        }}
         
-        .forecast-cell-growth {
+        .forecast-cell-growth {{
             font-size: 12px;
             font-weight: 600;
             padding: 2px 6px;
             border-radius: 4px;
             display: inline-block;
-        }
+        }}
         
-        .forecast-cell-growth.positive {
-            background: \#d4edda;
-            color: \#155724;
-        }
+        .forecast-cell-growth.positive {{
+            background: #d4edda;
+            color: #155724;
+        }}
         
-        .forecast-cell-growth.negative {
-            background: \#f8d7da;
-            color: \#721c24;
-        }
+        .forecast-cell-growth.negative {{
+            background: #f8d7da;
+            color: #721c24;
+        }}
         
-        <!-- Analysis Sections -->
+        /* Analysis Sections */
         .trends-analysis-section,
-        .forecast-analysis-section {
-            background: \#e8f5e8;
-            border: 1px solid \#c3e6c3;
-            border-left: 4px solid \#28a745;
+        .forecast-analysis-section {{
+            background: #e8f5e8;
+            border: 1px solid #c3e6c3;
+            border-left: 4px solid #28a745;
             padding: 20px;
             margin: 25px 0;
             border-radius: 4px;
-        }
+        }}
         
         .trends-analysis-title,
-        .forecast-analysis-title {
+        .forecast-analysis-title {{
             font-size: 16px;
             font-weight: 700;
-            color: \#155724;
+            color: #155724;
             margin-bottom: 15px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-        }
+        }}
         
         .trends-analysis-content,
-        .forecast-analysis-content {
-            color: \#155724;
+        .forecast-analysis-content {{
+            color: #155724;
             line-height: 1.6;
             font-size: 13px;
-        }
+        }}
         
         .trends-analysis-content p,
-        .forecast-analysis-content p {
+        .forecast-analysis-content p {{
             margin-bottom: 10px;
-        }
+        }}
         
         .trends-analysis-content strong,
-        .forecast-analysis-content strong {
+        .forecast-analysis-content strong {{
             font-weight: 700;
-        }
+        }}
         
-        <!-- Key Metrics -->
-        .forecast-metrics-compact-section {
+        /* Key Metrics */
+        .forecast-metrics-compact-section {{
             margin: 20px 0;
             padding: 20px;
-            background: \#f8f9fa;
-            border: 1px solid \#dee2e6;
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
             border-radius: 8px;
-        }
+        }}
         
-        .forecast-metrics-compact-title {
+        .forecast-metrics-compact-title {{
             font-size: 14px;
             font-weight: 700;
-            color: \#2c3e50;
+            color: #2c3e50;
             margin-bottom: 15px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-        }
+        }}
         
-        .forecast-metrics-compact-grid {
+        .forecast-metrics-compact-grid {{
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 15px;
-        }
+        }}
         
-        .metric-compact-item {
+        .metric-compact-item {{
             display: flex;
             justify-content: space-between;
             padding: 8px 0;
-            border-bottom: 1px solid \#dee2e6;
-        }
+            border-bottom: 1px solid #dee2e6;
+        }}
         
-        .metric-compact-label {
+        .metric-compact-label {{
             font-weight: 600;
-            color: \#495057;
+            color: #495057;
             font-size: 12px;
-        }
+        }}
         
-        .metric-compact-value {
+        .metric-compact-value {{
             font-weight: 700;
-            color: \#2c3e50;
+            color: #2c3e50;
             font-size: 12px;
-        }
+        }}
         
-        .metric-compact-value.positive {
-            color: \#27ae60;
-        }
+        .metric-compact-value.positive {{
+            color: #27ae60;
+        }}
         
-        .metric-compact-value.negative {
-            color: \#e74c3c;
-        }
+        .metric-compact-value.negative {{
+            color: #e74c3c;
+        }}
         
-        <!-- Chart Replacements -->
-        .chart-container {
-            background: \#f8f9fa;
-            border: 1px solid \#dee2e6;
+        /* Chart Replacements */
+        .chart-container {{
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
             border-radius: 8px;
             padding: 40px;
             text-align: center;
             margin: 20px 0;
-        }
+        }}
         
-        .chart-placeholder {
-            background: \#ffffff;
-            border: 2px dashed \#3498db;
+        .chart-placeholder {{
+            background: #ffffff;
+            border: 2px dashed #3498db;
             border-radius: 8px;
             padding: 40px;
-            color: \#6c757d;
+            color: #6c757d;
             font-style: italic;
-        }
+        }}
         
-        .chart-info {
+        .chart-info {{
             margin-top: 10px;
             font-size: 11px;
-            color: \#6c757d;
+            color: #6c757d;
             font-style: italic;
             text-align: center;
-        }
+        }}
         
-        <!-- Additional spacing -->
-        .block-spacing {
+        /* Additional spacing */
+        .block-spacing {{
             height: 20px;
-        }
+        }}
         
-        .section-spacing {
+        .section-spacing {{
             height: 10px;
-        }
+        }}
         
-        <!-- Price forecast info -->
-        .price-forecast-date {
+        /* Price forecast info */
+        .price-forecast-date {{
             text-align: center;
             font-weight: 700;
-            color: \#2c3e50;
+            color: #2c3e50;
             margin: 15px 0;
             font-size: 14px;
-        }
+        }}
         
-        .price-forecast-currency-info {
+        .price-forecast-currency-info {{
             text-align: center;
             font-size: 12px;
-            color: \#6c757d;
+            color: #6c757d;
             margin: 10px 0;
-        }
+        }}
         
-        .price-forecast-disclaimer {
-            background: \#fff3cd;
-            border: 1px solid \#ffeaa7;
+        .price-forecast-disclaimer {{
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
             border-radius: 4px;
             padding: 15px;
             font-size: 11px;
-            color: \#856404;
+            color: #856404;
             text-align: center;
             font-style: italic;
             margin: 15px 0;
-        }
+        }}
 
-        <!-- Location and Object Info -->
-        .location-object-info {
-            background: \#f8f9fa;
-            border: 1px solid \#dee2e6;
+        /* Location and Object Info */
+        .location-object-info {{
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
             margin: 0;
             padding: 25px 30px;
-        }
+        }}
         
-        .location-info-section {
+        .location-info-section {{
             margin-bottom: 20px;
-        }
+        }}
         
-        .info-section-title {
+        .info-section-title {{
             font-size: 16px;
             font-weight: 700;
-            color: \#2c3e50;
+            color: #2c3e50;
             margin-bottom: 15px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            border-bottom: 2px solid \#3498db;
+            border-bottom: 2px solid #3498db;
             padding-bottom: 8px;
-        }
+        }}
         
-        .info-grid {
+        .info-grid {{
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 15px;
-        }
+        }}
         
-        .info-item {
+        .info-item {{
             display: flex;
             justify-content: space-between;
             padding: 10px 0;
-            border-bottom: 1px solid \#dee2e6;
-        }
+            border-bottom: 1px solid #dee2e6;
+        }}
         
-        .info-label {
+        .info-label {{
             font-weight: 600;
-            color: \#495057;
-        }
+            color: #495057;
+        }}
         
-        .info-value {
-            color: \#2c3e50;
+        .info-value {{
+            color: #2c3e50;
             font-weight: 500;
             text-align: right;
-        }
+        }}
 
-        <!-- Корпоративный футер -->
-        .corporate-footer {
-            background: \#f8f9fa;
-            border-top: 3px solid \#3498db;
+        /* Корпоративный футер */
+        .corporate-footer {{
+            background: #f8f9fa;
+            border-top: 3px solid #3498db;
             padding: 30px;
             margin-top: 40px;
-        }
+        }}
 
-        .disclaimer {
-            background: \#fff3cd;
-            border: 1px solid \#ffeaa7;
-            border-left: 4px solid \#f39c12;
+        .disclaimer {{
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-left: 4px solid #f39c12;
             padding: 20px;
             margin: 20px 0;
             border-radius: 4px;
-        }
+        }}
 
-        .disclaimer-title {
+        .disclaimer-title {{
             font-weight: 700;
-            color: \#856404;
+            color: #856404;
             margin-bottom: 10px;
             font-size: 16px;
-        }
+        }}
 
-        .disclaimer-text {
-            color: \#856404;
+        .disclaimer-text {{
+            color: #856404;
             font-size: 13px;
             line-height: 1.5;
-        }
+        }}
 
-        .verification-section {
-            background: \#e8f5e8;
-            border: 1px solid \#c3e6c3;
-            border-left: 4px solid \#28a745;
+        .verification-section {{
+            background: #e8f5e8;
+            border: 1px solid #c3e6c3;
+            border-left: 4px solid #28a745;
             padding: 20px;
             margin: 20px 0;
             border-radius: 4px;
-        }
+        }}
 
-        .verification-title {
+        .verification-title {{
             font-weight: 700;
-            color: \#155724;
+            color: #155724;
             margin-bottom: 10px;
-        }
+        }}
 
-        .verification-link {
-            color: \#0066cc;
+        .verification-link {{
+            color: #0066cc;
             text-decoration: none;
             font-weight: 500;
-        }
+        }}
 
-        .verification-link:hover {
+        .verification-link:hover {{
             text-decoration: underline;
-        }
+        }}
 
-        .footer-info {
+        .footer-info {{
             text-align: center;
-            color: \#6c757d;
+            color: #6c757d;
             font-size: 12px;
             margin-top: 20px;
             padding-top: 20px;
-            border-top: 1px solid \#dee2e6;
-        }
+            border-top: 1px solid #dee2e6;
+        }}
 
-        @media print {
-            body { background: white; }
-            .document { border: none; box-shadow: none; }
-            .corporate-header { background: \#2c3e50 !important; }
-        }
+        @media print {{
+            body {{ background: white; }}
+            .document {{ border: none; box-shadow: none; }}
+            .corporate-header {{ background: #2c3e50 !important; }}
+        }}
     </style>
 </head>
 <body>
@@ -5581,7 +5612,7 @@ def api_save_html_report():
         <div class="corporate-header">
             <img src="logo-flt.png" alt="Aaadviser" class="company-logo" />
             <div class="document-title">Аналитический отчет по недвижимости</div>
-            <div class="document-subtitle">""" + location_info + """</div>
+            <div class="document-subtitle">{location_info}</div>
         </div>
 
         <!-- Метаданные отчета -->
@@ -5590,7 +5621,7 @@ def api_save_html_report():
                 <div>
                     <div class="metadata-item">
                         <span class="metadata-label">Номер отчета:</span>
-                        <span class="metadata-value">{report_id}</span>
+                        <span class="metadata-value">{report_number}</span>
                     </div>
                     <div class="metadata-item">
                         <span class="metadata-label">Дата формирования:</span>
@@ -5598,7 +5629,7 @@ def api_save_html_report():
                     </div>
                     <div class="metadata-item">
                         <span class="metadata-label">Время формирования:</span>
-                        <span class="metadata-value">{datetime.now().strftime("%H:%M:%S UTC")}</span>
+                        <span class="metadata-value">{datetime.now().strftime("%H:%M:%S")} UTC</span>
                     </div>
                 </div>
                 <div>
@@ -5619,10 +5650,7 @@ def api_save_html_report():
             
             <div class="qr-section">
                 <div class="qr-code">
-                    <svg width="80" height="80" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <rect width="25" height="25" fill="white"/>
-                        <path d="M1 1h3v3H1V1zm5 0h1v1H6V1zm2 0h3v1H8V1zm5 0h1v1h-1V1zm2 0h3v3h-2V1zm5 0h3v3h-3V1zM1 2h1v1H1V2zm3 0h1v1H4V2zm5 0h1v1H9V2zm2 0h1v1h-1V2zm7 0h1v1h-1V2zM1 3h1v1H1V3zm3 0h1v1H4V3zm7 0h1v1h-1V3zm3 0h1v1h-1V3zm5 0h1v1h-1V3zM1 5h3v3H1V5zm5 0h1v1H6V5zm3 0h1v1H9V5zm2 0h1v1h-1V5zm3 0h1v1h-1V5zm6 0h3v3h-3V5zM1 6h1v1H1V6zm3 0h1v1H4V6zm5 0h3v1H9V6zm4 0h1v1h-1V6zm7 0h1v1h-1V6zM1 7h1v1H1V7zm3 0h1v1H4V7zm8 0h1v1h-1V7zm3 0h1v1h-1V7zm5 0h1v1h-1V7zM6 9h1v1H6V9zm2 0h1v1H8V9zm3 0h1v1h-1V9zm2 0h1v1h-1V9zm3 0h1v1h-1V9zm3 0h1v1h-1V9zM1 10h1v1H1v-1zm2 0h1v1H3v-1zm4 0h1v1H7v-1zm4 0h3v1h-3v-1zm5 0h1v1h-1v-1zm3 0h1v1h-1v-1zM2 11h1v1H2v-1zm2 0h3v1H4v-1zm3 0h1v1H7v-1zm3 0h1v1h-1v-1zm4 0h1v1h-1v-1zm3 0h1v1h-1v-1zM1 12h1v1H1v-1zm4 0h1v1H5v-1zm2 0h1v1H7v-1zm4 0h1v1h-1v-1zm2 0h1v1h-1v-1zm4 0h1v1h-1v-1zm3 0h1v1h-1v-1zM3 13h1v1H3v-1zm2 0h1v1H5v-1zm3 0h1v1H8v-1zm4 0h1v1h-1v-1zm3 0h1v1h-1v-1zm3 0h1v1h-1v-1zM1 14h1v1H1v-1zm3 0h1v1H4v-1zm2 0h1v1H6v-1zm3 0h1v1H9v-1zm2 0h1v1h-1v-1zm5 0h1v1h-1v-1zm3 0h1v1h-1v-1zM2 15h1v1H2v-1zm2 0h1v1H4v-1zm3 0h1v1H7v-1zm3 0h1v1h-1v-1zm3 0h1v1h-1v-1zm4 0h1v1h-1v-1zM1 17h3v3H1v-3zm5 0h1v1H6v-1zm3 0h1v1H9v-1zm2 0h1v1h-1v-1zm3 0h1v1h-1v-1zm4 0h1v1h-1v-1zM1 18h1v1H1v-1zm3 0h1v1H4v-1zm5 0h1v1H9v-1zm3 0h1v1h-1v-1zm3 0h1v1h-1v-1zm4 0h1v1h-1v-1zM1 19h1v1H1v-1zm3 0h1v1H4v-1zm6 0h1v1h-1v-1zm2 0h1v1h-1v-1zm4 0h3v1h-3v-1zm4 0h1v1h-1v-1zM6 21h1v1H6v-1zm3 0h1v1H9v-1zm2 0h1v1h-1v-1zm3 0h1v1h-1v-1zm3 0h1v1h-1v-1zm3 0h1v1h-1v-1zM1 22h1v1H1v-1zm2 0h1v1H3v-1zm3 0h1v1H6v-1zm3 0h1v1h-1v-1zm3 0h1v1h-1v-1zm4 0h1v1h-1v-1zm4 0h1v1h-1v-1zM2 23h3v1H2v-1zm3 0h1v1H5v-1zm3 0h1v1H8v-1zm3 0h1v1h-1v-1zm3 0h1v1h-1v-1zm3 0h1v1h-1v-1z" fill="\#2c3e50"/>
-                    </svg>
+                    {qr_code_svg}
                 </div>
                 <div class="qr-label">QR-код для верификации отчета</div>
             </div>
@@ -5635,7 +5663,7 @@ def api_save_html_report():
                 <div class="info-grid">
                     <div class="info-item">
                         <span class="info-label">Регион:</span>
-                        <span class="info-value">""" + location_info + """</span>
+                        <span class="info-value">{location_info}</span>
                     </div>
                     <div class="info-item">
                         <span class="info-label">Тип анализа:</span>
@@ -5643,27 +5671,27 @@ def api_save_html_report():
                     </div>
                     <div class="info-item">
                         <span class="info-label">Количество спален:</span>
-                        <span class="info-value">{object_data.get('bedrooms', 'Не указано')}</span>
+                        <span class="info-value">{report_data.get('bedrooms', 'Не указано')}</span>
                     </div>
                     <div class="info-item">
                         <span class="info-label">Этаж:</span>
-                        <span class="info-value">{object_data.get('floor', 'Не указано')}</span>
+                        <span class="info-value">{report_data.get('floor', 'Не указано')}</span>
                     </div>
                     <div class="info-item">
                         <span class="info-label">Возраст объекта:</span>
-                        <span class="info-value">{object_data.get('age', 'Не указано')}</span>
+                        <span class="info-value">{report_data.get('age', 'Не указано')}</span>
                     </div>
                     <div class="info-item">
                         <span class="info-label">Тип отопления:</span>
-                        <span class="info-value">{object_data.get('heating', 'Не указано')}</span>
+                        <span class="info-value">{report_data.get('heating', 'Не указано')}</span>
                     </div>
                     <div class="info-item">
                         <span class="info-label">Цена объекта:</span>
-                        <span class="info-value">{object_data.get('price', 'Не указано')} {object_data.get('currency', 'EUR')}</span>
+                        <span class="info-value">{report_data.get('price', 'Не указано')}</span>
                     </div>
                     <div class="info-item">
                         <span class="info-label">Площадь объекта:</span>
-                        <span class="info-value">{object_data.get('area', 'Не указано')} м²</span>
+                        <span class="info-value">{report_data.get('area', 'Не указано')}</span>
                     </div>
                 </div>
             </div>
@@ -5687,13 +5715,13 @@ def api_save_html_report():
                 <div class="verification-title">Проверка актуальности данных</div>
                 <div>
                     Для проверки актуальности данных и верификации отчета перейдите по ссылке: 
-                    <a href="{report_url_for_qr}" class="verification-link" target="_blank">{report_url_for_qr}</a>
+                    <a href="{verification_url}" class="verification-link" target="_blank">{verification_url}</a>
                 </div>
             </div>
             
             <div class="footer-info">
                 <strong>Aaadviser</strong> - Система аналитики недвижимости<br>
-                Отчет №{report_id} | Сформирован {datetime.now().strftime("%d.%m.%Y в %H:%M:%S")}<br>
+                Отчет №{report_number} | Сформирован {datetime.now().strftime("%d.%m.%Y в %H:%M:%S")}<br>
                 © 2024 Aaadviser. Все права защищены.
             </div>
         </div>
@@ -5701,304 +5729,109 @@ def api_save_html_report():
     
     <script>
         // Функция для восстановления интерактивных графиков в экспортируемом отчете
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function() {{
             restoreCharts();
-        });
+        }});
         
-        function restoreCharts() {
-            console.log('🔧 Starting chart restoration...');
-            
+        function restoreCharts() {{
             // Находим все canvas элементы с данными графиков
             const canvasElements = document.querySelectorAll('canvas[data-chart-data]');
-            console.log(`📊 Found ${canvasElements.length} canvas elements to restore`);
             
-            canvasElements.forEach((canvas, index) => {
-                console.log(`🔍 Processing canvas ${index + 1}: ${canvas.id}`);
-                
-                try {
+            canvasElements.forEach(canvas => {{
+                try {{
                     const chartData = JSON.parse(canvas.getAttribute('data-chart-data'));
                     const chartType = canvas.getAttribute('data-chart-type') || 'line';
                     const chartId = canvas.getAttribute('data-chart-id') || 'chart';
                     
-                    console.log(`📊 Chart data for ${canvas.id}:`, chartData);
-                    
                     // Восстанавливаем график
-                    if (chartData && chartData.data && chartData.data.labels && chartData.data.labels.length > 0) {
-                        console.log(`✅ Full chart data found for ${canvas.id}, creating chart...`);
-                        createChartFromData(canvas, chartData, chartType, chartId);
-                    } else {
-                        console.log(`⚠️ Incomplete chart data for ${canvas.id}, trying to create from table...`);
-                        createChartFromTable(canvas, chartId);
-                    }
-                } catch (error) {
-                    console.error(`❌ Error processing ${canvas.id}:`, error);
-                    // В случае ошибки пытаемся создать график из таблицы
-                    try {
-                        const chartId = canvas.getAttribute('data-chart-id') || 'chart';
-                        createChartFromTable(canvas, chartId);
-                    } catch (fallbackError) {
-                        console.error(`❌ Fallback also failed for ${canvas.id}:`, fallbackError);
-                        showChartPlaceholder(canvas);
-                    }
-                }
-            });
-        }
+                    if (chartData && chartData.data) {{
+                        const ctx = canvas.getContext('2d');
+                        
+                        // Создаем новый график с сохраненными данными
+                        new Chart(ctx, {{
+                            type: chartType,
+                            data: chartData.data,
+                            options: {{
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: {{
+                                    legend: {{
+                                        position: 'top',
+                                        labels: {{
+                                            font: {{
+                                                size: 12
+                                            }},
+                                            color: '#2c3e50'
+                                        }}
+                                    }},
+                                    title: {{
+                                        display: true,
+                                        text: getChartTitle(chartId),
+                                        color: '#2c3e50',
+                                        font: {{
+                                            size: 16,
+                                            weight: 'bold'
+                                        }}
+                                    }}
+                                }},
+                                scales: {{
+                                    x: {{
+                                        grid: {{
+                                            color: '#e9ecef'
+                                        }},
+                                        ticks: {{
+                                            color: '#6c757d',
+                                            font: {{
+                                                size: 11
+                                            }}
+                                        }}
+                                    }},
+                                    y: {{
+                                        grid: {{
+                                            color: '#e9ecef'
+                                        }},
+                                        ticks: {{
+                                            color: '#6c757d',
+                                            font: {{
+                                                size: 11
+                                            }}
+                                        }}
+                                    }}
+                                }}
+                            }}
+                        }});
+                    }}
+                }} catch (error) {{
+                    console.error('Error restoring chart:', error);
+                    // В случае ошибки показываем placeholder
+                    showChartPlaceholder(canvas);
+                }}
+            }});
+        }}
         
-        function createChartFromData(canvas, chartData, chartType, chartId) {
-            const ctx = canvas.getContext('2d');
-            
-            // Создаем новый график с сохраненными данными
-            new Chart(ctx, {
-                type: chartType,
-                data: chartData.data,
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'top',
-                            labels: {
-                                font: {
-                                    size: 12
-                                },
-                                color: '\#2c3e50'
-                            }
-                        },
-                        title: {
-                            display: true,
-                            text: getChartTitle(chartId),
-                            color: '\#2c3e50',
-                            font: {
-                                size: 16,
-                                weight: 'bold'
-                            }
-                        }
-                    },
-                    scales: {
-                        x: {
-                            grid: {
-                                color: '\#e9ecef'
-                            },
-                            ticks: {
-                                color: '\#6c757d',
-                                font: {
-                                    size: 11
-                                }
-                            }
-                        },
-                        y: {
-                            grid: {
-                                color: '\#e9ecef'
-                            },
-                            ticks: {
-                                color: '\#6c757d',
-                                font: {
-                                    size: 11
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-            
-            console.log(`✅ Chart created from data for ${chartId}`);
-        }
-        
-        function createChartFromTable(canvas, chartId) {
-            console.log(`🔍 Creating chart from table for ${chartId}`);
-            
-            let chartData = null;
-            
-            if (chartId === 'trendsChart') {
-                chartData = extractDataFromTrendsTable();
-            } else if (chartId === 'forecastChart') {
-                chartData = extractDataFromForecastTable();
-            }
-            
-            if (chartData && chartData.data && chartData.data.labels && chartData.data.labels.length > 0) {
-                console.log(`✅ Table data extracted for ${chartId}:`, chartData);
-                createChartFromData(canvas, chartData, chartData.type, chartId);
-            } else {
-                console.log(`⚠️ No table data found for ${chartId}, showing placeholder`);
-                showChartPlaceholder(canvas);
-            }
-        }
-        
-        function extractDataFromTrendsTable() {
-            try {
-                const table = document.querySelector('.trends-table');
-                if (!table) {
-                    console.log('❌ Trends table not found');
-                    return null;
-                }
-                
-                const rows = table.querySelectorAll('tbody tr:not(.filter-info)');
-                console.log(`🔍 Found ${rows.length} rows in trends table`);
-                
-                const labels = [];
-                const salesData = [];
-                const rentData = [];
-                
-                rows.forEach((row, index) => {
-                    const cells = row.querySelectorAll('td');
-                    if (cells.length >= 4) {
-                        const date = cells[0].textContent.trim();
-                        const salesPriceText = cells[1].textContent.trim();
-                        const rentPriceText = cells[3].textContent.trim();
-                        
-                        // Extract numeric values from price text
-                        const salesPrice = parseFloat(salesPriceText.replace(/[^\d.,]/g, '').replace(',', '.'));
-                        const rentPrice = parseFloat(rentPriceText.replace(/[^\d.,]/g, '').replace(',', '.'));
-                        
-                        console.log(`Row ${index}: Date=${date}, Sales=${salesPriceText}->${salesPrice}, Rent=${rentPriceText}->${rentPrice}`);
-                        
-                        if (date && !isNaN(salesPrice) && !isNaN(rentPrice)) {
-                            labels.push(date);
-                            salesData.push(salesPrice);
-                            rentData.push(rentPrice);
-                        }
-                    }
-                });
-                
-                console.log(`✅ Extracted trends data: ${labels.length} labels, ${salesData.length} sales, ${rentData.length} rent`);
-                
-                if (labels.length === 0) {
-                    console.log('⚠️ No valid trends data extracted from table');
-                    return null;
-                }
-                
-                return {
-                    type: 'line',
-                    data: {
-                        labels: labels,
-                        datasets: [
-                            {
-                                label: 'Цена продажи (₺/м²)',
-                                data: salesData,
-                                borderColor: '\#28a745',
-                                backgroundColor: 'rgba(40, 167, 69, 0.1)',
-                                tension: 0.4,
-                                borderWidth: 3,
-                                fill: false
-                            },
-                            {
-                                label: 'Цена аренды (₺/м²)',
-                                data: rentData,
-                                borderColor: '\#ffc107',
-                                backgroundColor: 'rgba(255, 193, 7, 0.1)',
-                                tension: 0.4,
-                                borderWidth: 3,
-                                fill: false
-                            }
-                        ]
-                    },
-                    options: {}
-                };
-            } catch (error) {
-                console.log('❌ Error extracting trends data from table:', error);
-                return null;
-            }
-        }
-        
-        function extractDataFromForecastTable() {
-            try {
-                const table = document.querySelector('.forecast-table');
-                if (!table) {
-                    console.log('❌ Forecast table not found');
-                    return null;
-                }
-                
-                const rows = table.querySelectorAll('tbody tr:not(.filter-info)');
-                console.log(`🔍 Found ${rows.length} rows in forecast table`);
-                
-                const labels = [];
-                const salesData = [];
-                const rentData = [];
-                
-                rows.forEach((row, index) => {
-                    const cells = row.querySelectorAll('td');
-                    if (cells.length >= 3) {
-                        const date = cells[0].textContent.trim();
-                        const salesPriceText = cells[1].textContent.trim();
-                        const rentPriceText = cells[2].textContent.trim();
-                        
-                        // Extract numeric values from price text
-                        const salesPrice = parseFloat(salesPriceText.replace(/[^\d.,]/g, '').replace(',', '.'));
-                        const rentPrice = parseFloat(rentPriceText.replace(/[^\d.,]/g, '').replace(',', '.'));
-                        
-                        console.log(`Row ${index}: Date=${date}, Sales=${salesPriceText}->${salesPrice}, Rent=${rentPriceText}->${rentPrice}`);
-                        
-                        if (date && !isNaN(salesPrice) && !isNaN(rentPrice)) {
-                            labels.push(date);
-                            salesData.push(salesPrice);
-                            rentData.push(rentPrice);
-                        }
-                    }
-                });
-                
-                console.log(`✅ Extracted forecast data: ${labels.length} labels, ${salesData.length} sales, ${rentData.length} rent`);
-                
-                if (labels.length === 0) {
-                    console.log('❌ No valid forecast data extracted from table');
-                    return null;
-                }
-                
-                return {
-                    type: 'line',
-                    data: {
-                        labels: labels,
-                        datasets: [
-                            {
-                                label: 'Прогноз продажи (₺/м²)',
-                                data: salesData,
-                                borderColor: '\#3498db',
-                                backgroundColor: 'rgba(52, 152, 219, 0.1)',
-                                tension: 0.4,
-                                borderWidth: 3,
-                                fill: false
-                            },
-                            {
-                                label: 'Прогноз аренды (₺/м²)',
-                                data: rentData,
-                                borderColor: '\#e74c3c',
-                                backgroundColor: 'rgba(231, 76, 60, 0.1)',
-                                tension: 0.4,
-                                borderWidth: 3,
-                                fill: false
-                            }
-                        ]
-                    },
-                    options: {}
-                };
-            } catch (error) {
-                console.log('❌ Error extracting forecast data from table:', error);
-                return null;
-            }
-        }
-        
-        function getChartTitle(chartId) {
-            const titles = {
+        function getChartTitle(chartId) {{
+            const titles = {{
                 'trendsChart': 'График трендов цен на недвижимость',
                 'forecastChart': 'Прогноз цен на недвижимость',
                 'priceChart': 'Динамика цен',
                 'default': 'График данных'
-            };
+            }};
             return titles[chartId] || titles['default'];
-        }
+        }}
         
-        function showChartPlaceholder(canvas) {
+        function showChartPlaceholder(canvas) {{
             const placeholder = document.createElement('div');
             placeholder.className = 'chart-placeholder';
             placeholder.innerHTML = `
                 <div style="font-size: 16px; font-weight: 600; margin-bottom: 10px;">
                     📊 График данных
                 </div>
-                <div style="font-size: 13px; color: \#6c757d;">
+                <div style="font-size: 13px; color: #6c757d;">
                     Данные для построения графика представлены в таблицах выше
                 </div>
             `;
             canvas.parentNode.replaceChild(placeholder, canvas);
-        }
+        }}
     </script>
 </body>
 </html>"""
@@ -6011,170 +5844,32 @@ def api_save_html_report():
         base_url = request.host_url.rstrip('/')
         report_url = f"{base_url}/reports/{filename}"
         
-        # Сохраняем данные отчета в базу данных
-        try:
-            # Извлекаем координаты из location_info (если доступны)
-            latitude, longitude = extract_coordinates_from_location(location_info)
-            
-            # Подготавливаем данные для сохранения в БД
-            report_data = {
-                'user_id': telegram_id,
-                'report_type': 'object_evaluation',
-                'title': f"Оценка объекта - {location_info}",
-                'description': f"Автоматически сгенерированный отчет по оценке недвижимости в регионе {location_info}",
-                'parameters': object_data,  # JSON с параметрами объекта
-                'address': location_info,
-                'latitude': latitude,
-                'longitude': longitude,
-                'bedrooms': extract_bedrooms_count(object_data.get('bedrooms')),
-                'price_range_min': extract_price_value(object_data.get('price')),
-                'price_range_max': extract_price_value(object_data.get('price')),
-                'price': extract_price_value(object_data.get('price')),
-                'area': extract_area_value(object_data.get('area')),
-                'report_url': report_url,
-                'full_report': {
-                    'report_id': report_id,
-                    'content_summary': 'HTML отчет с анализом недвижимости',
-                    'generation_timestamp': timestamp,
-                    'filename': filename
-                }
-            }
-            
-            # Сохраняем в базу данных
-            save_report_to_database(report_data)
-            
-        except Exception as db_error:
-            logger.error(f"Error saving report to database: {db_error}")
-            # Продолжаем выполнение, даже если сохранение в БД не удалось
-        
         return jsonify({
             'success': True,
             'report_url': report_url,
             'filename': filename,
-            'report_id': report_id
+            'report_id': report_id,
+            'report_number': report_number
         })
         
     except Exception as e:
         logger.error(f"Error saving HTML report: {e}")
         return jsonify({'error': 'Internal error'}), 500
 
-
-def extract_coordinates_from_location(location_info):
-    """Извлекает координаты из информации о локации"""
+def generate_qr_code_svg(url):
+    """Генерирует QR-код в формате SVG"""
     try:
-        # Попытаемся извлечь координаты из глобальной переменной selectedLocationCoords
-        # если она доступна в контексте Flask
-        if hasattr(g, 'location_coords') and g.location_coords:
-            return g.location_coords.get('lat'), g.location_coords.get('lng')
+        import qrcode
+        qr = qrcode.QRCode(version=1, box_size=10, border=5)
+        qr.add_data(url)
+        qr.make(fit=True)
         
-        # Возможные сопоставления городов с координатами для базовых случаев
-        location_coords_map = {
-            'antalya': (36.8969, 30.7133),
-            'istanbul': (41.0082, 28.9784),
-            'izmir': (38.4237, 27.1428),
-            'ankara': (39.9334, 32.8597),
-            'bodrum': (37.0344, 27.4305),
-            'alanya': (36.5439, 31.9956),
-            'kemer': (36.6024, 30.5596),
-            'kas': (36.2020, 29.6363),
-            'kalkan': (36.2645, 29.4117),
-            'fethiye': (36.6217, 29.1167),
-            'marmaris': (36.8547, 28.2737),
-            'didim': (37.3737, 27.2619),
-            'kusadasi': (37.8583, 27.2611),
-            'cesme': (38.3000, 26.3056)
-        }
-        
-        # Приводим location_info к нижнему регистру для поиска
-        location_lower = location_info.lower()
-        
-        # Ищем совпадения в названиях городов
-        for city, coords in location_coords_map.items():
-            if city in location_lower:
-                return coords
-        
-        # Если ничего не найдено, возвращаем None
-        return None, None
-        
-    except Exception as e:
-        logger.error(f"Error extracting coordinates: {e}")
-        return None, None
-
-
-def extract_bedrooms_count(bedrooms_str):
-    """Извлекает количество спален из строки"""
-    if not bedrooms_str or bedrooms_str == 'Не указано':
-        return None
-    
-    # Пытаемся извлечь число из строки типа "2+1", "3 спальни", "Studio", etc.
-    import re
-    numbers = re.findall(r'\d+', str(bedrooms_str))
-    if numbers:
-        return int(numbers[0])
-    
-    # Обработка специальных случаев
-    if 'studio' in str(bedrooms_str).lower():
-        return 0
-    
-    return None
-
-
-def extract_price_value(price_str):
-    """Извлекает числовое значение цены"""
-    if not price_str or price_str == 'Не указано':
-        return None
-    
-    # Удаляем все кроме цифр и точек/запятых
-    import re
-    price_clean = re.sub(r'[^\d.,]', '', str(price_str))
-    price_clean = price_clean.replace(',', '.')
-    
-    try:
-        return float(price_clean)
-    except (ValueError, TypeError):
-        return None
-
-
-def extract_area_value(area_str):
-    """Извлекает числовое значение площади"""
-    if not area_str or area_str == 'Не указано':
-        return None
-    
-    # Удаляем все кроме цифр и точек/запятых
-    import re
-    area_clean = re.sub(r'[^\d.,]', '', str(area_str))
-    area_clean = area_clean.replace(',', '.')
-    
-    try:
-        return float(area_clean)
-    except (ValueError, TypeError):
-        return None
-
-
-def save_report_to_database(report_data):
-    """Сохраняет данные отчета в базу данных"""
-    try:
-        # Преобразуем данные для Supabase (убираем None значения)
-        clean_data = {}
-        for key, value in report_data.items():
-            if value is not None:
-                clean_data[key] = value
-        
-        # Вставляем данные в таблицу user_reports используя Supabase клиент
-        result = supabase.table('user_reports').insert(clean_data).execute()
-        
-        if result.data and len(result.data) > 0:
-            report_id = result.data[0]['id']
-            logger.info(f"Report saved to database with ID: {report_id}")
-            return report_id
-        else:
-            logger.error("No data returned after inserting report")
-            return None
-        
-    except Exception as e:
-        logger.error(f"Database error while saving report: {e}")
-        # В случае ошибки БД, не прерываем выполнение - отчет все равно сохранен как файл
-        return None
+        # Создаем SVG
+        svg_string = qr.make_svg(fill_color="black", back_color="white")
+        return svg_string
+    except ImportError:
+        # Fallback если qrcode не установлен
+        return f'<svg width="80" height="80" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="25" height="25" fill="white"/><text x="12.5" y="12.5" text-anchor="middle" dy=".3em" font-size="8" fill="#2c3e50">QR</text></svg>'
 
 @app.route('/api/send_saved_report_pdf', methods=['POST'])
 def api_send_saved_report_pdf():
