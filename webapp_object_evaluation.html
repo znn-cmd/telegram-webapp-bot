@@ -9296,11 +9296,177 @@
                         canvas.setAttribute('data-chart-id', chartId);
                         
                         console.log(`Chart data saved for ${chartId}:`, chartData);
+                    } else {
+                        // Если график не найден, попробуем получить данные из таблиц
+                        const tableData = extractTableDataForChart(chartId);
+                        if (tableData) {
+                            canvas.setAttribute('data-chart-data', JSON.stringify(tableData));
+                            canvas.setAttribute('data-chart-type', 'line');
+                            canvas.setAttribute('data-chart-id', chartId);
+                            console.log(`Table data extracted for ${chartId}:`, tableData);
+                        }
                     }
                 } catch (error) {
                     console.error('Error saving chart data:', error);
+                    // Fallback: попробуем извлечь данные из таблиц
+                    try {
+                        const chartId = canvas.id;
+                        const tableData = extractTableDataForChart(chartId);
+                        if (tableData) {
+                            canvas.setAttribute('data-chart-data', JSON.stringify(tableData));
+                            canvas.setAttribute('data-chart-type', 'line');
+                            canvas.setAttribute('data-chart-id', chartId);
+                            console.log(`Fallback table data for ${chartId}:`, tableData);
+                        }
+                    } catch (fallbackError) {
+                        console.error('Fallback error:', fallbackError);
+                    }
                 }
             });
+        }
+
+        function extractTableDataForChart(chartId) {
+            // Извлекаем данные из таблиц для построения графиков
+            if (chartId === 'trendsChart') {
+                return extractTrendsData();
+            } else if (chartId === 'forecastChart') {
+                return extractForecastData();
+            }
+            return null;
+        }
+
+        function extractTrendsData() {
+            // Извлекаем данные из таблицы трендов
+            const trendsTable = document.querySelector('.trends-table tbody');
+            if (!trendsTable) return null;
+            
+            const rows = trendsTable.querySelectorAll('tr:not(.filter-info)');
+            const labels = [];
+            const saleData = [];
+            const rentData = [];
+            
+            rows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                if (cells.length >= 5) {
+                    const date = cells[0].textContent.trim();
+                    const salePrice = parseFloat(cells[1].textContent.replace(/[^\d.]/g, ''));
+                    const rentPrice = parseFloat(cells[3].textContent.replace(/[^\d.]/g, ''));
+                    
+                    if (!isNaN(salePrice) && !isNaN(rentPrice)) {
+                        labels.push(date);
+                        saleData.push(salePrice);
+                        rentData.push(rentPrice);
+                    }
+                }
+            });
+            
+            return {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Продажа (₺/м²)',
+                            data: saleData,
+                            borderColor: '#3498db',
+                            backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                            tension: 0.1
+                        },
+                        {
+                            label: 'Аренда (₺/м²)',
+                            data: rentData,
+                            borderColor: '#e74c3c',
+                            backgroundColor: 'rgba(231, 76, 60, 0.1)',
+                            tension: 0.1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        },
+                        title: {
+                            display: true,
+                            text: 'График трендов цен на недвижимость'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false
+                        }
+                    }
+                }
+            };
+        }
+
+        function extractForecastData() {
+            // Извлекаем данные из таблицы прогноза
+            const forecastTable = document.querySelector('.forecast-table tbody');
+            if (!forecastTable) return null;
+            
+            const rows = forecastTable.querySelectorAll('tr:not(.forecast-info)');
+            const labels = [];
+            const saleData = [];
+            const rentData = [];
+            
+            rows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                if (cells.length >= 3) {
+                    const date = cells[0].textContent.trim();
+                    const salePrice = parseFloat(cells[1].textContent.replace(/[^\d.]/g, ''));
+                    const rentPrice = parseFloat(cells[2].textContent.replace(/[^\d.]/g, ''));
+                    
+                    if (!isNaN(salePrice) && !isNaN(rentPrice)) {
+                        labels.push(date);
+                        saleData.push(salePrice);
+                        rentData.push(rentPrice);
+                    }
+                }
+            });
+            
+            return {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Прогноз продажи (₺/м²)',
+                            data: saleData,
+                            borderColor: '#9b59b6',
+                            backgroundColor: 'rgba(155, 89, 182, 0.1)',
+                            tension: 0.1
+                        },
+                        {
+                            label: 'Прогноз аренды (₺/м²)',
+                            data: rentData,
+                            borderColor: '#f39c12',
+                            backgroundColor: 'rgba(243, 156, 18, 0.1)',
+                            tension: 0.1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        },
+                        title: {
+                            display: true,
+                            text: 'Прогноз цен на недвижимость'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false
+                        }
+                    }
+                }
+            };
         }
 
         function removeInteractiveElements(element) {

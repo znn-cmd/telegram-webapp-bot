@@ -5925,6 +5925,19 @@ def api_save_html_report():
                                 }}
                             }}
                         }});
+                    }} else {{
+                        // Если данных нет, попробуем извлечь из таблиц в сохраненном отчете
+                        const tableData = extractTableDataFromSavedReport(chartId);
+                        if (tableData) {{
+                            const ctx = canvas.getContext('2d');
+                            new Chart(ctx, {{
+                                type: 'line',
+                                data: tableData.data,
+                                options: tableData.options
+                            }});
+                        }} else {{
+                            showChartPlaceholder(canvas);
+                        }}
                     }}
                 }} catch (error) {{
                     console.error('Error restoring chart:', error);
@@ -5932,6 +5945,174 @@ def api_save_html_report():
                     showChartPlaceholder(canvas);
                 }}
             }});
+        }}
+
+        function extractTableDataFromSavedReport(chartId) {{
+            // Извлекаем данные из таблиц в сохраненном отчете
+            if (chartId === 'trendsChart') {{
+                return extractTrendsDataFromSavedReport();
+            }} else if (chartId === 'forecastChart') {{
+                return extractForecastDataFromSavedReport();
+            }}
+            return null;
+        }}
+
+        function extractTrendsDataFromSavedReport() {{
+            // Извлекаем данные из таблицы трендов в сохраненном отчете
+            const trendsTable = document.querySelector('.trends-table tbody');
+            if (!trendsTable) return null;
+            
+            const rows = trendsTable.querySelectorAll('tr:not(.filter-info)');
+            const labels = [];
+            const saleData = [];
+            const rentData = [];
+            
+            rows.forEach(row => {{
+                const cells = row.querySelectorAll('td');
+                if (cells.length >= 5) {{
+                    const date = cells[0].textContent.trim();
+                    const salePrice = parseFloat(cells[1].textContent.replace(/[^\\d.]/g, ''));
+                    const rentPrice = parseFloat(cells[3].textContent.replace(/[^\\d.]/g, ''));
+                    
+                    if (!isNaN(salePrice) && !isNaN(rentPrice)) {{
+                        labels.push(date);
+                        saleData.push(salePrice);
+                        rentData.push(rentPrice);
+                    }}
+                }}
+            }});
+            
+            if (labels.length === 0) return null;
+            
+            return {{
+                data: {{
+                    labels: labels,
+                    datasets: [
+                        {{
+                            label: 'Продажа (₺/м²)',
+                            data: saleData,
+                            borderColor: '#3498db',
+                            backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                            tension: 0.1
+                        }},
+                        {{
+                            label: 'Аренда (₺/м²)',
+                            data: rentData,
+                            borderColor: '#e74c3c',
+                            backgroundColor: 'rgba(231, 76, 60, 0.1)',
+                            tension: 0.1
+                        }}
+                    ]
+                }},
+                options: {{
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {{
+                        legend: {{
+                            position: 'top',
+                            labels: {{
+                                font: {{ size: 12 }},
+                                color: '#2c3e50'
+                            }}
+                        }},
+                        title: {{
+                            display: true,
+                            text: 'График трендов цен на недвижимость',
+                            color: '#2c3e50',
+                            font: {{ size: 16, weight: 'bold' }}
+                        }}
+                    }},
+                    scales: {{
+                        x: {{
+                            grid: {{ color: '#e9ecef' }},
+                            ticks: {{ color: '#6c757d', font: {{ size: 11 }} }}
+                        }},
+                        y: {{
+                            grid: {{ color: '#e9ecef' }},
+                            ticks: {{ color: '#6c757d', font: {{ size: 11 }} }}
+                        }}
+                    }}
+                }}
+            }};
+        }}
+
+        function extractForecastDataFromSavedReport() {{
+            // Извлекаем данные из таблицы прогноза в сохраненном отчете
+            const forecastTable = document.querySelector('.forecast-table tbody');
+            if (!forecastTable) return null;
+            
+            const rows = forecastTable.querySelectorAll('tr:not(.forecast-info)');
+            const labels = [];
+            const saleData = [];
+            const rentData = [];
+            
+            rows.forEach(row => {{
+                const cells = row.querySelectorAll('td');
+                if (cells.length >= 3) {{
+                    const date = cells[0].textContent.trim();
+                    const salePrice = parseFloat(cells[1].textContent.replace(/[^\\d.]/g, ''));
+                    const rentPrice = parseFloat(cells[2].textContent.replace(/[^\\d.]/g, ''));
+                    
+                    if (!isNaN(salePrice) && !isNaN(rentPrice)) {{
+                        labels.push(date);
+                        saleData.push(salePrice);
+                        rentData.push(rentPrice);
+                    }}
+                }}
+            }});
+            
+            if (labels.length === 0) return null;
+            
+            return {{
+                data: {{
+                    labels: labels,
+                    datasets: [
+                        {{
+                            label: 'Прогноз продажи (₺/м²)',
+                            data: saleData,
+                            borderColor: '#9b59b6',
+                            backgroundColor: 'rgba(155, 89, 182, 0.1)',
+                            tension: 0.1
+                        }},
+                        {{
+                            label: 'Прогноз аренды (₺/м²)',
+                            data: rentData,
+                            borderColor: '#f39c12',
+                            backgroundColor: 'rgba(243, 156, 18, 0.1)',
+                            tension: 0.1
+                        }}
+                    ]
+                }},
+                options: {{
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {{
+                        legend: {{
+                            position: 'top',
+                            labels: {{
+                                font: {{ size: 12 }},
+                                color: '#2c3e50'
+                            }}
+                        }},
+                        title: {{
+                            display: true,
+                            text: 'Прогноз цен на недвижимость',
+                            color: '#2c3e50',
+                            font: {{ size: 16, weight: 'bold' }}
+                        }}
+                    }},
+                    scales: {{
+                        x: {{
+                            grid: {{ color: '#e9ecef' }},
+                            ticks: {{ color: '#6c757d', font: {{ size: 11 }} }}
+                        }},
+                        y: {{
+                            grid: {{ color: '#e9ecef' }},
+                            ticks: {{ color: '#6c757d', font: {{ size: 11 }} }}
+                        }}
+                    }}
+                }}
+            }};
         }}
         
         function getChartTitle(chartId) {{
