@@ -9264,10 +9264,43 @@
             // Clone the content to avoid modifying the original
             const clonedContent = dataContent.cloneNode(true);
             
+            // Сохраняем данные графиков перед удалением интерактивных элементов
+            saveChartData(clonedContent);
+            
             // Remove interactive elements
             removeInteractiveElements(clonedContent);
             
             return clonedContent.innerHTML;
+        }
+
+        function saveChartData(element) {
+            // Находим все canvas элементы с графиками
+            const canvasElements = element.querySelectorAll('canvas');
+            
+            canvasElements.forEach(canvas => {
+                try {
+                    // Получаем данные графика из Chart.js
+                    const chartId = canvas.id;
+                    const chart = Chart.getChart(canvas);
+                    
+                    if (chart) {
+                        // Сохраняем данные графика в data-атрибутах
+                        const chartData = {
+                            type: chart.config.type,
+                            data: chart.config.data,
+                            options: chart.config.options
+                        };
+                        
+                        canvas.setAttribute('data-chart-data', JSON.stringify(chartData));
+                        canvas.setAttribute('data-chart-type', chart.config.type);
+                        canvas.setAttribute('data-chart-id', chartId);
+                        
+                        console.log(`Chart data saved for ${chartId}:`, chartData);
+                    }
+                } catch (error) {
+                    console.error('Error saving chart data:', error);
+                }
+            });
         }
 
         function removeInteractiveElements(element) {
@@ -9305,6 +9338,11 @@
                 el.removeAttribute('onfocus');
                 el.removeAttribute('onblur');
             });
+            
+            // НЕ удаляем canvas элементы - они нужны для графиков
+            // Вместо этого удаляем только элементы управления графиками
+            const chartControls = element.querySelectorAll('.chart-controls, .chart-type-buttons');
+            chartControls.forEach(control => control.remove());
         }
 
         function getLocationInfo() {

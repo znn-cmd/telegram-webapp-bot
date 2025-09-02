@@ -5993,8 +5993,11 @@ def generate_qr_code_svg(url):
         svg_string = qr.make_svg(fill_color="black", back_color="white")
         return svg_string
     except ImportError:
-        # Fallback если qrcode не установлен
-        return f'<svg width="80" height="80" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="25" height="25" fill="white"/><text x="12.5" y="12.5" text-anchor="middle" dy=".3em" font-size="8" fill="#2c3e50">QR</text></svg>'
+        # Fallback если qrcode не установлен - создаем простой SVG QR-код
+        return f'''<svg width="80" height="80" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="25" height="25" fill="white"/>
+            <path d="M1 1h3v3H1V1zm5 0h1v1H6V1zm2 0h3v1H8V1zm5 0h1v1h-1V1zm2 0h3v3h-2V1zm5 0h3v3h-3V1zM1 2h1v1H1V2zm3 0h1v1H4V2zm5 0h1v1H9V2zm2 0h1v1h-1V2zm7 0h1v1h-1V2zM1 3h1v1H1V3zm3 0h1v1H4V3zm7 0h1v1h-1V3zm3 0h1v1h-1V3zm5 0h1v1h-1V3zM1 5h3v3H1V5zm5 0h1v1H6V5zm3 0h1v1H9V5zm2 0h1v1h-1V5zm3 0h1v1h-1V5zm6 0h3v3h-3V5zM1 6h1v1H1V6zm3 0h1v1H4V6zm5 0h3v1H9V6zm4 0h1v1h-1V6zm7 0h1v1h-1V6zM1 7h1v1H1V7zm3 0h1v1H4V7zm8 0h1v1h-1V7zm3 0h1v1h-1V7zm5 0h1v1h-1V7zM6 9h1v1H6V9zm2 0h1v1H8V9zm3 0h1v1h-1V9zm2 0h1v1h-1V9zm3 0h1v1h-1V9zm3 0h1v1h-1V9zM1 10h1v1H1v-1zm2 0h1v1H3v-1zm4 0h1v1H7v-1zm4 0h3v1h-3v-1zm5 0h1v1h-1v-1zm3 0h1v1h-1v-1zM2 11h1v1H2v-1zm2 0h3v1H4v-1zm3 0h1v1H7v-1zm3 0h1v1h-1v-1zm4 0h1v1h-1v-1zm3 0h1v1h-1v-1zM1 12h1v1H1v-1zm4 0h1v1H5v-1zm2 0h1v1H7v-1zm4 0h1v1h-1v-1zm2 0h1v1h-1v-1zm4 0h1v1h-1v-1zm3 0h1v1h-1v-1zM3 13h1v1H3v-1zm2 0h1v1H5v-1zm3 0h1v1H8v-1zm4 0h1v1h-1v-1zm3 0h1v1h-1v-1zm3 0h1v1h-1v-1zM1 14h1v1H1v-1zm3 0h1v1H4v-1zm2 0h1v1H6v-1zm3 0h1v1H9v-1zm2 0h1v1h-1v-1zm5 0h1v1h-1v-1zm3 0h1v1h-1v-1zM2 15h1v1H2v-1zm2 0h1v1H4v-1zm3 0h1v1H7v-1zm3 0h1v1h-1v-1zm3 0h1v1h-1v-1zm4 0h1v1h-1v-1zM1 17h3v3H1v-3zm5 0h1v1H6v-1zm3 0h1v1H9v-1zm2 0h1v1h-1v-1zm3 0h1v1h-1v-1zm4 0h1v1h-1v-1zM1 18h1v1H1v-1zm3 0h1v1H4v-1zm5 0h1v1H9v-1zm3 0h1v1h-1v-1zm3 0h1v1h-1v-1zm4 0h1v1h-1v-1zM1 19h1v1H1v-1zm3 0h1v1H4v-1zm6 0h1v1h-1v-1zm2 0h1v1h-1v-1zm4 0h3v1h-3v-1zm4 0h1v1h-1v-1zM6 21h1v1H6v-1zm3 0h1v1H9v-1zm2 0h1v1h-1v-1zm3 0h1v1h-1v-1zm3 0h1v1h-1v-1zm3 0h1v1h-1v-1zM1 22h1v1H1v-1zm2 0h1v1H3v-1zm3 0h1v1H6v-1zm3 0h1v1h-1v-1zm3 0h1v1h-1v-1zm4 0h1v1h-1v-1zm4 0h1v1h-1v-1zM2 23h3v1H2v-1zm3 0h1v1H5v-1zm3 0h1v1H8v-1zm3 0h1v1h-1v-1zm3 0h1v1h-1v-1zm3 0h1v1h-1v-1z" fill="#2c3e50"/>
+        </svg>'''
 
 @app.route('/api/send_saved_report_pdf', methods=['POST'])
 def api_send_saved_report_pdf():
