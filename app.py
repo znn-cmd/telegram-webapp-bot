@@ -5823,9 +5823,136 @@ def api_save_html_report():
         </div>
 
         <!-- Основной контент отчета -->
-        <div class="report-content">
-            {report_content}
-        </div>
+                        <div class="report-content">
+                    {report_content}
+                </div>
+                
+                <!-- Добавляем кнопки переключения графиков -->
+                <script>
+                    // Добавляем кнопки переключения для графиков трендов
+                    function addChartControls() {{
+                        const trendsChartContainer = document.querySelector('#trendsChart').parentElement;
+                        if (trendsChartContainer && !trendsChartContainer.querySelector('.chart-controls')) {{
+                            const controlsHtml = `
+                                <div class="chart-controls" style="margin-bottom: 15px; text-align: center;">
+                                    <button class="chart-button active" data-chart-type="sale" onclick="switchTrendsChartType('sale')" style="background: #28a745; color: white; border: none; padding: 8px 16px; margin: 0 5px; border-radius: 4px; cursor: pointer; font-size: 12px;">
+                                        Цена м² продажи
+                                    </button>
+                                    <button class="chart-button" data-chart-type="rent" onclick="switchTrendsChartType('rent')" style="background: #6c757d; color: white; border: none; padding: 8px 16px; margin: 0 5px; border-radius: 4px; cursor: pointer; font-size: 12px;">
+                                        Цена м² аренды
+                                    </button>
+                                </div>
+                            `;
+                            trendsChartContainer.insertAdjacentHTML('beforebegin', controlsHtml);
+                        }}
+                        
+                        const forecastChartContainer = document.querySelector('#forecastChart').parentElement;
+                        if (forecastChartContainer && !forecastChartContainer.querySelector('.chart-controls')) {{
+                            const controlsHtml = `
+                                <div class="chart-controls" style="margin-bottom: 15px; text-align: center;">
+                                    <button class="chart-button active" data-chart-type="sale" onclick="switchForecastChartType('sale')" style="background: #9b59b6; color: white; border: none; padding: 8px 16px; margin: 0 5px; border-radius: 4px; cursor: pointer; font-size: 12px;">
+                                        Прогноз продажи
+                                    </button>
+                                    <button class="chart-button" data-chart-type="rent" onclick="switchForecastChartType('rent')" style="background: #6c757d; color: white; border: none; padding: 8px 16px; margin: 0 5px; border-radius: 4px; cursor: pointer; font-size: 12px;">
+                                        Прогноз аренды
+                                    </button>
+                                </div>
+                            `;
+                            forecastChartContainer.insertAdjacentHTML('beforebegin', controlsHtml);
+                        }}
+                    }}
+                    
+                    // Переключение типа графика трендов
+                    function switchTrendsChartType(chartType) {{
+                        const buttons = document.querySelectorAll('[data-chart-type="sale"], [data-chart-type="rent"]');
+                        buttons.forEach(btn => btn.classList.remove('active'));
+                        event.target.classList.add('active');
+                        
+                        const canvas = document.getElementById('trendsChart');
+                        if (canvas) {{
+                            const chartData = JSON.parse(canvas.getAttribute('data-chart-data'));
+                            if (chartData && chartData.data) {{
+                                // Обновляем данные для нового типа
+                                const newData = {{
+                                    ...chartData,
+                                    data: {{
+                                        ...chartData.data,
+                                        datasets: [{{
+                                            ...chartData.data.datasets[0],
+                                            data: chartData.data.datasets[0].data,
+                                            pointBackgroundColor: chartType === 'sale' ? '#28a745' : '#ffc107',
+                                            borderColor: chartType === 'sale' ? '#28a745' : '#ffc107'
+                                        }}]
+                                    }}
+                                }};
+                                
+                                // Обновляем опции
+                                if (newData.options && newData.options.scales && newData.options.scales.y) {{
+                                    newData.options.scales.y.title.text = chartType === 'sale' ? 'Цена продажи (₺/м²)' : 'Цена аренды (₺/м²)';
+                                }}
+                                
+                                // Пересоздаем график
+                                const ctx = canvas.getContext('2d');
+                                if (window.trendsChart) {{
+                                    window.trendsChart.destroy();
+                                }}
+                                window.trendsChart = new Chart(ctx, {{
+                                    type: 'line',
+                                    data: newData.data,
+                                    options: newData.options
+                                }});
+                            }}
+                        }}
+                    }}
+                    
+                    // Переключение типа графика прогноза
+                    function switchForecastChartType(chartType) {{
+                        const buttons = document.querySelectorAll('[data-chart-type="sale"], [data-chart-type="rent"]');
+                        buttons.forEach(btn => btn.classList.remove('active'));
+                        event.target.classList.add('active');
+                        
+                        const canvas = document.getElementById('forecastChart');
+                        if (canvas) {{
+                            const chartData = JSON.parse(canvas.getAttribute('data-chart-data'));
+                            if (chartData && chartData.data) {{
+                                // Обновляем данные для нового типа
+                                const newData = {{
+                                    ...chartData,
+                                    data: {{
+                                        ...chartData.data,
+                                        datasets: [{{
+                                            ...chartData.data.datasets[0],
+                                            data: chartData.data.datasets[0].data,
+                                            pointBackgroundColor: chartType === 'sale' ? '#9b59b6' : '#f39c12',
+                                            borderColor: chartType === 'sale' ? '#9b59b6' : '#f39c12'
+                                        }}]
+                                    }}
+                                }};
+                                
+                                // Обновляем опции
+                                if (newData.options && newData.options.scales && newData.options.scales.y) {{
+                                    newData.options.scales.y.title.text = chartType === 'sale' ? 'Прогноз продажи (₺/м²)' : 'Прогноз аренды (₺/м²)';
+                                }}
+                                
+                                // Пересоздаем график
+                                const ctx = canvas.getContext('2d');
+                                if (window.forecastChart) {{
+                                    window.forecastChart.destroy();
+                                }}
+                                window.forecastChart = new Chart(ctx, {{
+                                    type: 'line',
+                                    data: newData.data,
+                                    options: newData.options
+                                }});
+                            }}
+                        }}
+                    }}
+                    
+                    // Добавляем контролы после загрузки страницы
+                    document.addEventListener('DOMContentLoaded', function() {{
+                        setTimeout(addChartControls, 100);
+                    }});
+                </script>
         
         <!-- Дисклеймер и информация -->
         <div class="corporate-footer">
@@ -5925,19 +6052,6 @@ def api_save_html_report():
                                 }}
                             }}
                         }});
-                    }} else {{
-                        // Если данных нет, попробуем извлечь из таблиц в сохраненном отчете
-                        const tableData = extractTableDataFromSavedReport(chartId);
-                        if (tableData) {{
-                            const ctx = canvas.getContext('2d');
-                            new Chart(ctx, {{
-                                type: 'line',
-                                data: tableData.data,
-                                options: tableData.options
-                            }});
-                        }} else {{
-                            showChartPlaceholder(canvas);
-                        }}
                     }}
                 }} catch (error) {{
                     console.error('Error restoring chart:', error);
@@ -5945,174 +6059,6 @@ def api_save_html_report():
                     showChartPlaceholder(canvas);
                 }}
             }});
-        }}
-
-        function extractTableDataFromSavedReport(chartId) {{
-            // Извлекаем данные из таблиц в сохраненном отчете
-            if (chartId === 'trendsChart') {{
-                return extractTrendsDataFromSavedReport();
-            }} else if (chartId === 'forecastChart') {{
-                return extractForecastDataFromSavedReport();
-            }}
-            return null;
-        }}
-
-        function extractTrendsDataFromSavedReport() {{
-            // Извлекаем данные из таблицы трендов в сохраненном отчете
-            const trendsTable = document.querySelector('.trends-table tbody');
-            if (!trendsTable) return null;
-            
-            const rows = trendsTable.querySelectorAll('tr:not(.filter-info)');
-            const labels = [];
-            const saleData = [];
-            const rentData = [];
-            
-            rows.forEach(row => {{
-                const cells = row.querySelectorAll('td');
-                if (cells.length >= 5) {{
-                    const date = cells[0].textContent.trim();
-                    const salePrice = parseFloat(cells[1].textContent.replace(/[^\\d.]/g, ''));
-                    const rentPrice = parseFloat(cells[3].textContent.replace(/[^\\d.]/g, ''));
-                    
-                    if (!isNaN(salePrice) && !isNaN(rentPrice)) {{
-                        labels.push(date);
-                        saleData.push(salePrice);
-                        rentData.push(rentPrice);
-                    }}
-                }}
-            }});
-            
-            if (labels.length === 0) return null;
-            
-            return {{
-                data: {{
-                    labels: labels,
-                    datasets: [
-                        {{
-                            label: 'Продажа (₺/м²)',
-                            data: saleData,
-                            borderColor: '#3498db',
-                            backgroundColor: 'rgba(52, 152, 219, 0.1)',
-                            tension: 0.1
-                        }},
-                        {{
-                            label: 'Аренда (₺/м²)',
-                            data: rentData,
-                            borderColor: '#e74c3c',
-                            backgroundColor: 'rgba(231, 76, 60, 0.1)',
-                            tension: 0.1
-                        }}
-                    ]
-                }},
-                options: {{
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {{
-                        legend: {{
-                            position: 'top',
-                            labels: {{
-                                font: {{ size: 12 }},
-                                color: '#2c3e50'
-                            }}
-                        }},
-                        title: {{
-                            display: true,
-                            text: 'График трендов цен на недвижимость',
-                            color: '#2c3e50',
-                            font: {{ size: 16, weight: 'bold' }}
-                        }}
-                    }},
-                    scales: {{
-                        x: {{
-                            grid: {{ color: '#e9ecef' }},
-                            ticks: {{ color: '#6c757d', font: {{ size: 11 }} }}
-                        }},
-                        y: {{
-                            grid: {{ color: '#e9ecef' }},
-                            ticks: {{ color: '#6c757d', font: {{ size: 11 }} }}
-                        }}
-                    }}
-                }}
-            }};
-        }}
-
-        function extractForecastDataFromSavedReport() {{
-            // Извлекаем данные из таблицы прогноза в сохраненном отчете
-            const forecastTable = document.querySelector('.forecast-table tbody');
-            if (!forecastTable) return null;
-            
-            const rows = forecastTable.querySelectorAll('tr:not(.forecast-info)');
-            const labels = [];
-            const saleData = [];
-            const rentData = [];
-            
-            rows.forEach(row => {{
-                const cells = row.querySelectorAll('td');
-                if (cells.length >= 3) {{
-                    const date = cells[0].textContent.trim();
-                    const salePrice = parseFloat(cells[1].textContent.replace(/[^\\d.]/g, ''));
-                    const rentPrice = parseFloat(cells[2].textContent.replace(/[^\\d.]/g, ''));
-                    
-                    if (!isNaN(salePrice) && !isNaN(rentPrice)) {{
-                        labels.push(date);
-                        saleData.push(salePrice);
-                        rentData.push(rentPrice);
-                    }}
-                }}
-            }});
-            
-            if (labels.length === 0) return null;
-            
-            return {{
-                data: {{
-                    labels: labels,
-                    datasets: [
-                        {{
-                            label: 'Прогноз продажи (₺/м²)',
-                            data: saleData,
-                            borderColor: '#9b59b6',
-                            backgroundColor: 'rgba(155, 89, 182, 0.1)',
-                            tension: 0.1
-                        }},
-                        {{
-                            label: 'Прогноз аренды (₺/м²)',
-                            data: rentData,
-                            borderColor: '#f39c12',
-                            backgroundColor: 'rgba(243, 156, 18, 0.1)',
-                            tension: 0.1
-                        }}
-                    ]
-                }},
-                options: {{
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {{
-                        legend: {{
-                            position: 'top',
-                            labels: {{
-                                font: {{ size: 12 }},
-                                color: '#2c3e50'
-                            }}
-                        }},
-                        title: {{
-                            display: true,
-                            text: 'Прогноз цен на недвижимость',
-                            color: '#2c3e50',
-                            font: {{ size: 16, weight: 'bold' }}
-                        }}
-                    }},
-                    scales: {{
-                        x: {{
-                            grid: {{ color: '#e9ecef' }},
-                            ticks: {{ color: '#6c757d', font: {{ size: 11 }} }}
-                        }},
-                        y: {{
-                            grid: {{ color: '#e9ecef' }},
-                            ticks: {{ color: '#6c757d', font: {{ size: 11 }} }}
-                        }}
-                    }}
-                }}
-            }};
         }}
         
         function getChartTitle(chartId) {{

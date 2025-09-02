@@ -9279,12 +9279,11 @@
             
             canvasElements.forEach(canvas => {
                 try {
-                    // Получаем данные графика из Chart.js
                     const chartId = canvas.id;
                     const chart = Chart.getChart(canvas);
                     
                     if (chart) {
-                        // Сохраняем данные графика в data-атрибутах
+                        // Сохраняем полные данные графика
                         const chartData = {
                             type: chart.config.type,
                             data: chart.config.data,
@@ -9297,26 +9296,26 @@
                         
                         console.log(`Chart data saved for ${chartId}:`, chartData);
                     } else {
-                        // Если график не найден, извлекаем данные из таблиц
-                        const tableData = extractTableDataForChart(chartId);
-                        if (tableData) {
-                            canvas.setAttribute('data-chart-data', JSON.stringify(tableData));
+                        // Если график не найден, сохраняем данные из глобальных переменных
+                        const savedData = getChartDataFromGlobalVariables(chartId);
+                        if (savedData) {
+                            canvas.setAttribute('data-chart-data', JSON.stringify(savedData));
                             canvas.setAttribute('data-chart-type', 'line');
                             canvas.setAttribute('data-chart-id', chartId);
-                            console.log(`Table data extracted for ${chartId}:`, tableData);
+                            console.log(`Global data saved for ${chartId}:`, savedData);
                         }
                     }
                 } catch (error) {
                     console.error('Error saving chart data:', error);
-                    // Fallback: попробуем извлечь данные из таблиц
+                    // Fallback: попробуем получить данные из глобальных переменных
                     try {
                         const chartId = canvas.id;
-                        const tableData = extractTableDataForChart(chartId);
-                        if (tableData) {
-                            canvas.setAttribute('data-chart-data', JSON.stringify(tableData));
+                        const savedData = getChartDataFromGlobalVariables(chartId);
+                        if (savedData) {
+                            canvas.setAttribute('data-chart-data', JSON.stringify(savedData));
                             canvas.setAttribute('data-chart-type', 'line');
                             canvas.setAttribute('data-chart-id', chartId);
-                            console.log(`Fallback table data for ${chartId}:`, tableData);
+                            console.log(`Fallback global data for ${chartId}:`, savedData);
                         }
                     } catch (fallbackError) {
                         console.error('Fallback error:', fallbackError);
@@ -9325,171 +9324,296 @@
             });
         }
 
-        function extractTableDataForChart(chartId) {
-            // Извлекаем данные из таблиц для построения графиков
-            if (chartId === 'trendsChart') {
-                return extractTrendsData();
-            } else if (chartId === 'forecastChart') {
-                return extractForecastData();
+        function getChartDataFromGlobalVariables(chartId) {
+            if (chartId === 'trendsChart' && window.currentTrendsData) {
+                return prepareChartDataForSave(window.currentTrendsData, currentChartType);
+            } else if (chartId === 'forecastChart' && currentForecastData) {
+                return prepareForecastChartDataForSave(currentForecastData, currentForecastChartType);
             }
             return null;
         }
 
-        function extractTrendsData() {
-            // Извлекаем данные из таблицы трендов
-            const trendsTable = document.querySelector('.trends-table tbody');
-            if (!trendsTable) return null;
+        function prepareChartDataForSave(trends, chartType) {
+            if (!trends || trends.length === 0) return null;
             
-            const rows = trendsTable.querySelectorAll('tr:not(.filter-info)');
-            const labels = [];
-            const saleData = [];
-            const rentData = [];
+            const monthNames = [
+                'Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн',
+                'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'
+            ];
             
-            rows.forEach(row => {
-                const cells = row.querySelectorAll('td');
-                if (cells.length >= 5) {
-                    const date = cells[0].textContent.trim();
-                    const salePrice = parseFloat(cells[1].textContent.replace(/[^\d.]/g, ''));
-                    const rentPrice = parseFloat(cells[3].textContent.replace(/[^\d.]/g, ''));
-                    
-                    if (!isNaN(salePrice) && !isNaN(rentPrice)) {
-                        labels.push(date);
-                        saleData.push(salePrice);
-                        rentData.push(rentPrice);
-                    }
+            // Сортируем тренды по дате
+            const sortedTrends = trends.sort((a, b) => {
+                if (a.property_year !== b.property_year) {
+                    return a.property_year - b.property_year;
                 }
+                return a.property_month - b.property_month;
             });
             
-            if (labels.length === 0) return null;
+            // Фильтруем данные: до текущего месяца и один месяц вперед
+            const today = new Date();
+            const currentYear = today.getFullYear();
+            const currentMonth = today.getMonth() + 1;
+            
+            const oneMonthAhead = new Date();
+            oneMonthAhead.setMonth(today.getMonth() + 1);
+            const oneMonthAheadYear = oneMonthAhead.getFullYear();
+            const oneMonthAheadMonth = oneMonthAhead.getMonth() + 1;
+            
+            const filteredTrends = sortedTrends.filter(trend => {
+                const trendDate = new Date(trend.property_year, trend.property_month - 1, 1);
+                const filterEndDate = new Date(oneMonthAheadYear, oneMonthAheadMonth - 1, 1);
+                return trendDate <= filterEndDate;
+            });
+            
+            const labels = filteredTrends.map(trend => {
+                const monthName = monthNames[trend.property_month - 1] || trend.property_month;
+                return `${monthName} ${trend.property_year}`;
+            });
+            
+            const data = filteredTrends.map(trend => {
+                if (chartType === 'sale') {
+                    return parseFloat(trend.is_price_calculated ? trend.calculated_sale_price : trend.unit_price_for_sale) || 0;
+                } else {
+                    return parseFloat(trend.is_price_calculated ? trend.calculated_rent_price : trend.unit_price_for_rent) || 0;
+                }
+            });
             
             return {
                 type: 'line',
                 data: {
                     labels: labels,
-                    datasets: [
-                        {
-                            label: 'Продажа (₺/м²)',
-                            data: saleData,
-                            borderColor: '#3498db',
-                            backgroundColor: 'rgba(52, 152, 219, 0.1)',
-                            tension: 0.1
-                        },
-                        {
-                            label: 'Аренда (₺/м²)',
-                            data: rentData,
-                            borderColor: '#e74c3c',
-                            backgroundColor: 'rgba(231, 76, 60, 0.1)',
-                            tension: 0.1
-                        }
-                    ]
+                    datasets: [{
+                        data: data,
+                        fill: false,
+                        pointBackgroundColor: chartType === 'sale' ? '#28a745' : '#ffc107',
+                        pointBorderColor: 'white',
+                        pointBorderWidth: 2,
+                        pointRadius: 4,
+                        pointHoverRadius: 6,
+                        borderColor: chartType === 'sale' ? '#28a745' : '#ffc107',
+                        borderWidth: 3,
+                        tension: 0.4
+                    }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: {
                         legend: {
-                            position: 'top',
-                            labels: {
-                                font: { size: 12 },
-                                color: '#2c3e50'
-                            }
+                            display: false
                         },
-                        title: {
-                            display: true,
-                            text: 'График трендов цен на недвижимость',
-                            color: '#2c3e50',
-                            font: { size: 16, weight: 'bold' }
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false,
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            titleColor: 'white',
+                            bodyColor: 'white',
+                            borderColor: '#667eea',
+                            borderWidth: 1,
+                            callbacks: {
+                                label: function(context) {
+                                    const value = context.parsed.y;
+                                    if (chartType === 'sale') {
+                                        return `Цена продажи: ₺${value.toLocaleString('ru-RU', { minimumFractionDigits: 2 })}/м²`;
+                                    } else {
+                                        return `Цена аренды: ₺${value.toLocaleString('ru-RU', { minimumFractionDigits: 2 })}/м²`;
+                                    }
+                                }
+                            }
                         }
                     },
                     scales: {
                         x: {
-                            grid: { color: '#e9ecef' },
-                            ticks: { color: '#6c757d', font: { size: 11 } }
+                            display: true,
+                            title: {
+                                display: true,
+                                text: 'Месяц',
+                                color: '#495057',
+                                font: {
+                                    size: 12,
+                                    weight: '500'
+                                }
+                            },
+                            ticks: {
+                                color: '#6c757d',
+                                font: {
+                                    size: 10
+                                }
+                            },
+                            grid: {
+                                color: '#e9ecef',
+                                drawBorder: false
+                            }
                         },
                         y: {
-                            grid: { color: '#e9ecef' },
-                            ticks: { color: '#6c757d', font: { size: 11 } }
+                            display: true,
+                            title: {
+                                display: true,
+                                text: chartType === 'sale' ? 'Цена продажи (₺/м²)' : 'Цена аренды (₺/м²)',
+                                color: '#495057',
+                                font: {
+                                    size: 12,
+                                    weight: '500'
+                                }
+                            },
+                            ticks: {
+                                color: '#6c757d',
+                                font: {
+                                    size: 10
+                                },
+                                callback: function(value) {
+                                    if (chartType === 'sale') {
+                                        return `₺${value.toLocaleString('ru-RU')}`;
+                                    } else {
+                                        return `₺${value}`;
+                                    }
+                                }
+                            },
+                            grid: {
+                                color: '#e9ecef',
+                                drawBorder: false
+                            }
                         }
+                    },
+                    interaction: {
+                        mode: 'nearest',
+                        axis: 'x',
+                        intersect: false
                     }
                 }
             };
         }
 
-        function extractForecastData() {
-            // Извлекаем данные из таблицы прогноза
-            const forecastTable = document.querySelector('.forecast-table tbody');
-            if (!forecastTable) return null;
+        function prepareForecastChartDataForSave(forecastTrends, chartType) {
+            if (!forecastTrends || forecastTrends.length === 0) return null;
             
-            const rows = forecastTable.querySelectorAll('tr:not(.forecast-info)');
-            const labels = [];
-            const saleData = [];
-            const rentData = [];
+            const monthNames = [
+                'Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн',
+                'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'
+            ];
             
-            rows.forEach(row => {
-                const cells = row.querySelectorAll('td');
-                if (cells.length >= 3) {
-                    const date = cells[0].textContent.trim();
-                    const salePrice = parseFloat(cells[1].textContent.replace(/[^\d.]/g, ''));
-                    const rentPrice = parseFloat(cells[2].textContent.replace(/[^\d.]/g, ''));
-                    
-                    if (!isNaN(salePrice) && !isNaN(rentPrice)) {
-                        labels.push(date);
-                        saleData.push(salePrice);
-                        rentData.push(rentPrice);
-                    }
+            // Сортируем тренды по дате
+            const sortedTrends = forecastTrends.sort((a, b) => {
+                if (a.property_year !== b.property_year) {
+                    return a.property_year - b.property_year;
                 }
+                return a.property_month - b.property_month;
             });
             
-            if (labels.length === 0) return null;
+            const labels = sortedTrends.map(trend => {
+                const monthName = monthNames[trend.property_month - 1] || trend.property_month;
+                return `${monthName} ${trend.property_year}`;
+            });
+            
+            const data = sortedTrends.map(trend => {
+                if (chartType === 'sale') {
+                    return parseFloat(trend.calculated_sale_price || trend.unit_price_for_sale) || 0;
+                } else {
+                    return parseFloat(trend.calculated_rent_price || trend.unit_price_for_rent) || 0;
+                }
+            });
             
             return {
                 type: 'line',
                 data: {
                     labels: labels,
-                    datasets: [
-                        {
-                            label: 'Прогноз продажи (₺/м²)',
-                            data: saleData,
-                            borderColor: '#9b59b6',
-                            backgroundColor: 'rgba(155, 89, 182, 0.1)',
-                            tension: 0.1
-                        },
-                        {
-                            label: 'Прогноз аренды (₺/м²)',
-                            data: rentData,
-                            borderColor: '#f39c12',
-                            backgroundColor: 'rgba(243, 156, 18, 0.1)',
-                            tension: 0.1
-                        }
-                    ]
+                    datasets: [{
+                        data: data,
+                        fill: false,
+                        pointBackgroundColor: chartType === 'sale' ? '#9b59b6' : '#f39c12',
+                        pointBorderColor: 'white',
+                        pointBorderWidth: 2,
+                        pointRadius: 4,
+                        pointHoverRadius: 6,
+                        borderColor: chartType === 'sale' ? '#9b59b6' : '#f39c12',
+                        borderWidth: 3,
+                        tension: 0.4
+                    }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: {
                         legend: {
-                            position: 'top',
-                            labels: {
-                                font: { size: 12 },
-                                color: '#2c3e50'
-                            }
+                            display: false
                         },
-                        title: {
-                            display: true,
-                            text: 'Прогноз цен на недвижимость',
-                            color: '#2c3e50',
-                            font: { size: 16, weight: 'bold' }
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false,
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            titleColor: 'white',
+                            bodyColor: 'white',
+                            borderColor: '#667eea',
+                            borderWidth: 1,
+                            callbacks: {
+                                label: function(context) {
+                                    const value = context.parsed.y;
+                                    if (chartType === 'sale') {
+                                        return `Прогноз продажи: ₺${value.toLocaleString('ru-RU', { minimumFractionDigits: 2 })}/м²`;
+                                    } else {
+                                        return `Прогноз аренды: ₺${value.toLocaleString('ru-RU', { minimumFractionDigits: 2 })}/м²`;
+                                    }
+                                }
+                            }
                         }
                     },
                     scales: {
                         x: {
-                            grid: { color: '#e9ecef' },
-                            ticks: { color: '#6c757d', font: { size: 11 } }
+                            display: true,
+                            title: {
+                                display: true,
+                                text: 'Месяц',
+                                color: '#495057',
+                                font: {
+                                    size: 12,
+                                    weight: '500'
+                                }
+                            },
+                            ticks: {
+                                color: '#6c757d',
+                                font: {
+                                    size: 10
+                                }
+                            },
+                            grid: {
+                                color: '#e9ecef',
+                                drawBorder: false
+                            }
                         },
                         y: {
-                            grid: { color: '#e9ecef' },
-                            ticks: { color: '#6c757d', font: { size: 11 } }
+                            display: true,
+                            title: {
+                                display: true,
+                                text: chartType === 'sale' ? 'Прогноз продажи (₺/м²)' : 'Прогноз аренды (₺/м²)',
+                                color: '#495057',
+                                font: {
+                                    size: 12,
+                                    weight: '500'
+                                }
+                            },
+                            ticks: {
+                                color: '#6c757d',
+                                font: {
+                                    size: 10
+                                },
+                                callback: function(value) {
+                                    if (chartType === 'sale') {
+                                        return `₺${value.toLocaleString('ru-RU')}`;
+                                    } else {
+                                        return `₺${value}`;
+                                    }
+                                }
+                            },
+                            grid: {
+                                color: '#e9ecef',
+                                drawBorder: false
+                            }
                         }
+                    },
+                    interaction: {
+                        mode: 'nearest',
+                        axis: 'x',
+                        intersect: false
                     }
                 }
             };
