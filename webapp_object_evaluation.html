@@ -9326,9 +9326,17 @@
 
         function getChartDataFromGlobalVariables(chartId) {
             if (chartId === 'trendsChart' && window.currentTrendsData) {
-                return prepareChartDataForSave(window.currentTrendsData, currentChartType);
+                // Сохраняем данные для обоих типов графиков
+                return {
+                    sale: prepareChartDataForSave(window.currentTrendsData, 'sale'),
+                    rent: prepareChartDataForSave(window.currentTrendsData, 'rent')
+                };
             } else if (chartId === 'forecastChart' && currentForecastData) {
-                return prepareForecastChartDataForSave(currentForecastData, currentForecastChartType);
+                // Сохраняем данные для обоих типов графиков
+                return {
+                    sale: prepareForecastChartDataForSave(currentForecastData, 'sale'),
+                    rent: prepareForecastChartDataForSave(currentForecastData, 'rent')
+                };
             }
             return null;
         }

@@ -5864,32 +5864,21 @@ def api_save_html_report():
                     
                     // Переключение типа графика трендов
                     function switchTrendsChartType(chartType) {{
-                        const buttons = document.querySelectorAll('[data-chart-type="sale"], [data-chart-type="rent"]');
-                        buttons.forEach(btn => btn.classList.remove('active'));
+                        // Обновляем активную кнопку
+                        const buttons = document.querySelectorAll('.chart-controls button[data-chart-type]');
+                        buttons.forEach(btn => {{
+                            btn.classList.remove('active');
+                            btn.style.background = '#6c757d';
+                        }});
                         event.target.classList.add('active');
+                        event.target.style.background = chartType === 'sale' ? '#28a745' : '#ffc107';
                         
                         const canvas = document.getElementById('trendsChart');
                         if (canvas) {{
                             const chartData = JSON.parse(canvas.getAttribute('data-chart-data'));
-                            if (chartData && chartData.data) {{
-                                // Обновляем данные для нового типа
-                                const newData = {{
-                                    ...chartData,
-                                    data: {{
-                                        ...chartData.data,
-                                        datasets: [{{
-                                            ...chartData.data.datasets[0],
-                                            data: chartData.data.datasets[0].data,
-                                            pointBackgroundColor: chartType === 'sale' ? '#28a745' : '#ffc107',
-                                            borderColor: chartType === 'sale' ? '#28a745' : '#ffc107'
-                                        }}]
-                                    }}
-                                }};
-                                
-                                // Обновляем опции
-                                if (newData.options && newData.options.scales && newData.options.scales.y) {{
-                                    newData.options.scales.y.title.text = chartType === 'sale' ? 'Цена продажи (₺/м²)' : 'Цена аренды (₺/м²)';
-                                }}
+                            if (chartData && chartData[chartType]) {{
+                                // Используем сохраненные данные для выбранного типа
+                                const newData = chartData[chartType];
                                 
                                 // Пересоздаем график
                                 const ctx = canvas.getContext('2d');
@@ -5907,32 +5896,21 @@ def api_save_html_report():
                     
                     // Переключение типа графика прогноза
                     function switchForecastChartType(chartType) {{
-                        const buttons = document.querySelectorAll('[data-chart-type="sale"], [data-chart-type="rent"]');
-                        buttons.forEach(btn => btn.classList.remove('active'));
+                        // Обновляем активную кнопку
+                        const buttons = document.querySelectorAll('.chart-controls button[data-chart-type]');
+                        buttons.forEach(btn => {{
+                            btn.classList.remove('active');
+                            btn.style.background = '#6c757d';
+                        }});
                         event.target.classList.add('active');
+                        event.target.style.background = chartType === 'sale' ? '#9b59b6' : '#f39c12';
                         
                         const canvas = document.getElementById('forecastChart');
                         if (canvas) {{
                             const chartData = JSON.parse(canvas.getAttribute('data-chart-data'));
-                            if (chartData && chartData.data) {{
-                                // Обновляем данные для нового типа
-                                const newData = {{
-                                    ...chartData,
-                                    data: {{
-                                        ...chartData.data,
-                                        datasets: [{{
-                                            ...chartData.data.datasets[0],
-                                            data: chartData.data.datasets[0].data,
-                                            pointBackgroundColor: chartType === 'sale' ? '#9b59b6' : '#f39c12',
-                                            borderColor: chartType === 'sale' ? '#9b59b6' : '#f39c12'
-                                        }}]
-                                    }}
-                                }};
-                                
-                                // Обновляем опции
-                                if (newData.options && newData.options.scales && newData.options.scales.y) {{
-                                    newData.options.scales.y.title.text = chartType === 'sale' ? 'Прогноз продажи (₺/м²)' : 'Прогноз аренды (₺/м²)';
-                                }}
+                            if (chartData && chartData[chartType]) {{
+                                // Используем сохраненные данные для выбранного типа
+                                const newData = chartData[chartType];
                                 
                                 // Пересоздаем график
                                 const ctx = canvas.getContext('2d');
@@ -5996,62 +5974,89 @@ def api_save_html_report():
                     const chartId = canvas.getAttribute('data-chart-id') || 'chart';
                     
                     // Восстанавливаем график
-                    if (chartData && chartData.data) {{
+                    if (chartData) {{
                         const ctx = canvas.getContext('2d');
                         
+                        // Определяем, какой тип данных у нас есть
+                        let chartConfig;
+                        if (chartData.sale && chartData.rent) {{
+                            // У нас есть данные для обоих типов, используем продажу по умолчанию
+                            chartConfig = chartData.sale;
+                        }} else if (chartData.data) {{
+                            // Старый формат данных
+                            chartConfig = chartData;
+                        }} else {{
+                            console.error('Invalid chart data format');
+                            return;
+                        }}
+                        
                         // Создаем новый график с сохраненными данными
-                        new Chart(ctx, {{
-                            type: chartType,
-                            data: chartData.data,
-                            options: chartData.options || {{
-                                responsive: true,
-                                maintainAspectRatio: false,
-                                plugins: {{
-                                    legend: {{
-                                        position: 'top',
-                                        labels: {{
-                                            font: {{
-                                                size: 12
-                                            }},
-                                            color: '#2c3e50'
-                                        }}
-                                    }},
-                                    title: {{
-                                        display: true,
-                                        text: getChartTitle(chartId),
-                                        color: '#2c3e50',
-                                        font: {{
-                                            size: 16,
-                                            weight: 'bold'
-                                        }}
-                                    }}
-                                }},
-                                scales: {{
-                                    x: {{
-                                        grid: {{
-                                            color: '#e9ecef'
+                        if (chartId === 'trendsChart') {{
+                            window.trendsChart = new Chart(ctx, {{
+                                type: chartType,
+                                data: chartConfig.data,
+                                options: chartConfig.options
+                            }});
+                        }} else if (chartId === 'forecastChart') {{
+                            window.forecastChart = new Chart(ctx, {{
+                                type: chartType,
+                                data: chartConfig.data,
+                                options: chartConfig.options
+                            }});
+                        }} else {{
+                            new Chart(ctx, {{
+                                type: chartType,
+                                data: chartConfig.data,
+                                options: chartConfig.options || {{
+                                    responsive: true,
+                                    maintainAspectRatio: false,
+                                    plugins: {{
+                                        legend: {{
+                                            position: 'top',
+                                            labels: {{
+                                                font: {{
+                                                    size: 12
+                                                }},
+                                                color: '#2c3e50'
+                                            }}
                                         }},
-                                        ticks: {{
-                                            color: '#6c757d',
+                                        title: {{
+                                            display: true,
+                                            text: getChartTitle(chartId),
+                                            color: '#2c3e50',
                                             font: {{
-                                                size: 11
+                                                size: 16,
+                                                weight: 'bold'
                                             }}
                                         }}
                                     }},
-                                    y: {{
-                                        grid: {{
-                                            color: '#e9ecef'
+                                    scales: {{
+                                        x: {{
+                                            grid: {{
+                                                color: '#e9ecef'
+                                            }},
+                                            ticks: {{
+                                                color: '#6c757d',
+                                                font: {{
+                                                    size: 11
+                                                }}
+                                            }}
                                         }},
-                                        ticks: {{
-                                            color: '#6c757d',
-                                            font: {{
-                                                size: 11
+                                        y: {{
+                                            grid: {{
+                                                color: '#e9ecef'
+                                            }},
+                                            ticks: {{
+                                                color: '#6c757d',
+                                                font: {{
+                                                    size: 11
+                                                }}
                                             }}
                                         }}
                                     }}
                                 }}
-                            }}
-                        }});
+                            }});
+                        }}
                     }}
                 }} catch (error) {{
                     console.error('Error restoring chart:', error);
