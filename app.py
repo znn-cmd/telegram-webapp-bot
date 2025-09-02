@@ -58,14 +58,34 @@ except ImportError:
 # Инициализация Flask приложения
 app = Flask(__name__)
 
-# Инициализация Supabase
+# Инициализация Supabase с улучшенными настройками
 supabase_url = os.getenv("SUPABASE_URL")
 supabase_key = os.getenv("SUPABASE_ANON_KEY")
 if not supabase_url or not supabase_key:
     raise RuntimeError("SUPABASE_URL и SUPABASE_ANON_KEY должны быть заданы в переменных окружения!")
 
-# Инициализация Supabase клиента
-supabase: Client = create_client(supabase_url, supabase_key)
+# Создаем HTTP клиент с увеличенными таймаутами и retry логикой
+import httpx
+from httpx import TimeoutException, ConnectTimeout
+
+http_client = httpx.Client(
+    timeout=httpx.Timeout(
+        connect=30.0,  # Таймаут на установку соединения
+        read=60.0,     # Таймаут на чтение
+        write=30.0,    # Таймаут на запись
+        pool=30.0      # Таймаут пула соединений
+    ),
+    limits=httpx.Limits(
+        max_keepalive_connections=20,
+        max_connections=100
+    )
+)
+
+# Инициализация Supabase с кастомным клиентом
+supabase: Client = create_client(
+    supabase_url, 
+    supabase_key
+)
 
 # Токен бота
 TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
@@ -156,31 +176,34 @@ GOOGLE_MAPS_TIMEOUT = int(os.getenv('GOOGLE_MAPS_TIMEOUT', '30'))  # Увели�
 #     # Запускаем бота (закомментировано для WebApp)
 #     # application.run_polling(allowed_updates=Update.ALL_TYPES)
 
-# Функция для безопасного выполнения операций с базой данных (временно отключена)
-# def safe_db_operation(operation, max_retries=3, retry_delay=2):
-#     """
-#     Безопасно выполняет операцию с базой данных с retry логикой
-#     
-#     Args:
-#         operation: Функция для выполнения
-#         max_retries: Максимальное количество попыток
-#         retry_delay: Задержка между попытками в секундах
-#     
-#     Returns:
-#         Результат операции или None в случае ошибки
-#     """
-#     for attempt in range(max_retries):
-#         try:
-#             return operation()
-#         except Exception as e:
-#             logger.warning(f"Database error on attempt {attempt + 1}/{max_retries}: {e}")
-#             if attempt < max_retries - 1:
-#                 time.sleep(retry_delay)
-#                 continue
-#             else:
-#                 logger.error(f"Database operation failed after {max_retries} attempts: {e}")
-#                 return None
-#     return None
+# Функция для безопасного выполнения операций с базой данных
+def safe_db_operation(operation, max_retries=3, retry_delay=2):
+    """
+    Безопасно выполняет операцию с базой данных с retry логикой
+    
+    Args:
+        operation: Функция для выполнения
+        max_retries: Максимальное количество попыток
+        retry_delay: Задержка между попытками в секундах
+    
+    Returns:
+        Результат операции или None в случае ошибки
+    """
+    for attempt in range(max_retries):
+        try:
+            return operation()
+        except (TimeoutException, ConnectTimeout) as e:
+            logger.warning(f"Database timeout on attempt {attempt + 1}/{max_retries}: {e}")
+            if attempt < max_retries - 1:
+                time.sleep(retry_delay)
+                continue
+            else:
+                logger.error(f"Database operation failed after {max_retries} attempts: {e}")
+                return None
+        except Exception as e:
+            logger.error(f"Database operation error: {e}")
+            return None
+    return None
 
 # Flask маршруты для WebApp
 @app.route('/webapp')
@@ -281,7 +304,11 @@ def api_user():
         return jsonify({'error': 'telegram_id required'}), 400
     # Проверяем пользователя в базе
     try:
-        user_result = supabase.table('users').select('*').eq('telegram_id', telegram_id).execute()
+        user_result = safe_db_operation(
+            lambda: supabase.table('users').select('*').eq('telegram_id', telegram_id).execute()
+        )
+        if user_result is None:
+            return jsonify({'error': 'Database connection error'}), 500
         user = user_result.data[0] if user_result.data else None
     except Exception as e:
         logger.error(f"Database connection error: {e}")
@@ -327,7 +354,11 @@ def api_user():
         if referal:
             user_data['referal'] = referal
         try:
-            result = supabase.table('users').insert(user_data).execute()
+            result = safe_db_operation(
+                lambda: supabase.table('users').insert(user_data).execute()
+            )
+            if result is None:
+                return jsonify({'error': 'Database connection error'}), 500
         except Exception as e:
             logger.error(f"Error creating new user: {e}")
             return jsonify({'error': 'Database connection error'}), 500
@@ -4789,7 +4820,11 @@ def api_save_user_report():
     try:
         # Получаем user_id по telegram_id
         try:
-            user_result = supabase.table('users').select('id').eq('telegram_id', telegram_id).execute()
+            user_result = safe_db_operation(
+                lambda: supabase.table('users').select('id').eq('telegram_id', telegram_id).execute()
+            )
+            if user_result is None:
+                return jsonify({'error': 'Database connection error'}), 500
             user_id = user_result.data[0]['id'] if user_result.data else telegram_id
         except Exception as e:
             logger.error(f"Error getting user_id: {e}")
@@ -4804,7 +4839,11 @@ def api_save_user_report():
             'updated_at': datetime.now().isoformat()
         }
         try:
-            result = supabase.table('user_reports').insert(report_data).execute()
+            result = safe_db_operation(
+                lambda: supabase.table('user_reports').insert(report_data).execute()
+            )
+            if result is None:
+                return jsonify({'error': 'Database connection error'}), 500
             new_id = result.data[0]['id'] if hasattr(result, 'data') and result.data else None
             return jsonify({'success': True, 'report_id': new_id})
         except Exception as e:
@@ -4850,8 +4889,14 @@ def api_save_html_report():
         
         # Получаем user_id по telegram_id
         try:
-            user_result = supabase.table('users').select('id').eq('telegram_id', telegram_id).execute()
-            user_id = user_result.data[0]['id'] if user_result.data else telegram_id
+            user_result = safe_db_operation(
+                lambda: supabase.table('users').select('id').eq('telegram_id', telegram_id).execute()
+            )
+            if user_result is None:
+                logger.error("Failed to get user_id from database")
+                user_id = telegram_id  # Используем telegram_id как fallback
+            else:
+                user_id = user_result.data[0]['id'] if user_result.data else telegram_id
         except Exception as e:
             logger.error(f"Error getting user_id: {e}")
             user_id = telegram_id  # Используем telegram_id как fallback
@@ -4902,8 +4947,14 @@ def api_save_html_report():
         
         # Сохраняем в базу данных с обработкой ошибок
         try:
-            db_result = supabase.table('user_reports').insert(db_report_data).execute()
-            report_id = db_result.data[0]['id'] if db_result.data else None
+            db_result = safe_db_operation(
+                lambda: supabase.table('user_reports').insert(db_report_data).execute()
+            )
+            if db_result is None:
+                logger.error("Failed to save report to database")
+                report_id = None
+            else:
+                report_id = db_result.data[0]['id'] if db_result.data else None
         except Exception as e:
             logger.error(f"Error saving to database: {e}")
             # Продолжаем без сохранения в БД
@@ -5825,7 +5876,7 @@ def api_save_html_report():
                         new Chart(ctx, {{
                             type: chartType,
                             data: chartData.data,
-                            options: {{
+                            options: chartData.options || {{
                                 responsive: true,
                                 maintainAspectRatio: false,
                                 plugins: {{

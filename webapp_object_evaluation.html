@@ -9297,7 +9297,7 @@
                         
                         console.log(`Chart data saved for ${chartId}:`, chartData);
                     } else {
-                        // Если график не найден, попробуем получить данные из таблиц
+                        // Если график не найден, извлекаем данные из таблиц
                         const tableData = extractTableDataForChart(chartId);
                         if (tableData) {
                             canvas.setAttribute('data-chart-data', JSON.stringify(tableData));
@@ -9360,6 +9360,8 @@
                 }
             });
             
+            if (labels.length === 0) return null;
+            
             return {
                 type: 'line',
                 data: {
@@ -9386,16 +9388,27 @@
                     maintainAspectRatio: false,
                     plugins: {
                         legend: {
-                            position: 'top'
+                            position: 'top',
+                            labels: {
+                                font: { size: 12 },
+                                color: '#2c3e50'
+                            }
                         },
                         title: {
                             display: true,
-                            text: 'График трендов цен на недвижимость'
+                            text: 'График трендов цен на недвижимость',
+                            color: '#2c3e50',
+                            font: { size: 16, weight: 'bold' }
                         }
                     },
                     scales: {
+                        x: {
+                            grid: { color: '#e9ecef' },
+                            ticks: { color: '#6c757d', font: { size: 11 } }
+                        },
                         y: {
-                            beginAtZero: false
+                            grid: { color: '#e9ecef' },
+                            ticks: { color: '#6c757d', font: { size: 11 } }
                         }
                     }
                 }
@@ -9427,6 +9440,8 @@
                 }
             });
             
+            if (labels.length === 0) return null;
+            
             return {
                 type: 'line',
                 data: {
@@ -9453,16 +9468,27 @@
                     maintainAspectRatio: false,
                     plugins: {
                         legend: {
-                            position: 'top'
+                            position: 'top',
+                            labels: {
+                                font: { size: 12 },
+                                color: '#2c3e50'
+                            }
                         },
                         title: {
                             display: true,
-                            text: 'Прогноз цен на недвижимость'
+                            text: 'Прогноз цен на недвижимость',
+                            color: '#2c3e50',
+                            font: { size: 16, weight: 'bold' }
                         }
                     },
                     scales: {
+                        x: {
+                            grid: { color: '#e9ecef' },
+                            ticks: { color: '#6c757d', font: { size: 11 } }
+                        },
                         y: {
-                            beginAtZero: false
+                            grid: { color: '#e9ecef' },
+                            ticks: { color: '#6c757d', font: { size: 11 } }
                         }
                     }
                 }
