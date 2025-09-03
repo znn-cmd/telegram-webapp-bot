@@ -461,18 +461,18 @@
     <div class="toast-container" id="toastContainer"></div>
 
     <!-- Modal для подтверждения удаления -->
-    <div id="deleteModal" class="modal-overlay hidden" onclick="if(event.target === this) closeDeleteModal()">
+    <div id="deleteModal" class="modal-overlay" style="display: none;">
         <div class="modal">
             <div class="modal-header">
                 <div class="modal-title" id="deleteModalTitle">Подтверждение удаления</div>
-                <button class="modal-close" onclick="closeDeleteModal()">×</button>
+                <button class="modal-close" id="closeDeleteModalBtn">×</button>
             </div>
             <div class="modal-content">
                 <p id="deleteModalMessage">Вы уверены, что хотите удалить этот отчет? Это действие нельзя отменить.</p>
             </div>
             <div class="modal-actions">
-                <button class="modal-btn secondary" onclick="closeDeleteModal()" id="cancelDeleteBtn">Отмена</button>
-                <button class="modal-btn danger" onclick="confirmDelete()" id="confirmDeleteBtn">Удалить</button>
+                <button class="modal-btn secondary" id="cancelDeleteBtn">Отмена</button>
+                <button class="modal-btn danger" id="confirmDeleteBtn">Удалить</button>
             </div>
         </div>
     </div>
@@ -754,7 +754,7 @@
                     <button class="action-btn copy" onclick="copyReportLink(${report.id})">
                         📋 ${getText('copyLink')}
                     </button>
-                    <button class="action-btn delete" onclick="showDeleteModal(${report.id})">
+                    <button class="action-btn delete" data-report-id="${report.id}">
                         🗑️ ${getText('deleteReport')}
                     </button>
                 </div>
@@ -814,21 +814,41 @@
 
         // Показ модального окна удаления
         function showDeleteModal(reportId) {
+            console.log('showDeleteModal called with reportId:', reportId);
+            if (!reportId) {
+                console.error('No reportId provided');
+                return;
+            }
             reportToDelete = reportId;
             const modal = document.getElementById('deleteModal');
-            modal.classList.remove('hidden');
+            if (modal) {
+                modal.style.display = 'flex';
+                console.log('Modal shown successfully');
+            } else {
+                console.error('Modal element not found');
+            }
         }
 
         // Закрытие модального окна удаления
         function closeDeleteModal() {
+            console.log('closeDeleteModal called');
             const modal = document.getElementById('deleteModal');
-            modal.classList.add('hidden');
-            reportToDelete = null;
+            if (modal) {
+                modal.style.display = 'none';
+                reportToDelete = null;
+                console.log('Modal closed successfully');
+            } else {
+                console.error('Modal element not found');
+            }
         }
 
         // Подтверждение удаления отчета
         async function confirmDelete() {
-            if (!reportToDelete) return;
+            console.log('confirmDelete called');
+            if (!reportToDelete) {
+                console.error('No report to delete');
+                return;
+            }
 
             try {
                 const response = await fetch('/api/delete_report', {
@@ -845,8 +865,10 @@
                     reports = reports.filter(r => r.id !== reportToDelete);
                     displayReports();
                     showToast(getText('reportDeleted'), 'success');
+                    console.log('Report deleted successfully');
                 } else {
-                    throw new Error('Failed to delete report');
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Failed to delete report');
                 }
             } catch (error) {
                 console.error('Error deleting report:', error);
@@ -898,6 +920,8 @@
         
         // Добавляем обработчики событий для кнопок
         document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOMContentLoaded - setting up event listeners');
+            
             // Добавляем обработчик для кнопки "Назад"
             const backButton = document.querySelector('[onclick*="goToMainMenu"]');
             if (backButton) {
@@ -907,13 +931,63 @@
                 });
             }
             
-            // Добавляем обработчик клавиши Escape для модального окна удаления
+            // Добавляем обработчики для кнопок удаления отчетов
+            document.addEventListener('click', function(e) {
+                if (e.target.closest('.action-btn.delete')) {
+                    const button = e.target.closest('.action-btn.delete');
+                    const reportId = button.getAttribute('data-report-id');
+                    console.log('Delete button clicked for reportId:', reportId);
+                    if (reportId) {
+                        showDeleteModal(parseInt(reportId));
+                    }
+                }
+            });
+            
+            // Добавляем обработчики для модального окна удаления
+            const deleteModal = document.getElementById('deleteModal');
+            if (deleteModal) {
+                // Закрытие по клику вне модального окна
+                deleteModal.addEventListener('click', function(e) {
+                    if (e.target === deleteModal) {
+                        console.log('Modal backdrop clicked - closing modal');
+                        closeDeleteModal();
+                    }
+                });
+                
+                // Закрытие по кнопке X
+                const closeBtn = document.getElementById('closeDeleteModalBtn');
+                if (closeBtn) {
+                    closeBtn.addEventListener('click', function(e) {
+                        console.log('Close button clicked');
+                        closeDeleteModal();
+                    });
+                }
+                
+                // Кнопка "Отмена"
+                const cancelBtn = document.getElementById('cancelDeleteBtn');
+                if (cancelBtn) {
+                    cancelBtn.addEventListener('click', function(e) {
+                        console.log('Cancel button clicked');
+                        closeDeleteModal();
+                    });
+                }
+                
+                // Кнопка "Удалить"
+                const confirmBtn = document.getElementById('confirmDeleteBtn');
+                if (confirmBtn) {
+                    confirmBtn.addEventListener('click', function(e) {
+                        console.log('Confirm delete button clicked');
+                        confirmDelete();
+                    });
+                }
+            }
+            
+            // Добавляем обработчик клавиши Escape
             document.addEventListener('keydown', function(e) {
                 if (e.key === 'Escape') {
-                    console.log('Escape key pressed'); // Отладочный лог
+                    console.log('Escape key pressed');
                     const deleteModal = document.getElementById('deleteModal');
-                    
-                    if (deleteModal && !deleteModal.classList.contains('hidden')) {
+                    if (deleteModal && deleteModal.style.display === 'flex') {
                         closeDeleteModal();
                     }
                 }
