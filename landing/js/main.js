@@ -369,6 +369,32 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    // FAQ functionality
+    function initFAQ() {
+        const faqItems = document.querySelectorAll('.faq-item');
+        
+        faqItems.forEach(item => {
+            const question = item.querySelector('.faq-question');
+            
+            question.addEventListener('click', function() {
+                const isActive = item.classList.contains('active');
+                
+                // Close all other FAQ items
+                faqItems.forEach(otherItem => {
+                    otherItem.classList.remove('active');
+                });
+                
+                // Toggle current item
+                if (!isActive) {
+                    item.classList.add('active');
+                }
+            });
+        });
+    }
+
+    // Initialize FAQ
+    initFAQ();
+
     // Add tooltip styles
     const tooltipStyles = `
         <style>
@@ -418,6 +444,6 @@ document.addEventListener('DOMContentLoaded', function() {
         ✅ Analytics tracking
         ✅ Performance monitoring
         
-        For support, contact: https://t.me/your_support
+        For support, contact: https://t.me/Aaadviser_support
     `);
 });

@@ -441,7 +441,7 @@ def api_locations_countries():
     """Получение списка стран из таблицы locations"""
     try:
         logger.info("🔍 Запрос списка стран")
-        result = supabase.table('locations').select('country_id, country_name').execute()
+        result = supabase.table('locations').select('country_id, country_name').limit(10000).execute()
         
         logger.info(f"📊 Получено записей: {len(result.data) if result.data else 0}")
         
@@ -481,7 +481,7 @@ def api_locations_cities():
     
     try:
         logger.info(f"🔍 Запрос городов для country_id: {country_id}")
-        result = supabase.table('locations').select('city_id, city_name').eq('country_id', country_id).execute()
+        result = supabase.table('locations').select('city_id, city_name').eq('country_id', country_id).limit(10000).execute()
         
         logger.info(f"📊 Получено записей: {len(result.data) if result.data else 0}")
         
@@ -522,7 +522,7 @@ def api_locations_counties():
     
     try:
         logger.info(f"🔍 Запрос областей для city_id: {city_id}")
-        result = supabase.table('locations').select('county_id, county_name').eq('city_id', city_id).execute()
+        result = supabase.table('locations').select('county_id, county_name').eq('city_id', city_id).limit(10000).execute()
         
         logger.info(f"📊 Получено записей: {len(result.data) if result.data else 0}")
         
@@ -563,7 +563,7 @@ def api_locations_districts():
     
     try:
         logger.info(f"🔍 Запрос районов для county_id: {county_id}")
-        result = supabase.table('locations').select('district_id, district_name').eq('county_id', county_id).execute()
+        result = supabase.table('locations').select('district_id, district_name').eq('county_id', county_id).limit(10000).execute()
         
         logger.info(f"📊 Получено записей: {len(result.data) if result.data else 0}")
         

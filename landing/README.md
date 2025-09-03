@@ -314,7 +314,7 @@ netlify deploy --prod --dir=landing
 - [Web Performance](https://web.dev/performance/)
 
 ### Контакты для поддержки:
-- Telegram: https://t.me/your_support
+- Telegram: https://t.me/Aaadviser_support
 - Email: support@aaadvisor.com
 
 ## 📝 Чек-лист развертывания

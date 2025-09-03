@@ -85,7 +85,29 @@ const translations = {
         'footer.support.telegram': 'Telegram канал',
         'footer.support.feedback': 'Отзывы и предложения',
         'footer.support.help': 'Помощь',
-        'footer.rights': 'Все права защищены.'
+        'footer.rights': 'Все права защищены.',
+        
+        // FAQ Section
+        'faq.title': 'Часто задаваемые вопросы',
+        'faq.subtitle': 'Ответы на самые популярные вопросы о Aaadvisor',
+        'faq.q1': 'Как работает Aaadvisor?',
+        'faq.a1': 'Aaadvisor — это Telegram бот, который анализирует недвижимость в Турции, Испании и Португалии. Просто отправьте адрес объекта, и бот создаст профессиональный отчет с анализом рынка, прогнозом цен и расчетом доходности за 1 минуту.',
+        'faq.q2': 'Какие данные анализирует Aaadvisor?',
+        'faq.a2': 'Бот анализирует текущие цены на недвижимость, историческую динамику цен, рыночные тренды, доходность от аренды, сравнение с аналогичными объектами и прогноз роста стоимости на 1-3 года вперед.',
+        'faq.q3': 'Сколько стоит использование?',
+        'faq.a3': 'В настоящее время Aaadvisor доступен бесплатно в тестовом режиме. Вы можете получить неограниченное количество отчетов без регистрации и без ограничений.',
+        'faq.q4': 'В каких странах работает Aaadvisor?',
+        'faq.a4': 'Сейчас Aaadvisor работает с недвижимостью в Турции, Испании и Португалии. Мы постоянно расширяем географию и добавляем новые рынки.',
+        'faq.q5': 'Насколько точны прогнозы?',
+        'faq.a5': 'Прогнозы основаны на анализе исторических данных, экономических показателей и рыночных трендов. Точность составляет 85-90% для краткосрочных прогнозов (1 год) и 70-80% для долгосрочных (2-3 года).',
+        'faq.q6': 'Могу ли я использовать отчеты для клиентов?',
+        'faq.a6': 'Да! Отчеты Aaadvisor предназначены именно для работы с клиентами. Они содержат профессиональную аналитику, которую можно показывать покупателям для обоснования цены и потенциальной доходности.',
+        'faq.q7': 'Как часто обновляются данные?',
+        'faq.a7': 'Данные обновляются еженедельно. Мы отслеживаем изменения цен, новые объявления и рыночные тренды, чтобы обеспечить актуальность информации в отчетах.',
+        'faq.q8': 'Что делать, если бот не отвечает?',
+        'faq.a8': 'Если возникли проблемы с ботом, обратитесь в нашу поддержку через Telegram канал @Aaadviser_support. Мы обычно отвечаем в течение 1-2 часов в рабочее время.',
+        'faq.cta_text': 'Не нашли ответ на свой вопрос?',
+        'faq.cta_button': 'Спросить в Telegram'
     },
     
     en: {
@@ -173,7 +195,29 @@ const translations = {
         'footer.support.telegram': 'Telegram Channel',
         'footer.support.feedback': 'Feedback & Suggestions',
         'footer.support.help': 'Help',
-        'footer.rights': 'All rights reserved.'
+        'footer.rights': 'All rights reserved.',
+        
+        // FAQ Section
+        'faq.title': 'Frequently Asked Questions',
+        'faq.subtitle': 'Answers to the most common questions about Aaadvisor',
+        'faq.q1': 'How does Aaadvisor work?',
+        'faq.a1': 'Aaadvisor is a Telegram bot that analyzes real estate in Turkey, Spain, and Portugal. Simply send the property address, and the bot will create a professional report with market analysis, price forecasts, and yield calculations in 1 minute.',
+        'faq.q2': 'What data does Aaadvisor analyze?',
+        'faq.a2': 'The bot analyzes current property prices, historical price dynamics, market trends, rental yields, comparison with similar properties, and growth forecasts for 1-3 years ahead.',
+        'faq.q3': 'How much does it cost to use?',
+        'faq.a3': 'Currently, Aaadvisor is available for free in beta mode. You can get unlimited reports without registration and without restrictions.',
+        'faq.q4': 'In which countries does Aaadvisor work?',
+        'faq.a4': 'Currently, Aaadvisor works with real estate in Turkey, Spain, and Portugal. We are constantly expanding geography and adding new markets.',
+        'faq.q5': 'How accurate are the forecasts?',
+        'faq.a5': 'Forecasts are based on analysis of historical data, economic indicators, and market trends. Accuracy is 85-90% for short-term forecasts (1 year) and 70-80% for long-term forecasts (2-3 years).',
+        'faq.q6': 'Can I use reports for clients?',
+        'faq.a6': 'Yes! Aaadvisor reports are designed specifically for working with clients. They contain professional analytics that can be shown to buyers to justify pricing and potential returns.',
+        'faq.q7': 'How often is data updated?',
+        'faq.a7': 'Data is updated weekly. We track price changes, new listings, and market trends to ensure the information in reports is current.',
+        'faq.q8': 'What if the bot doesn\'t respond?',
+        'faq.a8': 'If you encounter issues with the bot, contact our support through the Telegram channel @Aaadviser_support. We usually respond within 1-2 hours during business hours.',
+        'faq.cta_text': 'Didn\'t find an answer to your question?',
+        'faq.cta_button': 'Ask in Telegram'
     },
     
     de: {
@@ -261,7 +305,29 @@ const translations = {
         'footer.support.telegram': 'Telegram-Kanal',
         'footer.support.feedback': 'Feedback & Vorschläge',
         'footer.support.help': 'Hilfe',
-        'footer.rights': 'Alle Rechte vorbehalten.'
+        'footer.rights': 'Alle Rechte vorbehalten.',
+        
+        // FAQ Section
+        'faq.title': 'Häufig gestellte Fragen',
+        'faq.subtitle': 'Antworten auf die häufigsten Fragen zu Aaadvisor',
+        'faq.q1': 'Wie funktioniert Aaadvisor?',
+        'faq.a1': 'Aaadvisor ist ein Telegram-Bot, der Immobilien in der Türkei, Spanien und Portugal analysiert. Senden Sie einfach die Immobilienadresse, und der Bot erstellt in 1 Minute einen professionellen Bericht mit Marktanalyse, Preisprognosen und Renditeberechnungen.',
+        'faq.q2': 'Welche Daten analysiert Aaadvisor?',
+        'faq.a2': 'Der Bot analysiert aktuelle Immobilienpreise, historische Preisdynamik, Markttrends, Mietrenditen, Vergleich mit ähnlichen Immobilien und Wachstumsprognosen für 1-3 Jahre im Voraus.',
+        'faq.q3': 'Wie viel kostet die Nutzung?',
+        'faq.a3': 'Derzeit ist Aaadvisor kostenlos im Beta-Modus verfügbar. Sie können unbegrenzte Berichte ohne Registrierung und ohne Einschränkungen erhalten.',
+        'faq.q4': 'In welchen Ländern funktioniert Aaadvisor?',
+        'faq.a4': 'Derzeit arbeitet Aaadvisor mit Immobilien in der Türkei, Spanien und Portugal. Wir erweitern kontinuierlich die Geographie und fügen neue Märkte hinzu.',
+        'faq.q5': 'Wie genau sind die Prognosen?',
+        'faq.a5': 'Prognosen basieren auf der Analyse historischer Daten, wirtschaftlicher Indikatoren und Markttrends. Die Genauigkeit beträgt 85-90% für kurzfristige Prognosen (1 Jahr) und 70-80% für langfristige Prognosen (2-3 Jahre).',
+        'faq.q6': 'Kann ich Berichte für Kunden verwenden?',
+        'faq.a6': 'Ja! Aaadvisor-Berichte sind speziell für die Arbeit mit Kunden konzipiert. Sie enthalten professionelle Analysen, die Käufern zur Rechtfertigung von Preisen und potenziellen Renditen gezeigt werden können.',
+        'faq.q7': 'Wie oft werden Daten aktualisiert?',
+        'faq.a7': 'Daten werden wöchentlich aktualisiert. Wir verfolgen Preisänderungen, neue Angebote und Markttrends, um die Aktualität der Informationen in Berichten zu gewährleisten.',
+        'faq.q8': 'Was, wenn der Bot nicht antwortet?',
+        'faq.a8': 'Bei Problemen mit dem Bot kontaktieren Sie unseren Support über den Telegram-Kanal @Aaadviser_support. Wir antworten normalerweise innerhalb von 1-2 Stunden während der Geschäftszeiten.',
+        'faq.cta_text': 'Keine Antwort auf Ihre Frage gefunden?',
+        'faq.cta_button': 'In Telegram fragen'
     },
     
     fr: {
@@ -349,7 +415,29 @@ const translations = {
         'footer.support.telegram': 'Canal Telegram',
         'footer.support.feedback': 'Retours et suggestions',
         'footer.support.help': 'Aide',
-        'footer.rights': 'Tous droits réservés.'
+        'footer.rights': 'Tous droits réservés.',
+        
+        // FAQ Section
+        'faq.title': 'Questions Fréquemment Posées',
+        'faq.subtitle': 'Réponses aux questions les plus courantes sur Aaadvisor',
+        'faq.q1': 'Comment fonctionne Aaadvisor?',
+        'faq.a1': 'Aaadvisor est un bot Telegram qui analyse l\'immobilier en Turquie, Espagne et Portugal. Envoyez simplement l\'adresse du bien, et le bot créera un rapport professionnel avec analyse de marché, prévisions de prix et calculs de rendement en 1 minute.',
+        'faq.q2': 'Quelles données Aaadvisor analyse-t-il?',
+        'faq.a2': 'Le bot analyse les prix immobiliers actuels, la dynamique historique des prix, les tendances du marché, les rendements locatifs, la comparaison avec des biens similaires et les prévisions de croissance pour 1-3 ans à l\'avance.',
+        'faq.q3': 'Combien coûte l\'utilisation?',
+        'faq.a3': 'Actuellement, Aaadvisor est disponible gratuitement en mode bêta. Vous pouvez obtenir des rapports illimités sans inscription et sans restrictions.',
+        'faq.q4': 'Dans quels pays Aaadvisor fonctionne-t-il?',
+        'faq.a4': 'Actuellement, Aaadvisor fonctionne avec l\'immobilier en Turquie, Espagne et Portugal. Nous élargissons constamment la géographie et ajoutons de nouveaux marchés.',
+        'faq.q5': 'Quelle est la précision des prévisions?',
+        'faq.a5': 'Les prévisions sont basées sur l\'analyse de données historiques, d\'indicateurs économiques et de tendances du marché. La précision est de 85-90% pour les prévisions à court terme (1 an) et de 70-80% pour les prévisions à long terme (2-3 ans).',
+        'faq.q6': 'Puis-je utiliser les rapports pour les clients?',
+        'faq.a6': 'Oui! Les rapports Aaadvisor sont conçus spécifiquement pour travailler avec les clients. Ils contiennent des analyses professionnelles qui peuvent être montrées aux acheteurs pour justifier les prix et les rendements potentiels.',
+        'faq.q7': 'À quelle fréquence les données sont-elles mises à jour?',
+        'faq.a7': 'Les données sont mises à jour hebdomadairement. Nous suivons les changements de prix, les nouvelles annonces et les tendances du marché pour assurer l\'actualité des informations dans les rapports.',
+        'faq.q8': 'Que faire si le bot ne répond pas?',
+        'faq.a8': 'Si vous rencontrez des problèmes avec le bot, contactez notre support via le canal Telegram @Aaadviser_support. Nous répondons généralement dans les 1-2 heures pendant les heures de bureau.',
+        'faq.cta_text': 'Vous n\'avez pas trouvé de réponse à votre question?',
+        'faq.cta_button': 'Demander dans Telegram'
     },
     
     tr: {
@@ -437,7 +525,29 @@ const translations = {
         'footer.support.telegram': 'Telegram Kanalı',
         'footer.support.feedback': 'Geri Bildirim ve Öneriler',
         'footer.support.help': 'Yardım',
-        'footer.rights': 'Tüm hakları saklıdır.'
+        'footer.rights': 'Tüm hakları saklıdır.',
+        
+        // FAQ Section
+        'faq.title': 'Sık Sorulan Sorular',
+        'faq.subtitle': 'Aaadvisor hakkında en yaygın soruların cevapları',
+        'faq.q1': 'Aaadvisor nasıl çalışır?',
+        'faq.a1': 'Aaadvisor, Türkiye, İspanya ve Portekiz\'deki gayrimenkulü analiz eden bir Telegram botudur. Sadece mülk adresini gönderin ve bot 1 dakika içinde pazar analizi, fiyat tahminleri ve getiri hesaplamaları ile profesyonel bir rapor oluşturacak.',
+        'faq.q2': 'Aaadvisor hangi verileri analiz eder?',
+        'faq.a2': 'Bot, mevcut gayrimenkul fiyatlarını, tarihsel fiyat dinamiklerini, pazar trendlerini, kira getirilerini, benzer mülklerle karşılaştırmayı ve 1-3 yıl öncesine kadar büyüme tahminlerini analiz eder.',
+        'faq.q3': 'Kullanım ne kadar tutar?',
+        'faq.a3': 'Şu anda Aaadvisor beta modunda ücretsiz olarak kullanılabilir. Kayıt olmadan ve kısıtlama olmadan sınırsız rapor alabilirsiniz.',
+        'faq.q4': 'Aaadvisor hangi ülkelerde çalışır?',
+        'faq.a4': 'Şu anda Aaadvisor Türkiye, İspanya ve Portekiz\'deki gayrimenkul ile çalışıyor. Sürekli olarak coğrafyayı genişletiyor ve yeni pazarlar ekliyoruz.',
+        'faq.q5': 'Tahminler ne kadar doğru?',
+        'faq.a5': 'Tahminler, tarihsel verilerin, ekonomik göstergelerin ve pazar trendlerinin analizine dayanır. Kısa vadeli tahminler (1 yıl) için doğruluk %85-90, uzun vadeli tahminler (2-3 yıl) için %70-80\'dir.',
+        'faq.q6': 'Raporları müşteriler için kullanabilir miyim?',
+        'faq.a6': 'Evet! Aaadvisor raporları özellikle müşterilerle çalışmak için tasarlanmıştır. Fiyatları ve potansiyel getirileri haklı çıkarmak için alıcılara gösterilebilecek profesyonel analitikler içerir.',
+        'faq.q7': 'Veriler ne sıklıkla güncellenir?',
+        'faq.a7': 'Veriler haftalık olarak güncellenir. Raporlardaki bilgilerin güncel olmasını sağlamak için fiyat değişikliklerini, yeni ilanları ve pazar trendlerini takip ediyoruz.',
+        'faq.q8': 'Bot yanıt vermezse ne yapmalıyım?',
+        'faq.a8': 'Bot ile ilgili sorun yaşarsanız, Telegram kanalı @Aaadviser_support üzerinden destek ekibimizle iletişime geçin. Genellikle iş saatleri içinde 1-2 saat içinde yanıt veriyoruz.',
+        'faq.cta_text': 'Sorunuza cevap bulamadınız mı?',
+        'faq.cta_button': 'Telegram\'da Sor'
     }
 };
 

@@ -140,13 +140,13 @@
   "logo": "https://your-domain.com/logo-flt.png",
   "description": "Professional real estate analytics tool for realtors",
   "sameAs": [
-    "https://t.me/your_bot_username",
-    "https://t.me/your_support"
+    "https://t.me/Aaadviser_bot",
+    "https://t.me/Aaadviser_support"
   ],
   "contactPoint": {
     "@type": "ContactPoint",
     "contactType": "customer service",
-    "url": "https://t.me/your_support"
+    "url": "https://t.me/Aaadviser_support"
   }
 }
 </script>
@@ -181,7 +181,7 @@
   "operatingSystem": "Telegram",
   "description": "Professional real estate analytics tool that helps realtors close more deals with detailed reports",
   "url": "https://your-domain.com",
-  "downloadUrl": "https://t.me/your_bot_username",
+  "downloadUrl": "https://t.me/Aaadviser_bot",
   "offers": {
     "@type": "Offer",
     "price": "0",
