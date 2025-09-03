@@ -3764,12 +3764,18 @@ def api_user_reports():
         return jsonify({'error': 'telegram_id required'}), 400
     try:
         # Получаем user_id из базы данных по telegram_id
-        user_result = supabase.table('users').select('id').eq('telegram_id', telegram_id).execute()
-        if not user_result.data:
+        user_result = safe_db_operation(
+            lambda: supabase.table('users').select('id').eq('telegram_id', telegram_id).execute()
+        )
+        if user_result is None or not user_result.data:
             return jsonify({'error': 'User not found'}), 404
         user_id = user_result.data[0]['id']
         # Возвращаем только неудаленные отчеты (deleted_at IS NULL)
-        result = supabase.table('user_reports').select('*').eq('user_id', user_id).is_('deleted_at', 'null').order('created_at', desc=True).execute()
+        result = safe_db_operation(
+            lambda: supabase.table('user_reports').select('*').eq('user_id', user_id).is_('deleted_at', 'null').order('created_at', desc=True).execute()
+        )
+        if result is None:
+            return jsonify({'error': 'Database connection error'}), 500
         reports = result.data if hasattr(result, 'data') else result
         return jsonify({'success': True, 'reports': reports})
     except Exception as e:
@@ -4170,19 +4176,27 @@ def api_delete_user_report():
         return jsonify({'error': 'Missing required data'}), 400
     try:
         # Получаем user_id по telegram_id
-        user_result = supabase.table('users').select('id').eq('telegram_id', telegram_id).execute()
-        if not user_result.data:
+        user_result = safe_db_operation(
+            lambda: supabase.table('users').select('id').eq('telegram_id', telegram_id).execute()
+        )
+        if user_result is None or not user_result.data:
             logger.error(f"User with telegram_id {telegram_id} not found for report deletion")
             return jsonify({'error': 'User not found'}), 404
         user_id = user_result.data[0]['id']
         # Проверяем, что отчет принадлежит пользователю и не удалён
-        report_result = supabase.table('user_reports').select('id').eq('id', report_id).eq('user_id', user_id).is_('deleted_at', 'null').execute()
-        if not report_result.data:
+        report_result = safe_db_operation(
+            lambda: supabase.table('user_reports').select('id').eq('id', report_id).eq('user_id', user_id).is_('deleted_at', 'null').execute()
+        )
+        if report_result is None or not report_result.data:
             logger.error(f"Report {report_id} not found or not owned by user_id {user_id} or already deleted")
             return jsonify({'error': 'Report not found or not owned by user'}), 404
         # Soft delete: выставляем deleted_at
         now = datetime.utcnow().isoformat()
-        supabase.table('user_reports').update({'deleted_at': now}).eq('id', report_id).execute()
+        delete_result = safe_db_operation(
+            lambda: supabase.table('user_reports').update({'deleted_at': now}).eq('id', report_id).execute()
+        )
+        if delete_result is None:
+            return jsonify({'error': 'Database connection error'}), 500
         return jsonify({'success': True})
     except Exception as e:
         logger.error(f"Error deleting user report: {e}")
