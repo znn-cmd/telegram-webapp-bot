@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Тестовый скрипт для проверки исправлений API локаций
+Тестовый скрипт для проверки исправлений API локаций с пагинацией
 """
 
 import requests
@@ -8,10 +8,10 @@ import json
 
 def test_locations_api():
     """Тестирует API локаций"""
-    base_url = "http://localhost:5000"
+    base_url = "http://localhost:8080"  # Изменен порт на 8080
     
-    print("🧪 ТЕСТИРОВАНИЕ API ЛОКАЦИЙ")
-    print("=" * 50)
+    print("🧪 ТЕСТИРОВАНИЕ API ЛОКАЦИЙ С ПАГИНАЦИЕЙ")
+    print("=" * 60)
     
     # Тест 1: Получение стран
     print("\n1️⃣ ТЕСТ ПОЛУЧЕНИЯ СТРАН")
@@ -24,7 +24,7 @@ def test_locations_api():
             if data.get('success'):
                 countries = data.get('countries', [])
                 print(f"✅ Получено стран: {len(countries)}")
-                for i, (country_id, country_name) in enumerate(countries[:5]):
+                for i, (country_id, country_name) in enumerate(countries):
                     print(f"   {i+1}. {country_name} (ID: {country_id})")
             else:
                 print(f"❌ Ошибка: {data.get('error')}")
@@ -45,12 +45,9 @@ def test_locations_api():
             if data.get('success'):
                 cities = data.get('cities', [])
                 print(f"✅ Получено городов: {len(cities)}")
-                print("📋 Первые 10 городов:")
-                for i, (city_id, city_name) in enumerate(cities[:10]):
-                    print(f"   {i+1}. {city_name} (ID: {city_id})")
-                
-                if len(cities) > 10:
-                    print(f"   ... и еще {len(cities) - 10} городов")
+                print("📋 Все города Турции:")
+                for i, (city_id, city_name) in enumerate(cities):
+                    print(f"   {i+1:2d}. {city_name} (ID: {city_id})")
             else:
                 print(f"❌ Ошибка: {data.get('error')}")
         else:
@@ -63,15 +60,15 @@ def test_locations_api():
     print("-" * 30)
     
     try:
-        # Используем первый город из предыдущего теста
+        # Используем город Düzce (ID: 81)
         response = requests.post(f"{base_url}/api/locations/counties", 
-                                json={"city_id": 81})  # Düzce
+                                json={"city_id": 81})
         if response.status_code == 200:
             data = response.json()
             if data.get('success'):
                 counties = data.get('counties', [])
                 print(f"✅ Получено округов: {len(counties)}")
-                print("📋 Округа:")
+                print("📋 Округа города Düzce:")
                 for i, (county_id, county_name) in enumerate(counties):
                     print(f"   {i+1}. {county_name} (ID: {county_id})")
             else:
@@ -86,19 +83,20 @@ def test_locations_api():
     print("-" * 30)
     
     try:
+        # Используем округ Gölyaka (ID: 1794)
         response = requests.post(f"{base_url}/api/locations/districts", 
-                                json={"county_id": 1794})  # Gölyaka
+                                json={"county_id": 1794})
         if response.status_code == 200:
             data = response.json()
             if data.get('success'):
                 districts = data.get('districts', [])
                 print(f"✅ Получено районов: {len(districts)}")
-                print("📋 Первые 10 районов:")
-                for i, (district_id, district_name) in enumerate(districts[:10]):
-                    print(f"   {i+1}. {district_name} (ID: {district_id})")
+                print("📋 Первые 15 районов округа Gölyaka:")
+                for i, (district_id, district_name) in enumerate(districts[:15]):
+                    print(f"   {i+1:2d}. {district_name} (ID: {district_id})")
                 
-                if len(districts) > 10:
-                    print(f"   ... и еще {len(districts) - 10} районов")
+                if len(districts) > 15:
+                    print(f"   ... и еще {len(districts) - 15} районов")
             else:
                 print(f"❌ Ошибка: {data.get('error')}")
         else:

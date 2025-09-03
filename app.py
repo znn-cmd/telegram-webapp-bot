@@ -441,15 +441,32 @@ def api_locations_countries():
     """Получение списка стран из таблицы locations"""
     try:
         logger.info("🔍 Запрос списка стран")
-        result = supabase.table('locations').select('country_id, country_name').limit(10000).execute()
         
-        logger.info(f"📊 Получено записей: {len(result.data) if result.data else 0}")
+        # Получаем все записи с помощью пагинации
+        all_records = []
+        page = 0
+        page_size = 1000
         
-        if result.data:
+        while True:
+            result = supabase.table('locations').select('country_id, country_name').range(page * page_size, (page + 1) * page_size - 1).execute()
+            
+            if not result.data:
+                break
+                
+            all_records.extend(result.data)
+            page += 1
+            
+            # Защита от бесконечного цикла
+            if page > 10:  # Максимум 10 страниц
+                break
+        
+        logger.info(f"📊 Получено записей: {len(all_records)}")
+        
+        if all_records:
             # Убираем дубликаты, фильтруем None значения и сортируем
             countries = []
             seen = set()
-            for item in result.data:
+            for item in all_records:
                 if item['country_id'] is not None and item['country_name'] is not None:
                     country_tuple = (item['country_id'], item['country_name'])
                     if country_tuple not in seen:
@@ -481,15 +498,32 @@ def api_locations_cities():
     
     try:
         logger.info(f"🔍 Запрос городов для country_id: {country_id}")
-        result = supabase.table('locations').select('city_id, city_name').eq('country_id', country_id).limit(10000).execute()
         
-        logger.info(f"📊 Получено записей: {len(result.data) if result.data else 0}")
+        # Получаем все записи с помощью пагинации
+        all_records = []
+        page = 0
+        page_size = 1000
         
-        if result.data:
+        while True:
+            result = supabase.table('locations').select('city_id, city_name').eq('country_id', country_id).range(page * page_size, (page + 1) * page_size - 1).execute()
+            
+            if not result.data:
+                break
+                
+            all_records.extend(result.data)
+            page += 1
+            
+            # Защита от бесконечного цикла
+            if page > 10:  # Максимум 10 страниц
+                break
+        
+        logger.info(f"📊 Получено записей: {len(all_records)}")
+        
+        if all_records:
             # Убираем дубликаты, фильтруем None значения и сортируем
             cities = []
             seen = set()
-            for item in result.data:
+            for item in all_records:
                 if item['city_id'] is not None and item['city_name'] is not None:
                     city_tuple = (item['city_id'], item['city_name'])
                     if city_tuple not in seen:
@@ -522,15 +556,32 @@ def api_locations_counties():
     
     try:
         logger.info(f"🔍 Запрос областей для city_id: {city_id}")
-        result = supabase.table('locations').select('county_id, county_name').eq('city_id', city_id).limit(10000).execute()
         
-        logger.info(f"📊 Получено записей: {len(result.data) if result.data else 0}")
+        # Получаем все записи с помощью пагинации
+        all_records = []
+        page = 0
+        page_size = 1000
         
-        if result.data:
+        while True:
+            result = supabase.table('locations').select('county_id, county_name').eq('city_id', city_id).range(page * page_size, (page + 1) * page_size - 1).execute()
+            
+            if not result.data:
+                break
+                
+            all_records.extend(result.data)
+            page += 1
+            
+            # Защита от бесконечного цикла
+            if page > 10:  # Максимум 10 страниц
+                break
+        
+        logger.info(f"📊 Получено записей: {len(all_records)}")
+        
+        if all_records:
             # Убираем дубликаты, фильтруем None значения и сортируем
             counties = []
             seen = set()
-            for item in result.data:
+            for item in all_records:
                 if item['county_id'] is not None and item['county_name'] is not None:
                     county_tuple = (item['county_id'], item['county_name'])
                     if county_tuple not in seen:
@@ -563,15 +614,32 @@ def api_locations_districts():
     
     try:
         logger.info(f"🔍 Запрос районов для county_id: {county_id}")
-        result = supabase.table('locations').select('district_id, district_name').eq('county_id', county_id).limit(10000).execute()
         
-        logger.info(f"📊 Получено записей: {len(result.data) if result.data else 0}")
+        # Получаем все записи с помощью пагинации
+        all_records = []
+        page = 0
+        page_size = 1000
         
-        if result.data:
+        while True:
+            result = supabase.table('locations').select('district_id, district_name').eq('county_id', county_id).range(page * page_size, (page + 1) * page_size - 1).execute()
+            
+            if not result.data:
+                break
+                
+            all_records.extend(result.data)
+            page += 1
+            
+            # Защита от бесконечного цикла
+            if page > 10:  # Максимум 10 страниц
+                break
+        
+        logger.info(f"📊 Получено записей: {len(all_records)}")
+        
+        if all_records:
             # Убираем дубликаты, фильтруем None значения и сортируем
             districts = []
             seen = set()
-            for item in result.data:
+            for item in all_records:
                 if item['district_id'] is not None and item['district_name'] is not None:
                     district_tuple = (item['district_id'], item['district_name'])
                     if district_tuple not in seen:
