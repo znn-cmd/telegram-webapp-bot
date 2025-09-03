@@ -477,22 +477,6 @@
         </div>
     </div>
 
-    <!-- Modal для просмотра отчета -->
-    <div id="reportModal" class="modal-overlay hidden" onclick="if(event.target === this) closeReportModal()">
-        <div class="modal">
-            <div class="modal-header">
-                <div class="modal-title" id="reportModalTitle">Просмотр отчета</div>
-                <button class="modal-close" onclick="closeReportModal()">×</button>
-            </div>
-            <div class="modal-content">
-                <iframe id="reportFrame" style="width: 100%; height: 400px; border: none; border-radius: 8px;"></iframe>
-            </div>
-            <div class="modal-actions">
-                <button class="modal-btn primary" onclick="closeReportModal()" id="closeReportBtn">Закрыть</button>
-            </div>
-        </div>
-    </div>
-
     <script>
         let tg = window.Telegram.WebApp;
         tg.expand();
@@ -519,8 +503,6 @@
                 'deleteModalMessage': 'Вы уверены, что хотите удалить этот отчет? Это действие нельзя отменить.',
                 'cancelDeleteBtn': 'Отмена',
                 'confirmDeleteBtn': 'Удалить',
-                'reportModalTitle': 'Просмотр отчета',
-                'closeReportBtn': 'Закрыть',
                 'linkCopied': 'Ссылка скопирована в буфер обмена',
                 'reportDeleted': 'Отчет успешно удален',
                 'errorLoading': 'Ошибка загрузки отчетов',
@@ -544,8 +526,6 @@
                 'deleteModalMessage': 'Are you sure you want to delete this report? This action cannot be undone.',
                 'cancelDeleteBtn': 'Cancel',
                 'confirmDeleteBtn': 'Delete',
-                'reportModalTitle': 'View report',
-                'closeReportBtn': 'Close',
                 'linkCopied': 'Link copied to clipboard',
                 'reportDeleted': 'Report successfully deleted',
                 'errorLoading': 'Error loading reports',
@@ -569,8 +549,6 @@
                 'deleteModalMessage': 'Sind Sie sicher, dass Sie diesen Bericht löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden.',
                 'cancelDeleteBtn': 'Abbrechen',
                 'confirmDeleteBtn': 'Löschen',
-                'reportModalTitle': 'Bericht anzeigen',
-                'closeReportBtn': 'Schließen',
                 'linkCopied': 'Link in die Zwischenablage kopiert',
                 'reportDeleted': 'Bericht erfolgreich gelöscht',
                 'errorLoading': 'Fehler beim Laden der Berichte',
@@ -594,8 +572,6 @@
                 'deleteModalMessage': 'Êtes-vous sûr de vouloir supprimer ce rapport ? Cette action ne peut pas être annulée.',
                 'cancelDeleteBtn': 'Annuler',
                 'confirmDeleteBtn': 'Supprimer',
-                'reportModalTitle': 'Voir le rapport',
-                'closeReportBtn': 'Fermer',
                 'linkCopied': 'Lien copié dans le presse-papiers',
                 'reportDeleted': 'Rapport supprimé avec succès',
                 'errorLoading': 'Erreur de chargement des rapports',
@@ -619,8 +595,6 @@
                 'deleteModalMessage': 'Bu raporu silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.',
                 'cancelDeleteBtn': 'İptal',
                 'confirmDeleteBtn': 'Sil',
-                'reportModalTitle': 'Raporu görüntüle',
-                'closeReportBtn': 'Kapat',
                 'linkCopied': 'Bağlantı panoya kopyalandı',
                 'reportDeleted': 'Rapor başarıyla silindi',
                 'errorLoading': 'Raporlar yüklenirken hata',
@@ -801,38 +775,14 @@
                 return;
             }
             
-            // Проверяем, что функция вызвана пользователем, а не автоматически
-            if (!event || !event.isTrusted) {
-                console.log('viewReport called programmatically, ignoring');
-                return;
-            }
-            
             const report = reports.find(r => r.id === reportId);
             if (!report || !report.report_url) {
                 showToast('Ссылка на отчет недоступна', 'error');
                 return;
             }
 
-            const modal = document.getElementById('reportModal');
-            const frame = document.getElementById('reportFrame');
-            
-            frame.src = report.report_url;
-            modal.classList.remove('hidden');
-        }
-
-        // Закрытие модального окна отчета
-        function closeReportModal() {
-            console.log('closeReportModal called'); // Отладочный лог
-            const modal = document.getElementById('reportModal');
-            const frame = document.getElementById('reportFrame');
-            
-            if (modal) {
-                frame.src = '';
-                modal.classList.add('hidden');
-                console.log('Modal closed successfully'); // Отладочный лог
-            } else {
-                console.error('Modal element not found'); // Отладочный лог
-            }
+            // Открываем отчет в новой вкладке
+            window.open(report.report_url, '_blank');
         }
 
         // Копирование ссылки на отчет
@@ -912,14 +862,9 @@
         async function init() {
             console.log('Initializing page...'); // Отладочный лог
             
-            // Сразу же закрываем все модальные окна
-            const reportModal = document.getElementById('reportModal');
+            // Сразу же закрываем модальное окно удаления
             const deleteModal = document.getElementById('deleteModal');
             
-            if (reportModal) {
-                reportModal.classList.add('hidden');
-                console.log('Report modal hidden on init');
-            }
             if (deleteModal) {
                 deleteModal.classList.add('hidden');
                 console.log('Delete modal hidden on init');
@@ -931,8 +876,7 @@
                 localStorage.setItem('telegram_id', userData.id);
             }
 
-            // Убеждаемся, что модальные окна закрыты при загрузке
-            document.getElementById('reportModal').classList.add('hidden');
+            // Убеждаемся, что модальное окно удаления закрыто при загрузке
             document.getElementById('deleteModal').classList.add('hidden');
 
             // Получаем язык пользователя из базы данных
@@ -965,34 +909,8 @@
         // Запускаем инициализацию
         init();
         
-        // Добавляем обработчик для отслеживания изменений модального окна
-        const reportModal = document.getElementById('reportModal');
-        if (reportModal) {
-            const observer = new MutationObserver(function(mutations) {
-                mutations.forEach(function(mutation) {
-                    if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
-                        const isHidden = reportModal.classList.contains('hidden');
-                        console.log('Modal visibility changed:', isHidden ? 'hidden' : 'visible');
-                    }
-                });
-            });
-            
-            observer.observe(reportModal, {
-                attributes: true,
-                attributeFilter: ['class']
-            });
-        }
-        
-        // Добавляем обработчики событий для кнопок закрытия
+        // Добавляем обработчики событий для кнопок
         document.addEventListener('DOMContentLoaded', function() {
-            const closeButtons = document.querySelectorAll('[onclick*="closeReportModal"]');
-            closeButtons.forEach(button => {
-                button.addEventListener('click', function(e) {
-                    console.log('Close button clicked'); // Отладочный лог
-                    closeReportModal();
-                });
-            });
-            
             // Добавляем обработчик для кнопки "Назад"
             const backButton = document.querySelector('[onclick*="goToMainMenu"]');
             if (backButton) {
@@ -1002,16 +920,13 @@
                 });
             }
             
-            // Добавляем обработчик клавиши Escape
+            // Добавляем обработчик клавиши Escape для модального окна удаления
             document.addEventListener('keydown', function(e) {
                 if (e.key === 'Escape') {
                     console.log('Escape key pressed'); // Отладочный лог
-                    const reportModal = document.getElementById('reportModal');
                     const deleteModal = document.getElementById('deleteModal');
                     
-                    if (reportModal && !reportModal.classList.contains('hidden')) {
-                        closeReportModal();
-                    } else if (deleteModal && !deleteModal.classList.contains('hidden')) {
+                    if (deleteModal && !deleteModal.classList.contains('hidden')) {
                         closeDeleteModal();
                     }
                 }
