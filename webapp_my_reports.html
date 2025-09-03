@@ -793,6 +793,14 @@
 
         // Просмотр отчета
         function viewReport(reportId) {
+            console.log('viewReport called with reportId:', reportId); // Отладочный лог
+            
+            // Проверяем, что reportId является числом
+            if (!reportId || isNaN(reportId)) {
+                console.error('Invalid reportId:', reportId);
+                return;
+            }
+            
             const report = reports.find(r => r.id === reportId);
             if (!report || !report.report_url) {
                 showToast('Ссылка на отчет недоступна', 'error');
@@ -889,11 +897,24 @@
 
         // Инициализация
         async function init() {
+            console.log('Initializing page...'); // Отладочный лог
+            
+            // Сразу же закрываем все модальные окна
+            const reportModal = document.getElementById('reportModal');
+            const deleteModal = document.getElementById('deleteModal');
+            
+            if (reportModal) reportModal.classList.add('hidden');
+            if (deleteModal) deleteModal.classList.add('hidden');
+            
             userData = getUserData();
             
             if (userData && userData.id) {
                 localStorage.setItem('telegram_id', userData.id);
             }
+
+            // Убеждаемся, что модальные окна закрыты при загрузке
+            document.getElementById('reportModal').classList.add('hidden');
+            document.getElementById('deleteModal').classList.add('hidden');
 
             // Получаем язык пользователя из базы данных
             try {
@@ -924,6 +945,24 @@
 
         // Запускаем инициализацию
         init();
+        
+        // Добавляем обработчик для отслеживания изменений модального окна
+        const reportModal = document.getElementById('reportModal');
+        if (reportModal) {
+            const observer = new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
+                    if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+                        const isHidden = reportModal.classList.contains('hidden');
+                        console.log('Modal visibility changed:', isHidden ? 'hidden' : 'visible');
+                    }
+                });
+            });
+            
+            observer.observe(reportModal, {
+                attributes: true,
+                attributeFilter: ['class']
+            });
+        }
     </script>
 </body>
 </html>
