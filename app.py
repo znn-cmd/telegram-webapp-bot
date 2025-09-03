@@ -267,6 +267,12 @@ def webapp_object_evaluation():
     with open('webapp_object_evaluation.html', 'r', encoding='utf-8') as f:
         return f.read()
 
+@app.route('/webapp_my_reports')
+def webapp_my_reports():
+    """Страница моих отчетов"""
+    with open('webapp_my_reports.html', 'r', encoding='utf-8') as f:
+        return f.read()
+
 @app.route('/health')
 def health():
     """Эндпоинт для проверки здоровья приложения"""

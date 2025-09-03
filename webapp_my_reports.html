@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мои отчеты — Aaadviser</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 20px;
+            background: white;
+            min-height: 100vh;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px 0;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .logo {
+            width: 110px;
+            height: auto;
+            display: block;
+            margin: 0 auto 18px auto;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .logo:hover {
+            transform: scale(1.05);
+        }
+
+        .title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: #666;
+            font-style: italic;
+        }
+
+        .content-section {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 24px;
+            margin: 20px 0;
+            text-align: center;
+            border-left: 4px solid #667eea;
+        }
+
+        .development-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.7;
+        }
+
+        .development-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 12px;
+        }
+
+        .development-description {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+
+        .feature-list {
+            text-align: left;
+            margin: 20px 0;
+            padding: 0 20px;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            margin: 12px 0;
+            font-size: 14px;
+            color: #555;
+        }
+
+        .feature-icon {
+            margin-right: 12px;
+            font-size: 16px;
+            color: #667eea;
+        }
+
+        .back-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 16px 24px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-top: 20px;
+            box-shadow: 0 2px 8px rgba(102,126,234,0.15);
+        }
+
+        .back-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102,126,234,0.25);
+        }
+
+        .back-btn:active {
+            transform: translateY(-1px);
+        }
+
+        .language-selector {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 18px;
+            margin: 20px 0;
+            transition: all 0.3s ease;
+        }
+
+        .language-title {
+            font-size: 14px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+
+        .language-buttons {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .lang-btn {
+            background: white;
+            color: #333;
+            border: 1px solid #ddd;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .lang-btn.selected {
+            background: #007bff;
+            color: white;
+            border-color: #007bff;
+            box-shadow: 0 2px 8px rgba(0,123,255,0.3);
+        }
+
+        .lang-btn:hover {
+            background: #f0f0f0;
+            transform: translateY(-1px);
+        }
+
+        .lang-btn.selected:hover {
+            background: #0056b3;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .content-section {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Логотип -->
+        <div class="header">
+            <img src="logo-sqv.png" alt="Aaadviser Logo" class="logo" onclick="goToMainMenu()">
+            <div class="title" id="pageTitle">Мои отчеты</div>
+            <div class="subtitle" id="pageSubtitle">Управление вашими отчетами</div>
+        </div>
+
+        <!-- Выбор языка -->
+        <div class="language-selector" id="languageSelector">
+            <div class="language-title" id="languageTitle">Выберите язык</div>
+            <div class="language-buttons">
+                <button class="lang-btn selected" data-lang="ru" onclick="selectLanguage('ru')">🇷🇺 Русский</button>
+                <button class="lang-btn" data-lang="en" onclick="selectLanguage('en')">🇺🇸 English</button>
+                <button class="lang-btn" data-lang="de" onclick="selectLanguage('de')">🇩🇪 Deutsch</button>
+                <button class="lang-btn" data-lang="fr" onclick="selectLanguage('fr')">🇫🇷 Français</button>
+                <button class="lang-btn" data-lang="tr" onclick="selectLanguage('tr')">🇹🇷 Türkçe</button>
+            </div>
+        </div>
+
+        <!-- Основной контент -->
+        <div class="content-section">
+            <div class="development-icon">🚧</div>
+            <div class="development-title" id="developmentTitle">Функция в разработке</div>
+            <div class="development-description" id="developmentDescription">
+                Раздел "Мои отчеты" находится в разработке. Здесь вы сможете:
+            </div>
+            
+            <div class="feature-list">
+                <div class="feature-item">
+                    <span class="feature-icon">📊</span>
+                    <span id="feature1">Просматривать все созданные отчеты</span>
+                </div>
+                <div class="feature-item">
+                    <span class="feature-icon">🔍</span>
+                    <span id="feature2">Искать отчеты по дате и адресу</span>
+                </div>
+                <div class="feature-item">
+                    <span class="feature-icon">💾</span>
+                    <span id="feature3">Сохранять избранные отчеты</span>
+                </div>
+                <div class="feature-item">
+                    <span class="feature-icon">📤</span>
+                    <span id="feature4">Экспортировать отчеты в PDF</span>
+                </div>
+                <div class="feature-item">
+                    <span class="feature-icon">📈</span>
+                    <span id="feature5">Отслеживать изменения цен</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Кнопка возврата -->
+        <button class="back-btn" onclick="goToMainMenu()" id="backBtn">Вернуться в главное меню</button>
+    </div>
+
+    <script>
+        let currentLanguage = 'ru';
+
+        // Локализации
+        const locales = {
+            'ru': {
+                'pageTitle': 'Мои отчеты',
+                'pageSubtitle': 'Управление вашими отчетами',
+                'languageTitle': 'Выберите язык',
+                'developmentTitle': 'Функция в разработке',
+                'developmentDescription': 'Раздел "Мои отчеты" находится в разработке. Здесь вы сможете:',
+                'feature1': 'Просматривать все созданные отчеты',
+                'feature2': 'Искать отчеты по дате и адресу',
+                'feature3': 'Сохранять избранные отчеты',
+                'feature4': 'Экспортировать отчеты в PDF',
+                'feature5': 'Отслеживать изменения цен',
+                'backBtn': 'Вернуться в главное меню'
+            },
+            'en': {
+                'pageTitle': 'My Reports',
+                'pageSubtitle': 'Manage your reports',
+                'languageTitle': 'Select language',
+                'developmentTitle': 'Feature in Development',
+                'developmentDescription': 'The "My Reports" section is under development. Here you will be able to:',
+                'feature1': 'View all created reports',
+                'feature2': 'Search reports by date and address',
+                'feature3': 'Save favorite reports',
+                'feature4': 'Export reports to PDF',
+                'feature5': 'Track price changes',
+                'backBtn': 'Back to main menu'
+            },
+            'de': {
+                'pageTitle': 'Meine Berichte',
+                'pageSubtitle': 'Verwalten Sie Ihre Berichte',
+                'languageTitle': 'Sprache auswählen',
+                'developmentTitle': 'Funktion in Entwicklung',
+                'developmentDescription': 'Der Bereich "Meine Berichte" befindet sich in der Entwicklung. Hier können Sie:',
+                'feature1': 'Alle erstellten Berichte anzeigen',
+                'feature2': 'Berichte nach Datum und Adresse suchen',
+                'feature3': 'Lieblingsberichte speichern',
+                'feature4': 'Berichte als PDF exportieren',
+                'feature5': 'Preisänderungen verfolgen',
+                'backBtn': 'Zurück zum Hauptmenü'
+            },
+            'fr': {
+                'pageTitle': 'Mes Rapports',
+                'pageSubtitle': 'Gérer vos rapports',
+                'languageTitle': 'Sélectionner la langue',
+                'developmentTitle': 'Fonction en développement',
+                'developmentDescription': 'La section "Mes Rapports" est en cours de développement. Ici vous pourrez:',
+                'feature1': 'Voir tous les rapports créés',
+                'feature2': 'Rechercher des rapports par date et adresse',
+                'feature3': 'Sauvegarder les rapports favoris',
+                'feature4': 'Exporter les rapports en PDF',
+                'feature5': 'Suivre les changements de prix',
+                'backBtn': 'Retour au menu principal'
+            },
+            'tr': {
+                'pageTitle': 'Raporlarım',
+                'pageSubtitle': 'Raporlarınızı yönetin',
+                'languageTitle': 'Dil seçin',
+                'developmentTitle': 'Geliştirme Aşamasında',
+                'developmentDescription': '"Raporlarım" bölümü geliştirme aşamasındadır. Burada şunları yapabileceksiniz:',
+                'feature1': 'Tüm oluşturulan raporları görüntüleyin',
+                'feature2': 'Raporları tarih ve adrese göre arayın',
+                'feature3': 'Favori raporları kaydedin',
+                'feature4': 'Raporları PDF olarak dışa aktarın',
+                'feature5': 'Fiyat değişikliklerini takip edin',
+                'backBtn': 'Ana menüye dön'
+            }
+        };
+
+        // Функция для получения локализованного текста
+        function getText(key) {
+            const locale = locales[currentLanguage] || locales['ru'];
+            return locale[key] || key;
+        }
+
+        // Обновление текста на странице
+        function updatePageText() {
+            document.getElementById('pageTitle').textContent = getText('pageTitle');
+            document.getElementById('pageSubtitle').textContent = getText('pageSubtitle');
+            document.getElementById('languageTitle').textContent = getText('languageTitle');
+            document.getElementById('developmentTitle').textContent = getText('developmentTitle');
+            document.getElementById('developmentDescription').textContent = getText('developmentDescription');
+            document.getElementById('feature1').textContent = getText('feature1');
+            document.getElementById('feature2').textContent = getText('feature2');
+            document.getElementById('feature3').textContent = getText('feature3');
+            document.getElementById('feature4').textContent = getText('feature4');
+            document.getElementById('feature5').textContent = getText('feature5');
+            document.getElementById('backBtn').textContent = getText('backBtn');
+        }
+
+        // Установка языка
+        function selectLanguage(lang) {
+            currentLanguage = lang;
+            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('selected'));
+            document.querySelector(`[data-lang="${lang}"]`).classList.add('selected');
+            updatePageText();
+        }
+
+        // Функция возврата в главное меню
+        function goToMainMenu() {
+            window.location.href = '/webapp';
+        }
+
+        // Инициализация
+        function init() {
+            // Определяем язык пользователя
+            const userLang = navigator.language || navigator.userLanguage;
+            if (userLang.startsWith('ru')) {
+                currentLanguage = 'ru';
+            } else if (userLang.startsWith('en')) {
+                currentLanguage = 'en';
+            } else if (userLang.startsWith('de')) {
+                currentLanguage = 'de';
+            } else if (userLang.startsWith('fr')) {
+                currentLanguage = 'fr';
+            } else if (userLang.startsWith('tr')) {
+                currentLanguage = 'tr';
+            }
+
+            // Обновляем выбранную кнопку языка
+            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('selected'));
+            document.querySelector(`[data-lang="${currentLanguage}"]`).classList.add('selected');
+
+            updatePageText();
+        }
+
+        // Запускаем инициализацию
+        init();
+    </script>
+</body>
+</html>

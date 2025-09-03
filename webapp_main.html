@@ -495,6 +495,12 @@
                 <span class="menu-btn-description" id="objectEvaluationDesc">Оценка недвижимости</span>
             </button>
 
+            <button class="menu-btn fade-in" onclick="showMyReports()">
+                <span class="menu-btn-icon">📋</span>
+                <span class="menu-btn-text" id="myReportsBtn">Мои отчеты</span>
+                <span class="menu-btn-description" id="myReportsDesc">Ваши созданные отчеты</span>
+            </button>
+
             <button class="menu-btn fade-in" onclick="showProfile()">
                 <span class="menu-btn-icon">👤</span>
                 <span class="menu-btn-text" id="profileBtn">Личный кабинет</span>
@@ -629,6 +635,8 @@
                 'regionAnalyticsDesc': 'Отчет по региону',
                 'objectEvaluationBtn': 'Оценка объекта',
                 'objectEvaluationDesc': 'Оценка недвижимости',
+                'myReportsBtn': 'Мои отчеты',
+                'myReportsDesc': 'Ваши созданные отчеты',
                 'adminSectionTitle': 'Для админа',
                 'error_loading': 'Ошибка загрузки данных',
                 'error_network': 'Ошибка сети. Проверьте соединение.',
@@ -655,6 +663,8 @@
                 'regionAnalyticsDesc': 'Region Report',
                 'objectEvaluationBtn': 'Object Evaluation',
                 'objectEvaluationDesc': 'Property Evaluation',
+                'myReportsBtn': 'My Reports',
+                'myReportsDesc': 'Your created reports',
                 'adminSectionTitle': 'For Admin',
                 'error_loading': 'Error loading data',
                 'error_network': 'Network error. Check your connection.',
@@ -681,6 +691,8 @@
                 'regionAnalyticsDesc': 'Regionsbericht',
                 'objectEvaluationBtn': 'Objektbewertung',
                 'objectEvaluationDesc': 'Immobilienbewertung',
+                'myReportsBtn': 'Meine Berichte',
+                'myReportsDesc': 'Ihre erstellten Berichte',
                 'adminSectionTitle': 'Für Admin',
                 'error_loading': 'Fehler beim Laden der Daten',
                 'error_network': 'Netzwerkfehler. Überprüfen Sie Ihre Verbindung.',
@@ -707,6 +719,8 @@
                 'regionAnalyticsDesc': 'Rapport de région',
                 'objectEvaluationBtn': 'Évaluation d\'objet',
                 'objectEvaluationDesc': 'Évaluation immobilière',
+                'myReportsBtn': 'Mes Rapports',
+                'myReportsDesc': 'Vos rapports créés',
                 'adminSectionTitle': 'Pour Admin',
                 'error_loading': 'Erreur de chargement des données',
                 'error_network': 'Erreur réseau. Vérifiez votre connexion.',
@@ -733,6 +747,8 @@
                 'regionAnalyticsDesc': 'Bölge Raporu',
                 'objectEvaluationBtn': 'Nesne Değerlendirmesi',
                 'objectEvaluationDesc': 'Gayrimenkul Değerlendirmesi',
+                'myReportsBtn': 'Raporlarım',
+                'myReportsDesc': 'Oluşturduğunuz raporlar',
                 'adminSectionTitle': 'Admin İçin',
                 'error_loading': 'Veri yükleme hatası',
                 'error_network': 'Ağ hatası. Bağlantınızı kontrol edin.',
@@ -764,6 +780,8 @@
             document.getElementById('regionAnalyticsDesc').textContent = getText('regionAnalyticsDesc');
             document.getElementById('objectEvaluationBtn').textContent = getText('objectEvaluationBtn');
             document.getElementById('objectEvaluationDesc').textContent = getText('objectEvaluationDesc');
+            document.getElementById('myReportsBtn').textContent = getText('myReportsBtn');
+            document.getElementById('myReportsDesc').textContent = getText('myReportsDesc');
             document.getElementById('adminSectionTitle').textContent = getText('adminSectionTitle');
             document.getElementById('loadingText').textContent = getText('loading');
         }
@@ -956,6 +974,13 @@
             showLoading();
             showToast('Переход к оценке объекта...', 'info');
             window.location.href = '/webapp_object_evaluation';
+        }
+
+        // Функция перехода к моим отчетам
+        function showMyReports() {
+            showLoading();
+            showToast('Переход к вашим отчетам...', 'info');
+            window.location.href = '/webapp_my_reports';
         }
 
         // Инициализация
