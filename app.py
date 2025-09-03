@@ -4706,7 +4706,9 @@ def api_generate_pdf_report():
         # Перемещаем PDF в static/reports/
         reports_dir = os.path.join(app.root_path, 'static', 'reports')
         os.makedirs(reports_dir, exist_ok=True)
-        final_pdf_name = f'report_{report_id}.pdf'
+        # Генерируем уникальное имя файла только цифрами
+        file_id = ''.join(random.choices(string.digits, k=12))
+        final_pdf_name = f'{file_id}.pdf'
         final_pdf_path = os.path.join(reports_dir, final_pdf_name)
         import shutil
         shutil.move(temp_file.name, final_pdf_path)
@@ -4966,13 +4968,9 @@ def api_save_html_report():
         random_suffix = ''.join(random.choices(string.digits, k=5))
         report_number = f"RPT-{timestamp}-{random_suffix}"
         
-        # Генерируем уникальное имя файла
-        safe_location = re.sub(r'[^\w\s-]', '', location_info).strip()
-        safe_location = re.sub(r'[-\s]+', '-', safe_location)
-        if len(safe_location) > 50:
-            safe_location = safe_location[:50]
-        
-        filename = f"Аналитический_отчет_по_недвижимости_{safe_location}_{timestamp}.html"
+        # Генерируем уникальное имя файла только цифрами
+        file_id = ''.join(random.choices(string.digits, k=12))
+        filename = f"{file_id}.html"
         file_path = os.path.join('reports', filename)
         
         # Получаем user_id по telegram_id
@@ -6566,7 +6564,9 @@ def api_send_saved_report_pdf():
         # Перемещаем PDF в static/reports/
         reports_dir = os.path.join(app.root_path, 'static', 'reports')
         os.makedirs(reports_dir, exist_ok=True)
-        final_pdf_name = f'report_{report_id}.pdf'
+        # Генерируем уникальное имя файла только цифрами
+        file_id = ''.join(random.choices(string.digits, k=12))
+        final_pdf_name = f'{file_id}.pdf'
         final_pdf_path = os.path.join(reports_dir, final_pdf_name)
         shutil.move(temp_file.name, final_pdf_path)
         pdf_url = f'/static/reports/{final_pdf_name}'
