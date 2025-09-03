@@ -461,7 +461,7 @@
     <div class="toast-container" id="toastContainer"></div>
 
     <!-- Modal для подтверждения удаления -->
-    <div id="deleteModal" class="modal-overlay hidden">
+    <div id="deleteModal" class="modal-overlay hidden" onclick="if(event.target === this) closeDeleteModal()">
         <div class="modal">
             <div class="modal-header">
                 <div class="modal-title" id="deleteModalTitle">Подтверждение удаления</div>
@@ -478,7 +478,7 @@
     </div>
 
     <!-- Modal для просмотра отчета -->
-    <div id="reportModal" class="modal-overlay hidden">
+    <div id="reportModal" class="modal-overlay hidden" onclick="if(event.target === this) closeReportModal()">
         <div class="modal">
             <div class="modal-header">
                 <div class="modal-title" id="reportModalTitle">Просмотр отчета</div>
@@ -801,6 +801,12 @@
                 return;
             }
             
+            // Проверяем, что функция вызвана пользователем, а не автоматически
+            if (!event || !event.isTrusted) {
+                console.log('viewReport called programmatically, ignoring');
+                return;
+            }
+            
             const report = reports.find(r => r.id === reportId);
             if (!report || !report.report_url) {
                 showToast('Ссылка на отчет недоступна', 'error');
@@ -816,11 +822,17 @@
 
         // Закрытие модального окна отчета
         function closeReportModal() {
+            console.log('closeReportModal called'); // Отладочный лог
             const modal = document.getElementById('reportModal');
             const frame = document.getElementById('reportFrame');
             
-            frame.src = '';
-            modal.classList.add('hidden');
+            if (modal) {
+                frame.src = '';
+                modal.classList.add('hidden');
+                console.log('Modal closed successfully'); // Отладочный лог
+            } else {
+                console.error('Modal element not found'); // Отладочный лог
+            }
         }
 
         // Копирование ссылки на отчет
@@ -892,6 +904,7 @@
 
         // Функция возврата в главное меню
         function goToMainMenu() {
+            console.log('goToMainMenu called'); // Отладочный лог
             window.location.href = '/webapp';
         }
 
@@ -903,8 +916,14 @@
             const reportModal = document.getElementById('reportModal');
             const deleteModal = document.getElementById('deleteModal');
             
-            if (reportModal) reportModal.classList.add('hidden');
-            if (deleteModal) deleteModal.classList.add('hidden');
+            if (reportModal) {
+                reportModal.classList.add('hidden');
+                console.log('Report modal hidden on init');
+            }
+            if (deleteModal) {
+                deleteModal.classList.add('hidden');
+                console.log('Delete modal hidden on init');
+            }
             
             userData = getUserData();
             
@@ -963,6 +982,41 @@
                 attributeFilter: ['class']
             });
         }
+        
+        // Добавляем обработчики событий для кнопок закрытия
+        document.addEventListener('DOMContentLoaded', function() {
+            const closeButtons = document.querySelectorAll('[onclick*="closeReportModal"]');
+            closeButtons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    console.log('Close button clicked'); // Отладочный лог
+                    closeReportModal();
+                });
+            });
+            
+            // Добавляем обработчик для кнопки "Назад"
+            const backButton = document.querySelector('[onclick*="goToMainMenu"]');
+            if (backButton) {
+                backButton.addEventListener('click', function(e) {
+                    console.log('Back button clicked'); // Отладочный лог
+                    goToMainMenu();
+                });
+            }
+            
+            // Добавляем обработчик клавиши Escape
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    console.log('Escape key pressed'); // Отладочный лог
+                    const reportModal = document.getElementById('reportModal');
+                    const deleteModal = document.getElementById('deleteModal');
+                    
+                    if (reportModal && !reportModal.classList.contains('hidden')) {
+                        closeReportModal();
+                    } else if (deleteModal && !deleteModal.classList.contains('hidden')) {
+                        closeDeleteModal();
+                    }
+                }
+            });
+        });
     </script>
 </body>
 </html>
