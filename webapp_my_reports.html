@@ -461,21 +461,7 @@
     <div class="toast-container" id="toastContainer"></div>
 
     <!-- Modal для подтверждения удаления -->
-    <div id="deleteModal" class="modal-overlay hidden" onclick="if(event.target === this) closeDeleteModal()">
-        <div class="modal">
-            <div class="modal-header">
-                <div class="modal-title" id="deleteModalTitle">Подтверждение удаления</div>
-                <button class="modal-close" onclick="closeDeleteModal()">×</button>
-            </div>
-            <div class="modal-content">
-                <p id="deleteModalMessage">Вы уверены, что хотите удалить этот отчет? Это действие нельзя отменить.</p>
-            </div>
-            <div class="modal-actions">
-                <button class="modal-btn secondary" onclick="closeDeleteModal()" id="cancelDeleteBtn">Отмена</button>
-                <button class="modal-btn danger" onclick="confirmDelete()" id="confirmDeleteBtn">Удалить</button>
-            </div>
-        </div>
-    </div>
+    <!-- Временно отключено - добавим позже -->
 
     <script>
         let tg = window.Telegram.WebApp;
@@ -485,7 +471,6 @@
         let userData = null;
         let currentLanguage = 'ru';
         let reports = [];
-        let reportToDelete = null;
 
         // Локализации
         const locales = {
@@ -499,10 +484,6 @@
                 'viewReport': 'Просмотреть',
                 'deleteReport': 'Удалить',
                 'copyLink': 'Копировать ссылку',
-                'deleteModalTitle': 'Подтверждение удаления',
-                'deleteModalMessage': 'Вы уверены, что хотите удалить этот отчет? Это действие нельзя отменить.',
-                'cancelDeleteBtn': 'Отмена',
-                'confirmDeleteBtn': 'Удалить',
                 'linkCopied': 'Ссылка скопирована в буфер обмена',
                 'reportDeleted': 'Отчет успешно удален',
                 'errorLoading': 'Ошибка загрузки отчетов',
@@ -522,10 +503,6 @@
                 'viewReport': 'View',
                 'deleteReport': 'Delete',
                 'copyLink': 'Copy link',
-                'deleteModalTitle': 'Confirm deletion',
-                'deleteModalMessage': 'Are you sure you want to delete this report? This action cannot be undone.',
-                'cancelDeleteBtn': 'Cancel',
-                'confirmDeleteBtn': 'Delete',
                 'linkCopied': 'Link copied to clipboard',
                 'reportDeleted': 'Report successfully deleted',
                 'errorLoading': 'Error loading reports',
@@ -545,10 +522,6 @@
                 'viewReport': 'Anzeigen',
                 'deleteReport': 'Löschen',
                 'copyLink': 'Link kopieren',
-                'deleteModalTitle': 'Löschung bestätigen',
-                'deleteModalMessage': 'Sind Sie sicher, dass Sie diesen Bericht löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden.',
-                'cancelDeleteBtn': 'Abbrechen',
-                'confirmDeleteBtn': 'Löschen',
                 'linkCopied': 'Link in die Zwischenablage kopiert',
                 'reportDeleted': 'Bericht erfolgreich gelöscht',
                 'errorLoading': 'Fehler beim Laden der Berichte',
@@ -568,10 +541,6 @@
                 'viewReport': 'Voir',
                 'deleteReport': 'Supprimer',
                 'copyLink': 'Copier le lien',
-                'deleteModalTitle': 'Confirmer la suppression',
-                'deleteModalMessage': 'Êtes-vous sûr de vouloir supprimer ce rapport ? Cette action ne peut pas être annulée.',
-                'cancelDeleteBtn': 'Annuler',
-                'confirmDeleteBtn': 'Supprimer',
                 'linkCopied': 'Lien copié dans le presse-papiers',
                 'reportDeleted': 'Rapport supprimé avec succès',
                 'errorLoading': 'Erreur de chargement des rapports',
@@ -591,10 +560,6 @@
                 'viewReport': 'Görüntüle',
                 'deleteReport': 'Sil',
                 'copyLink': 'Bağlantıyı kopyala',
-                'deleteModalTitle': 'Silme onayı',
-                'deleteModalMessage': 'Bu raporu silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.',
-                'cancelDeleteBtn': 'İptal',
-                'confirmDeleteBtn': 'Sil',
                 'linkCopied': 'Bağlantı panoya kopyalandı',
                 'reportDeleted': 'Rapor başarıyla silindi',
                 'errorLoading': 'Raporlar yüklenirken hata',
@@ -633,12 +598,6 @@
             document.getElementById('emptyTitle').textContent = getText('emptyTitle');
             document.getElementById('emptyDescription').textContent = getText('emptyDescription');
             document.getElementById('backBtn').textContent = getText('backBtn');
-            document.getElementById('deleteModalTitle').textContent = getText('deleteModalTitle');
-            document.getElementById('deleteModalMessage').textContent = getText('deleteModalMessage');
-            document.getElementById('cancelDeleteBtn').textContent = getText('cancelDeleteBtn');
-            document.getElementById('confirmDeleteBtn').textContent = getText('confirmDeleteBtn');
-            document.getElementById('reportModalTitle').textContent = getText('reportModalTitle');
-            document.getElementById('closeReportBtn').textContent = getText('closeReportBtn');
         }
 
         // Toast notification system
@@ -756,7 +715,7 @@
                     <button class="action-btn copy" onclick="copyReportLink(${report.id})">
                         📋 ${getText('copyLink')}
                     </button>
-                    <button class="action-btn delete" onclick="showDeleteModal(${report.id})">
+                    <button class="action-btn delete" onclick="showToast('Функция удаления временно недоступна', 'info')">
                         🗑️ ${getText('deleteReport')}
                     </button>
                 </div>
@@ -808,50 +767,6 @@
             }
         }
 
-        // Показ модального окна удаления
-        function showDeleteModal(reportId) {
-            reportToDelete = reportId;
-            const modal = document.getElementById('deleteModal');
-            modal.classList.remove('hidden');
-        }
-
-        // Закрытие модального окна удаления
-        function closeDeleteModal() {
-            const modal = document.getElementById('deleteModal');
-            modal.classList.add('hidden');
-            reportToDelete = null;
-        }
-
-        // Подтверждение удаления отчета
-        async function confirmDelete() {
-            if (!reportToDelete) return;
-
-            try {
-                const response = await fetch('/api/delete_report', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        telegram_id: userData.id,
-                        report_id: reportToDelete
-                    })
-                });
-
-                if (response.ok) {
-                    // Удаляем отчет из локального массива
-                    reports = reports.filter(r => r.id !== reportToDelete);
-                    displayReports();
-                    showToast(getText('reportDeleted'), 'success');
-                } else {
-                    throw new Error('Failed to delete report');
-                }
-            } catch (error) {
-                console.error('Error deleting report:', error);
-                showToast(getText('errorDeleting'), 'error');
-            } finally {
-                closeDeleteModal();
-            }
-        }
-
         // Функция возврата в главное меню
         function goToMainMenu() {
             console.log('goToMainMenu called'); // Отладочный лог
@@ -862,22 +777,11 @@
         async function init() {
             console.log('Initializing page...'); // Отладочный лог
             
-            // Сразу же закрываем модальное окно удаления
-            const deleteModal = document.getElementById('deleteModal');
-            
-            if (deleteModal) {
-                deleteModal.classList.add('hidden');
-                console.log('Delete modal hidden on init');
-            }
-            
             userData = getUserData();
             
             if (userData && userData.id) {
                 localStorage.setItem('telegram_id', userData.id);
             }
-
-            // Убеждаемся, что модальное окно удаления закрыто при загрузке
-            document.getElementById('deleteModal').classList.add('hidden');
 
             // Получаем язык пользователя из базы данных
             try {
@@ -919,18 +823,6 @@
                     goToMainMenu();
                 });
             }
-            
-            // Добавляем обработчик клавиши Escape для модального окна удаления
-            document.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape') {
-                    console.log('Escape key pressed'); // Отладочный лог
-                    const deleteModal = document.getElementById('deleteModal');
-                    
-                    if (deleteModal && !deleteModal.classList.contains('hidden')) {
-                        closeDeleteModal();
-                    }
-                }
-            });
         });
     </script>
 </body>
