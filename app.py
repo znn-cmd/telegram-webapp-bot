@@ -3768,8 +3768,8 @@ def api_user_reports():
         if not user_result.data:
             return jsonify({'error': 'User not found'}), 404
         user_id = user_result.data[0]['id']
-        # Возвращаем только неотвязанные отчеты
-        result = supabase.table('user_reports').select('*').eq('user_id', user_id).is_('deleted_at', None).order('created_at', desc=True).execute()
+        # Возвращаем только неудаленные отчеты (deleted_at IS NULL)
+        result = supabase.table('user_reports').select('*').eq('user_id', user_id).is_('deleted_at', 'null').order('created_at', desc=True).execute()
         reports = result.data if hasattr(result, 'data') else result
         return jsonify({'success': True, 'reports': reports})
     except Exception as e:
@@ -4176,7 +4176,7 @@ def api_delete_user_report():
             return jsonify({'error': 'User not found'}), 404
         user_id = user_result.data[0]['id']
         # Проверяем, что отчет принадлежит пользователю и не удалён
-        report_result = supabase.table('user_reports').select('id').eq('id', report_id).eq('user_id', user_id).is_('deleted_at', None).execute()
+        report_result = supabase.table('user_reports').select('id').eq('id', report_id).eq('user_id', user_id).is_('deleted_at', 'null').execute()
         if not report_result.data:
             logger.error(f"Report {report_id} not found or not owned by user_id {user_id} or already deleted")
             return jsonify({'error': 'Report not found or not owned by user'}), 404
