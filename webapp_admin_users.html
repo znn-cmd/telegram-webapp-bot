@@ -33,17 +33,17 @@
         <div class="stats-block">
             <div class="stats-title">Общая статистика</div>
             <div class="stats-list" id="generalStats">
-                <div class="loading" data-i18n="common.loading" data-i18n="common.loading" data-i18n="common.loading" data-i18n="common.loading">Загрузка...</div>
+                <div class="loading" data-i18n="common.loading">Загрузка...</div>
             </div>
         </div>
         <div class="stats-block">
             <div class="stats-title">Отчёты пользователей</div>
             <div class="stats-list" id="reportsStats">
-                <div class="loading" data-i18n="common.loading" data-i18n="common.loading" data-i18n="common.loading" data-i18n="common.loading">Загрузка...</div>
+                <div class="loading" data-i18n="common.loading">Загрузка...</div>
             </div>
         </div>
         <div class="nav-btn-row">
-            <button class="nav-btn" onclick="goBack()" data-i18n="common.back" data-i18n="common.back" data-i18n="common.back" data-i18n="common.back">Назад</button>
+            <button class="nav-btn" onclick="goBack()" data-i18n="common.back">Назад</button>
             <button class="nav-btn nav-btn-main" onclick="goToMainMenu()">В главное меню</button>
         </div>
     </div>
@@ -95,8 +95,8 @@
                     `;
                 })
                 .catch(() => {
-                    document.getElementById('generalStats').innerHTML = '<div class="loading" data-i18n="common.error" data-i18n="common.error">Ошибка сети</div>';
-                    document.getElementById('reportsStats').innerHTML = '<div class="loading" data-i18n="common.error" data-i18n="common.error">Ошибка сети</div>';
+                    document.getElementById('generalStats').innerHTML = '<div class="loading" data-i18n="common.error">Ошибка сети</div>';
+                    document.getElementById('reportsStats').innerHTML = '<div class="loading" data-i18n="common.error">Ошибка сети</div>';
                     showToast('Ошибка сети', 'error');
                 });
         });

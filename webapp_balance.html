@@ -136,11 +136,11 @@
 </head>
 <body>
     <div class="container">
-        <div class="title" data-i18n="profile.balance" data-i18n="profile.balance" data-i18n="profile.balance" data-i18n="profile.balance">Баланс</div>
+        <div class="title" data-i18n="profile.balance">Баланс</div>
         <div id="balance-block" style="margin-bottom:22px;display:none;"></div>
-        <button class="balance-btn" onclick="showDeposit()" data-i18n="profile.top_up" data-i18n="profile.top_up" data-i18n="profile.top_up" data-i18n="profile.top_up">Пополнить</button>
+        <button class="balance-btn" onclick="showDeposit()" data-i18n="profile.top_up">Пополнить</button>
         <button class="balance-btn" onclick="showTariffs()">Тарифы</button>
-        <button class="back-btn" onclick="goBack()" data-i18n="common.back" data-i18n="common.back" data-i18n="common.back" data-i18n="common.back">Назад</button>
+        <button class="back-btn" onclick="goBack()" data-i18n="common.back">Назад</button>
     </div>
     <div id="modal-bg" class="modal-bg" style="display:none;">
         <div class="modal">
@@ -150,7 +150,7 @@
             <div class="modal-title" id="modal-title"></div>
             <div class="modal-content" id="modal-content"></div>
             <div class="modal-btn-row">
-                <button class="modal-btn modal-btn-primary" onclick="closeModal()" data-i18n="common.ok" data-i18n="common.ok" data-i18n="common.ok" data-i18n="common.ok">OK</button>
+                <button class="modal-btn modal-btn-primary" onclick="closeModal()" data-i18n="common.ok">OK</button>
             </div>
         </div>
     </div>
@@ -181,7 +181,7 @@
                                 <div class='tariff-type'>${type}</div>
                             </div>`;
                         });
-                        html += `<button id='tariffs-back-btn' onclick='closeModal()' data-i18n="common.back" data-i18n="common.back" data-i18n="common.back" data-i18n="common.back">Назад</button>`;
+                        html += `<button id='tariffs-back-btn' onclick='closeModal()' data-i18n="common.back">Назад</button>`;
                         showModal('Тарифы', html, true);
                     } else {
                         showModal('Тарифы', 'Нет доступных тарифов.', true);

@@ -72,7 +72,7 @@
             <input type="text" id="cityInput" class="input-field" placeholder="Например: Стамбул">
             <div class="btn-row">
                 <button class="btn btn-secondary" onclick="goToMainMenu()">В главное меню</button>
-                <button class="btn btn-primary" onclick="verifyCity()" data-i18n="common.next" data-i18n="common.next" data-i18n="common.next" data-i18n="common.next">Далее</button>
+                <button class="btn btn-primary" onclick="verifyCity()" data-i18n="common.next">Далее</button>
             </div>
             <div id="city-error" class="error" style="display:none;"></div>
         </div>
@@ -81,16 +81,16 @@
             <div class="map-block" id="cityMap"></div>
             <div style="font-size:15px;color:#555;margin-bottom:10px;" id="confirmedCity"></div>
             <div class="btn-row">
-                <button class="btn btn-secondary" onclick="backToCity()" data-i18n="common.no" data-i18n="common.no" data-i18n="common.no" data-i18n="common.no">Нет</button>
-                <button class="btn btn-primary" onclick="confirmCity()" data-i18n="common.yes" data-i18n="common.yes" data-i18n="common.yes" data-i18n="common.yes">Да</button>
+                <button class="btn btn-secondary" onclick="backToCity()" data-i18n="common.no">Нет</button>
+                <button class="btn btn-primary" onclick="confirmCity()" data-i18n="common.yes">Да</button>
             </div>
         </div>
         <div id="step-district" class="step-card" style="display:none;">
             <div style="font-size:17px;font-weight:600;margin-bottom:12px;">Введите район города</div>
             <input type="text" id="districtInput" class="input-field" placeholder="Например: Kadıköy">
             <div class="btn-row">
-                <button class="btn btn-secondary" onclick="backToCityMap()" data-i18n="common.back" data-i18n="common.back" data-i18n="common.back" data-i18n="common.back">Назад</button>
-                <button class="btn btn-primary" onclick="verifyDistrict()" data-i18n="common.next" data-i18n="common.next" data-i18n="common.next" data-i18n="common.next">Далее</button>
+                <button class="btn btn-secondary" onclick="backToCityMap()" data-i18n="common.back">Назад</button>
+                <button class="btn btn-primary" onclick="verifyDistrict()" data-i18n="common.next">Далее</button>
             </div>
             <div id="district-error" class="error" style="display:none;"></div>
         </div>
@@ -99,8 +99,8 @@
             <div class="map-block" id="districtMap"></div>
             <div style="font-size:15px;color:#555;margin-bottom:10px;" id="confirmedDistrict"></div>
             <div class="btn-row">
-                <button class="btn btn-secondary" onclick="backToDistrict()" data-i18n="common.no" data-i18n="common.no" data-i18n="common.no" data-i18n="common.no">Нет</button>
-                <button class="btn btn-primary" onclick="confirmDistrict()" data-i18n="common.yes" data-i18n="common.yes" data-i18n="common.yes" data-i18n="common.yes">Да</button>
+                <button class="btn btn-secondary" onclick="backToDistrict()" data-i18n="common.no">Нет</button>
+                <button class="btn btn-primary" onclick="confirmDistrict()" data-i18n="common.yes">Да</button>
             </div>
         </div>
         <div id="step-report" class="step-card" style="display:none;">
@@ -111,7 +111,7 @@
             </div>
             <button class="back-btn" onclick="goToMainMenu()">В главное меню</button>
         </div>
-        <div id="loading" class="loading" style="display:none;" data-i18n="common.loading" data-i18n="common.loading" data-i18n="common.loading" data-i18n="common.loading">Загрузка...</div>
+        <div id="loading" class="loading" style="display:none;" data-i18n="common.loading">Загрузка...</div>
     </div>
     <div id="toast-container" class="toast-container"></div>
     <script>
@@ -301,7 +301,7 @@
                 <tr><td>Объектов на рынке</td><td align="right">${stats.total_properties}</td></tr>
                 <tr><td>Среднее время продажи</td><td align="right">${stats.avg_days_on_market} дней</td></tr>
                 <tr><td>Годовой рост цен</td><td align="right">${stats.price_growth_yoy}%</td></tr>
-                <tr><td data-i18n="reports.rental_yield" data-i18n="reports.rental_yield">Доходность аренды</td><td align="right">${stats.rental_yield}%</td></tr>
+                <tr><td data-i18n="reports.rental_yield">Доходность аренды</td><td align="right">${stats.rental_yield}%</td></tr>
                 <tr><td>Активность рынка</td><td align="right">${stats.market_activity}</td></tr>
                 <tr><td>Тренд цен</td><td align="right">${stats.price_trend}</td></tr>
             </table>`;
