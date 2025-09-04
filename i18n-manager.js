@@ -117,7 +117,7 @@ class I18nManager {
                     'share_report': 'Поделиться отчетом', 'delete_report': 'Удалить отчет',
                     'edit_report': 'Редактировать отчет', 'save_report': 'Сохранить отчет',
                     'report_saved': 'Отчет сохранен', 'report_deleted': 'Отчет удален',
-                    'report_shared': 'Отчет отправлен'
+                    'report_shared': 'Отчет отправлен', 'liquidity': 'Ликвидность'
                 },
                 'main': {
                     'title': 'Главное меню', 'welcome': 'Добро пожаловать',
@@ -191,7 +191,7 @@ class I18nManager {
                     'share_report': 'Share Report', 'delete_report': 'Delete Report',
                     'edit_report': 'Edit Report', 'save_report': 'Save Report',
                     'report_saved': 'Report Saved', 'report_deleted': 'Report Deleted',
-                    'report_shared': 'Report Shared'
+                    'report_shared': 'Report Shared', 'liquidity': 'Liquidity'
                 },
                 'main': {
                     'title': 'Main Menu', 'welcome': 'Welcome',
@@ -266,7 +266,7 @@ class I18nManager {
                     'share_report': 'Bericht teilen', 'delete_report': 'Bericht löschen',
                     'edit_report': 'Bericht bearbeiten', 'save_report': 'Bericht speichern',
                     'report_saved': 'Bericht gespeichert', 'report_deleted': 'Bericht gelöscht',
-                    'report_shared': 'Bericht geteilt'
+                    'report_shared': 'Bericht geteilt', 'liquidity': 'Liquidität'
                 },
                 'main': {
                     'title': 'Hauptmenü', 'welcome': 'Willkommen',
@@ -341,7 +341,7 @@ class I18nManager {
                     'share_report': 'Partager le rapport', 'delete_report': 'Supprimer le rapport',
                     'edit_report': 'Modifier le rapport', 'save_report': 'Enregistrer le rapport',
                     'report_saved': 'Rapport enregistré', 'report_deleted': 'Rapport supprimé',
-                    'report_shared': 'Rapport partagé'
+                    'report_shared': 'Rapport partagé', 'liquidity': 'Liquidité'
                 },
                 'main': {
                     'title': 'Menu principal', 'welcome': 'Bienvenue',
@@ -416,7 +416,7 @@ class I18nManager {
                     'share_report': 'Raporu paylaş', 'delete_report': 'Raporu sil',
                     'edit_report': 'Raporu düzenle', 'save_report': 'Raporu kaydet',
                     'report_saved': 'Rapor kaydedildi', 'report_deleted': 'Rapor silindi',
-                    'report_shared': 'Rapor paylaşıldı'
+                    'report_shared': 'Rapor paylaşıldı', 'liquidity': 'Likidite'
                 },
                 'main': {
                     'title': 'Ana menü', 'welcome': 'Hoş geldiniz',
