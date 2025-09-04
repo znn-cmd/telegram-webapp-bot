@@ -433,7 +433,7 @@
         <div class="user-info hidden" id="userInfo">
             <div class="user-name" id="userName" data-i18n="common.loading">Загрузка...</div>
             <div class="user-balance" style="margin-top: 10px;">
-                <span>Баланс:</span>
+                <span id="balanceLabel">Баланс:</span>
                 <span class="balance-amount" id="userBalance">$0</span>
             </div>
         </div>
@@ -745,6 +745,7 @@
             document.getElementById('adminPanelBtn').textContent = getText('adminPanelBtn');
             document.getElementById('adminPanelDesc').textContent = getText('adminPanelDesc');
             document.getElementById('loadingText').textContent = getText('loading');
+            document.getElementById('balanceLabel').textContent = getText('balance');
             
             // Обновляем кнопку подтверждения языка
             const confirmBtn = document.getElementById('confirmLangBtn');
