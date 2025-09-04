@@ -1,14 +1,13 @@
 <!DOCTYPE html>
-
 <html lang="ru">
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Aaadviser - Оценка объекта</title>
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
-<script src="/i18n-manager.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aaadviser - Оценка объекта</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="/i18n-manager.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
         * {
             margin: 0;
             padding: 0;
@@ -3659,165 +3658,192 @@
     </style>
 </head>
 <body>
-<div class="container">
-<!-- Логотип -->
-<div style="display:flex;flex-direction:column;align-items:center;margin-top:18px;margin-bottom:10px;">
-<img alt="Aaadviser Logo" onclick="goToMainMenu()" src="logo-flt.png" style="width:110px;height:auto;display:block;margin-bottom:8px;cursor:pointer;"/>
-<div id="slogan" style="font-size:15px;color:#888;font-style:italic;">Инсайты рынка недвижимости</div>
-</div>
-<!-- Заголовок страницы -->
-<div class="page-title" data-i18n="reports.object_evaluation_title" id="pageTitle">Оценка объекта</div>
-<div class="page-description" data-i18n="reports.object_evaluation_description" id="pageDescription">Получите профессиональную оценку стоимости недвижимости в выбранном регионе</div>
-<!-- Форма выбора локации -->
-<div class="location-form" id="locationForm">
-<div class="form-group">
-<label data-i18n="reports.country_label" for="countrySelect" id="countryLabel">Страна:</label>
-<select id="countrySelect" onchange="onCountryChange()">
-<option data-i18n="reports.country_placeholder" id="countryPlaceholder" value="">Выберите страну</option>
-</select>
-</div>
-<div class="form-group">
-<label data-i18n="reports.city_label" for="citySelect" id="cityLabel">Город:</label>
-<select disabled="" id="citySelect" onchange="onCityChange()">
-<option data-i18n="reports.city_placeholder" id="cityPlaceholder" value="">Сначала выберите страну</option>
-</select>
-</div>
-<div class="form-group">
-<label data-i18n="reports.county_label" for="countySelect" id="countyLabel">Область/Регион:</label>
-<select disabled="" id="countySelect" onchange="onCountyChange()">
-<option data-i18n="reports.county_placeholder" id="countyPlaceholder" value="">Сначала выберите город</option>
-</select>
-</div>
-<div class="form-group">
-<label data-i18n="reports.district_label" for="districtSelect" id="districtLabel">Район:</label>
-<select disabled="" id="districtSelect" onchange="onDistrictChange()">
-<option data-i18n="reports.district_placeholder" id="districtPlaceholder" value="">Сначала выберите область</option>
-</select>
-</div>
-<!-- Listing Type Selection -->
-<div class="listing-type-section" id="listingTypeSection" style="display: none;">
-<div class="listing-type-title" data-i18n="reports.listing_type_title" id="listingTypeTitle">Выберите тип недвижимости для анализа:</div>
-<!-- House Type Listing Types -->
-<div class="listing-type-group">
-<div class="listing-type-subtitle" data-i18n="reports.house_type_subtitle" id="houseTypeSubtitle">Количество спален:</div>
-<select class="listing-type-select" id="houseTypeSelect">
-<option id="houseTypePlaceholder" value="">Выберите количество спален</option>
-</select>
-</div>
-<!-- Floor Segment Listing Types -->
-<div class="listing-type-group">
-<div class="listing-type-subtitle" data-i18n="reports.floor_segment_subtitle" id="floorSegmentSubtitle">Этаж:</div>
-<select class="listing-type-select" id="floorSegmentSelect">
-<option id="floorSegmentPlaceholder" value="">Выберите этаж</option>
-</select>
-</div>
-<!-- Age Data Listing Types -->
-<div class="listing-type-group">
-<div class="listing-type-subtitle" data-i18n="reports.age_data_subtitle" id="ageDataSubtitle">Возраст объекта:</div>
-<select class="listing-type-select" id="ageDataSelect">
-<option id="ageDataPlaceholder" value="">Выберите возраст объекта</option>
-</select>
-</div>
-<!-- Heating Data Listing Types -->
-<div class="listing-type-group">
-<div class="listing-type-subtitle" data-i18n="reports.heating_data_subtitle" id="heatingDataSubtitle">Тип отопления:</div>
-<select class="listing-type-select" id="heatingDataSelect">
-<option id="heatingDataPlaceholder" value="">Выберите тип отопления</option>
-</select>
-</div>
-<!-- Price Object -->
-<div class="listing-type-group">
-<div class="listing-type-subtitle" data-i18n="reports.price_object_subtitle" id="priceObjectSubtitle">Цена объекта:</div>
-<input class="listing-type-input" id="priceObjectInput" placeholder="Введите цену" type="number"/>
-<!-- Currency Selection -->
-<div class="currency-buttons-container">
-<div class="currency-buttons-title" data-i18n="reports.currency_title" id="currencyTitle">Выберите валюту:</div>
-<div class="currency-buttons">
-<button class="currency-button" data-currency="TRY" type="button">
-<span class="currency-symbol">₺</span>
-</button>
-<button class="currency-button" data-currency="EUR" type="button">
-<span class="currency-symbol">€</span>
-</button>
-<button class="currency-button" data-currency="USD" type="button">
-<span class="currency-symbol">$</span>
-</button>
-</div>
-</div>
-</div>
-<!-- Area Object -->
-<div class="listing-type-group">
-<div class="listing-type-subtitle" data-i18n="reports.area_object_subtitle" id="areaObjectSubtitle">Площадь объекта (м²):</div>
-<input class="listing-type-input" id="areaObjectInput" max="1000" min="10" placeholder="Введите площадь" type="number"/>
-</div>
-</div>
-<button class="confirm-button" disabled="" id="confirmButton" onclick="confirmLocation()">
-<span data-i18n="reports.confirm_selection" id="confirmButtonText">Подтвердить выбор</span>
-</button>
-</div>
-<!-- Выбранная локация -->
-<div class="selected-location" id="selectedLocation" style="display: none;">
-<div class="location-title" data-i18n="reports.selected_location" id="selectedLocationTitle">Выбранная локация:</div>
-<div class="location-details" id="locationDetails"></div>
-<!-- Выбранные характеристики недвижимости -->
-<div class="selected-property-types" id="selectedPropertyTypes" style="display: none;">
-<div class="property-types-title" data-i18n="reports.property_types_title" id="propertyTypesTitle">Выбранные характеристики недвижимости:</div>
-<div class="property-types-details" id="propertyTypesDetails"></div>
-</div>
-</div>
-<!-- Блок с ID для админов (отдельный) -->
-<div class="admin-ids-block" id="adminIdsBlock" style="display: none;">
-<div class="admin-ids-title" data-i18n="reports.admin_ids" id="adminIdsTitle">ID для админов:</div>
-<div class="admin-ids-details" id="adminIdsDetails"></div>
-</div>
-<!-- Ключевые метрики - скрыты -->
-<div class="key-metrics-section" id="keyMetricsSection" style="display: none;">
-<!-- Ключевые метрики скрыты, показывается только таблица "Средние значения" -->
-</div>
-<!-- Data Content -->
-<div class="data-content" id="dataContent" style="display: none;">
-<!-- Market Indicators Table -->
-<div class="data-section" id="summaryDataSection">
-<h3 class="data-section-title" id="summaryDataTitle"></h3>
-<div class="data-section-content" id="summaryDataContent">
-<!-- Market indicators data will be populated here -->
-</div>
-</div>
-</div>
-<!-- Save and Share Button -->
-<button class="save-share-button" id="saveShareButton" onclick="saveAndShareReport()">
-<span data-i18n="reports.save_share_button_text" id="saveShareButtonText">Сохранить и поделиться отчетом</span>
-</button>
-<!-- Error State -->
-<div class="error-state" id="errorState" style="display: none;">
-<div class="error-icon">❌</div>
-<div class="error-text" data-i18n="reports.error_text" id="errorText">Ошибка загрузки данных</div>
-</div>
-<!-- Back Button -->
-<a class="back-button" data-i18n="reports.back_to_main" href="/webapp_main" id="backButton">← Вернуться в главное меню</a>
-<!-- Modal for sharing report -->
-<div class="modal-overlay" id="shareModal">
-<div class="modal-content">
-<button class="modal-close" onclick="closeShareModal()">×</button>
-<div class="modal-title" data-i18n="reports.report_saved" id="modalTitle">Отчет сохранен</div>
-<div class="modal-description" data-i18n="reports.modal_description" id="modalDescription">
+    <div class="container">
+        <!-- Логотип -->
+        <div style="display:flex;flex-direction:column;align-items:center;margin-top:18px;margin-bottom:10px;">
+            <img src="logo-flt.png" alt="Aaadviser Logo" style="width:110px;height:auto;display:block;margin-bottom:8px;cursor:pointer;" onclick="goToMainMenu()" />
+            <div style="font-size:15px;color:#888;font-style:italic;" id="slogan">Инсайты рынка недвижимости</div>
+        </div>
+
+        <!-- Заголовок страницы -->
+        <div class="page-title" id="pageTitle">Оценка объекта</div>
+        <div class="page-description" id="pageDescription">Получите профессиональную оценку стоимости недвижимости в выбранном регионе</div>
+
+        <!-- Форма выбора локации -->
+        <div class="location-form" id="locationForm">
+            <div class="form-group">
+                <label for="countrySelect" id="countryLabel">Страна:</label>
+                <select id="countrySelect" onchange="onCountryChange()">
+                    <option value="" id="countryPlaceholder">Выберите страну</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="citySelect" id="cityLabel">Город:</label>
+                <select id="citySelect" disabled onchange="onCityChange()">
+                    <option value="" id="cityPlaceholder">Сначала выберите страну</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="countySelect" id="countyLabel">Область/Регион:</label>
+                <select id="countySelect" disabled onchange="onCountyChange()">
+                    <option value="" id="countyPlaceholder">Сначала выберите город</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="districtSelect" id="districtLabel">Район:</label>
+                <select id="districtSelect" disabled onchange="onDistrictChange()">
+                    <option value="" id="districtPlaceholder">Сначала выберите область</option>
+                </select>
+            </div>
+
+                            <!-- Listing Type Selection -->
+                <div class="listing-type-section" id="listingTypeSection" style="display: none;">
+                    <div class="listing-type-title" id="listingTypeTitle">Выберите тип недвижимости для анализа:</div>
+                    
+                    <!-- House Type Listing Types -->
+                    <div class="listing-type-group">
+                        <div class="listing-type-subtitle" id="houseTypeSubtitle">Количество спален:</div>
+                        <select class="listing-type-select" id="houseTypeSelect">
+                            <option value="" id="houseTypePlaceholder">Выберите количество спален</option>
+                        </select>
+                    </div>
+
+                    <!-- Floor Segment Listing Types -->
+                    <div class="listing-type-group">
+                        <div class="listing-type-subtitle" id="floorSegmentSubtitle">Этаж:</div>
+                        <select class="listing-type-select" id="floorSegmentSelect">
+                            <option value="" id="floorSegmentPlaceholder">Выберите этаж</option>
+                        </select>
+                    </div>
+
+                    <!-- Age Data Listing Types -->
+                    <div class="listing-type-group">
+                        <div class="listing-type-subtitle" id="ageDataSubtitle">Возраст объекта:</div>
+                        <select class="listing-type-select" id="ageDataSelect">
+                            <option value="" id="ageDataPlaceholder">Выберите возраст объекта</option>
+                        </select>
+                    </div>
+
+                    <!-- Heating Data Listing Types -->
+                    <div class="listing-type-group">
+                        <div class="listing-type-subtitle" id="heatingDataSubtitle">Тип отопления:</div>
+                        <select class="listing-type-select" id="heatingDataSelect">
+                            <option value="" id="heatingDataPlaceholder">Выберите тип отопления</option>
+                        </select>
+                    </div>
+
+                    <!-- Price Object -->
+                    <div class="listing-type-group">
+                        <div class="listing-type-subtitle" id="priceObjectSubtitle">Цена объекта:</div>
+                        <input type="number" id="priceObjectInput" class="listing-type-input" placeholder="Введите цену">
+                        
+                        <!-- Currency Selection -->
+                        <div class="currency-buttons-container">
+                            <div class="currency-buttons-title" id="currencyTitle">Выберите валюту:</div>
+                            <div class="currency-buttons">
+                                <button type="button" class="currency-button" data-currency="TRY">
+                                    <span class="currency-symbol">₺</span>
+                                </button>
+                                <button type="button" class="currency-button" data-currency="EUR">
+                                    <span class="currency-symbol">€</span>
+                                </button>
+                                <button type="button" class="currency-button" data-currency="USD">
+                                    <span class="currency-symbol">$</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Area Object -->
+                    <div class="listing-type-group">
+                        <div class="listing-type-subtitle" id="areaObjectSubtitle">Площадь объекта (м²):</div>
+                        <input type="number" id="areaObjectInput" class="listing-type-input" placeholder="Введите площадь" min="10" max="1000">
+                    </div>
+                </div>
+
+            <button class="confirm-button" id="confirmButton" onclick="confirmLocation()" disabled>
+                <span id="confirmButtonText">Подтвердить выбор</span>
+            </button>
+        </div>
+
+        <!-- Выбранная локация -->
+        <div class="selected-location" id="selectedLocation" style="display: none;">
+            <div class="location-title" id="selectedLocationTitle">Выбранная локация:</div>
+            <div class="location-details" id="locationDetails"></div>
+            
+            <!-- Выбранные характеристики недвижимости -->
+            <div class="selected-property-types" id="selectedPropertyTypes" style="display: none;">
+                <div class="property-types-title" id="propertyTypesTitle">Выбранные характеристики недвижимости:</div>
+                <div class="property-types-details" id="propertyTypesDetails"></div>
+            </div>
+            
+            </div>
+        
+        <!-- Блок с ID для админов (отдельный) -->
+        <div class="admin-ids-block" id="adminIdsBlock" style="display: none;">
+            <div class="admin-ids-title" id="adminIdsTitle">ID для админов:</div>
+            <div class="admin-ids-details" id="adminIdsDetails"></div>
+        </div>
+
+        <!-- Ключевые метрики - скрыты -->
+        <div class="key-metrics-section" id="keyMetricsSection" style="display: none;">
+            <!-- Ключевые метрики скрыты, показывается только таблица "Средние значения" -->
+        </div>
+
+
+
+        <!-- Data Content -->
+        <div class="data-content" id="dataContent" style="display: none;">
+            <!-- Market Indicators Table -->
+            <div class="data-section" id="summaryDataSection">
+                <h3 class="data-section-title" id="summaryDataTitle"></h3>
+                <div class="data-section-content" id="summaryDataContent">
+                    <!-- Market indicators data will be populated here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Save and Share Button -->
+        <button class="save-share-button" id="saveShareButton" onclick="saveAndShareReport()">
+            <span id="saveShareButtonText">Сохранить и поделиться отчетом</span>
+        </button>
+
+        <!-- Error State -->
+        <div class="error-state" id="errorState" style="display: none;">
+            <div class="error-icon">❌</div>
+            <div class="error-text" id="errorText">Ошибка загрузки данных</div>
+        </div>
+
+        <!-- Back Button -->
+        <a href="/webapp_main" class="back-button" id="backButton">← Вернуться в главное меню</a>
+
+        <!-- Modal for sharing report -->
+        <div class="modal-overlay" id="shareModal">
+            <div class="modal-content">
+                <button class="modal-close" onclick="closeShareModal()">×</button>
+                <div class="modal-title" id="modalTitle" data-i18n="reports.report_saved">Отчет сохранен</div>
+                <div class="modal-description" id="modalDescription">
                     Ваш отчет успешно сохранен. Вы можете скопировать ссылку и поделиться ею с другими.
                 </div>
-<div class="modal-link-container">
-<a class="modal-link" href="#" id="modalLink" target="_blank">Ссылка на отчет</a>
-</div>
-<div class="modal-actions">
-<button class="modal-button modal-button-primary" onclick="copyReportLink()">
-<span data-i18n="reports.copy_button_text" id="copyButtonText">Копировать ссылку</span>
-</button>
-<button class="modal-button modal-button-secondary" data-i18n="common.close" onclick="closeShareModal()">
-<span data-i18n="common.close" id="closeButtonText">Закрыть</span>
-</button>
-</div>
-</div>
-</div>
-</div>
-<script>
+                <div class="modal-link-container">
+                    <a id="modalLink" href="#" target="_blank" class="modal-link">Ссылка на отчет</a>
+                </div>
+                <div class="modal-actions">
+                    <button class="modal-button modal-button-primary" onclick="copyReportLink()">
+                        <span id="copyButtonText">Копировать ссылку</span>
+                    </button>
+                    <button class="modal-button modal-button-secondary" onclick="closeShareModal()">
+                        <span id="closeButtonText" data-i18n="common.close">Закрыть</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
         // Telegram WebApp initialization
         let tg = window.Telegram.WebApp;
         tg.ready();
@@ -3854,169 +3880,758 @@
         };
 
         // Localization data
-        
+        const locales = {
+            'ru': {
+                'slogan': 'Инсайты рынка недвижимости',
+                'pageTitle': 'Оценка объекта',
+                'pageDescription': 'Получите профессиональную оценку стоимости недвижимости в выбранном регионе',
+                'countryLabel': 'Страна:',
+                'cityLabel': 'Город:',
+                'countyLabel': 'Область/Регион:',
+                'districtLabel': 'Район:',
+                'countryPlaceholder': 'Выберите страну',
+                'cityPlaceholder': 'Сначала выберите страну',
+                'countyPlaceholder': 'Сначала выберите город',
+                'districtPlaceholder': 'Сначала выберите область',
+                'confirmButtonText': 'Подтвердить выбор',
+                'backButton': '← Вернуться в главное меню',
+                'selectedLocationTitle': 'Выбранная локация:',
+                'adminIdsTitle': 'ID для админов:',
+                'loading': 'Загрузка...',
+                'errorLoading': 'Ошибка загрузки данных',
+                'dataSectionTitle': 'Анализ данных региона',
+                'loadingText': 'Загрузка данных...',
+                'errorText': 'Ошибка загрузки данных',
+                'totalProperties': 'Всего объектов:',
+                'averagePrice': 'Средняя цена:',
+                'priceRange': 'Диапазон цен:',
+                'noDataAvailable': 'Данные недоступны',
+                'keyMetricsTitle': 'Ключевые показатели',
+                'avgSalePriceLabel': 'Средняя цена продажи за м²',
+                'avgRentPriceLabel': 'Средняя цена аренды за м²',
+                'listingPeriodSaleLabel': 'Период размещения (продажа)',
+                'listingPeriodRentLabel': 'Период размещения (аренда)',
+                'yieldLabel': 'Доходность',
+
+                'listingTypeTitle': 'Выберите тип недвижимости для анализа:',
+                'houseTypeSubtitle': 'Количество спален:',
+                'floorSegmentSubtitle': 'Этаж:',
+                'ageDataSubtitle': 'Возраст объекта:',
+                'heatingDataSubtitle': 'Тип отопления:',
+                'priceObjectSubtitle': 'Цена объекта:',
+                'areaObjectSubtitle': 'Площадь объекта (м²):',
+                'selectBedrooms': 'количество спален',
+                'selectFloor': 'этаж',
+                'selectAge': 'возраст объекта',
+                'selectHeating': 'тип отопления',
+                'propertyTypesTitle': 'Выбранные характеристики недвижимости:',
+                'bedroomsLabel': 'Количество спален',
+                'floorLabel': 'Этаж',
+                'ageLabel': 'Возраст объекта',
+                'heatingLabel': 'Тип отопления',
+                'marketIndicatorsTitle': 'Показатели рынка',
+                'marketTrendsTitle': 'Тренды рынка',
+                'saleHeader': 'Продажа',
+                'rentHeader': 'Аренда',
+                'currencyTitle': 'Выберите валюту:',
+                'saveShareButtonText': 'Сохранить и поделиться отчетом',
+                'modalTitle': 'Отчет сохранен',
+                'modalDescription': 'Ваш отчет успешно сохранен. Вы можете скопировать ссылку и поделиться ею с другими.',
+                'copyButtonText': 'Копировать ссылку',
+                'closeButtonText': 'Закрыть',
+                'linkCopied': 'Ссылка скопирована!',
+                'savingReport': 'Сохранение отчета...',
+                'errorSaving': 'Ошибка сохранения отчета',
+                'pricePlaceholder': 'Введите цену',
+                'areaPlaceholder': 'Введите площадь',
+                'trendsFilterInfo': 'Показано ${filteredCount} из ${totalCount} трендов',
+                'marketComparisonTitle': 'Сравнение с рынком',
+                'pricePerM2Label': 'Цена за м²',
+                'areaLabel': 'Площадь',
+                'priceComparisonLabel': 'Цена за м²:',
+                'areaComparisonLabel': 'Площадь:',
+                'priceCloseToMarket': 'Ваш объект (${userPrice}) близок к рыночной (${marketMin} – ${marketMax}).',
+                'priceAboveMarket': 'Ваш объект (${userPrice}) выше рынка на ${percent}%.',
+                'priceBelowMarket': 'Ваш объект (${userPrice}) ниже рынка на ${percent}%.',
+                'areaMatchesMarket': 'Ваш объект (${userArea} м²) соответствует рыночному спросу (${marketMin}–${marketMax} м²).',
+                'areaBelowMarket': 'Ваш объект (${userArea} м²) меньше востребованной на рынке (${marketMin}–${marketMax} м²).',
+                'areaAboveMarket': 'Ваш объект (${userArea} м²) больше востребованной на рынке (${marketMin}–${marketMax} м²).',
+                'houseTypeDataTitle': 'Данные по количеству спален',
+                'floorSegmentDataTitle': 'Данные по этажу',
+                'ageDataTitle': 'Данные по возрасту объектов',
+                'heatingDataTitle': 'Данные по типу отопления',
+                'consolidatedAssessmentTitle': 'Консолидированная оценка',
+                'salePriceTitle': 'Цена за м² (Unit Price For Sale):',
+                'rentPriceTitle': 'Цена аренды за м² (Unit Price For Rent):',
+                'yieldTitle': 'Доходность (Yield):',
+                'consolidatedAverageLabel': 'Консолидированная средняя:',
+                'bedroomsLabel': 'Спальни',
+                'floorLabel': 'Этаж',
+                'ageLabel': 'Возраст',
+                'heatingLabel': 'Отопление',
+                
+                // Ключи локализации для таблицы "Показатели рынка"
+                'indicatorLabel': 'Показатель',
+                'minValueLabel': 'Минимальное значение',
+                'maxValueLabel': 'Максимальное значение',
+                'comparableAreaForSaleLabel': 'Сопоставимая площадь',
+                'countForSaleLabel': 'Количество для продажи',
+                'listingPeriodForSaleLabel': 'Срок до продажи',
+                'unitPriceForSaleLabel': 'Цена за м²',
+                'comparableAreaForRentLabel': 'Сопоставимая площадь',
+                'countForRentLabel': 'Количество для аренды',
+                'listingPeriodForRentLabel': 'Срок до аренды',
+                'unitPriceForRentLabel': 'Цена за м²',
+                
+                // Ключи для текстового анализа рынка
+                'marketAnalysisTitle': 'Анализ рынка',
+                'saleAnalysisText': 'Продажа: при площади {area} м² (среднее значение по проданным объектам) и минимальной цене {minPrice}/м² срок продажи составляет ~{minDays} дней; при максимальной цене {maxPrice}/м² - срок продажи до {maxDays} дней.',
+                'rentAnalysisText': 'Аренда: при площади {area} м² (среднее значение по сданным в аренду объектам) минимальная цена {minPrice}/м² срок сдачи ~{minDays} дней; при максимальной цене {maxPrice}/м² срок до {maxDays} дней.',
+                
+                // Ключи для графика трендов
+                'chart_title': 'График трендов',
+                'sale_button': 'Цена м² продажи',
+                'rent_button': 'Цена м² аренды',
+                'chart_info': 'Показаны данные до текущего месяца и один месяц вперед',
+                
+                // Ключи для графика прогноза
+                'forecast_chart_title': 'График прогноза цен и аренды',
+                'forecast_chart_info': 'Прогноз на основе текущего и будущих месяцев',
+                
+                // Ключи для блока "Вывод по объекту"
+                'objectSummaryTitle': 'Вывод по объекту',
+                'objectPricePerM2Label': 'Цена за м² вашего объекта:',
+                'objectCurrencyLabel': 'Валюта объекта:',
+                'objectAreaLabel': 'Площадь объекта:',
+                'exchangeRateLabel': 'Курс конвертации:',
+                
+                // Ключи для сообщения о подписке
+                'subscriptionRequiredTitle': 'Функция долгосрочного прогноза стоимости объекта доступна только для пользователей с активной подпиской.',
+                'subscriptionBenefits': 'Что даёт подписка:',
+                'subscriptionBenefit1': 'Прогноз цены объекта на 12 месяцев вперёд',
+                'subscriptionBenefit2': 'Дополнительные аналитические данные',
+                'subscriptionBenefit3': 'Дополнительные возможности сервиса',
+                'howToSubscribe': 'Как оформить подписку:',
+                'subscribeInstructions': 'Перейдите к боту @Aaadviser_pay_bot',
+                'followInstructions': 'Следуйте инструкциям для подключения',
+                'needHelp': 'Нужна помощь?',
+                'contactSupport': 'Свяжитесь с нашей поддержкой: @Aaadviser_support_bot'
+            },
+            'en': {
+                'slogan': 'Real Estate Market Insights',
+                'pageTitle': 'Object Evaluation',
+                'pageDescription': 'Get a professional property valuation in the selected region',
+                'countryLabel': 'Country:',
+                'cityLabel': 'City:',
+                'countyLabel': 'Region/Area:',
+                'districtLabel': 'District:',
+                'countryPlaceholder': 'Select country',
+                'cityPlaceholder': 'First select country',
+                'countyPlaceholder': 'First select city',
+                'districtPlaceholder': 'First select region',
+                'confirmButtonText': 'Confirm selection',
+                'backButton': '← Back to main menu',
+                'selectedLocationTitle': 'Selected location:',
+                'adminIdsTitle': 'IDs for admins:',
+                'loading': 'Loading...',
+                'errorLoading': 'Error loading data',
+                'dataSectionTitle': 'Regional Data Analysis',
+                'loadingText': 'Loading data...',
+                'errorText': 'Error loading data',
+                'totalProperties': 'Total properties:',
+                'averagePrice': 'Average price:',
+                'priceRange': 'Price range:',
+                'noDataAvailable': 'Data not available',
+                'keyMetricsTitle': 'Key Metrics',
+                'avgSalePriceLabel': 'Average Sale Price per m²',
+                'avgRentPriceLabel': 'Average Rent Price per m²',
+                'listingPeriodSaleLabel': 'Listing Period (Sale)',
+                'listingPeriodRentLabel': 'Listing Period (Rent)',
+                'yieldLabel': 'Yield',
+
+                'listingTypeTitle': 'Select property type for analysis:',
+                'houseTypeSubtitle': 'Bedroom count:',
+                'floorSegmentSubtitle': 'Floor:',
+                'ageDataSubtitle': 'Property age:',
+                'heatingDataSubtitle': 'Heating type:',
+                'priceObjectSubtitle': 'Property price:',
+                'areaObjectSubtitle': 'Property area (m²):',
+                'selectBedrooms': 'bedroom count',
+                'selectFloor': 'floor',
+                'selectAge': 'property age',
+                'selectHeating': 'heating type',
+                'propertyTypesTitle': 'Selected property characteristics:',
+                'bedroomsLabel': 'Bedroom count',
+                'floorLabel': 'Floor',
+                'ageLabel': 'Property age',
+                'heatingLabel': 'Heating type',
+                'marketIndicatorsTitle': 'Market Indicators',
+                'marketTrendsTitle': 'Market Trends',
+                'saleHeader': 'Sale',
+                'rentHeader': 'Rent',
+                'currencyTitle': 'Select currency:',
+                'saveShareButtonText': 'Save and share report',
+                'modalTitle': 'Report saved',
+                'modalDescription': 'Your report has been successfully saved. You can copy the link and share it with others.',
+                'copyButtonText': 'Copy link',
+                'closeButtonText': 'Close',
+                'linkCopied': 'Link copied!',
+                'savingReport': 'Saving report...',
+                'errorSaving': 'Error saving report',
+                'pricePlaceholder': 'Enter price',
+                'areaPlaceholder': 'Enter area',
+                'trendsFilterInfo': 'Showing ${filteredCount} of ${totalCount} trends',
+                'marketComparisonTitle': 'Market Comparison',
+                'pricePerM2Label': 'Price per m²',
+                'areaLabel': 'Area',
+                'priceComparisonLabel': 'Price per m²:',
+                'areaComparisonLabel': 'Area:',
+                'priceCloseToMarket': 'Your object (${userPrice}) is close to market (${marketMin} – ${marketMax}).',
+                'priceAboveMarket': 'Your object (${userPrice}) is above market by ${percent}%.',
+                'priceBelowMarket': 'Your object (${userPrice}) is below market by ${percent}%.',
+                'areaMatchesMarket': 'Your object (${userArea} m²) matches market demand (${marketMin}–${marketMax} m²).',
+                'areaBelowMarket': 'Your object (${userArea} m²) is smaller than market demand (${marketMin}–${marketMax} m²).',
+                'areaAboveMarket': 'Your object (${userArea} m²) is larger than market demand (${marketMin}–${marketMax} m²).',
+                'houseTypeDataTitle': 'Bedroom Count Data',
+                'floorSegmentDataTitle': 'Floor Data',
+                'ageDataTitle': 'Property Age Data',
+                'heatingDataTitle': 'Heating Type Data',
+                'consolidatedAssessmentTitle': 'Consolidated Assessment',
+                'salePriceTitle': 'Price per m² (Unit Price For Sale):',
+                'rentPriceTitle': 'Rent Price per m² (Unit Price For Rent):',
+                'yieldTitle': 'Yield:',
+                'consolidatedAverageLabel': 'Consolidated Average:',
+                'bedroomsLabel': 'Bedrooms',
+                
+                // Market analysis text localization keys
+                'marketAnalysisTitle': 'Market Analysis',
+                'saleAnalysisText': 'Sale: with an area of {area} m² (average value for sold properties) and a minimum price of {minPrice}/m², the sale period is ~{minDays} days; with a maximum price of {maxPrice}/m² - the sale period is up to {maxDays} days.',
+                'rentAnalysisText': 'Rent: with an area of {area} m² (average value for rented properties) minimum price {minPrice}/m², rental period ~{minDays} days; with a maximum price of {maxPrice}/m² period up to {maxDays} days.',
+                
+                // Object summary localization keys
+                'objectSummaryTitle': 'Object Summary',
+                'objectPricePerM2Label': 'Price per m² of your object:',
+                'objectCurrencyLabel': 'Object currency:',
+                'objectAreaLabel': 'Object area:',
+                'exchangeRateLabel': 'Exchange rate:',
+                'floorLabel': 'Floor',
+                'ageLabel': 'Age',
+                'heatingLabel': 'Heating',
+                
+                // Keys for "Market Indicators" table
+                'indicatorLabel': 'Indicator',
+                'minValueLabel': 'Minimum Value',
+                'maxValueLabel': 'Maximum Value',
+                'comparableAreaForSaleLabel': 'Comparable Area',
+                'countForSaleLabel': 'Count for Sale',
+                'listingPeriodForSaleLabel': 'Time to Sale',
+                'unitPriceForSaleLabel': 'Unit Price',
+                'comparableAreaForRentLabel': 'Comparable Area',
+                'countForRentLabel': 'Count for Rent',
+                'listingPeriodForRentLabel': 'Time to Rent',
+                'unitPriceForRentLabel': 'Unit Price',
+                
+                // Keys for market analysis text
+                'marketAnalysisTitle': 'Market Analysis',
+                'saleAnalysisText': 'Sale: with an area of {area} m² (average value for sold properties) and minimum price {minPrice}/m², the sale period is ~{minDays} days; with maximum price {maxPrice}/m² - sale period up to {maxDays} days.',
+                'rentAnalysisText': 'Rent: with an area of {area} m² (average value for rented properties) minimum price {minPrice}/m², rental period ~{minDays} days; with maximum price {maxPrice}/m², period up to {maxDays} days.',
+                
+                // Keys for trends chart
+                'chart_title': 'Trends Chart',
+                'sale_button': 'Sale Price per m²',
+                'rent_button': 'Rent Price per m²',
+                'chart_info': 'Data shown up to current month and one month ahead',
+                
+                // Keys for forecast chart
+                'forecast_chart_title': 'Price and Rent Forecast Chart',
+                'forecast_chart_info': 'Forecast based on current and future months',
+                
+                // Keys for subscription message
+                'subscriptionRequiredTitle': 'Long-term property value forecasting is only available for users with an active subscription.',
+                'subscriptionBenefits': 'What subscription gives you:',
+                'subscriptionBenefit1': 'Property price forecast for 12 months ahead',
+                'subscriptionBenefit2': 'Additional analytical data',
+                'subscriptionBenefit3': 'Additional service capabilities',
+                'howToSubscribe': 'How to subscribe:',
+                'subscribeInstructions': 'Go to bot @Aaadviser_pay_bot',
+                'followInstructions': 'Follow the connection instructions',
+                'needHelp': 'Need help?',
+                'contactSupport': 'Contact our support: @Aaadviser_support_bot'
+            },
+            'de': {
+                'slogan': 'Immobilienmarkt-Einblicke',
+                'pageTitle': 'Objektbewertung',
+                'pageDescription': 'Erhalten Sie eine professionelle Immobilienbewertung in der ausgewählten Region',
+                'countryLabel': 'Land:',
+                'cityLabel': 'Stadt:',
+                'countyLabel': 'Region/Bereich:',
+                'districtLabel': 'Bezirk:',
+                'countryPlaceholder': 'Land auswählen',
+                'cityPlaceholder': 'Zuerst Land auswählen',
+                'countyPlaceholder': 'Zuerst Stadt auswählen',
+                'districtPlaceholder': 'Zuerst Region auswählen',
+                'confirmButtonText': 'Auswahl bestätigen',
+                'backButton': '← Zurück zum Hauptmenü',
+                'selectedLocationTitle': 'Ausgewählte Lage:',
+                'adminIdsTitle': 'IDs für Administratoren:',
+                'loading': 'Laden...',
+                'errorLoading': 'Fehler beim Laden der Daten',
+                'dataSectionTitle': 'Regionale Datenanalyse',
+                'generalDataTitle': 'Allgemeine Daten',
+                'houseTypeDataTitle': 'Schlafzimmer-Anzahl-Daten',
+                'floorSegmentDataTitle': 'Etagen-Daten',
+                'ageDataTitle': 'Altersdaten',
+                'heatingDataTitle': 'Heizungstyp-Daten',
+                'loadingText': 'Daten werden geladen...',
+                'errorText': 'Fehler beim Laden der Daten',
+                'totalProperties': 'Gesamtobjekte:',
+                'averagePrice': 'Durchschnittspreis:',
+                'priceRange': 'Preisbereich:',
+                'noDataAvailable': 'Daten nicht verfügbar',
+                'keyMetricsTitle': 'Wichtige Kennzahlen',
+                'avgSalePriceLabel': 'Durchschnittlicher Verkaufspreis pro m²',
+                'avgRentPriceLabel': 'Durchschnittlicher Mietpreis pro m²',
+                'listingPeriodSaleLabel': 'Angebotsdauer (Verkauf)',
+                'listingPeriodRentLabel': 'Angebotsdauer (Vermietung)',
+                'yieldLabel': 'Rendite',
+                'insightsTitle': 'Zusammenfassung',
+                'insightsLoading': 'Daten werden analysiert...',
+                'insightsError': 'Fehler bei der Datenanalyse'
+            },
+            'fr': {
+                'slogan': 'Aperçus du marché immobilier',
+                'pageTitle': 'Évaluation d\'objet',
+                'pageDescription': 'Obtenez une évaluation professionnelle de propriété dans la région sélectionnée',
+                'countryLabel': 'Pays :',
+                'cityLabel': 'Ville :',
+                'countyLabel': 'Région/Zone :',
+                'districtLabel': 'District :',
+                'countryPlaceholder': 'Sélectionner un pays',
+                'cityPlaceholder': 'D\'abord sélectionner un pays',
+                'countyPlaceholder': 'D\'abord sélectionner une ville',
+                'districtPlaceholder': 'D\'abord sélectionner une région',
+                'confirmButtonText': 'Confirmer la sélection',
+                'backButton': '← Retour au menu principal',
+                'selectedLocationTitle': 'Emplacement sélectionné :',
+                'adminIdsTitle': 'IDs pour les administrateurs :',
+                'loading': 'Chargement...',
+                'errorLoading': 'Erreur de chargement des données',
+                'dataSectionTitle': 'Analyse des données régionales',
+                'generalDataTitle': 'Données générales',
+                'houseTypeDataTitle': 'Données du nombre de chambres',
+                'floorSegmentDataTitle': 'Données d\'étage',
+                'ageDataTitle': 'Données d\'âge',
+                'heatingDataTitle': 'Données du type de chauffage',
+                'loadingText': 'Chargement des données...',
+                'errorText': 'Erreur de chargement des données',
+                'totalProperties': 'Total des propriétés :',
+                'averagePrice': 'Prix moyen :',
+                'priceRange': 'Fourchette de prix :',
+                'noDataAvailable': 'Données non disponibles',
+                'keyMetricsTitle': 'Métriques clés',
+                'avgSalePriceLabel': 'Prix de vente moyen par m²',
+                'avgRentPriceLabel': 'Prix de location moyen par m²',
+                'listingPeriodSaleLabel': 'Période d\'inscription (vente)',
+                'listingPeriodRentLabel': 'Période d\'inscription (location)',
+                'yieldLabel': 'Rendement',
+                'insightsTitle': 'Résumé',
+                'insightsLoading': 'Analyse des données...',
+                'insightsError': 'Erreur lors de l\'analyse des données'
+            },
+            'tr': {
+                'slogan': 'Gayrimenkul Piyasa İçgörüleri',
+                'pageTitle': 'Nesne Değerlendirmesi',
+                'pageDescription': 'Seçilen bölgede profesyonel gayrimenkul değerlendirmesi alın',
+                'countryLabel': 'Ülke:',
+                'cityLabel': 'Şehir:',
+                'countyLabel': 'Bölge/Alan:',
+                'districtLabel': 'İlçe:',
+                'countryPlaceholder': 'Ülke seçin',
+                'cityPlaceholder': 'Önce ülke seçin',
+                'countyPlaceholder': 'Önce şehir seçin',
+                'districtPlaceholder': 'Önce bölge seçin',
+                'confirmButtonText': 'Seçimi onayla',
+                'backButton': '← Ana menüye dön',
+                'selectedLocationTitle': 'Seçilen konum:',
+                'adminIdsTitle': 'Yöneticiler için ID\'ler:',
+                'loading': 'Yükleniyor...',
+                'errorLoading': 'Veri yükleme hatası',
+                'dataSectionTitle': 'Bölgesel Veri Analizi',
+                'generalDataTitle': 'Genel Veriler',
+                'houseTypeDataTitle': 'Yatak Odası Sayısı Verileri',
+                'floorSegmentDataTitle': 'Kat Verileri',
+                'ageDataTitle': 'Yaş Verileri',
+                'heatingDataTitle': 'Isıtma Tipi Verileri',
+                'loadingText': 'Veriler yükleniyor...',
+                'errorText': 'Veri yükleme hatası',
+                'totalProperties': 'Toplam mülk:',
+                'averagePrice': 'Ortalama fiyat:',
+                'priceRange': 'Fiyat aralığı:',
+                'noDataAvailable': 'Veri mevcut değil',
+                'keyMetricsTitle': 'Ana Metrikler',
+                'avgSalePriceLabel': 'm² başına ortalama satış fiyatı',
+                'avgRentPriceLabel': 'm² başına ortalama kiralama fiyatı',
+                'listingPeriodSaleLabel': 'İlan süresi (satış)',
+                'listingPeriodRentLabel': 'İlan süresi (kiralama)',
+                'yieldLabel': 'Getiri',
+
+                'marketComparisonTitle': 'Piyasa Karşılaştırması',
+                'pricePerM2Label': 'm² başına fiyat',
+                'areaLabel': 'Alan',
+                'priceComparisonLabel': 'm² başına fiyat:',
+                'areaComparisonLabel': 'Alan:',
+                'priceCloseToMarket': 'Nesneniz (${userPrice}) piyasaya yakın (${marketMin} – ${marketMax}).',
+                'priceAboveMarket': 'Nesneniz (${userPrice}) piyasadan ${percent}% yüksek.',
+                'priceBelowMarket': 'Nesneniz (${userPrice}) piyasadan ${percent}% düşük.',
+                'areaMatchesMarket': 'Nesneniz (${userArea} m²) piyasa talebine uygun (${marketMin}–${marketMax} m²).',
+                'areaBelowMarket': 'Nesneniz (${userArea} m²) piyasa talebinden küçük (${marketMin}–${marketMax} m²).',
+                'areaAboveMarket': 'Nesneniz (${userArea} m²) piyasa talebinden büyük (${marketMin}–${marketMax} m²).',
+                'consolidatedAssessmentTitle': 'Konsolide Değerlendirme',
+                'salePriceTitle': 'm² başına fiyat (Satış Birim Fiyatı):',
+                'rentPriceTitle': 'm² başına kiralama fiyatı (Kiralama Birim Fiyatı):',
+                'yieldTitle': 'Getiri:',
+                'consolidatedAverageLabel': 'Konsolide ortalama:',
+                'bedroomsLabel': 'Yatak Odası',
+                'floorLabel': 'Kat',
+                'ageLabel': 'Yaş',
+                'heatingLabel': 'Isıtma',
+                
+                // "Piyasa Analizi" metni için anahtarlar
+                'marketAnalysisTitle': 'Piyasa Analizi',
+                'saleAnalysisText': 'Satış: {area} m² alan (satılan mülklerin ortalama değeri) ve {minPrice}/m² minimum fiyat ile satış süresi ~{minDays} gün; {maxPrice}/m² maksimum fiyat ile satış süresi {maxDays} güne kadar.',
+                'rentAnalysisText': 'Kiralama: {area} m² alan (kiralanan mülklerin ortalama değeri) {minPrice}/m² minimum fiyat, kiralama süresi ~{minDays} gün; {maxPrice}/m² maksimum fiyat ile süre {maxDays} güne kadar.'
+            },
+            'de': {
+                'slogan': 'Immobilienmarkt-Einblicke',
+                'pageTitle': 'Objektbewertung',
+                'pageDescription': 'Erhalten Sie eine professionelle Immobilienbewertung in der ausgewählten Region',
+                'countryLabel': 'Land:',
+                'cityLabel': 'Stadt:',
+                'countyLabel': 'Region/Bereich:',
+                'districtLabel': 'Bezirk:',
+                'countryPlaceholder': 'Land auswählen',
+                'cityPlaceholder': 'Zuerst Land auswählen',
+                'countyPlaceholder': 'Zuerst Stadt auswählen',
+                'districtPlaceholder': 'Zuerst Region auswählen',
+                'confirmButtonText': 'Auswahl bestätigen',
+                'backButton': '← Zurück zum Hauptmenü',
+                'selectedLocationTitle': 'Ausgewählte Lage:',
+                'adminIdsTitle': 'IDs für Administratoren:',
+                'loading': 'Laden...',
+                'errorLoading': 'Fehler beim Laden der Daten',
+                'dataSectionTitle': 'Regionale Datenanalyse',
+                'generalDataTitle': 'Allgemeine Daten',
+                'houseTypeDataTitle': 'Schlafzimmer-Anzahl-Daten',
+                'floorSegmentDataTitle': 'Etagen-Daten',
+                'ageDataTitle': 'Altersdaten',
+                'heatingDataTitle': 'Heizungstyp-Daten',
+                'loadingText': 'Daten werden geladen...',
+                'errorText': 'Fehler beim Laden der Daten',
+                'totalProperties': 'Gesamtobjekte:',
+                'averagePrice': 'Durchschnittspreis:',
+                'priceRange': 'Preisbereich:',
+                'noDataAvailable': 'Daten nicht verfügbar',
+                'keyMetricsTitle': 'Wichtige Kennzahlen',
+                'avgSalePriceLabel': 'Durchschnittlicher Verkaufspreis pro m²',
+                'avgRentPriceLabel': 'Durchschnittlicher Mietpreis pro m²',
+                'listingPeriodSaleLabel': 'Angebotsdauer (Verkauf)',
+                'listingPeriodRentLabel': 'Angebotsdauer (Vermietung)',
+                'yieldLabel': 'Rendite',
+                'insightsTitle': 'Zusammenfassung',
+                'insightsLoading': 'Daten werden analysiert...',
+                'insightsError': 'Fehler bei der Datenanalyse'
+            },
+            'fr': {
+                'slogan': 'Aperçus du marché immobilier',
+                'pageTitle': 'Évaluation d\'objet',
+                'pageDescription': 'Obtenez une évaluation professionnelle de propriété dans la région sélectionnée',
+                'countryLabel': 'Pays :',
+                'cityLabel': 'Ville :',
+                'countyLabel': 'Région/Zone :',
+                'districtLabel': 'District :',
+                'countryPlaceholder': 'Sélectionner un pays',
+                'cityPlaceholder': 'D\'abord sélectionner un pays',
+                'countyPlaceholder': 'D\'abord sélectionner une ville',
+                'districtPlaceholder': 'D\'abord sélectionner une région',
+                'confirmButtonText': 'Confirmer la sélection',
+                'backButton': '← Retour au menu principal',
+                'selectedLocationTitle': 'Emplacement sélectionné :',
+                'adminIdsTitle': 'IDs pour les administrateurs :',
+                'loading': 'Chargement...',
+                'errorLoading': 'Erreur de chargement des données',
+                'dataSectionTitle': 'Analyse des données régionales',
+                'generalDataTitle': 'Données générales',
+                'houseTypeDataTitle': 'Données du nombre de chambres',
+                'floorSegmentDataTitle': 'Données d\'étage',
+                'ageDataTitle': 'Données d\'âge',
+                'heatingDataTitle': 'Données du type de chauffage',
+                'loadingText': 'Chargement des données...',
+                'errorText': 'Erreur de chargement des données',
+                'totalProperties': 'Total des propriétés :',
+                'averagePrice': 'Prix moyen :',
+                'priceRange': 'Fourchette de prix :',
+                'noDataAvailable': 'Données non disponibles',
+                'keyMetricsTitle': 'Métriques clés',
+                'avgSalePriceLabel': 'Prix de vente moyen par m²',
+                'avgRentPriceLabel': 'Prix de location moyen par m²',
+                'listingPeriodSaleLabel': 'Période d\'inscription (vente)',
+                'listingPeriodRentLabel': 'Période d\'inscription (location)',
+                'yieldLabel': 'Rendement',
+                'insightsTitle': 'Résumé',
+                'insightsLoading': 'Analyse des données...',
+                'insightsError': 'Erreur lors de l\'analyse des données'
+            },
+            'tr': {
+                'slogan': 'Gayrimenkul Piyasa İçgörüleri',
+                'pageTitle': 'Nesne Değerlendirmesi',
+                'pageDescription': 'Seçilen bölgede profesyonel gayrimenkul değerlendirmesi alın',
+                'countryLabel': 'Ülke:',
+                'cityLabel': 'Şehir:',
+                'countyLabel': 'Bölge/Alan:',
+                'districtLabel': 'İlçe:',
+                'countryPlaceholder': 'Ülke seçin',
+                'cityPlaceholder': 'Önce ülke seçin',
+                'countyPlaceholder': 'Önce şehir seçin',
+                'districtPlaceholder': 'Önce bölge seçin',
+                'confirmButtonText': 'Seçimi onayla',
+                'backButton': '← Ana menüye dön',
+                'selectedLocationTitle': 'Seçilen konum:',
+                'adminIdsTitle': 'Yöneticiler için ID\'ler:',
+                'loading': 'Yükleniyor...',
+                'errorLoading': 'Veri yükleme hatası',
+                'dataSectionTitle': 'Bölgesel Veri Analizi',
+                'generalDataTitle': 'Genel Veriler',
+                'houseTypeDataTitle': 'Yatak Odası Sayısı Verileri',
+                'floorSegmentDataTitle': 'Kat Verileri',
+                'ageDataTitle': 'Yaş Verileri',
+                'heatingDataTitle': 'Isıtma Tipi Verileri',
+                'loadingText': 'Veriler yükleniyor...',
+                'errorText': 'Veri yükleme hatası',
+                'totalProperties': 'Toplam mülk:',
+                'averagePrice': 'Ortalama fiyat:',
+                'priceRange': 'Fiyat aralığı:',
+                'noDataAvailable': 'Veri mevcut değil',
+                'keyMetricsTitle': 'Ana Metrikler',
+                'avgSalePriceLabel': 'm² başına ortalama satış fiyatı',
+                'avgRentPriceLabel': 'm² başına ortalama kiralama fiyatı',
+                'listingPeriodSaleLabel': 'İlan süresi (satış)',
+                'listingPeriodRentLabel': 'İlan süresi (kiralama)',
+                'yieldLabel': 'Getiri',
+                'insightsTitle': 'Özet',
+                'insightsLoading': 'Veriler analiz ediliyor...',
+                'insightsError': 'Veri analizi hatası',
+                
+                // Keys for trends chart
+                'chart_title': 'Trend Grafiği',
+                'sale_button': 'm² Satış Fiyatı',
+                'rent_button': 'm² Kiralama Fiyatı',
+                'chart_info': 'Mevcut ay ve bir ay ileriye kadar veriler gösterilir',
+                
+                // Keys for forecast chart
+                'forecast_chart_title': 'Fiyat ve Kiralama Tahmin Grafiği',
+                'forecast_chart_info': 'Mevcut ve gelecek aylara dayalı tahmin',
+                
+                // Abonelik mesajı için anahtarlar
+                'subscriptionRequiredTitle': 'Uzun vadeli mülk değeri tahmin fonksiyonu yalnızca aktif aboneliği olan kullanıcılar için kullanılabilir.',
+                'subscriptionBenefits': 'Abonelik size ne verir:',
+                'subscriptionBenefit1': '12 ay öncesine kadar mülk fiyat tahmini',
+                'subscriptionBenefit2': 'Ek analitik veriler',
+                'subscriptionBenefit3': 'Ek servis özellikleri',
+                'howToSubscribe': 'Nasıl abone olunur:',
+                'subscribeInstructions': '@Aaadviser_pay_bot botuna gidin',
+                'followInstructions': 'Bağlantı talimatlarını takip edin',
+                'needHelp': 'Yardıma mı ihtiyacınız var?',
+                'contactSupport': 'Destek ekibimizle iletişime geçin: @Aaadviser_support_bot',
+                
+                // "Piyasa Göstergeleri" tablosu için anahtarlar
+                'marketIndicatorsTitle': 'Piyasa Göstergeleri',
+                'saleHeader': 'Satış',
+                'rentHeader': 'Kiralama',
+                'indicatorLabel': 'Gösterge',
+                'minValueLabel': 'Minimum değer',
+                'maxValueLabel': 'Maksimum değer',
+                'comparableAreaForSaleLabel': 'Karşılaştırılabilir alan',
+                'countForSaleLabel': 'Satış için sayı',
+                'listingPeriodForSaleLabel': 'Satışa kadar süre',
+                'unitPriceForSaleLabel': 'Birim fiyat',
+                'comparableAreaForRentLabel': 'Karşılaştırılabilir alan',
+                'countForRentLabel': 'Kiralama için sayı',
+                'listingPeriodForRentLabel': 'Kiralamaya kadar süre',
+                'unitPriceForRentLabel': 'Birim fiyat'
+            }
+        };
 
         // Get localized text
-        
+        function getText(key) {
+            return locales[currentLanguage][key] || key;
+        }
 
         // Update page text based on current language
-        
+        function updatePageText() {
+            document.getElementById('slogan').textContent = getText('slogan');
+            document.getElementById('pageTitle').textContent = getText('pageTitle');
+            document.getElementById('pageDescription').textContent = getText('pageDescription');
+            document.getElementById('countryLabel').textContent = getText('countryLabel');
+            document.getElementById('cityLabel').textContent = getText('cityLabel');
+            document.getElementById('countyLabel').textContent = getText('countyLabel');
+            document.getElementById('districtLabel').textContent = getText('districtLabel');
+            document.getElementById('countryPlaceholder').textContent = getText('countryPlaceholder');
+            document.getElementById('cityPlaceholder').textContent = getText('cityPlaceholder');
+            document.getElementById('countyPlaceholder').textContent = getText('countyPlaceholder');
+            document.getElementById('districtPlaceholder').textContent = getText('districtPlaceholder');
+            document.getElementById('confirmButtonText').textContent = getText('confirmButtonText');
+            document.getElementById('backButton').textContent = getText('backButton');
+            document.getElementById('selectedLocationTitle').textContent = getText('selectedLocationTitle');
+            document.getElementById('adminIdsTitle').textContent = getText('adminIdsTitle');
+            
+            // Update new data section elements
+            const dataSectionTitle = document.getElementById('dataSectionTitle');
+            if (dataSectionTitle) {
+                dataSectionTitle.textContent = getText('dataSectionTitle');
+            }
             
             const summaryDataTitle = document.getElementById('summaryDataTitle');
             if (summaryDataTitle) {
-                summaryDataTitle.textContent = window.i18nManager ? window.i18nManager.getTranslation("reports.marketIndicatorsTitle") : "marketIndicatorsTitle";
+                summaryDataTitle.textContent = getText('marketIndicatorsTitle');
             }
 
             const loadingText = document.getElementById('loadingText');
             if (loadingText) {
-                loadingText.textContent = window.i18nManager ? window.i18nManager.getTranslation("reports.loadingText") : "loadingText";
+                loadingText.textContent = getText('loadingText');
             }
             
             const errorText = document.getElementById('errorText');
             if (errorText) {
-                errorText.textContent = window.i18nManager ? window.i18nManager.getTranslation("reports.errorText") : "errorText";
+                errorText.textContent = getText('errorText');
             }
             
             // Update key metrics labels
             const keyMetricsTitle = document.getElementById('keyMetricsTitle');
             if (keyMetricsTitle) {
-                keyMetricsTitle.textContent = window.i18nManager ? window.i18nManager.getTranslation("reports.keyMetricsTitle") : "keyMetricsTitle";
+                keyMetricsTitle.textContent = getText('keyMetricsTitle');
             }
             
             const avgSalePriceLabel = document.getElementById('avgSalePriceLabel');
             if (avgSalePriceLabel) {
-                avgSalePriceLabel.textContent = window.i18nManager ? window.i18nManager.getTranslation("reports.avgSalePriceLabel") : "avgSalePriceLabel";
+                avgSalePriceLabel.textContent = getText('avgSalePriceLabel');
             }
             
             const avgRentPriceLabel = document.getElementById('avgRentPriceLabel');
             if (avgRentPriceLabel) {
-                avgRentPriceLabel.textContent = window.i18nManager ? window.i18nManager.getTranslation("reports.avgRentPriceLabel") : "avgRentPriceLabel";
+                avgRentPriceLabel.textContent = getText('avgRentPriceLabel');
             }
             
             const listingPeriodSaleLabel = document.getElementById('listingPeriodSaleLabel');
             if (listingPeriodSaleLabel) {
-                listingPeriodSaleLabel.textContent = window.i18nManager ? window.i18nManager.getTranslation("reports.listingPeriodSaleLabel") : "listingPeriodSaleLabel";
+                listingPeriodSaleLabel.textContent = getText('listingPeriodSaleLabel');
             }
             
             const listingPeriodRentLabel = document.getElementById('listingPeriodRentLabel');
             if (listingPeriodRentLabel) {
-                listingPeriodRentLabel.textContent = window.i18nManager ? window.i18nManager.getTranslation("reports.listingPeriodRentLabel") : "listingPeriodRentLabel";
+                listingPeriodRentLabel.textContent = getText('listingPeriodRentLabel');
             }
             
             const yieldLabel = document.getElementById('yieldLabel');
             if (yieldLabel) {
-                yieldLabel.textContent = window.i18nManager ? window.i18nManager.getTranslation("reports.yieldLabel") : "yieldLabel";
+                yieldLabel.textContent = getText('yieldLabel');
             }
             
 
             
             // Update listing type selection elements
             const listingTypeTitle = document.getElementById('listingTypeTitle');
-            if (listingTypeTitle) { listingTypeTitle.textContent = window.i18nManager ? window.i18nManager.getTranslation("reports.listingTypeTitle") : "listingTypeTitle"; }
+            if (listingTypeTitle) { listingTypeTitle.textContent = getText('listingTypeTitle'); }
             const houseTypeSubtitle = document.getElementById('houseTypeSubtitle');
-            if (houseTypeSubtitle) { houseTypeSubtitle.textContent = window.i18nManager ? window.i18nManager.getTranslation("reports.houseTypeSubtitle") : "houseTypeSubtitle"; }
+            if (houseTypeSubtitle) { houseTypeSubtitle.textContent = getText('houseTypeSubtitle'); }
             const floorSegmentSubtitle = document.getElementById('floorSegmentSubtitle');
-            if (floorSegmentSubtitle) { floorSegmentSubtitle.textContent = window.i18nManager ? window.i18nManager.getTranslation("reports.floorSegmentSubtitle") : "floorSegmentSubtitle"; }
+            if (floorSegmentSubtitle) { floorSegmentSubtitle.textContent = getText('floorSegmentSubtitle'); }
             const ageDataSubtitle = document.getElementById('ageDataSubtitle');
-            if (ageDataSubtitle) { ageDataSubtitle.textContent = window.i18nManager ? window.i18nManager.getTranslation("reports.ageDataSubtitle") : "ageDataSubtitle"; }
+            if (ageDataSubtitle) { ageDataSubtitle.textContent = getText('ageDataSubtitle'); }
             const heatingDataSubtitle = document.getElementById('heatingDataSubtitle');
-            if (heatingDataSubtitle) { heatingDataSubtitle.textContent = window.i18nManager ? window.i18nManager.getTranslation("reports.heatingDataSubtitle") : "heatingDataSubtitle"; }
+            if (heatingDataSubtitle) { heatingDataSubtitle.textContent = getText('heatingDataSubtitle'); }
             
             // Update new fields
             const priceObjectSubtitle = document.getElementById('priceObjectSubtitle');
-            if (priceObjectSubtitle) { priceObjectSubtitle.textContent = window.i18nManager ? window.i18nManager.getTranslation("reports.priceObjectSubtitle") : "priceObjectSubtitle"; }
+            if (priceObjectSubtitle) { priceObjectSubtitle.textContent = getText('priceObjectSubtitle'); }
             const areaObjectSubtitle = document.getElementById('areaObjectSubtitle');
-            if (areaObjectSubtitle) { areaObjectSubtitle.textContent = window.i18nManager ? window.i18nManager.getTranslation("reports.areaObjectSubtitle") : "areaObjectSubtitle"; }
+            if (areaObjectSubtitle) { areaObjectSubtitle.textContent = getText('areaObjectSubtitle'); }
             
             // Update currency title
             const currencyTitle = document.getElementById('currencyTitle');
-            if (currencyTitle) { currencyTitle.textContent = window.i18nManager ? window.i18nManager.getTranslation("reports.currencyTitle") : "currencyTitle"; }
+            if (currencyTitle) { currencyTitle.textContent = getText('currencyTitle'); }
             
             // Update placeholders
             const priceObjectInput = document.getElementById('priceObjectInput');
-            if (priceObjectInput) { priceObjectInput.placeholder = window.i18nManager ? window.i18nManager.getTranslation("reports.pricePlaceholder") : "pricePlaceholder"; }
+            if (priceObjectInput) { priceObjectInput.placeholder = getText('pricePlaceholder'); }
             const areaObjectInput = document.getElementById('areaObjectInput');
-            if (areaObjectInput) { areaObjectInput.placeholder = window.i18nManager ? window.i18nManager.getTranslation("reports.areaPlaceholder") : "areaPlaceholder"; }
+            if (areaObjectInput) { areaObjectInput.placeholder = getText('areaPlaceholder'); }
             
             // Update placeholder texts
             const houseTypePlaceholder = document.getElementById('houseTypePlaceholder');
-            if (houseTypePlaceholder) { houseTypePlaceholder.textContent = window.i18nManager ? window.i18nManager.getTranslation("reports.selectBedrooms") : "selectBedrooms"; }
+            if (houseTypePlaceholder) { houseTypePlaceholder.textContent = getText('selectBedrooms'); }
             const floorSegmentPlaceholder = document.getElementById('floorSegmentPlaceholder');
-            if (floorSegmentPlaceholder) { floorSegmentPlaceholder.textContent = window.i18nManager ? window.i18nManager.getTranslation("reports.selectFloor") : "selectFloor"; }
+            if (floorSegmentPlaceholder) { floorSegmentPlaceholder.textContent = getText('selectFloor'); }
             const ageDataPlaceholder = document.getElementById('ageDataPlaceholder');
-            if (ageDataPlaceholder) { ageDataPlaceholder.textContent = window.i18nManager ? window.i18nManager.getTranslation("reports.selectAge") : "selectAge"; }
+            if (ageDataPlaceholder) { ageDataPlaceholder.textContent = getText('selectAge'); }
             const heatingDataPlaceholder = document.getElementById('heatingDataPlaceholder');
-            if (heatingDataPlaceholder) { heatingDataPlaceholder.textContent = window.i18nManager ? window.i18nManager.getTranslation("reports.selectHeating") : "selectHeating"; }
+            if (heatingDataPlaceholder) { heatingDataPlaceholder.textContent = getText('selectHeating'); }
             
             // Update property types section
             const propertyTypesTitle = document.getElementById('propertyTypesTitle');
-            if (propertyTypesTitle) { propertyTypesTitle.textContent = window.i18nManager ? window.i18nManager.getTranslation("reports.propertyTypesTitle") : "propertyTypesTitle"; }
+            if (propertyTypesTitle) { propertyTypesTitle.textContent = getText('propertyTypesTitle'); }
             
             // Update detailed data table titles
             const detailedDataTitles = document.querySelectorAll('.detailed-data-title');
             detailedDataTitles.forEach(titleElement => {
                 const titleText = titleElement.textContent;
                 if (titleText.includes('количество спален') || titleText.includes('Bedroom Count') || titleText.includes('Schlafzimmer') || titleText.includes('chambres') || titleText.includes('Yatak Odası')) {
-                    titleElement.textContent = window.i18nManager ? window.i18nManager.getTranslation("reports.houseTypeDataTitle") : "houseTypeDataTitle";
+                    titleElement.textContent = getText('houseTypeDataTitle');
                 } else if (titleText.includes('этажу') || titleText.includes('Floor') || titleText.includes('Etagen') || titleText.includes('étage') || titleText.includes('Kat')) {
-                    titleElement.textContent = window.i18nManager ? window.i18nManager.getTranslation("reports.floorSegmentDataTitle") : "floorSegmentDataTitle";
+                    titleElement.textContent = getText('floorSegmentDataTitle');
                 } else if (titleText.includes('возрасту') || titleText.includes('Age') || titleText.includes('Alters') || titleText.includes('âge') || titleText.includes('Yaş')) {
-                    titleElement.textContent = window.i18nManager ? window.i18nManager.getTranslation("reports.ageDataTitle") : "ageDataTitle";
+                    titleElement.textContent = getText('ageDataTitle');
                 } else if (titleText.includes('отопления') || titleText.includes('Heating') || titleText.includes('Heizung') || titleText.includes('chauffage') || titleText.includes('Isıtma')) {
-                    titleElement.textContent = window.i18nManager ? window.i18nManager.getTranslation("reports.heatingDataTitle") : "heatingDataTitle";
+                    titleElement.textContent = getText('heatingDataTitle');
                 }
             });
             
             // Update save and share elements
             const saveShareButtonText = document.getElementById('saveShareButtonText');
             if (saveShareButtonText) {
-                saveShareButtonText.textContent = window.i18nManager ? window.i18nManager.getTranslation("reports.saveShareButtonText") : "saveShareButtonText";
+                saveShareButtonText.textContent = getText('saveShareButtonText');
             }
             
             const modalTitle = document.getElementById('modalTitle');
             if (modalTitle) {
-                modalTitle.textContent = window.i18nManager ? window.i18nManager.getTranslation("reports.modalTitle") : "modalTitle";
+                modalTitle.textContent = getText('modalTitle');
             }
             
             const modalDescription = document.getElementById('modalDescription');
             if (modalDescription) {
-                modalDescription.textContent = window.i18nManager ? window.i18nManager.getTranslation("reports.modalDescription") : "modalDescription";
+                modalDescription.textContent = getText('modalDescription');
             }
             
             const copyButtonText = document.getElementById('copyButtonText');
             if (copyButtonText) {
-                copyButtonText.textContent = window.i18nManager ? window.i18nManager.getTranslation("reports.copyButtonText") : "copyButtonText";
+                copyButtonText.textContent = getText('copyButtonText');
             }
             
             const closeButtonText = document.getElementById('closeButtonText');
             if (closeButtonText) {
-                closeButtonText.textContent = window.i18nManager ? window.i18nManager.getTranslation("reports.closeButtonText") : "closeButtonText";
+                closeButtonText.textContent = getText('closeButtonText');
             }
         }
 
         // Load countries from API
         async function loadCountries() {
             try {
-                console.log('🔄 Загружаем страны...');
                 const response = await fetch('/api/locations/countries');
                 const data = await response.json();
                 
                 if (data.success) {
                     const countrySelect = document.getElementById('countrySelect');
-                    if (!countrySelect) {
-                        console.error('❌ Элемент countrySelect не найден');
-                        return;
-                    }
+                    countrySelect.innerHTML = `<option value="">${getText('countryPlaceholder')}</option>`;
                     
-                    // Получаем перевод плейсхолдера
-                    let placeholderText = 'Выберите страну';
-                    if (window.i18nManager) {
-                        placeholderText = window.i18nManager.getTranslation("reports.countryPlaceholder") || 'Выберите страну';
-                    }
-                    
-                    countrySelect.innerHTML = `<option value="">${placeholderText}</option>`;
-                    
-                    console.log(`✅ Загружено ${data.countries.length} стран`);
                     data.countries.forEach(([id, name]) => {
                         const option = document.createElement('option');
                         option.value = id;
@@ -4024,17 +4639,16 @@
                         countrySelect.appendChild(option);
                     });
                 } else {
-                    console.error('❌ Ошибка загрузки стран:', data.error);
+                    console.error('Failed to load countries:', data.error);
                 }
             } catch (error) {
-                console.error('❌ Ошибка при загрузке стран:', error);
+                console.error('Error loading countries:', error);
             }
         }
 
         // Load cities based on selected country
         async function loadCities(countryId) {
             try {
-                console.log(`🔄 Загружаем города для страны ${countryId}...`);
                 const response = await fetch('/api/locations/cities', {
                     method: 'POST',
                     headers: {
@@ -4047,20 +4661,8 @@
                 
                 if (data.success) {
                     const citySelect = document.getElementById('citySelect');
-                    if (!citySelect) {
-                        console.error('❌ Элемент citySelect не найден');
-                        return;
-                    }
+                    citySelect.innerHTML = `<option value="">${getText('cityPlaceholder')}</option>`;
                     
-                    // Получаем перевод плейсхолдера
-                    let placeholderText = 'Сначала выберите страну';
-                    if (window.i18nManager) {
-                        placeholderText = window.i18nManager.getTranslation("reports.cityPlaceholder") || 'Сначала выберите страну';
-                    }
-                    
-                    citySelect.innerHTML = `<option value="">${placeholderText}</option>`;
-                    
-                    console.log(`✅ Загружено ${data.cities.length} городов`);
                     data.cities.forEach(([id, name]) => {
                         const option = document.createElement('option');
                         option.value = id;
@@ -4070,17 +4672,16 @@
                     
                     citySelect.disabled = false;
                 } else {
-                    console.error('❌ Ошибка загрузки городов:', data.error);
+                    console.error('Failed to load cities:', data.error);
                 }
             } catch (error) {
-                console.error('❌ Ошибка при загрузке городов:', error);
+                console.error('Error loading cities:', error);
             }
         }
 
         // Load counties based on selected city
         async function loadCounties(cityId) {
             try {
-                console.log(`🔄 Загружаем области для города ${cityId}...`);
                 const response = await fetch('/api/locations/counties', {
                     method: 'POST',
                     headers: {
@@ -4093,20 +4694,8 @@
                 
                 if (data.success) {
                     const countySelect = document.getElementById('countySelect');
-                    if (!countySelect) {
-                        console.error('❌ Элемент countySelect не найден');
-                        return;
-                    }
+                    countySelect.innerHTML = `<option value="">${getText('countyPlaceholder')}</option>`;
                     
-                    // Получаем перевод плейсхолдера
-                    let placeholderText = 'Сначала выберите город';
-                    if (window.i18nManager) {
-                        placeholderText = window.i18nManager.getTranslation("reports.countyPlaceholder") || 'Сначала выберите город';
-                    }
-                    
-                    countySelect.innerHTML = `<option value="">${placeholderText}</option>`;
-                    
-                    console.log(`✅ Загружено ${data.counties.length} областей`);
                     data.counties.forEach(([id, name]) => {
                         const option = document.createElement('option');
                         option.value = id;
@@ -4116,10 +4705,10 @@
                     
                     countySelect.disabled = false;
                 } else {
-                    console.error('❌ Ошибка загрузки областей:', data.error);
+                    console.error('Failed to load cities:', data.error);
                 }
             } catch (error) {
-                console.error('❌ Ошибка при загрузке областей:', error);
+                console.error('Error loading cities:', error);
             }
         }
 
@@ -4357,7 +4946,7 @@
 
         // Load districts based on selected county
         async function loadDistricts(countyId) {
-            console.log('🔄 Загружаем районы для области:', countyId);
+            console.log('🔄 Loading districts for county_id:', countyId);
             
             try {
                 const response = await fetch('/api/locations/districts', {
@@ -4369,22 +4958,11 @@
                 });
                 
                 const data = await response.json();
-                console.log('📊 Ответ API районов:', data);
+                console.log('📊 Districts API response:', data);
                 
                 if (data.success) {
                     const districtSelect = document.getElementById('districtSelect');
-                    if (!districtSelect) {
-                        console.error('❌ Элемент districtSelect не найден');
-                        return;
-                    }
-                    
-                    // Получаем перевод плейсхолдера
-                    let placeholderText = 'Сначала выберите область';
-                    if (window.i18nManager) {
-                        placeholderText = window.i18nManager.getTranslation("reports.districtPlaceholder") || 'Сначала выберите область';
-                    }
-                    
-                    districtSelect.innerHTML = `<option value="">${placeholderText}</option>`;
+                    districtSelect.innerHTML = `<option value="">${getText('districtPlaceholder')}</option>`;
                     
                     // Add "не имеет значения" option
                     const noDistrictOption = document.createElement('option');
@@ -4392,7 +4970,7 @@
                     noDistrictOption.textContent = 'Не имеет значения';
                     districtSelect.appendChild(noDistrictOption);
                     
-                    console.log(`✅ Загружено ${data.districts.length} районов`);
+                    console.log('📍 Adding districts:', data.districts);
                     data.districts.forEach(([id, name]) => {
                         const option = document.createElement('option');
                         option.value = id;
@@ -4401,12 +4979,12 @@
                     });
                     
                     districtSelect.disabled = false;
-                    console.log('✅ Районы загружены, селект районов включен');
+                    console.log('✅ Districts loaded, district select enabled');
                 } else {
-                    console.error('❌ Ошибка загрузки районов:', data.error);
+                    console.error('❌ Failed to load districts:', data.error);
                 }
             } catch (error) {
-                console.error('❌ Ошибка при загрузке районов:', error);
+                console.error('❌ Error loading districts:', error);
             }
         }
 
@@ -4420,11 +4998,11 @@
             const countryId = countrySelect.value;
             
             // Reset dependent selects
-            citySelect.innerHTML = `<option value="">${window.i18nManager ? window.i18nManager.getTranslation("reports.cityPlaceholder") : "cityPlaceholder"}</option>`;
+            citySelect.innerHTML = `<option value="">${getText('cityPlaceholder')}</option>`;
             citySelect.disabled = true;
-            countySelect.innerHTML = `<option value="">${window.i18nManager ? window.i18nManager.getTranslation("reports.countyPlaceholder") : "countyPlaceholder"}</option>`;
+            countySelect.innerHTML = `<option value="">${getText('countyPlaceholder')}</option>`;
             countySelect.disabled = true;
-            districtSelect.innerHTML = `<option value="">${window.i18nManager ? window.i18nManager.getTranslation("reports.districtPlaceholder") : "districtPlaceholder"}</option>`;
+            districtSelect.innerHTML = `<option value="">${getText('districtPlaceholder')}</option>`;
             districtSelect.disabled = true;
             
             // Reset listing type selection and hide section
@@ -4452,9 +5030,9 @@
             const cityId = citySelect.value;
             
             // Reset dependent selects
-            countySelect.innerHTML = `<option value="">${window.i18nManager ? window.i18nManager.getTranslation("reports.countyPlaceholder") : "countyPlaceholder"}</option>`;
+            countySelect.innerHTML = `<option value="">${getText('countyPlaceholder')}</option>`;
             countySelect.disabled = true;
-            districtSelect.innerHTML = `<option value="">${window.i18nManager ? window.i18nManager.getTranslation("reports.districtPlaceholder") : "districtPlaceholder"}</option>`;
+            districtSelect.innerHTML = `<option value="">${getText('districtPlaceholder')}</option>`;
             districtSelect.disabled = true;
             
             // Reset listing type selection and hide section
@@ -4484,7 +5062,7 @@
             console.log('📍 Selected county_id:', countyId);
             
             // Reset dependent selects
-            districtSelect.innerHTML = `<option value="">${window.i18nManager ? window.i18nManager.getTranslation("reports.districtPlaceholder") : "districtPlaceholder"}</option>`;
+            districtSelect.innerHTML = `<option value="">${getText('districtPlaceholder')}</option>`;
             districtSelect.disabled = true;
             console.log('🔄 Reset district select');
             
@@ -4565,7 +5143,7 @@
                 if (selectedListingTypes.house_type) {
                     html += `
                         <div class="property-type-item">
-                            <span class="property-type-label">${window.i18nManager ? window.i18nManager.getTranslation("reports.bedroomsLabel") : "bedroomsLabel"}:</span>
+                            <span class="property-type-label">${getText('bedroomsLabel')}:</span>
                             <span class="property-type-value">${selectedListingTypes.house_type}</span>
                         </div>
                     `;
@@ -4574,7 +5152,7 @@
                 if (selectedListingTypes.floor_segment) {
                     html += `
                         <div class="property-type-item">
-                            <span class="property-type-label">${window.i18nManager ? window.i18nManager.getTranslation("reports.floorLabel") : "floorLabel"}:</span>
+                            <span class="property-type-label">${getText('floorLabel')}:</span>
                             <span class="property-type-value">${selectedListingTypes.floor_segment}</span>
                         </div>
                     `;
@@ -4583,7 +5161,7 @@
                 if (selectedListingTypes.age) {
                     html += `
                         <div class="property-type-item">
-                            <span class="property-type-label">${window.i18nManager ? window.i18nManager.getTranslation("reports.ageLabel") : "ageLabel"}:</span>
+                            <span class="property-type-label">${getText('ageLabel')}:</span>
                             <span class="property-type-value">${selectedListingTypes.age}</span>
                         </div>
                     `;
@@ -4592,7 +5170,7 @@
                 if (selectedListingTypes.heating) {
                     html += `
                         <div class="property-type-item">
-                            <span class="property-type-label">${window.i18nManager ? window.i18nManager.getTranslation("reports.heatingLabel") : "heatingLabel"}:</span>
+                            <span class="property-type-label">${getText('heatingLabel')}:</span>
                             <span class="property-type-value">${selectedListingTypes.heating}</span>
                         </div>
                     `;
@@ -4839,7 +5417,7 @@
                         if (data.success) {
                             userLanguage = data.language;
                             currentLanguage = data.language;
-                            
+                            updatePageText();
                         }
                     }
                 }
@@ -5040,30 +5618,30 @@
             
             // Price comparison
             if (Math.abs(priceDifferencePercent) < 5) {
-                comparisonText += `<p><strong>${window.i18nManager ? window.i18nManager.getTranslation("reports.priceComparisonLabel") : "priceComparisonLabel"}</strong> ${window.i18nManager ? window.i18nManager.getTranslation("reports.priceCloseToMarket") : "priceCloseToMarket".replace('${userPrice}', formatValue(userPriceInTargetCurrency, 'price')).replace('${marketMin}', formatValue(marketPricePerM2.min, 'price')).replace('${marketMax}', formatValue(marketPricePerM2.max, 'price'))}</p>`;
+                comparisonText += `<p><strong>${getText('priceComparisonLabel')}</strong> ${getText('priceCloseToMarket').replace('${userPrice}', formatValue(userPriceInTargetCurrency, 'price')).replace('${marketMin}', formatValue(marketPricePerM2.min, 'price')).replace('${marketMax}', formatValue(marketPricePerM2.max, 'price'))}</p>`;
             } else if (priceDifferencePercent > 0) {
-                comparisonText += `<p><strong>${window.i18nManager ? window.i18nManager.getTranslation("reports.priceComparisonLabel") : "priceComparisonLabel"}</strong> ${window.i18nManager ? window.i18nManager.getTranslation("reports.priceAboveMarket") : "priceAboveMarket".replace('${userPrice}', formatValue(userPriceInTargetCurrency, 'price')).replace('${percent}', Math.abs(priceDifferencePercent).toFixed(1))}</p>`;
+                comparisonText += `<p><strong>${getText('priceComparisonLabel')}</strong> ${getText('priceAboveMarket').replace('${userPrice}', formatValue(userPriceInTargetCurrency, 'price')).replace('${percent}', Math.abs(priceDifferencePercent).toFixed(1))}</p>`;
             } else {
-                comparisonText += `<p><strong>${window.i18nManager ? window.i18nManager.getTranslation("reports.priceComparisonLabel") : "priceComparisonLabel"}</strong> ${window.i18nManager ? window.i18nManager.getTranslation("reports.priceBelowMarket") : "priceBelowMarket".replace('${userPrice}', formatValue(userPriceInTargetCurrency, 'price')).replace('${percent}', Math.abs(priceDifferencePercent).toFixed(1))}</p>`;
+                comparisonText += `<p><strong>${getText('priceComparisonLabel')}</strong> ${getText('priceBelowMarket').replace('${userPrice}', formatValue(userPriceInTargetCurrency, 'price')).replace('${percent}', Math.abs(priceDifferencePercent).toFixed(1))}</p>`;
             }
             
             // Area comparison
             if (userArea >= marketArea.min && userArea <= marketArea.max) {
-                comparisonText += `<p><strong>${window.i18nManager ? window.i18nManager.getTranslation("reports.areaLabel") : "areaLabel"}:</strong> ${window.i18nManager ? window.i18nManager.getTranslation("reports.areaMatchesMarket") : "areaMatchesMarket".replace('${userArea}', userArea).replace('${marketMin}', marketArea.min).replace('${marketMax}', marketArea.max)}</p>`;
+                comparisonText += `<p><strong>${getText('areaLabel')}:</strong> ${getText('areaMatchesMarket').replace('${userArea}', userArea).replace('${marketMin}', marketArea.min).replace('${marketMax}', marketArea.max)}</p>`;
             } else if (userArea < marketArea.min) {
-                comparisonText += `<p><strong>${window.i18nManager ? window.i18nManager.getTranslation("reports.areaLabel") : "areaLabel"}:</strong> ${window.i18nManager ? window.i18nManager.getTranslation("reports.areaBelowMarket") : "areaBelowMarket".replace('${userArea}', userArea).replace('${marketMin}', marketArea.min).replace('${marketMax}', marketArea.max)}</p>`;
+                comparisonText += `<p><strong>${getText('areaLabel')}:</strong> ${getText('areaBelowMarket').replace('${userArea}', userArea).replace('${marketMin}', marketArea.min).replace('${marketMax}', marketArea.max)}</p>`;
             } else {
-                comparisonText += `<p><strong>${window.i18nManager ? window.i18nManager.getTranslation("reports.areaLabel") : "areaLabel"}:</strong> ${window.i18nManager ? window.i18nManager.getTranslation("reports.areaAboveMarket") : "areaAboveMarket".replace('${userArea}', userArea).replace('${marketMin}', marketArea.min).replace('${marketMax}', marketArea.max)}</p>`;
+                comparisonText += `<p><strong>${getText('areaLabel')}:</strong> ${getText('areaAboveMarket').replace('${userArea}', userArea).replace('${marketMin}', marketArea.min).replace('${marketMax}', marketArea.max)}</p>`;
             }
             
             // Generate HTML
             let html = '<div class="market-comparison-block">';
             html += '<div class="market-comparison-content">';
-            html += `<h4 class="market-comparison-title">${window.i18nManager ? window.i18nManager.getTranslation("reports.marketComparisonTitle") : "marketComparisonTitle"}</h4>`;
+            html += `<h4 class="market-comparison-title">${getText('marketComparisonTitle')}</h4>`;
             html += `<div class="market-comparison-value">${formatValue(userPricePerM2, 'price')}/м²</div>`;
             html += '<div class="market-comparison-details">';
-            html += `<div class="market-comparison-price">${window.i18nManager ? window.i18nManager.getTranslation("reports.priceComparisonLabel") : "priceComparisonLabel"} ${formatValue(userPriceInTargetCurrency, 'price')}</div>`;
-            html += `<div class="market-comparison-area">${window.i18nManager ? window.i18nManager.getTranslation("reports.areaLabel") : "areaLabel"}: ${userArea} м²</div>`;
+            html += `<div class="market-comparison-price">${getText('priceComparisonLabel')} ${formatValue(userPriceInTargetCurrency, 'price')}</div>`;
+            html += `<div class="market-comparison-area">${getText('areaLabel')}: ${userArea} м²</div>`;
             html += '</div>';
             html += '<div class="market-comparison-analysis">';
             html += comparisonText;
@@ -5266,7 +5844,7 @@
                     // Calculate average area
                     const avgArea = Math.round((area.min + area.max) / 2);
                     
-                    const saleText = window.i18nManager ? window.i18nManager.getTranslation("reports.saleAnalysisText") : "saleAnalysisText"
+                    const saleText = getText('saleAnalysisText')
                         .replace('{area}', avgArea)
                         .replace('{minPrice}', formatValue(price.min, 'price'))
                         .replace('{maxPrice}', formatValue(price.max, 'price'))
@@ -5274,7 +5852,7 @@
                         .replace('{maxDays}', period.max);
                     
                     analysis += `<div class="analysis-section">
-                        <strong>${window.i18nManager ? window.i18nManager.getTranslation("reports.saleHeader") : "saleHeader"}:</strong> ${saleText}
+                        <strong>${getText('saleHeader')}:</strong> ${saleText}
                     </div>`;
                 }
                 
@@ -5293,7 +5871,7 @@
                     // Calculate average area
                     const avgArea = Math.round((area.min + area.max) / 2);
                     
-                    const rentTextFinal = window.i18nManager ? window.i18nManager.getTranslation("reports.rentAnalysisText") : "rentAnalysisText"
+                    const rentTextFinal = getText('rentAnalysisText')
                         .replace('{area}', avgArea)
                         .replace('{minPrice}', formatValue(price.min, 'price'))
                         .replace('{maxPrice}', formatValue(price.max, 'price'))
@@ -5301,7 +5879,7 @@
                         .replace('{maxDays}', period.max);
                     
                     analysis += `<div class="analysis-section">
-                        <strong>${window.i18nManager ? window.i18nManager.getTranslation("reports.rentHeader") : "rentHeader"}:</strong> ${rentTextFinal}
+                        <strong>${getText('rentHeader')}:</strong> ${rentTextFinal}
                     </div>`;
                 }
             }
@@ -5334,7 +5912,7 @@
             const rentMaxPeriod = summary.listing_period_for_rent ? summary.listing_period_for_rent.max : 96;
             
             let html = '<div class="market-analysis-text-block">';
-            html += `<h4 class="market-analysis-text-title">${window.i18nManager ? window.i18nManager.getTranslation("reports.marketAnalysisTitle") : "marketAnalysisTitle"}</h4>`;
+            html += `<h4 class="market-analysis-text-title">${getText('marketAnalysisTitle')}</h4>`;
             html += '<div class="market-analysis-text-content">';
             
             // Sale analysis in unified style (like "Вывод прогноза")
@@ -5372,7 +5950,7 @@
             });
             
             if (allData.length === 0) {
-                summaryContainer.innerHTML = `<div class="no-data">${window.i18nManager ? window.i18nManager.getTranslation("reports.noDataAvailable") : "noDataAvailable"}</div>`;
+                summaryContainer.innerHTML = `<div class="no-data">${getText('noDataAvailable')}</div>`;
                 return;
             }
             
@@ -5433,8 +6011,8 @@
             html += '<table class="market-data-table">';
             html += '<thead>';
             html += '<tr>';
-            html += `<th class="category-header">${window.i18nManager ? window.i18nManager.getTranslation("reports.saleHeader") : "saleHeader"}</th>`;
-            html += `<th class="category-header">${window.i18nManager ? window.i18nManager.getTranslation("reports.rentHeader") : "rentHeader"}</th>`;
+            html += `<th class="category-header">${getText('saleHeader')}</th>`;
+            html += `<th class="category-header">${getText('rentHeader')}</th>`;
             html += '</tr>';
             html += '</thead>';
             html += '<tbody>';
@@ -5442,7 +6020,7 @@
             // Row 1: Comparable Area (single value - average)
             html += '<tr>';
             html += '<td class="data-cell">';
-            html += `<div class="cell-label">${window.i18nManager ? window.i18nManager.getTranslation("reports.comparableAreaForSaleLabel") : "comparableAreaForSaleLabel"}:</div>`;
+            html += `<div class="cell-label">${getText('comparableAreaForSaleLabel')}:</div>`;
                 if (summary.comparable_area_for_sale) {
                     const area = summary.comparable_area_for_sale;
                 const avgArea = Math.round((area.min + area.max) / 2);
@@ -5452,7 +6030,7 @@
             }
             html += '</td>';
             html += '<td class="data-cell">';
-            html += `<div class="cell-label">${window.i18nManager ? window.i18nManager.getTranslation("reports.comparableAreaForRentLabel") : "comparableAreaForRentLabel"}:</div>`;
+            html += `<div class="cell-label">${getText('comparableAreaForRentLabel')}:</div>`;
                 if (summary.comparable_area_for_rent) {
                     const area = summary.comparable_area_for_rent;
                 const avgArea = Math.round((area.min + area.max) / 2);
@@ -5466,7 +6044,7 @@
             // Row 2: Listing Period
             html += '<tr>';
             html += '<td class="data-cell">';
-            html += `<div class="cell-label">${window.i18nManager ? window.i18nManager.getTranslation("reports.listingPeriodForSaleLabel") : "listingPeriodForSaleLabel"}:</div>`;
+            html += `<div class="cell-label">${getText('listingPeriodForSaleLabel')}:</div>`;
             if (summary.listing_period_for_sale) {
                 const period = summary.listing_period_for_sale;
                 html += `<div class="cell-value">${period.min} – ${period.max} дней</div>`;
@@ -5475,7 +6053,7 @@
             }
             html += '</td>';
             html += '<td class="data-cell">';
-            html += `<div class="cell-label">${window.i18nManager ? window.i18nManager.getTranslation("reports.listingPeriodForRentLabel") : "listingPeriodForRentLabel"}:</div>`;
+            html += `<div class="cell-label">${getText('listingPeriodForRentLabel')}:</div>`;
                 if (summary.listing_period_for_rent) {
                     const period = summary.listing_period_for_rent;
                 html += `<div class="cell-value">${period.min} – ${period.max} дней</div>`;
@@ -5488,7 +6066,7 @@
             // Row 3: Unit Price
             html += '<tr>';
             html += '<td class="data-cell">';
-            html += `<div class="cell-label">${window.i18nManager ? window.i18nManager.getTranslation("reports.unitPriceForSaleLabel") : "unitPriceForSaleLabel"}:</div>`;
+            html += `<div class="cell-label">${getText('unitPriceForSaleLabel')}:</div>`;
             if (summary.unit_price_for_sale) {
                 const price = summary.unit_price_for_sale;
                 html += `<div class="cell-value">${formatValue(price.min, 'price')} – ${formatValue(price.max, 'price')}</div>`;
@@ -5497,7 +6075,7 @@
             }
             html += '</td>';
             html += '<td class="data-cell">';
-            html += `<div class="cell-label">${window.i18nManager ? window.i18nManager.getTranslation("reports.unitPriceForRentLabel") : "unitPriceForRentLabel"}:</div>`;
+            html += `<div class="cell-label">${getText('unitPriceForRentLabel')}:</div>`;
                 if (summary.unit_price_for_rent) {
                     const price = summary.unit_price_for_rent;
                 html += `<div class="cell-value">${formatValue(price.min, 'price')} – ${formatValue(price.max, 'price')}</div>`;
@@ -5831,7 +6409,7 @@
             const groupedTrends = groupTrendsByType(trends);
             
             trendsSection.innerHTML = `
-                <h3 class="data-section-title">${window.i18nManager ? window.i18nManager.getTranslation("reports.marketTrendsTitle") : "marketTrendsTitle"}</h3>
+                <h3 class="data-section-title">${getText('marketTrendsTitle')}</h3>
                 <div class="data-section-content">
                     <div class="trends-grid">
                         ${Object.entries(groupedTrends).map(([type, typeTrends]) => {
@@ -6443,13 +7021,13 @@
             // Добавляем график трендов
             html += `
                 <div class="trends-chart-section">
-                    <h4 class="trends-chart-title">${window.i18nManager ? window.i18nManager.getTranslation("reports.chart_title") : "chart_title"}</h4>
+                    <h4 class="trends-chart-title">${getText('chart_title')}</h4>
                     <div class="chart-controls">
                         <button class="chart-button active" data-chart-type="sale" onclick="switchChartType('sale')">
-                            ${window.i18nManager ? window.i18nManager.getTranslation("reports.sale_button") : "sale_button"}
+                            ${getText('sale_button')}
                         </button>
                         <button class="chart-button" data-chart-type="rent" onclick="switchChartType('rent')">
-                            ${window.i18nManager ? window.i18nManager.getTranslation("reports.rent_button") : "rent_button"}
+                            ${getText('rent_button')}
                         </button>
                     </div>
                     <div class="chart-container">
@@ -6457,7 +7035,7 @@
                     </div>
                     <div class="chart-info">
                         <small style="color: #6c757d; font-style: italic; text-align: center; display: block; margin-top: 10px;">
-                            ${window.i18nManager ? window.i18nManager.getTranslation("reports.chart_info") : "chart_info"}
+                            ${getText('chart_info')}
                         </small>
                     </div>
                 </div>
@@ -6783,7 +7361,7 @@
                 
                 // Начинаем создание компактного HTML
                 let html = '<div class="object-summary-section">';
-                html += `<h4 class="object-summary-title">${window.i18nManager ? window.i18nManager.getTranslation("reports.objectSummaryTitle") : "objectSummaryTitle"}</h4>`;
+                html += `<h4 class="object-summary-title">${getText('objectSummaryTitle')}</h4>`;
                 html += '<div class="object-summary-content">';
                 
                 // Создаем компактную таблицу с основными данными и сравнениями
@@ -7022,13 +7600,13 @@
             // Добавляем график прогноза цен и аренды
             forecastHtml += `
                 <div class="forecast-chart-section" id="forecastChartSection">
-                    <h4 class="forecast-chart-title">${window.i18nManager ? window.i18nManager.getTranslation("reports.forecast_chart_title") : "forecast_chart_title"}</h4>
+                    <h4 class="forecast-chart-title">${getText('forecast_chart_title')}</h4>
                     <div class="chart-controls">
                         <button class="chart-button active" data-chart-type="sale" onclick="switchForecastChartType('sale')">
-                            ${window.i18nManager ? window.i18nManager.getTranslation("reports.sale_button") : "sale_button"}
+                            ${getText('sale_button')}
                         </button>
                         <button class="chart-button" data-chart-type="rent" onclick="switchForecastChartType('rent')">
-                            ${window.i18nManager ? window.i18nManager.getTranslation("reports.rent_button") : "rent_button"}
+                            ${getText('rent_button')}
                         </button>
                     </div>
                     <div class="chart-container">
@@ -7036,7 +7614,7 @@
                     </div>
                     <div class="chart-info">
                         <small style="color: #6c757d; font-style: italic; text-align: center; display: block; margin-top: 10px;">
-                            ${window.i18nManager ? window.i18nManager.getTranslation("reports.forecast_chart_info") : "forecast_chart_info"}
+                            ${getText('forecast_chart_info')}
                         </small>
                     </div>
                 </div>
@@ -7651,30 +8229,8 @@
 
         // Initialize page
         function init() {
-            console.log('🔄 Инициализация страницы...');
-            
-            // Ждем инициализации i18nManager
-            if (window.i18nManager) {
-                console.log('✅ i18nManager уже инициализирован');
+            updatePageText();
             loadCountries();
-            } else {
-                console.log('⏳ Ожидаем инициализацию i18nManager...');
-                // Проверяем каждые 100мс, максимум 5 секунд
-                let attempts = 0;
-                const maxAttempts = 50;
-                const checkInterval = setInterval(() => {
-                    attempts++;
-                    if (window.i18nManager) {
-                        console.log('✅ i18nManager инициализирован, загружаем страны...');
-                        clearInterval(checkInterval);
-                        loadCountries();
-                    } else if (attempts >= maxAttempts) {
-                        console.log('⚠️ i18nManager не инициализирован, загружаем страны без переводов...');
-                        clearInterval(checkInterval);
-                        loadCountries();
-                    }
-                }, 100);
-            }
             
             // Initialize price input
             const priceInput = document.getElementById('priceObjectInput');
@@ -7795,18 +8351,18 @@
             
             // Generate HTML for consolidated assessment
             let html = '<div class="consolidated-assessment-section">';
-            html += `<h4 class="consolidated-assessment-title">${window.i18nManager ? window.i18nManager.getTranslation("reports.marketAnalysisTitle") : "marketAnalysisTitle"}</h4>`;
+            html += `<h4 class="consolidated-assessment-title">${getText('marketAnalysisTitle')}</h4>`;
             html += '<div class="consolidated-assessment-content">';
             
             // Sale Price Section
             html += '<div class="assessment-category">';
-            html += `<h5 class="assessment-category-title">${window.i18nManager ? window.i18nManager.getTranslation("reports.salePriceTitle") : "salePriceTitle"}</h5>`;
+            html += `<h5 class="assessment-category-title">${getText('salePriceTitle')}</h5>`;
             html += '<div class="assessment-items">';
             
             if (houseTypeData?.unit_price_for_sale) {
                 const listingType = houseTypeData.listing_type || '1+1';
                 html += `<div class="assessment-item">
-                    <span class="assessment-label">${window.i18nManager ? window.i18nManager.getTranslation("reports.bedroomsLabel") : "bedroomsLabel"} ${listingType}:</span>
+                    <span class="assessment-label">${getText('bedroomsLabel')} ${listingType}:</span>
                     <span class="assessment-value">${formatValue(houseTypeData.unit_price_for_sale, 'price')}</span>
                 </div>`;
             }
@@ -7814,7 +8370,7 @@
             if (floorSegmentData?.unit_price_for_sale) {
                 const listingType = floorSegmentData.listing_type || 'Giriş';
                 html += `<div class="assessment-item">
-                    <span class="assessment-label">${window.i18nManager ? window.i18nManager.getTranslation("reports.floorLabel") : "floorLabel"} ${listingType}:</span>
+                    <span class="assessment-label">${getText('floorLabel')} ${listingType}:</span>
                     <span class="assessment-value">${formatValue(floorSegmentData.unit_price_for_sale, 'price')}</span>
                 </div>`;
             }
@@ -7822,7 +8378,7 @@
             if (ageData?.unit_price_for_sale) {
                 const listingType = ageData.listing_type || '0–4';
                 html += `<div class="assessment-item">
-                    <span class="assessment-label">${window.i18nManager ? window.i18nManager.getTranslation("reports.ageLabel") : "ageLabel"} ${listingType}:</span>
+                    <span class="assessment-label">${getText('ageLabel')} ${listingType}:</span>
                     <span class="assessment-value">${formatValue(ageData.unit_price_for_sale, 'price')}</span>
                 </div>`;
             }
@@ -7830,7 +8386,7 @@
             if (heatingData?.unit_price_for_sale) {
                 const listingType = heatingData.listing_type || 'Yok';
                 html += `<div class="assessment-item">
-                    <span class="assessment-label">${window.i18nManager ? window.i18nManager.getTranslation("reports.heatingLabel") : "heatingLabel"} ${listingType}:</span>
+                    <span class="assessment-label">${getText('heatingLabel')} ${listingType}:</span>
                     <span class="assessment-value">${formatValue(heatingData.unit_price_for_sale, 'price')}</span>
                 </div>`;
             }
@@ -7838,7 +8394,7 @@
             html += '</div>';
             if (salePrice.calculated) {
                 html += `<div class="assessment-consolidated">
-                    <span class="assessment-consolidated-label">${window.i18nManager ? window.i18nManager.getTranslation("reports.consolidatedAverageLabel") : "consolidatedAverageLabel"}</span>
+                    <span class="assessment-consolidated-label">${getText('consolidatedAverageLabel')}</span>
                     <span class="assessment-consolidated-value">≈ ${formatValue(salePrice.value, 'price')}/м²</span>
                 </div>`;
             }
@@ -7846,13 +8402,13 @@
             
             // Rent Price Section
             html += '<div class="assessment-category">';
-            html += `<h5 class="assessment-category-title">${window.i18nManager ? window.i18nManager.getTranslation("reports.rentPriceTitle") : "rentPriceTitle"}</h5>`;
+            html += `<h5 class="assessment-category-title">${getText('rentPriceTitle')}</h5>`;
             html += '<div class="assessment-items">';
             
             if (houseTypeData?.unit_price_for_rent) {
                 const listingType = houseTypeData.listing_type || '1+1';
                 html += `<div class="assessment-item">
-                    <span class="assessment-label">${window.i18nManager ? window.i18nManager.getTranslation("reports.bedroomsLabel") : "bedroomsLabel"} ${listingType}:</span>
+                    <span class="assessment-label">${getText('bedroomsLabel')} ${listingType}:</span>
                     <span class="assessment-value">${formatValue(houseTypeData.unit_price_for_rent, 'price')}</span>
                 </div>`;
             }
@@ -7860,7 +8416,7 @@
             if (floorSegmentData?.unit_price_for_rent) {
                 const listingType = floorSegmentData.listing_type || 'Giriş';
                 html += `<div class="assessment-item">
-                    <span class="assessment-label">${window.i18nManager ? window.i18nManager.getTranslation("reports.floorLabel") : "floorLabel"} ${listingType}:</span>
+                    <span class="assessment-label">${getText('floorLabel')} ${listingType}:</span>
                     <span class="assessment-value">${formatValue(floorSegmentData.unit_price_for_rent, 'price')}</span>
                 </div>`;
             }
@@ -7868,7 +8424,7 @@
             if (ageData?.unit_price_for_rent) {
                 const listingType = ageData.listing_type || '0–4';
                 html += `<div class="assessment-item">
-                    <span class="assessment-label">${window.i18nManager ? window.i18nManager.getTranslation("reports.ageLabel") : "ageLabel"} ${listingType}:</span>
+                    <span class="assessment-label">${getText('ageLabel')} ${listingType}:</span>
                     <span class="assessment-value">${formatValue(ageData.unit_price_for_rent, 'price')}</span>
                 </div>`;
             }
@@ -7876,7 +8432,7 @@
             if (heatingData?.unit_price_for_rent) {
                 const listingType = heatingData.listing_type || 'Yok';
                 html += `<div class="assessment-item">
-                    <span class="assessment-label">${window.i18nManager ? window.i18nManager.getTranslation("reports.heatingLabel") : "heatingLabel"} ${listingType}:</span>
+                    <span class="assessment-label">${getText('heatingLabel')} ${listingType}:</span>
                     <span class="assessment-value">${formatValue(heatingData.unit_price_for_rent, 'price')}</span>
                 </div>`;
             }
@@ -7884,7 +8440,7 @@
             html += '</div>';
             if (rentPrice.calculated) {
                 html += `<div class="assessment-consolidated">
-                    <span class="assessment-consolidated-label">${window.i18nManager ? window.i18nManager.getTranslation("reports.consolidatedAverageLabel") : "consolidatedAverageLabel"}</span>
+                    <span class="assessment-consolidated-label">${getText('consolidatedAverageLabel')}</span>
                     <span class="assessment-consolidated-value">≈ ${formatValue(rentPrice.value, 'price')}/м²</span>
                 </div>`;
             }
@@ -7892,13 +8448,13 @@
             
             // Yield Section
             html += '<div class="assessment-category">';
-            html += `<h5 class="assessment-category-title">${window.i18nManager ? window.i18nManager.getTranslation("reports.yieldTitle") : "yieldTitle"}</h5>`;
+            html += `<h5 class="assessment-category-title">${getText('yieldTitle')}</h5>`;
             html += '<div class="assessment-items">';
             
             if (houseTypeData?.yield) {
                 const listingType = houseTypeData.listing_type || '1+1';
                 html += `<div class="assessment-item">
-                    <span class="assessment-label">${window.i18nManager ? window.i18nManager.getTranslation("reports.bedroomsLabel") : "bedroomsLabel"}:</span>
+                    <span class="assessment-label">${getText('bedroomsLabel')}:</span>
                     <span class="assessment-value">${formatValue(houseTypeData.yield, 'percentage')}</span>
                 </div>`;
             }
@@ -7906,7 +8462,7 @@
             if (floorSegmentData?.yield) {
                 const listingType = floorSegmentData.listing_type || 'Giriş';
                 html += `<div class="assessment-item">
-                    <span class="assessment-label">${window.i18nManager ? window.i18nManager.getTranslation("reports.floorLabel") : "floorLabel"}:</span>
+                    <span class="assessment-label">${getText('floorLabel')}:</span>
                     <span class="assessment-value">${formatValue(floorSegmentData.yield, 'percentage')}</span>
                 </div>`;
             }
@@ -7914,7 +8470,7 @@
             if (ageData?.yield) {
                 const listingType = ageData.listing_type || '0–4';
                 html += `<div class="assessment-item">
-                    <span class="assessment-label">${window.i18nManager ? window.i18nManager.getTranslation("reports.ageLabel") : "ageLabel"}:</span>
+                    <span class="assessment-label">${getText('ageLabel')}:</span>
                     <span class="assessment-value">${formatValue(ageData.yield, 'percentage')}</span>
                 </div>`;
             }
@@ -7922,7 +8478,7 @@
             if (heatingData?.yield) {
                 const listingType = heatingData.listing_type || 'Yok';
                 html += `<div class="assessment-item">
-                    <span class="assessment-label">${window.i18nManager ? window.i18nManager.getTranslation("reports.heatingLabel") : "heatingLabel"}:</span>
+                    <span class="assessment-label">${getText('heatingLabel')}:</span>
                     <span class="assessment-value">${formatValue(heatingData.yield, 'percentage')}</span>
                 </div>`;
             }
@@ -7930,7 +8486,7 @@
             html += '</div>';
             if (yield.calculated) {
                 html += `<div class="assessment-consolidated">
-                    <span class="assessment-consolidated-label">${window.i18nManager ? window.i18nManager.getTranslation("reports.consolidatedAverageLabel") : "consolidatedAverageLabel"}</span>
+                    <span class="assessment-consolidated-label">${getText('consolidatedAverageLabel')}</span>
                     <span class="assessment-consolidated-value">≈ ${formatValue(yield.value, 'percentage')}</span>
                 </div>`;
             }
@@ -8649,7 +9205,7 @@
             try {
                 // Disable button and show loading
                 saveButton.disabled = true;
-                saveButton.innerHTML = `<span>${window.i18nManager ? window.i18nManager.getTranslation("reports.savingReport") : "savingReport"}</span>`;
+                saveButton.innerHTML = `<span>${getText('savingReport')}</span>`;
                 
                 // Get report content
                 const reportContent = extractReportContent();
@@ -8691,7 +9247,7 @@
                 
             } catch (error) {
                 console.error('Error saving report:', error);
-                alert(window.i18nManager ? window.i18nManager.getTranslation("reports.errorSaving") : "errorSaving");
+                alert(getText('errorSaving'));
             } finally {
                 // Re-enable button
                 saveButton.disabled = false;
@@ -9212,7 +9768,7 @@
                     document.body.removeChild(textArea);
                 }
                 
-                copyButton.innerHTML = `<span>${window.i18nManager ? window.i18nManager.getTranslation("reports.linkCopied") : "linkCopied"}</span>`;
+                copyButton.innerHTML = `<span>${getText('linkCopied')}</span>`;
                 
                 setTimeout(() => {
                     copyButton.innerHTML = originalText;

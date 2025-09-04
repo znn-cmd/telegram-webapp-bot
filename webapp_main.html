@@ -1,13 +1,12 @@
 <!DOCTYPE html>
-
 <html lang="ru">
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Aaadviser - Главное меню</title>
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
-<script src="/i18n-manager.js"></script>
-<style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aaadviser - Главное меню</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="/i18n-manager.js"></script>
+    <style>
         * {
             margin: 0;
             padding: 0;
@@ -406,7 +405,27 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Admin button styles */
+        /* Admin section styles */
+        .admin-section {
+            margin-top: 20px;
+            padding: 20px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 12px;
+            border: 2px solid #dee2e6;
+        }
+
+        .admin-section-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #495057;
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 10px;
+            background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
+            border-radius: 8px;
+            color: #222;
+        }
+
         .admin-btn {
             background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%) !important;
             color: #222 !important;
@@ -421,87 +440,122 @@
     </style>
 </head>
 <body>
-<div class="container">
-<!-- Логотип -->
-<div style="display:flex;flex-direction:column;align-items:center;margin-top:18px;margin-bottom:10px;">
-<img alt="Aaadviser Logo" onclick="goToMainMenu()" src="logo-sqv.png" style="width:110px;height:auto;display:block;margin-bottom:8px;cursor:pointer;"/>
-<div id="slogan" style="font-size:15px;color:#888;font-style:italic;">Инсайты рынка недвижимости</div>
-</div>
-<!-- Skeleton loading for user info -->
-<div class="skeleton skeleton-user" id="userSkeleton"></div>
-<!-- Информация о пользователе -->
-<div class="user-info hidden" id="userInfo">
-<div class="user-name" data-i18n="common.loading" id="userName">Загрузка...</div>
-<div class="user-balance" style="margin-top: 10px;">
-<span>Баланс:</span>
-<span class="balance-amount" id="userBalance">$0</span>
-</div>
-</div>
-<!-- Выбор языка -->
-<div class="language-selector hidden" id="languageSelector">
-<div class="language-title" data-i18n="common.language" id="languageTitle">Выберите язык</div>
-<div class="language-buttons">
-<button class="lang-btn selected" data-lang="ru" onclick="selectLanguage('ru')">🇷🇺 Русский</button>
-<button class="lang-btn" data-lang="en" onclick="selectLanguage('en')">🇺🇸 English</button>
-<button class="lang-btn" data-lang="de" onclick="selectLanguage('de')">🇩🇪 Deutsch</button>
-<button class="lang-btn" data-lang="fr" onclick="selectLanguage('fr')">🇫🇷 Français</button>
-<button class="lang-btn" data-lang="tr" onclick="selectLanguage('tr')">🇹🇷 Türkçe</button>
-</div>
-<button class="menu-btn" data-i18n="common.confirm" id="confirmLangBtn" onclick="confirmLanguage()" style="margin-top:15px;width:100%;">Подтвердить</button>
-</div>
-<!-- Skeleton loading for menu -->
-<div id="menuSkeleton">
-<div class="skeleton skeleton-menu"></div>
-<div class="skeleton skeleton-menu"></div>
-<div class="skeleton skeleton-menu"></div>
-<div class="skeleton skeleton-menu"></div>
-</div>
-<!-- Главное меню -->
-<div class="menu-section hidden" id="menuSection">
-<div class="menu-title" data-i18n="main.title" id="menuTitle">Главное меню</div>
-<!-- Новые кнопки сверху -->
-<button class="menu-btn fade-in" onclick="showRegionAnalytics()">
-<span class="menu-btn-icon">🗺️</span>
-<span class="menu-btn-text" data-i18n="reports.region_analytics" id="regionAnalyticsBtn">Аналитика региона</span>
-<span class="menu-btn-description" id="regionAnalyticsDesc">Отчет по региону</span>
-</button>
-<button class="menu-btn fade-in" onclick="showObjectEvaluation()">
-<span class="menu-btn-icon">🏠</span>
-<span class="menu-btn-text" id="objectEvaluationBtn">Оценка объекта</span>
-<span class="menu-btn-description" data-i18n="reports.property_evaluation" id="objectEvaluationDesc">Оценка недвижимости</span>
-</button>
-<button class="menu-btn fade-in" onclick="showMyReports()">
-<span class="menu-btn-icon">📋</span>
-<span class="menu-btn-text" data-i18n="reports.my_reports" id="myReportsBtn">Мои отчеты</span>
-<span class="menu-btn-description" id="myReportsDesc">Ваши созданные отчеты</span>
-</button>
-<button class="menu-btn fade-in" onclick="showProfile()">
-<span class="menu-btn-icon">👤</span>
-<span class="menu-btn-text" data-i18n="profile.title" id="profileBtn">Личный кабинет</span>
-<span class="menu-btn-description" id="profileDesc">Настройки и баланс</span>
-</button>
-<!-- Кнопка Помощь -->
-<button class="menu-btn fade-in" onclick="showHelp()">
-<span class="menu-btn-icon">❓</span>
-<span class="menu-btn-text" data-i18n="common.help">Помощь</span>
-<span class="menu-btn-description">Ответы на вопросы и поддержка</span>
-</button>
-<!-- Кнопка Админ-панель -->
-<button class="menu-btn fade-in admin-btn hidden" id="adminPanelBtn" onclick="showAdminPanel()">
-<span class="menu-btn-icon">🛠️</span>
-<span class="menu-btn-text">Админ-панель</span>
-<span class="menu-btn-description">Управление и статистика</span>
-</button>
-</div>
-<!-- Загрузка -->
-<div class="loading hidden" data-i18n="common.loading" id="loading">
-<div class="spinner"></div>
-<p data-i18n="common.loading" id="loadingText">Загрузка...</p>
-</div>
-</div>
-<!-- Toast container -->
-<div class="toast-container" id="toastContainer"></div>
-<script>
+    <div class="container">
+        <!-- Логотип -->
+        <div style="display:flex;flex-direction:column;align-items:center;margin-top:18px;margin-bottom:10px;">
+            <img src="logo-sqv.png" alt="Aaadviser Logo" style="width:110px;height:auto;display:block;margin-bottom:8px;cursor:pointer;" onclick="goToMainMenu()" />
+            <div style="font-size:15px;color:#888;font-style:italic;" id="slogan">Инсайты рынка недвижимости</div>
+        </div>
+
+        <!-- Skeleton loading for user info -->
+        <div class="skeleton skeleton-user" id="userSkeleton"></div>
+        <!-- Информация о пользователе -->
+        <div class="user-info hidden" id="userInfo">
+            <div class="user-name" id="userName" data-i18n="common.loading">Загрузка...</div>
+            <div class="user-balance" style="margin-top: 10px;">
+                <span>Баланс:</span>
+                <span class="balance-amount" id="userBalance">$0</span>
+            </div>
+        </div>
+
+        <!-- Выбор языка -->
+        <div class="language-selector hidden" id="languageSelector">
+            <div class="language-title" id="languageTitle" data-i18n="common.language">Выберите язык</div>
+            <div class="language-buttons">
+                <button class="lang-btn selected" data-lang="ru" onclick="selectLanguage('ru')">🇷🇺 Русский</button>
+                <button class="lang-btn" data-lang="en" onclick="selectLanguage('en')">🇺🇸 English</button>
+                <button class="lang-btn" data-lang="de" onclick="selectLanguage('de')">🇩🇪 Deutsch</button>
+                <button class="lang-btn" data-lang="fr" onclick="selectLanguage('fr')">🇫🇷 Français</button>
+                <button class="lang-btn" data-lang="tr" onclick="selectLanguage('tr')">🇹🇷 Türkçe</button>
+            </div>
+            <button class="menu-btn" id="confirmLangBtn" style="margin-top:15px;width:100%;" onclick="confirmLanguage()" data-i18n="common.confirm">Подтвердить</button>
+        </div>
+
+        <!-- Skeleton loading for menu -->
+        <div id="menuSkeleton">
+            <div class="skeleton skeleton-menu"></div>
+            <div class="skeleton skeleton-menu"></div>
+            <div class="skeleton skeleton-menu"></div>
+            <div class="skeleton skeleton-menu"></div>
+        </div>
+
+        <!-- Главное меню -->
+        <div class="menu-section hidden" id="menuSection">
+            <div class="menu-title" id="menuTitle" data-i18n="main.title">Главное меню</div>
+            
+            <!-- Новые кнопки сверху -->
+            <button class="menu-btn fade-in" onclick="showRegionAnalytics()">
+                <span class="menu-btn-icon">🗺️</span>
+                <span class="menu-btn-text" id="regionAnalyticsBtn" data-i18n="reports.region_analytics">Аналитика региона</span>
+                <span class="menu-btn-description" id="regionAnalyticsDesc">Отчет по региону</span>
+            </button>
+
+            <button class="menu-btn fade-in" onclick="showObjectEvaluation()">
+                <span class="menu-btn-icon">🏠</span>
+                <span class="menu-btn-text" id="objectEvaluationBtn">Оценка объекта</span>
+                <span class="menu-btn-description" id="objectEvaluationDesc" data-i18n="reports.property_evaluation">Оценка недвижимости</span>
+            </button>
+
+            <button class="menu-btn fade-in" onclick="showMyReports()">
+                <span class="menu-btn-icon">📋</span>
+                <span class="menu-btn-text" id="myReportsBtn" data-i18n="reports.title" data-i18n="reports.my_reports">Мои отчеты</span>
+                <span class="menu-btn-description" id="myReportsDesc">Ваши созданные отчеты</span>
+            </button>
+
+            <button class="menu-btn fade-in" onclick="showProfile()">
+                <span class="menu-btn-icon">👤</span>
+                <span class="menu-btn-text" id="profileBtn" data-i18n="profile.title">Личный кабинет</span>
+                <span class="menu-btn-description" id="profileDesc">Настройки и баланс</span>
+            </button>
+
+            <!-- Кнопка Помощь -->
+            <button class="menu-btn fade-in" onclick="showHelp()">
+                <span class="menu-btn-icon">❓</span>
+                <span class="menu-btn-text" data-i18n="common.help">Помощь</span>
+                <span class="menu-btn-description">Ответы на вопросы и поддержка</span>
+            </button>
+
+            <!-- Блок для админа -->
+            <div class="admin-section hidden" id="adminSection">
+                <div class="admin-section-title" id="adminSectionTitle">Для админа</div>
+                
+                <button class="menu-btn fade-in admin-btn" onclick="startNewReport()">
+                    <span class="menu-btn-icon">📊</span>
+                    <span class="menu-btn-text" id="newReportBtn">Получить новый отчет</span>
+                    <span class="menu-btn-description" id="newReportDesc">Анализ недвижимости по адресу</span>
+                </button>
+
+                <button class="menu-btn fade-in admin-btn" onclick="showMarketStats()">
+                    <span class="menu-btn-icon">📈</span>
+                    <span class="menu-btn-text" id="marketStatsBtn">Статистика рынка</span>
+                    <span class="menu-btn-description" id="marketStatsDesc">Анализ трендов и цен</span>
+                </button>
+
+                <button class="menu-btn fade-in admin-btn" onclick="showSavedReports()">
+                    <span class="menu-btn-icon">💾</span>
+                    <span class="menu-btn-text" id="savedReportsBtn">Мои сохраненные отчеты</span>
+                    <span class="menu-btn-description" id="savedReportsDesc">История ваших запросов</span>
+                </button>
+
+                <button class="menu-btn fade-in admin-btn" onclick="showAdminPanel()">
+                    <span class="menu-btn-icon">🛠️</span>
+                    <span class="menu-btn-text">Админ-панель</span>
+                    <span class="menu-btn-description">Управление и статистика</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Загрузка -->
+        <div id="loading" class="loading hidden">
+            <div class="spinner"></div>
+            <p id="loadingText" data-i18n="common.loading">Загрузка...</p>
+        </div>
+    </div>
+
+    <!-- Toast container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script>
         let tg = window.Telegram.WebApp;
         tg.expand();
         tg.ready();
@@ -568,6 +622,12 @@
                 'balance': 'Баланс: ',
                 'languageTitle': 'Выберите язык',
                 'menuTitle': 'Главное меню',
+                'newReportBtn': 'Получить новый отчет',
+                'newReportDesc': 'Анализ недвижимости по адресу',
+                'marketStatsBtn': 'Статистика рынка',
+                'marketStatsDesc': 'Анализ трендов и цен',
+                'savedReportsBtn': 'Мои сохраненные отчеты',
+                'savedReportsDesc': 'История ваших запросов',
                 'profileBtn': 'Личный кабинет',
                 'profileDesc': 'Настройки и баланс',
                 'welcome_new': 'Добро пожаловать в Aaadvisor',
@@ -578,6 +638,7 @@
                 'objectEvaluationDesc': 'Оценка недвижимости',
                 'myReportsBtn': 'Мои отчеты',
                 'myReportsDesc': 'Ваши созданные отчеты',
+                'adminSectionTitle': 'Для админа',
                 'error_loading': 'Ошибка загрузки данных',
                 'error_network': 'Ошибка сети. Проверьте соединение.',
                 'success_language': 'Язык успешно изменен',
@@ -589,6 +650,12 @@
                 'balance': 'Balance: ',
                 'languageTitle': 'Select language',
                 'menuTitle': 'Main menu',
+                'newReportBtn': 'Get new report',
+                'newReportDesc': 'Property analysis by address',
+                'marketStatsBtn': 'Market statistics',
+                'marketStatsDesc': 'Trend and price analysis',
+                'savedReportsBtn': 'My saved reports',
+                'savedReportsDesc': 'Your analysis history',
                 'profileBtn': 'Profile',
                 'profileDesc': 'Settings and balance',
                 'welcome_new': 'Welcome to Aaadvisor',
@@ -599,6 +666,7 @@
                 'objectEvaluationDesc': 'Property Evaluation',
                 'myReportsBtn': 'My Reports',
                 'myReportsDesc': 'Your created reports',
+                'adminSectionTitle': 'For Admin',
                 'error_loading': 'Error loading data',
                 'error_network': 'Network error. Check your connection.',
                 'success_language': 'Language changed successfully',
@@ -610,6 +678,12 @@
                 'balance': 'Kontostand: ',
                 'languageTitle': 'Sprache auswählen',
                 'menuTitle': 'Hauptmenü',
+                'newReportBtn': 'Neuen Bericht erstellen',
+                'newReportDesc': 'Immobilienanalyse nach Adresse',
+                'marketStatsBtn': 'Marktstatistiken',
+                'marketStatsDesc': 'Trend- und Preisanalyse',
+                'savedReportsBtn': 'Meine gespeicherten Berichte',
+                'savedReportsDesc': 'Ihre Analysehistorie',
                 'profileBtn': 'Profil',
                 'profileDesc': 'Einstellungen und Kontostand',
                 'welcome_new': 'Willkommen bei Aaadvisor',
@@ -620,6 +694,7 @@
                 'objectEvaluationDesc': 'Immobilienbewertung',
                 'myReportsBtn': 'Meine Berichte',
                 'myReportsDesc': 'Ihre erstellten Berichte',
+                'adminSectionTitle': 'Für Admin',
                 'error_loading': 'Fehler beim Laden der Daten',
                 'error_network': 'Netzwerkfehler. Überprüfen Sie Ihre Verbindung.',
                 'success_language': 'Sprache erfolgreich geändert',
@@ -631,6 +706,12 @@
                 'balance': 'Solde: ',
                 'languageTitle': 'Sélectionner la langue',
                 'menuTitle': 'Menu principal',
+                'newReportBtn': 'Obtenir un nouveau rapport',
+                'newReportDesc': 'Analyse immobilière par adresse',
+                'marketStatsBtn': 'Statistiques du marché',
+                'marketStatsDesc': 'Analyse des tendances et prix',
+                'savedReportsBtn': 'Mes rapports enregistrés',
+                'savedReportsDesc': 'Historique de vos analyses',
                 'profileBtn': 'Profil',
                 'profileDesc': 'Paramètres et solde',
                 'welcome_new': 'Bienvenue sur Aaadvisor',
@@ -641,6 +722,7 @@
                 'objectEvaluationDesc': 'Évaluation immobilière',
                 'myReportsBtn': 'Mes Rapports',
                 'myReportsDesc': 'Vos rapports créés',
+                'adminSectionTitle': 'Pour Admin',
                 'error_loading': 'Erreur de chargement des données',
                 'error_network': 'Erreur réseau. Vérifiez votre connexion.',
                 'success_language': 'Langue changée avec succès',
@@ -652,6 +734,12 @@
                 'balance': 'Bakiye: ',
                 'languageTitle': 'Dil seçin',
                 'menuTitle': 'Ana menü',
+                'newReportBtn': 'Yeni rapor al',
+                'newReportDesc': 'Adrese göre mülk analizi',
+                'marketStatsBtn': 'Piyasa istatistikleri',
+                'marketStatsDesc': 'Trend ve fiyat analizi',
+                'savedReportsBtn': 'Kayıtlı raporlarım',
+                'savedReportsDesc': 'Analiz geçmişiniz',
                 'profileBtn': 'Profil',
                 'profileDesc': 'Ayarlar ve bakiye',
                 'welcome_new': 'Aaadvisor\'a hoş geldiniz',
@@ -662,6 +750,7 @@
                 'objectEvaluationDesc': 'Gayrimenkul Değerlendirmesi',
                 'myReportsBtn': 'Raporlarım',
                 'myReportsDesc': 'Oluşturduğunuz raporlar',
+                'adminSectionTitle': 'Admin İçin',
                 'error_loading': 'Veri yükleme hatası',
                 'error_network': 'Ağ hatası. Bağlantınızı kontrol edin.',
                 'success_language': 'Dil başarıyla değiştirildi',
@@ -680,6 +769,12 @@
             document.getElementById('slogan').textContent = getText('slogan');
             document.getElementById('languageTitle').textContent = getText('languageTitle');
             document.getElementById('menuTitle').textContent = getText('menuTitle');
+            document.getElementById('newReportBtn').textContent = getText('newReportBtn');
+            document.getElementById('newReportDesc').textContent = getText('newReportDesc');
+            document.getElementById('marketStatsBtn').textContent = getText('marketStatsBtn');
+            document.getElementById('marketStatsDesc').textContent = getText('marketStatsDesc');
+            document.getElementById('savedReportsBtn').textContent = getText('savedReportsBtn');
+            document.getElementById('savedReportsDesc').textContent = getText('savedReportsDesc');
             document.getElementById('profileBtn').textContent = getText('profileBtn');
             document.getElementById('profileDesc').textContent = getText('profileDesc');
             document.getElementById('regionAnalyticsBtn').textContent = getText('regionAnalyticsBtn');
@@ -688,6 +783,7 @@
             document.getElementById('objectEvaluationDesc').textContent = getText('objectEvaluationDesc');
             document.getElementById('myReportsBtn').textContent = getText('myReportsBtn');
             document.getElementById('myReportsDesc').textContent = getText('myReportsDesc');
+            document.getElementById('adminSectionTitle').textContent = getText('adminSectionTitle');
             document.getElementById('loadingText').textContent = getText('loading');
         }
 
@@ -759,11 +855,11 @@
                 if (response.ok) {
                     const userInfo = await response.json();
 
-                    // Показываем кнопку админа только если user_status === 'admin'
+                    // Показываем блок админа только если user_status === 'admin'
                     if (userInfo.user_status === 'admin') {
-                        document.getElementById('adminPanelBtn').classList.remove('hidden');
+                        document.getElementById('adminSection').classList.remove('hidden');
                     } else {
-                        document.getElementById('adminPanelBtn').classList.add('hidden');
+                        document.getElementById('adminSection').classList.add('hidden');
                     }
 
                     // Скрыть выбор языка, если уже выбран
@@ -825,6 +921,26 @@
         }
 
         // Функции меню
+        function startNewReport() {
+            showLoading();
+            showToast('Переход к созданию отчета...', 'info');
+            // Переходим к странице создания отчета
+            window.location.href = '/webapp_report';
+        }
+
+        function showMarketStats() {
+            window.location.href = '/webapp_stats';
+        }
+
+        function showSavedReports() {
+            if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe && window.Telegram.WebApp.initDataUnsafe.user) {
+                localStorage.setItem('aaadviser_user', JSON.stringify(window.Telegram.WebApp.initDataUnsafe.user));
+            }
+            showLoading();
+            showToast('Загрузка ваших отчетов...', 'info');
+            window.location.href = '/webapp_saved';
+        }
+
         function showProfile() {
             window.location.href = '/webapp_profile';
         }

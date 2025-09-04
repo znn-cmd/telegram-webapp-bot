@@ -1,0 +1,24 @@
+name: telegram-webapp-bot
+runtime: python
+version: "3.11"
+
+build:
+  commands:
+    - conda install -c conda-forge -c defaults flask flask-cors requests python-dotenv matplotlib pillow numpy python-dateutil -y
+    - pip install fpdf2 python-telegram-bot openai supabase --timeout 300 --retries 10 --index-url https://pypi.tuna.tsinghua.edu.cn/simple/ --trusted-host pypi.tuna.tsinghua.edu.cn
+
+run:
+  command: python app.py
+  port: 8080
+
+env:
+  - name: TELEGRAM_BOT_TOKEN
+    value: 7215676549:AAFS86JbRCqwzTKQG-dF96JX-C1aWNvBoLo
+  - name: SUPABASE_URL
+    value: https://dzllnnohurlzjyabgsft.supabase.co
+  - name: SUPABASE_ANON_KEY
+    value: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR6bGxubm9odXJsemp5YWJnc2Z0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA5NDgwMjcsImV4cCI6MjA2NjUyNDAyN30.sJCIeeIm0Ye1JbAdw5HzfAMe8QLgQomArK8yoppuevQ
+
+resources:
+  memory: 512Mi
+  cpu: 250m

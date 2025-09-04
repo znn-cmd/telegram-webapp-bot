@@ -1,13 +1,12 @@
 <!DOCTYPE html>
-
 <html lang="ru">
 <head>
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
-<script src="/i18n-manager.js"></script>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>О приложении — Aaadviser</title>
-<style>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="/i18n-manager.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>О приложении — Aaadviser</title>
+    <style>
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f8f9fa; margin: 0; }
         .container { max-width: 400px; margin: 40px auto; background: #fff; border-radius: 16px; box-shadow: 0 2px 12px rgba(102,126,234,0.10); padding: 32px 20px 24px 20px; text-align: center; }
         .logo { width: 110px; height: auto; display: block; margin: 0 auto 18px auto; cursor: pointer; transition: transform 0.2s; }
@@ -26,33 +25,38 @@
     </style>
 </head>
 <body>
-<div class="container">
-<img alt="Aaadviser" class="logo" onclick="goToMainMenu()" src="logo-flt.png"/>
-<div class="title" data-i18n="common.about_app_title">О приложении</div>
-<div class="content">
-<h3 data-i18n="common.about_app_what_is">Что такое Aaadviser?</h3>
-<p data-i18n="common.about_app_description">Aaadviser — это интеллектуальная платформа для анализа рынка недвижимости, которая помогает инвесторам и покупателям принимать обоснованные решения.</p>
-<h3 data-i18n="common.about_app_capabilities">Наши возможности:</h3>
-<ul>
-<li>📊 Детальный анализ цен в районе</li>
-<li>📈 Статистика рынка недвижимости</li>
-<li>🏠 Сравнение с похожими объектами</li>
-<li>🔮 Прогноз изменения цен</li>
-<li>💡 Рекомендации по инвестициям</li>
-<li>📋 Сохранение отчетов</li>
-<li>📱 Удобный мобильный интерфейс</li>
-</ul>
-<h3 data-i18n="common.about_app_how_works">Как это работает?</h3>
-<p data-i18n="common.about_app_how_works_desc">Просто введите адрес недвижимости, укажите количество спален и примерную цену. Наша система проанализирует рынок и предоставит подробный отчет с рекомендациями.</p>
-<h3 data-i18n="common.about_app_why">Почему Aaadviser?</h3>
-<p data-i18n="common.about_app_why_desc">Мы используем передовые технологии машинного обучения и большие данные для анализа рынка недвижимости, что позволяет получать точные и актуальные данные для принятия инвестиционных решений.</p>
-</div>
-<div class="nav-buttons">
-<button class="nav-btn back-btn" data-i18n="common.about_app_back" onclick="goBack()">← Назад</button>
-<button class="nav-btn" data-i18n="common.about_app_main_menu" onclick="goToMainMenu()">В главное меню</button>
-</div>
-</div>
-<script>
+    <div class="container">
+        <img src="logo-flt.png" alt="Aaadviser" class="logo" onclick="goToMainMenu()">
+        <div class="title">О приложении</div>
+        
+        <div class="content">
+            <h3>Что такое Aaadviser?</h3>
+            <p>Aaadviser — это интеллектуальная платформа для анализа рынка недвижимости, которая помогает инвесторам и покупателям принимать обоснованные решения.</p>
+            
+            <h3>Наши возможности:</h3>
+            <ul>
+                <li>📊 Детальный анализ цен в районе</li>
+                <li>📈 Статистика рынка недвижимости</li>
+                <li>🏠 Сравнение с похожими объектами</li>
+                <li>🔮 Прогноз изменения цен</li>
+                <li>💡 Рекомендации по инвестициям</li>
+                <li>📋 Сохранение отчетов</li>
+                <li>📱 Удобный мобильный интерфейс</li>
+            </ul>
+            
+            <h3>Как это работает?</h3>
+            <p>Просто введите адрес недвижимости, укажите количество спален и примерную цену. Наша система проанализирует рынок и предоставит подробный отчет с рекомендациями.</p>
+            
+            <h3>Почему Aaadviser?</h3>
+            <p>Мы используем передовые технологии машинного обучения и большие данные для анализа рынка недвижимости, что позволяет получать точные и актуальные данные для принятия инвестиционных решений.</p>
+        </div>
+        
+        <div class="nav-buttons">
+            <button class="nav-btn back-btn" onclick="goBack()">← Назад</button>
+            <button class="nav-btn" onclick="goToMainMenu()">В главное меню</button>
+        </div>
+    </div>
+    <script>
         function goToMainMenu() {
             window.location.href = '/webapp';
         }

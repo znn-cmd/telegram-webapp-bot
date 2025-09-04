@@ -1,13 +1,12 @@
 <!DOCTYPE html>
-
 <html lang="ru">
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Aaadviser - Аналитика региона</title>
-<script src="https://telegram.org/js/telegram-web-app.js"><script src="https://telegram.org/js/telegram-web-app.js"></script></script>
-<script src="/i18n-manager.js"></script>
-<style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aaadviser - Аналитика региона</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="/i18n-manager.js"></script>
+    <style>
         * {
             margin: 0;
             padding: 0;
@@ -879,229 +878,256 @@
     </style>
 </head>
 <body>
-<div class="container">
-<!-- Header with Logo -->
-<div class="header">
-<img alt="Aaadviser Logo" class="logo" onclick="goToMainMenu()" src="logo-flt.png"/>
-<div class="slogan" id="slogan">Инсайты рынка недвижимости</div>
-</div>
-<!-- Page Title -->
-<div class="page-title" data-i18n="reports.region_analytics" id="pageTitle">Аналитика региона</div>
-<!-- Page Description -->
-<div class="page-description" data-i18n="reports.page_description" id="pageDescription">
+    <div class="container">
+        <!-- Header with Logo -->
+        <div class="header">
+            <img src="logo-flt.png" alt="Aaadviser Logo" class="logo" onclick="goToMainMenu()" />
+            <div class="slogan" id="slogan">Инсайты рынка недвижимости</div>
+        </div>
+
+        <!-- Page Title -->
+        <div class="page-title" id="pageTitle" data-i18n="reports.region_analytics">Аналитика региона</div>
+
+        <!-- Page Description -->
+        <div class="page-description" id="pageDescription">
                             Получите детальный анализ рынка недвижимости в выбранном регионе
         </div>
-<!-- Location Selection Section -->
-<div class="location-section">
-<!-- Country Selection -->
-<div class="location-group">
-<label class="location-label" data-i18n="reports.country_label" id="countryLabel">Страна:</label>
-<select class="location-select" id="countrySelect" onchange="onCountryChange()">
-<option data-i18n="reports.country_placeholder" id="countryPlaceholder" value="">Выберите страну</option>
-</select>
-</div>
-<!-- City Selection -->
-<div class="location-group">
-<label class="location-label" data-i18n="reports.city_label" id="cityLabel">Город:</label>
-<select class="location-select" disabled="" id="citySelect" onchange="onCityChange()">
-<option data-i18n="reports.city_placeholder" id="cityPlaceholder" value="">Сначала выберите страну</option>
-</select>
-</div>
-<!-- County Selection -->
-<div class="location-group">
-<label class="location-label" data-i18n="reports.county_label" id="countyLabel">Область/Регион:</label>
-<select class="location-select" disabled="" id="countySelect" onchange="onCountyChange()">
-<option data-i18n="reports.county_placeholder" id="countyPlaceholder" value="">Сначала выберите город</option>
-</select>
-</div>
-<!-- District Selection -->
-<div class="location-group">
-<label class="location-label" data-i18n="reports.district_label" id="districtLabel">Район:</label>
-<select class="location-select" disabled="" id="districtSelect" onchange="onDistrictChange()">
-<option data-i18n="reports.district_placeholder" id="districtPlaceholder" value="">Сначала выберите область</option>
-</select>
-</div>
-<!-- Confirm Button -->
-<button class="confirm-button" disabled="" id="confirmButton" onclick="confirmLocationSelection()">
-<span data-i18n="reports.confirm_selection" id="confirmButtonText">Подтвердить выбор</span>
-</button>
-</div>
-<!-- Selected Location Display -->
-<div class="selected-location" id="selectedLocation">
-<div class="selected-location-title" data-i18n="reports.selected_location" id="selectedLocationTitle">Выбранная локация:</div>
-<div class="selected-location-text" id="selectedLocationText"></div>
-<div class="admin-ids" id="adminIds" style="display: none;">
-<div class="admin-ids-title" data-i18n="reports.admin_ids" id="adminIdsTitle">ID для админов:</div>
-<div class="admin-ids-text" id="adminIdsText"></div>
-</div>
-</div>
-<!-- Region Data Analysis -->
-<div class="region-data-section" id="regionDataSection" style="display: none;">
-<!-- Loading State -->
-<div class="loading-state" id="loadingState">
-<div class="loading-spinner"></div>
-<div class="loading-text" data-i18n="reports.loading_text" id="loadingText">Загрузка данных...</div>
-</div>
-<!-- Currency Switcher -->
-<div class="currency-switcher" id="currencySwitcher" style="display: none;">
-<div class="currency-switcher-title">Валюта отображения:</div>
-<div class="currency-buttons">
-<button class="currency-btn active" data-currency="TRY" onclick="switchCurrency('TRY')">
-<span class="currency-icon">₺</span>
-<span class="currency-code">TRY</span>
-</button>
-<button class="currency-btn" data-currency="USD" onclick="switchCurrency('USD')">
-<span class="currency-icon">$</span>
-<span class="currency-code">USD</span>
-</button>
-<button class="currency-btn" data-currency="EUR" onclick="switchCurrency('EUR')">
-<span class="currency-icon">€</span>
-<span class="currency-code">EUR</span>
-</button>
-<button class="currency-btn" data-currency="RUB" onclick="switchCurrency('RUB')">
-<span class="currency-icon">₽</span>
-<span class="currency-code">RUB</span>
-</button>
-</div>
-</div>
-<!-- Key Metrics Cards -->
-<div class="key-metrics-section" id="keyMetricsSection" style="display: none;">
-<h3 class="key-metrics-title" data-i18n="reports.key_metrics_title" id="keyMetricsTitle">Ключевые показатели</h3>
-<div class="key-metrics-grid">
-<!-- Average Sale Price per m² -->
-<div class="key-metric-card">
-<div class="metric-content">
-<div class="metric-label" data-i18n="reports.avg_sale_price_label" id="avgSalePriceLabel">Средняя цена продажи за м²</div>
-<div class="metric-value" id="avgSalePrice">-</div>
-</div>
-</div>
-<!-- Average Rent Price per m² -->
-<div class="key-metric-card">
-<div class="metric-content">
-<div class="metric-label" data-i18n="reports.avg_rent_price_label" id="avgRentPriceLabel">Средняя цена аренды за м²</div>
-<div class="metric-value" id="avgRentPrice">-</div>
-</div>
-</div>
-<!-- Listing Period Sale -->
-<div class="key-metric-card">
-<div class="metric-content">
-<div class="metric-label" data-i18n="reports.listing_period_sale_label" id="listingPeriodSaleLabel">Период размещения (продажа)</div>
-<div class="metric-value" id="listingPeriodSale">-</div>
-</div>
-</div>
-<!-- Listing Period Rent -->
-<div class="key-metric-card">
-<div class="metric-content">
-<div class="metric-label" data-i18n="reports.listing_period_rent_label" id="listingPeriodRentLabel">Период размещения (аренда)</div>
-<div class="metric-value" id="listingPeriodRent">-</div>
-</div>
-</div>
-</div>
-<!-- Yield Card - Full Width -->
-<div class="yield-card">
-<div class="yield-content">
-<div class="yield-label" data-i18n="reports.yield_label" id="yieldLabel">Yield (Доходность)</div>
-<div class="yield-value" id="yieldValue">-</div>
-</div>
-</div>
-</div>
-<!-- AI Insights Section -->
-<div class="insights-section" id="insightsSection" style="display: none;">
-<div class="insights-card">
-<div class="insights-header">
-<div class="insights-title" data-i18n="reports.insights_title" id="insightsTitle">Саммари</div>
-</div>
-<div class="insights-content" id="insightsContent">
-<div class="insights-loading" id="insightsLoading">
-<div class="loading-spinner"></div>
-<div class="loading-text" data-i18n="reports.insights_loading" id="insightsLoadingText"></div>
-</div>
-<div class="insights-text" id="insightsText" style="display: none;"></div>
-<div class="insights-error" id="insightsError" style="display: none;">
-<div class="error-icon">⚠️</div>
-<div class="error-text" data-i18n="reports.insights_error" id="insightsErrorText"></div>
-</div>
-</div>
-</div>
-</div>
-<!-- Data Content -->
-<div class="data-content" id="dataContent" style="display: none;">
-<!-- General Data -->
-<div class="data-card" id="generalDataCard">
-<div class="data-card-header" onclick="toggleAccordion('generalDataCard')">
-<div style="display: flex; align-items: center;">
-<div class="data-card-icon"></div>
-<div class="data-card-title" data-i18n="reports.general_data_title" id="generalDataTitle">Общие данные</div>
-</div>
-<div class="data-card-toggle expanded" id="generalDataToggle">▲</div>
-</div>
-<div class="data-card-content expanded" id="generalDataContent">
-<!-- General data will be populated here - expanded by default -->
-</div>
-</div>
-<!-- House Type Data -->
-<div class="data-card" id="houseTypeDataCard">
-<div class="data-card-header" onclick="toggleAccordion('houseTypeDataCard')">
-<div style="display: flex; align-items: center; gap: 12px;">
-<div class="data-card-icon"></div>
-<div class="data-card-title" data-i18n="reports.house_type_data_title" id="houseTypeDataTitle">Данные по количеству спален</div>
-</div>
-<div class="data-card-toggle" id="houseTypeDataToggle">▼</div>
-</div>
-<div class="data-card-content" id="houseTypeDataContent">
-<!-- House type data will be populated here - collapsed by default -->
-</div>
-</div>
-<!-- Floor Segment Data -->
-<div class="data-card" id="floorSegmentDataCard">
-<div class="data-card-header" onclick="toggleAccordion('floorSegmentDataCard')">
-<div style="display: flex; align-items: center; gap: 12px;">
-<div class="data-card-icon"></div>
-<div class="data-card-title" data-i18n="reports.floor_segment_data_title" id="floorSegmentDataTitle">Данные по этажу</div>
-</div>
-<div class="data-card-toggle" id="floorSegmentDataToggle">▼</div>
-</div>
-<div class="data-card-content" id="floorSegmentDataContent">
-<!-- Floor segment data will be populated here - collapsed by default -->
-</div>
-</div>
-<!-- Age Data -->
-<div class="data-card" id="ageDataCard">
-<div class="data-card-header" onclick="toggleAccordion('ageDataCard')">
-<div style="display: flex; align-items: center; gap: 12px;">
-<div class="data-card-icon"></div>
-<div class="data-card-title" data-i18n="reports.age_data_title" id="ageDataTitle">Данные по возрасту объектов</div>
-</div>
-<div class="data-card-toggle" id="ageDataToggle">▼</div>
-</div>
-<div class="data-card-content" id="ageDataContent">
-<!-- Age data will be populated here - collapsed by default -->
-</div>
-</div>
-<!-- Heating Data -->
-<div class="data-card" id="heatingDataCard">
-<div class="data-card-header" onclick="toggleAccordion('heatingDataCard')">
-<div style="display: flex; align-items: center; gap: 12px;">
-<div class="data-card-icon"></div>
-<div class="data-card-title" data-i18n="reports.heating_data_title" id="heatingDataTitle">Данные по типу отопления</div>
-</div>
-<div class="data-card-toggle" id="heatingDataToggle">▼</div>
-</div>
-<div class="data-card-content" id="heatingDataContent">
-<!-- Heating data will be populated here - collapsed by default -->
-</div>
-</div>
-</div>
-<!-- Error State -->
-<div class="error-state" id="errorState" style="display: none;">
-<div class="error-icon">❌</div>
-<div class="error-text" data-i18n="reports.error_text" id="errorText">Ошибка загрузки данных</div>
-</div>
-</div>
-<!-- Back Button -->
-<a class="back-button" data-i18n="reports.back_to_main" href="/webapp_main" id="backButton">← Вернуться в главное меню</a>
-</div>
-<script>
+
+        <!-- Location Selection Section -->
+        <div class="location-section">
+            <!-- Country Selection -->
+            <div class="location-group">
+                <label class="location-label" id="countryLabel">Страна:</label>
+                <select class="location-select" id="countrySelect" onchange="onCountryChange()">
+                    <option value="" id="countryPlaceholder">Выберите страну</option>
+                </select>
+            </div>
+
+            <!-- City Selection -->
+            <div class="location-group">
+                <label class="location-label" id="cityLabel">Город:</label>
+                <select class="location-select" id="citySelect" onchange="onCityChange()" disabled>
+                    <option value="" id="cityPlaceholder">Сначала выберите страну</option>
+                </select>
+            </div>
+
+            <!-- County Selection -->
+            <div class="location-group">
+                <label class="location-label" id="countyLabel">Область/Регион:</label>
+                <select class="location-select" id="countySelect" onchange="onCountyChange()" disabled>
+                    <option value="" id="countyPlaceholder">Сначала выберите город</option>
+                </select>
+            </div>
+
+            <!-- District Selection -->
+            <div class="location-group">
+                <label class="location-label" id="districtLabel">Район:</label>
+                <select class="location-select" id="districtSelect" onchange="onDistrictChange()" disabled>
+                    <option value="" id="districtPlaceholder">Сначала выберите область</option>
+                </select>
+            </div>
+
+            <!-- Confirm Button -->
+            <button class="confirm-button" id="confirmButton" onclick="confirmLocationSelection()" disabled>
+                <span id="confirmButtonText">Подтвердить выбор</span>
+            </button>
+        </div>
+
+        <!-- Selected Location Display -->
+        <div class="selected-location" id="selectedLocation">
+            <div class="selected-location-title" id="selectedLocationTitle">Выбранная локация:</div>
+            <div class="selected-location-text" id="selectedLocationText"></div>
+            <div class="admin-ids" id="adminIds" style="display: none;">
+                <div class="admin-ids-title" id="adminIdsTitle">ID для админов:</div>
+                <div class="admin-ids-text" id="adminIdsText"></div>
+            </div>
+        </div>
+
+        <!-- Region Data Analysis -->
+        <div class="region-data-section" id="regionDataSection" style="display: none;">
+            
+            <!-- Loading State -->
+            <div class="loading-state" id="loadingState">
+                <div class="loading-spinner"></div>
+                <div class="loading-text" id="loadingText">Загрузка данных...</div>
+            </div>
+            
+            <!-- Currency Switcher -->
+            <div class="currency-switcher" id="currencySwitcher" style="display: none;">
+                <div class="currency-switcher-title">Валюта отображения:</div>
+                <div class="currency-buttons">
+                    <button class="currency-btn active" data-currency="TRY" onclick="switchCurrency('TRY')">
+                        <span class="currency-icon">₺</span>
+                        <span class="currency-code">TRY</span>
+                    </button>
+                    <button class="currency-btn" data-currency="USD" onclick="switchCurrency('USD')">
+                        <span class="currency-icon">$</span>
+                        <span class="currency-code">USD</span>
+                    </button>
+                    <button class="currency-btn" data-currency="EUR" onclick="switchCurrency('EUR')">
+                        <span class="currency-icon">€</span>
+                        <span class="currency-code">EUR</span>
+                    </button>
+                    <button class="currency-btn" data-currency="RUB" onclick="switchCurrency('RUB')">
+                        <span class="currency-icon">₽</span>
+                        <span class="currency-code">RUB</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Key Metrics Cards -->
+            <div class="key-metrics-section" id="keyMetricsSection" style="display: none;">
+                <h3 class="key-metrics-title" id="keyMetricsTitle">Ключевые показатели</h3>
+                <div class="key-metrics-grid">
+                    <!-- Average Sale Price per m² -->
+                    <div class="key-metric-card">
+                        <div class="metric-content">
+                            <div class="metric-label" id="avgSalePriceLabel">Средняя цена продажи за м²</div>
+                            <div class="metric-value" id="avgSalePrice">-</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Average Rent Price per m² -->
+                    <div class="key-metric-card">
+                        <div class="metric-content">
+                            <div class="metric-label" id="avgRentPriceLabel">Средняя цена аренды за м²</div>
+                            <div class="metric-value" id="avgRentPrice">-</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Listing Period Sale -->
+                    <div class="key-metric-card">
+                        <div class="metric-content">
+                            <div class="metric-label" id="listingPeriodSaleLabel">Период размещения (продажа)</div>
+                            <div class="metric-value" id="listingPeriodSale">-</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Listing Period Rent -->
+                    <div class="key-metric-card">
+                        <div class="metric-content">
+                            <div class="metric-label" id="listingPeriodRentLabel">Период размещения (аренда)</div>
+                            <div class="metric-value" id="listingPeriodRent">-</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Yield Card - Full Width -->
+                <div class="yield-card">
+                    <div class="yield-content">
+                        <div class="yield-label" id="yieldLabel">Yield (Доходность)</div>
+                        <div class="yield-value" id="yieldValue">-</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- AI Insights Section -->
+            <div class="insights-section" id="insightsSection" style="display: none;">
+                <div class="insights-card">
+                    <div class="insights-header">
+                        <div class="insights-title" id="insightsTitle">Саммари</div>
+                    </div>
+                    <div class="insights-content" id="insightsContent">
+                        <div class="insights-loading" id="insightsLoading">
+                            <div class="loading-spinner"></div>
+                            <div class="loading-text" id="insightsLoadingText"></div>
+                        </div>
+                        <div class="insights-text" id="insightsText" style="display: none;"></div>
+                        <div class="insights-error" id="insightsError" style="display: none;">
+                            <div class="error-icon">⚠️</div>
+                            <div class="error-text" id="insightsErrorText"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Data Content -->
+            <div class="data-content" id="dataContent" style="display: none;">
+                                 <!-- General Data -->
+                 <div class="data-card" id="generalDataCard">
+                     <div class="data-card-header" onclick="toggleAccordion('generalDataCard')">
+                         <div style="display: flex; align-items: center;">
+                             <div class="data-card-icon"></div>
+                             <div class="data-card-title" id="generalDataTitle">Общие данные</div>
+                         </div>
+                         <div class="data-card-toggle expanded" id="generalDataToggle">▲</div>
+                     </div>
+                     <div class="data-card-content expanded" id="generalDataContent">
+                         <!-- General data will be populated here - expanded by default -->
+                     </div>
+                 </div>
+                
+                                 <!-- House Type Data -->
+                 <div class="data-card" id="houseTypeDataCard">
+                     <div class="data-card-header" onclick="toggleAccordion('houseTypeDataCard')">
+                         <div style="display: flex; align-items: center; gap: 12px;">
+                             <div class="data-card-icon"></div>
+                             <div class="data-card-title" id="houseTypeDataTitle">Данные по количеству спален</div>
+                         </div>
+                         <div class="data-card-toggle" id="houseTypeDataToggle">▼</div>
+                     </div>
+                     <div class="data-card-content" id="houseTypeDataContent">
+                         <!-- House type data will be populated here - collapsed by default -->
+                     </div>
+                 </div>
+                
+                                 <!-- Floor Segment Data -->
+                 <div class="data-card" id="floorSegmentDataCard">
+                     <div class="data-card-header" onclick="toggleAccordion('floorSegmentDataCard')">
+                         <div style="display: flex; align-items: center; gap: 12px;">
+                             <div class="data-card-icon"></div>
+                             <div class="data-card-title" id="floorSegmentDataTitle">Данные по этажу</div>
+                         </div>
+                         <div class="data-card-toggle" id="floorSegmentDataToggle">▼</div>
+                     </div>
+                     <div class="data-card-content" id="floorSegmentDataContent">
+                         <!-- Floor segment data will be populated here - collapsed by default -->
+                     </div>
+                 </div>
+                
+                                 <!-- Age Data -->
+                 <div class="data-card" id="ageDataCard">
+                     <div class="data-card-header" onclick="toggleAccordion('ageDataCard')">
+                         <div style="display: flex; align-items: center; gap: 12px;">
+                             <div class="data-card-icon"></div>
+                             <div class="data-card-title" id="ageDataTitle">Данные по возрасту объектов</div>
+                         </div>
+                         <div class="data-card-toggle" id="ageDataToggle">▼</div>
+                     </div>
+                     <div class="data-card-content" id="ageDataContent">
+                         <!-- Age data will be populated here - collapsed by default -->
+                     </div>
+                 </div>
+
+                                 <!-- Heating Data -->
+                 <div class="data-card" id="heatingDataCard">
+                     <div class="data-card-header" onclick="toggleAccordion('heatingDataCard')">
+                         <div style="display: flex; align-items: center; gap: 12px;">
+                             <div class="data-card-icon"></div>
+                             <div class="data-card-title" id="heatingDataTitle">Данные по типу отопления</div>
+                         </div>
+                         <div class="data-card-toggle" id="heatingDataToggle">▼</div>
+                     </div>
+                     <div class="data-card-content" id="heatingDataContent">
+                         <!-- Heating data will be populated here - collapsed by default -->
+                     </div>
+                 </div>
+            </div>
+            
+
+            
+            <!-- Error State -->
+            <div class="error-state" id="errorState" style="display: none;">
+                <div class="error-icon">❌</div>
+                <div class="error-text" id="errorText">Ошибка загрузки данных</div>
+            </div>
+        </div>
+
+        <!-- Back Button -->
+        <a href="/webapp_main" class="back-button" id="backButton">← Вернуться в главное меню</a>
+    </div>
+
+    <script>
         // Telegram WebApp initialization
         let tg = window.Telegram.WebApp;
         tg.ready();

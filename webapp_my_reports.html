@@ -1,13 +1,12 @@
 <!DOCTYPE html>
-
 <html lang="ru">
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title data-i18n-title="reports.my_reports">Мои отчеты — Aaadviser</title>
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
-<script src="/i18n-manager.js"></script>
-<style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n-title="reports.my_reports">Мои отчеты — Aaadviser</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="/i18n-manager.js"></script>
+    <style>
         * {
             margin: 0;
             padding: 0;
@@ -419,52 +418,59 @@
     </style>
 </head>
 <body>
-<div class="container">
-<!-- Логотип -->
-<div class="header">
-<img alt="Aaadviser Logo" class="logo" onclick="goToMainMenu()" src="logo-flt.png"/>
-<div class="title" data-i18n="reports.my_reports" id="pageTitle">Мои отчеты</div>
-<div class="subtitle" data-i18n="reports.my_reports_subtitle" id="pageSubtitle">Управление вашими отчетами</div>
-</div>
-<!-- Загрузка -->
-<div class="loading" id="loading">
-<div class="spinner"></div>
-<p data-i18n="reports.my_reports_loading" id="loadingText">Загрузка отчетов...</p>
-</div>
-<!-- Пустое состояние -->
-<div class="empty-state hidden" id="emptyState">
-<div class="empty-state-icon">📋</div>
-<div class="empty-state-title" data-i18n="reports.my_reports_empty_title" id="emptyTitle">Отчеты не найдены</div>
-<div class="empty-state-description" data-i18n="reports.my_reports_empty_description" id="emptyDescription">
+    <div class="container">
+        <!-- Логотип -->
+        <div class="header">
+            <img src="logo-flt.png" alt="Aaadviser Logo" class="logo" onclick="goToMainMenu()">
+            <div class="title" id="pageTitle" data-i18n="reports.title" data-i18n="reports.my_reports">Мои отчеты</div>
+            <div class="subtitle" id="pageSubtitle">Управление вашими отчетами</div>
+        </div>
+
+        <!-- Загрузка -->
+        <div id="loading" class="loading">
+            <div class="spinner"></div>
+            <p id="loadingText">Загрузка отчетов...</p>
+        </div>
+
+        <!-- Пустое состояние -->
+        <div id="emptyState" class="empty-state hidden">
+            <div class="empty-state-icon">📋</div>
+            <div class="empty-state-title" id="emptyTitle">Отчеты не найдены</div>
+            <div class="empty-state-description" id="emptyDescription">
                 У вас пока нет сохраненных отчетов. Создайте первый отчет в главном меню.
             </div>
-</div>
-<!-- Секция с отчетами -->
-<div class="reports-section hidden" id="reportsSection">
-<div id="reportsList"></div>
-</div>
-<!-- Кнопка возврата -->
-<button class="back-btn" data-i18n="common.back" id="backBtn" onclick="goToMainMenu()">Вернуться в главное меню</button>
-</div>
-<!-- Toast container -->
-<div class="toast-container" id="toastContainer"></div>
-<!-- Modal для подтверждения удаления -->
-<div class="modal-overlay" id="deleteModal" style="display: none;">
-<div class="modal">
-<div class="modal-header">
-<div class="modal-title" data-i18n="reports.my_reports_delete_modal_title" id="deleteModalTitle">Подтверждение удаления</div>
-<button class="modal-close" id="closeDeleteModalBtn">×</button>
-</div>
-<div class="modal-content">
-<p data-i18n="reports.my_reports_delete_modal_message" id="deleteModalMessage">Вы уверены, что хотите удалить этот отчет? Это действие нельзя отменить.</p>
-</div>
-<div class="modal-actions">
-<button class="modal-btn secondary" data-i18n="common.cancel" id="cancelDeleteBtn">Отмена</button>
-<button class="modal-btn danger" data-i18n="common.delete" id="confirmDeleteBtn">Удалить</button>
-</div>
-</div>
-</div>
-<script>
+        </div>
+
+        <!-- Секция с отчетами -->
+        <div id="reportsSection" class="reports-section hidden">
+            <div id="reportsList"></div>
+        </div>
+
+        <!-- Кнопка возврата -->
+        <button class="back-btn" onclick="goToMainMenu()" id="backBtn" data-i18n="common.back">Вернуться в главное меню</button>
+    </div>
+
+    <!-- Toast container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Modal для подтверждения удаления -->
+    <div id="deleteModal" class="modal-overlay" style="display: none;">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title" id="deleteModalTitle">Подтверждение удаления</div>
+                <button class="modal-close" id="closeDeleteModalBtn">×</button>
+            </div>
+            <div class="modal-content">
+                <p id="deleteModalMessage">Вы уверены, что хотите удалить этот отчет? Это действие нельзя отменить.</p>
+            </div>
+            <div class="modal-actions">
+                <button class="modal-btn secondary" id="cancelDeleteBtn" data-i18n="common.cancel">Отмена</button>
+                <button class="modal-btn danger" id="confirmDeleteBtn" data-i18n="common.delete">Удалить</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
         let tg = window.Telegram.WebApp;
         tg.expand();
         tg.ready();
@@ -475,7 +481,123 @@
         let reportToDelete = null;
 
         // Локализации
-        
+        const locales = {
+            'ru': {
+                'pageTitle': 'Мои отчеты',
+                'pageSubtitle': 'Управление вашими отчетами',
+                'loadingText': 'Загрузка отчетов...',
+                'emptyTitle': 'Отчеты не найдены',
+                'emptyDescription': 'У вас пока нет сохраненных отчетов. Создайте первый отчет в главном меню.',
+                'backBtn': 'Вернуться в главное меню',
+                'viewReport': 'Просмотреть',
+                'deleteReport': 'Удалить',
+                'copyLink': 'Копировать ссылку',
+                'deleteModalTitle': 'Подтверждение удаления',
+                'deleteModalMessage': 'Вы уверены, что хотите удалить этот отчет? Это действие нельзя отменить.',
+                'cancelDeleteBtn': 'Отмена',
+                'confirmDeleteBtn': 'Удалить',
+                'linkCopied': 'Ссылка скопирована в буфер обмена',
+                'reportDeleted': 'Отчет успешно удален',
+                'errorLoading': 'Ошибка загрузки отчетов',
+                'errorDeleting': 'Ошибка при удалении отчета',
+                'noAddress': 'Адрес не указан',
+                'noPrice': 'Цена не указана',
+                'noArea': 'Площадь не указана',
+                'noBedrooms': 'Количество комнат не указано'
+            },
+            'en': {
+                'pageTitle': 'My Reports',
+                'pageSubtitle': 'Manage your reports',
+                'loadingText': 'Loading reports...',
+                'emptyTitle': 'No reports found',
+                'emptyDescription': 'You don\'t have any saved reports yet. Create your first report in the main menu.',
+                'backBtn': 'Back to main menu',
+                'viewReport': 'View',
+                'deleteReport': 'Delete',
+                'copyLink': 'Copy link',
+                'deleteModalTitle': 'Confirm deletion',
+                'deleteModalMessage': 'Are you sure you want to delete this report? This action cannot be undone.',
+                'cancelDeleteBtn': 'Cancel',
+                'confirmDeleteBtn': 'Delete',
+                'linkCopied': 'Link copied to clipboard',
+                'reportDeleted': 'Report successfully deleted',
+                'errorLoading': 'Error loading reports',
+                'errorDeleting': 'Error deleting report',
+                'noAddress': 'Address not specified',
+                'noPrice': 'Price not specified',
+                'noArea': 'Area not specified',
+                'noBedrooms': 'Bedrooms not specified'
+            },
+            'de': {
+                'pageTitle': 'Meine Berichte',
+                'pageSubtitle': 'Verwalten Sie Ihre Berichte',
+                'loadingText': 'Berichte werden geladen...',
+                'emptyTitle': 'Keine Berichte gefunden',
+                'emptyDescription': 'Sie haben noch keine gespeicherten Berichte. Erstellen Sie Ihren ersten Bericht im Hauptmenü.',
+                'backBtn': 'Zurück zum Hauptmenü',
+                'viewReport': 'Anzeigen',
+                'deleteReport': 'Löschen',
+                'copyLink': 'Link kopieren',
+                'deleteModalTitle': 'Löschung bestätigen',
+                'deleteModalMessage': 'Sind Sie sicher, dass Sie diesen Bericht löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden.',
+                'cancelDeleteBtn': 'Abbrechen',
+                'confirmDeleteBtn': 'Löschen',
+                'linkCopied': 'Link in die Zwischenablage kopiert',
+                'reportDeleted': 'Bericht erfolgreich gelöscht',
+                'errorLoading': 'Fehler beim Laden der Berichte',
+                'errorDeleting': 'Fehler beim Löschen des Berichts',
+                'noAddress': 'Adresse nicht angegeben',
+                'noPrice': 'Preis nicht angegeben',
+                'noArea': 'Fläche nicht angegeben',
+                'noBedrooms': 'Schlafzimmer nicht angegeben'
+            },
+            'fr': {
+                'pageTitle': 'Mes Rapports',
+                'pageSubtitle': 'Gérer vos rapports',
+                'loadingText': 'Chargement des rapports...',
+                'emptyTitle': 'Aucun rapport trouvé',
+                'emptyDescription': 'Vous n\'avez pas encore de rapports sauvegardés. Créez votre premier rapport dans le menu principal.',
+                'backBtn': 'Retour au menu principal',
+                'viewReport': 'Voir',
+                'deleteReport': 'Supprimer',
+                'copyLink': 'Copier le lien',
+                'deleteModalTitle': 'Confirmer la suppression',
+                'deleteModalMessage': 'Êtes-vous sûr de vouloir supprimer ce rapport ? Cette action ne peut pas être annulée.',
+                'cancelDeleteBtn': 'Annuler',
+                'confirmDeleteBtn': 'Supprimer',
+                'linkCopied': 'Lien copié dans le presse-papiers',
+                'reportDeleted': 'Rapport supprimé avec succès',
+                'errorLoading': 'Erreur de chargement des rapports',
+                'errorDeleting': 'Erreur lors de la suppression du rapport',
+                'noAddress': 'Adresse non spécifiée',
+                'noPrice': 'Prix non spécifié',
+                'noArea': 'Surface non spécifiée',
+                'noBedrooms': 'Chambres non spécifiées'
+            },
+            'tr': {
+                'pageTitle': 'Raporlarım',
+                'pageSubtitle': 'Raporlarınızı yönetin',
+                'loadingText': 'Raporlar yükleniyor...',
+                'emptyTitle': 'Rapor bulunamadı',
+                'emptyDescription': 'Henüz kayıtlı raporunuz yok. Ana menüde ilk raporunuzu oluşturun.',
+                'backBtn': 'Ana menüye dön',
+                'viewReport': 'Görüntüle',
+                'deleteReport': 'Sil',
+                'copyLink': 'Bağlantıyı kopyala',
+                'deleteModalTitle': 'Silme onayı',
+                'deleteModalMessage': 'Bu raporu silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.',
+                'cancelDeleteBtn': 'İptal',
+                'confirmDeleteBtn': 'Sil',
+                'linkCopied': 'Bağlantı panoya kopyalandı',
+                'reportDeleted': 'Rapor başarıyla silindi',
+                'errorLoading': 'Raporlar yüklenirken hata',
+                'errorDeleting': 'Rapor silinirken hata',
+                'noAddress': 'Adres belirtilmemiş',
+                'noPrice': 'Fiyat belirtilmemiş',
+                'noArea': 'Alan belirtilmemiş',
+                'noBedrooms': 'Yatak odası sayısı belirtilmemiş'
+            }
+        };
 
         // Получаем данные пользователя
         function getUserData() {
@@ -491,10 +613,24 @@
         }
 
         // Функция для получения локализованного текста
-        
+        function getText(key) {
+            const locale = locales[currentLanguage] || locales['ru'];
+            return locale[key] || key;
+        }
 
         // Обновление текста на странице
-        
+        function updatePageText() {
+            document.getElementById('pageTitle').textContent = getText('pageTitle');
+            document.getElementById('pageSubtitle').textContent = getText('pageSubtitle');
+            document.getElementById('loadingText').textContent = getText('loadingText');
+            document.getElementById('emptyTitle').textContent = getText('emptyTitle');
+            document.getElementById('emptyDescription').textContent = getText('emptyDescription');
+            document.getElementById('backBtn').textContent = getText('backBtn');
+            document.getElementById('deleteModalTitle').textContent = getText('deleteModalTitle');
+            document.getElementById('deleteModalMessage').textContent = getText('deleteModalMessage');
+            document.getElementById('cancelDeleteBtn').textContent = getText('cancelDeleteBtn');
+            document.getElementById('confirmDeleteBtn').textContent = getText('confirmDeleteBtn');
+        }
 
         // Toast notification system
         function showToast(message, type = 'success', duration = 3000) {
@@ -550,7 +686,7 @@
                 }
             } catch (error) {
                 console.error('Error loading reports:', error);
-                showToast(window.i18nManager ? window.i18nManager.getTranslation("reports.my_reports_errorLoading") : "errorLoading", 'error');
+                showToast(getText('errorLoading'), 'error');
             } finally {
                 document.getElementById('loading').classList.add('hidden');
             }
@@ -585,10 +721,10 @@
             reportDiv.className = 'report-item';
             reportDiv.dataset.reportId = report.id;
 
-            const address = report.address || window.i18nManager ? window.i18nManager.getTranslation("reports.my_reports_noAddress") : "noAddress";
+            const address = report.address || getText('noAddress');
             
             // Обработка цены с учетом валюты из parameters
-            let price = window.i18nManager ? window.i18nManager.getTranslation("reports.my_reports_noPrice") : "noPrice";
+            let price = getText('noPrice');
             if (report.price) {
                 // Проверяем, есть ли валюта в parameters
                 let currency = '$'; // По умолчанию доллар
@@ -604,15 +740,15 @@
                 price = `${currency}${report.price.toLocaleString()}`;
             }
             
-            const area = report.area ? `${report.area} м²` : window.i18nManager ? window.i18nManager.getTranslation("reports.my_reports_noArea") : "noArea";
-            const bedrooms = report.bedrooms ? `${report.bedrooms} комн.` : window.i18nManager ? window.i18nManager.getTranslation("reports.my_reports_noBedrooms") : "noBedrooms";
+            const area = report.area ? `${report.area} м²` : getText('noArea');
+            const bedrooms = report.bedrooms ? `${report.bedrooms} комн.` : getText('noBedrooms');
             const createdAt = new Date(report.created_at).toLocaleDateString();
             
             // Преобразование типа отчета
             const reportTypeMap = {
-                'property_evaluation': window.i18nManager ? window.i18nManager.getTranslation('reports.my_reports_property_evaluation') : 'Object Evaluation',
-                'property_analysis': window.i18nManager ? window.i18nManager.getTranslation('reports.my_reports_property_analysis') : 'Object Analysis',
-                'market_analysis': window.i18nManager ? window.i18nManager.getTranslation('reports.my_reports_market_analysis') : 'Market Analysis'
+                'property_evaluation': 'Оценка объекта',
+                'property_analysis': 'Анализ объекта',
+                'market_analysis': 'Анализ рынка'
             };
             const reportType = reportTypeMap[report.report_type] || report.report_type;
 
@@ -630,13 +766,13 @@
                 </div>
                 <div class="report-actions">
                     <button class="action-btn" onclick="viewReport(${report.id})">
-                        👁️ ${window.i18nManager ? window.i18nManager.getTranslation("reports.my_reports_viewReport") : "viewReport"}
+                        👁️ ${getText('viewReport')}
                     </button>
                     <button class="action-btn copy" onclick="copyReportLink(${report.id})">
-                        📋 ${window.i18nManager ? window.i18nManager.getTranslation("reports.my_reports_copyLink") : "copyLink"}
+                        📋 ${getText('copyLink')}
                     </button>
                     <button class="action-btn delete" data-report-id="${report.id}">
-                        🗑️ ${window.i18nManager ? window.i18nManager.getTranslation("reports.my_reports_deleteReport") : "deleteReport"}
+                        🗑️ ${getText('deleteReport')}
                     </button>
                 </div>
             `;
@@ -674,7 +810,7 @@
 
             try {
                 await navigator.clipboard.writeText(report.report_url);
-                showToast(window.i18nManager ? window.i18nManager.getTranslation("reports.my_reports_linkCopied") : "linkCopied", 'success');
+                showToast(getText('linkCopied'), 'success');
             } catch (error) {
                 // Fallback для старых браузеров
                 const textArea = document.createElement('textarea');
@@ -683,7 +819,7 @@
                 textArea.select();
                 document.execCommand('copy');
                 document.body.removeChild(textArea);
-                showToast(window.i18nManager ? window.i18nManager.getTranslation("reports.my_reports_linkCopied") : "linkCopied", 'success');
+                showToast(getText('linkCopied'), 'success');
             }
         }
 
@@ -745,7 +881,7 @@
                     // Удаляем отчет из локального массива
                     reports = reports.filter(r => r.id !== reportToDelete);
                     displayReports();
-                    showToast(window.i18nManager ? window.i18nManager.getTranslation("reports.my_reports_reportDeleted") : "reportDeleted", 'success');
+                    showToast(getText('reportDeleted'), 'success');
                     console.log('Report deleted successfully');
                 } else {
                     const errorData = await response.json();
@@ -753,7 +889,7 @@
                 }
             } catch (error) {
                 console.error('Error deleting report:', error);
-                showToast(window.i18nManager ? window.i18nManager.getTranslation("reports.my_reports_errorDeleting") : "errorDeleting", 'error');
+                showToast(getText('errorDeleting'), 'error');
             } finally {
                 closeDeleteModal();
             }
@@ -792,7 +928,7 @@
                 currentLanguage = userData?.language_code || 'ru';
             }
 
-            
+            updatePageText();
             await loadUserReports();
         }
 
