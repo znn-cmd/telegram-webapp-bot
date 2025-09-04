@@ -382,6 +382,11 @@ def webapp_admin_performance():
     """Административная панель для мониторинга производительности"""
     return render_template('webapp_admin_performance.html')
 
+@app.route('/i18n-manager.js')
+def serve_i18n_manager():
+    """Сервис менеджера интернационализации"""
+    return send_from_directory('.', 'i18n-manager.js')
+
 @app.route('/logo-sqv.png')
 def serve_logo():
     return send_from_directory('.', 'logo-sqv.png')
@@ -448,10 +453,54 @@ def api_user():
             )
         
         if user_result is None:
+            # Если есть кэшированные данные, используем их как fallback
+            if cache_manager:
+                cached_user = cache_manager.get_user_data(telegram_id)
+                if cached_user:
+                    logger.warning(f"⚠️ Используем кэшированные данные из-за ошибки БД для пользователя {telegram_id}")
+                    lang = cached_user.get('language') or (language_code[:2] if language_code[:2] in locales else 'en')
+                    return jsonify({
+                        'exists': True,
+                        'is_new_user': False,
+                        'language': cached_user.get('language') or lang,
+                        'language_code': lang,
+                        'welcome': locales[lang]['welcome_back'],
+                        'menu': locales[lang]['menu'],
+                        'name': cached_user.get('name'),
+                        'tg_name': cached_user.get('tg_name'),
+                        'last_name': cached_user.get('last_name'),
+                        'username': cached_user.get('username'),
+                        'balance': cached_user.get('balance', 0),
+                        'telegram_id': cached_user.get('telegram_id'),
+                        'user_status': cached_user.get('user_status', None),
+                        'source': 'cache_fallback'
+                    })
             return jsonify({'error': 'Database connection error'}), 500
         user = user_result.data[0] if user_result.data else None
     except Exception as e:
         logger.error(f"Database connection error: {e}")
+        # Если есть кэшированные данные, используем их как fallback
+        if cache_manager:
+            cached_user = cache_manager.get_user_data(telegram_id)
+            if cached_user:
+                logger.warning(f"⚠️ Используем кэшированные данные из-за ошибки БД для пользователя {telegram_id}")
+                lang = cached_user.get('language') or (language_code[:2] if language_code[:2] in locales else 'en')
+                return jsonify({
+                    'exists': True,
+                    'is_new_user': False,
+                    'language': cached_user.get('language') or lang,
+                    'language_code': lang,
+                    'welcome': locales[lang]['welcome_back'],
+                    'menu': locales[lang]['menu'],
+                    'name': cached_user.get('name'),
+                    'tg_name': cached_user.get('tg_name'),
+                    'last_name': cached_user.get('last_name'),
+                    'username': cached_user.get('username'),
+                    'balance': cached_user.get('balance', 0),
+                    'telegram_id': cached_user.get('telegram_id'),
+                    'user_status': cached_user.get('user_status', None),
+                    'source': 'cache_fallback'
+                })
         return jsonify({'error': 'Database connection error'}), 500
     if user is not None:
         lang = user.get('language') or (language_code[:2] if language_code[:2] in locales else 'en')
