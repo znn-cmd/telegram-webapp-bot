@@ -3997,13 +3997,26 @@
         // Load countries from API
         async function loadCountries() {
             try {
+                console.log('🔄 Загружаем страны...');
                 const response = await fetch('/api/locations/countries');
                 const data = await response.json();
                 
                 if (data.success) {
                     const countrySelect = document.getElementById('countrySelect');
-                    countrySelect.innerHTML = `<option value="">${window.i18nManager ? window.i18nManager.getTranslation("reports.countryPlaceholder") : "countryPlaceholder"}</option>`;
+                    if (!countrySelect) {
+                        console.error('❌ Элемент countrySelect не найден');
+                        return;
+                    }
                     
+                    // Получаем перевод плейсхолдера
+                    let placeholderText = 'Выберите страну';
+                    if (window.i18nManager) {
+                        placeholderText = window.i18nManager.getTranslation("reports.countryPlaceholder") || 'Выберите страну';
+                    }
+                    
+                    countrySelect.innerHTML = `<option value="">${placeholderText}</option>`;
+                    
+                    console.log(`✅ Загружено ${data.countries.length} стран`);
                     data.countries.forEach(([id, name]) => {
                         const option = document.createElement('option');
                         option.value = id;
@@ -4011,16 +4024,17 @@
                         countrySelect.appendChild(option);
                     });
                 } else {
-                    console.error('Failed to load countries:', data.error);
+                    console.error('❌ Ошибка загрузки стран:', data.error);
                 }
             } catch (error) {
-                console.error('Error loading countries:', error);
+                console.error('❌ Ошибка при загрузке стран:', error);
             }
         }
 
         // Load cities based on selected country
         async function loadCities(countryId) {
             try {
+                console.log(`🔄 Загружаем города для страны ${countryId}...`);
                 const response = await fetch('/api/locations/cities', {
                     method: 'POST',
                     headers: {
@@ -4033,8 +4047,20 @@
                 
                 if (data.success) {
                     const citySelect = document.getElementById('citySelect');
-                    citySelect.innerHTML = `<option value="">${window.i18nManager ? window.i18nManager.getTranslation("reports.cityPlaceholder") : "cityPlaceholder"}</option>`;
+                    if (!citySelect) {
+                        console.error('❌ Элемент citySelect не найден');
+                        return;
+                    }
                     
+                    // Получаем перевод плейсхолдера
+                    let placeholderText = 'Сначала выберите страну';
+                    if (window.i18nManager) {
+                        placeholderText = window.i18nManager.getTranslation("reports.cityPlaceholder") || 'Сначала выберите страну';
+                    }
+                    
+                    citySelect.innerHTML = `<option value="">${placeholderText}</option>`;
+                    
+                    console.log(`✅ Загружено ${data.cities.length} городов`);
                     data.cities.forEach(([id, name]) => {
                         const option = document.createElement('option');
                         option.value = id;
@@ -4044,16 +4070,17 @@
                     
                     citySelect.disabled = false;
                 } else {
-                    console.error('Failed to load cities:', data.error);
+                    console.error('❌ Ошибка загрузки городов:', data.error);
                 }
             } catch (error) {
-                console.error('Error loading cities:', error);
+                console.error('❌ Ошибка при загрузке городов:', error);
             }
         }
 
         // Load counties based on selected city
         async function loadCounties(cityId) {
             try {
+                console.log(`🔄 Загружаем области для города ${cityId}...`);
                 const response = await fetch('/api/locations/counties', {
                     method: 'POST',
                     headers: {
@@ -4066,8 +4093,20 @@
                 
                 if (data.success) {
                     const countySelect = document.getElementById('countySelect');
-                    countySelect.innerHTML = `<option value="">${window.i18nManager ? window.i18nManager.getTranslation("reports.countyPlaceholder") : "countyPlaceholder"}</option>`;
+                    if (!countySelect) {
+                        console.error('❌ Элемент countySelect не найден');
+                        return;
+                    }
                     
+                    // Получаем перевод плейсхолдера
+                    let placeholderText = 'Сначала выберите город';
+                    if (window.i18nManager) {
+                        placeholderText = window.i18nManager.getTranslation("reports.countyPlaceholder") || 'Сначала выберите город';
+                    }
+                    
+                    countySelect.innerHTML = `<option value="">${placeholderText}</option>`;
+                    
+                    console.log(`✅ Загружено ${data.counties.length} областей`);
                     data.counties.forEach(([id, name]) => {
                         const option = document.createElement('option');
                         option.value = id;
@@ -4077,10 +4116,10 @@
                     
                     countySelect.disabled = false;
                 } else {
-                    console.error('Failed to load cities:', data.error);
+                    console.error('❌ Ошибка загрузки областей:', data.error);
                 }
             } catch (error) {
-                console.error('Error loading cities:', error);
+                console.error('❌ Ошибка при загрузке областей:', error);
             }
         }
 
@@ -4318,7 +4357,7 @@
 
         // Load districts based on selected county
         async function loadDistricts(countyId) {
-            console.log('🔄 Loading districts for county_id:', countyId);
+            console.log('🔄 Загружаем районы для области:', countyId);
             
             try {
                 const response = await fetch('/api/locations/districts', {
@@ -4330,11 +4369,22 @@
                 });
                 
                 const data = await response.json();
-                console.log('📊 Districts API response:', data);
+                console.log('📊 Ответ API районов:', data);
                 
                 if (data.success) {
                     const districtSelect = document.getElementById('districtSelect');
-                    districtSelect.innerHTML = `<option value="">${window.i18nManager ? window.i18nManager.getTranslation("reports.districtPlaceholder") : "districtPlaceholder"}</option>`;
+                    if (!districtSelect) {
+                        console.error('❌ Элемент districtSelect не найден');
+                        return;
+                    }
+                    
+                    // Получаем перевод плейсхолдера
+                    let placeholderText = 'Сначала выберите область';
+                    if (window.i18nManager) {
+                        placeholderText = window.i18nManager.getTranslation("reports.districtPlaceholder") || 'Сначала выберите область';
+                    }
+                    
+                    districtSelect.innerHTML = `<option value="">${placeholderText}</option>`;
                     
                     // Add "не имеет значения" option
                     const noDistrictOption = document.createElement('option');
@@ -4342,7 +4392,7 @@
                     noDistrictOption.textContent = 'Не имеет значения';
                     districtSelect.appendChild(noDistrictOption);
                     
-                    console.log('📍 Adding districts:', data.districts);
+                    console.log(`✅ Загружено ${data.districts.length} районов`);
                     data.districts.forEach(([id, name]) => {
                         const option = document.createElement('option');
                         option.value = id;
@@ -4351,12 +4401,12 @@
                     });
                     
                     districtSelect.disabled = false;
-                    console.log('✅ Districts loaded, district select enabled');
+                    console.log('✅ Районы загружены, селект районов включен');
                 } else {
-                    console.error('❌ Failed to load districts:', data.error);
+                    console.error('❌ Ошибка загрузки районов:', data.error);
                 }
             } catch (error) {
-                console.error('❌ Error loading districts:', error);
+                console.error('❌ Ошибка при загрузке районов:', error);
             }
         }
 
@@ -7601,8 +7651,30 @@
 
         // Initialize page
         function init() {
+            console.log('🔄 Инициализация страницы...');
             
-            loadCountries();
+            // Ждем инициализации i18nManager
+            if (window.i18nManager) {
+                console.log('✅ i18nManager уже инициализирован');
+                loadCountries();
+            } else {
+                console.log('⏳ Ожидаем инициализацию i18nManager...');
+                // Проверяем каждые 100мс, максимум 5 секунд
+                let attempts = 0;
+                const maxAttempts = 50;
+                const checkInterval = setInterval(() => {
+                    attempts++;
+                    if (window.i18nManager) {
+                        console.log('✅ i18nManager инициализирован, загружаем страны...');
+                        clearInterval(checkInterval);
+                        loadCountries();
+                    } else if (attempts >= maxAttempts) {
+                        console.log('⚠️ i18nManager не инициализирован, загружаем страны без переводов...');
+                        clearInterval(checkInterval);
+                        loadCountries();
+                    }
+                }, 100);
+            }
             
             // Initialize price input
             const priceInput = document.getElementById('priceObjectInput');
