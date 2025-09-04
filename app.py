@@ -6600,7 +6600,6 @@ def api_admin_balance_100():
 
 @app.route('/api/admin_users_stats', methods=['GET'])
 def api_admin_users_stats():
-    from datetime import datetime, timedelta
     from dateutil.relativedelta import relativedelta
     now = datetime.now()
     today = now.date()
