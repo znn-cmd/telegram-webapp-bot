@@ -404,39 +404,6 @@
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
-
-        /* Admin section styles */
-        .admin-section {
-            margin-top: 20px;
-            padding: 20px;
-            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-            border-radius: 12px;
-            border: 2px solid #dee2e6;
-        }
-
-        .admin-section-title {
-            font-size: 18px;
-            font-weight: bold;
-            color: #495057;
-            text-align: center;
-            margin-bottom: 20px;
-            padding: 10px;
-            background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
-            border-radius: 8px;
-            color: #222;
-        }
-
-        .admin-btn {
-            background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%) !important;
-            color: #222 !important;
-            border: 2px solid #e0a800;
-        }
-
-        .admin-btn:hover {
-            background: linear-gradient(135deg, #ffb300 0%, #f57c00 100%) !important;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(255, 193, 7, 0.3);
-        }
     </style>
 </head>
 <body>
@@ -515,16 +482,12 @@
                 <span class="menu-btn-description">Ответы на вопросы и поддержка</span>
             </button>
 
-            <!-- Блок для админа -->
-            <div class="admin-section hidden" id="adminSection">
-                <div class="admin-section-title" id="adminSectionTitle">Для админа</div>
-                
-                <button class="menu-btn fade-in admin-btn" onclick="showAdminPanel()">
-                    <span class="menu-btn-icon">🛠️</span>
-                    <span class="menu-btn-text">Админ-панель</span>
-                    <span class="menu-btn-description">Управление и статистика</span>
-                </button>
-            </div>
+            <!-- Кнопка Админ-панель -->
+            <button class="menu-btn fade-in" onclick="showAdminPanel()">
+                <span class="menu-btn-icon">🛠️</span>
+                <span class="menu-btn-text">Админ-панель</span>
+                <span class="menu-btn-description">Управление и статистика</span>
+            </button>
         </div>
 
         <!-- Загрузка -->
@@ -614,7 +577,6 @@
                 'objectEvaluationDesc': 'Оценка недвижимости',
                 'myReportsBtn': 'Мои отчеты',
                 'myReportsDesc': 'Ваши созданные отчеты',
-                'adminSectionTitle': 'Для админа',
                 'error_loading': 'Ошибка загрузки данных',
                 'error_network': 'Ошибка сети. Проверьте соединение.',
                 'success_language': 'Язык успешно изменен',
@@ -636,7 +598,6 @@
                 'objectEvaluationDesc': 'Property Evaluation',
                 'myReportsBtn': 'My Reports',
                 'myReportsDesc': 'Your created reports',
-                'adminSectionTitle': 'For Admin',
                 'error_loading': 'Error loading data',
                 'error_network': 'Network error. Check your connection.',
                 'success_language': 'Language changed successfully',
@@ -658,7 +619,6 @@
                 'objectEvaluationDesc': 'Immobilienbewertung',
                 'myReportsBtn': 'Meine Berichte',
                 'myReportsDesc': 'Ihre erstellten Berichte',
-                'adminSectionTitle': 'Für Admin',
                 'error_loading': 'Fehler beim Laden der Daten',
                 'error_network': 'Netzwerkfehler. Überprüfen Sie Ihre Verbindung.',
                 'success_language': 'Sprache erfolgreich geändert',
@@ -680,7 +640,6 @@
                 'objectEvaluationDesc': 'Évaluation immobilière',
                 'myReportsBtn': 'Mes Rapports',
                 'myReportsDesc': 'Vos rapports créés',
-                'adminSectionTitle': 'Pour Admin',
                 'error_loading': 'Erreur de chargement des données',
                 'error_network': 'Erreur réseau. Vérifiez votre connexion.',
                 'success_language': 'Langue changée avec succès',
@@ -702,7 +661,6 @@
                 'objectEvaluationDesc': 'Gayrimenkul Değerlendirmesi',
                 'myReportsBtn': 'Raporlarım',
                 'myReportsDesc': 'Oluşturduğunuz raporlar',
-                'adminSectionTitle': 'Admin İçin',
                 'error_loading': 'Veri yükleme hatası',
                 'error_network': 'Ağ hatası. Bağlantınızı kontrol edin.',
                 'success_language': 'Dil başarıyla değiştirildi',
@@ -729,7 +687,6 @@
             document.getElementById('objectEvaluationDesc').textContent = getText('objectEvaluationDesc');
             document.getElementById('myReportsBtn').textContent = getText('myReportsBtn');
             document.getElementById('myReportsDesc').textContent = getText('myReportsDesc');
-            document.getElementById('adminSectionTitle').textContent = getText('adminSectionTitle');
             document.getElementById('loadingText').textContent = getText('loading');
         }
 
@@ -800,13 +757,6 @@
 
                 if (response.ok) {
                     const userInfo = await response.json();
-
-                    // Показываем блок админа только если user_status === 'admin'
-                    if (userInfo.user_status === 'admin') {
-                        document.getElementById('adminSection').classList.remove('hidden');
-                    } else {
-                        document.getElementById('adminSection').classList.add('hidden');
-                    }
 
                     // Скрыть выбор языка, если уже выбран
                     if (userInfo.language) {
