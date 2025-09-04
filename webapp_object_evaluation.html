@@ -3864,133 +3864,133 @@
             
             const summaryDataTitle = document.getElementById('summaryDataTitle');
             if (summaryDataTitle) {
-                summaryDataTitle.textContent = getText('marketIndicatorsTitle');
+                summaryDataTitle.textContent = window.i18nManager ? window.i18nManager.getTranslation("reports.marketIndicatorsTitle") : "marketIndicatorsTitle";
             }
 
             const loadingText = document.getElementById('loadingText');
             if (loadingText) {
-                loadingText.textContent = getText('loadingText');
+                loadingText.textContent = window.i18nManager ? window.i18nManager.getTranslation("reports.loadingText") : "loadingText";
             }
             
             const errorText = document.getElementById('errorText');
             if (errorText) {
-                errorText.textContent = getText('errorText');
+                errorText.textContent = window.i18nManager ? window.i18nManager.getTranslation("reports.errorText") : "errorText";
             }
             
             // Update key metrics labels
             const keyMetricsTitle = document.getElementById('keyMetricsTitle');
             if (keyMetricsTitle) {
-                keyMetricsTitle.textContent = getText('keyMetricsTitle');
+                keyMetricsTitle.textContent = window.i18nManager ? window.i18nManager.getTranslation("reports.keyMetricsTitle") : "keyMetricsTitle";
             }
             
             const avgSalePriceLabel = document.getElementById('avgSalePriceLabel');
             if (avgSalePriceLabel) {
-                avgSalePriceLabel.textContent = getText('avgSalePriceLabel');
+                avgSalePriceLabel.textContent = window.i18nManager ? window.i18nManager.getTranslation("reports.avgSalePriceLabel") : "avgSalePriceLabel";
             }
             
             const avgRentPriceLabel = document.getElementById('avgRentPriceLabel');
             if (avgRentPriceLabel) {
-                avgRentPriceLabel.textContent = getText('avgRentPriceLabel');
+                avgRentPriceLabel.textContent = window.i18nManager ? window.i18nManager.getTranslation("reports.avgRentPriceLabel") : "avgRentPriceLabel";
             }
             
             const listingPeriodSaleLabel = document.getElementById('listingPeriodSaleLabel');
             if (listingPeriodSaleLabel) {
-                listingPeriodSaleLabel.textContent = getText('listingPeriodSaleLabel');
+                listingPeriodSaleLabel.textContent = window.i18nManager ? window.i18nManager.getTranslation("reports.listingPeriodSaleLabel") : "listingPeriodSaleLabel";
             }
             
             const listingPeriodRentLabel = document.getElementById('listingPeriodRentLabel');
             if (listingPeriodRentLabel) {
-                listingPeriodRentLabel.textContent = getText('listingPeriodRentLabel');
+                listingPeriodRentLabel.textContent = window.i18nManager ? window.i18nManager.getTranslation("reports.listingPeriodRentLabel") : "listingPeriodRentLabel";
             }
             
             const yieldLabel = document.getElementById('yieldLabel');
             if (yieldLabel) {
-                yieldLabel.textContent = getText('yieldLabel');
+                yieldLabel.textContent = window.i18nManager ? window.i18nManager.getTranslation("reports.yieldLabel") : "yieldLabel";
             }
             
 
             
             // Update listing type selection elements
             const listingTypeTitle = document.getElementById('listingTypeTitle');
-            if (listingTypeTitle) { listingTypeTitle.textContent = getText('listingTypeTitle'); }
+            if (listingTypeTitle) { listingTypeTitle.textContent = window.i18nManager ? window.i18nManager.getTranslation("reports.listingTypeTitle") : "listingTypeTitle"; }
             const houseTypeSubtitle = document.getElementById('houseTypeSubtitle');
-            if (houseTypeSubtitle) { houseTypeSubtitle.textContent = getText('houseTypeSubtitle'); }
+            if (houseTypeSubtitle) { houseTypeSubtitle.textContent = window.i18nManager ? window.i18nManager.getTranslation("reports.houseTypeSubtitle") : "houseTypeSubtitle"; }
             const floorSegmentSubtitle = document.getElementById('floorSegmentSubtitle');
-            if (floorSegmentSubtitle) { floorSegmentSubtitle.textContent = getText('floorSegmentSubtitle'); }
+            if (floorSegmentSubtitle) { floorSegmentSubtitle.textContent = window.i18nManager ? window.i18nManager.getTranslation("reports.floorSegmentSubtitle") : "floorSegmentSubtitle"; }
             const ageDataSubtitle = document.getElementById('ageDataSubtitle');
-            if (ageDataSubtitle) { ageDataSubtitle.textContent = getText('ageDataSubtitle'); }
+            if (ageDataSubtitle) { ageDataSubtitle.textContent = window.i18nManager ? window.i18nManager.getTranslation("reports.ageDataSubtitle") : "ageDataSubtitle"; }
             const heatingDataSubtitle = document.getElementById('heatingDataSubtitle');
-            if (heatingDataSubtitle) { heatingDataSubtitle.textContent = getText('heatingDataSubtitle'); }
+            if (heatingDataSubtitle) { heatingDataSubtitle.textContent = window.i18nManager ? window.i18nManager.getTranslation("reports.heatingDataSubtitle") : "heatingDataSubtitle"; }
             
             // Update new fields
             const priceObjectSubtitle = document.getElementById('priceObjectSubtitle');
-            if (priceObjectSubtitle) { priceObjectSubtitle.textContent = getText('priceObjectSubtitle'); }
+            if (priceObjectSubtitle) { priceObjectSubtitle.textContent = window.i18nManager ? window.i18nManager.getTranslation("reports.priceObjectSubtitle") : "priceObjectSubtitle"; }
             const areaObjectSubtitle = document.getElementById('areaObjectSubtitle');
-            if (areaObjectSubtitle) { areaObjectSubtitle.textContent = getText('areaObjectSubtitle'); }
+            if (areaObjectSubtitle) { areaObjectSubtitle.textContent = window.i18nManager ? window.i18nManager.getTranslation("reports.areaObjectSubtitle") : "areaObjectSubtitle"; }
             
             // Update currency title
             const currencyTitle = document.getElementById('currencyTitle');
-            if (currencyTitle) { currencyTitle.textContent = getText('currencyTitle'); }
+            if (currencyTitle) { currencyTitle.textContent = window.i18nManager ? window.i18nManager.getTranslation("reports.currencyTitle") : "currencyTitle"; }
             
             // Update placeholders
             const priceObjectInput = document.getElementById('priceObjectInput');
-            if (priceObjectInput) { priceObjectInput.placeholder = getText('pricePlaceholder'); }
+            if (priceObjectInput) { priceObjectInput.placeholder = window.i18nManager ? window.i18nManager.getTranslation("reports.pricePlaceholder") : "pricePlaceholder"; }
             const areaObjectInput = document.getElementById('areaObjectInput');
-            if (areaObjectInput) { areaObjectInput.placeholder = getText('areaPlaceholder'); }
+            if (areaObjectInput) { areaObjectInput.placeholder = window.i18nManager ? window.i18nManager.getTranslation("reports.areaPlaceholder") : "areaPlaceholder"; }
             
             // Update placeholder texts
             const houseTypePlaceholder = document.getElementById('houseTypePlaceholder');
-            if (houseTypePlaceholder) { houseTypePlaceholder.textContent = getText('selectBedrooms'); }
+            if (houseTypePlaceholder) { houseTypePlaceholder.textContent = window.i18nManager ? window.i18nManager.getTranslation("reports.selectBedrooms") : "selectBedrooms"; }
             const floorSegmentPlaceholder = document.getElementById('floorSegmentPlaceholder');
-            if (floorSegmentPlaceholder) { floorSegmentPlaceholder.textContent = getText('selectFloor'); }
+            if (floorSegmentPlaceholder) { floorSegmentPlaceholder.textContent = window.i18nManager ? window.i18nManager.getTranslation("reports.selectFloor") : "selectFloor"; }
             const ageDataPlaceholder = document.getElementById('ageDataPlaceholder');
-            if (ageDataPlaceholder) { ageDataPlaceholder.textContent = getText('selectAge'); }
+            if (ageDataPlaceholder) { ageDataPlaceholder.textContent = window.i18nManager ? window.i18nManager.getTranslation("reports.selectAge") : "selectAge"; }
             const heatingDataPlaceholder = document.getElementById('heatingDataPlaceholder');
-            if (heatingDataPlaceholder) { heatingDataPlaceholder.textContent = getText('selectHeating'); }
+            if (heatingDataPlaceholder) { heatingDataPlaceholder.textContent = window.i18nManager ? window.i18nManager.getTranslation("reports.selectHeating") : "selectHeating"; }
             
             // Update property types section
             const propertyTypesTitle = document.getElementById('propertyTypesTitle');
-            if (propertyTypesTitle) { propertyTypesTitle.textContent = getText('propertyTypesTitle'); }
+            if (propertyTypesTitle) { propertyTypesTitle.textContent = window.i18nManager ? window.i18nManager.getTranslation("reports.propertyTypesTitle") : "propertyTypesTitle"; }
             
             // Update detailed data table titles
             const detailedDataTitles = document.querySelectorAll('.detailed-data-title');
             detailedDataTitles.forEach(titleElement => {
                 const titleText = titleElement.textContent;
                 if (titleText.includes('количество спален') || titleText.includes('Bedroom Count') || titleText.includes('Schlafzimmer') || titleText.includes('chambres') || titleText.includes('Yatak Odası')) {
-                    titleElement.textContent = getText('houseTypeDataTitle');
+                    titleElement.textContent = window.i18nManager ? window.i18nManager.getTranslation("reports.houseTypeDataTitle") : "houseTypeDataTitle";
                 } else if (titleText.includes('этажу') || titleText.includes('Floor') || titleText.includes('Etagen') || titleText.includes('étage') || titleText.includes('Kat')) {
-                    titleElement.textContent = getText('floorSegmentDataTitle');
+                    titleElement.textContent = window.i18nManager ? window.i18nManager.getTranslation("reports.floorSegmentDataTitle") : "floorSegmentDataTitle";
                 } else if (titleText.includes('возрасту') || titleText.includes('Age') || titleText.includes('Alters') || titleText.includes('âge') || titleText.includes('Yaş')) {
-                    titleElement.textContent = getText('ageDataTitle');
+                    titleElement.textContent = window.i18nManager ? window.i18nManager.getTranslation("reports.ageDataTitle") : "ageDataTitle";
                 } else if (titleText.includes('отопления') || titleText.includes('Heating') || titleText.includes('Heizung') || titleText.includes('chauffage') || titleText.includes('Isıtma')) {
-                    titleElement.textContent = getText('heatingDataTitle');
+                    titleElement.textContent = window.i18nManager ? window.i18nManager.getTranslation("reports.heatingDataTitle") : "heatingDataTitle";
                 }
             });
             
             // Update save and share elements
             const saveShareButtonText = document.getElementById('saveShareButtonText');
             if (saveShareButtonText) {
-                saveShareButtonText.textContent = getText('saveShareButtonText');
+                saveShareButtonText.textContent = window.i18nManager ? window.i18nManager.getTranslation("reports.saveShareButtonText") : "saveShareButtonText";
             }
             
             const modalTitle = document.getElementById('modalTitle');
             if (modalTitle) {
-                modalTitle.textContent = getText('modalTitle');
+                modalTitle.textContent = window.i18nManager ? window.i18nManager.getTranslation("reports.modalTitle") : "modalTitle";
             }
             
             const modalDescription = document.getElementById('modalDescription');
             if (modalDescription) {
-                modalDescription.textContent = getText('modalDescription');
+                modalDescription.textContent = window.i18nManager ? window.i18nManager.getTranslation("reports.modalDescription") : "modalDescription";
             }
             
             const copyButtonText = document.getElementById('copyButtonText');
             if (copyButtonText) {
-                copyButtonText.textContent = getText('copyButtonText');
+                copyButtonText.textContent = window.i18nManager ? window.i18nManager.getTranslation("reports.copyButtonText") : "copyButtonText";
             }
             
             const closeButtonText = document.getElementById('closeButtonText');
             if (closeButtonText) {
-                closeButtonText.textContent = getText('closeButtonText');
+                closeButtonText.textContent = window.i18nManager ? window.i18nManager.getTranslation("reports.closeButtonText") : "closeButtonText";
             }
         }
 
@@ -4002,7 +4002,7 @@
                 
                 if (data.success) {
                     const countrySelect = document.getElementById('countrySelect');
-                    countrySelect.innerHTML = `<option value="">${getText('countryPlaceholder')}</option>`;
+                    countrySelect.innerHTML = `<option value="">${window.i18nManager ? window.i18nManager.getTranslation("reports.countryPlaceholder") : "countryPlaceholder"}</option>`;
                     
                     data.countries.forEach(([id, name]) => {
                         const option = document.createElement('option');
@@ -4033,7 +4033,7 @@
                 
                 if (data.success) {
                     const citySelect = document.getElementById('citySelect');
-                    citySelect.innerHTML = `<option value="">${getText('cityPlaceholder')}</option>`;
+                    citySelect.innerHTML = `<option value="">${window.i18nManager ? window.i18nManager.getTranslation("reports.cityPlaceholder") : "cityPlaceholder"}</option>`;
                     
                     data.cities.forEach(([id, name]) => {
                         const option = document.createElement('option');
@@ -4066,7 +4066,7 @@
                 
                 if (data.success) {
                     const countySelect = document.getElementById('countySelect');
-                    countySelect.innerHTML = `<option value="">${getText('countyPlaceholder')}</option>`;
+                    countySelect.innerHTML = `<option value="">${window.i18nManager ? window.i18nManager.getTranslation("reports.countyPlaceholder") : "countyPlaceholder"}</option>`;
                     
                     data.counties.forEach(([id, name]) => {
                         const option = document.createElement('option');
@@ -4334,7 +4334,7 @@
                 
                 if (data.success) {
                     const districtSelect = document.getElementById('districtSelect');
-                    districtSelect.innerHTML = `<option value="">${getText('districtPlaceholder')}</option>`;
+                    districtSelect.innerHTML = `<option value="">${window.i18nManager ? window.i18nManager.getTranslation("reports.districtPlaceholder") : "districtPlaceholder"}</option>`;
                     
                     // Add "не имеет значения" option
                     const noDistrictOption = document.createElement('option');
@@ -4370,11 +4370,11 @@
             const countryId = countrySelect.value;
             
             // Reset dependent selects
-            citySelect.innerHTML = `<option value="">${getText('cityPlaceholder')}</option>`;
+            citySelect.innerHTML = `<option value="">${window.i18nManager ? window.i18nManager.getTranslation("reports.cityPlaceholder") : "cityPlaceholder"}</option>`;
             citySelect.disabled = true;
-            countySelect.innerHTML = `<option value="">${getText('countyPlaceholder')}</option>`;
+            countySelect.innerHTML = `<option value="">${window.i18nManager ? window.i18nManager.getTranslation("reports.countyPlaceholder") : "countyPlaceholder"}</option>`;
             countySelect.disabled = true;
-            districtSelect.innerHTML = `<option value="">${getText('districtPlaceholder')}</option>`;
+            districtSelect.innerHTML = `<option value="">${window.i18nManager ? window.i18nManager.getTranslation("reports.districtPlaceholder") : "districtPlaceholder"}</option>`;
             districtSelect.disabled = true;
             
             // Reset listing type selection and hide section
@@ -4402,9 +4402,9 @@
             const cityId = citySelect.value;
             
             // Reset dependent selects
-            countySelect.innerHTML = `<option value="">${getText('countyPlaceholder')}</option>`;
+            countySelect.innerHTML = `<option value="">${window.i18nManager ? window.i18nManager.getTranslation("reports.countyPlaceholder") : "countyPlaceholder"}</option>`;
             countySelect.disabled = true;
-            districtSelect.innerHTML = `<option value="">${getText('districtPlaceholder')}</option>`;
+            districtSelect.innerHTML = `<option value="">${window.i18nManager ? window.i18nManager.getTranslation("reports.districtPlaceholder") : "districtPlaceholder"}</option>`;
             districtSelect.disabled = true;
             
             // Reset listing type selection and hide section
@@ -4434,7 +4434,7 @@
             console.log('📍 Selected county_id:', countyId);
             
             // Reset dependent selects
-            districtSelect.innerHTML = `<option value="">${getText('districtPlaceholder')}</option>`;
+            districtSelect.innerHTML = `<option value="">${window.i18nManager ? window.i18nManager.getTranslation("reports.districtPlaceholder") : "districtPlaceholder"}</option>`;
             districtSelect.disabled = true;
             console.log('🔄 Reset district select');
             
@@ -4515,7 +4515,7 @@
                 if (selectedListingTypes.house_type) {
                     html += `
                         <div class="property-type-item">
-                            <span class="property-type-label">${getText('bedroomsLabel')}:</span>
+                            <span class="property-type-label">${window.i18nManager ? window.i18nManager.getTranslation("reports.bedroomsLabel") : "bedroomsLabel"}:</span>
                             <span class="property-type-value">${selectedListingTypes.house_type}</span>
                         </div>
                     `;
@@ -4524,7 +4524,7 @@
                 if (selectedListingTypes.floor_segment) {
                     html += `
                         <div class="property-type-item">
-                            <span class="property-type-label">${getText('floorLabel')}:</span>
+                            <span class="property-type-label">${window.i18nManager ? window.i18nManager.getTranslation("reports.floorLabel") : "floorLabel"}:</span>
                             <span class="property-type-value">${selectedListingTypes.floor_segment}</span>
                         </div>
                     `;
@@ -4533,7 +4533,7 @@
                 if (selectedListingTypes.age) {
                     html += `
                         <div class="property-type-item">
-                            <span class="property-type-label">${getText('ageLabel')}:</span>
+                            <span class="property-type-label">${window.i18nManager ? window.i18nManager.getTranslation("reports.ageLabel") : "ageLabel"}:</span>
                             <span class="property-type-value">${selectedListingTypes.age}</span>
                         </div>
                     `;
@@ -4542,7 +4542,7 @@
                 if (selectedListingTypes.heating) {
                     html += `
                         <div class="property-type-item">
-                            <span class="property-type-label">${getText('heatingLabel')}:</span>
+                            <span class="property-type-label">${window.i18nManager ? window.i18nManager.getTranslation("reports.heatingLabel") : "heatingLabel"}:</span>
                             <span class="property-type-value">${selectedListingTypes.heating}</span>
                         </div>
                     `;
@@ -4990,30 +4990,30 @@
             
             // Price comparison
             if (Math.abs(priceDifferencePercent) < 5) {
-                comparisonText += `<p><strong>${getText('priceComparisonLabel')}</strong> ${getText('priceCloseToMarket').replace('${userPrice}', formatValue(userPriceInTargetCurrency, 'price')).replace('${marketMin}', formatValue(marketPricePerM2.min, 'price')).replace('${marketMax}', formatValue(marketPricePerM2.max, 'price'))}</p>`;
+                comparisonText += `<p><strong>${window.i18nManager ? window.i18nManager.getTranslation("reports.priceComparisonLabel") : "priceComparisonLabel"}</strong> ${window.i18nManager ? window.i18nManager.getTranslation("reports.priceCloseToMarket") : "priceCloseToMarket".replace('${userPrice}', formatValue(userPriceInTargetCurrency, 'price')).replace('${marketMin}', formatValue(marketPricePerM2.min, 'price')).replace('${marketMax}', formatValue(marketPricePerM2.max, 'price'))}</p>`;
             } else if (priceDifferencePercent > 0) {
-                comparisonText += `<p><strong>${getText('priceComparisonLabel')}</strong> ${getText('priceAboveMarket').replace('${userPrice}', formatValue(userPriceInTargetCurrency, 'price')).replace('${percent}', Math.abs(priceDifferencePercent).toFixed(1))}</p>`;
+                comparisonText += `<p><strong>${window.i18nManager ? window.i18nManager.getTranslation("reports.priceComparisonLabel") : "priceComparisonLabel"}</strong> ${window.i18nManager ? window.i18nManager.getTranslation("reports.priceAboveMarket") : "priceAboveMarket".replace('${userPrice}', formatValue(userPriceInTargetCurrency, 'price')).replace('${percent}', Math.abs(priceDifferencePercent).toFixed(1))}</p>`;
             } else {
-                comparisonText += `<p><strong>${getText('priceComparisonLabel')}</strong> ${getText('priceBelowMarket').replace('${userPrice}', formatValue(userPriceInTargetCurrency, 'price')).replace('${percent}', Math.abs(priceDifferencePercent).toFixed(1))}</p>`;
+                comparisonText += `<p><strong>${window.i18nManager ? window.i18nManager.getTranslation("reports.priceComparisonLabel") : "priceComparisonLabel"}</strong> ${window.i18nManager ? window.i18nManager.getTranslation("reports.priceBelowMarket") : "priceBelowMarket".replace('${userPrice}', formatValue(userPriceInTargetCurrency, 'price')).replace('${percent}', Math.abs(priceDifferencePercent).toFixed(1))}</p>`;
             }
             
             // Area comparison
             if (userArea >= marketArea.min && userArea <= marketArea.max) {
-                comparisonText += `<p><strong>${getText('areaLabel')}:</strong> ${getText('areaMatchesMarket').replace('${userArea}', userArea).replace('${marketMin}', marketArea.min).replace('${marketMax}', marketArea.max)}</p>`;
+                comparisonText += `<p><strong>${window.i18nManager ? window.i18nManager.getTranslation("reports.areaLabel") : "areaLabel"}:</strong> ${window.i18nManager ? window.i18nManager.getTranslation("reports.areaMatchesMarket") : "areaMatchesMarket".replace('${userArea}', userArea).replace('${marketMin}', marketArea.min).replace('${marketMax}', marketArea.max)}</p>`;
             } else if (userArea < marketArea.min) {
-                comparisonText += `<p><strong>${getText('areaLabel')}:</strong> ${getText('areaBelowMarket').replace('${userArea}', userArea).replace('${marketMin}', marketArea.min).replace('${marketMax}', marketArea.max)}</p>`;
+                comparisonText += `<p><strong>${window.i18nManager ? window.i18nManager.getTranslation("reports.areaLabel") : "areaLabel"}:</strong> ${window.i18nManager ? window.i18nManager.getTranslation("reports.areaBelowMarket") : "areaBelowMarket".replace('${userArea}', userArea).replace('${marketMin}', marketArea.min).replace('${marketMax}', marketArea.max)}</p>`;
             } else {
-                comparisonText += `<p><strong>${getText('areaLabel')}:</strong> ${getText('areaAboveMarket').replace('${userArea}', userArea).replace('${marketMin}', marketArea.min).replace('${marketMax}', marketArea.max)}</p>`;
+                comparisonText += `<p><strong>${window.i18nManager ? window.i18nManager.getTranslation("reports.areaLabel") : "areaLabel"}:</strong> ${window.i18nManager ? window.i18nManager.getTranslation("reports.areaAboveMarket") : "areaAboveMarket".replace('${userArea}', userArea).replace('${marketMin}', marketArea.min).replace('${marketMax}', marketArea.max)}</p>`;
             }
             
             // Generate HTML
             let html = '<div class="market-comparison-block">';
             html += '<div class="market-comparison-content">';
-            html += `<h4 class="market-comparison-title">${getText('marketComparisonTitle')}</h4>`;
+            html += `<h4 class="market-comparison-title">${window.i18nManager ? window.i18nManager.getTranslation("reports.marketComparisonTitle") : "marketComparisonTitle"}</h4>`;
             html += `<div class="market-comparison-value">${formatValue(userPricePerM2, 'price')}/м²</div>`;
             html += '<div class="market-comparison-details">';
-            html += `<div class="market-comparison-price">${getText('priceComparisonLabel')} ${formatValue(userPriceInTargetCurrency, 'price')}</div>`;
-            html += `<div class="market-comparison-area">${getText('areaLabel')}: ${userArea} м²</div>`;
+            html += `<div class="market-comparison-price">${window.i18nManager ? window.i18nManager.getTranslation("reports.priceComparisonLabel") : "priceComparisonLabel"} ${formatValue(userPriceInTargetCurrency, 'price')}</div>`;
+            html += `<div class="market-comparison-area">${window.i18nManager ? window.i18nManager.getTranslation("reports.areaLabel") : "areaLabel"}: ${userArea} м²</div>`;
             html += '</div>';
             html += '<div class="market-comparison-analysis">';
             html += comparisonText;
@@ -5216,7 +5216,7 @@
                     // Calculate average area
                     const avgArea = Math.round((area.min + area.max) / 2);
                     
-                    const saleText = getText('saleAnalysisText')
+                    const saleText = window.i18nManager ? window.i18nManager.getTranslation("reports.saleAnalysisText") : "saleAnalysisText"
                         .replace('{area}', avgArea)
                         .replace('{minPrice}', formatValue(price.min, 'price'))
                         .replace('{maxPrice}', formatValue(price.max, 'price'))
@@ -5224,7 +5224,7 @@
                         .replace('{maxDays}', period.max);
                     
                     analysis += `<div class="analysis-section">
-                        <strong>${getText('saleHeader')}:</strong> ${saleText}
+                        <strong>${window.i18nManager ? window.i18nManager.getTranslation("reports.saleHeader") : "saleHeader"}:</strong> ${saleText}
                     </div>`;
                 }
                 
@@ -5243,7 +5243,7 @@
                     // Calculate average area
                     const avgArea = Math.round((area.min + area.max) / 2);
                     
-                    const rentTextFinal = getText('rentAnalysisText')
+                    const rentTextFinal = window.i18nManager ? window.i18nManager.getTranslation("reports.rentAnalysisText") : "rentAnalysisText"
                         .replace('{area}', avgArea)
                         .replace('{minPrice}', formatValue(price.min, 'price'))
                         .replace('{maxPrice}', formatValue(price.max, 'price'))
@@ -5251,7 +5251,7 @@
                         .replace('{maxDays}', period.max);
                     
                     analysis += `<div class="analysis-section">
-                        <strong>${getText('rentHeader')}:</strong> ${rentTextFinal}
+                        <strong>${window.i18nManager ? window.i18nManager.getTranslation("reports.rentHeader") : "rentHeader"}:</strong> ${rentTextFinal}
                     </div>`;
                 }
             }
@@ -5284,7 +5284,7 @@
             const rentMaxPeriod = summary.listing_period_for_rent ? summary.listing_period_for_rent.max : 96;
             
             let html = '<div class="market-analysis-text-block">';
-            html += `<h4 class="market-analysis-text-title">${getText('marketAnalysisTitle')}</h4>`;
+            html += `<h4 class="market-analysis-text-title">${window.i18nManager ? window.i18nManager.getTranslation("reports.marketAnalysisTitle") : "marketAnalysisTitle"}</h4>`;
             html += '<div class="market-analysis-text-content">';
             
             // Sale analysis in unified style (like "Вывод прогноза")
@@ -5322,7 +5322,7 @@
             });
             
             if (allData.length === 0) {
-                summaryContainer.innerHTML = `<div class="no-data">${getText('noDataAvailable')}</div>`;
+                summaryContainer.innerHTML = `<div class="no-data">${window.i18nManager ? window.i18nManager.getTranslation("reports.noDataAvailable") : "noDataAvailable"}</div>`;
                 return;
             }
             
@@ -5383,8 +5383,8 @@
             html += '<table class="market-data-table">';
             html += '<thead>';
             html += '<tr>';
-            html += `<th class="category-header">${getText('saleHeader')}</th>`;
-            html += `<th class="category-header">${getText('rentHeader')}</th>`;
+            html += `<th class="category-header">${window.i18nManager ? window.i18nManager.getTranslation("reports.saleHeader") : "saleHeader"}</th>`;
+            html += `<th class="category-header">${window.i18nManager ? window.i18nManager.getTranslation("reports.rentHeader") : "rentHeader"}</th>`;
             html += '</tr>';
             html += '</thead>';
             html += '<tbody>';
@@ -5392,7 +5392,7 @@
             // Row 1: Comparable Area (single value - average)
             html += '<tr>';
             html += '<td class="data-cell">';
-            html += `<div class="cell-label">${getText('comparableAreaForSaleLabel')}:</div>`;
+            html += `<div class="cell-label">${window.i18nManager ? window.i18nManager.getTranslation("reports.comparableAreaForSaleLabel") : "comparableAreaForSaleLabel"}:</div>`;
                 if (summary.comparable_area_for_sale) {
                     const area = summary.comparable_area_for_sale;
                 const avgArea = Math.round((area.min + area.max) / 2);
@@ -5402,7 +5402,7 @@
             }
             html += '</td>';
             html += '<td class="data-cell">';
-            html += `<div class="cell-label">${getText('comparableAreaForRentLabel')}:</div>`;
+            html += `<div class="cell-label">${window.i18nManager ? window.i18nManager.getTranslation("reports.comparableAreaForRentLabel") : "comparableAreaForRentLabel"}:</div>`;
                 if (summary.comparable_area_for_rent) {
                     const area = summary.comparable_area_for_rent;
                 const avgArea = Math.round((area.min + area.max) / 2);
@@ -5416,7 +5416,7 @@
             // Row 2: Listing Period
             html += '<tr>';
             html += '<td class="data-cell">';
-            html += `<div class="cell-label">${getText('listingPeriodForSaleLabel')}:</div>`;
+            html += `<div class="cell-label">${window.i18nManager ? window.i18nManager.getTranslation("reports.listingPeriodForSaleLabel") : "listingPeriodForSaleLabel"}:</div>`;
             if (summary.listing_period_for_sale) {
                 const period = summary.listing_period_for_sale;
                 html += `<div class="cell-value">${period.min} – ${period.max} дней</div>`;
@@ -5425,7 +5425,7 @@
             }
             html += '</td>';
             html += '<td class="data-cell">';
-            html += `<div class="cell-label">${getText('listingPeriodForRentLabel')}:</div>`;
+            html += `<div class="cell-label">${window.i18nManager ? window.i18nManager.getTranslation("reports.listingPeriodForRentLabel") : "listingPeriodForRentLabel"}:</div>`;
                 if (summary.listing_period_for_rent) {
                     const period = summary.listing_period_for_rent;
                 html += `<div class="cell-value">${period.min} – ${period.max} дней</div>`;
@@ -5438,7 +5438,7 @@
             // Row 3: Unit Price
             html += '<tr>';
             html += '<td class="data-cell">';
-            html += `<div class="cell-label">${getText('unitPriceForSaleLabel')}:</div>`;
+            html += `<div class="cell-label">${window.i18nManager ? window.i18nManager.getTranslation("reports.unitPriceForSaleLabel") : "unitPriceForSaleLabel"}:</div>`;
             if (summary.unit_price_for_sale) {
                 const price = summary.unit_price_for_sale;
                 html += `<div class="cell-value">${formatValue(price.min, 'price')} – ${formatValue(price.max, 'price')}</div>`;
@@ -5447,7 +5447,7 @@
             }
             html += '</td>';
             html += '<td class="data-cell">';
-            html += `<div class="cell-label">${getText('unitPriceForRentLabel')}:</div>`;
+            html += `<div class="cell-label">${window.i18nManager ? window.i18nManager.getTranslation("reports.unitPriceForRentLabel") : "unitPriceForRentLabel"}:</div>`;
                 if (summary.unit_price_for_rent) {
                     const price = summary.unit_price_for_rent;
                 html += `<div class="cell-value">${formatValue(price.min, 'price')} – ${formatValue(price.max, 'price')}</div>`;
@@ -5781,7 +5781,7 @@
             const groupedTrends = groupTrendsByType(trends);
             
             trendsSection.innerHTML = `
-                <h3 class="data-section-title">${getText('marketTrendsTitle')}</h3>
+                <h3 class="data-section-title">${window.i18nManager ? window.i18nManager.getTranslation("reports.marketTrendsTitle") : "marketTrendsTitle"}</h3>
                 <div class="data-section-content">
                     <div class="trends-grid">
                         ${Object.entries(groupedTrends).map(([type, typeTrends]) => {
@@ -6393,13 +6393,13 @@
             // Добавляем график трендов
             html += `
                 <div class="trends-chart-section">
-                    <h4 class="trends-chart-title">${getText('chart_title')}</h4>
+                    <h4 class="trends-chart-title">${window.i18nManager ? window.i18nManager.getTranslation("reports.chart_title") : "chart_title"}</h4>
                     <div class="chart-controls">
                         <button class="chart-button active" data-chart-type="sale" onclick="switchChartType('sale')">
-                            ${getText('sale_button')}
+                            ${window.i18nManager ? window.i18nManager.getTranslation("reports.sale_button") : "sale_button"}
                         </button>
                         <button class="chart-button" data-chart-type="rent" onclick="switchChartType('rent')">
-                            ${getText('rent_button')}
+                            ${window.i18nManager ? window.i18nManager.getTranslation("reports.rent_button") : "rent_button"}
                         </button>
                     </div>
                     <div class="chart-container">
@@ -6407,7 +6407,7 @@
                     </div>
                     <div class="chart-info">
                         <small style="color: #6c757d; font-style: italic; text-align: center; display: block; margin-top: 10px;">
-                            ${getText('chart_info')}
+                            ${window.i18nManager ? window.i18nManager.getTranslation("reports.chart_info") : "chart_info"}
                         </small>
                     </div>
                 </div>
@@ -6733,7 +6733,7 @@
                 
                 // Начинаем создание компактного HTML
                 let html = '<div class="object-summary-section">';
-                html += `<h4 class="object-summary-title">${getText('objectSummaryTitle')}</h4>`;
+                html += `<h4 class="object-summary-title">${window.i18nManager ? window.i18nManager.getTranslation("reports.objectSummaryTitle") : "objectSummaryTitle"}</h4>`;
                 html += '<div class="object-summary-content">';
                 
                 // Создаем компактную таблицу с основными данными и сравнениями
@@ -6972,13 +6972,13 @@
             // Добавляем график прогноза цен и аренды
             forecastHtml += `
                 <div class="forecast-chart-section" id="forecastChartSection">
-                    <h4 class="forecast-chart-title">${getText('forecast_chart_title')}</h4>
+                    <h4 class="forecast-chart-title">${window.i18nManager ? window.i18nManager.getTranslation("reports.forecast_chart_title") : "forecast_chart_title"}</h4>
                     <div class="chart-controls">
                         <button class="chart-button active" data-chart-type="sale" onclick="switchForecastChartType('sale')">
-                            ${getText('sale_button')}
+                            ${window.i18nManager ? window.i18nManager.getTranslation("reports.sale_button") : "sale_button"}
                         </button>
                         <button class="chart-button" data-chart-type="rent" onclick="switchForecastChartType('rent')">
-                            ${getText('rent_button')}
+                            ${window.i18nManager ? window.i18nManager.getTranslation("reports.rent_button") : "rent_button"}
                         </button>
                     </div>
                     <div class="chart-container">
@@ -6986,7 +6986,7 @@
                     </div>
                     <div class="chart-info">
                         <small style="color: #6c757d; font-style: italic; text-align: center; display: block; margin-top: 10px;">
-                            ${getText('forecast_chart_info')}
+                            ${window.i18nManager ? window.i18nManager.getTranslation("reports.forecast_chart_info") : "forecast_chart_info"}
                         </small>
                     </div>
                 </div>
@@ -7723,18 +7723,18 @@
             
             // Generate HTML for consolidated assessment
             let html = '<div class="consolidated-assessment-section">';
-            html += `<h4 class="consolidated-assessment-title">${getText('marketAnalysisTitle')}</h4>`;
+            html += `<h4 class="consolidated-assessment-title">${window.i18nManager ? window.i18nManager.getTranslation("reports.marketAnalysisTitle") : "marketAnalysisTitle"}</h4>`;
             html += '<div class="consolidated-assessment-content">';
             
             // Sale Price Section
             html += '<div class="assessment-category">';
-            html += `<h5 class="assessment-category-title">${getText('salePriceTitle')}</h5>`;
+            html += `<h5 class="assessment-category-title">${window.i18nManager ? window.i18nManager.getTranslation("reports.salePriceTitle") : "salePriceTitle"}</h5>`;
             html += '<div class="assessment-items">';
             
             if (houseTypeData?.unit_price_for_sale) {
                 const listingType = houseTypeData.listing_type || '1+1';
                 html += `<div class="assessment-item">
-                    <span class="assessment-label">${getText('bedroomsLabel')} ${listingType}:</span>
+                    <span class="assessment-label">${window.i18nManager ? window.i18nManager.getTranslation("reports.bedroomsLabel") : "bedroomsLabel"} ${listingType}:</span>
                     <span class="assessment-value">${formatValue(houseTypeData.unit_price_for_sale, 'price')}</span>
                 </div>`;
             }
@@ -7742,7 +7742,7 @@
             if (floorSegmentData?.unit_price_for_sale) {
                 const listingType = floorSegmentData.listing_type || 'Giriş';
                 html += `<div class="assessment-item">
-                    <span class="assessment-label">${getText('floorLabel')} ${listingType}:</span>
+                    <span class="assessment-label">${window.i18nManager ? window.i18nManager.getTranslation("reports.floorLabel") : "floorLabel"} ${listingType}:</span>
                     <span class="assessment-value">${formatValue(floorSegmentData.unit_price_for_sale, 'price')}</span>
                 </div>`;
             }
@@ -7750,7 +7750,7 @@
             if (ageData?.unit_price_for_sale) {
                 const listingType = ageData.listing_type || '0–4';
                 html += `<div class="assessment-item">
-                    <span class="assessment-label">${getText('ageLabel')} ${listingType}:</span>
+                    <span class="assessment-label">${window.i18nManager ? window.i18nManager.getTranslation("reports.ageLabel") : "ageLabel"} ${listingType}:</span>
                     <span class="assessment-value">${formatValue(ageData.unit_price_for_sale, 'price')}</span>
                 </div>`;
             }
@@ -7758,7 +7758,7 @@
             if (heatingData?.unit_price_for_sale) {
                 const listingType = heatingData.listing_type || 'Yok';
                 html += `<div class="assessment-item">
-                    <span class="assessment-label">${getText('heatingLabel')} ${listingType}:</span>
+                    <span class="assessment-label">${window.i18nManager ? window.i18nManager.getTranslation("reports.heatingLabel") : "heatingLabel"} ${listingType}:</span>
                     <span class="assessment-value">${formatValue(heatingData.unit_price_for_sale, 'price')}</span>
                 </div>`;
             }
@@ -7766,7 +7766,7 @@
             html += '</div>';
             if (salePrice.calculated) {
                 html += `<div class="assessment-consolidated">
-                    <span class="assessment-consolidated-label">${getText('consolidatedAverageLabel')}</span>
+                    <span class="assessment-consolidated-label">${window.i18nManager ? window.i18nManager.getTranslation("reports.consolidatedAverageLabel") : "consolidatedAverageLabel"}</span>
                     <span class="assessment-consolidated-value">≈ ${formatValue(salePrice.value, 'price')}/м²</span>
                 </div>`;
             }
@@ -7774,13 +7774,13 @@
             
             // Rent Price Section
             html += '<div class="assessment-category">';
-            html += `<h5 class="assessment-category-title">${getText('rentPriceTitle')}</h5>`;
+            html += `<h5 class="assessment-category-title">${window.i18nManager ? window.i18nManager.getTranslation("reports.rentPriceTitle") : "rentPriceTitle"}</h5>`;
             html += '<div class="assessment-items">';
             
             if (houseTypeData?.unit_price_for_rent) {
                 const listingType = houseTypeData.listing_type || '1+1';
                 html += `<div class="assessment-item">
-                    <span class="assessment-label">${getText('bedroomsLabel')} ${listingType}:</span>
+                    <span class="assessment-label">${window.i18nManager ? window.i18nManager.getTranslation("reports.bedroomsLabel") : "bedroomsLabel"} ${listingType}:</span>
                     <span class="assessment-value">${formatValue(houseTypeData.unit_price_for_rent, 'price')}</span>
                 </div>`;
             }
@@ -7788,7 +7788,7 @@
             if (floorSegmentData?.unit_price_for_rent) {
                 const listingType = floorSegmentData.listing_type || 'Giriş';
                 html += `<div class="assessment-item">
-                    <span class="assessment-label">${getText('floorLabel')} ${listingType}:</span>
+                    <span class="assessment-label">${window.i18nManager ? window.i18nManager.getTranslation("reports.floorLabel") : "floorLabel"} ${listingType}:</span>
                     <span class="assessment-value">${formatValue(floorSegmentData.unit_price_for_rent, 'price')}</span>
                 </div>`;
             }
@@ -7796,7 +7796,7 @@
             if (ageData?.unit_price_for_rent) {
                 const listingType = ageData.listing_type || '0–4';
                 html += `<div class="assessment-item">
-                    <span class="assessment-label">${getText('ageLabel')} ${listingType}:</span>
+                    <span class="assessment-label">${window.i18nManager ? window.i18nManager.getTranslation("reports.ageLabel") : "ageLabel"} ${listingType}:</span>
                     <span class="assessment-value">${formatValue(ageData.unit_price_for_rent, 'price')}</span>
                 </div>`;
             }
@@ -7804,7 +7804,7 @@
             if (heatingData?.unit_price_for_rent) {
                 const listingType = heatingData.listing_type || 'Yok';
                 html += `<div class="assessment-item">
-                    <span class="assessment-label">${getText('heatingLabel')} ${listingType}:</span>
+                    <span class="assessment-label">${window.i18nManager ? window.i18nManager.getTranslation("reports.heatingLabel") : "heatingLabel"} ${listingType}:</span>
                     <span class="assessment-value">${formatValue(heatingData.unit_price_for_rent, 'price')}</span>
                 </div>`;
             }
@@ -7812,7 +7812,7 @@
             html += '</div>';
             if (rentPrice.calculated) {
                 html += `<div class="assessment-consolidated">
-                    <span class="assessment-consolidated-label">${getText('consolidatedAverageLabel')}</span>
+                    <span class="assessment-consolidated-label">${window.i18nManager ? window.i18nManager.getTranslation("reports.consolidatedAverageLabel") : "consolidatedAverageLabel"}</span>
                     <span class="assessment-consolidated-value">≈ ${formatValue(rentPrice.value, 'price')}/м²</span>
                 </div>`;
             }
@@ -7820,13 +7820,13 @@
             
             // Yield Section
             html += '<div class="assessment-category">';
-            html += `<h5 class="assessment-category-title">${getText('yieldTitle')}</h5>`;
+            html += `<h5 class="assessment-category-title">${window.i18nManager ? window.i18nManager.getTranslation("reports.yieldTitle") : "yieldTitle"}</h5>`;
             html += '<div class="assessment-items">';
             
             if (houseTypeData?.yield) {
                 const listingType = houseTypeData.listing_type || '1+1';
                 html += `<div class="assessment-item">
-                    <span class="assessment-label">${getText('bedroomsLabel')}:</span>
+                    <span class="assessment-label">${window.i18nManager ? window.i18nManager.getTranslation("reports.bedroomsLabel") : "bedroomsLabel"}:</span>
                     <span class="assessment-value">${formatValue(houseTypeData.yield, 'percentage')}</span>
                 </div>`;
             }
@@ -7834,7 +7834,7 @@
             if (floorSegmentData?.yield) {
                 const listingType = floorSegmentData.listing_type || 'Giriş';
                 html += `<div class="assessment-item">
-                    <span class="assessment-label">${getText('floorLabel')}:</span>
+                    <span class="assessment-label">${window.i18nManager ? window.i18nManager.getTranslation("reports.floorLabel") : "floorLabel"}:</span>
                     <span class="assessment-value">${formatValue(floorSegmentData.yield, 'percentage')}</span>
                 </div>`;
             }
@@ -7842,7 +7842,7 @@
             if (ageData?.yield) {
                 const listingType = ageData.listing_type || '0–4';
                 html += `<div class="assessment-item">
-                    <span class="assessment-label">${getText('ageLabel')}:</span>
+                    <span class="assessment-label">${window.i18nManager ? window.i18nManager.getTranslation("reports.ageLabel") : "ageLabel"}:</span>
                     <span class="assessment-value">${formatValue(ageData.yield, 'percentage')}</span>
                 </div>`;
             }
@@ -7850,7 +7850,7 @@
             if (heatingData?.yield) {
                 const listingType = heatingData.listing_type || 'Yok';
                 html += `<div class="assessment-item">
-                    <span class="assessment-label">${getText('heatingLabel')}:</span>
+                    <span class="assessment-label">${window.i18nManager ? window.i18nManager.getTranslation("reports.heatingLabel") : "heatingLabel"}:</span>
                     <span class="assessment-value">${formatValue(heatingData.yield, 'percentage')}</span>
                 </div>`;
             }
@@ -7858,7 +7858,7 @@
             html += '</div>';
             if (yield.calculated) {
                 html += `<div class="assessment-consolidated">
-                    <span class="assessment-consolidated-label">${getText('consolidatedAverageLabel')}</span>
+                    <span class="assessment-consolidated-label">${window.i18nManager ? window.i18nManager.getTranslation("reports.consolidatedAverageLabel") : "consolidatedAverageLabel"}</span>
                     <span class="assessment-consolidated-value">≈ ${formatValue(yield.value, 'percentage')}</span>
                 </div>`;
             }
@@ -8577,7 +8577,7 @@
             try {
                 // Disable button and show loading
                 saveButton.disabled = true;
-                saveButton.innerHTML = `<span>${getText('savingReport')}</span>`;
+                saveButton.innerHTML = `<span>${window.i18nManager ? window.i18nManager.getTranslation("reports.savingReport") : "savingReport"}</span>`;
                 
                 // Get report content
                 const reportContent = extractReportContent();
@@ -8619,7 +8619,7 @@
                 
             } catch (error) {
                 console.error('Error saving report:', error);
-                alert(getText('errorSaving'));
+                alert(window.i18nManager ? window.i18nManager.getTranslation("reports.errorSaving") : "errorSaving");
             } finally {
                 // Re-enable button
                 saveButton.disabled = false;
@@ -9140,7 +9140,7 @@
                     document.body.removeChild(textArea);
                 }
                 
-                copyButton.innerHTML = `<span>${getText('linkCopied')}</span>`;
+                copyButton.innerHTML = `<span>${window.i18nManager ? window.i18nManager.getTranslation("reports.linkCopied") : "linkCopied"}</span>`;
                 
                 setTimeout(() => {
                     copyButton.innerHTML = originalText;
