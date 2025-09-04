@@ -34,7 +34,7 @@ def get_currency_rate_for_date(target_date=None):
     """
     try:
         if target_date is None:
-            target_date = datetime.datetime.now()
+            target_date = datetime.now()
         
         # Форматируем дату для поиска в базе
         date_str = target_date.strftime('%Y-%m-%d')
@@ -67,7 +67,7 @@ def fetch_and_save_currency_rates(target_date=None):
     """
     try:
         if target_date is None:
-            target_date = datetime.datetime.now()
+            target_date = datetime.now()
         
         # Форматируем дату для API запроса
         date_str = target_date.strftime('%Y-%m-%d')
@@ -285,7 +285,7 @@ def get_current_currency_rate():
     Returns:
         dict: Словарь с курсами валют или None если ошибка
     """
-    return get_currency_rate_for_date(datetime.datetime.now())
+    return get_currency_rate_for_date(datetime.now())
 
 def format_currency_info(currency_rate, language='en'):
     """
@@ -311,7 +311,7 @@ def format_currency_info(currency_rate, language='en'):
                 date_obj = created_at
             date_str = date_obj.strftime('%d.%m.%Y')
         else:
-            date_str = datetime.datetime.now().strftime('%d.%m.%Y')
+            date_str = datetime.now().strftime('%d.%m.%Y')
         
         # Форматируем курсы
         try_rate = currency_rate.get('try', 0)

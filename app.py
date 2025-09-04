@@ -47,18 +47,6 @@ except ImportError as e:
     calculate_3month_forecast = None
     format_chart_data = None
 
-# Импорт модулей оптимизации производительности
-try:
-    from cache_manager import cache_manager
-    from connection_pool import init_query_optimizer
-    from performance_monitor import performance_monitor, monitor_performance, monitor_query, monitor_api
-    logger.info("✅ Модули оптимизации производительности успешно импортированы")
-except ImportError as e:
-    logger.error(f"❌ Ошибка импорта модулей оптимизации: {e}")
-    cache_manager = None
-    init_query_optimizer = None
-    performance_monitor = None
-
 # Условный импорт openai
 try:
     import openai
@@ -98,14 +86,6 @@ supabase: Client = create_client(
     supabase_url, 
     supabase_key
 )
-
-# Инициализация оптимизатора запросов
-if init_query_optimizer:
-    query_optimizer = init_query_optimizer(supabase)
-    logger.info("✅ QueryOptimizer инициализирован")
-else:
-    query_optimizer = None
-    logger.warning("⚠️ QueryOptimizer не инициализирован")
 
 # Токен бота
 TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
@@ -298,95 +278,6 @@ def health():
     """Эндпоинт для проверки здоровья приложения"""
     return jsonify({"status": "ok", "message": "Telegram WebApp Bot is running"})
 
-@app.route('/api/performance/stats')
-def api_performance_stats():
-    """Получение статистики производительности"""
-    if not performance_monitor:
-        return jsonify({'error': 'Performance monitor not available'}), 500
-    
-    try:
-        # Получаем общую статистику за последний час
-        overall_stats = performance_monitor.get_overall_stats(window_seconds=3600)
-        
-        # Получаем статистику кэша
-        cache_stats = {}
-        if cache_manager:
-            cache_stats = cache_manager.get_stats()
-        
-        # Получаем статистику пула соединений
-        pool_stats = {}
-        if query_optimizer and hasattr(query_optimizer, 'pool'):
-            pool_stats = query_optimizer.pool.get_stats()
-        
-        return jsonify({
-            'success': True,
-            'overall_stats': overall_stats,
-            'cache_stats': cache_stats,
-            'pool_stats': pool_stats,
-            'timestamp': time.time()
-        })
-    except Exception as e:
-        logger.error(f"Ошибка получения статистики производительности: {e}")
-        return jsonify({'error': str(e)}), 500
-
-@app.route('/api/performance/cache/clear')
-def api_clear_cache():
-    """Очистка всех кэшей"""
-    if not cache_manager:
-        return jsonify({'error': 'Cache manager not available'}), 500
-    
-    try:
-        cache_manager.clear_all()
-        return jsonify({
-            'success': True,
-            'message': 'All caches cleared successfully'
-        })
-    except Exception as e:
-        logger.error(f"Ошибка очистки кэша: {e}")
-        return jsonify({'error': str(e)}), 500
-
-@app.route('/api/performance/metrics/export')
-def api_export_metrics():
-    """Экспорт метрик в JSON"""
-    if not performance_monitor:
-        return jsonify({'error': 'Performance monitor not available'}), 500
-    
-    try:
-        metrics_json = performance_monitor.export_metrics()
-        return jsonify({
-            'success': True,
-            'metrics': json.loads(metrics_json)
-        })
-    except Exception as e:
-        logger.error(f"Ошибка экспорта метрик: {e}")
-        return jsonify({'error': str(e)}), 500
-
-@app.route('/api/performance/metrics/clear_old')
-def api_clear_old_metrics():
-    """Очистка старых метрик"""
-    if not performance_monitor:
-        return jsonify({'error': 'Performance monitor not available'}), 500
-    
-    try:
-        performance_monitor.clear_old_metrics()
-        return jsonify({
-            'success': True,
-            'message': 'Старые метрики очищены'
-        })
-    except Exception as e:
-        logger.error(f"Ошибка очистки старых метрик: {e}")
-        return jsonify({'error': str(e)}), 500
-
-@app.route('/webapp_admin_performance')
-def webapp_admin_performance():
-    """Административная панель для мониторинга производительности"""
-    return render_template('webapp_admin_performance.html')
-
-@app.route('/i18n-manager.js')
-def serve_i18n_manager():
-    """Сервис менеджера интернационализации"""
-    return send_from_directory('.', 'i18n-manager.js')
-
 @app.route('/logo-sqv.png')
 def serve_logo():
     return send_from_directory('.', 'logo-sqv.png')
@@ -401,7 +292,6 @@ def serve_report(filename):
     return send_from_directory('reports', filename)
 
 @app.route('/api/user', methods=['POST'])
-@monitor_api('user_data')
 def api_user():
     data = request.json or {}
     telegram_id_raw = data.get('telegram_id')
@@ -418,149 +308,19 @@ def api_user():
     referal = data.get('referal')  # invite_code пригласившего, если есть
     if not telegram_id:
         return jsonify({'error': 'telegram_id required'}), 400
-    
-    # Проверяем кэш пользователя
-    if cache_manager:
-        cached_user = cache_manager.get_user_data(telegram_id)
-        if cached_user:
-            logger.info(f"✅ Данные пользователя {telegram_id} получены из кэша")
-            lang = cached_user.get('language') or (language_code[:2] if language_code[:2] in locales else 'en')
-            return jsonify({
-                'exists': True,
-                'is_new_user': False,
-                'language': cached_user.get('language') or lang,
-                'language_code': lang,
-                'welcome': locales[lang]['welcome_back'],
-                'menu': locales[lang]['menu'],
-                'name': cached_user.get('name'),
-                'tg_name': cached_user.get('tg_name'),
-                'last_name': cached_user.get('last_name'),
-                'username': cached_user.get('username'),
-                'balance': cached_user.get('balance', 0),
-                'telegram_id': cached_user.get('telegram_id'),
-                'user_status': cached_user.get('user_status', None),
-                'source': 'cache'
-            })
-    
     # Проверяем пользователя в базе
     try:
-        if query_optimizer:
-            future = query_optimizer.get_user_data_optimized(telegram_id)
-            if future is None:
-                logger.error("QueryOptimizer вернул None вместо Future")
-                # Если есть кэшированные данные, используем их как fallback
-                if cache_manager:
-                    cached_user = cache_manager.get_user_data(telegram_id)
-                    if cached_user:
-                        logger.warning(f"⚠️ Используем кэшированные данные из-за ошибки QueryOptimizer для пользователя {telegram_id}")
-                        lang = cached_user.get('language') or (language_code[:2] if language_code[:2] in locales else 'en')
-                        return jsonify({
-                            'exists': True,
-                            'is_new_user': False,
-                            'language': cached_user.get('language') or lang,
-                            'language_code': lang,
-                            'welcome': locales[lang]['welcome_back'],
-                            'menu': locales[lang]['menu'],
-                            'name': cached_user.get('name'),
-                            'tg_name': cached_user.get('tg_name'),
-                            'last_name': cached_user.get('last_name'),
-                            'username': cached_user.get('username'),
-                            'balance': cached_user.get('balance', 0),
-                            'telegram_id': cached_user.get('telegram_id'),
-                            'user_status': cached_user.get('user_status', None),
-                            'source': 'cache_fallback'
-                        })
-                return jsonify({'error': 'QueryOptimizer error'}), 500
-            
-            try:
-                user_result = future.result(timeout=30)
-            except Exception as e:
-                logger.error(f"Ошибка выполнения Future: {e}")
-                # Если есть кэшированные данные, используем их как fallback
-                if cache_manager:
-                    cached_user = cache_manager.get_user_data(telegram_id)
-                    if cached_user:
-                        logger.warning(f"⚠️ Используем кэшированные данные из-за ошибки Future для пользователя {telegram_id}")
-                        lang = cached_user.get('language') or (language_code[:2] if language_code[:2] in locales else 'en')
-                        return jsonify({
-                            'exists': True,
-                            'is_new_user': False,
-                            'language': cached_user.get('language') or lang,
-                            'language_code': lang,
-                            'welcome': locales[lang]['welcome_back'],
-                            'menu': locales[lang]['menu'],
-                            'name': cached_user.get('name'),
-                            'tg_name': cached_user.get('tg_name'),
-                            'last_name': cached_user.get('last_name'),
-                            'username': cached_user.get('username'),
-                            'balance': cached_user.get('balance', 0),
-                            'telegram_id': cached_user.get('telegram_id'),
-                            'user_status': cached_user.get('user_status', None),
-                            'source': 'cache_fallback'
-                        })
-                return jsonify({'error': 'Future execution error'}), 500
-        else:
-            user_result = safe_db_operation(
-                lambda: supabase.table('users').select('*').eq('telegram_id', telegram_id).execute()
-            )
-        
+        user_result = safe_db_operation(
+            lambda: supabase.table('users').select('*').eq('telegram_id', telegram_id).execute()
+        )
         if user_result is None:
-            # Если есть кэшированные данные, используем их как fallback
-            if cache_manager:
-                cached_user = cache_manager.get_user_data(telegram_id)
-                if cached_user:
-                    logger.warning(f"⚠️ Используем кэшированные данные из-за ошибки БД для пользователя {telegram_id}")
-                    lang = cached_user.get('language') or (language_code[:2] if language_code[:2] in locales else 'en')
-                    return jsonify({
-                        'exists': True,
-                        'is_new_user': False,
-                        'language': cached_user.get('language') or lang,
-                        'language_code': lang,
-                        'welcome': locales[lang]['welcome_back'],
-                        'menu': locales[lang]['menu'],
-                        'name': cached_user.get('name'),
-                        'tg_name': cached_user.get('tg_name'),
-                        'last_name': cached_user.get('last_name'),
-                        'username': cached_user.get('username'),
-                        'balance': cached_user.get('balance', 0),
-                        'telegram_id': cached_user.get('telegram_id'),
-                        'user_status': cached_user.get('user_status', None),
-                        'source': 'cache_fallback'
-                    })
             return jsonify({'error': 'Database connection error'}), 500
         user = user_result.data[0] if user_result.data else None
     except Exception as e:
         logger.error(f"Database connection error: {e}")
-        # Если есть кэшированные данные, используем их как fallback
-        if cache_manager:
-            cached_user = cache_manager.get_user_data(telegram_id)
-            if cached_user:
-                logger.warning(f"⚠️ Используем кэшированные данные из-за ошибки БД для пользователя {telegram_id}")
-                lang = cached_user.get('language') or (language_code[:2] if language_code[:2] in locales else 'en')
-                return jsonify({
-                    'exists': True,
-                    'is_new_user': False,
-                    'language': cached_user.get('language') or lang,
-                    'language_code': lang,
-                    'welcome': locales[lang]['welcome_back'],
-                    'menu': locales[lang]['menu'],
-                    'name': cached_user.get('name'),
-                    'tg_name': cached_user.get('tg_name'),
-                    'last_name': cached_user.get('last_name'),
-                    'username': cached_user.get('username'),
-                    'balance': cached_user.get('balance', 0),
-                    'telegram_id': cached_user.get('telegram_id'),
-                    'user_status': cached_user.get('user_status', None),
-                    'source': 'cache_fallback'
-                })
         return jsonify({'error': 'Database connection error'}), 500
     if user is not None:
         lang = user.get('language') or (language_code[:2] if language_code[:2] in locales else 'en')
-        
-        # Сохраняем в кэш
-        if cache_manager:
-            cache_manager.set_user_data(telegram_id, user)
-        
         return jsonify({
             'exists': True,
             'is_new_user': False,
@@ -575,7 +335,6 @@ def api_user():
             'balance': user.get('balance', 0),
             'telegram_id': user.get('telegram_id'),
             'user_status': user.get('user_status', None),
-            'source': 'database'
         })
     else:
         # Новый пользователь
@@ -619,8 +378,7 @@ def api_user():
             'languages': locales[lang]['language_names'],
             'balance': 0,
             'telegram_id': telegram_id,
-            'invite_code': invite_code,
-            'source': 'new_user'
+            'invite_code': invite_code
         })
 
 @app.route('/api/user_profile', methods=['POST'])
@@ -685,18 +443,10 @@ def api_menu():
     return jsonify({'menu': locales[language]['menu']})
 
 @app.route('/api/locations/countries', methods=['GET'])
-@monitor_api('locations_countries')
 def api_locations_countries():
     """Получение списка стран из таблицы locations"""
     try:
         logger.info("🔍 Запрос списка стран")
-        
-        # Проверяем кэш
-        if cache_manager:
-            cached_data = cache_manager.get_location_data(country_id=None)
-            if cached_data:
-                logger.info("✅ Данные стран получены из кэша")
-                return jsonify({'success': True, 'countries': cached_data})
         
         # Получаем все записи с помощью пагинации
         all_records = []
@@ -704,17 +454,7 @@ def api_locations_countries():
         page_size = 1000
         
         while True:
-            if query_optimizer:
-                # Используем оптимизированный запрос
-                future = query_optimizer.optimized_select(
-                    'locations', 
-                    fields='country_id,country_name',
-                    limit=page_size
-                )
-                result = future.result(timeout=30)
-            else:
-                # Fallback к обычному запросу
-                result = supabase.table('locations').select('country_id, country_name').range(page * page_size, (page + 1) * page_size - 1).execute()
+            result = supabase.table('locations').select('country_id, country_name').range(page * page_size, (page + 1) * page_size - 1).execute()
             
             if not result.data:
                 break
@@ -745,11 +485,6 @@ def api_locations_countries():
             
             # Сортируем по названию, игнорируя None
             countries.sort(key=lambda x: x[1] if x[1] is not None else '')
-            
-            # Сохраняем в кэш
-            if cache_manager:
-                cache_manager.set_location_data(country_id=None, data=countries)
-            
             return jsonify({'success': True, 'countries': countries})
         else:
             logger.warning("⚠️ Страны не найдены")
@@ -1082,52 +817,28 @@ def api_listing_types(table_name):
         return jsonify({'success': False, 'error': str(e)}), 500
 
 @app.route('/api/currency/rates', methods=['GET'])
-@monitor_api('currency_rates')
 def api_currency_rates():
     """Получение курсов валют из базы данных"""
     try:
         logger.info("🔍 Запрос курсов валют из базы данных")
         
-        # Проверяем кэш
-        if cache_manager:
-            cached_rates = cache_manager.get_currency_rates()
-            if cached_rates:
-                logger.info("✅ Курсы валют получены из кэша")
-                return jsonify({
-                    'success': True,
-                    'rates': cached_rates,
-                    'source': 'cache'
-                })
-        
         # Получаем последние курсы валют
-        if query_optimizer:
-            future = query_optimizer.get_currency_rates_optimized()
-            result = future.result(timeout=30)
-        else:
-            result = supabase.table('currency').select('*').order('created_at', desc=True).limit(1).execute()
+        result = supabase.table('currency').select('*').order('created_at', desc=True).limit(1).execute()
         
         if result.data and len(result.data) > 0:
             latest_rates = result.data[0]
-            rates_data = {
-                'rub': latest_rates.get('rub'),
-                'usd': latest_rates.get('usd'),
-                'euro': latest_rates.get('euro'),
-                'try': latest_rates.get('try'),
-                'aed': latest_rates.get('aed'),
-                'thb': latest_rates.get('thb')
-            }
-            
             logger.info(f"✅ Получены курсы валют: {latest_rates}")
-            
-            # Сохраняем в кэш
-            if cache_manager:
-                cache_manager.set_currency_rates(rates_data)
-            
             return jsonify({
                 'success': True,
-                'rates': rates_data,
-                'last_updated': latest_rates.get('created_at'),
-                'source': 'database'
+                'rates': {
+                    'rub': latest_rates.get('rub'),
+                    'usd': latest_rates.get('usd'),
+                    'euro': latest_rates.get('euro'),
+                    'try': latest_rates.get('try'),
+                    'aed': latest_rates.get('aed'),
+                    'thb': latest_rates.get('thb')
+                },
+                'last_updated': latest_rates.get('created_at')
             })
         else:
             logger.warning("⚠️ Курсы валют в базе данных не найдены")
@@ -1279,7 +990,7 @@ def api_currency_update():
         }
         
         # Проверяем, есть ли уже запись на сегодня
-        today = datetime.datetime.now().strftime('%Y-%m-%d')
+        today = datetime.now().strftime('%Y-%m-%d')
         today_result = supabase.table('currency').select('id').gte('created_at', f'{today}T00:00:00').lt('created_at', f'{today}T23:59:59').limit(1).execute()
         
         if not today_result.data or len(today_result.data) == 0:
@@ -1720,7 +1431,6 @@ def api_currency_latest():
         }), 500
 
 @app.route('/api/check_admin_status', methods=['POST'])
-@monitor_api('check_admin_status')
 def api_check_admin_status():
     """Проверка статуса администратора пользователя и подписки"""
     data = request.json or {}
@@ -1737,50 +1447,27 @@ def api_check_admin_status():
         return jsonify({'error': 'Invalid telegram_id'}), 400
     
     try:
-        # Проверяем кэш пользователя
-        if cache_manager:
-            cached_user = cache_manager.get_user_data(telegram_id)
-            if cached_user:
-                is_admin = cached_user.get('user_status') == 'admin'
-                logger.info(f"✅ Данные получены из кэша: is_admin={is_admin}")
-                return jsonify({
-                    'success': True,
-                    'is_admin': is_admin,
-                    'user_status': cached_user.get('user_status'),
-                    'period_end': cached_user.get('period_end'),
-                    'source': 'cache'
-                })
-        
         # Проверяем пользователя в базе с таймаутом
         logger.info(f"🔍 Поиск пользователя в базе для telegram_id: {telegram_id}")
         
-        # Используем query_optimizer если доступен
-        if query_optimizer:
-            future = query_optimizer.get_user_data_optimized(telegram_id)
+        # Добавляем таймаут для Supabase запроса
+        import asyncio
+        import concurrent.futures
+        
+        def execute_supabase_query():
+            return supabase.table('users').select('user_status, period_end').eq('telegram_id', telegram_id).execute()
+        
+        # Выполняем запрос с таймаутом
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            future = executor.submit(execute_supabase_query)
             try:
                 user_result = future.result(timeout=10)  # 10 секунд таймаут
+            except concurrent.futures.TimeoutError:
+                logger.error("❌ Таймаут при запросе к базе данных")
+                return jsonify({'error': 'Database timeout'}), 408
             except Exception as e:
-                logger.error(f"❌ Ошибка при выполнении оптимизированного запроса: {e}")
-                user_result = None
-        else:
-            # Добавляем таймаут для Supabase запроса
-            import asyncio
-            import concurrent.futures
-            
-            def execute_supabase_query():
-                return supabase.table('users').select('user_status, period_end').eq('telegram_id', telegram_id).execute()
-            
-            # Выполняем запрос с таймаутом
-            with concurrent.futures.ThreadPoolExecutor() as executor:
-                future = executor.submit(execute_supabase_query)
-                try:
-                    user_result = future.result(timeout=10)  # 10 секунд таймаут
-                except concurrent.futures.TimeoutError:
-                    logger.error("❌ Таймаут при запросе к базе данных")
-                    return jsonify({'error': 'Database timeout'}), 408
-                except Exception as e:
-                    logger.error(f"❌ Ошибка при выполнении запроса к базе: {e}")
-                    return jsonify({'error': 'Database error'}), 500
+                logger.error(f"❌ Ошибка при выполнении запроса к базе: {e}")
+                return jsonify({'error': 'Database error'}), 500
         
         logger.info(f"📊 Результат поиска: {len(user_result.data) if user_result.data else 0} записей")
         
@@ -1793,16 +1480,11 @@ def api_check_admin_status():
             logger.info(f"👤 Пользователь найден: user_status={user_status}, is_admin={is_admin}, period_end={period_end}")
             logger.info(f"📋 Проверяем user_status='{user_status}' == 'admin' = {user_status == 'admin'}")
             
-            # Сохраняем в кэш
-            if cache_manager:
-                cache_manager.set_user_data(telegram_id, user)
-            
             return jsonify({
                 'success': True,
                 'is_admin': is_admin,
                 'user_status': user_status,
-                'period_end': period_end,
-                'source': 'database'
+                'period_end': period_end
             })
         else:
             logger.warning(f"❌ Пользователь не найден для telegram_id: {telegram_id}")
@@ -2957,7 +2639,7 @@ def format_simple_report(address, bedrooms, price, location_codes, language='en'
     report_lines.extend([
         "=" * 50,
         "Отчет сгенерирован автоматически",
-        f"Дата: {datetime.datetime.now().strftime('%d.%m.%Y %H:%M')}",
+        f"Дата: {datetime.now().strftime('%d.%m.%Y %H:%M')}",
         ])
     
     return "\n".join(report_lines)
@@ -3187,7 +2869,7 @@ def get_economic_data(country_code='TUR', years_back=10):
     """
     try:
         # Получаем данные за последние N лет
-        current_year = datetime.datetime.now().year
+        current_year = datetime.now().year
         start_year = current_year - years_back
         
         # Запрос к таблице imf_economic_data для ВВП (NGDP_RPCH)
@@ -5202,7 +4884,7 @@ def api_update_user_report():
         # TODO: здесь должна быть логика перегенерации отчета
         # Пока просто обновляем дату
         supabase.table('user_reports').update({
-            'updated_at': datetime.datetime.now().isoformat()
+            'updated_at': datetime.now().isoformat()
         }).eq('id', report_id).execute()
         return jsonify({'success': True, 'balance': new_balance})
     except Exception as e:
@@ -5243,8 +4925,8 @@ def api_save_user_report():
             'report_type': report_type,
             'address': address,
             'full_report': full_report,
-            'created_at': datetime.datetime.now().isoformat(),
-            'updated_at': datetime.datetime.now().isoformat()
+            'created_at': datetime.now().isoformat(),
+            'updated_at': datetime.now().isoformat()
         }
         try:
             result = safe_db_operation(
@@ -5282,7 +4964,7 @@ def api_save_html_report():
     
     try:
         # Генерируем уникальный номер отчета
-        timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         random_suffix = ''.join(random.choices(string.digits, k=5))
         report_number = f"RPT-{timestamp}-{random_suffix}"
         
@@ -5324,7 +5006,7 @@ def api_save_html_report():
                 'content': report_content,
                 'location_info': location_info,
                 'report_number': report_number,
-                'generated_at': datetime.datetime.now().isoformat()
+                'generated_at': datetime.now().isoformat()
             }
         }
         
@@ -6154,11 +5836,11 @@ def api_save_html_report():
                     </div>
                     <div class="metadata-item">
                         <span class="metadata-label">Дата формирования:</span>
-                        <span class="metadata-value">{datetime.datetime.now().strftime("%d.%m.%Y")}</span>
+                        <span class="metadata-value">{datetime.now().strftime("%d.%m.%Y")}</span>
                     </div>
                     <div class="metadata-item">
                         <span class="metadata-label">Время формирования:</span>
-                        <span class="metadata-value">{datetime.datetime.now().strftime("%H:%M:%S")} UTC</span>
+                        <span class="metadata-value">{datetime.now().strftime("%H:%M:%S")} UTC</span>
                     </div>
                 </div>
                 <div>
@@ -6355,7 +6037,7 @@ def api_save_html_report():
             
             <div class="footer-info">
                 <strong>Aaadviser</strong> - Система аналитики недвижимости<br>
-                Отчет №{report_number} | Сформирован {datetime.datetime.now().strftime("%d.%m.%Y в %H:%M:%S")}<br>
+                Отчет №{report_number} | Сформирован {datetime.now().strftime("%d.%m.%Y в %H:%M:%S")}<br>
                 © 2024 Aaadviser. Все права защищены.
             </div>
         </div>
@@ -6929,7 +6611,7 @@ def api_admin_balance_100():
 def api_admin_users_stats():
     import datetime
     from dateutil.relativedelta import relativedelta
-    now = datetime.datetime.now()
+    now = datetime.now()
     today = now.date()
     week_ago = today - datetime.timedelta(days=7)
     month_ago = today - relativedelta(months=1)
@@ -7362,7 +7044,7 @@ def get_market_data_by_location_ids(location_codes, target_year=None, target_mon
         
         # Если год и месяц не указаны, используем текущие
         if target_year is None or target_month is None:
-            now = datetime.datetime.now()
+            now = datetime.now()
             target_year = target_year or now.year
             target_month = target_month or now.month
         
@@ -8661,7 +8343,7 @@ def get_market_comparison_data(age_id, floor_id, heating_id, area, price, locati
         price_trends = {}  # Для графиков изменения цен
         
         # Получаем текущую дату для фильтрации по trend_date
-        current_date = datetime.datetime.now().date()
+        current_date = datetime.now().date()
         twelve_months_ago = current_date - timedelta(days=365)  # 12 месяцев для графиков
         
         # 1. Сравнение по возрасту объекта

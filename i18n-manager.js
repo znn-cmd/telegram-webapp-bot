@@ -76,14 +76,6 @@ class I18nManager {
                     'timezone': 'Часовой пояс', 'notifications': 'Уведомления',
                     'dark_mode': 'Темная тема', 'light_mode': 'Светлая тема'
                 },
-                'main': {
-                    'title': 'Главное меню', 'welcome': 'Добро пожаловать',
-                    'quick_actions': 'Быстрые действия', 'recent_reports': 'Последние отчеты',
-                    'popular_services': 'Популярные услуги', 'news': 'Новости',
-                    'notifications': 'Уведомления', 'menu': 'Меню', 'home': 'Главная',
-                    'reports': 'Отчеты', 'analytics': 'Аналитика', 'profile': 'Профиль',
-                    'help': 'Помощь', 'settings': 'Настройки'
-                },
                 'profile': {
                     'title': 'Личный кабинет', 'personal_info': 'Личная информация',
                     'first_name': 'Имя', 'last_name': 'Фамилия', 'email': 'Email',
@@ -101,6 +93,17 @@ class I18nManager {
                     'profile_updated': 'Профиль обновлен', 'password_changed': 'Пароль изменен',
                     'account_deleted': 'Аккаунт удален'
                 },
+                'balance': {
+                    'title': 'Баланс', 'current_balance': 'Текущий баланс',
+                    'top_up_balance': 'Пополнить баланс', 'withdraw_funds': 'Вывести средства',
+                    'transaction_history': 'История транзакций', 'amount': 'Сумма', 'date': 'Дата',
+                    'type': 'Тип', 'status': 'Статус', 'description': 'Описание', 'income': 'Пополнение',
+                    'expense': 'Списание', 'pending': 'В обработке', 'completed': 'Завершено',
+                    'failed': 'Ошибка', 'payment_method': 'Способ оплаты', 'card': 'Карта',
+                    'bank_transfer': 'Банковский перевод', 'crypto': 'Криптовалюта',
+                    'min_amount': 'Минимальная сумма', 'max_amount': 'Максимальная сумма',
+                    'fee': 'Комиссия', 'total': 'Итого'
+                },
                 'reports': {
                     'title': 'Отчеты', 'my_reports': 'Мои отчеты', 'create_report': 'Создать отчет',
                     'report_details': 'Детали отчета', 'report_type': 'Тип отчета',
@@ -116,16 +119,13 @@ class I18nManager {
                     'report_saved': 'Отчет сохранен', 'report_deleted': 'Отчет удален',
                     'report_shared': 'Отчет отправлен'
                 },
-                'balance': {
-                    'title': 'Баланс', 'current_balance': 'Текущий баланс',
-                    'top_up_balance': 'Пополнить баланс', 'withdraw_funds': 'Вывести средства',
-                    'transaction_history': 'История транзакций', 'amount': 'Сумма', 'date': 'Дата',
-                    'type': 'Тип', 'status': 'Статус', 'description': 'Описание', 'income': 'Пополнение',
-                    'expense': 'Списание', 'pending': 'В обработке', 'completed': 'Завершено',
-                    'failed': 'Ошибка', 'payment_method': 'Способ оплаты', 'card': 'Карта',
-                    'bank_transfer': 'Банковский перевод', 'crypto': 'Криптовалюта',
-                    'min_amount': 'Минимальная сумма', 'max_amount': 'Максимальная сумма',
-                    'fee': 'Комиссия', 'total': 'Итого'
+                'main': {
+                    'title': 'Главное меню', 'welcome': 'Добро пожаловать',
+                    'quick_actions': 'Быстрые действия', 'recent_reports': 'Последние отчеты',
+                    'popular_services': 'Популярные услуги', 'news': 'Новости',
+                    'notifications': 'Уведомления', 'menu': 'Меню', 'home': 'Главная',
+                    'reports': 'Отчеты', 'analytics': 'Аналитика', 'profile': 'Профиль',
+                    'help': 'Помощь', 'settings': 'Настройки'
                 },
                 'admin': {
                     'title': 'Админ панель', 'users': 'Пользователи', 'publications': 'Публикации',
@@ -150,14 +150,6 @@ class I18nManager {
                     'timezone': 'Timezone', 'notifications': 'Notifications',
                     'dark_mode': 'Dark Mode', 'light_mode': 'Light Mode'
                 },
-                'main': {
-                    'title': 'Main Menu', 'welcome': 'Welcome',
-                    'quick_actions': 'Quick Actions', 'recent_reports': 'Recent Reports',
-                    'popular_services': 'Popular Services', 'news': 'News',
-                    'notifications': 'Notifications', 'menu': 'Menu', 'home': 'Home',
-                    'reports': 'Reports', 'analytics': 'Analytics', 'profile': 'Profile',
-                    'help': 'Help', 'settings': 'Settings'
-                },
                 'profile': {
                     'title': 'Profile', 'personal_info': 'Personal Information',
                     'first_name': 'First Name', 'last_name': 'Last Name', 'email': 'Email',
@@ -175,6 +167,17 @@ class I18nManager {
                     'profile_updated': 'Profile Updated', 'password_changed': 'Password Changed',
                     'account_deleted': 'Account Deleted'
                 },
+                'balance': {
+                    'title': 'Balance', 'current_balance': 'Current Balance',
+                    'top_up_balance': 'Top Up Balance', 'withdraw_funds': 'Withdraw Funds',
+                    'transaction_history': 'Transaction History', 'amount': 'Amount', 'date': 'Date',
+                    'type': 'Type', 'status': 'Status', 'description': 'Description', 'income': 'Income',
+                    'expense': 'Expense', 'pending': 'Pending', 'completed': 'Completed',
+                    'failed': 'Failed', 'payment_method': 'Payment Method', 'card': 'Card',
+                    'bank_transfer': 'Bank Transfer', 'crypto': 'Cryptocurrency',
+                    'min_amount': 'Minimum Amount', 'max_amount': 'Maximum Amount',
+                    'fee': 'Fee', 'total': 'Total'
+                },
                 'reports': {
                     'title': 'Reports', 'my_reports': 'My Reports', 'create_report': 'Create Report',
                     'report_details': 'Report Details', 'report_type': 'Report Type',
@@ -190,16 +193,13 @@ class I18nManager {
                     'report_saved': 'Report Saved', 'report_deleted': 'Report Deleted',
                     'report_shared': 'Report Shared'
                 },
-                'balance': {
-                    'title': 'Balance', 'current_balance': 'Current Balance',
-                    'top_up_balance': 'Top Up Balance', 'withdraw_funds': 'Withdraw Funds',
-                    'transaction_history': 'Transaction History', 'amount': 'Amount', 'date': 'Date',
-                    'type': 'Type', 'status': 'Status', 'description': 'Description', 'income': 'Income',
-                    'expense': 'Expense', 'pending': 'Pending', 'completed': 'Completed',
-                    'failed': 'Failed', 'payment_method': 'Payment Method', 'card': 'Card',
-                    'bank_transfer': 'Bank Transfer', 'crypto': 'Cryptocurrency',
-                    'min_amount': 'Minimum Amount', 'max_amount': 'Maximum Amount',
-                    'fee': 'Fee', 'total': 'Total'
+                'main': {
+                    'title': 'Main Menu', 'welcome': 'Welcome',
+                    'quick_actions': 'Quick Actions', 'recent_reports': 'Recent Reports',
+                    'popular_services': 'Popular Services', 'news': 'News',
+                    'notifications': 'Notifications', 'menu': 'Menu', 'home': 'Home',
+                    'reports': 'Reports', 'analytics': 'Analytics', 'profile': 'Profile',
+                    'help': 'Help', 'settings': 'Settings'
                 },
                 'admin': {
                     'title': 'Admin Panel', 'users': 'Users', 'publications': 'Publications',
@@ -225,14 +225,6 @@ class I18nManager {
                     'timezone': 'Zeitzone', 'notifications': 'Benachrichtigungen',
                     'dark_mode': 'Dunkler Modus', 'light_mode': 'Heller Modus'
                 },
-                'main': {
-                    'title': 'Hauptmenü', 'welcome': 'Willkommen',
-                    'quick_actions': 'Schnellaktionen', 'recent_reports': 'Letzte Berichte',
-                    'popular_services': 'Beliebte Dienste', 'news': 'Nachrichten',
-                    'notifications': 'Benachrichtigungen', 'menu': 'Menü', 'home': 'Startseite',
-                    'reports': 'Berichte', 'analytics': 'Analytik', 'profile': 'Profil',
-                    'help': 'Hilfe', 'settings': 'Einstellungen'
-                },
                 'profile': {
                     'title': 'Profil', 'personal_info': 'Persönliche Informationen',
                     'first_name': 'Vorname', 'last_name': 'Nachname', 'email': 'E-Mail',
@@ -250,6 +242,17 @@ class I18nManager {
                     'profile_updated': 'Profil aktualisiert', 'password_changed': 'Passwort geändert',
                     'account_deleted': 'Konto gelöscht'
                 },
+                'balance': {
+                    'title': 'Kontostand', 'current_balance': 'Aktueller Kontostand',
+                    'top_up_balance': 'Kontostand aufladen', 'withdraw_funds': 'Geld abheben',
+                    'transaction_history': 'Transaktionsverlauf', 'amount': 'Betrag', 'date': 'Datum',
+                    'type': 'Typ', 'status': 'Status', 'description': 'Beschreibung', 'income': 'Einnahmen',
+                    'expense': 'Ausgaben', 'pending': 'Ausstehend', 'completed': 'Abgeschlossen',
+                    'failed': 'Fehlgeschlagen', 'payment_method': 'Zahlungsmethode', 'card': 'Karte',
+                    'bank_transfer': 'Banküberweisung', 'crypto': 'Kryptowährung',
+                    'min_amount': 'Mindestbetrag', 'max_amount': 'Höchstbetrag',
+                    'fee': 'Gebühr', 'total': 'Gesamt'
+                },
                 'reports': {
                     'title': 'Berichte', 'my_reports': 'Meine Berichte', 'create_report': 'Bericht erstellen',
                     'report_details': 'Berichtsdetails', 'report_type': 'Berichtstyp',
@@ -265,16 +268,13 @@ class I18nManager {
                     'report_saved': 'Bericht gespeichert', 'report_deleted': 'Bericht gelöscht',
                     'report_shared': 'Bericht geteilt'
                 },
-                'balance': {
-                    'title': 'Kontostand', 'current_balance': 'Aktueller Kontostand',
-                    'top_up_balance': 'Kontostand aufladen', 'withdraw_funds': 'Geld abheben',
-                    'transaction_history': 'Transaktionsverlauf', 'amount': 'Betrag', 'date': 'Datum',
-                    'type': 'Typ', 'status': 'Status', 'description': 'Beschreibung', 'income': 'Einnahmen',
-                    'expense': 'Ausgaben', 'pending': 'Ausstehend', 'completed': 'Abgeschlossen',
-                    'failed': 'Fehlgeschlagen', 'payment_method': 'Zahlungsmethode', 'card': 'Karte',
-                    'bank_transfer': 'Banküberweisung', 'crypto': 'Kryptowährung',
-                    'min_amount': 'Mindestbetrag', 'max_amount': 'Höchstbetrag',
-                    'fee': 'Gebühr', 'total': 'Gesamt'
+                'main': {
+                    'title': 'Hauptmenü', 'welcome': 'Willkommen',
+                    'quick_actions': 'Schnellaktionen', 'recent_reports': 'Letzte Berichte',
+                    'popular_services': 'Beliebte Dienste', 'news': 'Nachrichten',
+                    'notifications': 'Benachrichtigungen', 'menu': 'Menü', 'home': 'Startseite',
+                    'reports': 'Berichte', 'analytics': 'Analytik', 'profile': 'Profil',
+                    'help': 'Hilfe', 'settings': 'Einstellungen'
                 },
                 'admin': {
                     'title': 'Admin-Panel', 'users': 'Benutzer', 'publications': 'Veröffentlichungen',
@@ -300,14 +300,6 @@ class I18nManager {
                     'timezone': 'Fuseau horaire', 'notifications': 'Notifications',
                     'dark_mode': 'Mode sombre', 'light_mode': 'Mode clair'
                 },
-                'main': {
-                    'title': 'Menu principal', 'welcome': 'Bienvenue',
-                    'quick_actions': 'Actions rapides', 'recent_reports': 'Rapports récents',
-                    'popular_services': 'Services populaires', 'news': 'Actualités',
-                    'notifications': 'Notifications', 'menu': 'Menu', 'home': 'Accueil',
-                    'reports': 'Rapports', 'analytics': 'Analytique', 'profile': 'Profil',
-                    'help': 'Aide', 'settings': 'Paramètres'
-                },
                 'profile': {
                     'title': 'Profil', 'personal_info': 'Informations personnelles',
                     'first_name': 'Prénom', 'last_name': 'Nom', 'email': 'E-mail',
@@ -325,6 +317,17 @@ class I18nManager {
                     'profile_updated': 'Profil mis à jour', 'password_changed': 'Mot de passe changé',
                     'account_deleted': 'Compte supprimé'
                 },
+                'balance': {
+                    'title': 'Solde', 'current_balance': 'Solde actuel',
+                    'top_up_balance': 'Recharger le solde', 'withdraw_funds': 'Retirer des fonds',
+                    'transaction_history': 'Historique des transactions', 'amount': 'Montant', 'date': 'Date',
+                    'type': 'Type', 'status': 'Statut', 'description': 'Description', 'income': 'Revenus',
+                    'expense': 'Dépenses', 'pending': 'En attente', 'completed': 'Terminé',
+                    'failed': 'Échoué', 'payment_method': 'Méthode de paiement', 'card': 'Carte',
+                    'bank_transfer': 'Virement bancaire', 'crypto': 'Cryptomonnaie',
+                    'min_amount': 'Montant minimum', 'max_amount': 'Montant maximum',
+                    'fee': 'Frais', 'total': 'Total'
+                },
                 'reports': {
                     'title': 'Rapports', 'my_reports': 'Mes rapports', 'create_report': 'Créer un rapport',
                     'report_details': 'Détails du rapport', 'report_type': 'Type de rapport',
@@ -340,16 +343,13 @@ class I18nManager {
                     'report_saved': 'Rapport enregistré', 'report_deleted': 'Rapport supprimé',
                     'report_shared': 'Rapport partagé'
                 },
-                'balance': {
-                    'title': 'Solde', 'current_balance': 'Solde actuel',
-                    'top_up_balance': 'Recharger le solde', 'withdraw_funds': 'Retirer des fonds',
-                    'transaction_history': 'Historique des transactions', 'amount': 'Montant', 'date': 'Date',
-                    'type': 'Type', 'status': 'Statut', 'description': 'Description', 'income': 'Revenus',
-                    'expense': 'Dépenses', 'pending': 'En attente', 'completed': 'Terminé',
-                    'failed': 'Échoué', 'payment_method': 'Méthode de paiement', 'card': 'Carte',
-                    'bank_transfer': 'Virement bancaire', 'crypto': 'Cryptomonnaie',
-                    'min_amount': 'Montant minimum', 'max_amount': 'Montant maximum',
-                    'fee': 'Frais', 'total': 'Total'
+                'main': {
+                    'title': 'Menu principal', 'welcome': 'Bienvenue',
+                    'quick_actions': 'Actions rapides', 'recent_reports': 'Rapports récents',
+                    'popular_services': 'Services populaires', 'news': 'Actualités',
+                    'notifications': 'Notifications', 'menu': 'Menu', 'home': 'Accueil',
+                    'reports': 'Rapports', 'analytics': 'Analytique', 'profile': 'Profil',
+                    'help': 'Aide', 'settings': 'Paramètres'
                 },
                 'admin': {
                     'title': 'Panneau d\'administration', 'users': 'Utilisateurs', 'publications': 'Publications',
@@ -375,14 +375,6 @@ class I18nManager {
                     'timezone': 'Saat dilimi', 'notifications': 'Bildirimler',
                     'dark_mode': 'Karanlık mod', 'light_mode': 'Aydınlık mod'
                 },
-                'main': {
-                    'title': 'Ana menü', 'welcome': 'Hoş geldiniz',
-                    'quick_actions': 'Hızlı işlemler', 'recent_reports': 'Son raporlar',
-                    'popular_services': 'Popüler hizmetler', 'news': 'Haberler',
-                    'notifications': 'Bildirimler', 'menu': 'Menü', 'home': 'Ana sayfa',
-                    'reports': 'Raporlar', 'analytics': 'Analitik', 'profile': 'Profil',
-                    'help': 'Yardım', 'settings': 'Ayarlar'
-                },
                 'profile': {
                     'title': 'Profil', 'personal_info': 'Kişisel bilgiler',
                     'first_name': 'Ad', 'last_name': 'Soyad', 'email': 'E-posta',
@@ -400,6 +392,17 @@ class I18nManager {
                     'profile_updated': 'Profil güncellendi', 'password_changed': 'Şifre değiştirildi',
                     'account_deleted': 'Hesap silindi'
                 },
+                'balance': {
+                    'title': 'Bakiye', 'current_balance': 'Mevcut bakiye',
+                    'top_up_balance': 'Bakiyeyi yükle', 'withdraw_funds': 'Para çek',
+                    'transaction_history': 'İşlem geçmişi', 'amount': 'Tutar', 'date': 'Tarih',
+                    'type': 'Tür', 'status': 'Durum', 'description': 'Açıklama', 'income': 'Gelir',
+                    'expense': 'Gider', 'pending': 'Beklemede', 'completed': 'Tamamlandı',
+                    'failed': 'Başarısız', 'payment_method': 'Ödeme yöntemi', 'card': 'Kart',
+                    'bank_transfer': 'Banka transferi', 'crypto': 'Kripto para',
+                    'min_amount': 'Minimum tutar', 'max_amount': 'Maksimum tutar',
+                    'fee': 'Ücret', 'total': 'Toplam'
+                },
                 'reports': {
                     'title': 'Raporlar', 'my_reports': 'Raporlarım', 'create_report': 'Rapor oluştur',
                     'report_details': 'Rapor detayları', 'report_type': 'Rapor türü',
@@ -415,16 +418,13 @@ class I18nManager {
                     'report_saved': 'Rapor kaydedildi', 'report_deleted': 'Rapor silindi',
                     'report_shared': 'Rapor paylaşıldı'
                 },
-                'balance': {
-                    'title': 'Bakiye', 'current_balance': 'Mevcut bakiye',
-                    'top_up_balance': 'Bakiyeyi yükle', 'withdraw_funds': 'Para çek',
-                    'transaction_history': 'İşlem geçmişi', 'amount': 'Tutar', 'date': 'Tarih',
-                    'type': 'Tür', 'status': 'Durum', 'description': 'Açıklama', 'income': 'Gelir',
-                    'expense': 'Gider', 'pending': 'Beklemede', 'completed': 'Tamamlandı',
-                    'failed': 'Başarısız', 'payment_method': 'Ödeme yöntemi', 'card': 'Kart',
-                    'bank_transfer': 'Banka transferi', 'crypto': 'Kripto para',
-                    'min_amount': 'Minimum tutar', 'max_amount': 'Maksimum tutar',
-                    'fee': 'Ücret', 'total': 'Toplam'
+                'main': {
+                    'title': 'Ana menü', 'welcome': 'Hoş geldiniz',
+                    'quick_actions': 'Hızlı işlemler', 'recent_reports': 'Son raporlar',
+                    'popular_services': 'Popüler hizmetler', 'news': 'Haberler',
+                    'notifications': 'Bildirimler', 'menu': 'Menü', 'home': 'Ana sayfa',
+                    'reports': 'Raporlar', 'analytics': 'Analitik', 'profile': 'Profil',
+                    'help': 'Yardım', 'settings': 'Ayarlar'
                 },
                 'admin': {
                     'title': 'Yönetici paneli', 'users': 'Kullanıcılar', 'publications': 'Yayınlar',
