@@ -1497,7 +1497,7 @@
                 }
             };
 
-            const currentHeaders = headers[userLanguage] || headers['ru'];
+            const currentHeaders = headers[currentLanguage] || headers['ru'];
 
             // Display Sale section
             if (saleFields.length > 0) {
@@ -1562,44 +1562,10 @@
         // Additional section toggle function removed as requested
 
         // User language and currency management
-        let userLanguage = 'ru'; // Default language
         let currentCurrency = 'TRY'; // Default currency
         let currencyRates = null;
         
-        // Get user language from database
-        async function getUserLanguage() {
-            try {
-                // Get telegram_id from Telegram WebApp
-                const telegramId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id;
-                if (!telegramId) {
-                    console.log('No telegram_id available, using default language: ru');
-                    return 'ru';
-                }
-                
-                const response = await fetch('/api/user/language', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ telegram_id: telegramId })
-                });
-                
-                const data = await response.json();
-                if (data.success) {
-                    userLanguage = data.language;
-                    console.log('User language loaded:', userLanguage);
-                    return userLanguage;
-                } else {
-                    console.log('Failed to get user language, using default: ru');
-                    return 'ru';
-                }
-            } catch (error) {
-                console.error('Error getting user language:', error);
-                return 'ru';
-            }
-        }
-        
-        // Set default currency based on selected country
+                // Set default currency based on selected country
         function setDefaultCurrency() {
             if (selectedLocation && selectedLocation.country_name) {
                 const countryName = selectedLocation.country_name.toLowerCase();
@@ -1954,7 +1920,7 @@
             };
             
             // Get label for current language
-            const currentLabels = labels[userLanguage] || labels['ru'];
+            const currentLabels = labels[currentLanguage] || labels['ru'];
             return currentLabels[key] || key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
         }
 
@@ -2583,10 +2549,8 @@
             // Set default currency based on selected country
             setDefaultCurrency();
             
-            // Get user language and load region data
-            getUserLanguage().then(() => {
-                loadRegionData();
-            });
+            // Load region data
+            loadRegionData();
         }
 
         // Load region data from API
@@ -2835,7 +2799,7 @@
                 // Prepare data for AI analysis
                 const analysisData = {
                     region_data: regionData,
-                    language: userLanguage
+                    language: currentLanguage
                 };
                 
                 // Make API request to get AI insights
@@ -3666,8 +3630,9 @@
 
         // Функция для получения данных пользователя из Telegram WebApp
         function getUserData() {
-            if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe && window.Telegram.WebApp.initDataUnsafe.user) {
-                return window.Telegram.WebApp.initDataUnsafe.user;
+            let tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
+            if (tg && tg.initDataUnsafe && tg.initDataUnsafe.user) {
+                return tg.initDataUnsafe.user;
             }
             return null;
         }
