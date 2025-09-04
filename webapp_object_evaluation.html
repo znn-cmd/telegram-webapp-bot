@@ -3848,9 +3848,6 @@
         tg.ready();
         tg.expand();
 
-        // Current language
-        let currentLanguage = 'ru';
-
         // Selected location data
         let selectedLocation = {
             country_id: null,
@@ -8227,7 +8224,6 @@
         }
 
         // Initialize page
-        // Initialize page
         async function init() {
             // Сначала инициализируем локализацию
             await initLocalization();
@@ -8295,9 +8291,6 @@
                 selectedListingTypes.currency = 'EUR';
             }
         }
-
-        // Start initialization when page loads
-        document.addEventListener('DOMContentLoaded', init);
 
         // Generate consolidated assessment block with market analysis (только для админов)
         async function generateConsolidatedAssessment(data) {
@@ -10121,8 +10114,8 @@
             updatePageText();
         }
 
-        // Запускаем инициализацию при загрузке страницы
-        document.addEventListener('DOMContentLoaded', init);
+        // Запускаем инициализацию
+        init();
     </script>
 </body>
 </html>
