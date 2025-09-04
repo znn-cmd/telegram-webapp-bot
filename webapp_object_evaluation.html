@@ -3848,6 +3848,9 @@
         tg.ready();
         tg.expand();
 
+        // Current language
+        let currentLanguage = 'ru';
+
         // Selected location data
         let selectedLocation = {
             country_id: null,
@@ -3862,6 +3865,9 @@
         
         // Global variable for market summary data
         let marketSummaryData = null;
+
+        // User language
+        let userLanguage = 'ru';
 
         // Selected listing types
         let selectedListingTypes = {
@@ -4960,7 +4966,7 @@
                     // Add "не имеет значения" option
                     const noDistrictOption = document.createElement('option');
                     noDistrictOption.value = 'none';
-                    noDistrictOption.textContent = getText('noDistrictOption');
+                    noDistrictOption.textContent = 'Не имеет значения';
                     districtSelect.appendChild(noDistrictOption);
                     
                     console.log('📍 Adding districts:', data.districts);
@@ -5267,7 +5273,7 @@
             const countryName = countrySelect.options[countrySelect.selectedIndex].text;
             const cityName = citySelect.options[citySelect.selectedIndex].text;
             const countyName = countySelect.options[countySelect.selectedIndex].text;
-                            const districtName = districtSelect.value === 'none' ? getText('noDistrictOption') : districtSelect.options[districtSelect.selectedIndex].text;
+            const districtName = districtSelect.value === 'none' ? 'Не имеет значения' : districtSelect.options[districtSelect.selectedIndex].text;
             
             // Convert price to EUR if needed
             let priceInEUR = null;
@@ -5312,6 +5318,9 @@
             
             // Display selected location
             displaySelectedLocation();
+            
+            // Get user language
+            await getUserLanguage();
             
             // Load region data with selected listing types
             await loadRegionData();
@@ -5374,7 +5383,7 @@
             if (selectedLocation.county_name) {
                 locationString += `, ${selectedLocation.county_name}`;
             }
-                            if (selectedLocation.district_name && selectedLocation.district_name !== getText('noDistrictOption')) {
+            if (selectedLocation.district_name && selectedLocation.district_name !== 'Не имеет значения') {
                 locationString += `, ${selectedLocation.district_name}`;
             }
             
@@ -5387,6 +5396,33 @@
             await checkAndDisplayAdminIds(adminIdsBlock, adminIdsDetails);
             
             selectedLocationDiv.style.display = 'block';
+        }
+
+        // Get user language
+        async function getUserLanguage() {
+            try {
+                if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe && window.Telegram.WebApp.initDataUnsafe.user) {
+                    const user = window.Telegram.WebApp.initDataUnsafe.user;
+                    if (user && user.id) {
+                        const response = await fetch('/api/user/language', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({ telegram_id: user.id })
+                        });
+                        
+                        const data = await response.json();
+                        if (data.success) {
+                            userLanguage = data.language;
+                            currentLanguage = data.language;
+                            updatePageText();
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('Error getting user language:', error);
+            }
         }
 
         // Load region data
@@ -7665,8 +7701,8 @@
                        'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık']
             };
             
-            const firstMonthName = monthNames[currentLanguage] ? monthNames[currentLanguage][firstMonth.property_month - 1] : monthNames['ru'][firstMonth.property_month - 1];
-            const lastMonthName = monthNames[currentLanguage] ? monthNames[currentLanguage][lastMonth.property_month - 1] : monthNames['ru'][lastMonth.property_month - 1];
+            const firstMonthName = monthNames[userLanguage] ? monthNames[userLanguage][firstMonth.property_month - 1] : monthNames['ru'][firstMonth.property_month - 1];
+            const lastMonthName = monthNames[userLanguage] ? monthNames[userLanguage][lastMonth.property_month - 1] : monthNames['ru'][lastMonth.property_month - 1];
             
             // Формируем аналитический вывод на разных языках
             const analysisTexts = {
@@ -7703,6 +7739,7 @@
             };
             
             // Получаем текст для текущего языка
+            const currentLanguage = userLanguage || 'ru';
             const texts = analysisTexts[currentLanguage] || analysisTexts['ru'];
             
             // Формируем HTML для блока анализа прогноза
@@ -7929,6 +7966,7 @@
                        'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık']
             };
             
+            const currentLanguage = userLanguage || 'ru';
             const monthNamesList = monthNames[currentLanguage] || monthNames['ru'];
             
             const futureMonthName = monthNamesList[futureTrend.property_month - 1] || '';
@@ -8189,46 +8227,7 @@
         }
 
         // Initialize page
-        async function init() {
-            const userData = getUserData();
-            if (!userData) {
-                updatePageText();
-                loadCountries();
-                return;
-            }
-
-            try {
-                const response = await fetch('/api/user', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        telegram_id: userData.id,
-                        username: userData.username,
-                        tg_name: userData.tg_name,
-                        last_name: userData.last_name,
-                        language_code: userData.language_code || 'ru'
-                    })
-                });
-
-                if (response.ok) {
-                    const userInfo = await response.json();
-                    
-                    // Устанавливаем язык в зависимости от статуса пользователя
-                    if (userInfo.user_status === 'admin' && userInfo.language) {
-                        // Для админов используем язык из базы данных
-                        currentLanguage = userInfo.language;
-                    } else if (userData.language_code) {
-                        // Для обычных пользователей используем язык из Telegram
-                        currentLanguage = userData.language_code;
-                    }
-                }
-            } catch (error) {
-                // В случае ошибки используем язык из Telegram
-                if (userData.language_code) {
-                    currentLanguage = userData.language_code;
-                }
-            }
-            
+        function init() {
             updatePageText();
             loadCountries();
             
@@ -8292,6 +8291,9 @@
                 selectedListingTypes.currency = 'EUR';
             }
         }
+
+        // Start initialization when page loads
+        document.addEventListener('DOMContentLoaded', init);
 
         // Generate consolidated assessment block with market analysis (только для админов)
         async function generateConsolidatedAssessment(data) {
@@ -8564,6 +8566,7 @@
         
         // Generate subscription required message
         function generateSubscriptionMessage() {
+            const currentLanguage = userLanguage || 'ru';
             const texts = {
                 'ru': {
                     title: 'subscriptionRequiredTitle',
@@ -9810,6 +9813,10 @@
             if (tg && tg.initDataUnsafe && tg.initDataUnsafe.user) {
                 return tg.initDataUnsafe.user;
             }
+            try {
+                const stored = localStorage.getItem('aaadviser_user');
+                if (stored) return JSON.parse(stored);
+            } catch (e) {}
             return null;
         }
 
@@ -10067,8 +10074,53 @@
             });
         }
 
-        // Запускаем инициализацию
-        init();
+        // Инициализация локализации
+        async function initLocalization() {
+            const userData = getUserData();
+            if (!userData) {
+                updatePageText();
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/user', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        telegram_id: userData.id,
+                        username: userData.username,
+                        tg_name: userData.tg_name,
+                        last_name: userData.last_name,
+                        language_code: userData.language_code || 'ru'
+                    })
+                });
+
+                if (response.ok) {
+                    const userInfo = await response.json();
+                    
+                    // Устанавливаем язык в зависимости от статуса пользователя
+                    if (userInfo.user_status === 'admin' && userInfo.language) {
+                        // Для админов используем язык из базы данных
+                        currentLanguage = userInfo.language;
+                    } else if (userData.language_code) {
+                        // Для обычных пользователей используем язык из Telegram
+                        currentLanguage = userData.language_code;
+                    }
+                }
+            } catch (error) {
+                // В случае ошибки используем язык из Telegram
+                if (userData.language_code) {
+                    currentLanguage = userData.language_code;
+                }
+            }
+            
+            updatePageText();
+        }
+
+        // Запускаем локализацию при загрузке страницы
+        document.addEventListener('DOMContentLoaded', function() {
+            initLocalization();
+        });
     </script>
 </body>
 </html>

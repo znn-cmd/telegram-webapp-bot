@@ -953,7 +953,7 @@
             
             <!-- Currency Switcher -->
             <div class="currency-switcher" id="currencySwitcher" style="display: none;">
-                <div class="currency-switcher-title" id="currencySwitcherTitle">Валюта отображения:</div>
+                <div class="currency-switcher-title">Валюта отображения:</div>
                 <div class="currency-buttons">
                     <button class="currency-btn active" data-currency="TRY" onclick="switchCurrency('TRY')">
                         <span class="currency-icon">₺</span>
@@ -1351,6 +1351,11 @@
             }
         };
 
+        // Get localized text
+        function getText(key) {
+            return locales[currentLanguage][key] || key;
+        }
+
         // Sort fields by priority for structured data display
         // Order: Sale data → Rent data → Yield → Additional data (hidden by default)
         function sortFieldsByPriority(fields) {
@@ -1497,7 +1502,7 @@
                 }
             };
 
-            const currentHeaders = headers[currentLanguage] || headers['ru'];
+            const currentHeaders = headers[userLanguage] || headers['ru'];
 
             // Display Sale section
             if (saleFields.length > 0) {
@@ -1562,10 +1567,44 @@
         // Additional section toggle function removed as requested
 
         // User language and currency management
+        let userLanguage = 'ru'; // Default language
         let currentCurrency = 'TRY'; // Default currency
         let currencyRates = null;
         
-                // Set default currency based on selected country
+        // Get user language from database
+        async function getUserLanguage() {
+            try {
+                // Get telegram_id from Telegram WebApp
+                const telegramId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id;
+                if (!telegramId) {
+                    console.log('No telegram_id available, using default language: ru');
+                    return 'ru';
+                }
+                
+                const response = await fetch('/api/user/language', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ telegram_id: telegramId })
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    userLanguage = data.language;
+                    console.log('User language loaded:', userLanguage);
+                    return userLanguage;
+                } else {
+                    console.log('Failed to get user language, using default: ru');
+                    return 'ru';
+                }
+            } catch (error) {
+                console.error('Error getting user language:', error);
+                return 'ru';
+            }
+        }
+        
+        // Set default currency based on selected country
         function setDefaultCurrency() {
             if (selectedLocation && selectedLocation.country_name) {
                 const countryName = selectedLocation.country_name.toLowerCase();
@@ -1920,7 +1959,7 @@
             };
             
             // Get label for current language
-            const currentLabels = labels[currentLanguage] || labels['ru'];
+            const currentLabels = labels[userLanguage] || labels['ru'];
             return currentLabels[key] || key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
         }
 
@@ -2368,7 +2407,7 @@
                     // Add "No value" option
                     const noValueOption = document.createElement('option');
                     noValueOption.value = 'none';
-                    noValueOption.textContent = getText('noDistrictOption');
+                    noValueOption.textContent = 'Не имеет значения';
                     districtSelect.appendChild(noValueOption);
                     
                     data.districts.forEach(([id, name]) => {
@@ -2489,7 +2528,7 @@
             
             // Update selected location
             selectedLocation.district_id = districtId === 'none' ? null : districtId;
-                            selectedLocation.district_name = districtId === 'none' ? getText('noDistrictOption') : districtName;
+            selectedLocation.district_name = districtId === 'none' ? 'Не имеет значения' : districtName;
             
             updateConfirmButton();
         }
@@ -2549,8 +2588,10 @@
             // Set default currency based on selected country
             setDefaultCurrency();
             
-            // Load region data
-            loadRegionData();
+            // Get user language and load region data
+            getUserLanguage().then(() => {
+                loadRegionData();
+            });
         }
 
         // Load region data from API
@@ -2799,7 +2840,7 @@
                 // Prepare data for AI analysis
                 const analysisData = {
                     region_data: regionData,
-                    language: currentLanguage
+                    language: userLanguage
                 };
                 
                 // Make API request to get AI insights
@@ -3414,48 +3455,20 @@
             }
         }
 
-        // Инициализация
-        async function init() {
-            const userData = getUserData();
-            if (!userData) {
-                updatePageText();
-                loadCountries();
-                return;
-            }
-
-            try {
-                const response = await fetch('/api/user', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        telegram_id: userData.id,
-                        username: userData.username,
-                        tg_name: userData.tg_name,
-                        last_name: userData.last_name,
-                        language_code: userData.language_code || 'ru'
-                    })
-                });
-
-                if (response.ok) {
-                    const userInfo = await response.json();
-                    
-                    // Устанавливаем язык в зависимости от статуса пользователя
-                    if (userInfo.user_status === 'admin' && userInfo.language) {
-                        // Для админов используем язык из базы данных
-                        currentLanguage = userInfo.language;
-                    } else if (userData.language_code) {
-                        // Для обычных пользователей используем язык из Telegram
-                        currentLanguage = userData.language_code;
-                    }
-                }
-            } catch (error) {
-                // В случае ошибки используем язык из Telegram
-                if (userData.language_code) {
-                    currentLanguage = userData.language_code;
+        // Initialize the page
+        function init() {
+            // Set language based on Telegram WebApp
+            if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
+                const userLang = tg.initDataUnsafe.user.language_code;
+                if (userLang && locales[userLang]) {
+                    currentLanguage = userLang;
                 }
             }
             
+            // Update page text
             updatePageText();
+            
+            // Load countries
             loadCountries();
         }
 
@@ -3491,8 +3504,7 @@
                 'ageDataTitle': 'Данные по возрасту объектов',
                 'heatingDataTitle': 'Данные по типу отопления',
                 'errorText': 'Ошибка загрузки данных',
-                'backButton': '← Вернуться в главное меню',
-                'noDistrictOption': 'Не имеет значения'
+                'backButton': '← Вернуться в главное меню'
             },
             'en': {
                 'pageTitleTag': 'Aaadviser - Region Analytics',
@@ -3524,8 +3536,7 @@
                 'ageDataTitle': 'Property Age Data',
                 'heatingDataTitle': 'Heating Type Data',
                 'errorText': 'Error loading data',
-                'backButton': '← Back to main menu',
-                'noDistrictOption': 'No preference'
+                'backButton': '← Back to main menu'
             },
             'de': {
                 'pageTitleTag': 'Aaadviser - Regionalanalytik',
@@ -3557,8 +3568,7 @@
                 'ageDataTitle': 'Immobilienalter-Daten',
                 'heatingDataTitle': 'Heizungstyp-Daten',
                 'errorText': 'Fehler beim Laden der Daten',
-                'backButton': '← Zurück zum Hauptmenü',
-                'noDistrictOption': 'Keine Präferenz'
+                'backButton': '← Zurück zum Hauptmenü'
             },
             'fr': {
                 'pageTitleTag': 'Aaadviser - Analytique régionale',
@@ -3590,8 +3600,7 @@
                 'ageDataTitle': 'Données d\'âge des propriétés',
                 'heatingDataTitle': 'Données du type de chauffage',
                 'errorText': 'Erreur de chargement des données',
-                'backButton': '← Retour au menu principal',
-                'noDistrictOption': 'Aucune préférence'
+                'backButton': '← Retour au menu principal'
             },
             'tr': {
                 'pageTitleTag': 'Aaadviser - Bölge Analizi',
@@ -3623,19 +3632,9 @@
                 'ageDataTitle': 'Gayrimenkul Yaşı Verileri',
                 'heatingDataTitle': 'Isıtma Türü Verileri',
                 'errorText': 'Veri yükleme hatası',
-                'backButton': '← Ana menüye dön',
-                'noDistrictOption': 'Tercih yok'
+                'backButton': '← Ana menüye dön'
             }
         };
-
-        // Функция для получения данных пользователя из Telegram WebApp
-        function getUserData() {
-            let tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
-            if (tg && tg.initDataUnsafe && tg.initDataUnsafe.user) {
-                return tg.initDataUnsafe.user;
-            }
-            return null;
-        }
 
         // Функция для получения локализованного текста
         function getText(key) {
@@ -3655,7 +3654,7 @@
                 'selectedLocationTitle', 'adminIdsTitle', 'loadingText', 'currencySwitcherTitle', 'keyMetricsTitle',
                 'avgSalePriceLabel', 'avgRentPriceLabel', 'listingPeriodSaleLabel', 'listingPeriodRentLabel',
                 'yieldLabel', 'insightsTitle', 'generalDataTitle', 'houseTypeDataTitle', 'floorSegmentDataTitle',
-                'ageDataTitle', 'heatingDataTitle', 'errorText', 'backButton', 'noDistrictOption'
+                'ageDataTitle', 'heatingDataTitle', 'errorText', 'backButton'
             ];
             
             elements.forEach(id => {
@@ -3666,8 +3665,25 @@
             });
         }
 
-        // Запускаем инициализацию
-        init();
+        // Initialize the page
+        function init() {
+            // Set language based on Telegram WebApp
+            if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
+                const userLang = tg.initDataUnsafe.user.language_code;
+                if (userLang && locales[userLang]) {
+                    currentLanguage = userLang;
+                }
+            }
+            
+            // Update page text
+            updatePageText();
+            
+            // Load countries
+            loadCountries();
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
 </html>
