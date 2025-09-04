@@ -345,64 +345,6 @@ def api_clear_cache():
         logger.error(f"Ошибка очистки кэша: {e}")
         return jsonify({'error': str(e)}), 500
 
-@app.route('/api/check_admin_status', methods=['POST'])
-@monitor_api('check_admin_status')
-def api_check_admin_status():
-    """Проверка статуса администратора пользователя"""
-    data = request.json or {}
-    telegram_id = data.get('telegram_id')
-    
-    if not telegram_id:
-        return jsonify({'error': 'telegram_id required'}), 400
-    
-    try:
-        # Проверяем кэш пользователя
-        if cache_manager:
-            cached_user = cache_manager.get_user_data(telegram_id)
-            if cached_user:
-                is_admin = cached_user.get('user_status') == 'admin'
-                return jsonify({
-                    'success': True,
-                    'is_admin': is_admin,
-                    'user_status': cached_user.get('user_status'),
-                    'source': 'cache'
-                })
-        
-        # Проверяем в базе данных
-        if query_optimizer:
-            future = query_optimizer.get_user_data_optimized(telegram_id)
-            user_result = future.result(timeout=30)
-        else:
-            user_result = safe_db_operation(
-                lambda: supabase.table('users').select('user_status').eq('telegram_id', telegram_id).limit(1).execute()
-            )
-        
-        if user_result is None:
-            return jsonify({'error': 'Database connection error'}), 500
-        
-        user = user_result.data[0] if user_result.data else None
-        
-        if user is None:
-            return jsonify({
-                'success': True,
-                'is_admin': False,
-                'user_status': None,
-                'source': 'database'
-            })
-        
-        is_admin = user.get('user_status') == 'admin'
-        
-        return jsonify({
-            'success': True,
-            'is_admin': is_admin,
-            'user_status': user.get('user_status'),
-            'source': 'database'
-        })
-        
-    except Exception as e:
-        logger.error(f"Ошибка проверки статуса администратора: {e}")
-        return jsonify({'error': str(e)}), 500
-
 @app.route('/api/performance/metrics/export')
 def api_export_metrics():
     """Экспорт метрик в JSON"""
@@ -1677,6 +1619,7 @@ def api_currency_latest():
         }), 500
 
 @app.route('/api/check_admin_status', methods=['POST'])
+@monitor_api('check_admin_status')
 def api_check_admin_status():
     """Проверка статуса администратора пользователя и подписки"""
     data = request.json or {}
@@ -1693,27 +1636,50 @@ def api_check_admin_status():
         return jsonify({'error': 'Invalid telegram_id'}), 400
     
     try:
+        # Проверяем кэш пользователя
+        if cache_manager:
+            cached_user = cache_manager.get_user_data(telegram_id)
+            if cached_user:
+                is_admin = cached_user.get('user_status') == 'admin'
+                logger.info(f"✅ Данные получены из кэша: is_admin={is_admin}")
+                return jsonify({
+                    'success': True,
+                    'is_admin': is_admin,
+                    'user_status': cached_user.get('user_status'),
+                    'period_end': cached_user.get('period_end'),
+                    'source': 'cache'
+                })
+        
         # Проверяем пользователя в базе с таймаутом
         logger.info(f"🔍 Поиск пользователя в базе для telegram_id: {telegram_id}")
         
-        # Добавляем таймаут для Supabase запроса
-        import asyncio
-        import concurrent.futures
-        
-        def execute_supabase_query():
-            return supabase.table('users').select('user_status, period_end').eq('telegram_id', telegram_id).execute()
-        
-        # Выполняем запрос с таймаутом
-        with concurrent.futures.ThreadPoolExecutor() as executor:
-            future = executor.submit(execute_supabase_query)
+        # Используем query_optimizer если доступен
+        if query_optimizer:
+            future = query_optimizer.get_user_data_optimized(telegram_id)
             try:
                 user_result = future.result(timeout=10)  # 10 секунд таймаут
-            except concurrent.futures.TimeoutError:
-                logger.error("❌ Таймаут при запросе к базе данных")
-                return jsonify({'error': 'Database timeout'}), 408
             except Exception as e:
-                logger.error(f"❌ Ошибка при выполнении запроса к базе: {e}")
-                return jsonify({'error': 'Database error'}), 500
+                logger.error(f"❌ Ошибка при выполнении оптимизированного запроса: {e}")
+                user_result = None
+        else:
+            # Добавляем таймаут для Supabase запроса
+            import asyncio
+            import concurrent.futures
+            
+            def execute_supabase_query():
+                return supabase.table('users').select('user_status, period_end').eq('telegram_id', telegram_id).execute()
+            
+            # Выполняем запрос с таймаутом
+            with concurrent.futures.ThreadPoolExecutor() as executor:
+                future = executor.submit(execute_supabase_query)
+                try:
+                    user_result = future.result(timeout=10)  # 10 секунд таймаут
+                except concurrent.futures.TimeoutError:
+                    logger.error("❌ Таймаут при запросе к базе данных")
+                    return jsonify({'error': 'Database timeout'}), 408
+                except Exception as e:
+                    logger.error(f"❌ Ошибка при выполнении запроса к базе: {e}")
+                    return jsonify({'error': 'Database error'}), 500
         
         logger.info(f"📊 Результат поиска: {len(user_result.data) if user_result.data else 0} записей")
         
@@ -1726,11 +1692,16 @@ def api_check_admin_status():
             logger.info(f"👤 Пользователь найден: user_status={user_status}, is_admin={is_admin}, period_end={period_end}")
             logger.info(f"📋 Проверяем user_status='{user_status}' == 'admin' = {user_status == 'admin'}")
             
+            # Сохраняем в кэш
+            if cache_manager:
+                cache_manager.set_user_data(telegram_id, user)
+            
             return jsonify({
                 'success': True,
                 'is_admin': is_admin,
                 'user_status': user_status,
-                'period_end': period_end
+                'period_end': period_end,
+                'source': 'database'
             })
         else:
             logger.warning(f"❌ Пользователь не найден для telegram_id: {telegram_id}")
