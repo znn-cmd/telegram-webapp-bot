@@ -1236,7 +1236,7 @@ def api_currency_update():
         }
         
         # Проверяем, есть ли уже запись на сегодня
-        today = datetime.now().strftime('%Y-%m-%d')
+        today = datetime.datetime.now().strftime('%Y-%m-%d')
         today_result = supabase.table('currency').select('id').gte('created_at', f'{today}T00:00:00').lt('created_at', f'{today}T23:59:59').limit(1).execute()
         
         if not today_result.data or len(today_result.data) == 0:
@@ -2885,7 +2885,7 @@ def format_simple_report(address, bedrooms, price, location_codes, language='en'
     report_lines.extend([
         "=" * 50,
         "Отчет сгенерирован автоматически",
-        f"Дата: {datetime.now().strftime('%d.%m.%Y %H:%M')}",
+        f"Дата: {datetime.datetime.now().strftime('%d.%m.%Y %H:%M')}",
         ])
     
     return "\n".join(report_lines)
@@ -3115,7 +3115,7 @@ def get_economic_data(country_code='TUR', years_back=10):
     """
     try:
         # Получаем данные за последние N лет
-        current_year = datetime.now().year
+        current_year = datetime.datetime.now().year
         start_year = current_year - years_back
         
         # Запрос к таблице imf_economic_data для ВВП (NGDP_RPCH)
@@ -5130,7 +5130,7 @@ def api_update_user_report():
         # TODO: здесь должна быть логика перегенерации отчета
         # Пока просто обновляем дату
         supabase.table('user_reports').update({
-            'updated_at': datetime.now().isoformat()
+            'updated_at': datetime.datetime.now().isoformat()
         }).eq('id', report_id).execute()
         return jsonify({'success': True, 'balance': new_balance})
     except Exception as e:
@@ -5171,8 +5171,8 @@ def api_save_user_report():
             'report_type': report_type,
             'address': address,
             'full_report': full_report,
-            'created_at': datetime.now().isoformat(),
-            'updated_at': datetime.now().isoformat()
+            'created_at': datetime.datetime.now().isoformat(),
+            'updated_at': datetime.datetime.now().isoformat()
         }
         try:
             result = safe_db_operation(
@@ -5210,7 +5210,7 @@ def api_save_html_report():
     
     try:
         # Генерируем уникальный номер отчета
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
         random_suffix = ''.join(random.choices(string.digits, k=5))
         report_number = f"RPT-{timestamp}-{random_suffix}"
         
@@ -5252,7 +5252,7 @@ def api_save_html_report():
                 'content': report_content,
                 'location_info': location_info,
                 'report_number': report_number,
-                'generated_at': datetime.now().isoformat()
+                'generated_at': datetime.datetime.now().isoformat()
             }
         }
         
@@ -6082,11 +6082,11 @@ def api_save_html_report():
                     </div>
                     <div class="metadata-item">
                         <span class="metadata-label">Дата формирования:</span>
-                        <span class="metadata-value">{datetime.now().strftime("%d.%m.%Y")}</span>
+                        <span class="metadata-value">{datetime.datetime.now().strftime("%d.%m.%Y")}</span>
                     </div>
                     <div class="metadata-item">
                         <span class="metadata-label">Время формирования:</span>
-                        <span class="metadata-value">{datetime.now().strftime("%H:%M:%S")} UTC</span>
+                        <span class="metadata-value">{datetime.datetime.now().strftime("%H:%M:%S")} UTC</span>
                     </div>
                 </div>
                 <div>
@@ -6283,7 +6283,7 @@ def api_save_html_report():
             
             <div class="footer-info">
                 <strong>Aaadviser</strong> - Система аналитики недвижимости<br>
-                Отчет №{report_number} | Сформирован {datetime.now().strftime("%d.%m.%Y в %H:%M:%S")}<br>
+                Отчет №{report_number} | Сформирован {datetime.datetime.now().strftime("%d.%m.%Y в %H:%M:%S")}<br>
                 © 2024 Aaadviser. Все права защищены.
             </div>
         </div>
@@ -6857,7 +6857,7 @@ def api_admin_balance_100():
 def api_admin_users_stats():
     import datetime
     from dateutil.relativedelta import relativedelta
-    now = datetime.now()
+    now = datetime.datetime.now()
     today = now.date()
     week_ago = today - datetime.timedelta(days=7)
     month_ago = today - relativedelta(months=1)
@@ -7290,7 +7290,7 @@ def get_market_data_by_location_ids(location_codes, target_year=None, target_mon
         
         # Если год и месяц не указаны, используем текущие
         if target_year is None or target_month is None:
-            now = datetime.now()
+            now = datetime.datetime.now()
             target_year = target_year or now.year
             target_month = target_month or now.month
         
@@ -8589,7 +8589,7 @@ def get_market_comparison_data(age_id, floor_id, heating_id, area, price, locati
         price_trends = {}  # Для графиков изменения цен
         
         # Получаем текущую дату для фильтрации по trend_date
-        current_date = datetime.now().date()
+        current_date = datetime.datetime.now().date()
         twelve_months_ago = current_date - timedelta(days=365)  # 12 месяцев для графиков
         
         # 1. Сравнение по возрасту объекта
