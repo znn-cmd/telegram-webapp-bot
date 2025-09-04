@@ -446,7 +446,59 @@ def api_user():
     try:
         if query_optimizer:
             future = query_optimizer.get_user_data_optimized(telegram_id)
-            user_result = future.result(timeout=30)
+            if future is None:
+                logger.error("QueryOptimizer вернул None вместо Future")
+                # Если есть кэшированные данные, используем их как fallback
+                if cache_manager:
+                    cached_user = cache_manager.get_user_data(telegram_id)
+                    if cached_user:
+                        logger.warning(f"⚠️ Используем кэшированные данные из-за ошибки QueryOptimizer для пользователя {telegram_id}")
+                        lang = cached_user.get('language') or (language_code[:2] if language_code[:2] in locales else 'en')
+                        return jsonify({
+                            'exists': True,
+                            'is_new_user': False,
+                            'language': cached_user.get('language') or lang,
+                            'language_code': lang,
+                            'welcome': locales[lang]['welcome_back'],
+                            'menu': locales[lang]['menu'],
+                            'name': cached_user.get('name'),
+                            'tg_name': cached_user.get('tg_name'),
+                            'last_name': cached_user.get('last_name'),
+                            'username': cached_user.get('username'),
+                            'balance': cached_user.get('balance', 0),
+                            'telegram_id': cached_user.get('telegram_id'),
+                            'user_status': cached_user.get('user_status', None),
+                            'source': 'cache_fallback'
+                        })
+                return jsonify({'error': 'QueryOptimizer error'}), 500
+            
+            try:
+                user_result = future.result(timeout=30)
+            except Exception as e:
+                logger.error(f"Ошибка выполнения Future: {e}")
+                # Если есть кэшированные данные, используем их как fallback
+                if cache_manager:
+                    cached_user = cache_manager.get_user_data(telegram_id)
+                    if cached_user:
+                        logger.warning(f"⚠️ Используем кэшированные данные из-за ошибки Future для пользователя {telegram_id}")
+                        lang = cached_user.get('language') or (language_code[:2] if language_code[:2] in locales else 'en')
+                        return jsonify({
+                            'exists': True,
+                            'is_new_user': False,
+                            'language': cached_user.get('language') or lang,
+                            'language_code': lang,
+                            'welcome': locales[lang]['welcome_back'],
+                            'menu': locales[lang]['menu'],
+                            'name': cached_user.get('name'),
+                            'tg_name': cached_user.get('tg_name'),
+                            'last_name': cached_user.get('last_name'),
+                            'username': cached_user.get('username'),
+                            'balance': cached_user.get('balance', 0),
+                            'telegram_id': cached_user.get('telegram_id'),
+                            'user_status': cached_user.get('user_status', None),
+                            'source': 'cache_fallback'
+                        })
+                return jsonify({'error': 'Future execution error'}), 500
         else:
             user_result = safe_db_operation(
                 lambda: supabase.table('users').select('*').eq('telegram_id', telegram_id).execute()
