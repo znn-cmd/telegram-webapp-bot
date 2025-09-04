@@ -53,6 +53,9 @@ if "%1"=="minimal" (
 ) else if "%1"=="amvera" (
     set DOCKERFILE=Dockerfile.amvera
     echo 📋 Используем альтернативный Dockerfile для Amvera
+) else if "%1"=="ultra" (
+    set DOCKERFILE=Dockerfile.ultra-minimal
+    echo 📋 Используем сверхминимальный Dockerfile (рекомендуется для Amvera)
 )
 
 REM Проверка наличия выбранного Dockerfile
@@ -68,12 +71,19 @@ if "%1"=="minimal" (
     docker build -f Dockerfile.minimal -t aaadviser .
 ) else if "%1"=="amvera" (
     docker build -f Dockerfile.amvera -t aaadviser .
+) else if "%1"=="ultra" (
+    docker build -f Dockerfile.ultra-minimal -t aaadviser .
 ) else (
     docker build -t aaadviser .
 )
 
 if errorlevel 1 (
-    echo ❌ Ошибка при сборке образа. Попробуйте использовать minimal или amvera
+    echo ❌ Ошибка при сборке образа. Попробуйте использовать ultra, minimal или amvera
+    echo.
+    echo Рекомендуемые варианты:
+    echo   deploy.bat ultra    - сверхминимальный (рекомендуется)
+    echo   deploy.bat minimal  - минимальный
+    echo   deploy.bat amvera   - альтернативный
     pause
     exit /b 1
 )
