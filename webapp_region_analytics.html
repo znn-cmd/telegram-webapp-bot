@@ -1351,11 +1351,6 @@
             }
         };
 
-        // Get localized text
-        function getText(key) {
-            return locales[currentLanguage][key] || key;
-        }
-
         // Sort fields by priority for structured data display
         // Order: Sale data → Rent data → Yield → Additional data (hidden by default)
         function sortFieldsByPriority(fields) {
@@ -3455,17 +3450,10 @@
             }
         }
 
-        // Initialize the page
+        // Инициализация
         async function init() {
             const userData = getUserData();
             if (!userData) {
-                // Set language based on Telegram WebApp
-                if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
-                    const userLang = tg.initDataUnsafe.user.language_code;
-                    if (userLang && locales[userLang]) {
-                        currentLanguage = userLang;
-                    }
-                }
                 updatePageText();
                 loadCountries();
                 return;
@@ -3503,10 +3491,7 @@
                 }
             }
             
-            // Update page text
             updatePageText();
-            
-            // Load countries
             loadCountries();
         }
 
@@ -3716,63 +3701,8 @@
             });
         }
 
-        // Initialize the page
-        async function init() {
-            const userData = getUserData();
-            if (!userData) {
-                // Set language based on Telegram WebApp
-                if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
-                    const userLang = tg.initDataUnsafe.user.language_code;
-                    if (userLang && locales[userLang]) {
-                        currentLanguage = userLang;
-                    }
-                }
-                updatePageText();
-                loadCountries();
-                return;
-            }
-
-            try {
-                const response = await fetch('/api/user', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        telegram_id: userData.id,
-                        username: userData.username,
-                        tg_name: userData.tg_name,
-                        last_name: userData.last_name,
-                        language_code: userData.language_code || 'ru'
-                    })
-                });
-
-                if (response.ok) {
-                    const userInfo = await response.json();
-                    
-                    // Устанавливаем язык в зависимости от статуса пользователя
-                    if (userInfo.user_status === 'admin' && userInfo.language) {
-                        // Для админов используем язык из базы данных
-                        currentLanguage = userInfo.language;
-                    } else if (userData.language_code) {
-                        // Для обычных пользователей используем язык из Telegram
-                        currentLanguage = userData.language_code;
-                    }
-                }
-            } catch (error) {
-                // В случае ошибки используем язык из Telegram
-                if (userData.language_code) {
-                    currentLanguage = userData.language_code;
-                }
-            }
-            
-            // Update page text
-            updatePageText();
-            
-            // Load countries
-            loadCountries();
-        }
-
-        // Initialize when page loads
-        document.addEventListener('DOMContentLoaded', init);
+        // Запускаем инициализацию
+        init();
     </script>
 </body>
 </html>
