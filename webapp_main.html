@@ -519,24 +519,6 @@
             <div class="admin-section hidden" id="adminSection">
                 <div class="admin-section-title" id="adminSectionTitle">Для админа</div>
                 
-                <button class="menu-btn fade-in admin-btn" onclick="startNewReport()">
-                    <span class="menu-btn-icon">📊</span>
-                    <span class="menu-btn-text" id="newReportBtn">Получить новый отчет</span>
-                    <span class="menu-btn-description" id="newReportDesc">Анализ недвижимости по адресу</span>
-                </button>
-
-                <button class="menu-btn fade-in admin-btn" onclick="showMarketStats()">
-                    <span class="menu-btn-icon">📈</span>
-                    <span class="menu-btn-text" id="marketStatsBtn">Статистика рынка</span>
-                    <span class="menu-btn-description" id="marketStatsDesc">Анализ трендов и цен</span>
-                </button>
-
-                <button class="menu-btn fade-in admin-btn" onclick="showSavedReports()">
-                    <span class="menu-btn-icon">💾</span>
-                    <span class="menu-btn-text" id="savedReportsBtn">Мои сохраненные отчеты</span>
-                    <span class="menu-btn-description" id="savedReportsDesc">История ваших запросов</span>
-                </button>
-
                 <button class="menu-btn fade-in admin-btn" onclick="showAdminPanel()">
                     <span class="menu-btn-icon">🛠️</span>
                     <span class="menu-btn-text">Админ-панель</span>
@@ -622,12 +604,6 @@
                 'balance': 'Баланс: ',
                 'languageTitle': 'Выберите язык',
                 'menuTitle': 'Главное меню',
-                'newReportBtn': 'Получить новый отчет',
-                'newReportDesc': 'Анализ недвижимости по адресу',
-                'marketStatsBtn': 'Статистика рынка',
-                'marketStatsDesc': 'Анализ трендов и цен',
-                'savedReportsBtn': 'Мои сохраненные отчеты',
-                'savedReportsDesc': 'История ваших запросов',
                 'profileBtn': 'Личный кабинет',
                 'profileDesc': 'Настройки и баланс',
                 'welcome_new': 'Добро пожаловать в Aaadvisor',
@@ -650,12 +626,6 @@
                 'balance': 'Balance: ',
                 'languageTitle': 'Select language',
                 'menuTitle': 'Main menu',
-                'newReportBtn': 'Get new report',
-                'newReportDesc': 'Property analysis by address',
-                'marketStatsBtn': 'Market statistics',
-                'marketStatsDesc': 'Trend and price analysis',
-                'savedReportsBtn': 'My saved reports',
-                'savedReportsDesc': 'Your analysis history',
                 'profileBtn': 'Profile',
                 'profileDesc': 'Settings and balance',
                 'welcome_new': 'Welcome to Aaadvisor',
@@ -678,12 +648,6 @@
                 'balance': 'Kontostand: ',
                 'languageTitle': 'Sprache auswählen',
                 'menuTitle': 'Hauptmenü',
-                'newReportBtn': 'Neuen Bericht erstellen',
-                'newReportDesc': 'Immobilienanalyse nach Adresse',
-                'marketStatsBtn': 'Marktstatistiken',
-                'marketStatsDesc': 'Trend- und Preisanalyse',
-                'savedReportsBtn': 'Meine gespeicherten Berichte',
-                'savedReportsDesc': 'Ihre Analysehistorie',
                 'profileBtn': 'Profil',
                 'profileDesc': 'Einstellungen und Kontostand',
                 'welcome_new': 'Willkommen bei Aaadvisor',
@@ -706,12 +670,6 @@
                 'balance': 'Solde: ',
                 'languageTitle': 'Sélectionner la langue',
                 'menuTitle': 'Menu principal',
-                'newReportBtn': 'Obtenir un nouveau rapport',
-                'newReportDesc': 'Analyse immobilière par adresse',
-                'marketStatsBtn': 'Statistiques du marché',
-                'marketStatsDesc': 'Analyse des tendances et prix',
-                'savedReportsBtn': 'Mes rapports enregistrés',
-                'savedReportsDesc': 'Historique de vos analyses',
                 'profileBtn': 'Profil',
                 'profileDesc': 'Paramètres et solde',
                 'welcome_new': 'Bienvenue sur Aaadvisor',
@@ -734,12 +692,6 @@
                 'balance': 'Bakiye: ',
                 'languageTitle': 'Dil seçin',
                 'menuTitle': 'Ana menü',
-                'newReportBtn': 'Yeni rapor al',
-                'newReportDesc': 'Adrese göre mülk analizi',
-                'marketStatsBtn': 'Piyasa istatistikleri',
-                'marketStatsDesc': 'Trend ve fiyat analizi',
-                'savedReportsBtn': 'Kayıtlı raporlarım',
-                'savedReportsDesc': 'Analiz geçmişiniz',
                 'profileBtn': 'Profil',
                 'profileDesc': 'Ayarlar ve bakiye',
                 'welcome_new': 'Aaadvisor\'a hoş geldiniz',
@@ -769,12 +721,6 @@
             document.getElementById('slogan').textContent = getText('slogan');
             document.getElementById('languageTitle').textContent = getText('languageTitle');
             document.getElementById('menuTitle').textContent = getText('menuTitle');
-            document.getElementById('newReportBtn').textContent = getText('newReportBtn');
-            document.getElementById('newReportDesc').textContent = getText('newReportDesc');
-            document.getElementById('marketStatsBtn').textContent = getText('marketStatsBtn');
-            document.getElementById('marketStatsDesc').textContent = getText('marketStatsDesc');
-            document.getElementById('savedReportsBtn').textContent = getText('savedReportsBtn');
-            document.getElementById('savedReportsDesc').textContent = getText('savedReportsDesc');
             document.getElementById('profileBtn').textContent = getText('profileBtn');
             document.getElementById('profileDesc').textContent = getText('profileDesc');
             document.getElementById('regionAnalyticsBtn').textContent = getText('regionAnalyticsBtn');
@@ -921,26 +867,6 @@
         }
 
         // Функции меню
-        function startNewReport() {
-            showLoading();
-            showToast('Переход к созданию отчета...', 'info');
-            // Переходим к странице создания отчета
-            window.location.href = '/webapp_report';
-        }
-
-        function showMarketStats() {
-            window.location.href = '/webapp_stats';
-        }
-
-        function showSavedReports() {
-            if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe && window.Telegram.WebApp.initDataUnsafe.user) {
-                localStorage.setItem('aaadviser_user', JSON.stringify(window.Telegram.WebApp.initDataUnsafe.user));
-            }
-            showLoading();
-            showToast('Загрузка ваших отчетов...', 'info');
-            window.location.href = '/webapp_saved';
-        }
-
         function showProfile() {
             window.location.href = '/webapp_profile';
         }
