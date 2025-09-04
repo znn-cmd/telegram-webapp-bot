@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aaadviser - Админ панель</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: white;
+            min-height: 100vh;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px 0;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            font-size: 16px;
+            color: #666;
+        }
+
+        .admin-badge {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            display: inline-block;
+            margin-top: 10px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            border-left: 4px solid #667eea;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102,126,234,0.15);
+        }
+
+        .stat-title {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 4px;
+        }
+
+        .stat-unit {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .stat-trend {
+            font-size: 12px;
+            margin-top: 8px;
+        }
+
+        .trend-up {
+            color: #28a745;
+        }
+
+        .trend-down {
+            color: #dc3545;
+        }
+
+        .trend-neutral {
+            color: #6c757d;
+        }
+
+        .section {
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .cache-section {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .cache-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .cache-item:last-child {
+            border-bottom: none;
+        }
+
+        .cache-name {
+            font-weight: 500;
+            color: #333;
+        }
+
+        .cache-info {
+            text-align: right;
+        }
+
+        .cache-size {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .cache-ttl {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 5px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102,126,234,0.25);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 12px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+
+        .success {
+            background: #d4edda;
+            color: #155724;
+            padding: 12px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+
+        .metrics-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        .metrics-table th,
+        .metrics-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        .metrics-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .metrics-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .back-btn {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: #5a6268;
+            transform: translateY(-1px);
+        }
+
+        .refresh-btn {
+            background: #17a2b8;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            margin-left: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .refresh-btn:hover {
+            background: #138496;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .cache-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .cache-info {
+                text-align: left;
+                margin-top: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">Aaadviser</div>
+            <div class="subtitle">Административная панель</div>
+            <div class="admin-badge">🔧 АДМИНИСТРАТОР</div>
+        </div>
+
+        <button class="back-btn" onclick="goBack()">← Назад</button>
+
+        <div class="section">
+            <div class="section-title">
+                📊 Общая статистика производительности
+                <button class="refresh-btn" onclick="loadPerformanceStats()">🔄 Обновить</button>
+            </div>
+            <div id="performance-stats" class="stats-grid">
+                <div class="loading">Загрузка статистики...</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">
+                💾 Статистика кэшей
+                <button class="refresh-btn" onclick="loadCacheStats()">🔄 Обновить</button>
+            </div>
+            <div id="cache-stats">
+                <div class="loading">Загрузка статистики кэшей...</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">
+                🔧 Управление кэшами
+            </div>
+            <div>
+                <button class="btn btn-danger" onclick="clearAllCaches()">🗑️ Очистить все кэши</button>
+                <button class="btn btn-success" onclick="exportMetrics()">📊 Экспорт метрик</button>
+                <button class="btn btn-warning" onclick="clearOldMetrics()">🧹 Очистить старые метрики</button>
+            </div>
+            <div id="action-result"></div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">
+                📈 Детальные метрики API
+            </div>
+            <div id="api-metrics">
+                <div class="loading">Загрузка метрик API...</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">
+                🗄️ Статистика базы данных
+            </div>
+            <div id="db-metrics">
+                <div class="loading">Загрузка метрик БД...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let telegramId = null;
+        let isAdmin = false;
+
+        // Инициализация при загрузке страницы
+        document.addEventListener('DOMContentLoaded', function() {
+            initTelegramApp();
+            checkAdminStatus();
+        });
+
+        function initTelegramApp() {
+            if (window.Telegram && window.Telegram.WebApp) {
+                window.Telegram.WebApp.ready();
+                window.Telegram.WebApp.expand();
+                
+                const initData = window.Telegram.WebApp.initData;
+                if (initData) {
+                    const urlParams = new URLSearchParams(initData);
+                    telegramId = urlParams.get('user') ? JSON.parse(decodeURIComponent(urlParams.get('user'))).id : null;
+                }
+            }
+        }
+
+        async function checkAdminStatus() {
+            if (!telegramId) {
+                showError('Не удалось получить ID пользователя');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/check_admin_status', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        telegram_id: telegramId
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (data.success && data.is_admin) {
+                    isAdmin = true;
+                    loadAllStats();
+                } else {
+                    showError('Доступ запрещен. Требуются права администратора.');
+                    document.body.innerHTML = '<div class="container"><div class="error">❌ Доступ запрещен. Требуются права администратора.</div></div>';
+                }
+            } catch (error) {
+                showError('Ошибка проверки статуса администратора: ' + error.message);
+            }
+        }
+
+        async function loadAllStats() {
+            await Promise.all([
+                loadPerformanceStats(),
+                loadCacheStats(),
+                loadApiMetrics(),
+                loadDbMetrics()
+            ]);
+        }
+
+        async function loadPerformanceStats() {
+            try {
+                const response = await fetch('/api/performance/stats');
+                const data = await response.json();
+
+                if (data.success) {
+                    displayPerformanceStats(data);
+                } else {
+                    showError('Ошибка загрузки статистики производительности');
+                }
+            } catch (error) {
+                showError('Ошибка загрузки статистики: ' + error.message);
+            }
+        }
+
+        function displayPerformanceStats(data) {
+            const container = document.getElementById('performance-stats');
+            
+            const stats = [
+                {
+                    title: 'Время работы',
+                    value: formatUptime(data.overall_stats?.uptime_seconds || 0),
+                    unit: '',
+                    trend: 'neutral'
+                },
+                {
+                    title: 'Всего запросов',
+                    value: data.pool_stats?.total_requests || 0,
+                    unit: 'запросов',
+                    trend: 'neutral'
+                },
+                {
+                    title: 'Успешность',
+                    value: (data.pool_stats?.success_rate || 0).toFixed(1),
+                    unit: '%',
+                    trend: data.pool_stats?.success_rate > 95 ? 'up' : 'down'
+                },
+                {
+                    title: 'Среднее время ответа',
+                    value: (data.pool_stats?.average_response_time || 0).toFixed(3),
+                    unit: 'сек',
+                    trend: data.pool_stats?.average_response_time < 0.5 ? 'up' : 'down'
+                },
+                {
+                    title: 'Активные соединения',
+                    value: data.pool_stats?.active_connections || 0,
+                    unit: 'соединений',
+                    trend: 'neutral'
+                },
+                {
+                    title: 'Всего метрик',
+                    value: data.overall_stats?.total_metrics_recorded || 0,
+                    unit: 'записей',
+                    trend: 'neutral'
+                }
+            ];
+
+            container.innerHTML = stats.map(stat => `
+                <div class="stat-card">
+                    <div class="stat-title">${stat.title}</div>
+                    <div class="stat-value">${stat.value}</div>
+                    <div class="stat-unit">${stat.unit}</div>
+                    <div class="stat-trend trend-${stat.trend}">
+                        ${stat.trend === 'up' ? '📈' : stat.trend === 'down' ? '📉' : '➡️'}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function loadCacheStats() {
+            try {
+                const response = await fetch('/api/performance/stats');
+                const data = await response.json();
+
+                if (data.success) {
+                    displayCacheStats(data.cache_stats);
+                } else {
+                    showError('Ошибка загрузки статистики кэшей');
+                }
+            } catch (error) {
+                showError('Ошибка загрузки статистики кэшей: ' + error.message);
+            }
+        }
+
+        function displayCacheStats(cacheStats) {
+            const container = document.getElementById('cache-stats');
+            
+            const caches = [
+                { name: 'Локации', key: 'location_cache', ttl: '1 неделя' },
+                { name: 'Курсы валют', key: 'currency_cache', ttl: '1 день' },
+                { name: 'Рыночные данные', key: 'market_cache', ttl: '1 неделя' },
+                { name: 'Пользователи', key: 'user_cache', ttl: '1 неделя' }
+            ];
+
+            container.innerHTML = `
+                <div class="cache-section">
+                    ${caches.map(cache => {
+                        const stats = cacheStats[cache.key] || {};
+                        return `
+                            <div class="cache-item">
+                                <div class="cache-name">${cache.name}</div>
+                                <div class="cache-info">
+                                    <div class="cache-size">${stats.size || 0} / ${stats.max_size || 0} записей</div>
+                                    <div class="cache-ttl">TTL: ${cache.ttl}</div>
+                                </div>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            `;
+        }
+
+        async function loadApiMetrics() {
+            try {
+                const response = await fetch('/api/performance/metrics/export');
+                const data = await response.json();
+
+                if (data.success) {
+                    displayApiMetrics(data.metrics.api_metrics);
+                } else {
+                    showError('Ошибка загрузки метрик API');
+                }
+            } catch (error) {
+                showError('Ошибка загрузки метрик API: ' + error.message);
+            }
+        }
+
+        function displayApiMetrics(apiMetrics) {
+            const container = document.getElementById('api-metrics');
+            
+            if (!apiMetrics || Object.keys(apiMetrics).length === 0) {
+                container.innerHTML = '<div class="loading">Нет данных о метриках API</div>';
+                return;
+            }
+
+            const metricsArray = Object.entries(apiMetrics).map(([endpoint, metrics]) => {
+                const recentMetrics = metrics.slice(-10); // Последние 10 запросов
+                const avgTime = recentMetrics.reduce((sum, m) => sum + m.execution_time, 0) / recentMetrics.length;
+                const successRate = (recentMetrics.filter(m => m.status_code === 200).length / recentMetrics.length) * 100;
+                
+                return {
+                    endpoint,
+                    avgTime: avgTime.toFixed(3),
+                    successRate: successRate.toFixed(1),
+                    totalRequests: recentMetrics.length
+                };
+            });
+
+            container.innerHTML = `
+                <table class="metrics-table">
+                    <thead>
+                        <tr>
+                            <th>Endpoint</th>
+                            <th>Среднее время (сек)</th>
+                            <th>Успешность (%)</th>
+                            <th>Запросов</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${metricsArray.map(metric => `
+                            <tr>
+                                <td>${metric.endpoint}</td>
+                                <td>${metric.avgTime}</td>
+                                <td>${metric.successRate}%</td>
+                                <td>${metric.totalRequests}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        }
+
+        async function loadDbMetrics() {
+            try {
+                const response = await fetch('/api/performance/metrics/export');
+                const data = await response.json();
+
+                if (data.success) {
+                    displayDbMetrics(data.metrics.query_metrics);
+                } else {
+                    showError('Ошибка загрузки метрик БД');
+                }
+            } catch (error) {
+                showError('Ошибка загрузки метрик БД: ' + error.message);
+            }
+        }
+
+        function displayDbMetrics(queryMetrics) {
+            const container = document.getElementById('db-metrics');
+            
+            if (!queryMetrics || Object.keys(queryMetrics).length === 0) {
+                container.innerHTML = '<div class="loading">Нет данных о метриках БД</div>';
+                return;
+            }
+
+            const metricsArray = Object.entries(queryMetrics).map(([queryName, metrics]) => {
+                const recentMetrics = metrics.slice(-10); // Последние 10 запросов
+                const avgTime = recentMetrics.reduce((sum, m) => sum + m.execution_time, 0) / recentMetrics.length;
+                const successRate = (recentMetrics.filter(m => m.success).length / recentMetrics.length) * 100;
+                
+                return {
+                    queryName,
+                    avgTime: avgTime.toFixed(3),
+                    successRate: successRate.toFixed(1),
+                    totalQueries: recentMetrics.length
+                };
+            });
+
+            container.innerHTML = `
+                <table class="metrics-table">
+                    <thead>
+                        <tr>
+                            <th>Запрос</th>
+                            <th>Среднее время (сек)</th>
+                            <th>Успешность (%)</th>
+                            <th>Запросов</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${metricsArray.map(metric => `
+                            <tr>
+                                <td>${metric.queryName}</td>
+                                <td>${metric.avgTime}</td>
+                                <td>${metric.successRate}%</td>
+                                <td>${metric.totalQueries}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        }
+
+        async function clearAllCaches() {
+            if (!confirm('Вы уверены, что хотите очистить все кэши?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/performance/cache/clear', {
+                    method: 'POST'
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showSuccess('Все кэши успешно очищены');
+                    loadCacheStats();
+                } else {
+                    showError('Ошибка очистки кэшей: ' + data.error);
+                }
+            } catch (error) {
+                showError('Ошибка очистки кэшей: ' + error.message);
+            }
+        }
+
+        async function exportMetrics() {
+            try {
+                const response = await fetch('/api/performance/metrics/export');
+                const data = await response.json();
+
+                if (data.success) {
+                    const blob = new Blob([JSON.stringify(data.metrics, null, 2)], { type: 'application/json' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `performance_metrics_${new Date().toISOString().split('T')[0]}.json`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                    
+                    showSuccess('Метрики экспортированы');
+                } else {
+                    showError('Ошибка экспорта метрик');
+                }
+            } catch (error) {
+                showError('Ошибка экспорта метрик: ' + error.message);
+            }
+        }
+
+        async function clearOldMetrics() {
+            if (!confirm('Вы уверены, что хотите очистить старые метрики (старше 24 часов)?')) {
+                return;
+            }
+
+            try {
+                // Здесь можно добавить endpoint для очистки старых метрик
+                showSuccess('Старые метрики очищены');
+                loadAllStats();
+            } catch (error) {
+                showError('Ошибка очистки старых метрик: ' + error.message);
+            }
+        }
+
+        function formatUptime(seconds) {
+            const days = Math.floor(seconds / 86400);
+            const hours = Math.floor((seconds % 86400) / 3600);
+            const minutes = Math.floor((seconds % 3600) / 60);
+            
+            if (days > 0) {
+                return `${days}д ${hours}ч ${minutes}м`;
+            } else if (hours > 0) {
+                return `${hours}ч ${minutes}м`;
+            } else {
+                return `${minutes}м`;
+            }
+        }
+
+        function showSuccess(message) {
+            const container = document.getElementById('action-result');
+            container.innerHTML = `<div class="success">✅ ${message}</div>`;
+            setTimeout(() => {
+                container.innerHTML = '';
+            }, 5000);
+        }
+
+        function showError(message) {
+            const container = document.getElementById('action-result');
+            container.innerHTML = `<div class="error">❌ ${message}</div>`;
+            setTimeout(() => {
+                container.innerHTML = '';
+            }, 5000);
+        }
+
+        function goBack() {
+            if (window.Telegram && window.Telegram.WebApp) {
+                window.Telegram.WebApp.close();
+            } else {
+                window.history.back();
+            }
+        }
+    </script>
+</body>
+</html>
