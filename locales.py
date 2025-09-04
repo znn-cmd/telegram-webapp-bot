@@ -4,9 +4,6 @@ locales = {
         'welcome_back': 'С возвращением!',
         'choose_language': 'Пожалуйста, выберите язык для дальнейшего общения:',
         'menu': [
-            'Получить новый отчет',
-            'Статистика рынка',
-            'Мои сохраненные обзоры',
             'Личный кабинет'
         ],
         'new_buttons': {
@@ -15,9 +12,6 @@ locales = {
         },
         'admin_section': {
             'title': 'Для админа',
-            'new_report': 'Получить новый отчет',
-            'market_stats': 'Статистика рынка',
-            'saved_reports': 'Мои сохраненные отчеты',
             'admin_panel': 'Админ-панель'
         },
         'language_names': {
@@ -157,9 +151,6 @@ locales = {
         'welcome_back': 'Welcome back!',
         'choose_language': 'Please select your preferred language:',
         'menu': [
-            'Get new report',
-            'Market statistics',
-            'My saved reports',
             'Profile'
         ],
         'new_buttons': {
@@ -168,9 +159,6 @@ locales = {
         },
         'admin_section': {
             'title': 'For Admin',
-            'new_report': 'Get new report',
-            'market_stats': 'Market statistics',
-            'saved_reports': 'My saved reports',
             'admin_panel': 'Admin panel'
         },
         'language_names': {
@@ -310,9 +298,6 @@ locales = {
         'welcome_back': 'Willkommen zurück!',
         'choose_language': 'Bitte wählen Sie Ihre bevorzugte Sprache:',
         'menu': [
-            'Neuen Bericht erstellen',
-            'Marktstatistiken',
-            'Meine gespeicherten Berichte',
             'Profil'
         ],
         'new_buttons': {
@@ -321,9 +306,6 @@ locales = {
         },
         'admin_section': {
             'title': 'Für Admin',
-            'new_report': 'Neuen Bericht erstellen',
-            'market_stats': 'Marktstatistiken',
-            'saved_reports': 'Meine gespeicherten Berichte',
             'admin_panel': 'Admin-Panel'
         },
         'language_names': {
@@ -463,9 +445,6 @@ locales = {
         'welcome_back': 'Bon retour !',
         'choose_language': 'Veuillez choisir votre langue préférée :',
         'menu': [
-            'Obtenir un nouveau rapport',
-            'Statistiques du marché',
-            'Mes rapports enregistrés',
             'Profil'
         ],
         'new_buttons': {
@@ -474,9 +453,6 @@ locales = {
         },
         'admin_section': {
             'title': 'Pour Admin',
-            'new_report': 'Obtenir un nouveau rapport',
-            'market_stats': 'Statistiques du marché',
-            'saved_reports': 'Mes rapports enregistrés',
             'admin_panel': 'Panneau admin'
         },
         'language_names': {
@@ -616,9 +592,6 @@ locales = {
         'welcome_back': 'Tekrar hoş geldiniz!',
         'choose_language': 'Lütfen tercih ettiğiniz dili seçin:',
         'menu': [
-            'Yeni rapor al',
-            'Piyasa istatistikleri',
-            'Kayıtlı raporlarım',
             'Profil'
         ],
         'new_buttons': {
@@ -627,9 +600,6 @@ locales = {
         },
         'admin_section': {
             'title': 'Admin İçin',
-            'new_report': 'Yeni rapor al',
-            'market_stats': 'Piyasa istatistikleri',
-            'saved_reports': 'Kayıtlı raporlarım',
             'admin_panel': 'Admin paneli'
         },
         'new_report': {

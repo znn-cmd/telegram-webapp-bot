@@ -218,18 +218,6 @@ def webapp_main():
     with open('webapp_main.html', 'r', encoding='utf-8') as f:
         return f.read()
 
-@app.route('/webapp_report')
-def webapp_report():
-    """Страница создания отчета"""
-    with open('webapp_real_data.html', 'r', encoding='utf-8') as f:
-        return f.read()
-
-@app.route('/webapp_saved')
-def webapp_saved():
-    """Страница сохраненных отчетов"""
-    with open('webapp_saved.html', 'r', encoding='utf-8') as f:
-        return f.read()
-
 @app.route('/webapp_help')
 def webapp_help():
     with open('webapp_help.html', 'r', encoding='utf-8') as f:
@@ -238,11 +226,6 @@ def webapp_help():
 @app.route('/webapp_profile')
 def webapp_profile():
     with open('webapp_profile.html', 'r', encoding='utf-8') as f:
-        return f.read()
-
-@app.route('/webapp_stats')
-def webapp_stats():
-    with open('webapp_stats.html', 'r', encoding='utf-8') as f:
         return f.read()
 
 @app.route('/webapp_profile_data')
