@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="/i18n-manager.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Админ-панель — Aaadviser</title>
@@ -36,7 +38,7 @@
         </button>
         <button class="admin-btn" onclick="showUsersStats()">
             <span class="admin-btn-icon">👥</span>
-            <span>Пользователи</span>
+            <span data-i18n="admin.users" data-i18n="admin.users">Пользователи</span>
         </button>
         <button class="admin-btn" onclick="showPublication()">
             <span class="admin-btn-icon">📢</span>
@@ -44,10 +46,10 @@
         </button>
         <button class="admin-btn" onclick="showSettings()">
             <span class="admin-btn-icon">⚙️</span>
-            <span>Настройки</span>
+            <span data-i18n="common.settings" data-i18n="common.settings" data-i18n="common.settings" data-i18n="common.settings">Настройки</span>
         </button>
         <div class="nav-btn-row">
-            <button class="nav-btn" onclick="goBack()">Назад</button>
+            <button class="nav-btn" onclick="goBack()" data-i18n="common.back" data-i18n="common.back" data-i18n="common.back" data-i18n="common.back">Назад</button>
             <button class="nav-btn nav-btn-main" onclick="goToMainMenu()">В главное меню</button>
         </div>
     </div>

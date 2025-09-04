@@ -9091,6 +9091,24 @@ def api_region_insights():
         return jsonify({'success': False, 'error': str(e)}), 500
 
 
+@app.route('/api/translations', methods=['POST'])
+def api_translations():
+    """API endpoint для получения переводов"""
+    try:
+        data = request.get_json()
+        language = data.get('language', 'ru')
+        
+        if language not in ['ru', 'en', 'de', 'fr', 'tr']:
+            language = 'ru'
+        
+        # Возвращаем переводы для запрошенного языка
+        return jsonify(locales.get(language, locales['ru']))
+        
+    except Exception as e:
+        logger.error(f"❌ Ошибка API translations: {e}")
+        return jsonify({'error': str(e)}), 500
+
+
 @app.route('/api/test_api_keys', methods=['GET'])
 def api_test_api_keys():
     """Тестовый endpoint для проверки таблицы api_keys"""

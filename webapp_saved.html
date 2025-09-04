@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="/i18n-manager.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Aaadviser - Мои отчеты</title>
@@ -365,7 +367,7 @@
 <body>
     <div class="container">
         <img src="logo-flt.png" alt="Aaadviser" class="logo" onclick="goToMainMenu()">
-        <div class="title" id="pageTitle">Мои отчеты</div>
+        <div class="title" id="pageTitle" data-i18n="reports.title" data-i18n="reports.title" data-i18n="reports.my_reports" data-i18n="reports.my_reports">Мои отчеты</div>
         
         <!-- Skeleton loading -->
         <div id="skeletonLoading">
@@ -374,7 +376,7 @@
             <div class="skeleton skeleton-report"></div>
         </div>
         
-        <div id="loading" class="loading" style="display:none;">Загрузка...</div>
+        <div id="loading" class="loading" style="display:none;" data-i18n="common.loading" data-i18n="common.loading" data-i18n="common.loading" data-i18n="common.loading">Загрузка...</div>
         <div id="reportList" class="report-list" style="display:none;"></div>
         
         <!-- Empty state -->
@@ -611,7 +613,7 @@
                             <span>⬇️<span class='tooltip'>Скачать PDF</span></span>
                         </button>
                         <button class="icon-btn" onclick="confirmDeleteReport('${r.id || ''}')" title="Удалить">
-                            <span>🗑️<span class='tooltip'>Удалить</span></span>
+                            <span>🗑️<span class='tooltip' data-i18n="common.delete" data-i18n="common.delete" data-i18n="common.delete" data-i18n="common.delete">Удалить</span></span>
                         </button>
                         <button class="icon-btn" onclick="confirmUpdateReport('${r.id || ''}')" ${canUpdate ? '' : 'disabled'} title="Обновить (1$)">
                             <span>♻️<span class='tooltip'>Обновить (1$)</span></span>
@@ -668,7 +670,7 @@
                         <button class="btn" onclick="exportPdfFlow()">Скачать PDF</button>
                         <button class="btn back-btn" style="background:#f1f1f1;color:#333;" onclick="saveAndExitFullReport()">Сохранить и выйти</button>
                     </div>
-                    <button class="btn back-btn" style="margin-top:18px;" onclick="closeFullReportModal()">Закрыть</button>
+                    <button class="btn back-btn" style="margin-top:18px;" onclick="closeFullReportModal()" data-i18n="common.close" data-i18n="common.close" data-i18n="common.close" data-i18n="common.close">Закрыть</button>
                 </div>
             `;
             document.body.appendChild(modal);

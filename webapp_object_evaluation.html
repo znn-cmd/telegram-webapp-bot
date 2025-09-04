@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Aaadviser - Оценка объекта</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="/i18n-manager.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         * {
@@ -3823,7 +3824,7 @@
         <div class="modal-overlay" id="shareModal">
             <div class="modal-content">
                 <button class="modal-close" onclick="closeShareModal()">×</button>
-                <div class="modal-title" id="modalTitle">Отчет сохранен</div>
+                <div class="modal-title" id="modalTitle" data-i18n="reports.report_saved" data-i18n="reports.report_saved">Отчет сохранен</div>
                 <div class="modal-description" id="modalDescription">
                     Ваш отчет успешно сохранен. Вы можете скопировать ссылку и поделиться ею с другими.
                 </div>
@@ -3835,7 +3836,7 @@
                         <span id="copyButtonText">Копировать ссылку</span>
                     </button>
                     <button class="modal-button modal-button-secondary" onclick="closeShareModal()">
-                        <span id="closeButtonText">Закрыть</span>
+                        <span id="closeButtonText" data-i18n="common.close" data-i18n="common.close" data-i18n="common.close" data-i18n="common.close">Закрыть</span>
                     </button>
                 </div>
             </div>
@@ -5692,7 +5693,7 @@
             }
             
             let analysis = '<div class="analytical-summary">';
-            analysis += '<h4 class="summary-title">Анализ рынка</h4>';
+            analysis += '<h4 class="summary-title" data-i18n="reports.market_analysis" data-i18n="reports.market_analysis" data-i18n="reports.market_analysis" data-i18n="reports.market_analysis">Анализ рынка</h4>';
             
 
             
@@ -6964,7 +6965,7 @@
             
             let html = '<table class="trends-table">';
             html += '<thead><tr>';
-            html += '<th>Дата</th>';
+            html += '<th data-i18n="balance.date" data-i18n="balance.date" data-i18n="balance.date" data-i18n="balance.date">Дата</th>';
             html += '<th>Продажа<br>(₺/м²)</th>';
             html += '<th>Изм-ие цены<br>продажи</th>';
             html += '<th>Аренда<br>(₺/м²)</th>';
@@ -7548,7 +7549,7 @@
             forecastHtml += '<div class="forecast-table-container">';
             forecastHtml += '<table class="forecast-table">';
             forecastHtml += '<thead><tr>';
-            forecastHtml += '<th>Дата</th>';
+            forecastHtml += '<th data-i18n="balance.date" data-i18n="balance.date" data-i18n="balance.date" data-i18n="balance.date">Дата</th>';
             forecastHtml += '<th>Прогноз продажи<br>(₺/м²)</th>';
             forecastHtml += '<th>Прогноз аренды<br>(₺/м²)</th>';
             forecastHtml += '<th>Прогноз доходности</th>';
