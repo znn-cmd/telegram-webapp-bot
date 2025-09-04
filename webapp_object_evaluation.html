@@ -4966,7 +4966,7 @@
                     // Add "не имеет значения" option
                     const noDistrictOption = document.createElement('option');
                     noDistrictOption.value = 'none';
-                    noDistrictOption.textContent = 'Не имеет значения';
+                    noDistrictOption.textContent = getText('noDistrictOption');
                     districtSelect.appendChild(noDistrictOption);
                     
                     console.log('📍 Adding districts:', data.districts);
@@ -5273,7 +5273,7 @@
             const countryName = countrySelect.options[countrySelect.selectedIndex].text;
             const cityName = citySelect.options[citySelect.selectedIndex].text;
             const countyName = countySelect.options[countySelect.selectedIndex].text;
-            const districtName = districtSelect.value === 'none' ? 'Не имеет значения' : districtSelect.options[districtSelect.selectedIndex].text;
+            const districtName = districtSelect.value === 'none' ? getText('noDistrictOption') : districtSelect.options[districtSelect.selectedIndex].text;
             
             // Convert price to EUR if needed
             let priceInEUR = null;
@@ -5383,7 +5383,7 @@
             if (selectedLocation.county_name) {
                 locationString += `, ${selectedLocation.county_name}`;
             }
-            if (selectedLocation.district_name && selectedLocation.district_name !== 'Не имеет значения') {
+            if (selectedLocation.district_name && selectedLocation.district_name !== getText('noDistrictOption')) {
                 locationString += `, ${selectedLocation.district_name}`;
             }
             
@@ -10035,7 +10035,8 @@
                 'noDistrictOption': 'Tercih yok',
                 'noData': 'Görüntülenecek veri yok',
                 'noDataRange': 'Seçilen aralıkta görüntülenecek veri yok',
-                'reportNotFound': 'Rapor bulunamadı'
+                'reportNotFound': 'Rapor bulunamadı',
+                'noDistrictOption': 'Tercih yok'
             }
         };
 
@@ -10059,7 +10060,7 @@
                 'heatingDataSubtitle', 'heatingDataPlaceholder', 'priceObjectSubtitle', 'priceObjectPlaceholder',
                 'currencyTitle', 'areaObjectSubtitle', 'areaObjectPlaceholder', 'confirmButtonText',
                 'selectedLocationTitle', 'propertyTypesTitle', 'adminIdsTitle', 'saveShareButtonText',
-                'errorText', 'backButton', 'modalTitle', 'modalLink', 'copyButtonText', 'closeButtonText'
+                'errorText', 'backButton', 'modalTitle', 'modalLink', 'copyButtonText', 'closeButtonText', 'noDistrictOption'
             ];
             
             elements.forEach(id => {
@@ -10122,5 +10123,6 @@
             initLocalization();
         });
     </script>
+    <script src="/i18n-manager.js"></script>
 </body>
 </html>
