@@ -5,7 +5,7 @@
     <script src="/i18n-manager.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title data-i18n-title="reports.full_report">Полный отчет - Aaadviser</title>
+    <title id="pageTitleTag">Полный отчет - Aaadviser</title>
     <style>
         * {
             margin: 0;
@@ -480,52 +480,52 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>📊 Полный отчет</h1>
-            <p>Детальный анализ объекта недвижимости</p>
+            <h1 id="pageTitle">📊 Полный отчет</h1>
+            <p id="pageDescription">Детальный анализ объекта недвижимости</p>
         </div>
 
         <div class="content">
             <div id="loading" class="loading">
-                <h3>🔄 Формируем полный отчет...</h3>
-                <p>Пожалуйста, подождите</p>
+                <h3 id="loadingTitle">🔄 Формируем полный отчет...</h3>
+                <p id="loadingText">Пожалуйста, подождите</p>
             </div>
 
             <div id="error" class="error" style="display: none;">
-                <h3>❌ Ошибка загрузки отчета</h3>
+                <h3 id="errorTitle">❌ Ошибка загрузки отчета</h3>
                 <p id="error-message">Произошла ошибка при формировании отчета</p>
             </div>
 
             <div id="report-content" style="display: none;">
                 <!-- Основная информация об объекте -->
                 <div class="section object-info">
-                    <h2>🏠 Информация об объекте</h2>
+                    <h2 id="objectInfoTitle">🏠 Информация об объекте</h2>
                     <div class="info-grid">
                         <div class="info-item">
-                            <div class="info-label">Адрес</div>
+                            <div class="info-label" id="addressLabel">Адрес</div>
                             <div class="info-value" id="object-address">-</div>
                         </div>
                         <div class="info-item">
-                            <div class="info-label">Спальни</div>
+                            <div class="info-label" id="bedroomsLabel">Спальни</div>
                             <div class="info-value" id="object-bedrooms">-</div>
                         </div>
                         <div class="info-item">
-                            <div class="info-label" data-i18n="reports.property_price">Цена</div>
+                            <div class="info-label" id="priceLabel">Цена</div>
                             <div class="info-value" id="object-price">-</div>
                         </div>
                         <div class="info-item">
-                            <div class="info-label">Возраст объекта</div>
+                            <div class="info-label" id="ageLabel">Возраст объекта</div>
                             <div class="info-value" id="object-age">-</div>
                         </div>
                         <div class="info-item">
-                            <div class="info-label">Этаж</div>
+                            <div class="info-label" id="floorLabel">Этаж</div>
                             <div class="info-value" id="object-floor">-</div>
                         </div>
                         <div class="info-item">
-                            <div class="info-label">Отопление</div>
+                            <div class="info-label" id="heatingLabel">Отопление</div>
                             <div class="info-value" id="object-heating">-</div>
                         </div>
                         <div class="info-item">
-                            <div class="info-label">Площадь объекта</div>
+                            <div class="info-label" id="areaLabel">Площадь объекта</div>
                             <div class="info-value" id="object-area">-</div>
                         </div>
                     </div>
@@ -533,27 +533,27 @@
 
                 <!-- Рыночный анализ -->
                 <div class="section">
-                    <h2>📊 Рыночный анализ</h2>
+                    <h2 id="marketAnalysisTitle">📊 Рыночный анализ</h2>
                     
                     <!-- Сравнение цен по критериям -->
                     <div class="price-comparison-section">
-                        <h3>📊 Сравнение с рыночными ценами</h3>
+                        <h3 id="priceComparisonTitle">📊 Сравнение с рыночными ценами</h3>
                         
                         <!-- Возраст объекта -->
                         <div class="comparison-item">
-                            <div class="comparison-label">По возрасту объекта:</div>
+                            <div class="comparison-label" id="ageComparisonLabel">По возрасту объекта:</div>
                             <div class="comparison-values" id="age-comparison">-</div>
                         </div>
                         
                         <!-- Этаж -->
                         <div class="comparison-item">
-                            <div class="comparison-label">По этажу:</div>
+                            <div class="comparison-label" id="floorComparisonLabel">По этажу:</div>
                             <div class="comparison-values" id="floor-comparison">-</div>
                         </div>
                         
                         <!-- Тип отопления -->
                         <div class="comparison-item">
-                            <div class="comparison-label">По типу отопления:</div>
+                            <div class="comparison-label" id="heatingComparisonLabel">По типу отопления:</div>
                             <div class="comparison-values" id="heating-comparison">-</div>
                         </div>
                         
@@ -561,19 +561,19 @@
                         
                         <!-- Итоговое сравнение -->
                         <div class="final-comparison">
-                            <div class="comparison-label">Итоговое сравнение:</div>
+                            <div class="comparison-label" id="finalComparisonLabel">Итоговое сравнение:</div>
                             <div class="comparison-values" id="final-comparison">-</div>
                         </div>
                         
                         <!-- Вывод по цене -->
                         <div class="price-conclusion">
-                            <div class="conclusion-label">Вывод по цене:</div>
+                            <div class="conclusion-label" id="priceConclusionLabel">Вывод по цене:</div>
                             <div class="conclusion-value" id="price-conclusion">-</div>
                         </div>
                         
                         <!-- Информация о конвертации валют -->
                         <div class="currency-info" id="currency-info" style="display: none;">
-                            <div class="info-label">💱 Конвертация валют:</div>
+                            <div class="info-label" id="currencyInfoLabel">💱 Конвертация валют:</div>
                             <div class="info-value" id="currency-info-value">-</div>
                         </div>
                     </div>
@@ -581,25 +581,25 @@
 
                 <!-- Анализ динамики цен -->
                 <div class="section">
-                    <h2>📊 Анализ динамики цен</h2>
+                    <h2 id="priceTrendsTitle">📊 Анализ динамики цен</h2>
                     <div class="info-grid">
                         <div class="info-item">
-                            <div class="info-label">Тренд цен</div>
+                            <div class="info-label" id="priceTrendLabel">Тренд цен</div>
                             <div class="info-value" id="price-trend">-</div>
                         </div>
                         <div class="info-item">
-                            <div class="info-label">Изменение за 3 года</div>
+                            <div class="info-label" id="priceChange3yLabel">Изменение за 3 года</div>
                             <div class="info-value" id="price-change-3y">-</div>
                         </div>
                         <div class="info-item">
-                            <div class="info-label">Прогноз на 3 месяца</div>
+                            <div class="info-label" id="priceForecastLabel">Прогноз на 3 месяца</div>
                             <div class="info-value" id="price-forecast">-</div>
                         </div>
                     </div>
                     
                     <!-- График динамики цен -->
                     <div class="price-chart-container" style="margin-top: 20px;">
-                        <h3>📈 График изменения цен</h3>
+                        <h3 id="priceChartTitle">📈 График изменения цен</h3>
                         <div class="chart-wrapper">
                             <canvas id="priceChart" width="400" height="200"></canvas>
                         </div>
@@ -608,11 +608,11 @@
                     <!-- Анализ тренда -->
                     <div class="trend-analysis" style="margin-top: 20px;">
                         <div class="trend-item">
-                            <div class="trend-label">Анализ тренда:</div>
+                            <div class="trend-label" id="trendAnalysisLabel">Анализ тренда:</div>
                             <div class="trend-value" id="trend-analysis">-</div>
                         </div>
                         <div class="trend-item">
-                            <div class="trend-label">Рекомендация:</div>
+                            <div class="trend-label" id="trendRecommendationLabel">Рекомендация:</div>
                             <div class="trend-value" id="trend-recommendation">-</div>
                         </div>
                     </div>
@@ -620,18 +620,18 @@
 
                 <!-- Анализ аренды -->
                 <div class="section">
-                    <h2>🏠 Анализ аренды</h2>
+                    <h2 id="rentalAnalysisTitle">🏠 Анализ аренды</h2>
                     <div class="info-grid">
                         <div class="info-item">
-                            <div class="info-label">Максимальная ставка аренды</div>
+                            <div class="info-label" id="maxRentalRateLabel">Максимальная ставка аренды</div>
                             <div class="info-value" id="max-rental-rate">-</div>
                         </div>
                         <div class="info-item">
-                            <div class="info-label">Годовая доходность</div>
+                            <div class="info-label" id="annualRentalYieldLabel">Годовая доходность</div>
                             <div class="info-value" id="annual-rental-yield">-</div>
                         </div>
                         <div class="info-item">
-                            <div class="info-label">Рекомендация по аренде</div>
+                            <div class="info-label" id="rentalRecommendationLabel">Рекомендация по аренде</div>
                             <div class="info-value" id="rental-recommendation">-</div>
                         </div>
                     </div>
@@ -639,31 +639,31 @@
 
                 <!-- ROI анализ -->
                 <div class="section">
-                    <h2>💰 ROI анализ</h2>
+                    <h2 id="roiAnalysisTitle">💰 ROI анализ</h2>
                     
                     <div class="highlight">
-                        <h3>Краткосрочная аренда (Airbnb)</h3>
+                        <h3 id="shortTermRentTitle">Краткосрочная аренда (Airbnb)</h3>
                         <div class="value" id="short-term-income">-</div>
-                        <div class="description">Доход в месяц</div>
+                        <div class="description" id="shortTermIncomeDesc">Доход в месяц</div>
                     </div>
 
                     <div class="highlight">
-                        <h3>Долгосрочная аренда</h3>
+                        <h3 id="longTermRentTitle">Долгосрочная аренда</h3>
                         <div class="value" id="long-term-income">-</div>
-                        <div class="description">Доход в год</div>
+                        <div class="description" id="longTermIncomeDesc">Доход в год</div>
                     </div>
 
                     <div class="info-grid">
                         <div class="info-item">
-                            <div class="info-label">Рост цены (5 лет)</div>
+                            <div class="info-label" id="priceGrowthLabel">Рост цены (5 лет)</div>
                             <div class="info-value" id="price-growth">-</div>
                         </div>
                         <div class="info-item">
-                            <div class="info-label">ROI с арендой</div>
+                            <div class="info-label" id="roiWithRentLabel">ROI с арендой</div>
                             <div class="info-value" id="roi-with-rent">-</div>
                         </div>
                         <div class="info-item">
-                            <div class="info-label">ROI без аренды</div>
+                            <div class="info-label" id="roiWithoutRentLabel">ROI без аренды</div>
                             <div class="info-value" id="roi-without-rent">-</div>
                         </div>
                     </div>
@@ -671,7 +671,7 @@
 
                 <!-- Альтернативные инвестиции -->
                 <div class="section">
-                    <h2>📈 Альтернативные инвестиции</h2>
+                    <h2 id="alternativesTitle">📈 Альтернативные инвестиции</h2>
                     <div class="info-grid" id="alternatives-grid">
                         <!-- Альтернативы будут добавлены динамически -->
                     </div>
@@ -679,22 +679,22 @@
 
                 <!-- Макроэкономические данные -->
                 <div class="section">
-                    <h2>🌍 Макроэкономические данные</h2>
+                    <h2 id="macroDataTitle">🌍 Макроэкономические данные</h2>
                     <div class="info-grid">
                         <div class="info-item">
-                            <div class="info-label">Инфляция</div>
+                            <div class="info-label" id="inflationLabel">Инфляция</div>
                             <div class="info-value" id="inflation">-</div>
                         </div>
                         <div class="info-item">
-                            <div class="info-label">Курс EUR/TRY</div>
+                            <div class="info-label" id="eurTryLabel">Курс EUR/TRY</div>
                             <div class="info-value" id="eur-try">-</div>
                         </div>
                         <div class="info-item">
-                            <div class="info-label">Рост ВВП</div>
+                            <div class="info-label" id="gdpGrowthLabel">Рост ВВП</div>
                             <div class="info-value" id="gdp-growth">-</div>
                         </div>
                         <div class="info-item">
-                            <div class="info-label">Ставка рефинансирования</div>
+                            <div class="info-label" id="refiRateLabel">Ставка рефинансирования</div>
                             <div class="info-value" id="refi-rate">-</div>
                         </div>
                     </div>
@@ -702,7 +702,7 @@
 
                 <!-- Налоги и сборы -->
                 <div class="section">
-                    <h2>🏛️ Налоги и сборы</h2>
+                    <h2 id="taxesTitle">🏛️ Налоги и сборы</h2>
                     <div class="info-grid" id="taxes-grid">
                         <!-- Налоги будут добавлены динамически -->
                     </div>
@@ -710,14 +710,14 @@
 
                 <!-- Риски и ликвидность -->
                 <div class="section">
-                    <h2>⚠️ Риски и ликвидность</h2>
+                    <h2 id="risksTitle">⚠️ Риски и ликвидность</h2>
                     <div class="info-grid">
                         <div class="info-item">
-                            <div class="info-label" data-i18n="reports.liquidity">Ликвидность</div>
+                            <div class="info-label" id="liquidityLabel">Ликвидность</div>
                             <div class="info-value" id="liquidity">-</div>
                         </div>
                         <div class="info-item">
-                            <div class="info-label">Район</div>
+                            <div class="info-label" id="districtLabel">Район</div>
                             <div class="info-value" id="district">-</div>
                         </div>
                     </div>
@@ -728,7 +728,7 @@
 
                 <!-- Экономические графики -->
                 <div class="section">
-                    <h2>📊 Экономические тренды</h2>
+                    <h2 id="economicTrendsTitle">📊 Экономические тренды</h2>
                     <div class="chart-container">
                         <div class="chart-placeholder">
                             📈 График экономических показателей
@@ -738,13 +738,13 @@
 
                 <!-- Кнопки действий -->
                 <div class="buttons">
-                    <button class="btn btn-primary" onclick="downloadPDF()">
+                    <button class="btn btn-primary" onclick="downloadPDF()" id="downloadPdfBtn">
                         📥 Скачать PDF
                     </button>
-                    <button class="btn btn-secondary" onclick="saveReport()">
+                    <button class="btn btn-secondary" onclick="saveReport()" id="saveReportBtn">
                         💾 Сохранить отчет
                     </button>
-                    <button class="btn btn-secondary" onclick="goBack()">
+                    <button class="btn btn-secondary" onclick="goBack()" id="backBtn">
                         ← Назад
                     </button>
                 </div>
@@ -897,23 +897,23 @@
                     // Показываем сообщение об ошибке в блоке трендов
                     const trendAnalysisElement = document.getElementById('trend-analysis');
                     if (trendAnalysisElement) {
-                        trendAnalysisElement.textContent = `Ошибка загрузки данных о трендах: ${error.message}`;
+                        trendAnalysisElement.textContent = `${getText('trendsError')}: ${error.message}`;
                     }
                     
                     // Заполняем остальные поля значением "Недоступно"
                     const priceTrendElement = document.getElementById('price-trend');
                     if (priceTrendElement) {
-                        priceTrendElement.textContent = 'Недоступно';
+                        priceTrendElement.textContent = getText('unavailable');
                     }
                     
                     const priceChangeElement = document.getElementById('price-change-3y');
                     if (priceChangeElement) {
-                        priceChangeElement.textContent = 'Недоступно';
+                        priceChangeElement.textContent = getText('unavailable');
                     }
                     
                     const priceForecastElement = document.getElementById('price-forecast');
                     if (priceForecastElement) {
-                        priceForecastElement.textContent = 'Недоступно';
+                        priceForecastElement.textContent = getText('unavailable');
                     }
                 }
                 } else {
@@ -924,23 +924,23 @@
                     // Показываем сообщение об отсутствии данных
                     const trendAnalysisElement = document.getElementById('trend-analysis');
                     if (trendAnalysisElement) {
-                        trendAnalysisElement.textContent = 'Недостаточно данных для анализа трендов';
+                        trendAnalysisElement.textContent = getText('insufficientData');
                     }
                     
                     // Заполняем остальные поля значением "Недоступно"
                     const priceTrendElement = document.getElementById('price-trend');
                     if (priceTrendElement) {
-                        priceTrendElement.textContent = 'Недоступно';
+                        priceTrendElement.textContent = getText('unavailable');
                     }
                     
                     const priceChangeElement = document.getElementById('price-change-3y');
                     if (priceChangeElement) {
-                        priceChangeElement.textContent = 'Недоступно';
+                        priceChangeElement.textContent = getText('unavailable');
                     }
                     
                     const priceForecastElement = document.getElementById('price-forecast');
                     if (priceForecastElement) {
-                        priceForecastElement.textContent = 'Недоступно';
+                        priceForecastElement.textContent = getText('unavailable');
                     }
                 }
 
@@ -982,7 +982,7 @@
                 // Показываем индикатор загрузки в блоке трендов
                 const trendAnalysisElement = document.getElementById('trend-analysis');
                 if (trendAnalysisElement) {
-                    trendAnalysisElement.textContent = 'Загружаем данные о трендах...';
+                    trendAnalysisElement.textContent = getText('loadingText');
                 }
                 
                 // Создаем AbortController для таймаута
@@ -1028,23 +1028,23 @@
                     // Показываем сообщение об отсутствии данных
                     const trendAnalysisElement = document.getElementById('trend-analysis');
                     if (trendAnalysisElement) {
-                        trendAnalysisElement.textContent = 'Данные о трендах цен для данной локации отсутствуют';
+                        trendAnalysisElement.textContent = getText('noTrendsData');
                     }
                     
                     // Заполняем остальные поля значением "Недоступно"
                     const priceTrendElement = document.getElementById('price-trend');
                     if (priceTrendElement) {
-                        priceTrendElement.textContent = 'Недоступно';
+                        priceTrendElement.textContent = getText('unavailable');
                     }
                     
                     const priceChangeElement = document.getElementById('price-change-3y');
                     if (priceChangeElement) {
-                        priceChangeElement.textContent = 'Недоступно';
+                        priceChangeElement.textContent = getText('unavailable');
                     }
                     
                     const priceForecastElement = document.getElementById('price-forecast');
                     if (priceForecastElement) {
-                        priceForecastElement.textContent = 'Недоступно';
+                        priceForecastElement.textContent = getText('unavailable');
                     }
                     
                     return;
@@ -1056,23 +1056,23 @@
                     // Показываем сообщение об отсутствии данных
                     const trendAnalysisElement = document.getElementById('trend-analysis');
                     if (trendAnalysisElement) {
-                        trendAnalysisElement.textContent = 'Данные о трендах цен для данной локации отсутствуют';
+                        trendAnalysisElement.textContent = getText('noTrendsData');
                     }
                     
                     // Заполняем остальные поля значением "Недоступно"
                     const priceTrendElement = document.getElementById('price-trend');
                     if (priceTrendElement) {
-                        priceTrendElement.textContent = 'Недоступно';
+                        priceTrendElement.textContent = getText('unavailable');
                     }
                     
                     const priceChangeElement = document.getElementById('price-change-3y');
                     if (priceChangeElement) {
-                        priceChangeElement.textContent = 'Недоступно';
+                        priceChangeElement.textContent = getText('unavailable');
                     }
                     
                     const priceForecastElement = document.getElementById('price-forecast');
                     if (priceForecastElement) {
-                        priceForecastElement.textContent = 'Недоступно';
+                        priceForecastElement.textContent = getText('unavailable');
                     }
                     
                     return;
@@ -1094,11 +1094,11 @@
                     clearTimeout(timeoutId);
                 }
                 
-                let errorMessage = 'Ошибка загрузки данных о трендах';
+                let errorMessage = getText('trendsError');
                 if (error.name === 'AbortError') {
-                    errorMessage = 'Превышено время ожидания ответа сервера';
+                    errorMessage = getText('timeoutError');
                 } else if (error.message) {
-                    errorMessage = `Ошибка: ${error.message}`;
+                    errorMessage = `${getText('trendsError')}: ${error.message}`;
                 }
                 
                 // Показываем сообщение об ошибке в блоке трендов
@@ -1110,17 +1110,17 @@
                 // Также показываем ошибку в других элементах
                 const priceTrendElement = document.getElementById('price-trend');
                 if (priceTrendElement) {
-                    priceTrendElement.textContent = 'Недоступно';
+                    priceTrendElement.textContent = getText('unavailable');
                 }
                 
                 const priceChangeElement = document.getElementById('price-change-3y');
                 if (priceChangeElement) {
-                    priceChangeElement.textContent = 'Недоступно';
+                    priceChangeElement.textContent = getText('unavailable');
                 }
                 
                 const priceForecastElement = document.getElementById('price-forecast');
                 if (priceForecastElement) {
-                    priceForecastElement.textContent = 'Недоступно';
+                    priceForecastElement.textContent = getText('unavailable');
                 }
             }
         }
@@ -1222,7 +1222,7 @@
                     data: {
                         labels: labels,
                         datasets: [{
-                            label: 'Цена объекта (€)',
+                            label: getText('chartLabel'),
                             data: prices,
                             borderColor: '#667eea',
                             backgroundColor: 'rgba(102, 126, 234, 0.1)',
@@ -1237,7 +1237,7 @@
                         plugins: {
                             title: {
                                 display: true,
-                                text: 'Динамика цен за 3 года + прогноз на 3 месяца'
+                                text: getText('chartTitle')
                             },
                             legend: {
                                 display: true,
@@ -1249,13 +1249,13 @@
                                 beginAtZero: false,
                                 title: {
                                     display: true,
-                                    text: 'Цена (€)'
+                                    text: getText('chartPrice')
                                 }
                             },
                             x: {
                                 title: {
                                     display: true,
-                                    text: 'Период'
+                                    text: getText('chartPeriod')
                                 }
                             }
                         }
@@ -1307,7 +1307,7 @@
             const areaElement = document.getElementById('object-area');
             if (areaElement) {
                 const areaValue = reportData.area && reportData.area !== 'unknown' ? 
-                    `${reportData.area} м²` : 'Не указано';
+                    `${reportData.area} м²` : getText('notSpecified');
                 areaElement.textContent = areaValue;
             }
             
@@ -1319,27 +1319,27 @@
                 // Возраст объекта
                 const ageText = characteristics.age && characteristics.age.name ? 
                     characteristics.age.name : 
-                    (reportData.age === 'unknown' ? 'Не известно' : 'Не указано');
+                    (reportData.age === 'unknown' ? getText('notKnown') : getText('notSpecified'));
                 elements['object-age'].textContent = ageText;
                 
                 // Этаж
                 const floorText = characteristics.floor && characteristics.floor.name ? 
                     characteristics.floor.name : 
-                    (reportData.floor === 'unknown' ? 'Не известно' : 'Не указано');
+                    (reportData.floor === 'unknown' ? getText('notKnown') : getText('notSpecified'));
                 elements['object-floor'].textContent = floorText;
                 
                 // Отопление
                 const heatingText = characteristics.heating && characteristics.heating.name ? 
                     characteristics.heating.name : 
-                    (reportData.heating === 'unknown' ? 'Не известно' : 'Не указано');
+                    (reportData.heating === 'unknown' ? getText('notKnown') : getText('notSpecified'));
                 elements['object-heating'].textContent = heatingText;
                 
                 console.log('✅ Характеристики объекта загружены:', { ageText, floorText, heatingText });
             } else {
                 // Fallback на старые данные
-                const ageText = reportData.age === 'unknown' ? 'Не известно' : reportData.age;
-                const floorText = reportData.floor === 'unknown' ? 'Не известно' : reportData.floor;
-                const heatingText = reportData.heating === 'unknown' ? 'Не известно' : reportData.heating;
+                const ageText = reportData.age === 'unknown' ? getText('notKnown') : reportData.age;
+                const floorText = reportData.floor === 'unknown' ? getText('notKnown') : reportData.floor;
+                const heatingText = reportData.heating === 'unknown' ? getText('notKnown') : reportData.heating;
                 
                 elements['object-age'].textContent = ageText;
                 elements['object-floor'].textContent = floorText;
@@ -1404,9 +1404,9 @@
                         if (currencyInfo.currency_rate && currencyInfo.currency_rate.try) {
                             const tryRate = currencyInfo.currency_rate.try;
                             const date = new Date(currencyInfo.currency_rate.created_at).toLocaleDateString('ru-RU');
-                            currencyValueElement.textContent = `Курс на ${date}: 1 EUR = ${tryRate.toFixed(4)} TRY. Все цены конвертированы в евро.`;
+                            currencyValueElement.textContent = getText('currencyRateInfo').replace('{date}', date).replace('{rate}', tryRate.toFixed(4));
                         } else {
-                            currencyValueElement.textContent = 'Все цены конвертированы в евро.';
+                            currencyValueElement.textContent = getText('currencyConverted');
                         }
                         
                         currencyElement.style.display = 'block';
@@ -1523,12 +1523,12 @@
         // Получаем читаемые названия налогов
         function getTaxLabel(key) {
             const labels = {
-                'transfer_tax': 'Налог на передачу',
-                'stamp_duty': 'Гербовый сбор',
-                'notary': 'Услуги нотариуса',
-                'annual_property_tax': 'Годовой налог на недвижимость',
-                'rental_income_tax': 'Налог на доход от аренды',
-                'capital_gains_tax': 'Налог на прирост капитала'
+                'transfer_tax': getText('transferTax'),
+                'stamp_duty': getText('stampDuty'),
+                'notary': getText('notary'),
+                'annual_property_tax': getText('annualPropertyTax'),
+                'rental_income_tax': getText('rentalIncomeTax'),
+                'capital_gains_tax': getText('capitalGainsTax')
             };
             return labels[key] || key;
         }
@@ -1548,13 +1548,13 @@
         // Скачать PDF
         function downloadPDF() {
             // Здесь будет логика скачивания PDF
-            alert('Функция скачивания PDF будет добавлена позже');
+            alert(getText('pdfDownloadSoon'));
         }
 
         // Сохранить отчет
         function saveReport() {
             // Здесь будет логика сохранения отчета
-            alert('Функция сохранения отчета будет добавлена позже');
+            alert(getText('saveReportSoon'));
         }
 
         // Вернуться назад
@@ -1566,6 +1566,504 @@
         document.addEventListener('DOMContentLoaded', () => {
             console.log('🚀 DOM загружен, вызываем loadFullReport');
             loadFullReport();
+        });
+    </script>
+
+    <!-- Локализация -->
+    <script>
+        let currentLanguage = 'ru';
+        
+        // Получаем данные пользователя из Telegram
+        async function getUserData() {
+            try {
+                const userData = window.Telegram.WebApp.initDataUnsafe.user;
+                if (!userData) {
+                    console.warn('Данные пользователя Telegram недоступны');
+                    return null;
+                }
+                return userData;
+            } catch (error) {
+                console.error('Ошибка получения данных пользователя:', error);
+                return null;
+            }
+        }
+        
+        // Словари локализации
+        const locales = {
+            ru: {
+                pageTitleTag: 'Полный отчет - Aaadviser',
+                pageTitle: '📊 Полный отчет',
+                pageDescription: 'Детальный анализ объекта недвижимости',
+                loadingTitle: '🔄 Формируем полный отчет...',
+                loadingText: 'Пожалуйста, подождите',
+                errorTitle: '❌ Ошибка загрузки отчета',
+                objectInfoTitle: '🏠 Информация об объекте',
+                addressLabel: 'Адрес',
+                bedroomsLabel: 'Спальни',
+                priceLabel: 'Цена',
+                ageLabel: 'Возраст объекта',
+                floorLabel: 'Этаж',
+                heatingLabel: 'Отопление',
+                areaLabel: 'Площадь объекта',
+                marketAnalysisTitle: '📊 Рыночный анализ',
+                priceComparisonTitle: '📊 Сравнение с рыночными ценами',
+                ageComparisonLabel: 'По возрасту объекта:',
+                floorComparisonLabel: 'По этажу:',
+                heatingComparisonLabel: 'По типу отопления:',
+                finalComparisonLabel: 'Итоговое сравнение:',
+                priceConclusionLabel: 'Вывод по цене:',
+                currencyInfoLabel: '💱 Конвертация валют:',
+                priceTrendsTitle: '📊 Анализ динамики цен',
+                priceTrendLabel: 'Тренд цен',
+                priceChange3yLabel: 'Изменение за 3 года',
+                priceForecastLabel: 'Прогноз на 3 месяца',
+                priceChartTitle: '📈 График изменения цен',
+                trendAnalysisLabel: 'Анализ тренда:',
+                trendRecommendationLabel: 'Рекомендация:',
+                rentalAnalysisTitle: '🏠 Анализ аренды',
+                maxRentalRateLabel: 'Максимальная ставка аренды',
+                annualRentalYieldLabel: 'Годовая доходность',
+                rentalRecommendationLabel: 'Рекомендация по аренде',
+                roiAnalysisTitle: '💰 ROI анализ',
+                shortTermRentTitle: 'Краткосрочная аренда (Airbnb)',
+                shortTermIncomeDesc: 'Доход в месяц',
+                longTermRentTitle: 'Долгосрочная аренда',
+                longTermIncomeDesc: 'Доход в год',
+                priceGrowthLabel: 'Рост цены (5 лет)',
+                roiWithRentLabel: 'ROI с арендой',
+                roiWithoutRentLabel: 'ROI без аренды',
+                alternativesTitle: '📈 Альтернативные инвестиции',
+                macroDataTitle: '🌍 Макроэкономические данные',
+                inflationLabel: 'Инфляция',
+                eurTryLabel: 'Курс EUR/TRY',
+                gdpGrowthLabel: 'Рост ВВП',
+                refiRateLabel: 'Ставка рефинансирования',
+                taxesTitle: '🏛️ Налоги и сборы',
+                risksTitle: '⚠️ Риски и ликвидность',
+                liquidityLabel: 'Ликвидность',
+                districtLabel: 'Район',
+                economicTrendsTitle: '📊 Экономические тренды',
+                downloadPdfBtn: '📥 Скачать PDF',
+                saveReportBtn: '💾 Сохранить отчет',
+                backBtn: '← Назад',
+                notSpecified: 'Не указано',
+                notKnown: 'Не известно',
+                unavailable: 'Недоступно',
+                insufficientData: 'Недостаточно данных для анализа трендов',
+                trendsError: 'Ошибка загрузки данных о трендах',
+                timeoutError: 'Превышено время ожидания ответа сервера',
+                noTrendsData: 'Данные о трендах цен для данной локации отсутствуют',
+                chartTitle: 'Динамика цен за 3 года + прогноз на 3 месяца',
+                chartLabel: 'Цена объекта (€)',
+                chartPeriod: 'Период',
+                chartPrice: 'Цена (€)',
+                transferTax: 'Налог на передачу',
+                stampDuty: 'Гербовый сбор',
+                notary: 'Услуги нотариуса',
+                annualPropertyTax: 'Годовой налог на недвижимость',
+                rentalIncomeTax: 'Налог на доход от аренды',
+                capitalGainsTax: 'Налог на прирост капитала',
+                currencyRateInfo: 'Курс на {date}: 1 EUR = {rate} TRY. Все цены конвертированы в евро.',
+                currencyConverted: 'Все цены конвертированы в евро.',
+                pdfDownloadSoon: 'Функция скачивания PDF будет добавлена позже',
+                saveReportSoon: 'Функция сохранения отчета будет добавлена позже'
+            },
+            en: {
+                pageTitleTag: 'Full Report - Aaadviser',
+                pageTitle: '📊 Full Report',
+                pageDescription: 'Detailed real estate analysis',
+                loadingTitle: '🔄 Generating full report...',
+                loadingText: 'Please wait',
+                errorTitle: '❌ Report loading error',
+                objectInfoTitle: '🏠 Property Information',
+                addressLabel: 'Address',
+                bedroomsLabel: 'Bedrooms',
+                priceLabel: 'Price',
+                ageLabel: 'Property Age',
+                floorLabel: 'Floor',
+                heatingLabel: 'Heating',
+                areaLabel: 'Property Area',
+                marketAnalysisTitle: '📊 Market Analysis',
+                priceComparisonTitle: '📊 Market Price Comparison',
+                ageComparisonLabel: 'By property age:',
+                floorComparisonLabel: 'By floor:',
+                heatingComparisonLabel: 'By heating type:',
+                finalComparisonLabel: 'Final comparison:',
+                priceConclusionLabel: 'Price conclusion:',
+                currencyInfoLabel: '💱 Currency conversion:',
+                priceTrendsTitle: '📊 Price Trends Analysis',
+                priceTrendLabel: 'Price trend',
+                priceChange3yLabel: 'Change over 3 years',
+                priceForecastLabel: '3-month forecast',
+                priceChartTitle: '📈 Price Change Chart',
+                trendAnalysisLabel: 'Trend analysis:',
+                trendRecommendationLabel: 'Recommendation:',
+                rentalAnalysisTitle: '🏠 Rental Analysis',
+                maxRentalRateLabel: 'Maximum rental rate',
+                annualRentalYieldLabel: 'Annual yield',
+                rentalRecommendationLabel: 'Rental recommendation',
+                roiAnalysisTitle: '💰 ROI Analysis',
+                shortTermRentTitle: 'Short-term rental (Airbnb)',
+                shortTermIncomeDesc: 'Monthly income',
+                longTermRentTitle: 'Long-term rental',
+                longTermIncomeDesc: 'Annual income',
+                priceGrowthLabel: 'Price growth (5 years)',
+                roiWithRentLabel: 'ROI with rental',
+                roiWithoutRentLabel: 'ROI without rental',
+                alternativesTitle: '📈 Alternative Investments',
+                macroDataTitle: '🌍 Macroeconomic Data',
+                inflationLabel: 'Inflation',
+                eurTryLabel: 'EUR/TRY rate',
+                gdpGrowthLabel: 'GDP growth',
+                refiRateLabel: 'Refinancing rate',
+                taxesTitle: '🏛️ Taxes and Fees',
+                risksTitle: '⚠️ Risks and Liquidity',
+                liquidityLabel: 'Liquidity',
+                districtLabel: 'District',
+                economicTrendsTitle: '📊 Economic Trends',
+                downloadPdfBtn: '📥 Download PDF',
+                saveReportBtn: '💾 Save Report',
+                backBtn: '← Back',
+                notSpecified: 'Not specified',
+                notKnown: 'Not known',
+                unavailable: 'Unavailable',
+                insufficientData: 'Insufficient data for trend analysis',
+                trendsError: 'Error loading trend data',
+                timeoutError: 'Server response timeout',
+                noTrendsData: 'Price trend data for this location is not available',
+                chartTitle: 'Price dynamics over 3 years + 3-month forecast',
+                chartLabel: 'Property price (€)',
+                chartPeriod: 'Period',
+                chartPrice: 'Price (€)',
+                transferTax: 'Transfer tax',
+                stampDuty: 'Stamp duty',
+                notary: 'Notary services',
+                annualPropertyTax: 'Annual property tax',
+                rentalIncomeTax: 'Rental income tax',
+                capitalGainsTax: 'Capital gains tax',
+                currencyRateInfo: 'Rate as of {date}: 1 EUR = {rate} TRY. All prices converted to euros.',
+                currencyConverted: 'All prices converted to euros.',
+                pdfDownloadSoon: 'PDF download function will be added later',
+                saveReportSoon: 'Report save function will be added later'
+            },
+            de: {
+                pageTitleTag: 'Vollständiger Bericht - Aaadviser',
+                pageTitle: '📊 Vollständiger Bericht',
+                pageDescription: 'Detaillierte Immobilienanalyse',
+                loadingTitle: '🔄 Vollständigen Bericht erstellen...',
+                loadingText: 'Bitte warten',
+                errorTitle: '❌ Fehler beim Laden des Berichts',
+                objectInfoTitle: '🏠 Objektinformationen',
+                addressLabel: 'Adresse',
+                bedroomsLabel: 'Schlafzimmer',
+                priceLabel: 'Preis',
+                ageLabel: 'Objektalter',
+                floorLabel: 'Etage',
+                heatingLabel: 'Heizung',
+                areaLabel: 'Objektfläche',
+                marketAnalysisTitle: '📊 Marktanalyse',
+                priceComparisonTitle: '📊 Marktpreisvergleich',
+                ageComparisonLabel: 'Nach Objektalter:',
+                floorComparisonLabel: 'Nach Etage:',
+                heatingComparisonLabel: 'Nach Heizungstyp:',
+                finalComparisonLabel: 'Endvergleich:',
+                priceConclusionLabel: 'Preisbewertung:',
+                currencyInfoLabel: '💱 Währungsumrechnung:',
+                priceTrendsTitle: '📊 Preistrendanalyse',
+                priceTrendLabel: 'Preistrend',
+                priceChange3yLabel: 'Änderung über 3 Jahre',
+                priceForecastLabel: '3-Monats-Prognose',
+                priceChartTitle: '📈 Preisentwicklungsdiagramm',
+                trendAnalysisLabel: 'Trendanalyse:',
+                trendRecommendationLabel: 'Empfehlung:',
+                rentalAnalysisTitle: '🏠 Mietanalyse',
+                maxRentalRateLabel: 'Maximale Mietrate',
+                annualRentalYieldLabel: 'Jährliche Rendite',
+                rentalRecommendationLabel: 'Mietempfehlung',
+                roiAnalysisTitle: '💰 ROI-Analyse',
+                shortTermRentTitle: 'Kurzzeitmiete (Airbnb)',
+                shortTermIncomeDesc: 'Monatliches Einkommen',
+                longTermRentTitle: 'Langzeitmiete',
+                longTermIncomeDesc: 'Jährliches Einkommen',
+                priceGrowthLabel: 'Preiswachstum (5 Jahre)',
+                roiWithRentLabel: 'ROI mit Miete',
+                roiWithoutRentLabel: 'ROI ohne Miete',
+                alternativesTitle: '📈 Alternative Investitionen',
+                macroDataTitle: '🌍 Makroökonomische Daten',
+                inflationLabel: 'Inflation',
+                eurTryLabel: 'EUR/TRY-Kurs',
+                gdpGrowthLabel: 'BIP-Wachstum',
+                refiRateLabel: 'Refinanzierungssatz',
+                taxesTitle: '🏛️ Steuern und Gebühren',
+                risksTitle: '⚠️ Risiken und Liquidität',
+                liquidityLabel: 'Liquidität',
+                districtLabel: 'Bezirk',
+                economicTrendsTitle: '📊 Wirtschaftstrends',
+                downloadPdfBtn: '📥 PDF herunterladen',
+                saveReportBtn: '💾 Bericht speichern',
+                backBtn: '← Zurück',
+                notSpecified: 'Nicht angegeben',
+                notKnown: 'Nicht bekannt',
+                unavailable: 'Nicht verfügbar',
+                insufficientData: 'Unzureichende Daten für Trendanalyse',
+                trendsError: 'Fehler beim Laden der Trenddaten',
+                timeoutError: 'Serverantwort-Timeout',
+                noTrendsData: 'Preistrenddaten für diesen Standort sind nicht verfügbar',
+                chartTitle: 'Preisdynamik über 3 Jahre + 3-Monats-Prognose',
+                chartLabel: 'Objektpreis (€)',
+                chartPeriod: 'Zeitraum',
+                chartPrice: 'Preis (€)',
+                transferTax: 'Übertragungssteuer',
+                stampDuty: 'Stempelsteuer',
+                notary: 'Notardienstleistungen',
+                annualPropertyTax: 'Jährliche Grundsteuer',
+                rentalIncomeTax: 'Mieteinkommensteuer',
+                capitalGainsTax: 'Kapitalgewinnsteuer',
+                currencyRateInfo: 'Kurs vom {date}: 1 EUR = {rate} TRY. Alle Preise in Euro umgerechnet.',
+                currencyConverted: 'Alle Preise in Euro umgerechnet.',
+                pdfDownloadSoon: 'PDF-Download-Funktion wird später hinzugefügt',
+                saveReportSoon: 'Bericht-Speicherfunktion wird später hinzugefügt'
+            },
+            fr: {
+                pageTitleTag: 'Rapport Complet - Aaadviser',
+                pageTitle: '📊 Rapport Complet',
+                pageDescription: 'Analyse détaillée de l\'immobilier',
+                loadingTitle: '🔄 Génération du rapport complet...',
+                loadingText: 'Veuillez patienter',
+                errorTitle: '❌ Erreur de chargement du rapport',
+                objectInfoTitle: '🏠 Informations sur le bien',
+                addressLabel: 'Adresse',
+                bedroomsLabel: 'Chambres',
+                priceLabel: 'Prix',
+                ageLabel: 'Âge du bien',
+                floorLabel: 'Étage',
+                heatingLabel: 'Chauffage',
+                areaLabel: 'Surface du bien',
+                marketAnalysisTitle: '📊 Analyse du marché',
+                priceComparisonTitle: '📊 Comparaison des prix du marché',
+                ageComparisonLabel: 'Par âge du bien:',
+                floorComparisonLabel: 'Par étage:',
+                heatingComparisonLabel: 'Par type de chauffage:',
+                finalComparisonLabel: 'Comparaison finale:',
+                priceConclusionLabel: 'Conclusion sur le prix:',
+                currencyInfoLabel: '💱 Conversion de devise:',
+                priceTrendsTitle: '📊 Analyse des tendances de prix',
+                priceTrendLabel: 'Tendance des prix',
+                priceChange3yLabel: 'Évolution sur 3 ans',
+                priceForecastLabel: 'Prévision 3 mois',
+                priceChartTitle: '📈 Graphique d\'évolution des prix',
+                trendAnalysisLabel: 'Analyse de tendance:',
+                trendRecommendationLabel: 'Recommandation:',
+                rentalAnalysisTitle: '🏠 Analyse de location',
+                maxRentalRateLabel: 'Taux de location maximum',
+                annualRentalYieldLabel: 'Rendement annuel',
+                rentalRecommendationLabel: 'Recommandation de location',
+                roiAnalysisTitle: '💰 Analyse ROI',
+                shortTermRentTitle: 'Location courte durée (Airbnb)',
+                shortTermIncomeDesc: 'Revenus mensuels',
+                longTermRentTitle: 'Location longue durée',
+                longTermIncomeDesc: 'Revenus annuels',
+                priceGrowthLabel: 'Croissance des prix (5 ans)',
+                roiWithRentLabel: 'ROI avec location',
+                roiWithoutRentLabel: 'ROI sans location',
+                alternativesTitle: '📈 Investissements alternatifs',
+                macroDataTitle: '🌍 Données macroéconomiques',
+                inflationLabel: 'Inflation',
+                eurTryLabel: 'Taux EUR/TRY',
+                gdpGrowthLabel: 'Croissance du PIB',
+                refiRateLabel: 'Taux de refinancement',
+                taxesTitle: '🏛️ Taxes et frais',
+                risksTitle: '⚠️ Risques et liquidité',
+                liquidityLabel: 'Liquidité',
+                districtLabel: 'Quartier',
+                economicTrendsTitle: '📊 Tendances économiques',
+                downloadPdfBtn: '📥 Télécharger PDF',
+                saveReportBtn: '💾 Sauvegarder rapport',
+                backBtn: '← Retour',
+                notSpecified: 'Non spécifié',
+                notKnown: 'Non connu',
+                unavailable: 'Non disponible',
+                insufficientData: 'Données insuffisantes pour l\'analyse des tendances',
+                trendsError: 'Erreur de chargement des données de tendance',
+                timeoutError: 'Délai d\'attente de réponse du serveur',
+                noTrendsData: 'Données de tendance des prix pour cet emplacement non disponibles',
+                chartTitle: 'Dynamique des prix sur 3 ans + prévision 3 mois',
+                chartLabel: 'Prix du bien (€)',
+                chartPeriod: 'Période',
+                chartPrice: 'Prix (€)',
+                transferTax: 'Taxe de transfert',
+                stampDuty: 'Droit de timbre',
+                notary: 'Services de notaire',
+                annualPropertyTax: 'Taxe foncière annuelle',
+                rentalIncomeTax: 'Taxe sur les revenus locatifs',
+                capitalGainsTax: 'Taxe sur les plus-values',
+                currencyRateInfo: 'Taux au {date}: 1 EUR = {rate} TRY. Tous les prix convertis en euros.',
+                currencyConverted: 'Tous les prix convertis en euros.',
+                pdfDownloadSoon: 'Fonction de téléchargement PDF sera ajoutée plus tard',
+                saveReportSoon: 'Fonction de sauvegarde du rapport sera ajoutée plus tard'
+            },
+            tr: {
+                pageTitleTag: 'Tam Rapor - Aaadviser',
+                pageTitle: '📊 Tam Rapor',
+                pageDescription: 'Detaylı emlak analizi',
+                loadingTitle: '🔄 Tam rapor oluşturuluyor...',
+                loadingText: 'Lütfen bekleyin',
+                errorTitle: '❌ Rapor yükleme hatası',
+                objectInfoTitle: '🏠 Mülk Bilgileri',
+                addressLabel: 'Adres',
+                bedroomsLabel: 'Yatak odası',
+                priceLabel: 'Fiyat',
+                ageLabel: 'Mülk yaşı',
+                floorLabel: 'Kat',
+                heatingLabel: 'Isıtma',
+                areaLabel: 'Mülk alanı',
+                marketAnalysisTitle: '📊 Pazar Analizi',
+                priceComparisonTitle: '📊 Pazar Fiyat Karşılaştırması',
+                ageComparisonLabel: 'Mülk yaşına göre:',
+                floorComparisonLabel: 'Kata göre:',
+                heatingComparisonLabel: 'Isıtma tipine göre:',
+                finalComparisonLabel: 'Final karşılaştırma:',
+                priceConclusionLabel: 'Fiyat sonucu:',
+                currencyInfoLabel: '💱 Döviz çevirisi:',
+                priceTrendsTitle: '📊 Fiyat Trend Analizi',
+                priceTrendLabel: 'Fiyat trendi',
+                priceChange3yLabel: '3 yıldaki değişim',
+                priceForecastLabel: '3 aylık tahmin',
+                priceChartTitle: '📈 Fiyat Değişim Grafiği',
+                trendAnalysisLabel: 'Trend analizi:',
+                trendRecommendationLabel: 'Öneri:',
+                rentalAnalysisTitle: '🏠 Kiralama Analizi',
+                maxRentalRateLabel: 'Maksimum kiralama oranı',
+                annualRentalYieldLabel: 'Yıllık getiri',
+                rentalRecommendationLabel: 'Kiralama önerisi',
+                roiAnalysisTitle: '💰 ROI Analizi',
+                shortTermRentTitle: 'Kısa vadeli kiralama (Airbnb)',
+                shortTermIncomeDesc: 'Aylık gelir',
+                longTermRentTitle: 'Uzun vadeli kiralama',
+                longTermIncomeDesc: 'Yıllık gelir',
+                priceGrowthLabel: 'Fiyat artışı (5 yıl)',
+                roiWithRentLabel: 'Kiralama ile ROI',
+                roiWithoutRentLabel: 'Kiralama olmadan ROI',
+                alternativesTitle: '📈 Alternatif Yatırımlar',
+                macroDataTitle: '🌍 Makroekonomik Veriler',
+                inflationLabel: 'Enflasyon',
+                eurTryLabel: 'EUR/TRY kuru',
+                gdpGrowthLabel: 'GSYİH büyümesi',
+                refiRateLabel: 'Refinansman oranı',
+                taxesTitle: '🏛️ Vergiler ve Harçlar',
+                risksTitle: '⚠️ Riskler ve Likidite',
+                liquidityLabel: 'Likidite',
+                districtLabel: 'İlçe',
+                economicTrendsTitle: '📊 Ekonomik Trendler',
+                downloadPdfBtn: '📥 PDF İndir',
+                saveReportBtn: '💾 Raporu Kaydet',
+                backBtn: '← Geri',
+                notSpecified: 'Belirtilmemiş',
+                notKnown: 'Bilinmiyor',
+                unavailable: 'Mevcut değil',
+                insufficientData: 'Trend analizi için yetersiz veri',
+                trendsError: 'Trend verilerini yükleme hatası',
+                timeoutError: 'Sunucu yanıt zaman aşımı',
+                noTrendsData: 'Bu konum için fiyat trend verileri mevcut değil',
+                chartTitle: '3 yıllık fiyat dinamikleri + 3 aylık tahmin',
+                chartLabel: 'Mülk fiyatı (€)',
+                chartPeriod: 'Dönem',
+                chartPrice: 'Fiyat (€)',
+                transferTax: 'Transfer vergisi',
+                stampDuty: 'Damga vergisi',
+                notary: 'Noter hizmetleri',
+                annualPropertyTax: 'Yıllık emlak vergisi',
+                rentalIncomeTax: 'Kiralama gelir vergisi',
+                capitalGainsTax: 'Sermaye kazancı vergisi',
+                currencyRateInfo: '{date} tarihli kur: 1 EUR = {rate} TRY. Tüm fiyatlar euroya çevrildi.',
+                currencyConverted: 'Tüm fiyatlar euroya çevrildi.',
+                pdfDownloadSoon: 'PDF indirme işlevi daha sonra eklenecek',
+                saveReportSoon: 'Rapor kaydetme işlevi daha sonra eklenecek'
+            }
+        };
+        
+        // Функция получения текста по ключу
+        function getText(key) {
+            return locales[currentLanguage][key] || key;
+        }
+        
+        // Функция обновления текста на странице
+        function updatePageText() {
+            // Обновляем title
+            document.getElementById('pageTitleTag').textContent = getText('pageTitleTag');
+            
+            // Обновляем основные элементы
+            const elements = [
+                'pageTitle', 'pageDescription', 'loadingTitle', 'loadingText', 'errorTitle',
+                'objectInfoTitle', 'addressLabel', 'bedroomsLabel', 'priceLabel', 'ageLabel',
+                'floorLabel', 'heatingLabel', 'areaLabel', 'marketAnalysisTitle', 'priceComparisonTitle',
+                'ageComparisonLabel', 'floorComparisonLabel', 'heatingComparisonLabel', 'finalComparisonLabel',
+                'priceConclusionLabel', 'currencyInfoLabel', 'priceTrendsTitle', 'priceTrendLabel',
+                'priceChange3yLabel', 'priceForecastLabel', 'priceChartTitle', 'trendAnalysisLabel',
+                'trendRecommendationLabel', 'rentalAnalysisTitle', 'maxRentalRateLabel', 'annualRentalYieldLabel',
+                'rentalRecommendationLabel', 'roiAnalysisTitle', 'shortTermRentTitle', 'shortTermIncomeDesc',
+                'longTermRentTitle', 'longTermIncomeDesc', 'priceGrowthLabel', 'roiWithRentLabel',
+                'roiWithoutRentLabel', 'alternativesTitle', 'macroDataTitle', 'inflationLabel',
+                'eurTryLabel', 'gdpGrowthLabel', 'refiRateLabel', 'taxesTitle', 'risksTitle',
+                'liquidityLabel', 'districtLabel', 'economicTrendsTitle', 'downloadPdfBtn',
+                'saveReportBtn', 'backBtn'
+            ];
+            
+            elements.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.textContent = getText(id);
+                }
+            });
+        }
+        
+        // Функция инициализации локализации
+        async function initLocalization() {
+            try {
+                const userData = await getUserData();
+                if (userData && userData.language_code) {
+                    // Проверяем, является ли пользователь админом
+                    const response = await fetch('/api/user', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            telegram_id: userData.id,
+                            username: userData.username,
+                            tg_name: userData.first_name,
+                            last_name: userData.last_name,
+                            language_code: userData.language_code
+                        })
+                    });
+                    
+                    if (response.ok) {
+                        const userInfo = await response.json();
+                        
+                        // Устанавливаем язык в зависимости от статуса пользователя
+                        if (userInfo.user_status === 'admin' && userInfo.language) {
+                            // Для админов используем язык из базы данных
+                            currentLanguage = userInfo.language;
+                        } else if (userData.language_code) {
+                            // Для обычных пользователей используем язык из Telegram
+                            currentLanguage = userData.language_code;
+                        }
+                        
+                        // Обновляем текст на странице с новым языком
+                        updatePageText();
+                    }
+                }
+            } catch (error) {
+                console.error('Ошибка инициализации локализации:', error);
+                // Используем русский язык по умолчанию
+                currentLanguage = 'ru';
+                updatePageText();
+            }
+        }
+        
+        // Инициализируем локализацию при загрузке страницы
+        document.addEventListener('DOMContentLoaded', () => {
+            initLocalization();
         });
     </script>
 </body>

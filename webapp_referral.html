@@ -31,35 +31,165 @@
 </head>
 <body>
     <div class="container">
-        <div class="title" data-i18n="profile.referral_program">Реферальная программа</div>
+        <div class="title" id="referralTitle">Реферальная программа</div>
         <div class="ref-code-block">
-            <div class="ref-code-label">Ваш реферальный код:</div>
+            <div class="ref-code-label" id="refCodeLabel">Ваш реферальный код:</div>
             <div class="ref-code-value" id="inviteCode">...</div>
             <div class="ref-link-block">
                 <span class="ref-link" id="refLink">...</span>
-                <button class="copy-btn" onclick="copyRefLink()" data-i18n="common.copy">Копировать</button>
+                <button class="copy-btn" onclick="copyRefLink()" id="copyBtn">Копировать</button>
             </div>
         </div>
         <div class="ref-terms" id="refTerms">Загрузка условий...</div>
         <div class="invited-list">
-            <div class="invited-title">Приглашённые пользователи:</div>
-            <div id="invitedUsers" data-i18n="common.loading">Загрузка...</div>
+            <div class="invited-title" id="invitedTitle">Приглашённые пользователи:</div>
+            <div id="invitedUsers">Загрузка...</div>
         </div>
-        <button class="back-btn" onclick="goToProfile()">Назад в профиль</button>
+        <button class="back-btn" onclick="goToProfile()" id="backBtn">Назад в профиль</button>
     </div>
     <script>
+        let currentLanguage = 'ru';
+
+        // Получаем данные пользователя
+        function getUserData() {
+            let tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
+            if (tg && tg.initDataUnsafe && tg.initDataUnsafe.user) {
+                return tg.initDataUnsafe.user;
+            }
+            try {
+                const stored = localStorage.getItem('aaadviser_user');
+                if (stored) return JSON.parse(stored);
+            } catch (e) {}
+            return null;
+        }
+
+        // Локализации
+        const locales = {
+            'ru': {
+                'referralTitle': 'Реферальная программа',
+                'refCodeLabel': 'Ваш реферальный код:',
+                'copyBtn': 'Копировать',
+                'backBtn': 'Назад в профиль',
+                'invitedTitle': 'Приглашённые пользователи:',
+                'loading': 'Загрузка...',
+                'loadingTerms': 'Загрузка условий...',
+                'userNotDefined': 'Пользователь не определён',
+                'openFromTelegram': 'Пожалуйста, откройте WebApp из Telegram.',
+                'errorLoadingTerms': 'Ошибка загрузки условий.',
+                'noInvitedUsers': 'Пока нет приглашённых пользователей.',
+                'completed': 'Выполнил',
+                'notCompleted': 'Не выполнил',
+                'linkCopied': 'Ссылка скопирована!',
+                'copyError': 'Ошибка копирования'
+            },
+            'en': {
+                'referralTitle': 'Referral Program',
+                'refCodeLabel': 'Your referral code:',
+                'copyBtn': 'Copy',
+                'backBtn': 'Back to Profile',
+                'invitedTitle': 'Invited users:',
+                'loading': 'Loading...',
+                'loadingTerms': 'Loading terms...',
+                'userNotDefined': 'User not defined',
+                'openFromTelegram': 'Please open WebApp from Telegram.',
+                'errorLoadingTerms': 'Error loading terms.',
+                'noInvitedUsers': 'No invited users yet.',
+                'completed': 'Completed',
+                'notCompleted': 'Not completed',
+                'linkCopied': 'Link copied!',
+                'copyError': 'Copy error'
+            },
+            'de': {
+                'referralTitle': 'Empfehlungsprogramm',
+                'refCodeLabel': 'Ihr Empfehlungscode:',
+                'copyBtn': 'Kopieren',
+                'backBtn': 'Zurück zum Profil',
+                'invitedTitle': 'Eingeladene Benutzer:',
+                'loading': 'Laden...',
+                'loadingTerms': 'Bedingungen laden...',
+                'userNotDefined': 'Benutzer nicht definiert',
+                'openFromTelegram': 'Bitte öffnen Sie WebApp aus Telegram.',
+                'errorLoadingTerms': 'Fehler beim Laden der Bedingungen.',
+                'noInvitedUsers': 'Noch keine eingeladenen Benutzer.',
+                'completed': 'Abgeschlossen',
+                'notCompleted': 'Nicht abgeschlossen',
+                'linkCopied': 'Link kopiert!',
+                'copyError': 'Kopierfehler'
+            },
+            'fr': {
+                'referralTitle': 'Programme de parrainage',
+                'refCodeLabel': 'Votre code de parrainage:',
+                'copyBtn': 'Copier',
+                'backBtn': 'Retour au profil',
+                'invitedTitle': 'Utilisateurs invités:',
+                'loading': 'Chargement...',
+                'loadingTerms': 'Chargement des conditions...',
+                'userNotDefined': 'Utilisateur non défini',
+                'openFromTelegram': 'Veuillez ouvrir WebApp depuis Telegram.',
+                'errorLoadingTerms': 'Erreur de chargement des conditions.',
+                'noInvitedUsers': 'Aucun utilisateur invité pour le moment.',
+                'completed': 'Terminé',
+                'notCompleted': 'Non terminé',
+                'linkCopied': 'Lien copié!',
+                'copyError': 'Erreur de copie'
+            },
+            'tr': {
+                'referralTitle': 'Referans Programı',
+                'refCodeLabel': 'Referans kodunuz:',
+                'copyBtn': 'Kopyala',
+                'backBtn': 'Profile Dön',
+                'invitedTitle': 'Davet edilen kullanıcılar:',
+                'loading': 'Yükleniyor...',
+                'loadingTerms': 'Şartlar yükleniyor...',
+                'userNotDefined': 'Kullanıcı tanımlanmadı',
+                'openFromTelegram': 'Lütfen WebApp\'i Telegram\'dan açın.',
+                'errorLoadingTerms': 'Şartlar yüklenirken hata.',
+                'noInvitedUsers': 'Henüz davet edilen kullanıcı yok.',
+                'completed': 'Tamamlandı',
+                'notCompleted': 'Tamamlanmadı',
+                'linkCopied': 'Bağlantı kopyalandı!',
+                'copyError': 'Kopyalama hatası'
+            }
+        };
+
+        // Функция для получения локализованного текста
+        function getText(key) {
+            const locale = locales[currentLanguage] || locales['ru'];
+            return locale[key] || key;
+        }
+
+        // Обновление текста на странице
+        function updatePageText() {
+            document.getElementById('referralTitle').textContent = getText('referralTitle');
+            document.getElementById('refCodeLabel').textContent = getText('refCodeLabel');
+            document.getElementById('copyBtn').textContent = getText('copyBtn');
+            document.getElementById('backBtn').textContent = getText('backBtn');
+            document.getElementById('invitedTitle').textContent = getText('invitedTitle');
+        }
+
+        // Инициализация
+        function init() {
+            const userData = getUserData();
+            if (userData && userData.language_code) {
+                currentLanguage = userData.language_code;
+            }
+            updatePageText();
+        }
+
         function goToProfile() {
             window.location.href = '/webapp_profile';
         }
         function copyRefLink() {
             const refLink = document.getElementById('refLink').textContent;
             navigator.clipboard.writeText(refLink).then(() => {
-                alert('Ссылка скопирована!');
+                alert(getText('linkCopied'));
             }, () => {
-                alert('Ошибка копирования');
+                alert(getText('copyError'));
             });
         }
         document.addEventListener('DOMContentLoaded', function() {
+            init();
+            
             let tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
             if (tg) { tg.ready(); tg.expand && tg.expand(); }
             let userData = tg && tg.initDataUnsafe && tg.initDataUnsafe.user ? tg.initDataUnsafe.user : null;
@@ -67,9 +197,9 @@
                 try { userData = JSON.parse(localStorage.getItem('aaadviser_user')); } catch (e) { userData = null; }
             }
             if (!userData || !userData.id) {
-                document.getElementById('inviteCode').textContent = 'Пользователь не определён';
+                document.getElementById('inviteCode').textContent = getText('userNotDefined');
                 document.getElementById('refLink').textContent = '-';
-                document.getElementById('refTerms').textContent = 'Пожалуйста, откройте WebApp из Telegram.';
+                document.getElementById('refTerms').textContent = getText('openFromTelegram');
                 document.getElementById('invitedUsers').textContent = '-';
                 return;
             }
@@ -85,16 +215,16 @@
                 document.getElementById('refTerms').textContent = data.referral_terms || '-';
                 if (Array.isArray(data.invited) && data.invited.length > 0) {
                     document.getElementById('invitedUsers').innerHTML = data.invited.map(u =>
-                        `<div class='invited-item'><span class='invited-name'>${u.tg_name || u.username || u.telegram_id}</span><span class='invited-status ${u.completed ? 'status-done' : 'status-pending'}'>${u.completed ? 'Выполнил' : 'Не выполнил'}</span></div>`
+                        `<div class='invited-item'><span class='invited-name'>${u.tg_name || u.username || u.telegram_id}</span><span class='invited-status ${u.completed ? 'status-done' : 'status-pending'}'>${u.completed ? getText('completed') : getText('notCompleted')}</span></div>`
                     ).join('');
                 } else {
-                    document.getElementById('invitedUsers').textContent = 'Пока нет приглашённых пользователей.';
+                    document.getElementById('invitedUsers').textContent = getText('noInvitedUsers');
                 }
             })
             .catch(() => {
                 document.getElementById('inviteCode').textContent = '-';
                 document.getElementById('refLink').textContent = '-';
-                document.getElementById('refTerms').textContent = 'Ошибка загрузки условий.';
+                document.getElementById('refTerms').textContent = getText('errorLoadingTerms');
                 document.getElementById('invitedUsers').textContent = '-';
             });
         });

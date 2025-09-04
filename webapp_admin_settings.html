@@ -5,7 +5,7 @@
     <script src="/i18n-manager.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title data-i18n-title="common.settings">Настройки — Aaadviser Admin</title>
+    <title id="pageTitleTag">Настройки — Aaadviser Admin</title>
     <link rel="stylesheet" href="styles.css">
     <style>
         body { background: #f8f9fa; margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
@@ -30,16 +30,16 @@
 </head>
 <body>
     <div class="container">
-        <div class="admin-title">Настройки API-ключей</div>
+        <div class="admin-title" id="adminTitle">Настройки API-ключей</div>
         <form class="settings-form" onsubmit="addApiKey(event)">
             <input class="settings-input" id="keyName" placeholder="Имя ключа (key_name)" required />
             <input class="settings-input" id="keyValue" placeholder="Значение ключа (key_value)" required />
-            <button class="settings-btn" type="submit">Добавить ключ</button>
+            <button class="settings-btn" type="submit" id="addKeyBtn">Добавить ключ</button>
         </form>
-        <div class="settings-list" id="keysList" data-i18n="common.loading">Загрузка...</div>
+        <div class="settings-list" id="keysList">Загрузка...</div>
         <div class="nav-btn-row">
-            <button class="nav-btn" onclick="goBack()" data-i18n="common.back">Назад</button>
-            <button class="nav-btn nav-btn-main" onclick="goToMainMenu()">В главное меню</button>
+            <button class="nav-btn" onclick="goBack()" id="backBtn">Назад</button>
+            <button class="nav-btn nav-btn-main" onclick="goToMainMenu()" id="mainMenuBtn">В главное меню</button>
         </div>
     </div>
     <div id="toastContainer" class="toast-container"></div>
@@ -70,33 +70,226 @@
                     document.getElementById('keyName').value = '';
                     document.getElementById('keyValue').value = '';
                     loadKeys();
-                    showToast('Ключ успешно добавлен!', 'success');
+                    showToast(getText('keyAddedSuccess'), 'success');
                 } else {
-                    alert('Ошибка: ' + (data.error || 'Не удалось добавить ключ.'));
-                    showToast('Ошибка: ' + (data.error || 'Не удалось добавить ключ.'), 'error');
+                    alert(getText('addKeyError') + (data.error || getText('addKeyFailed')));
+                    showToast(getText('addKeyError') + (data.error || getText('addKeyFailed')), 'error');
                 }
             })
-            .catch(() => { alert('Ошибка сети.'); showToast('Ошибка сети', 'error'); });
+            .catch(() => { alert(getText('networkError')); showToast(getText('networkError'), 'error'); });
         }
         function loadKeys() {
             fetch('/api/admin_list_apikeys')
                 .then(res => res.json())
                 .then(data => {
-                    if (!data || !Array.isArray(data.keys)) {
-                        document.getElementById('keysList').innerHTML = 'Ошибка загрузки ключей.';
-                        showToast('Ошибка загрузки ключей', 'error');
-                        return;
-                    }
-                    if (data.keys.length === 0) {
-                        document.getElementById('keysList').innerHTML = 'Нет новых ключей.';
-                        showToast('Нет новых ключей', 'info');
-                        return;
-                    }
+                                    if (!data || !Array.isArray(data.keys)) {
+                    document.getElementById('keysList').innerHTML = getText('loadKeysError') + '.';
+                    showToast(getText('loadKeysError'), 'error');
+                    return;
+                }
+                if (data.keys.length === 0) {
+                    document.getElementById('keysList').innerHTML = getText('noKeys') + '.';
+                    showToast(getText('noKeys'), 'info');
+                    return;
+                }
                     document.getElementById('keysList').innerHTML = data.keys.map(k => `<b>${k.key_name}</b>: <span style='color:#555;'>${k.key_value}</span>`).join('<br>');
                 })
-                .catch(() => { document.getElementById('keysList').innerHTML = 'Ошибка сети.'; showToast('Ошибка сети', 'error'); });
+                .catch(() => { document.getElementById('keysList').innerHTML = getText('networkError') + '.'; showToast(getText('networkError'), 'error'); });
         }
         document.addEventListener('DOMContentLoaded', loadKeys);
+    </script>
+
+    <!-- Локализация -->
+    <script>
+        let currentLanguage = 'ru';
+        
+        // Получаем данные пользователя из Telegram
+        async function getUserData() {
+            try {
+                const userData = window.Telegram.WebApp.initDataUnsafe.user;
+                if (!userData) {
+                    console.warn('Данные пользователя Telegram недоступны');
+                    return null;
+                }
+                return userData;
+            } catch (error) {
+                console.error('Ошибка получения данных пользователя:', error);
+                return null;
+            }
+        }
+        
+        // Словари локализации
+        const locales = {
+            ru: {
+                pageTitleTag: 'Настройки — Aaadviser Admin',
+                adminTitle: 'Настройки API-ключей',
+                keyNamePlaceholder: 'Имя ключа (key_name)',
+                keyValuePlaceholder: 'Значение ключа (key_value)',
+                addKeyBtn: 'Добавить ключ',
+                backBtn: 'Назад',
+                mainMenuBtn: 'В главное меню',
+                loadingText: 'Загрузка...',
+                keyAddedSuccess: 'Ключ успешно добавлен!',
+                addKeyError: 'Ошибка: ',
+                addKeyFailed: 'Не удалось добавить ключ.',
+                networkError: 'Ошибка сети.',
+                loadKeysError: 'Ошибка загрузки ключей.',
+                noKeys: 'Нет новых ключей.'
+            },
+            en: {
+                pageTitleTag: 'Settings — Aaadviser Admin',
+                adminTitle: 'API Keys Settings',
+                keyNamePlaceholder: 'Key name (key_name)',
+                keyValuePlaceholder: 'Key value (key_value)',
+                addKeyBtn: 'Add Key',
+                backBtn: 'Back',
+                mainMenuBtn: 'To Main Menu',
+                loadingText: 'Loading...',
+                keyAddedSuccess: 'Key added successfully!',
+                addKeyError: 'Error: ',
+                addKeyFailed: 'Failed to add key.',
+                networkError: 'Network error.',
+                loadKeysError: 'Error loading keys.',
+                noKeys: 'No new keys.'
+            },
+            de: {
+                pageTitleTag: 'Einstellungen — Aaadviser Admin',
+                adminTitle: 'API-Schlüssel Einstellungen',
+                keyNamePlaceholder: 'Schlüsselname (key_name)',
+                keyValuePlaceholder: 'Schlüsselwert (key_value)',
+                addKeyBtn: 'Schlüssel hinzufügen',
+                backBtn: 'Zurück',
+                mainMenuBtn: 'Zum Hauptmenü',
+                loadingText: 'Laden...',
+                keyAddedSuccess: 'Schlüssel erfolgreich hinzugefügt!',
+                addKeyError: 'Fehler: ',
+                addKeyFailed: 'Schlüssel konnte nicht hinzugefügt werden.',
+                networkError: 'Netzwerkfehler.',
+                loadKeysError: 'Fehler beim Laden der Schlüssel.',
+                noKeys: 'Keine neuen Schlüssel.'
+            },
+            fr: {
+                pageTitleTag: 'Paramètres — Aaadviser Admin',
+                adminTitle: 'Paramètres des clés API',
+                keyNamePlaceholder: 'Nom de la clé (key_name)',
+                keyValuePlaceholder: 'Valeur de la clé (key_value)',
+                addKeyBtn: 'Ajouter la clé',
+                backBtn: 'Retour',
+                mainMenuBtn: 'Au menu principal',
+                loadingText: 'Chargement...',
+                keyAddedSuccess: 'Clé ajoutée avec succès !',
+                addKeyError: 'Erreur : ',
+                addKeyFailed: 'Impossible d\'ajouter la clé.',
+                networkError: 'Erreur réseau.',
+                loadKeysError: 'Erreur de chargement des clés.',
+                noKeys: 'Aucune nouvelle clé.'
+            },
+            tr: {
+                pageTitleTag: 'Ayarlar — Aaadviser Admin',
+                adminTitle: 'API Anahtarları Ayarları',
+                keyNamePlaceholder: 'Anahtar adı (key_name)',
+                keyValuePlaceholder: 'Anahtar değeri (key_value)',
+                addKeyBtn: 'Anahtar Ekle',
+                backBtn: 'Geri',
+                mainMenuBtn: 'Ana Menüye',
+                loadingText: 'Yükleniyor...',
+                keyAddedSuccess: 'Anahtar başarıyla eklendi!',
+                addKeyError: 'Hata: ',
+                addKeyFailed: 'Anahtar eklenemedi.',
+                networkError: 'Ağ hatası.',
+                loadKeysError: 'Anahtarları yükleme hatası.',
+                noKeys: 'Yeni anahtar yok.'
+            }
+        };
+        
+        // Функция получения текста по ключу
+        function getText(key) {
+            return locales[currentLanguage][key] || key;
+        }
+        
+        // Функция обновления текста на странице
+        function updatePageText() {
+            // Обновляем title
+            document.getElementById('pageTitleTag').textContent = getText('pageTitleTag');
+            
+            // Обновляем основные элементы
+            const elements = [
+                'adminTitle', 'addKeyBtn', 'backBtn', 'mainMenuBtn'
+            ];
+            
+            elements.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.textContent = getText(id);
+                }
+            });
+            
+            // Обновляем placeholder для input
+            const keyNameInput = document.getElementById('keyName');
+            if (keyNameInput) {
+                keyNameInput.placeholder = getText('keyNamePlaceholder');
+            }
+            
+            const keyValueInput = document.getElementById('keyValue');
+            if (keyValueInput) {
+                keyValueInput.placeholder = getText('keyValuePlaceholder');
+            }
+            
+            // Обновляем текст загрузки
+            const keysList = document.getElementById('keysList');
+            if (keysList && keysList.textContent === 'Загрузка...') {
+                keysList.textContent = getText('loadingText');
+            }
+        }
+        
+        // Функция инициализации локализации
+        async function initLocalization() {
+            try {
+                const userData = await getUserData();
+                if (userData && userData.language_code) {
+                    // Проверяем, является ли пользователь админом
+                    const response = await fetch('/api/user', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            telegram_id: userData.id,
+                            username: userData.username,
+                            tg_name: userData.first_name,
+                            last_name: userData.last_name,
+                            language_code: userData.language_code
+                        })
+                    });
+                    
+                    if (response.ok) {
+                        const userInfo = await response.json();
+                        
+                        // Устанавливаем язык в зависимости от статуса пользователя
+                        if (userInfo.user_status === 'admin' && userInfo.language) {
+                            // Для админов используем язык из базы данных
+                            currentLanguage = userInfo.language;
+                        } else if (userData.language_code) {
+                            // Для обычных пользователей используем язык из Telegram
+                            currentLanguage = userData.language_code;
+                        }
+                        
+                        // Обновляем текст на странице с новым языком
+                        updatePageText();
+                    }
+                }
+            } catch (error) {
+                console.error('Ошибка инициализации локализации:', error);
+                // Используем русский язык по умолчанию
+                currentLanguage = 'ru';
+                updatePageText();
+            }
+        }
+        
+        // Инициализируем локализацию при загрузке страницы
+        document.addEventListener('DOMContentLoaded', () => {
+            initLocalization();
+        });
     </script>
 </body>
 </html> 

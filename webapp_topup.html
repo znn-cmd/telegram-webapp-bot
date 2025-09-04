@@ -14,8 +14,72 @@
 </head>
 <body>
     <div class="container">
-        <div class="title">Пополнение баланса</div>
-        <div class="soon">Тут скоро будет платежка</div>
+        <div class="title" id="topupTitle">Пополнение баланса</div>
+        <div class="soon" id="soonText">Тут скоро будет платежка</div>
     </div>
+    <script>
+        let currentLanguage = 'ru';
+
+        // Получаем данные пользователя
+        function getUserData() {
+            let tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
+            if (tg && tg.initDataUnsafe && tg.initDataUnsafe.user) {
+                return tg.initDataUnsafe.user;
+            }
+            try {
+                const stored = localStorage.getItem('aaadviser_user');
+                if (stored) return JSON.parse(stored);
+            } catch (e) {}
+            return null;
+        }
+
+        // Локализации
+        const locales = {
+            'ru': {
+                'topupTitle': 'Пополнение баланса',
+                'soonText': 'Тут скоро будет платежка'
+            },
+            'en': {
+                'topupTitle': 'Top Up Balance',
+                'soonText': 'Payment system coming soon'
+            },
+            'de': {
+                'topupTitle': 'Kontostand aufladen',
+                'soonText': 'Zahlungssystem kommt bald'
+            },
+            'fr': {
+                'topupTitle': 'Recharger le solde',
+                'soonText': 'Système de paiement bientôt disponible'
+            },
+            'tr': {
+                'topupTitle': 'Bakiye Yükle',
+                'soonText': 'Ödeme sistemi yakında gelecek'
+            }
+        };
+
+        // Функция для получения локализованного текста
+        function getText(key) {
+            const locale = locales[currentLanguage] || locales['ru'];
+            return locale[key] || key;
+        }
+
+        // Обновление текста на странице
+        function updatePageText() {
+            document.getElementById('topupTitle').textContent = getText('topupTitle');
+            document.getElementById('soonText').textContent = getText('soonText');
+        }
+
+        // Инициализация
+        function init() {
+            const userData = getUserData();
+            if (userData && userData.language_code) {
+                currentLanguage = userData.language_code;
+            }
+            updatePageText();
+        }
+
+        // Запускаем инициализацию
+        init();
+    </script>
 </body>
 </html> 

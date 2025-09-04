@@ -32,22 +32,22 @@
 <body>
     <div class="container">
         <img src="logo-flt.png" alt="Aaadviser" class="logo" onclick="goToMainMenu()">
-        <div class="title">Техническая поддержка</div>
+        <div class="title" id="supportTitle">Техническая поддержка</div>
         
         <div class="content">
-            <h3>Нужна помощь?</h3>
-            <p>Наша команда поддержки готова помочь вам с любыми вопросами по использованию Aaadviser.</p>
+            <h3 id="needHelpTitle">Нужна помощь?</h3>
+            <p id="needHelpDesc">Наша команда поддержки готова помочь вам с любыми вопросами по использованию Aaadviser.</p>
             
             <div class="support-card">
-                <div class="support-title">💬 Чат с поддержкой</div>
-                <div class="support-desc">Получите мгновенную помощь от наших специалистов через Telegram чат.</div>
-                <button class="chat-btn" onclick="openSupportChat()">
+                <div class="support-title" id="chatTitle">💬 Чат с поддержкой</div>
+                <div class="support-desc" id="chatDesc">Получите мгновенную помощь от наших специалистов через Telegram чат.</div>
+                <button class="chat-btn" onclick="openSupportChat()" id="chatBtn">
                     💬 Написать в поддержку
                 </button>
             </div>
             
-            <h3>Часто задаваемые вопросы</h3>
-            <ul>
+            <h3 id="faqTitle">Часто задаваемые вопросы</h3>
+            <ul id="faqList">
                 <li>❓ Как получить анализ недвижимости?</li>
                 <li>❓ Почему не работает поиск адреса?</li>
                 <li>❓ Как пополнить баланс?</li>
@@ -55,15 +55,15 @@
                 <li>❓ Как изменить язык интерфейса?</li>
             </ul>
             
-            <h3>Время работы поддержки</h3>
-            <ul>
+            <h3 id="workingHoursTitle">Время работы поддержки</h3>
+            <ul id="workingHoursList">
                 <li>🕐 Понедельник - Пятница: 9:00 - 18:00 (МСК)</li>
                 <li>🕐 Суббота: 10:00 - 16:00 (МСК)</li>
                 <li>🕐 Воскресенье: выходной</li>
             </ul>
             
-            <h3>Что мы можем помочь</h3>
-            <ul>
+            <h3 id="whatWeHelpTitle">Что мы можем помочь</h3>
+            <ul id="whatWeHelpList">
                 <li>✅ Настройка и использование приложения</li>
                 <li>✅ Технические проблемы</li>
                 <li>✅ Вопросы по оплате</li>
@@ -73,11 +73,235 @@
         </div>
         
         <div class="nav-buttons">
-            <button class="nav-btn back-btn" onclick="goBack()">← Назад</button>
-            <button class="nav-btn" onclick="goToMainMenu()">В главное меню</button>
+            <button class="nav-btn back-btn" onclick="goBack()" id="backBtn">← Назад</button>
+            <button class="nav-btn" onclick="goToMainMenu()" id="mainMenuBtn">В главное меню</button>
         </div>
     </div>
     <script>
+        let currentLanguage = 'ru';
+
+        // Получаем данные пользователя
+        function getUserData() {
+            let tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
+            if (tg && tg.initDataUnsafe && tg.initDataUnsafe.user) {
+                return tg.initDataUnsafe.user;
+            }
+            return null;
+        }
+
+        // Локализации
+        const locales = {
+            'ru': {
+                'supportTitle': 'Техническая поддержка',
+                'needHelpTitle': 'Нужна помощь?',
+                'needHelpDesc': 'Наша команда поддержки готова помочь вам с любыми вопросами по использованию Aaadviser.',
+                'chatTitle': '💬 Чат с поддержкой',
+                'chatDesc': 'Получите мгновенную помощь от наших специалистов через Telegram чат.',
+                'chatBtn': '💬 Написать в поддержку',
+                'faqTitle': 'Часто задаваемые вопросы',
+                'faqList': [
+                    '❓ Как получить анализ недвижимости?',
+                    '❓ Почему не работает поиск адреса?',
+                    '❓ Как пополнить баланс?',
+                    '❓ Где найти мои отчеты?',
+                    '❓ Как изменить язык интерфейса?'
+                ],
+                'workingHoursTitle': 'Время работы поддержки',
+                'workingHoursList': [
+                    '🕐 Понедельник - Пятница: 9:00 - 18:00 (МСК)',
+                    '🕐 Суббота: 10:00 - 16:00 (МСК)',
+                    '🕐 Воскресенье: выходной'
+                ],
+                'whatWeHelpTitle': 'Что мы можем помочь',
+                'whatWeHelpList': [
+                    '✅ Настройка и использование приложения',
+                    '✅ Технические проблемы',
+                    '✅ Вопросы по оплате',
+                    '✅ Ошибки в отчетах',
+                    '✅ Предложения по улучшению'
+                ],
+                'backBtn': '← Назад',
+                'mainMenuBtn': 'В главное меню'
+            },
+            'en': {
+                'supportTitle': 'Technical Support',
+                'needHelpTitle': 'Need help?',
+                'needHelpDesc': 'Our support team is ready to help you with any questions about using Aaadviser.',
+                'chatTitle': '💬 Support Chat',
+                'chatDesc': 'Get instant help from our specialists via Telegram chat.',
+                'chatBtn': '💬 Write to Support',
+                'faqTitle': 'Frequently Asked Questions',
+                'faqList': [
+                    '❓ How to get a property analysis?',
+                    '❓ Why doesn\'t address search work?',
+                    '❓ How to top up balance?',
+                    '❓ Where to find my reports?',
+                    '❓ How to change interface language?'
+                ],
+                'workingHoursTitle': 'Support Working Hours',
+                'workingHoursList': [
+                    '🕐 Monday - Friday: 9:00 - 18:00 (MSC)',
+                    '🕐 Saturday: 10:00 - 16:00 (MSC)',
+                    '🕐 Sunday: day off'
+                ],
+                'whatWeHelpTitle': 'What we can help with',
+                'whatWeHelpList': [
+                    '✅ App setup and usage',
+                    '✅ Technical issues',
+                    '✅ Payment questions',
+                    '✅ Report errors',
+                    '✅ Improvement suggestions'
+                ],
+                'backBtn': '← Back',
+                'mainMenuBtn': 'Main Menu'
+            },
+            'de': {
+                'supportTitle': 'Technischer Support',
+                'needHelpTitle': 'Brauchen Sie Hilfe?',
+                'needHelpDesc': 'Unser Support-Team ist bereit, Ihnen bei allen Fragen zur Nutzung von Aaadviser zu helfen.',
+                'chatTitle': '💬 Support-Chat',
+                'chatDesc': 'Erhalten Sie sofortige Hilfe von unseren Spezialisten über Telegram-Chat.',
+                'chatBtn': '💬 An Support schreiben',
+                'faqTitle': 'Häufig gestellte Fragen',
+                'faqList': [
+                    '❓ Wie erhalte ich eine Immobilienanalyse?',
+                    '❓ Warum funktioniert die Adresssuche nicht?',
+                    '❓ Wie kann ich das Guthaben aufladen?',
+                    '❓ Wo finde ich meine Berichte?',
+                    '❓ Wie ändere ich die Sprache der Benutzeroberfläche?'
+                ],
+                'workingHoursTitle': 'Support-Arbeitszeiten',
+                'workingHoursList': [
+                    '🕐 Montag - Freitag: 9:00 - 18:00 (MSC)',
+                    '🕐 Samstag: 10:00 - 16:00 (MSC)',
+                    '🕐 Sonntag: Ruhetag'
+                ],
+                'whatWeHelpTitle': 'Womit wir helfen können',
+                'whatWeHelpList': [
+                    '✅ App-Einrichtung und -Nutzung',
+                    '✅ Technische Probleme',
+                    '✅ Zahlungsfragen',
+                    '✅ Berichtsfehler',
+                    '✅ Verbesserungsvorschläge'
+                ],
+                'backBtn': '← Zurück',
+                'mainMenuBtn': 'Hauptmenü'
+            },
+            'fr': {
+                'supportTitle': 'Support technique',
+                'needHelpTitle': 'Besoin d\'aide?',
+                'needHelpDesc': 'Notre équipe de support est prête à vous aider avec toutes les questions concernant l\'utilisation d\'Aaadviser.',
+                'chatTitle': '💬 Chat de support',
+                'chatDesc': 'Obtenez une aide instantanée de nos spécialistes via le chat Telegram.',
+                'chatBtn': '💬 Écrire au support',
+                'faqTitle': 'Questions fréquemment posées',
+                'faqList': [
+                    '❓ Comment obtenir une analyse de propriété?',
+                    '❓ Pourquoi la recherche d\'adresse ne fonctionne-t-elle pas?',
+                    '❓ Comment recharger le solde?',
+                    '❓ Où trouver mes rapports?',
+                    '❓ Comment changer la langue de l\'interface?'
+                ],
+                'workingHoursTitle': 'Heures de travail du support',
+                'workingHoursList': [
+                    '🕐 Lundi - Vendredi: 9:00 - 18:00 (MSC)',
+                    '🕐 Samedi: 10:00 - 16:00 (MSC)',
+                    '🕐 Dimanche: jour de congé'
+                ],
+                'whatWeHelpTitle': 'Ce avec quoi nous pouvons aider',
+                'whatWeHelpList': [
+                    '✅ Configuration et utilisation de l\'app',
+                    '✅ Problèmes techniques',
+                    '✅ Questions de paiement',
+                    '✅ Erreurs dans les rapports',
+                    '✅ Suggestions d\'amélioration'
+                ],
+                'backBtn': '← Retour',
+                'mainMenuBtn': 'Menu principal'
+            },
+            'tr': {
+                'supportTitle': 'Teknik Destek',
+                'needHelpTitle': 'Yardıma mı ihtiyacınız var?',
+                'needHelpDesc': 'Destek ekibimiz Aaadviser kullanımıyla ilgili herhangi bir soruda size yardım etmeye hazır.',
+                'chatTitle': '💬 Destek Sohbeti',
+                'chatDesc': 'Uzmanlarımızdan Telegram sohbeti aracılığıyla anında yardım alın.',
+                'chatBtn': '💬 Destek\'e Yaz',
+                'faqTitle': 'Sık Sorulan Sorular',
+                'faqList': [
+                    '❓ Gayrimenkul analizi nasıl alınır?',
+                    '❓ Adres arama neden çalışmıyor?',
+                    '❓ Bakiye nasıl yüklenir?',
+                    '❓ Raporlarımı nerede bulabilirim?',
+                    '❓ Arayüz dilini nasıl değiştiririm?'
+                ],
+                'workingHoursTitle': 'Destek Çalışma Saatleri',
+                'workingHoursList': [
+                    '🕐 Pazartesi - Cuma: 9:00 - 18:00 (MSC)',
+                    '🕐 Cumartesi: 10:00 - 16:00 (MSC)',
+                    '🕐 Pazar: tatil günü'
+                ],
+                'whatWeHelpTitle': 'Yardım edebileceğimiz konular',
+                'whatWeHelpList': [
+                    '✅ Uygulama kurulumu ve kullanımı',
+                    '✅ Teknik sorunlar',
+                    '✅ Ödeme soruları',
+                    '✅ Rapor hataları',
+                    '✅ İyileştirme önerileri'
+                ],
+                'backBtn': '← Geri',
+                'mainMenuBtn': 'Ana Menü'
+            }
+        };
+
+        // Функция для получения локализованного текста
+        function getText(key) {
+            const locale = locales[currentLanguage] || locales['ru'];
+            return locale[key] || key;
+        }
+
+        // Обновление текста на странице
+        function updatePageText() {
+            document.getElementById('supportTitle').textContent = getText('supportTitle');
+            document.getElementById('needHelpTitle').textContent = getText('needHelpTitle');
+            document.getElementById('needHelpDesc').textContent = getText('needHelpDesc');
+            document.getElementById('chatTitle').textContent = getText('chatTitle');
+            document.getElementById('chatDesc').textContent = getText('chatDesc');
+            document.getElementById('chatBtn').textContent = getText('chatBtn');
+            document.getElementById('faqTitle').textContent = getText('faqTitle');
+            document.getElementById('workingHoursTitle').textContent = getText('workingHoursTitle');
+            document.getElementById('whatWeHelpTitle').textContent = getText('whatWeHelpTitle');
+            document.getElementById('backBtn').textContent = getText('backBtn');
+            document.getElementById('mainMenuBtn').textContent = getText('mainMenuBtn');
+            
+            // Обновляем списки
+            const faqList = document.getElementById('faqList');
+            const faq = getText('faqList');
+            if (Array.isArray(faq)) {
+                faqList.innerHTML = faq.map(item => `<li>${item}</li>`).join('');
+            }
+            
+            const workingHoursList = document.getElementById('workingHoursList');
+            const workingHours = getText('workingHoursList');
+            if (Array.isArray(workingHours)) {
+                workingHoursList.innerHTML = workingHours.map(item => `<li>${item}</li>`).join('');
+            }
+            
+            const whatWeHelpList = document.getElementById('whatWeHelpList');
+            const whatWeHelp = getText('whatWeHelpList');
+            if (Array.isArray(whatWeHelp)) {
+                whatWeHelpList.innerHTML = whatWeHelp.map(item => `<li>${item}</li>`).join('');
+            }
+        }
+
+        // Инициализация
+        function init() {
+            const userData = getUserData();
+            if (userData && userData.language_code) {
+                currentLanguage = userData.language_code;
+            }
+            updatePageText();
+        }
+
         function goToMainMenu() {
             window.location.href = '/webapp';
         }
@@ -87,6 +311,9 @@
         function openSupportChat() {
             window.open('https://t.me/Aaadviser_support_bot', '_blank');
         }
+
+        // Запускаем инициализацию
+        init();
     </script>
 </body>
 </html> 

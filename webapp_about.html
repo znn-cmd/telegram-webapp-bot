@@ -27,14 +27,14 @@
 <body>
     <div class="container">
         <img src="logo-flt.png" alt="Aaadviser" class="logo" onclick="goToMainMenu()">
-        <div class="title">О приложении</div>
+        <div class="title" id="aboutTitle">О приложении</div>
         
         <div class="content">
-            <h3>Что такое Aaadviser?</h3>
-            <p>Aaadviser — это интеллектуальная платформа для анализа рынка недвижимости, которая помогает инвесторам и покупателям принимать обоснованные решения.</p>
+            <h3 id="whatIsTitle">Что такое Aaadviser?</h3>
+            <p id="whatIsDesc">Aaadviser — это интеллектуальная платформа для анализа рынка недвижимости, которая помогает инвесторам и покупателям принимать обоснованные решения.</p>
             
-            <h3>Наши возможности:</h3>
-            <ul>
+            <h3 id="featuresTitle">Наши возможности:</h3>
+            <ul id="featuresList">
                 <li>📊 Детальный анализ цен в районе</li>
                 <li>📈 Статистика рынка недвижимости</li>
                 <li>🏠 Сравнение с похожими объектами</li>
@@ -44,25 +44,184 @@
                 <li>📱 Удобный мобильный интерфейс</li>
             </ul>
             
-            <h3>Как это работает?</h3>
-            <p>Просто введите адрес недвижимости, укажите количество спален и примерную цену. Наша система проанализирует рынок и предоставит подробный отчет с рекомендациями.</p>
+            <h3 id="howItWorksTitle">Как это работает?</h3>
+            <p id="howItWorksDesc">Просто введите адрес недвижимости, укажите количество спален и примерную цену. Наша система проанализирует рынок и предоставит подробный отчет с рекомендациями.</p>
             
-            <h3>Почему Aaadviser?</h3>
-            <p>Мы используем передовые технологии машинного обучения и большие данные для анализа рынка недвижимости, что позволяет получать точные и актуальные данные для принятия инвестиционных решений.</p>
+            <h3 id="whyTitle">Почему Aaadviser?</h3>
+            <p id="whyDesc">Мы используем передовые технологии машинного обучения и большие данные для анализа рынка недвижимости, что позволяет получать точные и актуальные данные для принятия инвестиционных решений.</p>
         </div>
         
         <div class="nav-buttons">
-            <button class="nav-btn back-btn" onclick="goBack()">← Назад</button>
-            <button class="nav-btn" onclick="goToMainMenu()">В главное меню</button>
+            <button class="nav-btn back-btn" onclick="goBack()" id="backBtn">← Назад</button>
+            <button class="nav-btn" onclick="goToMainMenu()" id="mainMenuBtn">В главное меню</button>
         </div>
     </div>
     <script>
+        let currentLanguage = 'ru';
+
+        // Получаем данные пользователя
+        function getUserData() {
+            let tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
+            if (tg && tg.initDataUnsafe && tg.initDataUnsafe.user) {
+                return tg.initDataUnsafe.user;
+            }
+            return null;
+        }
+
+        // Локализации
+        const locales = {
+            'ru': {
+                'aboutTitle': 'О приложении',
+                'whatIsTitle': 'Что такое Aaadviser?',
+                'whatIsDesc': 'Aaadviser — это интеллектуальная платформа для анализа рынка недвижимости, которая помогает инвесторам и покупателям принимать обоснованные решения.',
+                'featuresTitle': 'Наши возможности:',
+                'featuresList': [
+                    '📊 Детальный анализ цен в районе',
+                    '📈 Статистика рынка недвижимости',
+                    '🏠 Сравнение с похожими объектами',
+                    '🔮 Прогноз изменения цен',
+                    '💡 Рекомендации по инвестициям',
+                    '📋 Сохранение отчетов',
+                    '📱 Удобный мобильный интерфейс'
+                ],
+                'howItWorksTitle': 'Как это работает?',
+                'howItWorksDesc': 'Просто введите адрес недвижимости, укажите количество спален и примерную цену. Наша система проанализирует рынок и предоставит подробный отчет с рекомендациями.',
+                'whyTitle': 'Почему Aaadviser?',
+                'whyDesc': 'Мы используем передовые технологии машинного обучения и большие данные для анализа рынка недвижимости, что позволяет получать точные и актуальные данные для принятия инвестиционных решений.',
+                'backBtn': '← Назад',
+                'mainMenuBtn': 'В главное меню'
+            },
+            'en': {
+                'aboutTitle': 'About the App',
+                'whatIsTitle': 'What is Aaadviser?',
+                'whatIsDesc': 'Aaadviser is an intelligent real estate market analysis platform that helps investors and buyers make informed decisions.',
+                'featuresTitle': 'Our Features:',
+                'featuresList': [
+                    '📊 Detailed price analysis in the area',
+                    '📈 Real estate market statistics',
+                    '🏠 Comparison with similar properties',
+                    '🔮 Price change forecast',
+                    '💡 Investment recommendations',
+                    '📋 Report saving',
+                    '📱 Convenient mobile interface'
+                ],
+                'howItWorksTitle': 'How it works?',
+                'howItWorksDesc': 'Simply enter the property address, specify the number of bedrooms and approximate price. Our system will analyze the market and provide a detailed report with recommendations.',
+                'whyTitle': 'Why Aaadviser?',
+                'whyDesc': 'We use advanced machine learning technologies and big data for real estate market analysis, which allows us to obtain accurate and up-to-date data for making investment decisions.',
+                'backBtn': '← Back',
+                'mainMenuBtn': 'Main Menu'
+            },
+            'de': {
+                'aboutTitle': 'Über die App',
+                'whatIsTitle': 'Was ist Aaadviser?',
+                'whatIsDesc': 'Aaadviser ist eine intelligente Plattform zur Analyse des Immobilienmarkts, die Investoren und Käufern hilft, fundierte Entscheidungen zu treffen.',
+                'featuresTitle': 'Unsere Funktionen:',
+                'featuresList': [
+                    '📊 Detaillierte Preisanalyse in der Gegend',
+                    '📈 Immobilienmarktstatistiken',
+                    '🏠 Vergleich mit ähnlichen Objekten',
+                    '🔮 Preisänderungsprognose',
+                    '💡 Anlageempfehlungen',
+                    '📋 Berichtsspeicherung',
+                    '📱 Benutzerfreundliche mobile Oberfläche'
+                ],
+                'howItWorksTitle': 'Wie funktioniert es?',
+                'howItWorksDesc': 'Geben Sie einfach die Immobilienadresse ein, geben Sie die Anzahl der Schlafzimmer und den ungefähren Preis an. Unser System analysiert den Markt und erstellt einen detaillierten Bericht mit Empfehlungen.',
+                'whyTitle': 'Warum Aaadviser?',
+                'whyDesc': 'Wir verwenden fortschrittliche Machine-Learning-Technologien und Big Data für die Immobilienmarktanalyse, was es uns ermöglicht, genaue und aktuelle Daten für Investitionsentscheidungen zu erhalten.',
+                'backBtn': '← Zurück',
+                'mainMenuBtn': 'Hauptmenü'
+            },
+            'fr': {
+                'aboutTitle': 'À propos de l\'app',
+                'whatIsTitle': 'Qu\'est-ce qu\'Aaadviser?',
+                'whatIsDesc': 'Aaadviser est une plateforme intelligente d\'analyse du marché immobilier qui aide les investisseurs et les acheteurs à prendre des décisions éclairées.',
+                'featuresTitle': 'Nos fonctionnalités:',
+                'featuresList': [
+                    '📊 Analyse détaillée des prix dans la zone',
+                    '📈 Statistiques du marché immobilier',
+                    '🏠 Comparaison avec des propriétés similaires',
+                    '🔮 Prévision des changements de prix',
+                    '💡 Recommandations d\'investissement',
+                    '📋 Sauvegarde des rapports',
+                    '📱 Interface mobile pratique'
+                ],
+                'howItWorksTitle': 'Comment ça marche?',
+                'howItWorksDesc': 'Entrez simplement l\'adresse de la propriété, spécifiez le nombre de chambres et le prix approximatif. Notre système analysera le marché et fournira un rapport détaillé avec des recommandations.',
+                'whyTitle': 'Pourquoi Aaadviser?',
+                'whyDesc': 'Nous utilisons des technologies avancées d\'apprentissage automatique et du big data pour l\'analyse du marché immobilier, ce qui nous permet d\'obtenir des données précises et à jour pour prendre des décisions d\'investissement.',
+                'backBtn': '← Retour',
+                'mainMenuBtn': 'Menu principal'
+            },
+            'tr': {
+                'aboutTitle': 'Uygulama Hakkında',
+                'whatIsTitle': 'Aaadviser Nedir?',
+                'whatIsDesc': 'Aaadviser, yatırımcıların ve alıcıların bilinçli kararlar almasına yardımcı olan akıllı bir gayrimenkul pazarı analiz platformudur.',
+                'featuresTitle': 'Özelliklerimiz:',
+                'featuresList': [
+                    '📊 Bölgedeki detaylı fiyat analizi',
+                    '📈 Gayrimenkul pazarı istatistikleri',
+                    '🏠 Benzer mülklerle karşılaştırma',
+                    '🔮 Fiyat değişimi tahmini',
+                    '💡 Yatırım önerileri',
+                    '📋 Rapor kaydetme',
+                    '📱 Kullanışlı mobil arayüz'
+                ],
+                'howItWorksTitle': 'Nasıl çalışır?',
+                'howItWorksDesc': 'Sadece mülk adresini girin, yatak odası sayısını ve yaklaşık fiyatı belirtin. Sistemimiz pazarı analiz edecek ve önerilerle birlikte detaylı bir rapor sağlayacaktır.',
+                'whyTitle': 'Neden Aaadviser?',
+                'whyDesc': 'Gayrimenkul pazarı analizi için gelişmiş makine öğrenimi teknolojileri ve büyük veri kullanıyoruz, bu da yatırım kararları için doğru ve güncel veriler elde etmemizi sağlıyor.',
+                'backBtn': '← Geri',
+                'mainMenuBtn': 'Ana Menü'
+            }
+        };
+
+        // Функция для получения локализованного текста
+        function getText(key) {
+            const locale = locales[currentLanguage] || locales['ru'];
+            return locale[key] || key;
+        }
+
+        // Обновление текста на странице
+        function updatePageText() {
+            document.getElementById('aboutTitle').textContent = getText('aboutTitle');
+            document.getElementById('whatIsTitle').textContent = getText('whatIsTitle');
+            document.getElementById('whatIsDesc').textContent = getText('whatIsDesc');
+            document.getElementById('featuresTitle').textContent = getText('featuresTitle');
+            document.getElementById('howItWorksTitle').textContent = getText('howItWorksTitle');
+            document.getElementById('howItWorksDesc').textContent = getText('howItWorksDesc');
+            document.getElementById('whyTitle').textContent = getText('whyTitle');
+            document.getElementById('whyDesc').textContent = getText('whyDesc');
+            document.getElementById('backBtn').textContent = getText('backBtn');
+            document.getElementById('mainMenuBtn').textContent = getText('mainMenuBtn');
+            
+            // Обновляем список возможностей
+            const featuresList = document.getElementById('featuresList');
+            const features = getText('featuresList');
+            if (Array.isArray(features)) {
+                featuresList.innerHTML = features.map(feature => `<li>${feature}</li>`).join('');
+            }
+        }
+
+        // Инициализация
+        function init() {
+            const userData = getUserData();
+            if (userData && userData.language_code) {
+                currentLanguage = userData.language_code;
+            }
+            updatePageText();
+        }
+
         function goToMainMenu() {
             window.location.href = '/webapp';
         }
         function goBack() {
             window.location.href = '/webapp_help';
         }
+
+        // Запускаем инициализацию
+        init();
     </script>
 </body>
 </html> 

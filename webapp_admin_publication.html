@@ -5,7 +5,7 @@
     <script src="/i18n-manager.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Публикация — Aaadviser Admin</title>
+    <title id="pageTitleTag">Публикация — Aaadviser Admin</title>
     <link rel="stylesheet" href="styles.css">
     <style>
         body { background: #f8f9fa; margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
@@ -29,27 +29,27 @@
 </head>
 <body>
     <div class="container">
-        <div class="admin-title">Публикация для всех пользователей</div>
+        <div class="admin-title" id="adminTitle">Публикация для всех пользователей</div>
         <textarea class="pub-textarea" id="pubText" placeholder="Введите текст публикации...\nПоддерживается форматирование, смайлы и оформление."></textarea>
         <div style="text-align:left; margin: 10px 0 16px 0;">
             <label style="display:block; margin-bottom:6px;">
-                <input type="checkbox" id="onlyAdmins" checked /> Только администраторы
+                <input type="checkbox" id="onlyAdmins" checked /> <span id="onlyAdminsLabel">Только администраторы</span>
             </label>
             <label style="display:block; margin-bottom:6px;">
-                <input type="checkbox" id="saveToDb" /> Сохранить в базу
+                <input type="checkbox" id="saveToDb" /> <span id="saveToDbLabel">Сохранить в базу</span>
             </label>
             <label style="display:block; margin-bottom:6px;">
-                <input type="checkbox" id="autoTranslate" disabled /> Сделать автоперевод
+                <input type="checkbox" id="autoTranslate" disabled /> <span id="autoTranslateLabel">Сделать автоперевод</span>
             </label>
             <label style="display:block; margin-bottom:6px;">
-                <input type="checkbox" id="testSend" /> Тестовая отправка
+                <input type="checkbox" id="testSend" /> <span id="testSendLabel">Тестовая отправка</span>
             </label>
         </div>
         <div class="pub-report" id="pubReport" style="display: block;"></div>
         <button class="pub-btn" id="sendBtn" onclick="sendPublication()">Отправить</button>
         <div class="nav-btn-row">
-            <button class="nav-btn" onclick="goBack()" data-i18n="common.back">Назад</button>
-            <button class="nav-btn nav-btn-main" onclick="goToMainMenu()">В главное меню</button>
+            <button class="nav-btn" onclick="goBack()" id="backBtn">Назад</button>
+            <button class="nav-btn nav-btn-main" onclick="goToMainMenu()" id="mainMenuBtn">В главное меню</button>
         </div>
     </div>
     <div id="toastContainer" class="toast-container"></div>
@@ -75,7 +75,7 @@
             const saveToDb = document.getElementById('saveToDb').checked;
             const autoTranslate = document.getElementById('autoTranslate').checked;
             const testSend = document.getElementById('testSend').checked;
-            if (!text) { alert('Введите текст публикации!'); return; }
+            if (!text) { alert(getText('enterTextError')); return; }
             btn.disabled = true;
             document.getElementById('pubReport').innerHTML = '';
             fetch('/api/admin_publication', {
@@ -87,31 +87,229 @@
             .then(data => {
                 btn.disabled = false;
                 if (data.success) {
-                    let reportMsg = '<b>Рассылка завершена!</b>';
+                    let reportMsg = '<b>' + getText('mailingComplete') + '</b>';
                     if (data.result_message) {
                         reportMsg += '<br>' + data.result_message.replace(/\n/g, '<br>');
                     }
                     if (data.lang_stats) {
-                        reportMsg += '<br><b>По языкам:</b>';
+                        reportMsg += '<br><b>' + getText('byLanguages') + '</b>';
                         for (const [lang, qtty] of Object.entries(data.lang_stats)) {
                             reportMsg += `<br>${lang.toUpperCase()}: ${qtty}`;
                         }
                     }
                     document.getElementById('pubReport').innerHTML = reportMsg;
                     document.getElementById('pubReport').scrollIntoView({behavior: 'smooth'});
-                    showToast('Публикация успешно отправлена!', 'success');
+                    showToast(getText('publicationSuccess'), 'success');
                     document.getElementById('pubText').value = '';
                 } else {
-                    document.getElementById('pubReport').innerHTML = 'Ошибка: ' + (data.error || 'Не удалось отправить публикацию.');
-                    showToast('Ошибка: ' + (data.error || 'Не удалось отправить публикацию.'), 'error');
+                    document.getElementById('pubReport').innerHTML = getText('publicationError') + (data.error || getText('publicationFailed'));
+                    showToast(getText('publicationError') + (data.error || getText('publicationFailed')), 'error');
                 }
             })
             .catch(() => {
                 btn.disabled = false;
-                document.getElementById('pubReport').innerHTML = 'Ошибка сети.';
-                showToast('Ошибка сети', 'error');
+                document.getElementById('pubReport').innerHTML = getText('networkError');
+                showToast(getText('networkError'), 'error');
             });
         }
+    </script>
+
+    <!-- Локализация -->
+    <script>
+        let currentLanguage = 'ru';
+        
+        // Получаем данные пользователя из Telegram
+        async function getUserData() {
+            try {
+                const userData = window.Telegram.WebApp.initDataUnsafe.user;
+                if (!userData) {
+                    console.warn('Данные пользователя Telegram недоступны');
+                    return null;
+                }
+                return userData;
+            } catch (error) {
+                console.error('Ошибка получения данных пользователя:', error);
+                return null;
+            }
+        }
+        
+        // Словари локализации
+        const locales = {
+            ru: {
+                pageTitleTag: 'Публикация — Aaadviser Admin',
+                adminTitle: 'Публикация для всех пользователей',
+                pubTextPlaceholder: 'Введите текст публикации...\nПоддерживается форматирование, смайлы и оформление.',
+                onlyAdminsLabel: 'Только администраторы',
+                saveToDbLabel: 'Сохранить в базу',
+                autoTranslateLabel: 'Сделать автоперевод',
+                testSendLabel: 'Тестовая отправка',
+                sendBtn: 'Отправить',
+                backBtn: 'Назад',
+                mainMenuBtn: 'В главное меню',
+                enterTextError: 'Введите текст публикации!',
+                publicationSuccess: 'Публикация успешно отправлена!',
+                publicationError: 'Ошибка: ',
+                publicationFailed: 'Не удалось отправить публикацию.',
+                networkError: 'Ошибка сети.',
+                mailingComplete: 'Рассылка завершена!',
+                byLanguages: 'По языкам:'
+            },
+            en: {
+                pageTitleTag: 'Publication — Aaadviser Admin',
+                adminTitle: 'Publication for all users',
+                pubTextPlaceholder: 'Enter publication text...\nFormatting, emojis and styling are supported.',
+                onlyAdminsLabel: 'Administrators only',
+                saveToDbLabel: 'Save to database',
+                autoTranslateLabel: 'Auto translate',
+                testSendLabel: 'Test send',
+                sendBtn: 'Send',
+                backBtn: 'Back',
+                mainMenuBtn: 'To Main Menu',
+                enterTextError: 'Enter publication text!',
+                publicationSuccess: 'Publication sent successfully!',
+                publicationError: 'Error: ',
+                publicationFailed: 'Failed to send publication.',
+                networkError: 'Network error.',
+                mailingComplete: 'Mailing completed!',
+                byLanguages: 'By languages:'
+            },
+            de: {
+                pageTitleTag: 'Veröffentlichung — Aaadviser Admin',
+                adminTitle: 'Veröffentlichung für alle Benutzer',
+                pubTextPlaceholder: 'Veröffentlichungstext eingeben...\nFormatierung, Emojis und Styling werden unterstützt.',
+                onlyAdminsLabel: 'Nur Administratoren',
+                saveToDbLabel: 'In Datenbank speichern',
+                autoTranslateLabel: 'Auto-Übersetzung',
+                testSendLabel: 'Test senden',
+                sendBtn: 'Senden',
+                backBtn: 'Zurück',
+                mainMenuBtn: 'Zum Hauptmenü',
+                enterTextError: 'Veröffentlichungstext eingeben!',
+                publicationSuccess: 'Veröffentlichung erfolgreich gesendet!',
+                publicationError: 'Fehler: ',
+                publicationFailed: 'Veröffentlichung konnte nicht gesendet werden.',
+                networkError: 'Netzwerkfehler.',
+                mailingComplete: 'Mailing abgeschlossen!',
+                byLanguages: 'Nach Sprachen:'
+            },
+            fr: {
+                pageTitleTag: 'Publication — Aaadviser Admin',
+                adminTitle: 'Publication pour tous les utilisateurs',
+                pubTextPlaceholder: 'Entrez le texte de publication...\nLe formatage, les emojis et le style sont pris en charge.',
+                onlyAdminsLabel: 'Administrateurs uniquement',
+                saveToDbLabel: 'Sauvegarder en base',
+                autoTranslateLabel: 'Traduction automatique',
+                testSendLabel: 'Envoi de test',
+                sendBtn: 'Envoyer',
+                backBtn: 'Retour',
+                mainMenuBtn: 'Au menu principal',
+                enterTextError: 'Entrez le texte de publication !',
+                publicationSuccess: 'Publication envoyée avec succès !',
+                publicationError: 'Erreur : ',
+                publicationFailed: 'Impossible d\'envoyer la publication.',
+                networkError: 'Erreur réseau.',
+                mailingComplete: 'Mailing terminé !',
+                byLanguages: 'Par langues :'
+            },
+            tr: {
+                pageTitleTag: 'Yayın — Aaadviser Admin',
+                adminTitle: 'Tüm kullanıcılar için yayın',
+                pubTextPlaceholder: 'Yayın metnini girin...\nBiçimlendirme, emoji ve stil desteklenir.',
+                onlyAdminsLabel: 'Sadece yöneticiler',
+                saveToDbLabel: 'Veritabanına kaydet',
+                autoTranslateLabel: 'Otomatik çeviri',
+                testSendLabel: 'Test gönderimi',
+                sendBtn: 'Gönder',
+                backBtn: 'Geri',
+                mainMenuBtn: 'Ana Menüye',
+                enterTextError: 'Yayın metnini girin!',
+                publicationSuccess: 'Yayın başarıyla gönderildi!',
+                publicationError: 'Hata: ',
+                publicationFailed: 'Yayın gönderilemedi.',
+                networkError: 'Ağ hatası.',
+                mailingComplete: 'Mailing tamamlandı!',
+                byLanguages: 'Dillere göre:'
+            }
+        };
+        
+        // Функция получения текста по ключу
+        function getText(key) {
+            return locales[currentLanguage][key] || key;
+        }
+        
+        // Функция обновления текста на странице
+        function updatePageText() {
+            // Обновляем title
+            document.getElementById('pageTitleTag').textContent = getText('pageTitleTag');
+            
+            // Обновляем основные элементы
+            const elements = [
+                'adminTitle', 'onlyAdminsLabel', 'saveToDbLabel', 'autoTranslateLabel', 
+                'testSendLabel', 'sendBtn', 'backBtn', 'mainMenuBtn'
+            ];
+            
+            elements.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.textContent = getText(id);
+                }
+            });
+            
+            // Обновляем placeholder для textarea
+            const pubText = document.getElementById('pubText');
+            if (pubText) {
+                pubText.placeholder = getText('pubTextPlaceholder');
+            }
+        }
+        
+        // Функция инициализации локализации
+        async function initLocalization() {
+            try {
+                const userData = await getUserData();
+                if (userData && userData.language_code) {
+                    // Проверяем, является ли пользователь админом
+                    const response = await fetch('/api/user', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            telegram_id: userData.id,
+                            username: userData.username,
+                            tg_name: userData.first_name,
+                            last_name: userData.last_name,
+                            language_code: userData.language_code
+                        })
+                    });
+                    
+                    if (response.ok) {
+                        const userInfo = await response.json();
+                        
+                        // Устанавливаем язык в зависимости от статуса пользователя
+                        if (userInfo.user_status === 'admin' && userInfo.language) {
+                            // Для админов используем язык из базы данных
+                            currentLanguage = userInfo.language;
+                        } else if (userData.language_code) {
+                            // Для обычных пользователей используем язык из Telegram
+                            currentLanguage = userData.language_code;
+                        }
+                        
+                        // Обновляем текст на странице с новым языком
+                        updatePageText();
+                    }
+                }
+            } catch (error) {
+                console.error('Ошибка инициализации локализации:', error);
+                // Используем русский язык по умолчанию
+                currentLanguage = 'ru';
+                updatePageText();
+            }
+        }
+        
+        // Инициализируем локализацию при загрузке страницы
+        document.addEventListener('DOMContentLoaded', () => {
+            initLocalization();
+        });
     </script>
 </body>
 </html> 

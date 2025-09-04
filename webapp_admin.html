@@ -5,7 +5,7 @@
     <script src="/i18n-manager.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Админ-панель — Aaadviser</title>
+    <title id="pageTitleTag">Админ-панель — Aaadviser</title>
     <link rel="stylesheet" href="styles.css">
     <style>
         body { background: #f8f9fa; margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
@@ -31,26 +31,26 @@
 <body>
     <div class="container">
         <img src="/logo-flt.png" alt="Aaadviser Logo" class="admin-logo" />
-        <div class="admin-title">Админ-панель</div>
-        <button class="admin-btn admin-btn-yellow" onclick="makeBalance100()">
+        <div class="admin-title" id="adminTitle">Админ-панель</div>
+        <button class="admin-btn admin-btn-yellow" onclick="makeBalance100()" id="balanceBtn">
             <span class="admin-btn-icon">💰</span>
-            <span>Сделать баланс 100</span>
+            <span id="balanceBtnText">Сделать баланс 100</span>
         </button>
-        <button class="admin-btn" onclick="showUsersStats()">
+        <button class="admin-btn" onclick="showUsersStats()" id="usersBtn">
             <span class="admin-btn-icon">👥</span>
-            <span data-i18n="admin.users">Пользователи</span>
+            <span id="usersBtnText">Пользователи</span>
         </button>
-        <button class="admin-btn" onclick="showPublication()">
+        <button class="admin-btn" onclick="showPublication()" id="publicationBtn">
             <span class="admin-btn-icon">📢</span>
-            <span>Публикация</span>
+            <span id="publicationBtnText">Публикация</span>
         </button>
-        <button class="admin-btn" onclick="showSettings()">
+        <button class="admin-btn" onclick="showSettings()" id="settingsBtn">
             <span class="admin-btn-icon">⚙️</span>
-            <span data-i18n="common.settings">Настройки</span>
+            <span id="settingsBtnText">Настройки</span>
         </button>
         <div class="nav-btn-row">
-            <button class="nav-btn" onclick="goBack()" data-i18n="common.back">Назад</button>
-            <button class="nav-btn nav-btn-main" onclick="goToMainMenu()">В главное меню</button>
+            <button class="nav-btn" onclick="goBack()" id="backBtn">Назад</button>
+            <button class="nav-btn nav-btn-main" onclick="goToMainMenu()" id="mainMenuBtn">В главное меню</button>
         </div>
     </div>
     <div id="toastContainer" class="toast-container"></div>
@@ -72,7 +72,7 @@
                 try { userData = JSON.parse(localStorage.getItem('aaadviser_user')); } catch (e) { userData = null; }
             }
             if (!userData || !userData.id) {
-                alert('Пользователь не определён. Откройте WebApp из Telegram.');
+                alert(getText('userNotDefined'));
                 return;
             }
             const btn = event.target.closest('button');
@@ -85,19 +85,196 @@
             .then(res => res.json())
             .then(data => {
                 if (data.success) {
-                    btn.textContent = 'Баланс установлен: $100';
-                    showToast('Баланс успешно установлен!', 'success');
-                    setTimeout(() => { btn.textContent = 'Сделать баланс 100'; btn.disabled = false; }, 2000);
+                    btn.textContent = getText('balanceSetText');
+                    showToast(getText('balanceSuccess'), 'success');
+                    setTimeout(() => { btn.textContent = getText('balanceBtnText'); btn.disabled = false; }, 2000);
                 } else {
-                    showToast('Ошибка: ' + (data.error || 'Не удалось обновить баланс.'), 'error');
+                    showToast(getText('balanceError') + (data.error || getText('balanceUpdateError')), 'error');
                     btn.disabled = false;
                 }
             })
-            .catch(() => { showToast('Ошибка сети.', 'error'); btn.disabled = false; });
+            .catch(() => { showToast(getText('networkError'), 'error'); btn.disabled = false; });
         }
         function showUsersStats() { window.location.href = '/webapp_admin_users'; }
         function showPublication() { window.location.href = '/webapp_admin_publication'; }
         function showSettings() { window.location.href = '/webapp_admin_settings'; }
+    </script>
+
+    <!-- Локализация -->
+    <script>
+        let currentLanguage = 'ru';
+        
+        // Получаем данные пользователя из Telegram
+        async function getUserData() {
+            try {
+                const userData = window.Telegram.WebApp.initDataUnsafe.user;
+                if (!userData) {
+                    console.warn('Данные пользователя Telegram недоступны');
+                    return null;
+                }
+                return userData;
+            } catch (error) {
+                console.error('Ошибка получения данных пользователя:', error);
+                return null;
+            }
+        }
+        
+        // Словари локализации
+        const locales = {
+            ru: {
+                pageTitleTag: 'Админ-панель — Aaadviser',
+                adminTitle: 'Админ-панель',
+                balanceBtnText: 'Сделать баланс 100',
+                balanceSetText: 'Баланс установлен: $100',
+                usersBtnText: 'Пользователи',
+                publicationBtnText: 'Публикация',
+                settingsBtnText: 'Настройки',
+                backBtn: 'Назад',
+                mainMenuBtn: 'В главное меню',
+                userNotDefined: 'Пользователь не определён. Откройте WebApp из Telegram.',
+                balanceSuccess: 'Баланс успешно установлен!',
+                balanceError: 'Ошибка: ',
+                balanceUpdateError: 'Не удалось обновить баланс.',
+                networkError: 'Ошибка сети.'
+            },
+            en: {
+                pageTitleTag: 'Admin Panel — Aaadviser',
+                adminTitle: 'Admin Panel',
+                balanceBtnText: 'Set balance to 100',
+                balanceSetText: 'Balance set: $100',
+                usersBtnText: 'Users',
+                publicationBtnText: 'Publication',
+                settingsBtnText: 'Settings',
+                backBtn: 'Back',
+                mainMenuBtn: 'To Main Menu',
+                userNotDefined: 'User not defined. Open WebApp from Telegram.',
+                balanceSuccess: 'Balance successfully set!',
+                balanceError: 'Error: ',
+                balanceUpdateError: 'Failed to update balance.',
+                networkError: 'Network error.'
+            },
+            de: {
+                pageTitleTag: 'Admin-Panel — Aaadviser',
+                adminTitle: 'Admin-Panel',
+                balanceBtnText: 'Guthaben auf 100 setzen',
+                balanceSetText: 'Guthaben gesetzt: $100',
+                usersBtnText: 'Benutzer',
+                publicationBtnText: 'Veröffentlichung',
+                settingsBtnText: 'Einstellungen',
+                backBtn: 'Zurück',
+                mainMenuBtn: 'Zum Hauptmenü',
+                userNotDefined: 'Benutzer nicht definiert. Öffnen Sie WebApp aus Telegram.',
+                balanceSuccess: 'Guthaben erfolgreich gesetzt!',
+                balanceError: 'Fehler: ',
+                balanceUpdateError: 'Guthaben konnte nicht aktualisiert werden.',
+                networkError: 'Netzwerkfehler.'
+            },
+            fr: {
+                pageTitleTag: 'Panneau d\'administration — Aaadviser',
+                adminTitle: 'Panneau d\'administration',
+                balanceBtnText: 'Définir le solde à 100',
+                balanceSetText: 'Solde défini : $100',
+                usersBtnText: 'Utilisateurs',
+                publicationBtnText: 'Publication',
+                settingsBtnText: 'Paramètres',
+                backBtn: 'Retour',
+                mainMenuBtn: 'Au menu principal',
+                userNotDefined: 'Utilisateur non défini. Ouvrez WebApp depuis Telegram.',
+                balanceSuccess: 'Solde défini avec succès !',
+                balanceError: 'Erreur : ',
+                balanceUpdateError: 'Impossible de mettre à jour le solde.',
+                networkError: 'Erreur réseau.'
+            },
+            tr: {
+                pageTitleTag: 'Admin Paneli — Aaadviser',
+                adminTitle: 'Admin Paneli',
+                balanceBtnText: 'Bakiyeyi 100 yap',
+                balanceSetText: 'Bakiye ayarlandı: $100',
+                usersBtnText: 'Kullanıcılar',
+                publicationBtnText: 'Yayın',
+                settingsBtnText: 'Ayarlar',
+                backBtn: 'Geri',
+                mainMenuBtn: 'Ana Menüye',
+                userNotDefined: 'Kullanıcı tanımlanmadı. WebApp\'i Telegram\'dan açın.',
+                balanceSuccess: 'Bakiye başarıyla ayarlandı!',
+                balanceError: 'Hata: ',
+                balanceUpdateError: 'Bakiye güncellenemedi.',
+                networkError: 'Ağ hatası.'
+            }
+        };
+        
+        // Функция получения текста по ключу
+        function getText(key) {
+            return locales[currentLanguage][key] || key;
+        }
+        
+        // Функция обновления текста на странице
+        function updatePageText() {
+            // Обновляем title
+            document.getElementById('pageTitleTag').textContent = getText('pageTitleTag');
+            
+            // Обновляем основные элементы
+            const elements = [
+                'adminTitle', 'balanceBtnText', 'usersBtnText', 'publicationBtnText', 
+                'settingsBtnText', 'backBtn', 'mainMenuBtn'
+            ];
+            
+            elements.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.textContent = getText(id);
+                }
+            });
+        }
+        
+        // Функция инициализации локализации
+        async function initLocalization() {
+            try {
+                const userData = await getUserData();
+                if (userData && userData.language_code) {
+                    // Проверяем, является ли пользователь админом
+                    const response = await fetch('/api/user', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            telegram_id: userData.id,
+                            username: userData.username,
+                            tg_name: userData.first_name,
+                            last_name: userData.last_name,
+                            language_code: userData.language_code
+                        })
+                    });
+                    
+                    if (response.ok) {
+                        const userInfo = await response.json();
+                        
+                        // Устанавливаем язык в зависимости от статуса пользователя
+                        if (userInfo.user_status === 'admin' && userInfo.language) {
+                            // Для админов используем язык из базы данных
+                            currentLanguage = userInfo.language;
+                        } else if (userData.language_code) {
+                            // Для обычных пользователей используем язык из Telegram
+                            currentLanguage = userData.language_code;
+                        }
+                        
+                        // Обновляем текст на странице с новым языком
+                        updatePageText();
+                    }
+                }
+            } catch (error) {
+                console.error('Ошибка инициализации локализации:', error);
+                // Используем русский язык по умолчанию
+                currentLanguage = 'ru';
+                updatePageText();
+            }
+        }
+        
+        // Инициализируем локализацию при загрузке страницы
+        document.addEventListener('DOMContentLoaded', () => {
+            initLocalization();
+        });
     </script>
 </body>
 </html> 

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aaadviser - Оценка объекта</title>
+            <title id="pageTitleTag">Aaadviser - Оценка объекта</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="/i18n-manager.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -9803,6 +9803,290 @@
             if (event.key === 'Escape') {
                 closeShareModal();
             }
+        });
+    </script>
+    <script>
+        let currentLanguage = 'ru';
+
+        // Получаем данные пользователя
+        function getUserData() {
+            let tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
+            if (tg && tg.initDataUnsafe && tg.initDataUnsafe.user) {
+                return tg.initDataUnsafe.user;
+            }
+            try {
+                const stored = localStorage.getItem('aaadviser_user');
+                if (stored) return JSON.parse(stored);
+            } catch (e) {}
+            return null;
+        }
+
+        // Локализации
+        const locales = {
+            'ru': {
+                'pageTitleTag': 'Aaadviser - Оценка объекта',
+                'slogan': 'Инсайты рынка недвижимости',
+                'pageTitle': 'Оценка объекта',
+                'pageDescription': 'Получите профессиональную оценку стоимости недвижимости в выбранном регионе',
+                'countryLabel': 'Страна:',
+                'countryPlaceholder': 'Выберите страну',
+                'cityLabel': 'Город:',
+                'cityPlaceholder': 'Сначала выберите страну',
+                'countyLabel': 'Область/Регион:',
+                'countyPlaceholder': 'Сначала выберите город',
+                'districtLabel': 'Район:',
+                'districtPlaceholder': 'Сначала выберите область',
+                'listingTypeTitle': 'Выберите тип недвижимости для анализа:',
+                'houseTypeSubtitle': 'Количество спален:',
+                'houseTypePlaceholder': 'Выберите количество спален',
+                'floorSegmentSubtitle': 'Этаж:',
+                'floorSegmentPlaceholder': 'Выберите этаж',
+                'ageDataSubtitle': 'Возраст объекта:',
+                'ageDataPlaceholder': 'Выберите возраст объекта',
+                'heatingDataSubtitle': 'Тип отопления:',
+                'heatingDataPlaceholder': 'Выберите тип отопления',
+                'priceObjectSubtitle': 'Цена объекта:',
+                'priceObjectPlaceholder': 'Введите цену',
+                'currencyTitle': 'Выберите валюту:',
+                'areaObjectSubtitle': 'Площадь объекта (м²):',
+                'areaObjectPlaceholder': 'Введите площадь',
+                'confirmButtonText': 'Подтвердить выбор',
+                'selectedLocationTitle': 'Выбранная локация:',
+                'propertyTypesTitle': 'Выбранные характеристики недвижимости:',
+                'adminIdsTitle': 'ID для админов:',
+                'saveShareButtonText': 'Сохранить и поделиться отчетом',
+                'errorText': 'Ошибка загрузки данных',
+                'backButton': '← Вернуться в главное меню',
+                'modalTitle': 'Отчет сохранен',
+                'modalLink': 'Ссылка на отчет',
+                'copyButtonText': 'Копировать ссылку',
+                'closeButtonText': 'Закрыть',
+                'noDistrictOption': 'Не имеет значения',
+                'noData': 'Нет данных для отображения',
+                'noDataRange': 'Нет данных для отображения в выбранном диапазоне',
+                'reportNotFound': 'Отчет не найден'
+            },
+            'en': {
+                'pageTitleTag': 'Aaadviser - Property Evaluation',
+                'slogan': 'Real Estate Market Insights',
+                'pageTitle': 'Property Evaluation',
+                'pageDescription': 'Get professional property valuation in the selected region',
+                'countryLabel': 'Country:',
+                'countryPlaceholder': 'Select country',
+                'cityLabel': 'City:',
+                'cityPlaceholder': 'Select country first',
+                'countyLabel': 'Region/State:',
+                'countyPlaceholder': 'Select city first',
+                'districtLabel': 'District:',
+                'districtPlaceholder': 'Select region first',
+                'listingTypeTitle': 'Select property type for analysis:',
+                'houseTypeSubtitle': 'Number of bedrooms:',
+                'houseTypePlaceholder': 'Select number of bedrooms',
+                'floorSegmentSubtitle': 'Floor:',
+                'floorSegmentPlaceholder': 'Select floor',
+                'ageDataSubtitle': 'Property age:',
+                'ageDataPlaceholder': 'Select property age',
+                'heatingDataSubtitle': 'Heating type:',
+                'heatingDataPlaceholder': 'Select heating type',
+                'priceObjectSubtitle': 'Property price:',
+                'priceObjectPlaceholder': 'Enter price',
+                'currencyTitle': 'Select currency:',
+                'areaObjectSubtitle': 'Property area (m²):',
+                'areaObjectPlaceholder': 'Enter area',
+                'confirmButtonText': 'Confirm selection',
+                'selectedLocationTitle': 'Selected location:',
+                'propertyTypesTitle': 'Selected property characteristics:',
+                'adminIdsTitle': 'IDs for admins:',
+                'saveShareButtonText': 'Save and share report',
+                'errorText': 'Error loading data',
+                'backButton': '← Back to main menu',
+                'modalTitle': 'Report saved',
+                'modalLink': 'Report link',
+                'copyButtonText': 'Copy link',
+                'closeButtonText': 'Close',
+                'noDistrictOption': 'No preference',
+                'noData': 'No data to display',
+                'noDataRange': 'No data to display in selected range',
+                'reportNotFound': 'Report not found'
+            },
+            'de': {
+                'pageTitleTag': 'Aaadviser - Immobilienbewertung',
+                'slogan': 'Immobilienmarkt-Einblicke',
+                'pageTitle': 'Immobilienbewertung',
+                'pageDescription': 'Erhalten Sie professionelle Immobilienbewertung in der ausgewählten Region',
+                'countryLabel': 'Land:',
+                'countryPlaceholder': 'Land auswählen',
+                'cityLabel': 'Stadt:',
+                'cityPlaceholder': 'Zuerst Land auswählen',
+                'countyLabel': 'Region/Bundesland:',
+                'countyPlaceholder': 'Zuerst Stadt auswählen',
+                'districtLabel': 'Bezirk:',
+                'districtPlaceholder': 'Zuerst Region auswählen',
+                'listingTypeTitle': 'Immobilientyp für Analyse auswählen:',
+                'houseTypeSubtitle': 'Anzahl Schlafzimmer:',
+                'houseTypePlaceholder': 'Anzahl Schlafzimmer auswählen',
+                'floorSegmentSubtitle': 'Etage:',
+                'floorSegmentPlaceholder': 'Etage auswählen',
+                'ageDataSubtitle': 'Immobilienalter:',
+                'ageDataPlaceholder': 'Immobilienalter auswählen',
+                'heatingDataSubtitle': 'Heizungstyp:',
+                'heatingDataPlaceholder': 'Heizungstyp auswählen',
+                'priceObjectSubtitle': 'Immobilienpreis:',
+                'priceObjectPlaceholder': 'Preis eingeben',
+                'currencyTitle': 'Währung auswählen:',
+                'areaObjectSubtitle': 'Immobilienfläche (m²):',
+                'areaObjectPlaceholder': 'Fläche eingeben',
+                'confirmButtonText': 'Auswahl bestätigen',
+                'selectedLocationTitle': 'Ausgewählter Standort:',
+                'propertyTypesTitle': 'Ausgewählte Immobilienmerkmale:',
+                'adminIdsTitle': 'IDs für Administratoren:',
+                'saveShareButtonText': 'Bericht speichern und teilen',
+                'errorText': 'Fehler beim Laden der Daten',
+                'backButton': '← Zurück zum Hauptmenü',
+                'modalTitle': 'Bericht gespeichert',
+                'modalLink': 'Berichtslink',
+                'copyButtonText': 'Link kopieren',
+                'closeButtonText': 'Schließen',
+                'noDistrictOption': 'Keine Präferenz',
+                'noData': 'Keine Daten zur Anzeige',
+                'noDataRange': 'Keine Daten im ausgewählten Bereich',
+                'reportNotFound': 'Bericht nicht gefunden'
+            },
+            'fr': {
+                'pageTitleTag': 'Aaadviser - Évaluation immobilière',
+                'slogan': 'Aperçus du marché immobilier',
+                'pageTitle': 'Évaluation immobilière',
+                'pageDescription': 'Obtenez une évaluation immobilière professionnelle dans la région sélectionnée',
+                'countryLabel': 'Pays:',
+                'countryPlaceholder': 'Sélectionner le pays',
+                'cityLabel': 'Ville:',
+                'cityPlaceholder': 'Sélectionner d\'abord le pays',
+                'countyLabel': 'Région/État:',
+                'countyPlaceholder': 'Sélectionner d\'abord la ville',
+                'districtLabel': 'Quartier:',
+                'districtPlaceholder': 'Sélectionner d\'abord la région',
+                'listingTypeTitle': 'Sélectionner le type de propriété pour l\'analyse:',
+                'houseTypeSubtitle': 'Nombre de chambres:',
+                'houseTypePlaceholder': 'Sélectionner le nombre de chambres',
+                'floorSegmentSubtitle': 'Étage:',
+                'floorSegmentPlaceholder': 'Sélectionner l\'étage',
+                'ageDataSubtitle': 'Âge de la propriété:',
+                'ageDataPlaceholder': 'Sélectionner l\'âge de la propriété',
+                'heatingDataSubtitle': 'Type de chauffage:',
+                'heatingDataPlaceholder': 'Sélectionner le type de chauffage',
+                'priceObjectSubtitle': 'Prix de la propriété:',
+                'priceObjectPlaceholder': 'Entrer le prix',
+                'currencyTitle': 'Sélectionner la devise:',
+                'areaObjectSubtitle': 'Surface de la propriété (m²):',
+                'areaObjectPlaceholder': 'Entrer la surface',
+                'confirmButtonText': 'Confirmer la sélection',
+                'selectedLocationTitle': 'Emplacement sélectionné:',
+                'propertyTypesTitle': 'Caractéristiques sélectionnées:',
+                'adminIdsTitle': 'IDs pour les administrateurs:',
+                'saveShareButtonText': 'Sauvegarder et partager le rapport',
+                'errorText': 'Erreur de chargement des données',
+                'backButton': '← Retour au menu principal',
+                'modalTitle': 'Rapport sauvegardé',
+                'modalLink': 'Lien du rapport',
+                'copyButtonText': 'Copier le lien',
+                'closeButtonText': 'Fermer',
+                'noDistrictOption': 'Aucune préférence',
+                'noData': 'Aucune donnée à afficher',
+                'noDataRange': 'Aucune donnée dans la plage sélectionnée',
+                'reportNotFound': 'Rapport non trouvé'
+            },
+            'tr': {
+                'pageTitleTag': 'Aaadviser - Gayrimenkul Değerlendirmesi',
+                'slogan': 'Gayrimenkul Piyasası İçgörüleri',
+                'pageTitle': 'Gayrimenkul Değerlendirmesi',
+                'pageDescription': 'Seçilen bölgede profesyonel gayrimenkul değerlendirmesi alın',
+                'countryLabel': 'Ülke:',
+                'countryPlaceholder': 'Ülke seçin',
+                'cityLabel': 'Şehir:',
+                'cityPlaceholder': 'Önce ülke seçin',
+                'countyLabel': 'Bölge/Eyalet:',
+                'countyPlaceholder': 'Önce şehir seçin',
+                'districtLabel': 'İlçe:',
+                'districtPlaceholder': 'Önce bölge seçin',
+                'listingTypeTitle': 'Analiz için gayrimenkul türü seçin:',
+                'houseTypeSubtitle': 'Yatak odası sayısı:',
+                'houseTypePlaceholder': 'Yatak odası sayısını seçin',
+                'floorSegmentSubtitle': 'Kat:',
+                'floorSegmentPlaceholder': 'Kat seçin',
+                'ageDataSubtitle': 'Gayrimenkul yaşı:',
+                'ageDataPlaceholder': 'Gayrimenkul yaşını seçin',
+                'heatingDataSubtitle': 'Isıtma türü:',
+                'heatingDataPlaceholder': 'Isıtma türünü seçin',
+                'priceObjectSubtitle': 'Gayrimenkul fiyatı:',
+                'priceObjectPlaceholder': 'Fiyat girin',
+                'currencyTitle': 'Para birimi seçin:',
+                'areaObjectSubtitle': 'Gayrimenkul alanı (m²):',
+                'areaObjectPlaceholder': 'Alan girin',
+                'confirmButtonText': 'Seçimi onayla',
+                'selectedLocationTitle': 'Seçilen konum:',
+                'propertyTypesTitle': 'Seçilen gayrimenkul özellikleri:',
+                'adminIdsTitle': 'Yöneticiler için ID\'ler:',
+                'saveShareButtonText': 'Raporu kaydet ve paylaş',
+                'errorText': 'Veri yükleme hatası',
+                'backButton': '← Ana menüye dön',
+                'modalTitle': 'Rapor kaydedildi',
+                'modalLink': 'Rapor bağlantısı',
+                'copyButtonText': 'Bağlantıyı kopyala',
+                'closeButtonText': 'Kapat',
+                'noDistrictOption': 'Tercih yok',
+                'noData': 'Görüntülenecek veri yok',
+                'noDataRange': 'Seçilen aralıkta görüntülenecek veri yok',
+                'reportNotFound': 'Rapor bulunamadı'
+            }
+        };
+
+        // Функция для получения локализованного текста
+        function getText(key) {
+            const locale = locales[currentLanguage] || locales['ru'];
+            return locale[key] || key;
+        }
+
+        // Обновление текста на странице
+        function updatePageText() {
+            // Обновляем заголовок страницы
+            document.title = getText('pageTitleTag');
+            
+            // Обновляем основные элементы
+            const elements = [
+                'slogan', 'pageTitle', 'pageDescription', 'countryLabel', 'countryPlaceholder',
+                'cityLabel', 'cityPlaceholder', 'countyLabel', 'countyPlaceholder', 'districtLabel',
+                'districtPlaceholder', 'listingTypeTitle', 'houseTypeSubtitle', 'houseTypePlaceholder',
+                'floorSegmentSubtitle', 'floorSegmentPlaceholder', 'ageDataSubtitle', 'ageDataPlaceholder',
+                'heatingDataSubtitle', 'heatingDataPlaceholder', 'priceObjectSubtitle', 'priceObjectPlaceholder',
+                'currencyTitle', 'areaObjectSubtitle', 'areaObjectPlaceholder', 'confirmButtonText',
+                'selectedLocationTitle', 'propertyTypesTitle', 'adminIdsTitle', 'saveShareButtonText',
+                'errorText', 'backButton', 'modalTitle', 'modalLink', 'copyButtonText', 'closeButtonText'
+            ];
+            
+            elements.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    if (element.tagName === 'INPUT' && element.hasAttribute('placeholder')) {
+                        element.placeholder = getText(id);
+                    } else {
+                        element.textContent = getText(id);
+                    }
+                }
+            });
+        }
+
+        // Инициализация локализации
+        function initLocalization() {
+            const userData = getUserData();
+            if (userData && userData.language_code) {
+                currentLanguage = userData.language_code;
+            }
+            updatePageText();
+        }
+
+        // Запускаем локализацию при загрузке страницы
+        document.addEventListener('DOMContentLoaded', function() {
+            initLocalization();
         });
     </script>
 </body>
