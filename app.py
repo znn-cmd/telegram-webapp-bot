@@ -9091,8 +9091,386 @@ def api_translations():
         if language not in ['ru', 'en', 'de', 'fr', 'tr']:
             language = 'ru'
         
+        # Полные переводы для веб-интерфейса
+        full_translations = {
+            'ru': {
+                'common': {
+                    'loading': 'Загрузка...', 'error': 'Ошибка', 'success': 'Успешно',
+                    'cancel': 'Отмена', 'confirm': 'Подтвердить', 'back': 'Назад',
+                    'next': 'Далее', 'save': 'Сохранить', 'edit': 'Редактировать',
+                    'delete': 'Удалить', 'search': 'Поиск', 'filter': 'Фильтр',
+                    'sort': 'Сортировка', 'refresh': 'Обновить', 'close': 'Закрыть',
+                    'yes': 'Да', 'no': 'Нет', 'ok': 'OK', 'copy': 'Копировать',
+                    'download': 'Скачать', 'share': 'Поделиться', 'print': 'Печать',
+                    'export': 'Экспорт', 'import': 'Импорт', 'settings': 'Настройки',
+                    'profile': 'Профиль', 'logout': 'Выйти', 'login': 'Войти',
+                    'register': 'Регистрация', 'help': 'Помощь', 'support': 'Поддержка',
+                    'about': 'О нас', 'contact': 'Контакты', 'privacy': 'Конфиденциальность',
+                    'terms': 'Условия', 'language': 'Язык', 'currency': 'Валюта',
+                    'timezone': 'Часовой пояс', 'notifications': 'Уведомления',
+                    'dark_mode': 'Темная тема', 'light_mode': 'Светлая тема'
+                },
+                'profile': {
+                    'title': 'Личный кабинет', 'personal_info': 'Личная информация',
+                    'first_name': 'Имя', 'last_name': 'Фамилия', 'email': 'Email',
+                    'phone': 'Телефон', 'telegram': 'Telegram', 'balance': 'Баланс',
+                    'balance_amount': 'Баланс: $', 'top_up': 'Пополнить', 'withdraw': 'Вывести',
+                    'transaction_history': 'История транзакций', 'referral_program': 'Реферальная программа',
+                    'edit_profile': 'Редактировать профиль', 'language_settings': 'Настройки языка',
+                    'notification_settings': 'Настройки уведомлений', 'security_settings': 'Настройки безопасности',
+                    'account_info': 'Информация об аккаунте', 'user_id': 'ID пользователя',
+                    'registration_date': 'Дата регистрации', 'last_login': 'Последний вход',
+                    'status': 'Статус', 'admin': 'Администратор', 'user': 'Пользователь',
+                    'premium': 'Премиум', 'free': 'Бесплатный', 'change_password': 'Изменить пароль',
+                    'delete_account': 'Удалить аккаунт', 'save_changes': 'Сохранить изменения',
+                    'changes_saved': 'Изменения сохранены', 'error_saving': 'Ошибка сохранения',
+                    'profile_updated': 'Профиль обновлен', 'password_changed': 'Пароль изменен',
+                    'account_deleted': 'Аккаунт удален'
+                },
+                'balance': {
+                    'title': 'Баланс', 'current_balance': 'Текущий баланс',
+                    'top_up_balance': 'Пополнить баланс', 'withdraw_funds': 'Вывести средства',
+                    'transaction_history': 'История транзакций', 'amount': 'Сумма', 'date': 'Дата',
+                    'type': 'Тип', 'status': 'Статус', 'description': 'Описание', 'income': 'Пополнение',
+                    'expense': 'Списание', 'pending': 'В обработке', 'completed': 'Завершено',
+                    'failed': 'Ошибка', 'payment_method': 'Способ оплаты', 'card': 'Карта',
+                    'bank_transfer': 'Банковский перевод', 'crypto': 'Криптовалюта',
+                    'min_amount': 'Минимальная сумма', 'max_amount': 'Максимальная сумма',
+                    'fee': 'Комиссия', 'total': 'Итого'
+                },
+                'reports': {
+                    'title': 'Отчеты', 'my_reports': 'Мои отчеты', 'create_report': 'Создать отчет',
+                    'report_details': 'Детали отчета', 'report_type': 'Тип отчета',
+                    'property_evaluation': 'Оценка недвижимости', 'market_analysis': 'Анализ рынка',
+                    'investment_analysis': 'Инвестиционный анализ', 'region_analytics': 'Аналитика региона',
+                    'full_report': 'Полный отчет', 'report_date': 'Дата отчета',
+                    'property_address': 'Адрес объекта', 'property_type': 'Тип недвижимости',
+                    'property_area': 'Площадь', 'property_price': 'Цена', 'market_value': 'Рыночная стоимость',
+                    'investment_potential': 'Инвестиционный потенциал', 'risk_level': 'Уровень риска',
+                    'recommendations': 'Рекомендации', 'download_report': 'Скачать отчет',
+                    'share_report': 'Поделиться отчетом', 'delete_report': 'Удалить отчет',
+                    'edit_report': 'Редактировать отчет', 'save_report': 'Сохранить отчет',
+                    'report_saved': 'Отчет сохранен', 'report_deleted': 'Отчет удален',
+                    'report_shared': 'Отчет отправлен', 'liquidity': 'Ликвидность'
+                },
+                'main': {
+                    'title': 'Главное меню', 'welcome': 'Добро пожаловать',
+                    'quick_actions': 'Быстрые действия', 'recent_reports': 'Последние отчеты',
+                    'popular_services': 'Популярные услуги', 'news': 'Новости',
+                    'notifications': 'Уведомления', 'menu': 'Меню', 'home': 'Главная',
+                    'reports': 'Отчеты', 'analytics': 'Аналитика', 'profile': 'Профиль',
+                    'help': 'Помощь', 'settings': 'Настройки'
+                },
+                'admin': {
+                    'title': 'Админ панель', 'users': 'Пользователи', 'publications': 'Публикации',
+                    'settings': 'Настройки', 'statistics': 'Статистика', 'user_management': 'Управление пользователями',
+                    'content_management': 'Управление контентом', 'system_settings': 'Системные настройки',
+                    'backup': 'Резервное копирование', 'logs': 'Логи', 'security': 'Безопасность'
+                }
+            },
+            'de': {
+                'common': {
+                    'loading': 'Laden...', 'error': 'Fehler', 'success': 'Erfolg',
+                    'cancel': 'Abbrechen', 'confirm': 'Bestätigen', 'back': 'Zurück',
+                    'next': 'Weiter', 'save': 'Speichern', 'edit': 'Bearbeiten',
+                    'delete': 'Löschen', 'search': 'Suchen', 'filter': 'Filter',
+                    'sort': 'Sortieren', 'refresh': 'Aktualisieren', 'close': 'Schließen',
+                    'yes': 'Ja', 'no': 'Nein', 'ok': 'OK', 'copy': 'Kopieren',
+                    'download': 'Herunterladen', 'share': 'Teilen', 'print': 'Drucken',
+                    'export': 'Exportieren', 'import': 'Importieren', 'settings': 'Einstellungen',
+                    'profile': 'Profil', 'logout': 'Abmelden', 'login': 'Anmelden',
+                    'register': 'Registrieren', 'help': 'Hilfe', 'support': 'Support',
+                    'about': 'Über uns', 'contact': 'Kontakt', 'privacy': 'Datenschutz',
+                    'terms': 'Bedingungen', 'language': 'Sprache', 'currency': 'Währung',
+                    'timezone': 'Zeitzone', 'notifications': 'Benachrichtigungen',
+                    'dark_mode': 'Dunkler Modus', 'light_mode': 'Heller Modus'
+                },
+                'profile': {
+                    'title': 'Profil', 'personal_info': 'Persönliche Informationen',
+                    'first_name': 'Vorname', 'last_name': 'Nachname', 'email': 'E-Mail',
+                    'phone': 'Telefon', 'telegram': 'Telegram', 'balance': 'Kontostand',
+                    'balance_amount': 'Kontostand: $', 'top_up': 'Aufladen', 'withdraw': 'Abheben',
+                    'transaction_history': 'Transaktionsverlauf', 'referral_program': 'Empfehlungsprogramm',
+                    'edit_profile': 'Profil bearbeiten', 'language_settings': 'Spracheinstellungen',
+                    'notification_settings': 'Benachrichtigungseinstellungen', 'security_settings': 'Sicherheitseinstellungen',
+                    'account_info': 'Kontoinformationen', 'user_id': 'Benutzer-ID',
+                    'registration_date': 'Registrierungsdatum', 'last_login': 'Letzter Login',
+                    'status': 'Status', 'admin': 'Administrator', 'user': 'Benutzer',
+                    'premium': 'Premium', 'free': 'Kostenlos', 'change_password': 'Passwort ändern',
+                    'delete_account': 'Konto löschen', 'save_changes': 'Änderungen speichern',
+                    'changes_saved': 'Änderungen gespeichert', 'error_saving': 'Fehler beim Speichern',
+                    'profile_updated': 'Profil aktualisiert', 'password_changed': 'Passwort geändert',
+                    'account_deleted': 'Konto gelöscht'
+                },
+                'balance': {
+                    'title': 'Kontostand', 'current_balance': 'Aktueller Kontostand',
+                    'top_up_balance': 'Kontostand aufladen', 'withdraw_funds': 'Geld abheben',
+                    'transaction_history': 'Transaktionsverlauf', 'amount': 'Betrag', 'date': 'Datum',
+                    'type': 'Typ', 'status': 'Status', 'description': 'Beschreibung', 'income': 'Einnahmen',
+                    'expense': 'Ausgaben', 'pending': 'Ausstehend', 'completed': 'Abgeschlossen',
+                    'failed': 'Fehlgeschlagen', 'payment_method': 'Zahlungsmethode', 'card': 'Karte',
+                    'bank_transfer': 'Banküberweisung', 'crypto': 'Kryptowährung',
+                    'min_amount': 'Mindestbetrag', 'max_amount': 'Höchstbetrag',
+                    'fee': 'Gebühr', 'total': 'Gesamt'
+                },
+                'reports': {
+                    'title': 'Berichte', 'my_reports': 'Meine Berichte', 'create_report': 'Bericht erstellen',
+                    'report_details': 'Berichtsdetails', 'report_type': 'Berichtstyp',
+                    'property_evaluation': 'Immobilienbewertung', 'market_analysis': 'Marktanalyse',
+                    'investment_analysis': 'Investitionsanalyse', 'region_analytics': 'Regionsanalytik',
+                    'full_report': 'Vollständiger Bericht', 'report_date': 'Berichtsdatum',
+                    'property_address': 'Immobilienadresse', 'property_type': 'Immobilientyp',
+                    'property_area': 'Fläche', 'property_price': 'Preis', 'market_value': 'Marktwert',
+                    'investment_potential': 'Investitionspotenzial', 'risk_level': 'Risikolevel',
+                    'recommendations': 'Empfehlungen', 'download_report': 'Bericht herunterladen',
+                    'share_report': 'Bericht teilen', 'delete_report': 'Bericht löschen',
+                    'edit_report': 'Bericht bearbeiten', 'save_report': 'Bericht speichern',
+                    'report_saved': 'Bericht gespeichert', 'report_deleted': 'Bericht gelöscht',
+                    'report_shared': 'Bericht geteilt', 'liquidity': 'Liquidität'
+                },
+                'main': {
+                    'title': 'Hauptmenü', 'welcome': 'Willkommen',
+                    'quick_actions': 'Schnellaktionen', 'recent_reports': 'Letzte Berichte',
+                    'popular_services': 'Beliebte Dienste', 'news': 'Nachrichten',
+                    'notifications': 'Benachrichtigungen', 'menu': 'Menü', 'home': 'Startseite',
+                    'reports': 'Berichte', 'analytics': 'Analytik', 'profile': 'Profil',
+                    'help': 'Hilfe', 'settings': 'Einstellungen'
+                },
+                'admin': {
+                    'title': 'Admin-Panel', 'users': 'Benutzer', 'publications': 'Veröffentlichungen',
+                    'settings': 'Einstellungen', 'statistics': 'Statistiken', 'user_management': 'Benutzerverwaltung',
+                    'content_management': 'Inhaltsverwaltung', 'system_settings': 'Systemeinstellungen',
+                    'backup': 'Backup', 'logs': 'Protokolle', 'security': 'Sicherheit'
+                }
+            },
+            'fr': {
+                'common': {
+                    'loading': 'Chargement...', 'error': 'Erreur', 'success': 'Succès',
+                    'cancel': 'Annuler', 'confirm': 'Confirmer', 'back': 'Retour',
+                    'next': 'Suivant', 'save': 'Enregistrer', 'edit': 'Modifier',
+                    'delete': 'Supprimer', 'search': 'Rechercher', 'filter': 'Filtrer',
+                    'sort': 'Trier', 'refresh': 'Actualiser', 'close': 'Fermer',
+                    'yes': 'Oui', 'no': 'Non', 'ok': 'OK', 'copy': 'Copier',
+                    'download': 'Télécharger', 'share': 'Partager', 'print': 'Imprimer',
+                    'export': 'Exporter', 'import': 'Importer', 'settings': 'Paramètres',
+                    'profile': 'Profil', 'logout': 'Déconnexion', 'login': 'Connexion',
+                    'register': 'S\'inscrire', 'help': 'Aide', 'support': 'Support',
+                    'about': 'À propos', 'contact': 'Contact', 'privacy': 'Confidentialité',
+                    'terms': 'Conditions', 'language': 'Langue', 'currency': 'Devise',
+                    'timezone': 'Fuseau horaire', 'notifications': 'Notifications',
+                    'dark_mode': 'Mode sombre', 'light_mode': 'Mode clair'
+                },
+                'profile': {
+                    'title': 'Profil', 'personal_info': 'Informations personnelles',
+                    'first_name': 'Prénom', 'last_name': 'Nom', 'email': 'E-mail',
+                    'phone': 'Téléphone', 'telegram': 'Telegram', 'balance': 'Solde',
+                    'balance_amount': 'Solde: $', 'top_up': 'Recharger', 'withdraw': 'Retirer',
+                    'transaction_history': 'Historique des transactions', 'referral_program': 'Programme de parrainage',
+                    'edit_profile': 'Modifier le profil', 'language_settings': 'Paramètres de langue',
+                    'notification_settings': 'Paramètres de notification', 'security_settings': 'Paramètres de sécurité',
+                    'account_info': 'Informations du compte', 'user_id': 'ID utilisateur',
+                    'registration_date': 'Date d\'inscription', 'last_login': 'Dernière connexion',
+                    'status': 'Statut', 'admin': 'Administrateur', 'user': 'Utilisateur',
+                    'premium': 'Premium', 'free': 'Gratuit', 'change_password': 'Changer le mot de passe',
+                    'delete_account': 'Supprimer le compte', 'save_changes': 'Enregistrer les modifications',
+                    'changes_saved': 'Modifications enregistrées', 'error_saving': 'Erreur lors de l\'enregistrement',
+                    'profile_updated': 'Profil mis à jour', 'password_changed': 'Mot de passe changé',
+                    'account_deleted': 'Compte supprimé'
+                },
+                'balance': {
+                    'title': 'Solde', 'current_balance': 'Solde actuel',
+                    'top_up_balance': 'Recharger le solde', 'withdraw_funds': 'Retirer des fonds',
+                    'transaction_history': 'Historique des transactions', 'amount': 'Montant', 'date': 'Date',
+                    'type': 'Type', 'status': 'Statut', 'description': 'Description', 'income': 'Revenus',
+                    'expense': 'Dépenses', 'pending': 'En attente', 'completed': 'Terminé',
+                    'failed': 'Échoué', 'payment_method': 'Méthode de paiement', 'card': 'Carte',
+                    'bank_transfer': 'Virement bancaire', 'crypto': 'Cryptomonnaie',
+                    'min_amount': 'Montant minimum', 'max_amount': 'Montant maximum',
+                    'fee': 'Frais', 'total': 'Total'
+                },
+                'reports': {
+                    'title': 'Rapports', 'my_reports': 'Mes rapports', 'create_report': 'Créer un rapport',
+                    'report_details': 'Détails du rapport', 'report_type': 'Type de rapport',
+                    'property_evaluation': 'Évaluation immobilière', 'market_analysis': 'Analyse de marché',
+                    'investment_analysis': 'Analyse d\'investissement', 'region_analytics': 'Analytique de région',
+                    'full_report': 'Rapport complet', 'report_date': 'Date du rapport',
+                    'property_address': 'Adresse de la propriété', 'property_type': 'Type de propriété',
+                    'property_area': 'Surface', 'property_price': 'Prix', 'market_value': 'Valeur marchande',
+                    'investment_potential': 'Potentiel d\'investissement', 'risk_level': 'Niveau de risque',
+                    'recommendations': 'Recommandations', 'download_report': 'Télécharger le rapport',
+                    'share_report': 'Partager le rapport', 'delete_report': 'Supprimer le rapport',
+                    'edit_report': 'Modifier le rapport', 'save_report': 'Enregistrer le rapport',
+                    'report_saved': 'Rapport enregistré', 'report_deleted': 'Rapport supprimé',
+                    'report_shared': 'Rapport partagé', 'liquidity': 'Liquidité'
+                },
+                'main': {
+                    'title': 'Menu principal', 'welcome': 'Bienvenue',
+                    'quick_actions': 'Actions rapides', 'recent_reports': 'Rapports récents',
+                    'popular_services': 'Services populaires', 'news': 'Actualités',
+                    'notifications': 'Notifications', 'menu': 'Menu', 'home': 'Accueil',
+                    'reports': 'Rapports', 'analytics': 'Analytique', 'profile': 'Profil',
+                    'help': 'Aide', 'settings': 'Paramètres'
+                },
+                'admin': {
+                    'title': 'Panneau d\'administration', 'users': 'Utilisateurs', 'publications': 'Publications',
+                    'settings': 'Paramètres', 'statistics': 'Statistiques', 'user_management': 'Gestion des utilisateurs',
+                    'content_management': 'Gestion du contenu', 'system_settings': 'Paramètres système',
+                    'backup': 'Sauvegarde', 'logs': 'Journaux', 'security': 'Sécurité'
+                }
+            },
+            'tr': {
+                'common': {
+                    'loading': 'Yükleniyor...', 'error': 'Hata', 'success': 'Başarılı',
+                    'cancel': 'İptal', 'confirm': 'Onayla', 'back': 'Geri',
+                    'next': 'İleri', 'save': 'Kaydet', 'edit': 'Düzenle',
+                    'delete': 'Sil', 'search': 'Ara', 'filter': 'Filtre',
+                    'sort': 'Sırala', 'refresh': 'Yenile', 'close': 'Kapat',
+                    'yes': 'Evet', 'no': 'Hayır', 'ok': 'Tamam', 'copy': 'Kopyala',
+                    'download': 'İndir', 'share': 'Paylaş', 'print': 'Yazdır',
+                    'export': 'Dışa aktar', 'import': 'İçe aktar', 'settings': 'Ayarlar',
+                    'profile': 'Profil', 'logout': 'Çıkış', 'login': 'Giriş',
+                    'register': 'Kayıt ol', 'help': 'Yardım', 'support': 'Destek',
+                    'about': 'Hakkında', 'contact': 'İletişim', 'privacy': 'Gizlilik',
+                    'terms': 'Şartlar', 'language': 'Dil', 'currency': 'Para birimi',
+                    'timezone': 'Saat dilimi', 'notifications': 'Bildirimler',
+                    'dark_mode': 'Karanlık mod', 'light_mode': 'Aydınlık mod'
+                },
+                'profile': {
+                    'title': 'Profil', 'personal_info': 'Kişisel bilgiler',
+                    'first_name': 'Ad', 'last_name': 'Soyad', 'email': 'E-posta',
+                    'phone': 'Telefon', 'telegram': 'Telegram', 'balance': 'Bakiye',
+                    'balance_amount': 'Bakiye: $', 'top_up': 'Yükle', 'withdraw': 'Çek',
+                    'transaction_history': 'İşlem geçmişi', 'referral_program': 'Referans programı',
+                    'edit_profile': 'Profili düzenle', 'language_settings': 'Dil ayarları',
+                    'notification_settings': 'Bildirim ayarları', 'security_settings': 'Güvenlik ayarları',
+                    'account_info': 'Hesap bilgileri', 'user_id': 'Kullanıcı ID',
+                    'registration_date': 'Kayıt tarihi', 'last_login': 'Son giriş',
+                    'status': 'Durum', 'admin': 'Yönetici', 'user': 'Kullanıcı',
+                    'premium': 'Premium', 'free': 'Ücretsiz', 'change_password': 'Şifre değiştir',
+                    'delete_account': 'Hesabı sil', 'save_changes': 'Değişiklikleri kaydet',
+                    'changes_saved': 'Değişiklikler kaydedildi', 'error_saving': 'Kaydetme hatası',
+                    'profile_updated': 'Profil güncellendi', 'password_changed': 'Şifre değiştirildi',
+                    'account_deleted': 'Hesap silindi'
+                },
+                'balance': {
+                    'title': 'Bakiye', 'current_balance': 'Mevcut bakiye',
+                    'top_up_balance': 'Bakiyeyi yükle', 'withdraw_funds': 'Para çek',
+                    'transaction_history': 'İşlem geçmişi', 'amount': 'Tutar', 'date': 'Tarih',
+                    'type': 'Tür', 'status': 'Durum', 'description': 'Açıklama', 'income': 'Gelir',
+                    'expense': 'Gider', 'pending': 'Beklemede', 'completed': 'Tamamlandı',
+                    'failed': 'Başarısız', 'payment_method': 'Ödeme yöntemi', 'card': 'Kart',
+                    'bank_transfer': 'Banka transferi', 'crypto': 'Kripto para',
+                    'min_amount': 'Minimum tutar', 'max_amount': 'Maksimum tutar',
+                    'fee': 'Ücret', 'total': 'Toplam'
+                },
+                'reports': {
+                    'title': 'Raporlar', 'my_reports': 'Raporlarım', 'create_report': 'Rapor oluştur',
+                    'report_details': 'Rapor detayları', 'report_type': 'Rapor türü',
+                    'property_evaluation': 'Emlak değerlendirmesi', 'market_analysis': 'Pazar analizi',
+                    'investment_analysis': 'Yatırım analizi', 'region_analytics': 'Bölge analitiği',
+                    'full_report': 'Tam rapor', 'report_date': 'Rapor tarihi',
+                    'property_address': 'Emlak adresi', 'property_type': 'Emlak türü',
+                    'property_area': 'Alan', 'property_price': 'Fiyat', 'market_value': 'Piyasa değeri',
+                    'investment_potential': 'Yatırım potansiyeli', 'risk_level': 'Risk seviyesi',
+                    'recommendations': 'Öneriler', 'download_report': 'Raporu indir',
+                    'share_report': 'Raporu paylaş', 'delete_report': 'Raporu sil',
+                    'edit_report': 'Raporu düzenle', 'save_report': 'Raporu kaydet',
+                    'report_saved': 'Rapor kaydedildi', 'report_deleted': 'Rapor silindi',
+                    'report_shared': 'Rapor paylaşıldı', 'liquidity': 'Likidite'
+                },
+                'main': {
+                    'title': 'Ana menü', 'welcome': 'Hoş geldiniz',
+                    'quick_actions': 'Hızlı işlemler', 'recent_reports': 'Son raporlar',
+                    'popular_services': 'Popüler hizmetler', 'news': 'Haberler',
+                    'notifications': 'Bildirimler', 'menu': 'Menü', 'home': 'Ana sayfa',
+                    'reports': 'Raporlar', 'analytics': 'Analitik', 'profile': 'Profil',
+                    'help': 'Yardım', 'settings': 'Ayarlar'
+                },
+                'admin': {
+                    'title': 'Yönetici paneli', 'users': 'Kullanıcılar', 'publications': 'Yayınlar',
+                    'settings': 'Ayarlar', 'statistics': 'İstatistikler', 'user_management': 'Kullanıcı yönetimi',
+                    'content_management': 'İçerik yönetimi', 'system_settings': 'Sistem ayarları',
+                    'backup': 'Yedekleme', 'logs': 'Günlükler', 'security': 'Güvenlik'
+                }
+            },
+            'en': {
+                'common': {
+                    'loading': 'Loading...', 'error': 'Error', 'success': 'Success',
+                    'cancel': 'Cancel', 'confirm': 'Confirm', 'back': 'Back',
+                    'next': 'Next', 'save': 'Save', 'edit': 'Edit', 'delete': 'Delete',
+                    'search': 'Search', 'filter': 'Filter', 'sort': 'Sort', 'refresh': 'Refresh',
+                    'close': 'Close', 'yes': 'Yes', 'no': 'No', 'ok': 'OK', 'copy': 'Copy',
+                    'download': 'Download', 'share': 'Share', 'print': 'Print',
+                    'export': 'Export', 'import': 'Import', 'settings': 'Settings',
+                    'profile': 'Profile', 'logout': 'Logout', 'login': 'Login',
+                    'register': 'Register', 'help': 'Help', 'support': 'Support',
+                    'about': 'About', 'contact': 'Contact', 'privacy': 'Privacy',
+                    'terms': 'Terms', 'language': 'Language', 'currency': 'Currency',
+                    'timezone': 'Timezone', 'notifications': 'Notifications',
+                    'dark_mode': 'Dark Mode', 'light_mode': 'Light Mode'
+                },
+                'profile': {
+                    'title': 'Profile', 'personal_info': 'Personal Information',
+                    'first_name': 'First Name', 'last_name': 'Last Name', 'email': 'Email',
+                    'phone': 'Phone', 'telegram': 'Telegram', 'balance': 'Balance',
+                    'balance_amount': 'Balance: $', 'top_up': 'Top Up', 'withdraw': 'Withdraw',
+                    'transaction_history': 'Transaction History', 'referral_program': 'Referral Program',
+                    'edit_profile': 'Edit Profile', 'language_settings': 'Language Settings',
+                    'notification_settings': 'Notification Settings', 'security_settings': 'Security Settings',
+                    'account_info': 'Account Information', 'user_id': 'User ID',
+                    'registration_date': 'Registration Date', 'last_login': 'Last Login',
+                    'status': 'Status', 'admin': 'Administrator', 'user': 'User',
+                    'premium': 'Premium', 'free': 'Free', 'change_password': 'Change Password',
+                    'delete_account': 'Delete Account', 'save_changes': 'Save Changes',
+                    'changes_saved': 'Changes Saved', 'error_saving': 'Error Saving',
+                    'profile_updated': 'Profile Updated', 'password_changed': 'Password Changed',
+                    'account_deleted': 'Account Deleted'
+                },
+                'balance': {
+                    'title': 'Balance', 'current_balance': 'Current Balance',
+                    'top_up_balance': 'Top Up Balance', 'withdraw_funds': 'Withdraw Funds',
+                    'transaction_history': 'Transaction History', 'amount': 'Amount', 'date': 'Date',
+                    'type': 'Type', 'status': 'Status', 'description': 'Description', 'income': 'Income',
+                    'expense': 'Expense', 'pending': 'Pending', 'completed': 'Completed',
+                    'failed': 'Failed', 'payment_method': 'Payment Method', 'card': 'Card',
+                    'bank_transfer': 'Bank Transfer', 'crypto': 'Cryptocurrency',
+                    'min_amount': 'Minimum Amount', 'max_amount': 'Maximum Amount',
+                    'fee': 'Fee', 'total': 'Total'
+                },
+                'reports': {
+                    'title': 'Reports', 'my_reports': 'My Reports', 'create_report': 'Create Report',
+                    'report_details': 'Report Details', 'report_type': 'Report Type',
+                    'property_evaluation': 'Property Evaluation', 'market_analysis': 'Market Analysis',
+                    'investment_analysis': 'Investment Analysis', 'region_analytics': 'Region Analytics',
+                    'full_report': 'Full Report', 'report_date': 'Report Date',
+                    'property_address': 'Property Address', 'property_type': 'Property Type',
+                    'property_area': 'Area', 'property_price': 'Price', 'market_value': 'Market Value',
+                    'investment_potential': 'Investment Potential', 'risk_level': 'Risk Level',
+                    'recommendations': 'Recommendations', 'download_report': 'Download Report',
+                    'share_report': 'Share Report', 'delete_report': 'Delete Report',
+                    'edit_report': 'Edit Report', 'save_report': 'Save Report',
+                    'report_saved': 'Report Saved', 'report_deleted': 'Report Deleted',
+                    'report_shared': 'Report Shared', 'liquidity': 'Liquidity'
+                },
+                'main': {
+                    'title': 'Main Menu', 'welcome': 'Welcome',
+                    'quick_actions': 'Quick Actions', 'recent_reports': 'Recent Reports',
+                    'popular_services': 'Popular Services', 'news': 'News',
+                    'notifications': 'Notifications', 'menu': 'Menu', 'home': 'Home',
+                    'reports': 'Reports', 'analytics': 'Analytics', 'profile': 'Profile',
+                    'help': 'Help', 'settings': 'Settings'
+                },
+                'admin': {
+                    'title': 'Admin Panel', 'users': 'Users', 'publications': 'Publications',
+                    'settings': 'Settings', 'statistics': 'Statistics', 'user_management': 'User Management',
+                    'content_management': 'Content Management', 'system_settings': 'System Settings',
+                    'backup': 'Backup', 'logs': 'Logs', 'security': 'Security'
+                }
+            }
+        }
+        
         # Возвращаем переводы для запрошенного языка
-        return jsonify(locales.get(language, locales['ru']))
+        return jsonify(full_translations.get(language, full_translations['ru']))
         
     except Exception as e:
         logger.error(f"❌ Ошибка API translations: {e}")
