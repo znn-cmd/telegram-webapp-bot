@@ -1,13 +1,14 @@
 <!DOCTYPE html>
+
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aaadviser - Оценка объекта</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <script src="/i18n-manager.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Aaadviser - Оценка объекта</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script src="/i18n-manager.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
         * {
             margin: 0;
             padding: 0;
@@ -3658,192 +3659,165 @@
     </style>
 </head>
 <body>
-    <div class="container">
-        <!-- Логотип -->
-        <div style="display:flex;flex-direction:column;align-items:center;margin-top:18px;margin-bottom:10px;">
-            <img src="logo-flt.png" alt="Aaadviser Logo" style="width:110px;height:auto;display:block;margin-bottom:8px;cursor:pointer;" onclick="goToMainMenu()" />
-            <div style="font-size:15px;color:#888;font-style:italic;" id="slogan">Инсайты рынка недвижимости</div>
-        </div>
-
-        <!-- Заголовок страницы -->
-        <div class="page-title" id="pageTitle">Оценка объекта</div>
-        <div class="page-description" id="pageDescription">Получите профессиональную оценку стоимости недвижимости в выбранном регионе</div>
-
-        <!-- Форма выбора локации -->
-        <div class="location-form" id="locationForm">
-            <div class="form-group">
-                <label for="countrySelect" id="countryLabel">Страна:</label>
-                <select id="countrySelect" onchange="onCountryChange()">
-                    <option value="" id="countryPlaceholder">Выберите страну</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label for="citySelect" id="cityLabel">Город:</label>
-                <select id="citySelect" disabled onchange="onCityChange()">
-                    <option value="" id="cityPlaceholder">Сначала выберите страну</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label for="countySelect" id="countyLabel">Область/Регион:</label>
-                <select id="countySelect" disabled onchange="onCountyChange()">
-                    <option value="" id="countyPlaceholder">Сначала выберите город</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label for="districtSelect" id="districtLabel">Район:</label>
-                <select id="districtSelect" disabled onchange="onDistrictChange()">
-                    <option value="" id="districtPlaceholder">Сначала выберите область</option>
-                </select>
-            </div>
-
-                            <!-- Listing Type Selection -->
-                <div class="listing-type-section" id="listingTypeSection" style="display: none;">
-                    <div class="listing-type-title" id="listingTypeTitle">Выберите тип недвижимости для анализа:</div>
-                    
-                    <!-- House Type Listing Types -->
-                    <div class="listing-type-group">
-                        <div class="listing-type-subtitle" id="houseTypeSubtitle">Количество спален:</div>
-                        <select class="listing-type-select" id="houseTypeSelect">
-                            <option value="" id="houseTypePlaceholder">Выберите количество спален</option>
-                        </select>
-                    </div>
-
-                    <!-- Floor Segment Listing Types -->
-                    <div class="listing-type-group">
-                        <div class="listing-type-subtitle" id="floorSegmentSubtitle">Этаж:</div>
-                        <select class="listing-type-select" id="floorSegmentSelect">
-                            <option value="" id="floorSegmentPlaceholder">Выберите этаж</option>
-                        </select>
-                    </div>
-
-                    <!-- Age Data Listing Types -->
-                    <div class="listing-type-group">
-                        <div class="listing-type-subtitle" id="ageDataSubtitle">Возраст объекта:</div>
-                        <select class="listing-type-select" id="ageDataSelect">
-                            <option value="" id="ageDataPlaceholder">Выберите возраст объекта</option>
-                        </select>
-                    </div>
-
-                    <!-- Heating Data Listing Types -->
-                    <div class="listing-type-group">
-                        <div class="listing-type-subtitle" id="heatingDataSubtitle">Тип отопления:</div>
-                        <select class="listing-type-select" id="heatingDataSelect">
-                            <option value="" id="heatingDataPlaceholder">Выберите тип отопления</option>
-                        </select>
-                    </div>
-
-                    <!-- Price Object -->
-                    <div class="listing-type-group">
-                        <div class="listing-type-subtitle" id="priceObjectSubtitle">Цена объекта:</div>
-                        <input type="number" id="priceObjectInput" class="listing-type-input" placeholder="Введите цену">
-                        
-                        <!-- Currency Selection -->
-                        <div class="currency-buttons-container">
-                            <div class="currency-buttons-title" id="currencyTitle">Выберите валюту:</div>
-                            <div class="currency-buttons">
-                                <button type="button" class="currency-button" data-currency="TRY">
-                                    <span class="currency-symbol">₺</span>
-                                </button>
-                                <button type="button" class="currency-button" data-currency="EUR">
-                                    <span class="currency-symbol">€</span>
-                                </button>
-                                <button type="button" class="currency-button" data-currency="USD">
-                                    <span class="currency-symbol">$</span>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Area Object -->
-                    <div class="listing-type-group">
-                        <div class="listing-type-subtitle" id="areaObjectSubtitle">Площадь объекта (м²):</div>
-                        <input type="number" id="areaObjectInput" class="listing-type-input" placeholder="Введите площадь" min="10" max="1000">
-                    </div>
-                </div>
-
-            <button class="confirm-button" id="confirmButton" onclick="confirmLocation()" disabled>
-                <span id="confirmButtonText">Подтвердить выбор</span>
-            </button>
-        </div>
-
-        <!-- Выбранная локация -->
-        <div class="selected-location" id="selectedLocation" style="display: none;">
-            <div class="location-title" id="selectedLocationTitle">Выбранная локация:</div>
-            <div class="location-details" id="locationDetails"></div>
-            
-            <!-- Выбранные характеристики недвижимости -->
-            <div class="selected-property-types" id="selectedPropertyTypes" style="display: none;">
-                <div class="property-types-title" id="propertyTypesTitle">Выбранные характеристики недвижимости:</div>
-                <div class="property-types-details" id="propertyTypesDetails"></div>
-            </div>
-            
-            </div>
-        
-        <!-- Блок с ID для админов (отдельный) -->
-        <div class="admin-ids-block" id="adminIdsBlock" style="display: none;">
-            <div class="admin-ids-title" id="adminIdsTitle">ID для админов:</div>
-            <div class="admin-ids-details" id="adminIdsDetails"></div>
-        </div>
-
-        <!-- Ключевые метрики - скрыты -->
-        <div class="key-metrics-section" id="keyMetricsSection" style="display: none;">
-            <!-- Ключевые метрики скрыты, показывается только таблица "Средние значения" -->
-        </div>
-
-
-
-        <!-- Data Content -->
-        <div class="data-content" id="dataContent" style="display: none;">
-            <!-- Market Indicators Table -->
-            <div class="data-section" id="summaryDataSection">
-                <h3 class="data-section-title" id="summaryDataTitle"></h3>
-                <div class="data-section-content" id="summaryDataContent">
-                    <!-- Market indicators data will be populated here -->
-                </div>
-            </div>
-        </div>
-
-        <!-- Save and Share Button -->
-        <button class="save-share-button" id="saveShareButton" onclick="saveAndShareReport()">
-            <span id="saveShareButtonText">Сохранить и поделиться отчетом</span>
-        </button>
-
-        <!-- Error State -->
-        <div class="error-state" id="errorState" style="display: none;">
-            <div class="error-icon">❌</div>
-            <div class="error-text" id="errorText">Ошибка загрузки данных</div>
-        </div>
-
-        <!-- Back Button -->
-        <a href="/webapp_main" class="back-button" id="backButton">← Вернуться в главное меню</a>
-
-        <!-- Modal for sharing report -->
-        <div class="modal-overlay" id="shareModal">
-            <div class="modal-content">
-                <button class="modal-close" onclick="closeShareModal()">×</button>
-                <div class="modal-title" id="modalTitle" data-i18n="reports.report_saved">Отчет сохранен</div>
-                <div class="modal-description" id="modalDescription">
+<div class="container">
+<!-- Логотип -->
+<div style="display:flex;flex-direction:column;align-items:center;margin-top:18px;margin-bottom:10px;">
+<img alt="Aaadviser Logo" onclick="goToMainMenu()" src="logo-flt.png" style="width:110px;height:auto;display:block;margin-bottom:8px;cursor:pointer;"/>
+<div id="slogan" style="font-size:15px;color:#888;font-style:italic;">Инсайты рынка недвижимости</div>
+</div>
+<!-- Заголовок страницы -->
+<div class="page-title" id="pageTitle">Оценка объекта</div>
+<div class="page-description" id="pageDescription">Получите профессиональную оценку стоимости недвижимости в выбранном регионе</div>
+<!-- Форма выбора локации -->
+<div class="location-form" id="locationForm">
+<div class="form-group">
+<label for="countrySelect" id="countryLabel">Страна:</label>
+<select id="countrySelect" onchange="onCountryChange()">
+<option id="countryPlaceholder" value="">Выберите страну</option>
+</select>
+</div>
+<div class="form-group">
+<label for="citySelect" id="cityLabel">Город:</label>
+<select disabled="" id="citySelect" onchange="onCityChange()">
+<option id="cityPlaceholder" value="">Сначала выберите страну</option>
+</select>
+</div>
+<div class="form-group">
+<label for="countySelect" id="countyLabel">Область/Регион:</label>
+<select disabled="" id="countySelect" onchange="onCountyChange()">
+<option id="countyPlaceholder" value="">Сначала выберите город</option>
+</select>
+</div>
+<div class="form-group">
+<label for="districtSelect" id="districtLabel">Район:</label>
+<select disabled="" id="districtSelect" onchange="onDistrictChange()">
+<option id="districtPlaceholder" value="">Сначала выберите область</option>
+</select>
+</div>
+<!-- Listing Type Selection -->
+<div class="listing-type-section" id="listingTypeSection" style="display: none;">
+<div class="listing-type-title" id="listingTypeTitle">Выберите тип недвижимости для анализа:</div>
+<!-- House Type Listing Types -->
+<div class="listing-type-group">
+<div class="listing-type-subtitle" id="houseTypeSubtitle">Количество спален:</div>
+<select class="listing-type-select" id="houseTypeSelect">
+<option id="houseTypePlaceholder" value="">Выберите количество спален</option>
+</select>
+</div>
+<!-- Floor Segment Listing Types -->
+<div class="listing-type-group">
+<div class="listing-type-subtitle" id="floorSegmentSubtitle">Этаж:</div>
+<select class="listing-type-select" id="floorSegmentSelect">
+<option id="floorSegmentPlaceholder" value="">Выберите этаж</option>
+</select>
+</div>
+<!-- Age Data Listing Types -->
+<div class="listing-type-group">
+<div class="listing-type-subtitle" id="ageDataSubtitle">Возраст объекта:</div>
+<select class="listing-type-select" id="ageDataSelect">
+<option id="ageDataPlaceholder" value="">Выберите возраст объекта</option>
+</select>
+</div>
+<!-- Heating Data Listing Types -->
+<div class="listing-type-group">
+<div class="listing-type-subtitle" id="heatingDataSubtitle">Тип отопления:</div>
+<select class="listing-type-select" id="heatingDataSelect">
+<option id="heatingDataPlaceholder" value="">Выберите тип отопления</option>
+</select>
+</div>
+<!-- Price Object -->
+<div class="listing-type-group">
+<div class="listing-type-subtitle" id="priceObjectSubtitle">Цена объекта:</div>
+<input class="listing-type-input" id="priceObjectInput" placeholder="Введите цену" type="number"/>
+<!-- Currency Selection -->
+<div class="currency-buttons-container">
+<div class="currency-buttons-title" id="currencyTitle">Выберите валюту:</div>
+<div class="currency-buttons">
+<button class="currency-button" data-currency="TRY" type="button">
+<span class="currency-symbol">₺</span>
+</button>
+<button class="currency-button" data-currency="EUR" type="button">
+<span class="currency-symbol">€</span>
+</button>
+<button class="currency-button" data-currency="USD" type="button">
+<span class="currency-symbol">$</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Area Object -->
+<div class="listing-type-group">
+<div class="listing-type-subtitle" id="areaObjectSubtitle">Площадь объекта (м²):</div>
+<input class="listing-type-input" id="areaObjectInput" max="1000" min="10" placeholder="Введите площадь" type="number"/>
+</div>
+</div>
+<button class="confirm-button" disabled="" id="confirmButton" onclick="confirmLocation()">
+<span id="confirmButtonText">Подтвердить выбор</span>
+</button>
+</div>
+<!-- Выбранная локация -->
+<div class="selected-location" id="selectedLocation" style="display: none;">
+<div class="location-title" id="selectedLocationTitle">Выбранная локация:</div>
+<div class="location-details" id="locationDetails"></div>
+<!-- Выбранные характеристики недвижимости -->
+<div class="selected-property-types" id="selectedPropertyTypes" style="display: none;">
+<div class="property-types-title" id="propertyTypesTitle">Выбранные характеристики недвижимости:</div>
+<div class="property-types-details" id="propertyTypesDetails"></div>
+</div>
+</div>
+<!-- Блок с ID для админов (отдельный) -->
+<div class="admin-ids-block" id="adminIdsBlock" style="display: none;">
+<div class="admin-ids-title" id="adminIdsTitle">ID для админов:</div>
+<div class="admin-ids-details" id="adminIdsDetails"></div>
+</div>
+<!-- Ключевые метрики - скрыты -->
+<div class="key-metrics-section" id="keyMetricsSection" style="display: none;">
+<!-- Ключевые метрики скрыты, показывается только таблица "Средние значения" -->
+</div>
+<!-- Data Content -->
+<div class="data-content" id="dataContent" style="display: none;">
+<!-- Market Indicators Table -->
+<div class="data-section" id="summaryDataSection">
+<h3 class="data-section-title" id="summaryDataTitle"></h3>
+<div class="data-section-content" id="summaryDataContent">
+<!-- Market indicators data will be populated here -->
+</div>
+</div>
+</div>
+<!-- Save and Share Button -->
+<button class="save-share-button" id="saveShareButton" onclick="saveAndShareReport()">
+<span id="saveShareButtonText">Сохранить и поделиться отчетом</span>
+</button>
+<!-- Error State -->
+<div class="error-state" id="errorState" style="display: none;">
+<div class="error-icon">❌</div>
+<div class="error-text" id="errorText">Ошибка загрузки данных</div>
+</div>
+<!-- Back Button -->
+<a class="back-button" href="/webapp_main" id="backButton">← Вернуться в главное меню</a>
+<!-- Modal for sharing report -->
+<div class="modal-overlay" id="shareModal">
+<div class="modal-content">
+<button class="modal-close" onclick="closeShareModal()">×</button>
+<div class="modal-title" data-i18n="reports.report_saved" id="modalTitle">Отчет сохранен</div>
+<div class="modal-description" id="modalDescription">
                     Ваш отчет успешно сохранен. Вы можете скопировать ссылку и поделиться ею с другими.
                 </div>
-                <div class="modal-link-container">
-                    <a id="modalLink" href="#" target="_blank" class="modal-link">Ссылка на отчет</a>
-                </div>
-                <div class="modal-actions">
-                    <button class="modal-button modal-button-primary" onclick="copyReportLink()">
-                        <span id="copyButtonText">Копировать ссылку</span>
-                    </button>
-                    <button class="modal-button modal-button-secondary" onclick="closeShareModal()">
-                        <span id="closeButtonText" data-i18n="common.close">Закрыть</span>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script>
+<div class="modal-link-container">
+<a class="modal-link" href="#" id="modalLink" target="_blank">Ссылка на отчет</a>
+</div>
+<div class="modal-actions">
+<button class="modal-button modal-button-primary" onclick="copyReportLink()">
+<span id="copyButtonText">Копировать ссылку</span>
+</button>
+<button class="modal-button modal-button-secondary" data-i18n="common.close" onclick="closeShareModal()">
+<span data-i18n="common.close" id="closeButtonText">Закрыть</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<script>
         // Telegram WebApp initialization
         let tg = window.Telegram.WebApp;
         tg.ready();

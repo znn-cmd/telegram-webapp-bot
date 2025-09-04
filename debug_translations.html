@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Тест переводов - Отладка</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="i18n-manager.js?v=1.1"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-item { margin: 10px 0; padding: 10px; border: 1px solid #ccc; }
+        .key { font-weight: bold; color: #333; }
+        .result { color: #666; }
+        .error { color: red; }
+        .success { color: green; }
+        button { padding: 10px; margin: 5px; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Тест системы переводов</h1>
+    
+    <div class="test-item">
+        <div class="key">main.title:</div>
+        <div class="result" id="main-title">Загрузка...</div>
+    </div>
+    
+    <div class="test-item">
+        <div class="key">reports.region_analytics:</div>
+        <div class="result" id="reports-region_analytics">Загрузка...</div>
+    </div>
+    
+    <div class="test-item">
+        <div class="key">reports.property_evaluation:</div>
+        <div class="result" id="reports-property_evaluation">Загрузка...</div>
+    </div>
+    
+    <div class="test-item">
+        <div class="key">reports.title:</div>
+        <div class="result" id="reports-title">Загрузка...</div>
+    </div>
+    
+    <div class="test-item">
+        <div class="key">profile.title:</div>
+        <div class="result" id="profile-title">Загрузка...</div>
+    </div>
+    
+    <div class="test-item">
+        <div class="key">common.help:</div>
+        <div class="result" id="common-help">Загрузка...</div>
+    </div>
+    
+    <button onclick="testTranslations()">🔄 Обновить тест</button>
+    <button onclick="checkConsole()">📋 Проверить консоль</button>
+    <button onclick="forceUpdate()">⚡ Принудительное обновление</button>
+    
+    <div id="debug-info"></div>
+
+    <script>
+        // Ждем инициализации i18nManager
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('📄 DOM загружен, ждем инициализации i18nManager...');
+            
+            // Проверяем каждые 100мс, готов ли i18nManager
+            const checkInterval = setInterval(() => {
+                if (window.i18nManager && window.i18nManager.translations) {
+                    console.log('✅ i18nManager готов, запускаем тест...');
+                    clearInterval(checkInterval);
+                    testTranslations();
+                }
+            }, 100);
+            
+            // Таймаут на случай, если что-то пошло не так
+            setTimeout(() => {
+                clearInterval(checkInterval);
+                console.log('⚠️ Таймаут ожидания i18nManager, запускаем тест...');
+                testTranslations();
+            }, 5000);
+        });
+        
+        function testTranslations() {
+            console.log('🧪 Начинаем тест переводов...');
+            
+            const keys = [
+                'main.title',
+                'reports.region_analytics',
+                'reports.property_evaluation',
+                'reports.title',
+                'profile.title',
+                'common.help'
+            ];
+            
+            keys.forEach(key => {
+                const elementId = key.replace(/\./g, '-');
+                const element = document.getElementById(elementId);
+                const translation = i18nManager.getTranslation(key);
+                
+                console.log(`  - Обработка ключа: ${key} → ${translation}`);
+                console.log(`    🔍 Ищем элемент с ID: ${elementId}`);
+                
+                if (element) {
+                    element.textContent = translation;
+                    element.className = translation === key ? 'error' : 'success';
+                    console.log(`    ✅ Элемент ${elementId} обновлен: ${element.textContent}`);
+                } else {
+                    console.error(`    ❌ Элемент ${elementId} не найден!`);
+                    console.log(`    🔍 Доступные элементы на странице:`);
+                    document.querySelectorAll('[id]').forEach(el => {
+                        console.log(`      - ${el.id}`);
+                    });
+                }
+            });
+            
+            // Показываем отладочную информацию
+            const debugInfo = document.getElementById('debug-info');
+            debugInfo.innerHTML = `
+                <h3>🔍 Отладочная информация:</h3>
+                <p><strong>Текущий язык:</strong> ${i18nManager.currentLanguage}</p>
+                <p><strong>Переводы загружены:</strong> ${Object.keys(i18nManager.translations).join(', ')}</p>
+                <p><strong>Доступные ключи для ru:</strong> ${Object.keys(i18nManager.translations.ru || {}).join(', ')}</p>
+                <p><strong>Доступные ключи для reports:</strong> ${Object.keys(i18nManager.translations.ru?.reports || {}).join(', ')}</p>
+                <p><strong>Доступные ключи для main:</strong> ${Object.keys(i18nManager.translations.ru?.main || {}).join(', ')}</p>
+                <p><strong>Элементы на странице:</strong> ${Array.from(document.querySelectorAll('[id]')).map(el => el.id).join(', ')}</p>
+            `;
+        }
+        
+        function checkConsole() {
+            alert('Откройте консоль браузера (F12) для просмотра отладочной информации');
+        }
+        
+        function forceUpdate() {
+            console.log('⚡ Принудительное обновление...');
+            
+            // Принудительно переинициализируем i18nManager
+            if (window.i18nManager) {
+                window.i18nManager.loadFallbackTranslations();
+                console.log('✅ Переводы перезагружены');
+            }
+            
+            // Обновляем все элементы
+            testTranslations();
+            
+            // Дополнительно обновляем через небольшую задержку
+            setTimeout(() => {
+                console.log('🔄 Дополнительное обновление...');
+                testTranslations();
+            }, 100);
+        }
+    </script>
+</body>
+</html>

@@ -1,12 +1,13 @@
 <!DOCTYPE html>
+
 <html lang="ru">
 <head>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <script src="/i18n-manager.js"></script>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title data-i18n-title="reports.full_report">Полный отчет - Aaadviser</title>
-    <style>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script src="/i18n-manager.js"></script>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title data-i18n-title="reports.full_report">Полный отчет - Aaadviser</title>
+<style>
         * {
             margin: 0;
             padding: 0;
@@ -478,284 +479,256 @@
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>📊 Полный отчет</h1>
-            <p>Детальный анализ объекта недвижимости</p>
-        </div>
-
-        <div class="content">
-            <div id="loading" class="loading">
-                <h3>🔄 Формируем полный отчет...</h3>
-                <p>Пожалуйста, подождите</p>
-            </div>
-
-            <div id="error" class="error" style="display: none;">
-                <h3>❌ Ошибка загрузки отчета</h3>
-                <p id="error-message">Произошла ошибка при формировании отчета</p>
-            </div>
-
-            <div id="report-content" style="display: none;">
-                <!-- Основная информация об объекте -->
-                <div class="section object-info">
-                    <h2>🏠 Информация об объекте</h2>
-                    <div class="info-grid">
-                        <div class="info-item">
-                            <div class="info-label">Адрес</div>
-                            <div class="info-value" id="object-address">-</div>
-                        </div>
-                        <div class="info-item">
-                            <div class="info-label">Спальни</div>
-                            <div class="info-value" id="object-bedrooms">-</div>
-                        </div>
-                        <div class="info-item">
-                            <div class="info-label" data-i18n="reports.property_price">Цена</div>
-                            <div class="info-value" id="object-price">-</div>
-                        </div>
-                        <div class="info-item">
-                            <div class="info-label">Возраст объекта</div>
-                            <div class="info-value" id="object-age">-</div>
-                        </div>
-                        <div class="info-item">
-                            <div class="info-label">Этаж</div>
-                            <div class="info-value" id="object-floor">-</div>
-                        </div>
-                        <div class="info-item">
-                            <div class="info-label">Отопление</div>
-                            <div class="info-value" id="object-heating">-</div>
-                        </div>
-                        <div class="info-item">
-                            <div class="info-label">Площадь объекта</div>
-                            <div class="info-value" id="object-area">-</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Рыночный анализ -->
-                <div class="section">
-                    <h2>📊 Рыночный анализ</h2>
-                    
-                    <!-- Сравнение цен по критериям -->
-                    <div class="price-comparison-section">
-                        <h3>📊 Сравнение с рыночными ценами</h3>
-                        
-                        <!-- Возраст объекта -->
-                        <div class="comparison-item">
-                            <div class="comparison-label">По возрасту объекта:</div>
-                            <div class="comparison-values" id="age-comparison">-</div>
-                        </div>
-                        
-                        <!-- Этаж -->
-                        <div class="comparison-item">
-                            <div class="comparison-label">По этажу:</div>
-                            <div class="comparison-values" id="floor-comparison">-</div>
-                        </div>
-                        
-                        <!-- Тип отопления -->
-                        <div class="comparison-item">
-                            <div class="comparison-label">По типу отопления:</div>
-                            <div class="comparison-values" id="heating-comparison">-</div>
-                        </div>
-                        
-                        <!-- Тип дома - УБРАНО по требованию -->
-                        
-                        <!-- Итоговое сравнение -->
-                        <div class="final-comparison">
-                            <div class="comparison-label">Итоговое сравнение:</div>
-                            <div class="comparison-values" id="final-comparison">-</div>
-                        </div>
-                        
-                        <!-- Вывод по цене -->
-                        <div class="price-conclusion">
-                            <div class="conclusion-label">Вывод по цене:</div>
-                            <div class="conclusion-value" id="price-conclusion">-</div>
-                        </div>
-                        
-                        <!-- Информация о конвертации валют -->
-                        <div class="currency-info" id="currency-info" style="display: none;">
-                            <div class="info-label">💱 Конвертация валют:</div>
-                            <div class="info-value" id="currency-info-value">-</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Анализ динамики цен -->
-                <div class="section">
-                    <h2>📊 Анализ динамики цен</h2>
-                    <div class="info-grid">
-                        <div class="info-item">
-                            <div class="info-label">Тренд цен</div>
-                            <div class="info-value" id="price-trend">-</div>
-                        </div>
-                        <div class="info-item">
-                            <div class="info-label">Изменение за 3 года</div>
-                            <div class="info-value" id="price-change-3y">-</div>
-                        </div>
-                        <div class="info-item">
-                            <div class="info-label">Прогноз на 3 месяца</div>
-                            <div class="info-value" id="price-forecast">-</div>
-                        </div>
-                    </div>
-                    
-                    <!-- График динамики цен -->
-                    <div class="price-chart-container" style="margin-top: 20px;">
-                        <h3>📈 График изменения цен</h3>
-                        <div class="chart-wrapper">
-                            <canvas id="priceChart" width="400" height="200"></canvas>
-                        </div>
-                    </div>
-                    
-                    <!-- Анализ тренда -->
-                    <div class="trend-analysis" style="margin-top: 20px;">
-                        <div class="trend-item">
-                            <div class="trend-label">Анализ тренда:</div>
-                            <div class="trend-value" id="trend-analysis">-</div>
-                        </div>
-                        <div class="trend-item">
-                            <div class="trend-label">Рекомендация:</div>
-                            <div class="trend-value" id="trend-recommendation">-</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Анализ аренды -->
-                <div class="section">
-                    <h2>🏠 Анализ аренды</h2>
-                    <div class="info-grid">
-                        <div class="info-item">
-                            <div class="info-label">Максимальная ставка аренды</div>
-                            <div class="info-value" id="max-rental-rate">-</div>
-                        </div>
-                        <div class="info-item">
-                            <div class="info-label">Годовая доходность</div>
-                            <div class="info-value" id="annual-rental-yield">-</div>
-                        </div>
-                        <div class="info-item">
-                            <div class="info-label">Рекомендация по аренде</div>
-                            <div class="info-value" id="rental-recommendation">-</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- ROI анализ -->
-                <div class="section">
-                    <h2>💰 ROI анализ</h2>
-                    
-                    <div class="highlight">
-                        <h3>Краткосрочная аренда (Airbnb)</h3>
-                        <div class="value" id="short-term-income">-</div>
-                        <div class="description">Доход в месяц</div>
-                    </div>
-
-                    <div class="highlight">
-                        <h3>Долгосрочная аренда</h3>
-                        <div class="value" id="long-term-income">-</div>
-                        <div class="description">Доход в год</div>
-                    </div>
-
-                    <div class="info-grid">
-                        <div class="info-item">
-                            <div class="info-label">Рост цены (5 лет)</div>
-                            <div class="info-value" id="price-growth">-</div>
-                        </div>
-                        <div class="info-item">
-                            <div class="info-label">ROI с арендой</div>
-                            <div class="info-value" id="roi-with-rent">-</div>
-                        </div>
-                        <div class="info-item">
-                            <div class="info-label">ROI без аренды</div>
-                            <div class="info-value" id="roi-without-rent">-</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Альтернативные инвестиции -->
-                <div class="section">
-                    <h2>📈 Альтернативные инвестиции</h2>
-                    <div class="info-grid" id="alternatives-grid">
-                        <!-- Альтернативы будут добавлены динамически -->
-                    </div>
-                </div>
-
-                <!-- Макроэкономические данные -->
-                <div class="section">
-                    <h2>🌍 Макроэкономические данные</h2>
-                    <div class="info-grid">
-                        <div class="info-item">
-                            <div class="info-label">Инфляция</div>
-                            <div class="info-value" id="inflation">-</div>
-                        </div>
-                        <div class="info-item">
-                            <div class="info-label">Курс EUR/TRY</div>
-                            <div class="info-value" id="eur-try">-</div>
-                        </div>
-                        <div class="info-item">
-                            <div class="info-label">Рост ВВП</div>
-                            <div class="info-value" id="gdp-growth">-</div>
-                        </div>
-                        <div class="info-item">
-                            <div class="info-label">Ставка рефинансирования</div>
-                            <div class="info-value" id="refi-rate">-</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Налоги и сборы -->
-                <div class="section">
-                    <h2>🏛️ Налоги и сборы</h2>
-                    <div class="info-grid" id="taxes-grid">
-                        <!-- Налоги будут добавлены динамически -->
-                    </div>
-                </div>
-
-                <!-- Риски и ликвидность -->
-                <div class="section">
-                    <h2>⚠️ Риски и ликвидность</h2>
-                    <div class="info-grid">
-                        <div class="info-item">
-                            <div class="info-label" data-i18n="reports.liquidity">Ликвидность</div>
-                            <div class="info-value" id="liquidity">-</div>
-                        </div>
-                        <div class="info-item">
-                            <div class="info-label">Район</div>
-                            <div class="info-value" id="district">-</div>
-                        </div>
-                    </div>
-                    <div id="risks-list">
-                        <!-- Риски будут добавлены динамически -->
-                    </div>
-                </div>
-
-                <!-- Экономические графики -->
-                <div class="section">
-                    <h2>📊 Экономические тренды</h2>
-                    <div class="chart-container">
-                        <div class="chart-placeholder">
+<div class="container">
+<div class="header">
+<h1>📊 Полный отчет</h1>
+<p>Детальный анализ объекта недвижимости</p>
+</div>
+<div class="content">
+<div class="loading" id="loading">
+<h3>🔄 Формируем полный отчет...</h3>
+<p>Пожалуйста, подождите</p>
+</div>
+<div class="error" id="error" style="display: none;">
+<h3>❌ Ошибка загрузки отчета</h3>
+<p id="error-message">Произошла ошибка при формировании отчета</p>
+</div>
+<div id="report-content" style="display: none;">
+<!-- Основная информация об объекте -->
+<div class="section object-info">
+<h2>🏠 Информация об объекте</h2>
+<div class="info-grid">
+<div class="info-item">
+<div class="info-label">Адрес</div>
+<div class="info-value" id="object-address">-</div>
+</div>
+<div class="info-item">
+<div class="info-label">Спальни</div>
+<div class="info-value" id="object-bedrooms">-</div>
+</div>
+<div class="info-item">
+<div class="info-label" data-i18n="reports.property_price">Цена</div>
+<div class="info-value" id="object-price">-</div>
+</div>
+<div class="info-item">
+<div class="info-label">Возраст объекта</div>
+<div class="info-value" id="object-age">-</div>
+</div>
+<div class="info-item">
+<div class="info-label">Этаж</div>
+<div class="info-value" id="object-floor">-</div>
+</div>
+<div class="info-item">
+<div class="info-label">Отопление</div>
+<div class="info-value" id="object-heating">-</div>
+</div>
+<div class="info-item">
+<div class="info-label">Площадь объекта</div>
+<div class="info-value" id="object-area">-</div>
+</div>
+</div>
+</div>
+<!-- Рыночный анализ -->
+<div class="section">
+<h2>📊 Рыночный анализ</h2>
+<!-- Сравнение цен по критериям -->
+<div class="price-comparison-section">
+<h3>📊 Сравнение с рыночными ценами</h3>
+<!-- Возраст объекта -->
+<div class="comparison-item">
+<div class="comparison-label">По возрасту объекта:</div>
+<div class="comparison-values" id="age-comparison">-</div>
+</div>
+<!-- Этаж -->
+<div class="comparison-item">
+<div class="comparison-label">По этажу:</div>
+<div class="comparison-values" id="floor-comparison">-</div>
+</div>
+<!-- Тип отопления -->
+<div class="comparison-item">
+<div class="comparison-label">По типу отопления:</div>
+<div class="comparison-values" id="heating-comparison">-</div>
+</div>
+<!-- Тип дома - УБРАНО по требованию -->
+<!-- Итоговое сравнение -->
+<div class="final-comparison">
+<div class="comparison-label">Итоговое сравнение:</div>
+<div class="comparison-values" id="final-comparison">-</div>
+</div>
+<!-- Вывод по цене -->
+<div class="price-conclusion">
+<div class="conclusion-label">Вывод по цене:</div>
+<div class="conclusion-value" id="price-conclusion">-</div>
+</div>
+<!-- Информация о конвертации валют -->
+<div class="currency-info" id="currency-info" style="display: none;">
+<div class="info-label">💱 Конвертация валют:</div>
+<div class="info-value" id="currency-info-value">-</div>
+</div>
+</div>
+</div>
+<!-- Анализ динамики цен -->
+<div class="section">
+<h2>📊 Анализ динамики цен</h2>
+<div class="info-grid">
+<div class="info-item">
+<div class="info-label">Тренд цен</div>
+<div class="info-value" id="price-trend">-</div>
+</div>
+<div class="info-item">
+<div class="info-label">Изменение за 3 года</div>
+<div class="info-value" id="price-change-3y">-</div>
+</div>
+<div class="info-item">
+<div class="info-label">Прогноз на 3 месяца</div>
+<div class="info-value" id="price-forecast">-</div>
+</div>
+</div>
+<!-- График динамики цен -->
+<div class="price-chart-container" style="margin-top: 20px;">
+<h3>📈 График изменения цен</h3>
+<div class="chart-wrapper">
+<canvas height="200" id="priceChart" width="400"></canvas>
+</div>
+</div>
+<!-- Анализ тренда -->
+<div class="trend-analysis" style="margin-top: 20px;">
+<div class="trend-item">
+<div class="trend-label">Анализ тренда:</div>
+<div class="trend-value" id="trend-analysis">-</div>
+</div>
+<div class="trend-item">
+<div class="trend-label">Рекомендация:</div>
+<div class="trend-value" id="trend-recommendation">-</div>
+</div>
+</div>
+</div>
+<!-- Анализ аренды -->
+<div class="section">
+<h2>🏠 Анализ аренды</h2>
+<div class="info-grid">
+<div class="info-item">
+<div class="info-label">Максимальная ставка аренды</div>
+<div class="info-value" id="max-rental-rate">-</div>
+</div>
+<div class="info-item">
+<div class="info-label">Годовая доходность</div>
+<div class="info-value" id="annual-rental-yield">-</div>
+</div>
+<div class="info-item">
+<div class="info-label">Рекомендация по аренде</div>
+<div class="info-value" id="rental-recommendation">-</div>
+</div>
+</div>
+</div>
+<!-- ROI анализ -->
+<div class="section">
+<h2>💰 ROI анализ</h2>
+<div class="highlight">
+<h3>Краткосрочная аренда (Airbnb)</h3>
+<div class="value" id="short-term-income">-</div>
+<div class="description">Доход в месяц</div>
+</div>
+<div class="highlight">
+<h3>Долгосрочная аренда</h3>
+<div class="value" id="long-term-income">-</div>
+<div class="description">Доход в год</div>
+</div>
+<div class="info-grid">
+<div class="info-item">
+<div class="info-label">Рост цены (5 лет)</div>
+<div class="info-value" id="price-growth">-</div>
+</div>
+<div class="info-item">
+<div class="info-label">ROI с арендой</div>
+<div class="info-value" id="roi-with-rent">-</div>
+</div>
+<div class="info-item">
+<div class="info-label">ROI без аренды</div>
+<div class="info-value" id="roi-without-rent">-</div>
+</div>
+</div>
+</div>
+<!-- Альтернативные инвестиции -->
+<div class="section">
+<h2>📈 Альтернативные инвестиции</h2>
+<div class="info-grid" id="alternatives-grid">
+<!-- Альтернативы будут добавлены динамически -->
+</div>
+</div>
+<!-- Макроэкономические данные -->
+<div class="section">
+<h2>🌍 Макроэкономические данные</h2>
+<div class="info-grid">
+<div class="info-item">
+<div class="info-label">Инфляция</div>
+<div class="info-value" id="inflation">-</div>
+</div>
+<div class="info-item">
+<div class="info-label">Курс EUR/TRY</div>
+<div class="info-value" id="eur-try">-</div>
+</div>
+<div class="info-item">
+<div class="info-label">Рост ВВП</div>
+<div class="info-value" id="gdp-growth">-</div>
+</div>
+<div class="info-item">
+<div class="info-label">Ставка рефинансирования</div>
+<div class="info-value" id="refi-rate">-</div>
+</div>
+</div>
+</div>
+<!-- Налоги и сборы -->
+<div class="section">
+<h2>🏛️ Налоги и сборы</h2>
+<div class="info-grid" id="taxes-grid">
+<!-- Налоги будут добавлены динамически -->
+</div>
+</div>
+<!-- Риски и ликвидность -->
+<div class="section">
+<h2>⚠️ Риски и ликвидность</h2>
+<div class="info-grid">
+<div class="info-item">
+<div class="info-label" data-i18n="reports.liquidity">Ликвидность</div>
+<div class="info-value" id="liquidity">-</div>
+</div>
+<div class="info-item">
+<div class="info-label">Район</div>
+<div class="info-value" id="district">-</div>
+</div>
+</div>
+<div id="risks-list">
+<!-- Риски будут добавлены динамически -->
+</div>
+</div>
+<!-- Экономические графики -->
+<div class="section">
+<h2>📊 Экономические тренды</h2>
+<div class="chart-container">
+<div class="chart-placeholder">
                             📈 График экономических показателей
                         </div>
-                    </div>
-                </div>
-
-                <!-- Кнопки действий -->
-                <div class="buttons">
-                    <button class="btn btn-primary" onclick="downloadPDF()">
+</div>
+</div>
+<!-- Кнопки действий -->
+<div class="buttons">
+<button class="btn btn-primary" onclick="downloadPDF()">
                         📥 Скачать PDF
                     </button>
-                    <button class="btn btn-secondary" onclick="saveReport()">
+<button class="btn btn-secondary" onclick="saveReport()">
                         💾 Сохранить отчет
                     </button>
-                    <button class="btn btn-secondary" onclick="goBack()">
+<button class="btn btn-secondary" onclick="goBack()">
                         ← Назад
                     </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Chart.js для построения графиков -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-    <script>
+</div>
+</div>
+</div>
+</div>
+<!-- Chart.js для построения графиков -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
         // Получаем данные из URL параметров
         const urlParams = new URLSearchParams(window.location.search);
         console.log('🔍 URL параметры:', Object.fromEntries(urlParams));

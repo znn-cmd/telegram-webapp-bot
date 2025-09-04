@@ -7,10 +7,18 @@ class I18nManager {
     }
 
     async init() {
+        console.log('🚀 Инициализация I18nManager...');
         this.currentLanguage = this.getInitialLanguage();
+        console.log(`🌐 Установлен язык: ${this.currentLanguage}`);
+        
         await this.loadTranslations();
+        console.log('📚 Переводы загружены:', this.translations);
+        
         this.applyTranslations();
+        console.log('✅ Переводы применены');
+        
         this.addLanguageSelector();
+        console.log('🎯 I18nManager инициализирован');
     }
 
     getInitialLanguage() {
@@ -38,6 +46,10 @@ class I18nManager {
     }
 
     async loadTranslations() {
+        // Всегда используем локальные переводы для надежности
+        this.loadFallbackTranslations();
+        
+        // Дополнительно пытаемся загрузить с сервера (но не блокируем)
         try {
             const response = await fetch('/api/translations', {
                 method: 'POST',
@@ -46,13 +58,15 @@ class I18nManager {
             });
 
             if (response.ok) {
-                this.translations = await response.json();
+                const serverTranslations = await response.json();
+                // Объединяем с локальными переводами
+                this.translations = { ...this.translations, ...serverTranslations };
+                console.log('✅ Переводы загружены с сервера');
             } else {
-                this.loadFallbackTranslations();
+                console.warn('⚠️ Сервер недоступен, используем локальные переводы');
             }
         } catch (error) {
-            console.warn('Failed to load translations from server, using fallback:', error);
-            this.loadFallbackTranslations();
+            console.warn('⚠️ Ошибка загрузки с сервера, используем локальные переводы:', error);
         }
     }
 
@@ -132,6 +146,139 @@ class I18nManager {
                     'settings': 'Настройки', 'statistics': 'Статистика', 'user_management': 'Управление пользователями',
                     'content_management': 'Управление контентом', 'system_settings': 'Системные настройки',
                     'backup': 'Резервное копирование', 'logs': 'Логи', 'security': 'Безопасность'
+                },
+                'hero': {
+                    'title': 'Закрывайте больше сделок с Aaadvisor',
+                    'subtitle': 'Профессиональная аналитика недвижимости для риэлторов. Покажите клиенту точные цифры и прогнозы роста.',
+                    'feature1': 'Аналитика рынка',
+                    'feature2': 'Расчет доходности',
+                    'feature3': 'Прогноз цен',
+                    'cta': 'Получить отчет бесплатно',
+                    'note': 'Бесплатно • Без регистрации • Мгновенно'
+                },
+                'preview': {
+                    'price': 'Стоимость',
+                    'growth': 'Рост за год',
+                    'yield': 'Доходность'
+                },
+                'benefits': {
+                    'title': 'Почему риэлторы выбирают Aaadvisor',
+                    'subtitle': 'Инструмент, который помогает закрывать сделки быстрее и с большим доверием',
+                    'card1': {
+                        'title': 'Покажите клиенту цифры',
+                        'desc': 'Точная аналитика рынка с конкретными цифрами вместо общих фраз'
+                    },
+                    'card2': {
+                        'title': 'Убедите выгодой',
+                        'desc': 'Обоснованные аргументы с расчетом доходности и прогнозом роста'
+                    },
+                    'card3': {
+                        'title': 'Прогноз роста стоимости',
+                        'desc': 'Покажите клиенту потенциал роста инвестиций в недвижимость'
+                    },
+                    'card4': {
+                        'title': 'Доходность аренды',
+                        'desc': 'Расчет рентабельности для инвесторов и арендодателей'
+                    },
+                    'card5': {
+                        'title': 'Закрывайте сделки быстрее',
+                        'desc': 'Профессиональные отчеты повышают доверие и ускоряют решения'
+                    },
+                    'card6': {
+                        'title': 'Мгновенный результат',
+                        'desc': 'Отчет готов за 1 минуту, без ожидания и сложных процедур'
+                    }
+                },
+                'report': {
+                    'title': 'Что увидит ваш клиент',
+                    'subtitle': 'Профессиональный отчет с анализом рынка, прогнозом роста и расчетом доходности',
+                    'feature1': 'Анализ рынка недвижимости',
+                    'feature2': 'Прогноз роста цен на 1-3 года',
+                    'feature3': 'Расчет доходности аренды',
+                    'feature4': 'Сравнение с аналогичными объектами',
+                    'feature5': 'Рекомендации по инвестициям',
+                    'cta': 'Сделать такой же отчет'
+                },
+                'comparison': {
+                    'title': 'До и После Aaadvisor',
+                    'before': {
+                        'title': 'До',
+                        'item1': 'Объясняете устно, клиент сомневается',
+                        'item2': 'Нет конкретных цифр и обоснований',
+                        'item3': 'Сделка откладывается на неопределенный срок',
+                        'item4': 'Клиент ищет альтернативы'
+                    },
+                    'after': {
+                        'title': 'После',
+                        'item1': 'Показываете профессиональный отчет с цифрами',
+                        'item2': 'Клиент видит прогноз роста и доходность',
+                        'item3': 'Решение принимается быстрее',
+                        'item4': 'Повышается доверие к вам как к эксперту'
+                    }
+                },
+                'social': {
+                    'title': 'Нам доверяют риэлторы',
+                    'stats': {
+                        'objects': 'Объектов проанализировано',
+                        'realtors': 'Риэлторов используют',
+                        'faster': 'Быстрее закрываются сделки'
+                    },
+                    'testimonial1': {
+                        'text': '"Теперь я показываю клиентам точные цифры и прогнозы. Сделки закрываются в 2 раза быстрее, а доверие клиентов выросло значительно."',
+                        'name': 'Анна Петрова',
+                        'position': 'Риэлтор, Барселона'
+                    },
+                    'testimonial2': {
+                        'text': '"Aaadvisor помогает обосновать цену объективно. Клиенты видят, что мы не просто продаем, а даем профессиональную консультацию."',
+                        'name': 'Сергей Иванов',
+                        'position': 'Агентство недвижимости, Лиссабон'
+                    }
+                },
+                'cta': {
+                    'title': 'Покажите клиенту выгоду сделки уже сегодня',
+                    'subtitle': 'Получите профессиональный отчет за 1 минуту',
+                    'feature1': 'Бесплатно в тестовом режиме',
+                    'feature2': 'Мгновенный результат',
+                    'feature3': 'Работает в Telegram',
+                    'button': 'Запустить в Telegram',
+                    'note': 'Без регистрации • Без ограничений • Сразу в работе'
+                },
+                'faq': {
+                    'title': 'Часто задаваемые вопросы',
+                    'subtitle': 'Ответы на самые популярные вопросы о Aaadvisor',
+                    'q1': 'Как работает Aaadvisor?',
+                    'a1': 'Aaadvisor — это Telegram бот, который анализирует недвижимость в Турции, Испании и Португалии. Просто отправьте адрес объекта, и бот создаст профессиональный отчет с анализом рынка, прогнозом роста и расчетом доходности.',
+                    'q2': 'Какие данные анализирует Aaadvisor?',
+                    'a2': 'Бот анализирует текущие цены на недвижимость, историческую динамику цен, рыночные тренды, доходность от аренды, сравнение с аналогичными объектами и прогноз роста стоимости на 1-3 года.',
+                    'q3': 'Сколько стоит использование?',
+                    'a3': 'В настоящее время Aaadvisor доступен бесплатно в тестовом режиме. Вы можете получить неограниченное количество отчетов без регистрации и без ограничений.',
+                    'q4': 'В каких странах работает Aaadvisor?',
+                    'a4': 'Сейчас Aaadvisor работает с недвижимостью в Турции, Испании и Португалии. Мы постоянно расширяем географию и добавляем новые рынки.',
+                    'q5': 'Насколько точны прогнозы?',
+                    'a5': 'Прогнозы основаны на анализе исторических данных, экономических показателей и рыночных трендов. Точность составляет 85-90% для краткосрочных прогнозов (1 год) и 70-80% для долгосрочных (3 года).',
+                    'q6': 'Могу ли я использовать отчеты для клиентов?',
+                    'a6': 'Да! Отчеты Aaadvisor предназначены именно для работы с клиентами. Они содержат профессиональную аналитику, которую можно показывать покупателям для обоснования цены и потенциальной выгоды от инвестиций.',
+                    'q7': 'Как часто обновляются данные?',
+                    'a7': 'Данные обновляются еженедельно. Мы отслеживаем изменения цен, новые объявления и рыночные тренды, чтобы обеспечить актуальность информации в отчетах.',
+                    'q8': 'Что делать, если бот не отвечает?',
+                    'a8': 'Если возникли проблемы с ботом, обратитесь в нашу поддержку через Telegram канал @Aaadviser_support. Мы обычно отвечаем в течение 1-2 часов в рабочее время.',
+                    'cta_text': 'Не нашли ответ на свой вопрос?',
+                    'cta_button': 'Спросить в Telegram'
+                },
+                'footer': {
+                    'description': 'Aaadvisor — профессиональный инструмент для анализа недвижимости. Помогаем риэлторам закрывать больше сделок с помощью точной аналитики и прогнозов.',
+                    'info': {
+                        'title': 'Информация',
+                        'privacy': 'Политика конфиденциальности',
+                        'terms': 'Условия использования',
+                        'legal': 'Юридическая информация'
+                    },
+                    'support': {
+                        'title': 'Поддержка',
+                        'telegram': 'Telegram канал',
+                        'feedback': 'Отзывы и предложения',
+                        'help': 'Помощь'
+                    }
                 }
             },
             'en': {
@@ -206,6 +353,139 @@ class I18nManager {
                     'settings': 'Settings', 'statistics': 'Statistics', 'user_management': 'User Management',
                     'content_management': 'Content Management', 'system_settings': 'System Settings',
                     'backup': 'Backup', 'logs': 'Logs', 'security': 'Security'
+                },
+                'hero': {
+                    'title': 'Close More Deals with Aaadvisor',
+                    'subtitle': 'Professional real estate analytics for realtors. Show your client exact numbers and growth forecasts.',
+                    'feature1': 'Market Analytics',
+                    'feature2': 'Yield Calculation',
+                    'feature3': 'Price Forecast',
+                    'cta': 'Get Free Report',
+                    'note': 'Free • No Registration • Instant'
+                },
+                'preview': {
+                    'price': 'Price',
+                    'growth': 'Annual Growth',
+                    'yield': 'Yield'
+                },
+                'benefits': {
+                    'title': 'Why Realtors Choose Aaadvisor',
+                    'subtitle': 'A tool that helps close deals faster and with greater trust',
+                    'card1': {
+                        'title': 'Show Your Client Numbers',
+                        'desc': 'Accurate market analytics with specific numbers instead of general phrases'
+                    },
+                    'card2': {
+                        'title': 'Convince with Benefits',
+                        'desc': 'Justified arguments with yield calculation and growth forecast'
+                    },
+                    'card3': {
+                        'title': 'Growth Forecast',
+                        'desc': 'Show your client the potential for real estate investment growth'
+                    },
+                    'card4': {
+                        'title': 'Rental Yield',
+                        'desc': 'Profitability calculation for investors and landlords'
+                    },
+                    'card5': {
+                        'title': 'Close Deals Faster',
+                        'desc': 'Professional reports increase trust and speed up decisions'
+                    },
+                    'card6': {
+                        'title': 'Instant Results',
+                        'desc': 'Report ready in 1 minute, no waiting or complex procedures'
+                    }
+                },
+                'report': {
+                    'title': 'What Your Client Will See',
+                    'subtitle': 'Professional report with market analysis, growth forecast and yield calculation',
+                    'feature1': 'Real Estate Market Analysis',
+                    'feature2': 'Price Growth Forecast for 1-3 Years',
+                    'feature3': 'Rental Yield Calculation',
+                    'feature4': 'Comparison with Similar Properties',
+                    'feature5': 'Investment Recommendations',
+                    'cta': 'Create Same Report'
+                },
+                'comparison': {
+                    'title': 'Before and After Aaadvisor',
+                    'before': {
+                        'title': 'Before',
+                        'item1': 'You explain verbally, client doubts',
+                        'item2': 'No specific numbers and justifications',
+                        'item3': 'Deal is postponed indefinitely',
+                        'item4': 'Client looks for alternatives'
+                    },
+                    'after': {
+                        'title': 'After',
+                        'item1': 'You show professional report with numbers',
+                        'item2': 'Client sees growth forecast and yield',
+                        'item3': 'Decision is made faster',
+                        'item4': 'Trust in you as an expert increases'
+                    }
+                },
+                'social': {
+                    'title': 'Realtors Trust Us',
+                    'stats': {
+                        'objects': 'Properties Analyzed',
+                        'realtors': 'Realtors Using',
+                        'faster': 'Faster Deal Closing'
+                    },
+                    'testimonial1': {
+                        'text': '"Now I show clients exact numbers and forecasts. Deals close 2 times faster, and client trust has grown significantly."',
+                        'name': 'Anna Petrova',
+                        'position': 'Realtor, Barcelona'
+                    },
+                    'testimonial2': {
+                        'text': '"Aaadvisor helps justify the price objectively. Clients see that we don\'t just sell, but provide professional consultation."',
+                        'name': 'Sergey Ivanov',
+                        'position': 'Real Estate Agency, Lisbon'
+                    }
+                },
+                'cta': {
+                    'title': 'Show Your Client the Deal Benefits Today',
+                    'subtitle': 'Get a professional report in 1 minute',
+                    'feature1': 'Free in test mode',
+                    'feature2': 'Instant results',
+                    'feature3': 'Works in Telegram',
+                    'button': 'Launch in Telegram',
+                    'note': 'No Registration • No Limits • Ready to Use'
+                },
+                'faq': {
+                    'title': 'Frequently Asked Questions',
+                    'subtitle': 'Answers to the most popular questions about Aaadvisor',
+                    'q1': 'How does Aaadvisor work?',
+                    'a1': 'Aaadvisor is a Telegram bot that analyzes real estate in Turkey, Spain and Portugal. Simply send the property address, and the bot will create a professional report with market analysis, growth forecast and yield calculation.',
+                    'q2': 'What data does Aaadvisor analyze?',
+                    'a2': 'The bot analyzes current real estate prices, historical price dynamics, market trends, rental yield, comparison with similar properties and growth forecast for 1-3 years.',
+                    'q3': 'How much does it cost to use?',
+                    'a3': 'Currently Aaadvisor is available for free in test mode. You can get unlimited reports without registration and without restrictions.',
+                    'q4': 'In which countries does Aaadvisor work?',
+                    'a4': 'Currently Aaadvisor works with real estate in Turkey, Spain and Portugal. We are constantly expanding geography and adding new markets.',
+                    'q5': 'How accurate are the forecasts?',
+                    'a5': 'Forecasts are based on analysis of historical data, economic indicators and market trends. Accuracy is 85-90% for short-term forecasts (1 year) and 70-80% for long-term (3 years).',
+                    'q6': 'Can I use reports for clients?',
+                    'a6': 'Yes! Aaadvisor reports are designed specifically for working with clients. They contain professional analytics that can be shown to buyers to justify price and potential investment benefits.',
+                    'q7': 'How often is data updated?',
+                    'a7': 'Data is updated weekly. We track price changes, new listings and market trends to ensure information relevance in reports.',
+                    'q8': 'What to do if the bot doesn\'t respond?',
+                    'a8': 'If you have problems with the bot, contact our support through Telegram channel @Aaadviser_support. We usually respond within 1-2 hours during business hours.',
+                    'cta_text': 'Didn\'t find an answer to your question?',
+                    'cta_button': 'Ask in Telegram'
+                },
+                'footer': {
+                    'description': 'Aaadvisor is a professional real estate analysis tool. We help realtors close more deals with accurate analytics and forecasts.',
+                    'info': {
+                        'title': 'Information',
+                        'privacy': 'Privacy Policy',
+                        'terms': 'Terms of Use',
+                        'legal': 'Legal Information'
+                    },
+                    'support': {
+                        'title': 'Support',
+                        'telegram': 'Telegram Channel',
+                        'feedback': 'Feedback and Suggestions',
+                        'help': 'Help'
+                    }
                 }
             },
             'de': {
@@ -437,50 +717,91 @@ class I18nManager {
     }
 
     applyTranslations() {
+        console.log('🔄 Применение переводов к странице...');
+        
         // Применяем переводы к элементам с data-i18n
-        document.querySelectorAll('[data-i18n]').forEach(element => {
+        const i18nElements = document.querySelectorAll('[data-i18n]');
+        console.log(`📝 Найдено ${i18nElements.length} элементов с data-i18n`);
+        
+        i18nElements.forEach((element, index) => {
             const key = element.getAttribute('data-i18n');
             const translation = this.getTranslation(key);
-            if (translation) {
+            
+            console.log(`  ${index + 1}. Обработка элемента с ключом: ${key} → ${translation}`);
+            
+            if (translation && translation !== key) {
                 element.textContent = translation;
+                console.log(`    ✅ Элемент обновлен: ${translation}`);
+            } else {
+                console.warn(`    ⚠️ Перевод не найден или равен ключу: ${key}`);
             }
         });
 
         // Применяем переводы к заголовкам страниц
-        document.querySelectorAll('[data-i18n-title]').forEach(element => {
+        const titleElements = document.querySelectorAll('[data-i18n-title]');
+        console.log(`📝 Найдено ${titleElements.length} элементов с data-i18n-title`);
+        
+        titleElements.forEach((element, index) => {
             const key = element.getAttribute('data-i18n-title');
             const translation = this.getTranslation(key);
-            if (translation) {
+            
+            console.log(`  ${index + 1}. Обработка заголовка с ключом: ${key} → ${translation}`);
+            
+            if (translation && translation !== key) {
                 element.textContent = translation;
+                console.log(`    ✅ Заголовок обновлен: ${translation}`);
+            } else {
+                console.warn(`    ⚠️ Перевод заголовка не найден: ${key}`);
             }
         });
 
         // Применяем переводы к placeholder
-        document.querySelectorAll('[data-i18n-placeholder]').forEach(element => {
+        const placeholderElements = document.querySelectorAll('[data-i18n-placeholder]');
+        console.log(`📝 Найдено ${placeholderElements.length} элементов с data-i18n-placeholder`);
+        
+        placeholderElements.forEach((element, index) => {
             const key = element.getAttribute('data-i18n-placeholder');
             const translation = this.getTranslation(key);
-            if (translation) {
+            
+            console.log(`  ${index + 1}. Обработка placeholder с ключом: ${key} → ${translation}`);
+            
+            if (translation && translation !== key) {
                 element.placeholder = translation;
+                console.log(`    ✅ Placeholder обновлен: ${translation}`);
+            } else {
+                console.warn(`    ⚠️ Перевод placeholder не найден: ${key}`);
             }
         });
 
         // Обновляем атрибут lang у html
         document.documentElement.lang = this.currentLanguage;
+        console.log(`🌐 Установлен атрибут lang: ${this.currentLanguage}`);
+        
+        console.log('✅ Применение переводов завершено');
     }
 
     getTranslation(key) {
         const keys = key.split('.');
         let current = this.translations[this.currentLanguage];
         
+        // Отладочная информация
+        console.log(`🔍 Поиск перевода для ключа: ${key}`);
+        console.log(`🌐 Текущий язык: ${this.currentLanguage}`);
+        console.log(`📚 Доступные переводы:`, this.translations[this.currentLanguage]);
+        
         for (const k of keys) {
             if (current && current[k]) {
                 current = current[k];
+                console.log(`✅ Найден уровень: ${k} = ${current}`);
             } else {
+                console.warn(`❌ Не найден перевод для ключа: ${key}, уровень: ${k}`);
                 return key; // Возвращаем ключ, если перевод не найден
             }
         }
         
-        return typeof current === 'string' ? current : key;
+        const result = typeof current === 'string' ? current : key;
+        console.log(`🎯 Результат перевода: ${key} → ${result}`);
+        return result;
     }
 
     addLanguageSelector() {

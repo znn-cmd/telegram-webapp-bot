@@ -1,12 +1,13 @@
 <!DOCTYPE html>
+
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title data-i18n-title="reports.my_reports">Мои отчеты — Aaadviser</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <script src="/i18n-manager.js"></script>
-    <style>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title data-i18n-title="reports.my_reports">Мои отчеты — Aaadviser</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script src="/i18n-manager.js"></script>
+<style>
         * {
             margin: 0;
             padding: 0;
@@ -418,59 +419,52 @@
     </style>
 </head>
 <body>
-    <div class="container">
-        <!-- Логотип -->
-        <div class="header">
-            <img src="logo-flt.png" alt="Aaadviser Logo" class="logo" onclick="goToMainMenu()">
-            <div class="title" id="pageTitle" data-i18n="reports.title" data-i18n="reports.my_reports">Мои отчеты</div>
-            <div class="subtitle" id="pageSubtitle">Управление вашими отчетами</div>
-        </div>
-
-        <!-- Загрузка -->
-        <div id="loading" class="loading">
-            <div class="spinner"></div>
-            <p id="loadingText">Загрузка отчетов...</p>
-        </div>
-
-        <!-- Пустое состояние -->
-        <div id="emptyState" class="empty-state hidden">
-            <div class="empty-state-icon">📋</div>
-            <div class="empty-state-title" id="emptyTitle">Отчеты не найдены</div>
-            <div class="empty-state-description" id="emptyDescription">
+<div class="container">
+<!-- Логотип -->
+<div class="header">
+<img alt="Aaadviser Logo" class="logo" onclick="goToMainMenu()" src="logo-flt.png"/>
+<div class="title" data-i18n="reports.my_reports" id="pageTitle">Мои отчеты</div>
+<div class="subtitle" id="pageSubtitle">Управление вашими отчетами</div>
+</div>
+<!-- Загрузка -->
+<div class="loading" id="loading">
+<div class="spinner"></div>
+<p id="loadingText">Загрузка отчетов...</p>
+</div>
+<!-- Пустое состояние -->
+<div class="empty-state hidden" id="emptyState">
+<div class="empty-state-icon">📋</div>
+<div class="empty-state-title" id="emptyTitle">Отчеты не найдены</div>
+<div class="empty-state-description" id="emptyDescription">
                 У вас пока нет сохраненных отчетов. Создайте первый отчет в главном меню.
             </div>
-        </div>
-
-        <!-- Секция с отчетами -->
-        <div id="reportsSection" class="reports-section hidden">
-            <div id="reportsList"></div>
-        </div>
-
-        <!-- Кнопка возврата -->
-        <button class="back-btn" onclick="goToMainMenu()" id="backBtn" data-i18n="common.back">Вернуться в главное меню</button>
-    </div>
-
-    <!-- Toast container -->
-    <div class="toast-container" id="toastContainer"></div>
-
-    <!-- Modal для подтверждения удаления -->
-    <div id="deleteModal" class="modal-overlay" style="display: none;">
-        <div class="modal">
-            <div class="modal-header">
-                <div class="modal-title" id="deleteModalTitle">Подтверждение удаления</div>
-                <button class="modal-close" id="closeDeleteModalBtn">×</button>
-            </div>
-            <div class="modal-content">
-                <p id="deleteModalMessage">Вы уверены, что хотите удалить этот отчет? Это действие нельзя отменить.</p>
-            </div>
-            <div class="modal-actions">
-                <button class="modal-btn secondary" id="cancelDeleteBtn" data-i18n="common.cancel">Отмена</button>
-                <button class="modal-btn danger" id="confirmDeleteBtn" data-i18n="common.delete">Удалить</button>
-            </div>
-        </div>
-    </div>
-
-    <script>
+</div>
+<!-- Секция с отчетами -->
+<div class="reports-section hidden" id="reportsSection">
+<div id="reportsList"></div>
+</div>
+<!-- Кнопка возврата -->
+<button class="back-btn" data-i18n="common.back" id="backBtn" onclick="goToMainMenu()">Вернуться в главное меню</button>
+</div>
+<!-- Toast container -->
+<div class="toast-container" id="toastContainer"></div>
+<!-- Modal для подтверждения удаления -->
+<div class="modal-overlay" id="deleteModal" style="display: none;">
+<div class="modal">
+<div class="modal-header">
+<div class="modal-title" id="deleteModalTitle">Подтверждение удаления</div>
+<button class="modal-close" id="closeDeleteModalBtn">×</button>
+</div>
+<div class="modal-content">
+<p id="deleteModalMessage">Вы уверены, что хотите удалить этот отчет? Это действие нельзя отменить.</p>
+</div>
+<div class="modal-actions">
+<button class="modal-btn secondary" data-i18n="common.cancel" id="cancelDeleteBtn">Отмена</button>
+<button class="modal-btn danger" data-i18n="common.delete" id="confirmDeleteBtn">Удалить</button>
+</div>
+</div>
+</div>
+<script>
         let tg = window.Telegram.WebApp;
         tg.expand();
         tg.ready();
