@@ -3717,12 +3717,50 @@
         }
 
         // Initialize the page
-        function init() {
-            // Set language based on Telegram WebApp
-            if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
-                const userLang = tg.initDataUnsafe.user.language_code;
-                if (userLang && locales[userLang]) {
-                    currentLanguage = userLang;
+        async function init() {
+            const userData = getUserData();
+            if (!userData) {
+                // Set language based on Telegram WebApp
+                if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
+                    const userLang = tg.initDataUnsafe.user.language_code;
+                    if (userLang && locales[userLang]) {
+                        currentLanguage = userLang;
+                    }
+                }
+                updatePageText();
+                loadCountries();
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/user', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        telegram_id: userData.id,
+                        username: userData.username,
+                        tg_name: userData.tg_name,
+                        last_name: userData.last_name,
+                        language_code: userData.language_code || 'ru'
+                    })
+                });
+
+                if (response.ok) {
+                    const userInfo = await response.json();
+                    
+                    // Устанавливаем язык в зависимости от статуса пользователя
+                    if (userInfo.user_status === 'admin' && userInfo.language) {
+                        // Для админов используем язык из базы данных
+                        currentLanguage = userInfo.language;
+                    } else if (userData.language_code) {
+                        // Для обычных пользователей используем язык из Telegram
+                        currentLanguage = userData.language_code;
+                    }
+                }
+            } catch (error) {
+                // В случае ошибки используем язык из Telegram
+                if (userData.language_code) {
+                    currentLanguage = userData.language_code;
                 }
             }
             

@@ -8227,8 +8227,12 @@
         }
 
         // Initialize page
-        function init() {
-            updatePageText();
+        // Initialize page
+        async function init() {
+            // Сначала инициализируем локализацию
+            await initLocalization();
+            
+            // Затем загружаем страны и инициализируем остальные элементы
             loadCountries();
             
             // Initialize price input
@@ -10117,10 +10121,8 @@
             updatePageText();
         }
 
-        // Запускаем локализацию при загрузке страницы
-        document.addEventListener('DOMContentLoaded', function() {
-            initLocalization();
-        });
+        // Запускаем инициализацию при загрузке страницы
+        document.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
 </html>
