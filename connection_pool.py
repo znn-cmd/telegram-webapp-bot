@@ -43,6 +43,7 @@ class SupabaseConnectionPool:
                         if self.active_connections >= self.max_connections:
                             logger.warning(f"Достигнут лимит соединений ({self.max_connections}), ожидание...")
                             time.sleep(0.1)
+                            # Продолжаем попытку, а не выходим из цикла
                             continue
                         
                         self.active_connections += 1
@@ -89,8 +90,14 @@ class SupabaseConnectionPool:
                     logger.error(f"Все попытки исчерпаны. Ошибка: {e}")
                     raise e
             
-            # Если мы дошли сюда, значит все попытки исчерпаны
-            raise Exception("Все попытки выполнения запроса исчерпаны")
+            # Если мы дошли сюда, значит все попытки исчерпаны из-за лимита соединений
+            raise Exception("Не удалось получить соединение после всех попыток")
+        
+        # Всегда возвращаем Future
+        logger.debug(f"SupabaseConnectionPool.execute_query: создание Future")
+        future = self.executor.submit(wrapped_query)
+        logger.debug(f"SupabaseConnectionPool.execute_query: Future создан: {future}")
+        return future
     
     def _update_average_response_time(self, response_time: float):
         """Обновление среднего времени ответа"""
@@ -166,7 +173,10 @@ class QueryOptimizer:
             
             return query.execute()
         
-        return self.pool.execute_query(query_func)
+        logger.debug(f"Выполнение optimized_select для таблицы {table}")
+        future = self.pool.execute_query(query_func)
+        logger.debug(f"QueryOptimizer получил Future: {future}")
+        return future
     
     def batch_query(self, queries: list) -> list:
         """Выполнение batch запросов"""
