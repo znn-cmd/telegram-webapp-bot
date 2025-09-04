@@ -3666,72 +3666,72 @@
 <div id="slogan" style="font-size:15px;color:#888;font-style:italic;">Инсайты рынка недвижимости</div>
 </div>
 <!-- Заголовок страницы -->
-<div class="page-title" id="pageTitle">Оценка объекта</div>
-<div class="page-description" id="pageDescription">Получите профессиональную оценку стоимости недвижимости в выбранном регионе</div>
+<div class="page-title" data-i18n="reports.object_evaluation_title" id="pageTitle">Оценка объекта</div>
+<div class="page-description" data-i18n="reports.object_evaluation_description" id="pageDescription">Получите профессиональную оценку стоимости недвижимости в выбранном регионе</div>
 <!-- Форма выбора локации -->
 <div class="location-form" id="locationForm">
 <div class="form-group">
-<label for="countrySelect" id="countryLabel">Страна:</label>
+<label data-i18n="reports.country_label" for="countrySelect" id="countryLabel">Страна:</label>
 <select id="countrySelect" onchange="onCountryChange()">
-<option id="countryPlaceholder" value="">Выберите страну</option>
+<option data-i18n="reports.country_placeholder" id="countryPlaceholder" value="">Выберите страну</option>
 </select>
 </div>
 <div class="form-group">
-<label for="citySelect" id="cityLabel">Город:</label>
+<label data-i18n="reports.city_label" for="citySelect" id="cityLabel">Город:</label>
 <select disabled="" id="citySelect" onchange="onCityChange()">
-<option id="cityPlaceholder" value="">Сначала выберите страну</option>
+<option data-i18n="reports.city_placeholder" id="cityPlaceholder" value="">Сначала выберите страну</option>
 </select>
 </div>
 <div class="form-group">
-<label for="countySelect" id="countyLabel">Область/Регион:</label>
+<label data-i18n="reports.county_label" for="countySelect" id="countyLabel">Область/Регион:</label>
 <select disabled="" id="countySelect" onchange="onCountyChange()">
-<option id="countyPlaceholder" value="">Сначала выберите город</option>
+<option data-i18n="reports.county_placeholder" id="countyPlaceholder" value="">Сначала выберите город</option>
 </select>
 </div>
 <div class="form-group">
-<label for="districtSelect" id="districtLabel">Район:</label>
+<label data-i18n="reports.district_label" for="districtSelect" id="districtLabel">Район:</label>
 <select disabled="" id="districtSelect" onchange="onDistrictChange()">
-<option id="districtPlaceholder" value="">Сначала выберите область</option>
+<option data-i18n="reports.district_placeholder" id="districtPlaceholder" value="">Сначала выберите область</option>
 </select>
 </div>
 <!-- Listing Type Selection -->
 <div class="listing-type-section" id="listingTypeSection" style="display: none;">
-<div class="listing-type-title" id="listingTypeTitle">Выберите тип недвижимости для анализа:</div>
+<div class="listing-type-title" data-i18n="reports.listing_type_title" id="listingTypeTitle">Выберите тип недвижимости для анализа:</div>
 <!-- House Type Listing Types -->
 <div class="listing-type-group">
-<div class="listing-type-subtitle" id="houseTypeSubtitle">Количество спален:</div>
+<div class="listing-type-subtitle" data-i18n="reports.house_type_subtitle" id="houseTypeSubtitle">Количество спален:</div>
 <select class="listing-type-select" id="houseTypeSelect">
 <option id="houseTypePlaceholder" value="">Выберите количество спален</option>
 </select>
 </div>
 <!-- Floor Segment Listing Types -->
 <div class="listing-type-group">
-<div class="listing-type-subtitle" id="floorSegmentSubtitle">Этаж:</div>
+<div class="listing-type-subtitle" data-i18n="reports.floor_segment_subtitle" id="floorSegmentSubtitle">Этаж:</div>
 <select class="listing-type-select" id="floorSegmentSelect">
 <option id="floorSegmentPlaceholder" value="">Выберите этаж</option>
 </select>
 </div>
 <!-- Age Data Listing Types -->
 <div class="listing-type-group">
-<div class="listing-type-subtitle" id="ageDataSubtitle">Возраст объекта:</div>
+<div class="listing-type-subtitle" data-i18n="reports.age_data_subtitle" id="ageDataSubtitle">Возраст объекта:</div>
 <select class="listing-type-select" id="ageDataSelect">
 <option id="ageDataPlaceholder" value="">Выберите возраст объекта</option>
 </select>
 </div>
 <!-- Heating Data Listing Types -->
 <div class="listing-type-group">
-<div class="listing-type-subtitle" id="heatingDataSubtitle">Тип отопления:</div>
+<div class="listing-type-subtitle" data-i18n="reports.heating_data_subtitle" id="heatingDataSubtitle">Тип отопления:</div>
 <select class="listing-type-select" id="heatingDataSelect">
 <option id="heatingDataPlaceholder" value="">Выберите тип отопления</option>
 </select>
 </div>
 <!-- Price Object -->
 <div class="listing-type-group">
-<div class="listing-type-subtitle" id="priceObjectSubtitle">Цена объекта:</div>
+<div class="listing-type-subtitle" data-i18n="reports.price_object_subtitle" id="priceObjectSubtitle">Цена объекта:</div>
 <input class="listing-type-input" id="priceObjectInput" placeholder="Введите цену" type="number"/>
 <!-- Currency Selection -->
 <div class="currency-buttons-container">
-<div class="currency-buttons-title" id="currencyTitle">Выберите валюту:</div>
+<div class="currency-buttons-title" data-i18n="reports.currency_title" id="currencyTitle">Выберите валюту:</div>
 <div class="currency-buttons">
 <button class="currency-button" data-currency="TRY" type="button">
 <span class="currency-symbol">₺</span>
@@ -3747,27 +3747,27 @@
 </div>
 <!-- Area Object -->
 <div class="listing-type-group">
-<div class="listing-type-subtitle" id="areaObjectSubtitle">Площадь объекта (м²):</div>
+<div class="listing-type-subtitle" data-i18n="reports.area_object_subtitle" id="areaObjectSubtitle">Площадь объекта (м²):</div>
 <input class="listing-type-input" id="areaObjectInput" max="1000" min="10" placeholder="Введите площадь" type="number"/>
 </div>
 </div>
 <button class="confirm-button" disabled="" id="confirmButton" onclick="confirmLocation()">
-<span id="confirmButtonText">Подтвердить выбор</span>
+<span data-i18n="reports.confirm_selection" id="confirmButtonText">Подтвердить выбор</span>
 </button>
 </div>
 <!-- Выбранная локация -->
 <div class="selected-location" id="selectedLocation" style="display: none;">
-<div class="location-title" id="selectedLocationTitle">Выбранная локация:</div>
+<div class="location-title" data-i18n="reports.selected_location" id="selectedLocationTitle">Выбранная локация:</div>
 <div class="location-details" id="locationDetails"></div>
 <!-- Выбранные характеристики недвижимости -->
 <div class="selected-property-types" id="selectedPropertyTypes" style="display: none;">
-<div class="property-types-title" id="propertyTypesTitle">Выбранные характеристики недвижимости:</div>
+<div class="property-types-title" data-i18n="reports.property_types_title" id="propertyTypesTitle">Выбранные характеристики недвижимости:</div>
 <div class="property-types-details" id="propertyTypesDetails"></div>
 </div>
 </div>
 <!-- Блок с ID для админов (отдельный) -->
 <div class="admin-ids-block" id="adminIdsBlock" style="display: none;">
-<div class="admin-ids-title" id="adminIdsTitle">ID для админов:</div>
+<div class="admin-ids-title" data-i18n="reports.admin_ids" id="adminIdsTitle">ID для админов:</div>
 <div class="admin-ids-details" id="adminIdsDetails"></div>
 </div>
 <!-- Ключевые метрики - скрыты -->
@@ -3786,21 +3786,21 @@
 </div>
 <!-- Save and Share Button -->
 <button class="save-share-button" id="saveShareButton" onclick="saveAndShareReport()">
-<span id="saveShareButtonText">Сохранить и поделиться отчетом</span>
+<span data-i18n="reports.save_share_button_text" id="saveShareButtonText">Сохранить и поделиться отчетом</span>
 </button>
 <!-- Error State -->
 <div class="error-state" id="errorState" style="display: none;">
 <div class="error-icon">❌</div>
-<div class="error-text" id="errorText">Ошибка загрузки данных</div>
+<div class="error-text" data-i18n="reports.error_text" id="errorText">Ошибка загрузки данных</div>
 </div>
 <!-- Back Button -->
-<a class="back-button" href="/webapp_main" id="backButton">← Вернуться в главное меню</a>
+<a class="back-button" data-i18n="reports.back_to_main" href="/webapp_main" id="backButton">← Вернуться в главное меню</a>
 <!-- Modal for sharing report -->
 <div class="modal-overlay" id="shareModal">
 <div class="modal-content">
 <button class="modal-close" onclick="closeShareModal()">×</button>
 <div class="modal-title" data-i18n="reports.report_saved" id="modalTitle">Отчет сохранен</div>
-<div class="modal-description" id="modalDescription">
+<div class="modal-description" data-i18n="reports.modal_description" id="modalDescription">
                     Ваш отчет успешно сохранен. Вы можете скопировать ссылку и поделиться ею с другими.
                 </div>
 <div class="modal-link-container">
@@ -3808,7 +3808,7 @@
 </div>
 <div class="modal-actions">
 <button class="modal-button modal-button-primary" onclick="copyReportLink()">
-<span id="copyButtonText">Копировать ссылку</span>
+<span data-i18n="reports.copy_button_text" id="copyButtonText">Копировать ссылку</span>
 </button>
 <button class="modal-button modal-button-secondary" data-i18n="common.close" onclick="closeShareModal()">
 <span data-i18n="common.close" id="closeButtonText">Закрыть</span>
@@ -3854,615 +3854,13 @@
         };
 
         // Localization data
-        const locales = {
-            'ru': {
-                'slogan': 'Инсайты рынка недвижимости',
-                'pageTitle': 'Оценка объекта',
-                'pageDescription': 'Получите профессиональную оценку стоимости недвижимости в выбранном регионе',
-                'countryLabel': 'Страна:',
-                'cityLabel': 'Город:',
-                'countyLabel': 'Область/Регион:',
-                'districtLabel': 'Район:',
-                'countryPlaceholder': 'Выберите страну',
-                'cityPlaceholder': 'Сначала выберите страну',
-                'countyPlaceholder': 'Сначала выберите город',
-                'districtPlaceholder': 'Сначала выберите область',
-                'confirmButtonText': 'Подтвердить выбор',
-                'backButton': '← Вернуться в главное меню',
-                'selectedLocationTitle': 'Выбранная локация:',
-                'adminIdsTitle': 'ID для админов:',
-                'loading': 'Загрузка...',
-                'errorLoading': 'Ошибка загрузки данных',
-                'dataSectionTitle': 'Анализ данных региона',
-                'loadingText': 'Загрузка данных...',
-                'errorText': 'Ошибка загрузки данных',
-                'totalProperties': 'Всего объектов:',
-                'averagePrice': 'Средняя цена:',
-                'priceRange': 'Диапазон цен:',
-                'noDataAvailable': 'Данные недоступны',
-                'keyMetricsTitle': 'Ключевые показатели',
-                'avgSalePriceLabel': 'Средняя цена продажи за м²',
-                'avgRentPriceLabel': 'Средняя цена аренды за м²',
-                'listingPeriodSaleLabel': 'Период размещения (продажа)',
-                'listingPeriodRentLabel': 'Период размещения (аренда)',
-                'yieldLabel': 'Доходность',
-
-                'listingTypeTitle': 'Выберите тип недвижимости для анализа:',
-                'houseTypeSubtitle': 'Количество спален:',
-                'floorSegmentSubtitle': 'Этаж:',
-                'ageDataSubtitle': 'Возраст объекта:',
-                'heatingDataSubtitle': 'Тип отопления:',
-                'priceObjectSubtitle': 'Цена объекта:',
-                'areaObjectSubtitle': 'Площадь объекта (м²):',
-                'selectBedrooms': 'количество спален',
-                'selectFloor': 'этаж',
-                'selectAge': 'возраст объекта',
-                'selectHeating': 'тип отопления',
-                'propertyTypesTitle': 'Выбранные характеристики недвижимости:',
-                'bedroomsLabel': 'Количество спален',
-                'floorLabel': 'Этаж',
-                'ageLabel': 'Возраст объекта',
-                'heatingLabel': 'Тип отопления',
-                'marketIndicatorsTitle': 'Показатели рынка',
-                'marketTrendsTitle': 'Тренды рынка',
-                'saleHeader': 'Продажа',
-                'rentHeader': 'Аренда',
-                'currencyTitle': 'Выберите валюту:',
-                'saveShareButtonText': 'Сохранить и поделиться отчетом',
-                'modalTitle': 'Отчет сохранен',
-                'modalDescription': 'Ваш отчет успешно сохранен. Вы можете скопировать ссылку и поделиться ею с другими.',
-                'copyButtonText': 'Копировать ссылку',
-                'closeButtonText': 'Закрыть',
-                'linkCopied': 'Ссылка скопирована!',
-                'savingReport': 'Сохранение отчета...',
-                'errorSaving': 'Ошибка сохранения отчета',
-                'pricePlaceholder': 'Введите цену',
-                'areaPlaceholder': 'Введите площадь',
-                'trendsFilterInfo': 'Показано ${filteredCount} из ${totalCount} трендов',
-                'marketComparisonTitle': 'Сравнение с рынком',
-                'pricePerM2Label': 'Цена за м²',
-                'areaLabel': 'Площадь',
-                'priceComparisonLabel': 'Цена за м²:',
-                'areaComparisonLabel': 'Площадь:',
-                'priceCloseToMarket': 'Ваш объект (${userPrice}) близок к рыночной (${marketMin} – ${marketMax}).',
-                'priceAboveMarket': 'Ваш объект (${userPrice}) выше рынка на ${percent}%.',
-                'priceBelowMarket': 'Ваш объект (${userPrice}) ниже рынка на ${percent}%.',
-                'areaMatchesMarket': 'Ваш объект (${userArea} м²) соответствует рыночному спросу (${marketMin}–${marketMax} м²).',
-                'areaBelowMarket': 'Ваш объект (${userArea} м²) меньше востребованной на рынке (${marketMin}–${marketMax} м²).',
-                'areaAboveMarket': 'Ваш объект (${userArea} м²) больше востребованной на рынке (${marketMin}–${marketMax} м²).',
-                'houseTypeDataTitle': 'Данные по количеству спален',
-                'floorSegmentDataTitle': 'Данные по этажу',
-                'ageDataTitle': 'Данные по возрасту объектов',
-                'heatingDataTitle': 'Данные по типу отопления',
-                'consolidatedAssessmentTitle': 'Консолидированная оценка',
-                'salePriceTitle': 'Цена за м² (Unit Price For Sale):',
-                'rentPriceTitle': 'Цена аренды за м² (Unit Price For Rent):',
-                'yieldTitle': 'Доходность (Yield):',
-                'consolidatedAverageLabel': 'Консолидированная средняя:',
-                'bedroomsLabel': 'Спальни',
-                'floorLabel': 'Этаж',
-                'ageLabel': 'Возраст',
-                'heatingLabel': 'Отопление',
-                
-                // Ключи локализации для таблицы "Показатели рынка"
-                'indicatorLabel': 'Показатель',
-                'minValueLabel': 'Минимальное значение',
-                'maxValueLabel': 'Максимальное значение',
-                'comparableAreaForSaleLabel': 'Сопоставимая площадь',
-                'countForSaleLabel': 'Количество для продажи',
-                'listingPeriodForSaleLabel': 'Срок до продажи',
-                'unitPriceForSaleLabel': 'Цена за м²',
-                'comparableAreaForRentLabel': 'Сопоставимая площадь',
-                'countForRentLabel': 'Количество для аренды',
-                'listingPeriodForRentLabel': 'Срок до аренды',
-                'unitPriceForRentLabel': 'Цена за м²',
-                
-                // Ключи для текстового анализа рынка
-                'marketAnalysisTitle': 'Анализ рынка',
-                'saleAnalysisText': 'Продажа: при площади {area} м² (среднее значение по проданным объектам) и минимальной цене {minPrice}/м² срок продажи составляет ~{minDays} дней; при максимальной цене {maxPrice}/м² - срок продажи до {maxDays} дней.',
-                'rentAnalysisText': 'Аренда: при площади {area} м² (среднее значение по сданным в аренду объектам) минимальная цена {minPrice}/м² срок сдачи ~{minDays} дней; при максимальной цене {maxPrice}/м² срок до {maxDays} дней.',
-                
-                // Ключи для графика трендов
-                'chart_title': 'График трендов',
-                'sale_button': 'Цена м² продажи',
-                'rent_button': 'Цена м² аренды',
-                'chart_info': 'Показаны данные до текущего месяца и один месяц вперед',
-                
-                // Ключи для графика прогноза
-                'forecast_chart_title': 'График прогноза цен и аренды',
-                'forecast_chart_info': 'Прогноз на основе текущего и будущих месяцев',
-                
-                // Ключи для блока "Вывод по объекту"
-                'objectSummaryTitle': 'Вывод по объекту',
-                'objectPricePerM2Label': 'Цена за м² вашего объекта:',
-                'objectCurrencyLabel': 'Валюта объекта:',
-                'objectAreaLabel': 'Площадь объекта:',
-                'exchangeRateLabel': 'Курс конвертации:',
-                
-                // Ключи для сообщения о подписке
-                'subscriptionRequiredTitle': 'Функция долгосрочного прогноза стоимости объекта доступна только для пользователей с активной подпиской.',
-                'subscriptionBenefits': 'Что даёт подписка:',
-                'subscriptionBenefit1': 'Прогноз цены объекта на 12 месяцев вперёд',
-                'subscriptionBenefit2': 'Дополнительные аналитические данные',
-                'subscriptionBenefit3': 'Дополнительные возможности сервиса',
-                'howToSubscribe': 'Как оформить подписку:',
-                'subscribeInstructions': 'Перейдите к боту @Aaadviser_pay_bot',
-                'followInstructions': 'Следуйте инструкциям для подключения',
-                'needHelp': 'Нужна помощь?',
-                'contactSupport': 'Свяжитесь с нашей поддержкой: @Aaadviser_support_bot'
-            },
-            'en': {
-                'slogan': 'Real Estate Market Insights',
-                'pageTitle': 'Object Evaluation',
-                'pageDescription': 'Get a professional property valuation in the selected region',
-                'countryLabel': 'Country:',
-                'cityLabel': 'City:',
-                'countyLabel': 'Region/Area:',
-                'districtLabel': 'District:',
-                'countryPlaceholder': 'Select country',
-                'cityPlaceholder': 'First select country',
-                'countyPlaceholder': 'First select city',
-                'districtPlaceholder': 'First select region',
-                'confirmButtonText': 'Confirm selection',
-                'backButton': '← Back to main menu',
-                'selectedLocationTitle': 'Selected location:',
-                'adminIdsTitle': 'IDs for admins:',
-                'loading': 'Loading...',
-                'errorLoading': 'Error loading data',
-                'dataSectionTitle': 'Regional Data Analysis',
-                'loadingText': 'Loading data...',
-                'errorText': 'Error loading data',
-                'totalProperties': 'Total properties:',
-                'averagePrice': 'Average price:',
-                'priceRange': 'Price range:',
-                'noDataAvailable': 'Data not available',
-                'keyMetricsTitle': 'Key Metrics',
-                'avgSalePriceLabel': 'Average Sale Price per m²',
-                'avgRentPriceLabel': 'Average Rent Price per m²',
-                'listingPeriodSaleLabel': 'Listing Period (Sale)',
-                'listingPeriodRentLabel': 'Listing Period (Rent)',
-                'yieldLabel': 'Yield',
-
-                'listingTypeTitle': 'Select property type for analysis:',
-                'houseTypeSubtitle': 'Bedroom count:',
-                'floorSegmentSubtitle': 'Floor:',
-                'ageDataSubtitle': 'Property age:',
-                'heatingDataSubtitle': 'Heating type:',
-                'priceObjectSubtitle': 'Property price:',
-                'areaObjectSubtitle': 'Property area (m²):',
-                'selectBedrooms': 'bedroom count',
-                'selectFloor': 'floor',
-                'selectAge': 'property age',
-                'selectHeating': 'heating type',
-                'propertyTypesTitle': 'Selected property characteristics:',
-                'bedroomsLabel': 'Bedroom count',
-                'floorLabel': 'Floor',
-                'ageLabel': 'Property age',
-                'heatingLabel': 'Heating type',
-                'marketIndicatorsTitle': 'Market Indicators',
-                'marketTrendsTitle': 'Market Trends',
-                'saleHeader': 'Sale',
-                'rentHeader': 'Rent',
-                'currencyTitle': 'Select currency:',
-                'saveShareButtonText': 'Save and share report',
-                'modalTitle': 'Report saved',
-                'modalDescription': 'Your report has been successfully saved. You can copy the link and share it with others.',
-                'copyButtonText': 'Copy link',
-                'closeButtonText': 'Close',
-                'linkCopied': 'Link copied!',
-                'savingReport': 'Saving report...',
-                'errorSaving': 'Error saving report',
-                'pricePlaceholder': 'Enter price',
-                'areaPlaceholder': 'Enter area',
-                'trendsFilterInfo': 'Showing ${filteredCount} of ${totalCount} trends',
-                'marketComparisonTitle': 'Market Comparison',
-                'pricePerM2Label': 'Price per m²',
-                'areaLabel': 'Area',
-                'priceComparisonLabel': 'Price per m²:',
-                'areaComparisonLabel': 'Area:',
-                'priceCloseToMarket': 'Your object (${userPrice}) is close to market (${marketMin} – ${marketMax}).',
-                'priceAboveMarket': 'Your object (${userPrice}) is above market by ${percent}%.',
-                'priceBelowMarket': 'Your object (${userPrice}) is below market by ${percent}%.',
-                'areaMatchesMarket': 'Your object (${userArea} m²) matches market demand (${marketMin}–${marketMax} m²).',
-                'areaBelowMarket': 'Your object (${userArea} m²) is smaller than market demand (${marketMin}–${marketMax} m²).',
-                'areaAboveMarket': 'Your object (${userArea} m²) is larger than market demand (${marketMin}–${marketMax} m²).',
-                'houseTypeDataTitle': 'Bedroom Count Data',
-                'floorSegmentDataTitle': 'Floor Data',
-                'ageDataTitle': 'Property Age Data',
-                'heatingDataTitle': 'Heating Type Data',
-                'consolidatedAssessmentTitle': 'Consolidated Assessment',
-                'salePriceTitle': 'Price per m² (Unit Price For Sale):',
-                'rentPriceTitle': 'Rent Price per m² (Unit Price For Rent):',
-                'yieldTitle': 'Yield:',
-                'consolidatedAverageLabel': 'Consolidated Average:',
-                'bedroomsLabel': 'Bedrooms',
-                
-                // Market analysis text localization keys
-                'marketAnalysisTitle': 'Market Analysis',
-                'saleAnalysisText': 'Sale: with an area of {area} m² (average value for sold properties) and a minimum price of {minPrice}/m², the sale period is ~{minDays} days; with a maximum price of {maxPrice}/m² - the sale period is up to {maxDays} days.',
-                'rentAnalysisText': 'Rent: with an area of {area} m² (average value for rented properties) minimum price {minPrice}/m², rental period ~{minDays} days; with a maximum price of {maxPrice}/m² period up to {maxDays} days.',
-                
-                // Object summary localization keys
-                'objectSummaryTitle': 'Object Summary',
-                'objectPricePerM2Label': 'Price per m² of your object:',
-                'objectCurrencyLabel': 'Object currency:',
-                'objectAreaLabel': 'Object area:',
-                'exchangeRateLabel': 'Exchange rate:',
-                'floorLabel': 'Floor',
-                'ageLabel': 'Age',
-                'heatingLabel': 'Heating',
-                
-                // Keys for "Market Indicators" table
-                'indicatorLabel': 'Indicator',
-                'minValueLabel': 'Minimum Value',
-                'maxValueLabel': 'Maximum Value',
-                'comparableAreaForSaleLabel': 'Comparable Area',
-                'countForSaleLabel': 'Count for Sale',
-                'listingPeriodForSaleLabel': 'Time to Sale',
-                'unitPriceForSaleLabel': 'Unit Price',
-                'comparableAreaForRentLabel': 'Comparable Area',
-                'countForRentLabel': 'Count for Rent',
-                'listingPeriodForRentLabel': 'Time to Rent',
-                'unitPriceForRentLabel': 'Unit Price',
-                
-                // Keys for market analysis text
-                'marketAnalysisTitle': 'Market Analysis',
-                'saleAnalysisText': 'Sale: with an area of {area} m² (average value for sold properties) and minimum price {minPrice}/m², the sale period is ~{minDays} days; with maximum price {maxPrice}/m² - sale period up to {maxDays} days.',
-                'rentAnalysisText': 'Rent: with an area of {area} m² (average value for rented properties) minimum price {minPrice}/m², rental period ~{minDays} days; with maximum price {maxPrice}/m², period up to {maxDays} days.',
-                
-                // Keys for trends chart
-                'chart_title': 'Trends Chart',
-                'sale_button': 'Sale Price per m²',
-                'rent_button': 'Rent Price per m²',
-                'chart_info': 'Data shown up to current month and one month ahead',
-                
-                // Keys for forecast chart
-                'forecast_chart_title': 'Price and Rent Forecast Chart',
-                'forecast_chart_info': 'Forecast based on current and future months',
-                
-                // Keys for subscription message
-                'subscriptionRequiredTitle': 'Long-term property value forecasting is only available for users with an active subscription.',
-                'subscriptionBenefits': 'What subscription gives you:',
-                'subscriptionBenefit1': 'Property price forecast for 12 months ahead',
-                'subscriptionBenefit2': 'Additional analytical data',
-                'subscriptionBenefit3': 'Additional service capabilities',
-                'howToSubscribe': 'How to subscribe:',
-                'subscribeInstructions': 'Go to bot @Aaadviser_pay_bot',
-                'followInstructions': 'Follow the connection instructions',
-                'needHelp': 'Need help?',
-                'contactSupport': 'Contact our support: @Aaadviser_support_bot'
-            },
-            'de': {
-                'slogan': 'Immobilienmarkt-Einblicke',
-                'pageTitle': 'Objektbewertung',
-                'pageDescription': 'Erhalten Sie eine professionelle Immobilienbewertung in der ausgewählten Region',
-                'countryLabel': 'Land:',
-                'cityLabel': 'Stadt:',
-                'countyLabel': 'Region/Bereich:',
-                'districtLabel': 'Bezirk:',
-                'countryPlaceholder': 'Land auswählen',
-                'cityPlaceholder': 'Zuerst Land auswählen',
-                'countyPlaceholder': 'Zuerst Stadt auswählen',
-                'districtPlaceholder': 'Zuerst Region auswählen',
-                'confirmButtonText': 'Auswahl bestätigen',
-                'backButton': '← Zurück zum Hauptmenü',
-                'selectedLocationTitle': 'Ausgewählte Lage:',
-                'adminIdsTitle': 'IDs für Administratoren:',
-                'loading': 'Laden...',
-                'errorLoading': 'Fehler beim Laden der Daten',
-                'dataSectionTitle': 'Regionale Datenanalyse',
-                'generalDataTitle': 'Allgemeine Daten',
-                'houseTypeDataTitle': 'Schlafzimmer-Anzahl-Daten',
-                'floorSegmentDataTitle': 'Etagen-Daten',
-                'ageDataTitle': 'Altersdaten',
-                'heatingDataTitle': 'Heizungstyp-Daten',
-                'loadingText': 'Daten werden geladen...',
-                'errorText': 'Fehler beim Laden der Daten',
-                'totalProperties': 'Gesamtobjekte:',
-                'averagePrice': 'Durchschnittspreis:',
-                'priceRange': 'Preisbereich:',
-                'noDataAvailable': 'Daten nicht verfügbar',
-                'keyMetricsTitle': 'Wichtige Kennzahlen',
-                'avgSalePriceLabel': 'Durchschnittlicher Verkaufspreis pro m²',
-                'avgRentPriceLabel': 'Durchschnittlicher Mietpreis pro m²',
-                'listingPeriodSaleLabel': 'Angebotsdauer (Verkauf)',
-                'listingPeriodRentLabel': 'Angebotsdauer (Vermietung)',
-                'yieldLabel': 'Rendite',
-                'insightsTitle': 'Zusammenfassung',
-                'insightsLoading': 'Daten werden analysiert...',
-                'insightsError': 'Fehler bei der Datenanalyse'
-            },
-            'fr': {
-                'slogan': 'Aperçus du marché immobilier',
-                'pageTitle': 'Évaluation d\'objet',
-                'pageDescription': 'Obtenez une évaluation professionnelle de propriété dans la région sélectionnée',
-                'countryLabel': 'Pays :',
-                'cityLabel': 'Ville :',
-                'countyLabel': 'Région/Zone :',
-                'districtLabel': 'District :',
-                'countryPlaceholder': 'Sélectionner un pays',
-                'cityPlaceholder': 'D\'abord sélectionner un pays',
-                'countyPlaceholder': 'D\'abord sélectionner une ville',
-                'districtPlaceholder': 'D\'abord sélectionner une région',
-                'confirmButtonText': 'Confirmer la sélection',
-                'backButton': '← Retour au menu principal',
-                'selectedLocationTitle': 'Emplacement sélectionné :',
-                'adminIdsTitle': 'IDs pour les administrateurs :',
-                'loading': 'Chargement...',
-                'errorLoading': 'Erreur de chargement des données',
-                'dataSectionTitle': 'Analyse des données régionales',
-                'generalDataTitle': 'Données générales',
-                'houseTypeDataTitle': 'Données du nombre de chambres',
-                'floorSegmentDataTitle': 'Données d\'étage',
-                'ageDataTitle': 'Données d\'âge',
-                'heatingDataTitle': 'Données du type de chauffage',
-                'loadingText': 'Chargement des données...',
-                'errorText': 'Erreur de chargement des données',
-                'totalProperties': 'Total des propriétés :',
-                'averagePrice': 'Prix moyen :',
-                'priceRange': 'Fourchette de prix :',
-                'noDataAvailable': 'Données non disponibles',
-                'keyMetricsTitle': 'Métriques clés',
-                'avgSalePriceLabel': 'Prix de vente moyen par m²',
-                'avgRentPriceLabel': 'Prix de location moyen par m²',
-                'listingPeriodSaleLabel': 'Période d\'inscription (vente)',
-                'listingPeriodRentLabel': 'Période d\'inscription (location)',
-                'yieldLabel': 'Rendement',
-                'insightsTitle': 'Résumé',
-                'insightsLoading': 'Analyse des données...',
-                'insightsError': 'Erreur lors de l\'analyse des données'
-            },
-            'tr': {
-                'slogan': 'Gayrimenkul Piyasa İçgörüleri',
-                'pageTitle': 'Nesne Değerlendirmesi',
-                'pageDescription': 'Seçilen bölgede profesyonel gayrimenkul değerlendirmesi alın',
-                'countryLabel': 'Ülke:',
-                'cityLabel': 'Şehir:',
-                'countyLabel': 'Bölge/Alan:',
-                'districtLabel': 'İlçe:',
-                'countryPlaceholder': 'Ülke seçin',
-                'cityPlaceholder': 'Önce ülke seçin',
-                'countyPlaceholder': 'Önce şehir seçin',
-                'districtPlaceholder': 'Önce bölge seçin',
-                'confirmButtonText': 'Seçimi onayla',
-                'backButton': '← Ana menüye dön',
-                'selectedLocationTitle': 'Seçilen konum:',
-                'adminIdsTitle': 'Yöneticiler için ID\'ler:',
-                'loading': 'Yükleniyor...',
-                'errorLoading': 'Veri yükleme hatası',
-                'dataSectionTitle': 'Bölgesel Veri Analizi',
-                'generalDataTitle': 'Genel Veriler',
-                'houseTypeDataTitle': 'Yatak Odası Sayısı Verileri',
-                'floorSegmentDataTitle': 'Kat Verileri',
-                'ageDataTitle': 'Yaş Verileri',
-                'heatingDataTitle': 'Isıtma Tipi Verileri',
-                'loadingText': 'Veriler yükleniyor...',
-                'errorText': 'Veri yükleme hatası',
-                'totalProperties': 'Toplam mülk:',
-                'averagePrice': 'Ortalama fiyat:',
-                'priceRange': 'Fiyat aralığı:',
-                'noDataAvailable': 'Veri mevcut değil',
-                'keyMetricsTitle': 'Ana Metrikler',
-                'avgSalePriceLabel': 'm² başına ortalama satış fiyatı',
-                'avgRentPriceLabel': 'm² başına ortalama kiralama fiyatı',
-                'listingPeriodSaleLabel': 'İlan süresi (satış)',
-                'listingPeriodRentLabel': 'İlan süresi (kiralama)',
-                'yieldLabel': 'Getiri',
-
-                'marketComparisonTitle': 'Piyasa Karşılaştırması',
-                'pricePerM2Label': 'm² başına fiyat',
-                'areaLabel': 'Alan',
-                'priceComparisonLabel': 'm² başına fiyat:',
-                'areaComparisonLabel': 'Alan:',
-                'priceCloseToMarket': 'Nesneniz (${userPrice}) piyasaya yakın (${marketMin} – ${marketMax}).',
-                'priceAboveMarket': 'Nesneniz (${userPrice}) piyasadan ${percent}% yüksek.',
-                'priceBelowMarket': 'Nesneniz (${userPrice}) piyasadan ${percent}% düşük.',
-                'areaMatchesMarket': 'Nesneniz (${userArea} m²) piyasa talebine uygun (${marketMin}–${marketMax} m²).',
-                'areaBelowMarket': 'Nesneniz (${userArea} m²) piyasa talebinden küçük (${marketMin}–${marketMax} m²).',
-                'areaAboveMarket': 'Nesneniz (${userArea} m²) piyasa talebinden büyük (${marketMin}–${marketMax} m²).',
-                'consolidatedAssessmentTitle': 'Konsolide Değerlendirme',
-                'salePriceTitle': 'm² başına fiyat (Satış Birim Fiyatı):',
-                'rentPriceTitle': 'm² başına kiralama fiyatı (Kiralama Birim Fiyatı):',
-                'yieldTitle': 'Getiri:',
-                'consolidatedAverageLabel': 'Konsolide ortalama:',
-                'bedroomsLabel': 'Yatak Odası',
-                'floorLabel': 'Kat',
-                'ageLabel': 'Yaş',
-                'heatingLabel': 'Isıtma',
-                
-                // "Piyasa Analizi" metni için anahtarlar
-                'marketAnalysisTitle': 'Piyasa Analizi',
-                'saleAnalysisText': 'Satış: {area} m² alan (satılan mülklerin ortalama değeri) ve {minPrice}/m² minimum fiyat ile satış süresi ~{minDays} gün; {maxPrice}/m² maksimum fiyat ile satış süresi {maxDays} güne kadar.',
-                'rentAnalysisText': 'Kiralama: {area} m² alan (kiralanan mülklerin ortalama değeri) {minPrice}/m² minimum fiyat, kiralama süresi ~{minDays} gün; {maxPrice}/m² maksimum fiyat ile süre {maxDays} güne kadar.'
-            },
-            'de': {
-                'slogan': 'Immobilienmarkt-Einblicke',
-                'pageTitle': 'Objektbewertung',
-                'pageDescription': 'Erhalten Sie eine professionelle Immobilienbewertung in der ausgewählten Region',
-                'countryLabel': 'Land:',
-                'cityLabel': 'Stadt:',
-                'countyLabel': 'Region/Bereich:',
-                'districtLabel': 'Bezirk:',
-                'countryPlaceholder': 'Land auswählen',
-                'cityPlaceholder': 'Zuerst Land auswählen',
-                'countyPlaceholder': 'Zuerst Stadt auswählen',
-                'districtPlaceholder': 'Zuerst Region auswählen',
-                'confirmButtonText': 'Auswahl bestätigen',
-                'backButton': '← Zurück zum Hauptmenü',
-                'selectedLocationTitle': 'Ausgewählte Lage:',
-                'adminIdsTitle': 'IDs für Administratoren:',
-                'loading': 'Laden...',
-                'errorLoading': 'Fehler beim Laden der Daten',
-                'dataSectionTitle': 'Regionale Datenanalyse',
-                'generalDataTitle': 'Allgemeine Daten',
-                'houseTypeDataTitle': 'Schlafzimmer-Anzahl-Daten',
-                'floorSegmentDataTitle': 'Etagen-Daten',
-                'ageDataTitle': 'Altersdaten',
-                'heatingDataTitle': 'Heizungstyp-Daten',
-                'loadingText': 'Daten werden geladen...',
-                'errorText': 'Fehler beim Laden der Daten',
-                'totalProperties': 'Gesamtobjekte:',
-                'averagePrice': 'Durchschnittspreis:',
-                'priceRange': 'Preisbereich:',
-                'noDataAvailable': 'Daten nicht verfügbar',
-                'keyMetricsTitle': 'Wichtige Kennzahlen',
-                'avgSalePriceLabel': 'Durchschnittlicher Verkaufspreis pro m²',
-                'avgRentPriceLabel': 'Durchschnittlicher Mietpreis pro m²',
-                'listingPeriodSaleLabel': 'Angebotsdauer (Verkauf)',
-                'listingPeriodRentLabel': 'Angebotsdauer (Vermietung)',
-                'yieldLabel': 'Rendite',
-                'insightsTitle': 'Zusammenfassung',
-                'insightsLoading': 'Daten werden analysiert...',
-                'insightsError': 'Fehler bei der Datenanalyse'
-            },
-            'fr': {
-                'slogan': 'Aperçus du marché immobilier',
-                'pageTitle': 'Évaluation d\'objet',
-                'pageDescription': 'Obtenez une évaluation professionnelle de propriété dans la région sélectionnée',
-                'countryLabel': 'Pays :',
-                'cityLabel': 'Ville :',
-                'countyLabel': 'Région/Zone :',
-                'districtLabel': 'District :',
-                'countryPlaceholder': 'Sélectionner un pays',
-                'cityPlaceholder': 'D\'abord sélectionner un pays',
-                'countyPlaceholder': 'D\'abord sélectionner une ville',
-                'districtPlaceholder': 'D\'abord sélectionner une région',
-                'confirmButtonText': 'Confirmer la sélection',
-                'backButton': '← Retour au menu principal',
-                'selectedLocationTitle': 'Emplacement sélectionné :',
-                'adminIdsTitle': 'IDs pour les administrateurs :',
-                'loading': 'Chargement...',
-                'errorLoading': 'Erreur de chargement des données',
-                'dataSectionTitle': 'Analyse des données régionales',
-                'generalDataTitle': 'Données générales',
-                'houseTypeDataTitle': 'Données du nombre de chambres',
-                'floorSegmentDataTitle': 'Données d\'étage',
-                'ageDataTitle': 'Données d\'âge',
-                'heatingDataTitle': 'Données du type de chauffage',
-                'loadingText': 'Chargement des données...',
-                'errorText': 'Erreur de chargement des données',
-                'totalProperties': 'Total des propriétés :',
-                'averagePrice': 'Prix moyen :',
-                'priceRange': 'Fourchette de prix :',
-                'noDataAvailable': 'Données non disponibles',
-                'keyMetricsTitle': 'Métriques clés',
-                'avgSalePriceLabel': 'Prix de vente moyen par m²',
-                'avgRentPriceLabel': 'Prix de location moyen par m²',
-                'listingPeriodSaleLabel': 'Période d\'inscription (vente)',
-                'listingPeriodRentLabel': 'Période d\'inscription (location)',
-                'yieldLabel': 'Rendement',
-                'insightsTitle': 'Résumé',
-                'insightsLoading': 'Analyse des données...',
-                'insightsError': 'Erreur lors de l\'analyse des données'
-            },
-            'tr': {
-                'slogan': 'Gayrimenkul Piyasa İçgörüleri',
-                'pageTitle': 'Nesne Değerlendirmesi',
-                'pageDescription': 'Seçilen bölgede profesyonel gayrimenkul değerlendirmesi alın',
-                'countryLabel': 'Ülke:',
-                'cityLabel': 'Şehir:',
-                'countyLabel': 'Bölge/Alan:',
-                'districtLabel': 'İlçe:',
-                'countryPlaceholder': 'Ülke seçin',
-                'cityPlaceholder': 'Önce ülke seçin',
-                'countyPlaceholder': 'Önce şehir seçin',
-                'districtPlaceholder': 'Önce bölge seçin',
-                'confirmButtonText': 'Seçimi onayla',
-                'backButton': '← Ana menüye dön',
-                'selectedLocationTitle': 'Seçilen konum:',
-                'adminIdsTitle': 'Yöneticiler için ID\'ler:',
-                'loading': 'Yükleniyor...',
-                'errorLoading': 'Veri yükleme hatası',
-                'dataSectionTitle': 'Bölgesel Veri Analizi',
-                'generalDataTitle': 'Genel Veriler',
-                'houseTypeDataTitle': 'Yatak Odası Sayısı Verileri',
-                'floorSegmentDataTitle': 'Kat Verileri',
-                'ageDataTitle': 'Yaş Verileri',
-                'heatingDataTitle': 'Isıtma Tipi Verileri',
-                'loadingText': 'Veriler yükleniyor...',
-                'errorText': 'Veri yükleme hatası',
-                'totalProperties': 'Toplam mülk:',
-                'averagePrice': 'Ortalama fiyat:',
-                'priceRange': 'Fiyat aralığı:',
-                'noDataAvailable': 'Veri mevcut değil',
-                'keyMetricsTitle': 'Ana Metrikler',
-                'avgSalePriceLabel': 'm² başına ortalama satış fiyatı',
-                'avgRentPriceLabel': 'm² başına ortalama kiralama fiyatı',
-                'listingPeriodSaleLabel': 'İlan süresi (satış)',
-                'listingPeriodRentLabel': 'İlan süresi (kiralama)',
-                'yieldLabel': 'Getiri',
-                'insightsTitle': 'Özet',
-                'insightsLoading': 'Veriler analiz ediliyor...',
-                'insightsError': 'Veri analizi hatası',
-                
-                // Keys for trends chart
-                'chart_title': 'Trend Grafiği',
-                'sale_button': 'm² Satış Fiyatı',
-                'rent_button': 'm² Kiralama Fiyatı',
-                'chart_info': 'Mevcut ay ve bir ay ileriye kadar veriler gösterilir',
-                
-                // Keys for forecast chart
-                'forecast_chart_title': 'Fiyat ve Kiralama Tahmin Grafiği',
-                'forecast_chart_info': 'Mevcut ve gelecek aylara dayalı tahmin',
-                
-                // Abonelik mesajı için anahtarlar
-                'subscriptionRequiredTitle': 'Uzun vadeli mülk değeri tahmin fonksiyonu yalnızca aktif aboneliği olan kullanıcılar için kullanılabilir.',
-                'subscriptionBenefits': 'Abonelik size ne verir:',
-                'subscriptionBenefit1': '12 ay öncesine kadar mülk fiyat tahmini',
-                'subscriptionBenefit2': 'Ek analitik veriler',
-                'subscriptionBenefit3': 'Ek servis özellikleri',
-                'howToSubscribe': 'Nasıl abone olunur:',
-                'subscribeInstructions': '@Aaadviser_pay_bot botuna gidin',
-                'followInstructions': 'Bağlantı talimatlarını takip edin',
-                'needHelp': 'Yardıma mı ihtiyacınız var?',
-                'contactSupport': 'Destek ekibimizle iletişime geçin: @Aaadviser_support_bot',
-                
-                // "Piyasa Göstergeleri" tablosu için anahtarlar
-                'marketIndicatorsTitle': 'Piyasa Göstergeleri',
-                'saleHeader': 'Satış',
-                'rentHeader': 'Kiralama',
-                'indicatorLabel': 'Gösterge',
-                'minValueLabel': 'Minimum değer',
-                'maxValueLabel': 'Maksimum değer',
-                'comparableAreaForSaleLabel': 'Karşılaştırılabilir alan',
-                'countForSaleLabel': 'Satış için sayı',
-                'listingPeriodForSaleLabel': 'Satışa kadar süre',
-                'unitPriceForSaleLabel': 'Birim fiyat',
-                'comparableAreaForRentLabel': 'Karşılaştırılabilir alan',
-                'countForRentLabel': 'Kiralama için sayı',
-                'listingPeriodForRentLabel': 'Kiralamaya kadar süre',
-                'unitPriceForRentLabel': 'Birim fiyat'
-            }
-        };
+        
 
         // Get localized text
-        function getText(key) {
-            return locales[currentLanguage][key] || key;
-        }
+        
 
         // Update page text based on current language
-        function updatePageText() {
-            document.getElementById('slogan').textContent = getText('slogan');
-            document.getElementById('pageTitle').textContent = getText('pageTitle');
-            document.getElementById('pageDescription').textContent = getText('pageDescription');
-            document.getElementById('countryLabel').textContent = getText('countryLabel');
-            document.getElementById('cityLabel').textContent = getText('cityLabel');
-            document.getElementById('countyLabel').textContent = getText('countyLabel');
-            document.getElementById('districtLabel').textContent = getText('districtLabel');
-            document.getElementById('countryPlaceholder').textContent = getText('countryPlaceholder');
-            document.getElementById('cityPlaceholder').textContent = getText('cityPlaceholder');
-            document.getElementById('countyPlaceholder').textContent = getText('countyPlaceholder');
-            document.getElementById('districtPlaceholder').textContent = getText('districtPlaceholder');
-            document.getElementById('confirmButtonText').textContent = getText('confirmButtonText');
-            document.getElementById('backButton').textContent = getText('backButton');
-            document.getElementById('selectedLocationTitle').textContent = getText('selectedLocationTitle');
-            document.getElementById('adminIdsTitle').textContent = getText('adminIdsTitle');
-            
-            // Update new data section elements
-            const dataSectionTitle = document.getElementById('dataSectionTitle');
-            if (dataSectionTitle) {
-                dataSectionTitle.textContent = getText('dataSectionTitle');
-            }
+        
             
             const summaryDataTitle = document.getElementById('summaryDataTitle');
             if (summaryDataTitle) {
@@ -5391,7 +4789,7 @@
                         if (data.success) {
                             userLanguage = data.language;
                             currentLanguage = data.language;
-                            updatePageText();
+                            
                         }
                     }
                 }
@@ -8203,7 +7601,7 @@
 
         // Initialize page
         function init() {
-            updatePageText();
+            
             loadCountries();
             
             // Initialize price input

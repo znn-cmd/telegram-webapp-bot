@@ -5,7 +5,7 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>Aaadviser - Аналитика региона</title>
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script src="https://telegram.org/js/telegram-web-app.js"><script src="https://telegram.org/js/telegram-web-app.js"></script></script>
 <script src="/i18n-manager.js"></script>
 <style>
         * {
@@ -888,50 +888,50 @@
 <!-- Page Title -->
 <div class="page-title" data-i18n="reports.region_analytics" id="pageTitle">Аналитика региона</div>
 <!-- Page Description -->
-<div class="page-description" id="pageDescription">
+<div class="page-description" data-i18n="reports.page_description" id="pageDescription">
                             Получите детальный анализ рынка недвижимости в выбранном регионе
         </div>
 <!-- Location Selection Section -->
 <div class="location-section">
 <!-- Country Selection -->
 <div class="location-group">
-<label class="location-label" id="countryLabel">Страна:</label>
+<label class="location-label" data-i18n="reports.country_label" id="countryLabel">Страна:</label>
 <select class="location-select" id="countrySelect" onchange="onCountryChange()">
-<option id="countryPlaceholder" value="">Выберите страну</option>
+<option data-i18n="reports.country_placeholder" id="countryPlaceholder" value="">Выберите страну</option>
 </select>
 </div>
 <!-- City Selection -->
 <div class="location-group">
-<label class="location-label" id="cityLabel">Город:</label>
+<label class="location-label" data-i18n="reports.city_label" id="cityLabel">Город:</label>
 <select class="location-select" disabled="" id="citySelect" onchange="onCityChange()">
-<option id="cityPlaceholder" value="">Сначала выберите страну</option>
+<option data-i18n="reports.city_placeholder" id="cityPlaceholder" value="">Сначала выберите страну</option>
 </select>
 </div>
 <!-- County Selection -->
 <div class="location-group">
-<label class="location-label" id="countyLabel">Область/Регион:</label>
+<label class="location-label" data-i18n="reports.county_label" id="countyLabel">Область/Регион:</label>
 <select class="location-select" disabled="" id="countySelect" onchange="onCountyChange()">
-<option id="countyPlaceholder" value="">Сначала выберите город</option>
+<option data-i18n="reports.county_placeholder" id="countyPlaceholder" value="">Сначала выберите город</option>
 </select>
 </div>
 <!-- District Selection -->
 <div class="location-group">
-<label class="location-label" id="districtLabel">Район:</label>
+<label class="location-label" data-i18n="reports.district_label" id="districtLabel">Район:</label>
 <select class="location-select" disabled="" id="districtSelect" onchange="onDistrictChange()">
-<option id="districtPlaceholder" value="">Сначала выберите область</option>
+<option data-i18n="reports.district_placeholder" id="districtPlaceholder" value="">Сначала выберите область</option>
 </select>
 </div>
 <!-- Confirm Button -->
 <button class="confirm-button" disabled="" id="confirmButton" onclick="confirmLocationSelection()">
-<span id="confirmButtonText">Подтвердить выбор</span>
+<span data-i18n="reports.confirm_selection" id="confirmButtonText">Подтвердить выбор</span>
 </button>
 </div>
 <!-- Selected Location Display -->
 <div class="selected-location" id="selectedLocation">
-<div class="selected-location-title" id="selectedLocationTitle">Выбранная локация:</div>
+<div class="selected-location-title" data-i18n="reports.selected_location" id="selectedLocationTitle">Выбранная локация:</div>
 <div class="selected-location-text" id="selectedLocationText"></div>
 <div class="admin-ids" id="adminIds" style="display: none;">
-<div class="admin-ids-title" id="adminIdsTitle">ID для админов:</div>
+<div class="admin-ids-title" data-i18n="reports.admin_ids" id="adminIdsTitle">ID для админов:</div>
 <div class="admin-ids-text" id="adminIdsText"></div>
 </div>
 </div>
@@ -940,7 +940,7 @@
 <!-- Loading State -->
 <div class="loading-state" id="loadingState">
 <div class="loading-spinner"></div>
-<div class="loading-text" id="loadingText">Загрузка данных...</div>
+<div class="loading-text" data-i18n="reports.loading_text" id="loadingText">Загрузка данных...</div>
 </div>
 <!-- Currency Switcher -->
 <div class="currency-switcher" id="currencySwitcher" style="display: none;">
@@ -966,33 +966,33 @@
 </div>
 <!-- Key Metrics Cards -->
 <div class="key-metrics-section" id="keyMetricsSection" style="display: none;">
-<h3 class="key-metrics-title" id="keyMetricsTitle">Ключевые показатели</h3>
+<h3 class="key-metrics-title" data-i18n="reports.key_metrics_title" id="keyMetricsTitle">Ключевые показатели</h3>
 <div class="key-metrics-grid">
 <!-- Average Sale Price per m² -->
 <div class="key-metric-card">
 <div class="metric-content">
-<div class="metric-label" id="avgSalePriceLabel">Средняя цена продажи за м²</div>
+<div class="metric-label" data-i18n="reports.avg_sale_price_label" id="avgSalePriceLabel">Средняя цена продажи за м²</div>
 <div class="metric-value" id="avgSalePrice">-</div>
 </div>
 </div>
 <!-- Average Rent Price per m² -->
 <div class="key-metric-card">
 <div class="metric-content">
-<div class="metric-label" id="avgRentPriceLabel">Средняя цена аренды за м²</div>
+<div class="metric-label" data-i18n="reports.avg_rent_price_label" id="avgRentPriceLabel">Средняя цена аренды за м²</div>
 <div class="metric-value" id="avgRentPrice">-</div>
 </div>
 </div>
 <!-- Listing Period Sale -->
 <div class="key-metric-card">
 <div class="metric-content">
-<div class="metric-label" id="listingPeriodSaleLabel">Период размещения (продажа)</div>
+<div class="metric-label" data-i18n="reports.listing_period_sale_label" id="listingPeriodSaleLabel">Период размещения (продажа)</div>
 <div class="metric-value" id="listingPeriodSale">-</div>
 </div>
 </div>
 <!-- Listing Period Rent -->
 <div class="key-metric-card">
 <div class="metric-content">
-<div class="metric-label" id="listingPeriodRentLabel">Период размещения (аренда)</div>
+<div class="metric-label" data-i18n="reports.listing_period_rent_label" id="listingPeriodRentLabel">Период размещения (аренда)</div>
 <div class="metric-value" id="listingPeriodRent">-</div>
 </div>
 </div>
@@ -1000,7 +1000,7 @@
 <!-- Yield Card - Full Width -->
 <div class="yield-card">
 <div class="yield-content">
-<div class="yield-label" id="yieldLabel">Yield (Доходность)</div>
+<div class="yield-label" data-i18n="reports.yield_label" id="yieldLabel">Yield (Доходность)</div>
 <div class="yield-value" id="yieldValue">-</div>
 </div>
 </div>
@@ -1009,17 +1009,17 @@
 <div class="insights-section" id="insightsSection" style="display: none;">
 <div class="insights-card">
 <div class="insights-header">
-<div class="insights-title" id="insightsTitle">Саммари</div>
+<div class="insights-title" data-i18n="reports.insights_title" id="insightsTitle">Саммари</div>
 </div>
 <div class="insights-content" id="insightsContent">
 <div class="insights-loading" id="insightsLoading">
 <div class="loading-spinner"></div>
-<div class="loading-text" id="insightsLoadingText"></div>
+<div class="loading-text" data-i18n="reports.insights_loading" id="insightsLoadingText"></div>
 </div>
 <div class="insights-text" id="insightsText" style="display: none;"></div>
 <div class="insights-error" id="insightsError" style="display: none;">
 <div class="error-icon">⚠️</div>
-<div class="error-text" id="insightsErrorText"></div>
+<div class="error-text" data-i18n="reports.insights_error" id="insightsErrorText"></div>
 </div>
 </div>
 </div>
@@ -1031,7 +1031,7 @@
 <div class="data-card-header" onclick="toggleAccordion('generalDataCard')">
 <div style="display: flex; align-items: center;">
 <div class="data-card-icon"></div>
-<div class="data-card-title" id="generalDataTitle">Общие данные</div>
+<div class="data-card-title" data-i18n="reports.general_data_title" id="generalDataTitle">Общие данные</div>
 </div>
 <div class="data-card-toggle expanded" id="generalDataToggle">▲</div>
 </div>
@@ -1044,7 +1044,7 @@
 <div class="data-card-header" onclick="toggleAccordion('houseTypeDataCard')">
 <div style="display: flex; align-items: center; gap: 12px;">
 <div class="data-card-icon"></div>
-<div class="data-card-title" id="houseTypeDataTitle">Данные по количеству спален</div>
+<div class="data-card-title" data-i18n="reports.house_type_data_title" id="houseTypeDataTitle">Данные по количеству спален</div>
 </div>
 <div class="data-card-toggle" id="houseTypeDataToggle">▼</div>
 </div>
@@ -1057,7 +1057,7 @@
 <div class="data-card-header" onclick="toggleAccordion('floorSegmentDataCard')">
 <div style="display: flex; align-items: center; gap: 12px;">
 <div class="data-card-icon"></div>
-<div class="data-card-title" id="floorSegmentDataTitle">Данные по этажу</div>
+<div class="data-card-title" data-i18n="reports.floor_segment_data_title" id="floorSegmentDataTitle">Данные по этажу</div>
 </div>
 <div class="data-card-toggle" id="floorSegmentDataToggle">▼</div>
 </div>
@@ -1070,7 +1070,7 @@
 <div class="data-card-header" onclick="toggleAccordion('ageDataCard')">
 <div style="display: flex; align-items: center; gap: 12px;">
 <div class="data-card-icon"></div>
-<div class="data-card-title" id="ageDataTitle">Данные по возрасту объектов</div>
+<div class="data-card-title" data-i18n="reports.age_data_title" id="ageDataTitle">Данные по возрасту объектов</div>
 </div>
 <div class="data-card-toggle" id="ageDataToggle">▼</div>
 </div>
@@ -1083,7 +1083,7 @@
 <div class="data-card-header" onclick="toggleAccordion('heatingDataCard')">
 <div style="display: flex; align-items: center; gap: 12px;">
 <div class="data-card-icon"></div>
-<div class="data-card-title" id="heatingDataTitle">Данные по типу отопления</div>
+<div class="data-card-title" data-i18n="reports.heating_data_title" id="heatingDataTitle">Данные по типу отопления</div>
 </div>
 <div class="data-card-toggle" id="heatingDataToggle">▼</div>
 </div>
@@ -1095,11 +1095,11 @@
 <!-- Error State -->
 <div class="error-state" id="errorState" style="display: none;">
 <div class="error-icon">❌</div>
-<div class="error-text" id="errorText">Ошибка загрузки данных</div>
+<div class="error-text" data-i18n="reports.error_text" id="errorText">Ошибка загрузки данных</div>
 </div>
 </div>
 <!-- Back Button -->
-<a class="back-button" href="/webapp_main" id="backButton">← Вернуться в главное меню</a>
+<a class="back-button" data-i18n="reports.back_to_main" href="/webapp_main" id="backButton">← Вернуться в главное меню</a>
 </div>
 <script>
         // Telegram WebApp initialization
