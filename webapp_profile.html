@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title data-i18n-title="profile.title">Личный кабинет — Aaadviser</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <script src="/static/i18n-manager.js"></script>
     <style>
         body { 
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
@@ -260,21 +259,21 @@
 <body>
     <div class="container">
         <img src="logo-flt.png" alt="Aaadviser" class="logo" onclick="goToMainMenu()">
-        <div class="title" data-i18n="profile.title" data-i18n="profile.title">Личный кабинет</div>
+        <div class="title" data-i18n="profile.title">Личный кабинет</div>
         
         <!-- Loading skeleton -->
         <div id="loadingSkeleton" class="loading">
             <div class="reload-spinner"></div>
-            <div data-i18n="common.loading" data-i18n="common.loading">Загрузка...</div>
+            <div data-i18n="common.loading">Загрузка...</div>
         </div>
 
         <!-- Profile content -->
         <div id="profileContent" class="hidden">
             <!-- Balance Block -->
             <div id="balance-block" class="profile-balance-block">
-                <div class="profile-balance-name" data-i18n="profile.balance" data-i18n="profile.balance">Баланс</div>
+                <div class="profile-balance-name" data-i18n="profile.balance">Баланс</div>
                 <div class="profile-balance-sum">
-                    <span data-i18n="profile.balance_amount" data-i18n="profile.balance_amount">Баланс: $</span>
+                    <span data-i18n="profile.balance_amount">Баланс: $</span>
                     <span class="profile-balance-amount" id="balanceAmount">0</span>
                 </div>
             </div>
@@ -282,22 +281,22 @@
             <!-- Profile Buttons -->
             <button class="profile-btn" onclick="goToReferral()">
                 <span class="profile-btn-icon">🎁</span>
-                <span data-i18n="profile.referral_program" data-i18n="referral.title">Реферальная программа</span>
+                <span data-i18n="profile.referral_program">Реферальная программа</span>
             </button>
             
             <button class="profile-btn" onclick="editProfile()">
                 <span class="profile-btn-icon">👤</span>
-                <span data-i18n="profile.edit_profile" data-i18n="profile.edit_profile">Редактировать профиль</span>
+                <span data-i18n="profile.edit_profile">Редактировать профиль</span>
             </button>
             
             <button class="profile-btn" onclick="showSettings()">
                 <span class="profile-btn-icon">⚙️</span>
-                <span data-i18n="common.settings" data-i18n="common.settings">Настройки</span>
+                <span data-i18n="common.settings">Настройки</span>
             </button>
             
             <button class="profile-btn" onclick="showTransactionHistory()">
                 <span class="profile-btn-icon">📊</span>
-                <span data-i18n="profile.transaction_history" data-i18n="profile.transaction_history">История транзакций</span>
+                <span data-i18n="profile.transaction_history">История транзакций</span>
             </button>
 
             <button class="back-btn" onclick="goToMainMenu()" data-i18n="common.back">Вернуться в главное меню</button>
@@ -319,8 +318,8 @@
                 <button class="lang-btn" data-lang="tr" onclick="selectLanguage('tr')">🇹🇷 Türkçe</button>
             </div>
             <div class="modal-btn-row">
-                <button class="modal-btn modal-btn-secondary" onclick="closeModal()" data-i18n="common.cancel" data-i18n="common.cancel">Отмена</button>
-                <button class="modal-btn modal-btn-primary" onclick="confirmLanguage()" data-i18n="common.confirm" data-i18n="common.confirm">Подтвердить</button>
+                <button class="modal-btn modal-btn-secondary" onclick="closeModal()" data-i18n="common.cancel">Отмена</button>
+                <button class="modal-btn modal-btn-primary" onclick="confirmLanguage()" data-i18n="common.confirm">Подтвердить</button>
             </div>
         </div>
     </div>
@@ -329,7 +328,7 @@
     <div id="reload-modal-bg" class="reload-modal-bg" style="display:none;">
         <div class="reload-modal">
             <div class="reload-spinner"></div>
-            <div data-i18n="common.loading" data-i18n="common.loading">Загрузка...</div>
+            <div data-i18n="common.loading">Загрузка...</div>
         </div>
     </div>
 

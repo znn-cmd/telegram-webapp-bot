@@ -2,7 +2,6 @@
 <html lang="ru">
 <head>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <script src="/static/i18n-manager.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title data-i18n-title="common.settings">Настройки — Aaadviser Admin</title>
@@ -36,9 +35,9 @@
             <input class="settings-input" id="keyValue" placeholder="Значение ключа (key_value)" required />
             <button class="settings-btn" type="submit">Добавить ключ</button>
         </form>
-        <div class="settings-list" id="keysList" data-i18n="common.loading">Загрузка...</div>
+        <div class="settings-list" id="keysList">Загрузка...</div>
         <div class="nav-btn-row">
-            <button class="nav-btn" onclick="goBack()" data-i18n="common.back">Назад</button>
+            <button class="nav-btn" onclick="goBack()">Назад</button>
             <button class="nav-btn nav-btn-main" onclick="goToMainMenu()">В главное меню</button>
         </div>
     </div>
