@@ -2,7 +2,6 @@
 <html lang="ru">
 <head>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <script src="/i18n-manager.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Наша география — Aaadviser</title>
@@ -30,47 +29,47 @@
 <body>
     <div class="container">
         <img src="logo-flt.png" alt="Aaadviser" class="logo" onclick="goToMainMenu()">
-        <div class="title">Наша география</div>
+        <div class="title" id="geographyTitle">Наша география</div>
         
         <div class="content">
-            <h3>Где мы работаем</h3>
-            <p>Aaadviser предоставляет анализ рынка недвижимости в следующих регионах:</p>
+            <h3 id="whereWeWorkTitle">Где мы работаем</h3>
+            <p id="whereWeWorkDesc">Aaadviser предоставляет анализ рынка недвижимости в следующих регионах:</p>
             
-            <div class="region">
+            <div class="region" id="regionUSA">
                 <div class="region-title">🇺🇸 США</div>
-                <div class="region-desc">Полный анализ рынка недвижимости во всех штатах, включая Нью-Йорк, Калифорнию, Техас, Флориду и другие популярные регионы.</div>
+                <div class="region-desc" id="regionUSADesc">Полный анализ рынка недвижимости во всех штатах, включая Нью-Йорк, Калифорнию, Техас, Флориду и другие популярные регионы.</div>
             </div>
             
-            <div class="region">
+            <div class="region" id="regionCanada">
                 <div class="region-title">🇨🇦 Канада</div>
-                <div class="region-desc">Анализ рынка в крупных городах: Торонто, Ванкувер, Монреаль, Калгари и других.</div>
+                <div class="region-desc" id="regionCanadaDesc">Анализ рынка в крупных городах: Торонто, Ванкувер, Монреаль, Калгари и других.</div>
             </div>
             
-            <div class="region">
+            <div class="region" id="regionUK">
                 <div class="region-title">🇬🇧 Великобритания</div>
-                <div class="region-desc">Лондон, Манчестер, Бирмингем, Ливерпуль и другие города Англии, Шотландии, Уэльса.</div>
+                <div class="region-desc" id="regionUKDesc">Лондон, Манчестер, Бирмингем, Ливерпуль и другие города Англии, Шотландии, Уэльса.</div>
             </div>
             
-            <div class="region">
+            <div class="region" id="regionAustralia">
                 <div class="region-title">🇦🇺 Австралия</div>
-                <div class="region-desc">Сидней, Мельбурн, Брисбен, Перт и другие крупные города Австралии.</div>
+                <div class="region-desc" id="regionAustraliaDesc">Сидней, Мельбурн, Брисбен, Перт и другие крупные города Австралии.</div>
             </div>
             
-            <div class="region">
+            <div class="region" id="regionGermany">
                 <div class="region-title">🇩🇪 Германия</div>
-                <div class="region-desc">Берлин, Мюнхен, Гамбург, Франкфурт и другие немецкие города.</div>
+                <div class="region-desc" id="regionGermanyDesc">Берлин, Мюнхен, Гамбург, Франкфурт и другие немецкие города.</div>
             </div>
             
-            <div class="region">
+            <div class="region" id="regionFrance">
                 <div class="region-title">🇫🇷 Франция</div>
-                <div class="region-desc">Париж, Лион, Марсель, Тулуза и другие французские города.</div>
+                <div class="region-desc" id="regionFranceDesc">Париж, Лион, Марсель, Тулуза и другие французские города.</div>
             </div>
             
-            <h3>Расширение географии</h3>
-            <p>Мы постоянно расширяем географию нашего сервиса. Если ваш регион пока не поддерживается, свяжитесь с нами для уточнения планов развития.</p>
+            <h3 id="expansionTitle">Расширение географии</h3>
+            <p id="expansionDesc">Мы постоянно расширяем географию нашего сервиса. Если ваш регион пока не поддерживается, свяжитесь с нами для уточнения планов развития.</p>
             
-            <h3>Качество данных</h3>
-            <ul>
+            <h3 id="dataQualityTitle">Качество данных</h3>
+            <ul id="dataQualityList">
                 <li>✅ Актуальная информация о ценах</li>
                 <li>✅ Детальная статистика по районам</li>
                 <li>✅ Анализ трендов рынка</li>
@@ -78,8 +77,8 @@
                 <li>✅ Сравнение с похожими объектами</li>
             </ul>
             
-            <h3>Поддерживаемые типы недвижимости</h3>
-            <ul>
+            <h3 id="propertyTypesTitle">Поддерживаемые типы недвижимости</h3>
+            <ul id="propertyTypesList">
                 <li>🏠 Частные дома</li>
                 <li>🏢 Квартиры и кондоминиумы</li>
                 <li>🏭 Таунхаусы</li>
@@ -89,17 +88,272 @@
         </div>
         
         <div class="nav-buttons">
-            <button class="nav-btn back-btn" onclick="goBack()">← Назад</button>
-            <button class="nav-btn" onclick="goToMainMenu()">В главное меню</button>
+            <button class="nav-btn back-btn" onclick="goBack()" id="backBtn">← Назад</button>
+            <button class="nav-btn" onclick="goToMainMenu()" id="mainMenuBtn">В главное меню</button>
         </div>
     </div>
     <script>
+        let currentLanguage = 'ru';
+
+        // Получаем данные пользователя
+        function getUserData() {
+            let tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
+            if (tg && tg.initDataUnsafe && tg.initDataUnsafe.user) {
+                return tg.initDataUnsafe.user;
+            }
+            return null;
+        }
+
+        // Локализации
+        const locales = {
+            'ru': {
+                'geographyTitle': 'Наша география',
+                'whereWeWorkTitle': 'Где мы работаем',
+                'whereWeWorkDesc': 'Aaadviser предоставляет анализ рынка недвижимости в следующих регионах:',
+                'regionUSADesc': 'Полный анализ рынка недвижимости во всех штатах, включая Нью-Йорк, Калифорнию, Техас, Флориду и другие популярные регионы.',
+                'regionCanadaDesc': 'Анализ рынка в крупных городах: Торонто, Ванкувер, Монреаль, Калгари и других.',
+                'regionUKDesc': 'Лондон, Манчестер, Бирмингем, Ливерпуль и другие города Англии, Шотландии, Уэльса.',
+                'regionAustraliaDesc': 'Сидней, Мельбурн, Брисбен, Перт и другие крупные города Австралии.',
+                'regionGermanyDesc': 'Берлин, Мюнхен, Гамбург, Франкфурт и другие немецкие города.',
+                'regionFranceDesc': 'Париж, Лион, Марсель, Тулуза и другие французские города.',
+                'expansionTitle': 'Расширение географии',
+                'expansionDesc': 'Мы постоянно расширяем географию нашего сервиса. Если ваш регион пока не поддерживается, свяжитесь с нами для уточнения планов развития.',
+                'dataQualityTitle': 'Качество данных',
+                'dataQualityList': [
+                    '✅ Актуальная информация о ценах',
+                    '✅ Детальная статистика по районам',
+                    '✅ Анализ трендов рынка',
+                    '✅ Прогнозы изменения цен',
+                    '✅ Сравнение с похожими объектами'
+                ],
+                'propertyTypesTitle': 'Поддерживаемые типы недвижимости',
+                'propertyTypesList': [
+                    '🏠 Частные дома',
+                    '🏢 Квартиры и кондоминиумы',
+                    '🏭 Таунхаусы',
+                    '🏡 Дуплексы',
+                    '🏘️ Многоквартирные дома'
+                ],
+                'backBtn': '← Назад',
+                'mainMenuBtn': 'В главное меню'
+            },
+            'en': {
+                'geographyTitle': 'Our Geography',
+                'whereWeWorkTitle': 'Where we work',
+                'whereWeWorkDesc': 'Aaadviser provides real estate market analysis in the following regions:',
+                'regionUSADesc': 'Complete real estate market analysis in all states, including New York, California, Texas, Florida and other popular regions.',
+                'regionCanadaDesc': 'Market analysis in major cities: Toronto, Vancouver, Montreal, Calgary and others.',
+                'regionUKDesc': 'London, Manchester, Birmingham, Liverpool and other cities in England, Scotland, Wales.',
+                'regionAustraliaDesc': 'Sydney, Melbourne, Brisbane, Perth and other major Australian cities.',
+                'regionGermanyDesc': 'Berlin, Munich, Hamburg, Frankfurt and other German cities.',
+                'regionFranceDesc': 'Paris, Lyon, Marseille, Toulouse and other French cities.',
+                'expansionTitle': 'Geography expansion',
+                'expansionDesc': 'We are constantly expanding the geography of our service. If your region is not yet supported, contact us to clarify development plans.',
+                'dataQualityTitle': 'Data quality',
+                'dataQualityList': [
+                    '✅ Current price information',
+                    '✅ Detailed statistics by districts',
+                    '✅ Market trend analysis',
+                    '✅ Price change forecasts',
+                    '✅ Comparison with similar properties'
+                ],
+                'propertyTypesTitle': 'Supported property types',
+                'propertyTypesList': [
+                    '🏠 Private houses',
+                    '🏢 Apartments and condominiums',
+                    '🏭 Townhouses',
+                    '🏡 Duplexes',
+                    '🏘️ Multi-family homes'
+                ],
+                'backBtn': '← Back',
+                'mainMenuBtn': 'Main Menu'
+            },
+            'de': {
+                'geographyTitle': 'Unsere Geographie',
+                'whereWeWorkTitle': 'Wo wir arbeiten',
+                'whereWeWorkDesc': 'Aaadviser bietet Immobilienmarktanalyse in folgenden Regionen:',
+                'regionUSADesc': 'Vollständige Immobilienmarktanalyse in allen Bundesstaaten, einschließlich New York, Kalifornien, Texas, Florida und anderen beliebten Regionen.',
+                'regionCanadaDesc': 'Marktanalyse in großen Städten: Toronto, Vancouver, Montreal, Calgary und andere.',
+                'regionUKDesc': 'London, Manchester, Birmingham, Liverpool und andere Städte in England, Schottland, Wales.',
+                'regionAustraliaDesc': 'Sydney, Melbourne, Brisbane, Perth und andere große australische Städte.',
+                'regionGermanyDesc': 'Berlin, München, Hamburg, Frankfurt und andere deutsche Städte.',
+                'regionFranceDesc': 'Paris, Lyon, Marseille, Toulouse und andere französische Städte.',
+                'expansionTitle': 'Geographie-Erweiterung',
+                'expansionDesc': 'Wir erweitern ständig die Geographie unseres Dienstes. Wenn Ihre Region noch nicht unterstützt wird, kontaktieren Sie uns für Entwicklungspläne.',
+                'dataQualityTitle': 'Datenqualität',
+                'dataQualityList': [
+                    '✅ Aktuelle Preisinformationen',
+                    '✅ Detaillierte Statistiken nach Bezirken',
+                    '✅ Markttrendanalyse',
+                    '✅ Preisänderungsprognosen',
+                    '✅ Vergleich mit ähnlichen Objekten'
+                ],
+                'propertyTypesTitle': 'Unterstützte Immobilientypen',
+                'propertyTypesList': [
+                    '🏠 Einfamilienhäuser',
+                    '🏢 Wohnungen und Eigentumswohnungen',
+                    '🏭 Reihenhäuser',
+                    '🏡 Doppelhäuser',
+                    '🏘️ Mehrfamilienhäuser'
+                ],
+                'backBtn': '← Zurück',
+                'mainMenuBtn': 'Hauptmenü'
+            },
+            'fr': {
+                'geographyTitle': 'Notre géographie',
+                'whereWeWorkTitle': 'Où nous travaillons',
+                'whereWeWorkDesc': 'Aaadviser fournit une analyse du marché immobilier dans les régions suivantes:',
+                'regionUSADesc': 'Analyse complète du marché immobilier dans tous les États, y compris New York, Californie, Texas, Floride et autres régions populaires.',
+                'regionCanadaDesc': 'Analyse du marché dans les grandes villes: Toronto, Vancouver, Montréal, Calgary et autres.',
+                'regionUKDesc': 'Londres, Manchester, Birmingham, Liverpool et autres villes d\'Angleterre, d\'Écosse, du Pays de Galles.',
+                'regionAustraliaDesc': 'Sydney, Melbourne, Brisbane, Perth et autres grandes villes australiennes.',
+                'regionGermanyDesc': 'Berlin, Munich, Hambourg, Francfort et autres villes allemandes.',
+                'regionFranceDesc': 'Paris, Lyon, Marseille, Toulouse et autres villes françaises.',
+                'expansionTitle': 'Expansion géographique',
+                'expansionDesc': 'Nous élargissons constamment la géographie de notre service. Si votre région n\'est pas encore prise en charge, contactez-nous pour clarifier les plans de développement.',
+                'dataQualityTitle': 'Qualité des données',
+                'dataQualityList': [
+                    '✅ Informations actuelles sur les prix',
+                    '✅ Statistiques détaillées par districts',
+                    '✅ Analyse des tendances du marché',
+                    '✅ Prévisions de changement de prix',
+                    '✅ Comparaison avec des propriétés similaires'
+                ],
+                'propertyTypesTitle': 'Types de propriétés pris en charge',
+                'propertyTypesList': [
+                    '🏠 Maisons privées',
+                    '🏢 Appartements et condominiums',
+                    '🏭 Maisons en rangée',
+                    '🏡 Dubleks',
+                    '🏘️ Maisons multi-familles'
+                ],
+                'backBtn': '← Retour',
+                'mainMenuBtn': 'Menu principal'
+            },
+            'tr': {
+                'geographyTitle': 'Coğrafyamız',
+                'whereWeWorkTitle': 'Nerede çalışıyoruz',
+                'whereWeWorkDesc': 'Aaadviser aşağıdaki bölgelerde gayrimenkul pazarı analizi sağlar:',
+                'regionUSADesc': 'New York, Kaliforniya, Teksas, Florida ve diğer popüler bölgeler dahil tüm eyaletlerde tam gayrimenkul pazarı analizi.',
+                'regionCanadaDesc': 'Büyük şehirlerde pazar analizi: Toronto, Vancouver, Montreal, Calgary ve diğerleri.',
+                'regionUKDesc': 'Londra, Manchester, Birmingham, Liverpool ve İngiltere, İskoçya, Galler\'deki diğer şehirler.',
+                'regionAustraliaDesc': 'Sidney, Melbourne, Brisbane, Perth ve diğer büyük Avustralya şehirleri.',
+                'regionGermanyDesc': 'Berlin, Münih, Hamburg, Frankfurt ve diğer Alman şehirleri.',
+                'regionFranceDesc': 'Paris, Lyon, Marsilya, Toulouse ve diğer Fransız şehirleri.',
+                'expansionTitle': 'Coğrafya genişlemesi',
+                'expansionDesc': 'Hizmetimizin coğrafyasını sürekli genişletiyoruz. Bölgeniz henüz desteklenmiyorsa, geliştirme planları için bizimle iletişime geçin.',
+                'dataQualityTitle': 'Veri kalitesi',
+                'dataQualityList': [
+                    '✅ Güncel fiyat bilgileri',
+                    '✅ Bölgelere göre detaylı istatistikler',
+                    '✅ Pazar trend analizi',
+                    '✅ Fiyat değişimi tahminleri',
+                    '✅ Benzer mülklerle karşılaştırma'
+                ],
+                'propertyTypesTitle': 'Desteklenen mülk türleri',
+                'propertyTypesList': [
+                    '🏠 Özel evler',
+                    '🏢 Daireler ve kat mülkiyeti',
+                    '🏭 Şehir evleri',
+                    '🏡 Dubleksler',
+                    '🏘️ Çok aileli evler'
+                ],
+                'backBtn': '← Geri',
+                'mainMenuBtn': 'Ana Menü'
+            }
+        };
+
+        // Функция для получения локализованного текста
+        function getText(key) {
+            const locale = locales[currentLanguage] || locales['ru'];
+            return locale[key] || key;
+        }
+
+        // Обновление текста на странице
+        function updatePageText() {
+            document.getElementById('geographyTitle').textContent = getText('geographyTitle');
+            document.getElementById('whereWeWorkTitle').textContent = getText('whereWeWorkTitle');
+            document.getElementById('whereWeWorkDesc').textContent = getText('whereWeWorkDesc');
+            document.getElementById('regionUSADesc').textContent = getText('regionUSADesc');
+            document.getElementById('regionCanadaDesc').textContent = getText('regionCanadaDesc');
+            document.getElementById('regionUKDesc').textContent = getText('regionUKDesc');
+            document.getElementById('regionAustraliaDesc').textContent = getText('regionAustraliaDesc');
+            document.getElementById('regionGermanyDesc').textContent = getText('regionGermanyDesc');
+            document.getElementById('regionFranceDesc').textContent = getText('regionFranceDesc');
+            document.getElementById('expansionTitle').textContent = getText('expansionTitle');
+            document.getElementById('expansionDesc').textContent = getText('expansionDesc');
+            document.getElementById('dataQualityTitle').textContent = getText('dataQualityTitle');
+            document.getElementById('propertyTypesTitle').textContent = getText('propertyTypesTitle');
+            document.getElementById('backBtn').textContent = getText('backBtn');
+            document.getElementById('mainMenuBtn').textContent = getText('mainMenuBtn');
+            
+            // Обновляем списки
+            const dataQualityList = document.getElementById('dataQualityList');
+            const dataQuality = getText('dataQualityList');
+            if (Array.isArray(dataQuality)) {
+                dataQualityList.innerHTML = dataQuality.map(item => `<li>${item}</li>`).join('');
+            }
+            
+            const propertyTypesList = document.getElementById('propertyTypesList');
+            const propertyTypes = getText('propertyTypesList');
+            if (Array.isArray(propertyTypes)) {
+                propertyTypesList.innerHTML = propertyTypes.map(item => `<li>${item}</li>`).join('');
+            }
+        }
+
+        // Инициализация
+        async function init() {
+            const userData = getUserData();
+            if (!userData) {
+                updatePageText();
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/user', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        telegram_id: userData.id,
+                        username: userData.username,
+                        tg_name: userData.tg_name,
+                        last_name: userData.last_name,
+                        language_code: userData.language_code || 'ru'
+                    })
+                });
+
+                if (response.ok) {
+                    const userInfo = await response.json();
+                    
+                    // Устанавливаем язык в зависимости от статуса пользователя
+                    if (userInfo.user_status === 'admin' && userInfo.language) {
+                        // Для админов используем язык из базы данных
+                        currentLanguage = userInfo.language;
+                    } else if (userData.language_code) {
+                        // Для обычных пользователей используем язык из Telegram
+                        currentLanguage = userData.language_code;
+                    }
+                }
+            } catch (error) {
+                // В случае ошибки используем язык из Telegram
+                if (userData.language_code) {
+                    currentLanguage = userData.language_code;
+                }
+            }
+            
+            updatePageText();
+        }
+
         function goToMainMenu() {
             window.location.href = '/webapp';
         }
         function goBack() {
             window.location.href = '/webapp_help';
         }
+
+        // Запускаем инициализацию
+        init();
     </script>
+    <script src="/i18n-manager.js"></script>
 </body>
 </html> 

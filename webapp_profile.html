@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title data-i18n-title="profile.title">Личный кабинет — Aaadviser</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <script src="/i18n-manager.js"></script>
     <style>
         body { 
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
@@ -260,47 +259,47 @@
 <body>
     <div class="container">
         <img src="logo-flt.png" alt="Aaadviser" class="logo" onclick="goToMainMenu()">
-        <div class="title" data-i18n="profile.title">Личный кабинет</div>
+        <div class="title" id="profileTitle">Личный кабинет</div>
         
         <!-- Loading skeleton -->
         <div id="loadingSkeleton" class="loading">
             <div class="reload-spinner"></div>
-            <div data-i18n="common.loading">Загрузка...</div>
+            <div id="loadingText">Загрузка...</div>
         </div>
 
         <!-- Profile content -->
         <div id="profileContent" class="hidden">
             <!-- Balance Block -->
             <div id="balance-block" class="profile-balance-block">
-                <div class="profile-balance-name" data-i18n="profile.balance">Баланс</div>
+                <div class="profile-balance-name" id="balanceTitle">Баланс</div>
                 <div class="profile-balance-sum">
-                    <span data-i18n="profile.balance_amount">Баланс: $</span>
+                    <span id="balanceLabel">Баланс: $</span>
                     <span class="profile-balance-amount" id="balanceAmount">0</span>
                 </div>
             </div>
 
             <!-- Profile Buttons -->
-            <button class="profile-btn" onclick="goToReferral()">
+            <button class="profile-btn" onclick="goToReferral()" id="referralBtn">
                 <span class="profile-btn-icon">🎁</span>
-                <span data-i18n="profile.referral_program">Реферальная программа</span>
+                <span id="referralText">Реферальная программа</span>
             </button>
             
-            <button class="profile-btn" onclick="editProfile()">
+            <button class="profile-btn" onclick="editProfile()" id="editProfileBtn">
                 <span class="profile-btn-icon">👤</span>
-                <span data-i18n="profile.edit_profile">Редактировать профиль</span>
+                <span id="editProfileText">Редактировать профиль</span>
             </button>
             
-            <button class="profile-btn" onclick="showSettings()">
+            <button class="profile-btn" onclick="showSettings()" id="settingsBtn">
                 <span class="profile-btn-icon">⚙️</span>
-                <span data-i18n="common.settings">Настройки</span>
+                <span id="settingsText">Настройки</span>
             </button>
             
-            <button class="profile-btn" onclick="showTransactionHistory()">
+            <button class="profile-btn" onclick="showTransactionHistory()" id="transactionHistoryBtn">
                 <span class="profile-btn-icon">📊</span>
-                <span data-i18n="profile.transaction_history">История транзакций</span>
+                <span id="transactionHistoryText">История транзакций</span>
             </button>
 
-            <button class="back-btn" onclick="goToMainMenu()" data-i18n="common.back">Вернуться в главное меню</button>
+            <button class="back-btn" onclick="goToMainMenu()" id="backBtn">Вернуться в главное меню</button>
         </div>
 
         <!-- Error/Success messages -->
@@ -310,7 +309,7 @@
     <!-- Language Selection Modal -->
     <div id="modal-bg" class="modal-bg" style="display:none;">
         <div class="modal">
-            <div class="modal-title" data-i18n="common.language">Выберите язык</div>
+            <div class="modal-title" id="languageTitle">Выберите язык</div>
             <div class="language-buttons">
                 <button class="lang-btn selected" data-lang="ru" onclick="selectLanguage('ru')">🇷🇺 Русский</button>
                 <button class="lang-btn" data-lang="en" onclick="selectLanguage('en')">🇺🇸 English</button>
@@ -319,8 +318,8 @@
                 <button class="lang-btn" data-lang="tr" onclick="selectLanguage('tr')">🇹🇷 Türkçe</button>
             </div>
             <div class="modal-btn-row">
-                <button class="modal-btn modal-btn-secondary" onclick="closeModal()" data-i18n="common.cancel">Отмена</button>
-                <button class="modal-btn modal-btn-primary" onclick="confirmLanguage()" data-i18n="common.confirm">Подтвердить</button>
+                <button class="modal-btn modal-btn-secondary" onclick="closeModal()" id="cancelBtn">Отмена</button>
+                <button class="modal-btn modal-btn-primary" onclick="confirmLanguage()" id="confirmBtn">Подтвердить</button>
             </div>
         </div>
     </div>
@@ -329,7 +328,7 @@
     <div id="reload-modal-bg" class="reload-modal-bg" style="display:none;">
         <div class="reload-modal">
             <div class="reload-spinner"></div>
-            <div data-i18n="common.loading">Загрузка...</div>
+            <div id="reloadText">Загрузка...</div>
         </div>
     </div>
 
@@ -340,6 +339,7 @@
 
         let userData = null;
         let selectedLanguage = 'ru';
+        let currentLanguage = 'ru';
 
         // Получаем данные пользователя
         function getUserData() {
@@ -353,12 +353,139 @@
             return null;
         }
 
+        // Локализации
+        const locales = {
+            'ru': {
+                'profileTitle': 'Личный кабинет',
+                'loadingText': 'Загрузка...',
+                'balanceTitle': 'Баланс',
+                'balanceLabel': 'Баланс: $',
+                'referralText': 'Реферальная программа',
+                'editProfileText': 'Редактировать профиль',
+                'settingsText': 'Настройки',
+                'transactionHistoryText': 'История транзакций',
+                'backBtn': 'Вернуться в главное меню',
+                'languageTitle': 'Выберите язык',
+                'cancelBtn': 'Отмена',
+                'confirmBtn': 'Подтвердить',
+                'reloadText': 'Загрузка...',
+                'userNotDefined': 'Пользователь не определен. Откройте WebApp из Telegram.',
+                'loadError': 'Ошибка загрузки данных профиля: ',
+                'languageSuccess': 'Язык успешно изменен',
+                'languageError': 'Ошибка сохранения языка',
+                'networkError': 'Ошибка сети'
+            },
+            'en': {
+                'profileTitle': 'Profile',
+                'loadingText': 'Loading...',
+                'balanceTitle': 'Balance',
+                'balanceLabel': 'Balance: $',
+                'referralText': 'Referral Program',
+                'editProfileText': 'Edit Profile',
+                'settingsText': 'Settings',
+                'transactionHistoryText': 'Transaction History',
+                'backBtn': 'Back to Main Menu',
+                'languageTitle': 'Select Language',
+                'cancelBtn': 'Cancel',
+                'confirmBtn': 'Confirm',
+                'reloadText': 'Loading...',
+                'userNotDefined': 'User not defined. Open WebApp from Telegram.',
+                'loadError': 'Error loading profile data: ',
+                'languageSuccess': 'Language changed successfully',
+                'languageError': 'Error saving language',
+                'networkError': 'Network error'
+            },
+            'de': {
+                'profileTitle': 'Profil',
+                'loadingText': 'Laden...',
+                'balanceTitle': 'Kontostand',
+                'balanceLabel': 'Kontostand: $',
+                'referralText': 'Empfehlungsprogramm',
+                'editProfileText': 'Profil bearbeiten',
+                'settingsText': 'Einstellungen',
+                'transactionHistoryText': 'Transaktionsverlauf',
+                'backBtn': 'Zurück zum Hauptmenü',
+                'languageTitle': 'Sprache auswählen',
+                'cancelBtn': 'Abbrechen',
+                'confirmBtn': 'Bestätigen',
+                'reloadText': 'Laden...',
+                'userNotDefined': 'Benutzer nicht definiert. Öffnen Sie WebApp aus Telegram.',
+                'loadError': 'Fehler beim Laden der Profildaten: ',
+                'languageSuccess': 'Sprache erfolgreich geändert',
+                'languageError': 'Fehler beim Speichern der Sprache',
+                'networkError': 'Netzwerkfehler'
+            },
+            'fr': {
+                'profileTitle': 'Profil',
+                'loadingText': 'Chargement...',
+                'balanceTitle': 'Solde',
+                'balanceLabel': 'Solde: $',
+                'referralText': 'Programme de parrainage',
+                'editProfileText': 'Modifier le profil',
+                'settingsText': 'Paramètres',
+                'transactionHistoryText': 'Historique des transactions',
+                'backBtn': 'Retour au menu principal',
+                'languageTitle': 'Sélectionner la langue',
+                'cancelBtn': 'Annuler',
+                'confirmBtn': 'Confirmer',
+                'reloadText': 'Chargement...',
+                'userNotDefined': 'Utilisateur non défini. Ouvrez WebApp depuis Telegram.',
+                'loadError': 'Erreur de chargement des données de profil: ',
+                'languageSuccess': 'Langue changée avec succès',
+                'languageError': 'Erreur de sauvegarde de la langue',
+                'networkError': 'Erreur réseau'
+            },
+            'tr': {
+                'profileTitle': 'Profil',
+                'loadingText': 'Yükleniyor...',
+                'balanceTitle': 'Bakiye',
+                'balanceLabel': 'Bakiye: $',
+                'referralText': 'Referans Programı',
+                'editProfileText': 'Profili Düzenle',
+                'settingsText': 'Ayarlar',
+                'transactionHistoryText': 'İşlem Geçmişi',
+                'backBtn': 'Ana Menüye Dön',
+                'languageTitle': 'Dil Seçin',
+                'cancelBtn': 'İptal',
+                'confirmBtn': 'Onayla',
+                'reloadText': 'Yükleniyor...',
+                'userNotDefined': 'Kullanıcı tanımlanmadı. WebApp\'i Telegram\'dan açın.',
+                'loadError': 'Profil verisi yükleme hatası: ',
+                'languageSuccess': 'Dil başarıyla değiştirildi',
+                'languageError': 'Dil kaydetme hatası',
+                'networkError': 'Ağ hatası'
+            }
+        };
+
+        // Функция для получения локализованного текста
+        function getText(key) {
+            const locale = locales[currentLanguage] || locales['ru'];
+            return locale[key] || key;
+        }
+
+        // Обновление текста на странице
+        function updatePageText() {
+            document.getElementById('profileTitle').textContent = getText('profileTitle');
+            document.getElementById('loadingText').textContent = getText('loadingText');
+            document.getElementById('balanceTitle').textContent = getText('balanceTitle');
+            document.getElementById('balanceLabel').textContent = getText('balanceLabel');
+            document.getElementById('referralText').textContent = getText('referralText');
+            document.getElementById('editProfileText').textContent = getText('editProfileText');
+            document.getElementById('settingsText').textContent = getText('settingsText');
+            document.getElementById('transactionHistoryText').textContent = getText('transactionHistoryText');
+            document.getElementById('backBtn').textContent = getText('backBtn');
+            document.getElementById('languageTitle').textContent = getText('languageTitle');
+            document.getElementById('cancelBtn').textContent = getText('cancelBtn');
+            document.getElementById('confirmBtn').textContent = getText('confirmBtn');
+            document.getElementById('reloadText').textContent = getText('reloadText');
+        }
+
         // Загружаем данные профиля
         async function loadProfileData() {
             userData = getUserData();
             
             if (!userData) {
-                showMessage('Пользователь не определен. Откройте WebApp из Telegram.', 'error');
+                showMessage(getText('userNotDefined'), 'error');
                 return;
             }
 
@@ -377,12 +504,23 @@
 
                 if (response.ok) {
                     const userInfo = await response.json();
+                    
+                    // Устанавливаем язык в зависимости от статуса пользователя
+                    if (userInfo.user_status === 'admin' && userInfo.language) {
+                        currentLanguage = userInfo.language;
+                    } else if (userData.language_code) {
+                        currentLanguage = userData.language_code;
+                    }
+                    
+                    // Обновляем текст на странице
+                    updatePageText();
+                    
                     displayProfileData(userInfo);
                 } else {
                     throw new Error('Failed to load user data');
                 }
             } catch (error) {
-                showMessage('Ошибка загрузки данных профиля: ' + error.message, 'error');
+                showMessage(getText('loadError') + error.message, 'error');
             } finally {
                 document.getElementById('loadingSkeleton').classList.add('hidden');
                 document.getElementById('profileContent').classList.remove('hidden');
@@ -457,9 +595,9 @@
                     });
                     
                     if (response.ok) {
-                        showMessage('Язык успешно изменен', 'success');
+                        showMessage(getText('languageSuccess'), 'success');
                     } else {
-                        showMessage('Ошибка сохранения языка', 'error');
+                        showMessage(getText('languageError'), 'error');
                     }
                 }
                 
@@ -471,7 +609,7 @@
                 }, 1000);
                 
             } catch (error) {
-                showMessage('Ошибка сети', 'error');
+                showMessage(getText('networkError'), 'error');
             }
         }
 
@@ -480,5 +618,6 @@
             loadProfileData();
         });
     </script>
+    <script src="/i18n-manager.js"></script>
 </body>
 </html> 

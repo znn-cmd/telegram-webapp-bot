@@ -2,10 +2,9 @@
 <html lang="ru">
 <head>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <script src="/i18n-manager.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Личные данные — Aaadviser</title>
+    <title id="pageTitleTag">Личные данные — Aaadviser</title>
     <style>
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f8f9fa; margin: 0; }
         .container { max-width: 400px; margin: 20px auto; background: #fff; border-radius: 16px; box-shadow: 0 2px 12px rgba(102,126,234,0.10); padding: 24px 20px 20px 20px; text-align: center; }
@@ -35,30 +34,30 @@
 </head>
 <body>
     <div class="container">
-        <div class="title">Личные данные</div>
+        <div class="title" id="pageTitle">Личные данные</div>
         <div id="fields"></div>
-        <button class="back-btn" onclick="goBack()" data-i18n="common.back">Назад</button>
+        <button class="back-btn" onclick="goBack()" id="backBtn">Назад</button>
     </div>
     <div id="modal-bg" class="modal-bg" style="display:none;">
         <div class="modal">
             <div class="modal-title" id="modal-title"></div>
             <input type="text" id="modal-input" class="modal-input" />
             <div class="modal-btn-row">
-                <button class="modal-btn modal-btn-secondary" onclick="closeModal()" data-i18n="common.cancel">Отмена</button>
-                <button class="modal-btn modal-btn-primary" onclick="saveModal()" data-i18n="common.save">Сохранить</button>
+                <button class="modal-btn modal-btn-secondary" onclick="closeModal()" id="cancelBtn">Отмена</button>
+                <button class="modal-btn modal-btn-primary" onclick="saveModal()" id="saveBtn">Сохранить</button>
             </div>
         </div>
     </div>
     <div id="toast" class="toast"></div>
     <script>
         const FIELD_MAP = [
-            { key: 'first_name', label: 'Имя' },
-            { key: 'last_name', label: 'Фамилия' },
-            { key: 'phone', label: 'Телефон' },
-            { key: 'email', label: 'Email' },
-            { key: 'website', label: 'Website' },
-            { key: 'company', label: 'Компания' },
-            { key: 'about_me', label: 'О себе' }
+            { key: 'first_name', label: getText('firstName') },
+            { key: 'last_name', label: getText('lastName') },
+            { key: 'phone', label: getText('phone') },
+            { key: 'email', label: getText('email') },
+            { key: 'website', label: getText('website') },
+            { key: 'company', label: getText('company') },
+            { key: 'about_me', label: getText('aboutMe') }
         ];
         let userData = null;
         let currentEditField = null;
@@ -73,8 +72,8 @@
         }
         function openModal(fieldKey, fieldLabel, currentValue) {
             currentEditField = fieldKey;
-            document.getElementById('modal-title').textContent = 'Редактировать: ' + fieldLabel;
-            document.getElementById('modal-input').value = currentValue === 'пусто' ? '' : currentValue;
+            document.getElementById('modal-title').textContent = getText('editTitle') + fieldLabel;
+            document.getElementById('modal-input').value = currentValue === getText('empty') ? '' : currentValue;
             document.getElementById('modal-bg').style.display = 'flex';
             setTimeout(() => document.getElementById('modal-input').focus(), 100);
         }
@@ -92,13 +91,13 @@
             const fieldsDiv = document.getElementById('fields');
             fieldsDiv.innerHTML = '';
             FIELD_MAP.forEach(f => {
-                const val = data[f.key] && data[f.key].trim() ? data[f.key] : 'пусто';
+                const val = data[f.key] && data[f.key].trim() ? data[f.key] : getText('empty');
                 const block = document.createElement('div');
                 block.className = 'profile-field-block';
                 block.innerHTML = `
                     <div class='profile-field-content'>
                         <div class='profile-field-label'>${f.label}</div>
-                        <div class='profile-field-value${val==='пусто' ? ' profile-field-empty' : ''}'>${val}</div>
+                        <div class='profile-field-value${val===getText('empty') ? ' profile-field-empty' : ''}'>${val}</div>
                     </div>
                     <button class='edit-btn' onclick="openModal('${f.key}','${f.label}','${val.replace(/'/g, "&#39;")}')" title="Редактировать">
                         ✏️
@@ -124,14 +123,14 @@
                         userData[field] = value;
                     }
                     renderFields(userData);
-                    showToast('Сохранено!');
+                    showToast(getText('saved'));
                 } else {
-                    showToast('Ошибка сохранения: ' + (resp.error || 'Неизвестная ошибка'));
+                    showToast(getText('saveError') + (resp.error || getText('unknownError')));
                 }
             })
             .catch((error) => {
                 console.error('Error updating field:', error);
-                showToast('Ошибка соединения');
+                showToast(getText('connectionError'));
             });
         }
         // Получение пользователя (как в других разделах)
@@ -143,7 +142,7 @@
                 try { userData = JSON.parse(localStorage.getItem('aaadviser_user')); } catch (e) { userData = null; }
             }
             if (!userData || !userData.id) {
-                showToast('Пользователь не определён');
+                showToast(getText('userNotDefined'));
                 return;
             }
             fetch('/api/user_profile', {
@@ -157,11 +156,218 @@
                     Object.assign(userData, resp.profile);
                     renderFields(userData);
                 } else {
-                    showToast('Ошибка загрузки данных');
+                    showToast(getText('loadError'));
                 }
             })
-            .catch(() => showToast('Ошибка соединения'));
+            .catch(() => showToast(getText('connectionError')));
         })();
     </script>
+
+    <!-- Локализация -->
+    <script>
+        let currentLanguage = 'ru';
+        
+        // Получаем данные пользователя из Telegram
+        async function getUserData() {
+            try {
+                const userData = window.Telegram.WebApp.initDataUnsafe.user;
+                if (!userData) {
+                    console.warn('Данные пользователя Telegram недоступны');
+                    return null;
+                }
+                return userData;
+            } catch (error) {
+                console.error('Ошибка получения данных пользователя:', error);
+                return null;
+            }
+        }
+        
+        // Словари локализации
+        const locales = {
+            ru: {
+                pageTitleTag: 'Личные данные — Aaadviser',
+                pageTitle: 'Личные данные',
+                backBtn: 'Назад',
+                cancelBtn: 'Отмена',
+                saveBtn: 'Сохранить',
+                editTitle: 'Редактировать: ',
+                empty: 'пусто',
+                saved: 'Сохранено!',
+                saveError: 'Ошибка сохранения: ',
+                unknownError: 'Неизвестная ошибка',
+                connectionError: 'Ошибка соединения',
+                userNotDefined: 'Пользователь не определён',
+                loadError: 'Ошибка загрузки данных',
+                firstName: 'Имя',
+                lastName: 'Фамилия',
+                phone: 'Телефон',
+                email: 'Email',
+                website: 'Website',
+                company: 'Компания',
+                aboutMe: 'О себе'
+            },
+            en: {
+                pageTitleTag: 'Personal Data — Aaadviser',
+                pageTitle: 'Personal Data',
+                backBtn: 'Back',
+                cancelBtn: 'Cancel',
+                saveBtn: 'Save',
+                editTitle: 'Edit: ',
+                empty: 'empty',
+                saved: 'Saved!',
+                saveError: 'Save error: ',
+                unknownError: 'Unknown error',
+                connectionError: 'Connection error',
+                userNotDefined: 'User not defined',
+                loadError: 'Data loading error',
+                firstName: 'First Name',
+                lastName: 'Last Name',
+                phone: 'Phone',
+                email: 'Email',
+                website: 'Website',
+                company: 'Company',
+                aboutMe: 'About Me'
+            },
+            de: {
+                pageTitleTag: 'Persönliche Daten — Aaadviser',
+                pageTitle: 'Persönliche Daten',
+                backBtn: 'Zurück',
+                cancelBtn: 'Abbrechen',
+                saveBtn: 'Speichern',
+                editTitle: 'Bearbeiten: ',
+                empty: 'leer',
+                saved: 'Gespeichert!',
+                saveError: 'Speicherfehler: ',
+                unknownError: 'Unbekannter Fehler',
+                connectionError: 'Verbindungsfehler',
+                userNotDefined: 'Benutzer nicht definiert',
+                loadError: 'Datenladefehler',
+                firstName: 'Vorname',
+                lastName: 'Nachname',
+                phone: 'Telefon',
+                email: 'Email',
+                website: 'Website',
+                company: 'Unternehmen',
+                aboutMe: 'Über mich'
+            },
+            fr: {
+                pageTitleTag: 'Données personnelles — Aaadviser',
+                pageTitle: 'Données personnelles',
+                backBtn: 'Retour',
+                cancelBtn: 'Annuler',
+                saveBtn: 'Sauvegarder',
+                editTitle: 'Modifier : ',
+                empty: 'vide',
+                saved: 'Sauvegardé !',
+                saveError: 'Erreur de sauvegarde : ',
+                unknownError: 'Erreur inconnue',
+                connectionError: 'Erreur de connexion',
+                userNotDefined: 'Utilisateur non défini',
+                loadError: 'Erreur de chargement des données',
+                firstName: 'Prénom',
+                lastName: 'Nom',
+                phone: 'Téléphone',
+                email: 'Email',
+                website: 'Site web',
+                company: 'Entreprise',
+                aboutMe: 'À propos de moi'
+            },
+            tr: {
+                pageTitleTag: 'Kişisel Veriler — Aaadviser',
+                pageTitle: 'Kişisel Veriler',
+                backBtn: 'Geri',
+                cancelBtn: 'İptal',
+                saveBtn: 'Kaydet',
+                editTitle: 'Düzenle: ',
+                empty: 'boş',
+                saved: 'Kaydedildi!',
+                saveError: 'Kaydetme hatası: ',
+                unknownError: 'Bilinmeyen hata',
+                connectionError: 'Bağlantı hatası',
+                userNotDefined: 'Kullanıcı tanımlanmadı',
+                loadError: 'Veri yükleme hatası',
+                firstName: 'Ad',
+                lastName: 'Soyad',
+                phone: 'Telefon',
+                email: 'Email',
+                website: 'Website',
+                company: 'Şirket',
+                aboutMe: 'Hakkımda'
+            }
+        };
+        
+        // Функция получения текста по ключу
+        function getText(key) {
+            return locales[currentLanguage][key] || key;
+        }
+        
+        // Функция обновления текста на странице
+        function updatePageText() {
+            // Обновляем title
+            document.getElementById('pageTitleTag').textContent = getText('pageTitleTag');
+            
+            // Обновляем основные элементы
+            const elements = [
+                'pageTitle', 'backBtn', 'cancelBtn', 'saveBtn'
+            ];
+            
+            elements.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.textContent = getText(id);
+                }
+            });
+        }
+        
+        // Функция инициализации локализации
+        async function initLocalization() {
+            try {
+                const userData = await getUserData();
+                if (userData && userData.language_code) {
+                    // Проверяем, является ли пользователь админом
+                    const response = await fetch('/api/user', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            telegram_id: userData.id,
+                            username: userData.username,
+                            tg_name: userData.first_name,
+                            last_name: userData.last_name,
+                            language_code: userData.language_code
+                        })
+                    });
+                    
+                    if (response.ok) {
+                        const userInfo = await response.json();
+                        
+                        // Устанавливаем язык в зависимости от статуса пользователя
+                        if (userInfo.user_status === 'admin' && userInfo.language) {
+                            // Для админов используем язык из базы данных
+                            currentLanguage = userInfo.language;
+                        } else if (userData.language_code) {
+                            // Для обычных пользователей используем язык из Telegram
+                            currentLanguage = userData.language_code;
+                        }
+                        
+                        // Обновляем текст на странице с новым языком
+                        updatePageText();
+                    }
+                }
+            } catch (error) {
+                console.error('Ошибка инициализации локализации:', error);
+                // Используем русский язык по умолчанию
+                currentLanguage = 'ru';
+                updatePageText();
+            }
+        }
+        
+        // Инициализируем локализацию при загрузке страницы
+        document.addEventListener('DOMContentLoaded', () => {
+            initLocalization();
+        });
+    </script>
+    <script src="/i18n-manager.js"></script>
 </body>
 </html> 

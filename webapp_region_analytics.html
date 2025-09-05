@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aaadviser - Аналитика региона</title>
+            <title id="pageTitleTag">Aaadviser - Аналитика региона</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <script src="/i18n-manager.js"></script>
     <style>
         * {
             margin: 0;
@@ -1572,38 +1571,7 @@
         let currentCurrency = 'TRY'; // Default currency
         let currencyRates = null;
         
-        // Get user language from database
-        async function getUserLanguage() {
-            try {
-                // Get telegram_id from Telegram WebApp
-                const telegramId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id;
-                if (!telegramId) {
-                    console.log('No telegram_id available, using default language: ru');
-                    return 'ru';
-                }
-                
-                const response = await fetch('/api/user/language', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ telegram_id: telegramId })
-                });
-                
-                const data = await response.json();
-                if (data.success) {
-                    userLanguage = data.language;
-                    console.log('User language loaded:', userLanguage);
-                    return userLanguage;
-                } else {
-                    console.log('Failed to get user language, using default: ru');
-                    return 'ru';
-                }
-            } catch (error) {
-                console.error('Error getting user language:', error);
-                return 'ru';
-            }
-        }
+        // Удаляем функцию getUserLanguage - она больше не нужна
         
         // Set default currency based on selected country
         function setDefaultCurrency() {
@@ -2408,7 +2376,7 @@
                     // Add "No value" option
                     const noValueOption = document.createElement('option');
                     noValueOption.value = 'none';
-                    noValueOption.textContent = 'Не имеет значения';
+                    noValueOption.textContent = getText('noDistrictOption');
                     districtSelect.appendChild(noValueOption);
                     
                     data.districts.forEach(([id, name]) => {
@@ -2529,7 +2497,7 @@
             
             // Update selected location
             selectedLocation.district_id = districtId === 'none' ? null : districtId;
-            selectedLocation.district_name = districtId === 'none' ? 'Не имеет значения' : districtName;
+                            selectedLocation.district_name = districtId === 'none' ? getText('noDistrictOption') : districtName;
             
             updateConfirmButton();
         }
@@ -2590,9 +2558,7 @@
             setDefaultCurrency();
             
             // Get user language and load region data
-            getUserLanguage().then(() => {
-                loadRegionData();
-            });
+            loadRegionData();
         }
 
         // Load region data from API
@@ -3457,12 +3423,289 @@
         }
 
         // Initialize the page
-        function init() {
-            // Set language based on Telegram WebApp
-            if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
-                const userLang = tg.initDataUnsafe.user.language_code;
-                if (userLang && locales[userLang]) {
-                    currentLanguage = userLang;
+        async function init() {
+            const userData = getUserData();
+            if (!userData) {
+                updatePageText();
+                loadCountries();
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/user', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        telegram_id: userData.id,
+                        username: userData.username,
+                        tg_name: userData.tg_name,
+                        last_name: userData.last_name,
+                        language_code: userData.language_code || 'ru'
+                    })
+                });
+
+                if (response.ok) {
+                    const userInfo = await response.json();
+                    
+                    // Устанавливаем язык в зависимости от статуса пользователя
+                    if (userInfo.user_status === 'admin' && userInfo.language) {
+                        // Для админов используем язык из базы данных
+                        currentLanguage = userInfo.language;
+                    } else if (userData.language_code) {
+                        // Для обычных пользователей используем язык из Telegram
+                        currentLanguage = userData.language_code;
+                    }
+                }
+            } catch (error) {
+                // В случае ошибки используем язык из Telegram
+                if (userData.language_code) {
+                    currentLanguage = userData.language_code;
+                }
+            }
+            
+            // Update page text
+            updatePageText();
+            
+            // Load countries
+            loadCountries();
+        }
+
+        // Локализации
+        const locales = {
+            'ru': {
+                'pageTitleTag': 'Aaadviser - Аналитика региона',
+                'slogan': 'Инсайты рынка недвижимости',
+                'pageTitle': 'Аналитика региона',
+                'countryLabel': 'Страна:',
+                'countryPlaceholder': 'Выберите страну',
+                'cityLabel': 'Город:',
+                'cityPlaceholder': 'Сначала выберите страну',
+                'countyLabel': 'Область/Регион:',
+                'countyPlaceholder': 'Сначала выберите город',
+                'districtLabel': 'Район:',
+                'districtPlaceholder': 'Сначала выберите область',
+                'confirmButtonText': 'Подтвердить выбор',
+                'selectedLocationTitle': 'Выбранная локация:',
+                'adminIdsTitle': 'ID для админов:',
+                'loadingText': 'Загрузка данных...',
+                'currencySwitcherTitle': 'Валюта отображения:',
+                'keyMetricsTitle': 'Ключевые показатели',
+                'avgSalePriceLabel': 'Средняя цена продажи за м²',
+                'avgRentPriceLabel': 'Средняя цена аренды за м²',
+                'listingPeriodSaleLabel': 'Период размещения (продажа)',
+                'listingPeriodRentLabel': 'Период размещения (аренда)',
+                'yieldLabel': 'Yield (Доходность)',
+                'insightsTitle': 'Саммари',
+                'generalDataTitle': 'Общие данные',
+                'houseTypeDataTitle': 'Данные по количеству спален',
+                'floorSegmentDataTitle': 'Данные по этажу',
+                'ageDataTitle': 'Данные по возрасту объектов',
+                'heatingDataTitle': 'Данные по типу отопления',
+                'errorText': 'Ошибка загрузки данных',
+                'backButton': '← Вернуться в главное меню',
+                'noDistrictOption': 'Не имеет значения'
+            },
+            'en': {
+                'pageTitleTag': 'Aaadviser - Region Analytics',
+                'slogan': 'Real Estate Market Insights',
+                'pageTitle': 'Region Analytics',
+                'countryLabel': 'Country:',
+                'countryPlaceholder': 'Select country',
+                'cityLabel': 'City:',
+                'cityPlaceholder': 'Select country first',
+                'countyLabel': 'Region/State:',
+                'countyPlaceholder': 'Select city first',
+                'districtLabel': 'District:',
+                'districtPlaceholder': 'Select region first',
+                'confirmButtonText': 'Confirm selection',
+                'selectedLocationTitle': 'Selected location:',
+                'adminIdsTitle': 'IDs for admins:',
+                'loadingText': 'Loading data...',
+                'currencySwitcherTitle': 'Display currency:',
+                'keyMetricsTitle': 'Key Metrics',
+                'avgSalePriceLabel': 'Average sale price per m²',
+                'avgRentPriceLabel': 'Average rent price per m²',
+                'listingPeriodSaleLabel': 'Listing period (sale)',
+                'listingPeriodRentLabel': 'Listing period (rent)',
+                'yieldLabel': 'Yield (Return)',
+                'insightsTitle': 'Summary',
+                'generalDataTitle': 'General Data',
+                'houseTypeDataTitle': 'Bedroom Data',
+                'floorSegmentDataTitle': 'Floor Data',
+                'ageDataTitle': 'Property Age Data',
+                'heatingDataTitle': 'Heating Type Data',
+                'errorText': 'Error loading data',
+                'backButton': '← Back to main menu',
+                'noDistrictOption': 'No preference'
+            },
+            'de': {
+                'pageTitleTag': 'Aaadviser - Regionalanalytik',
+                'slogan': 'Immobilienmarkt-Einblicke',
+                'pageTitle': 'Regionalanalytik',
+                'countryLabel': 'Land:',
+                'countryPlaceholder': 'Land auswählen',
+                'cityLabel': 'Stadt:',
+                'cityPlaceholder': 'Zuerst Land auswählen',
+                'countyLabel': 'Region/Bundesland:',
+                'countyPlaceholder': 'Zuerst Stadt auswählen',
+                'districtLabel': 'Bezirk:',
+                'districtPlaceholder': 'Zuerst Region auswählen',
+                'confirmButtonText': 'Auswahl bestätigen',
+                'selectedLocationTitle': 'Ausgewählter Standort:',
+                'adminIdsTitle': 'IDs für Administratoren:',
+                'loadingText': 'Daten werden geladen...',
+                'currencySwitcherTitle': 'Anzeigewährung:',
+                'keyMetricsTitle': 'Schlüsselmetriken',
+                'avgSalePriceLabel': 'Durchschnittlicher Verkaufspreis pro m²',
+                'avgRentPriceLabel': 'Durchschnittlicher Mietpreis pro m²',
+                'listingPeriodSaleLabel': 'Anzeigedauer (Verkauf)',
+                'listingPeriodRentLabel': 'Anzeigedauer (Vermietung)',
+                'yieldLabel': 'Rendite (Ertrag)',
+                'insightsTitle': 'Zusammenfassung',
+                'generalDataTitle': 'Allgemeine Daten',
+                'houseTypeDataTitle': 'Schlafzimmer-Daten',
+                'floorSegmentDataTitle': 'Etagen-Daten',
+                'ageDataTitle': 'Immobilienalter-Daten',
+                'heatingDataTitle': 'Heizungstyp-Daten',
+                'errorText': 'Fehler beim Laden der Daten',
+                'backButton': '← Zurück zum Hauptmenü',
+                'noDistrictOption': 'Keine Präferenz'
+            },
+            'fr': {
+                'pageTitleTag': 'Aaadviser - Analytique régionale',
+                'slogan': 'Aperçus du marché immobilier',
+                'pageTitle': 'Analytique régionale',
+                'countryLabel': 'Pays:',
+                'countryPlaceholder': 'Sélectionner le pays',
+                'cityLabel': 'Ville:',
+                'cityPlaceholder': 'Sélectionner d\'abord le pays',
+                'countyLabel': 'Région/État:',
+                'countyPlaceholder': 'Sélectionner d\'abord la ville',
+                'districtLabel': 'Quartier:',
+                'districtPlaceholder': 'Sélectionner d\'abord la région',
+                'confirmButtonText': 'Confirmer la sélection',
+                'selectedLocationTitle': 'Emplacement sélectionné:',
+                'adminIdsTitle': 'IDs pour les administrateurs:',
+                'loadingText': 'Chargement des données...',
+                'currencySwitcherTitle': 'Devise d\'affichage:',
+                'keyMetricsTitle': 'Métriques clés',
+                'avgSalePriceLabel': 'Prix de vente moyen par m²',
+                'avgRentPriceLabel': 'Prix de location moyen par m²',
+                'listingPeriodSaleLabel': 'Période d\'annonce (vente)',
+                'listingPeriodRentLabel': 'Période d\'annonce (location)',
+                'yieldLabel': 'Rendement (Retour)',
+                'insightsTitle': 'Résumé',
+                'generalDataTitle': 'Données générales',
+                'houseTypeDataTitle': 'Données des chambres',
+                'floorSegmentDataTitle': 'Données des étages',
+                'ageDataTitle': 'Données d\'âge des propriétés',
+                'heatingDataTitle': 'Données du type de chauffage',
+                'errorText': 'Erreur de chargement des données',
+                'backButton': '← Retour au menu principal',
+                'noDistrictOption': 'Aucune préférence'
+            },
+            'tr': {
+                'pageTitleTag': 'Aaadviser - Bölge Analizi',
+                'slogan': 'Gayrimenkul Piyasası İçgörüleri',
+                'pageTitle': 'Bölge Analizi',
+                'countryLabel': 'Ülke:',
+                'countryPlaceholder': 'Ülke seçin',
+                'cityLabel': 'Şehir:',
+                'cityPlaceholder': 'Önce ülke seçin',
+                'countyLabel': 'Bölge/Eyalet:',
+                'countyPlaceholder': 'Önce şehir seçin',
+                'districtLabel': 'İlçe:',
+                'districtPlaceholder': 'Önce bölge seçin',
+                'confirmButtonText': 'Seçimi onayla',
+                'selectedLocationTitle': 'Seçilen konum:',
+                'adminIdsTitle': 'Yöneticiler için ID\'ler:',
+                'loadingText': 'Veriler yükleniyor...',
+                'currencySwitcherTitle': 'Görüntüleme para birimi:',
+                'keyMetricsTitle': 'Temel Metrikler',
+                'avgSalePriceLabel': 'Ortalama satış fiyatı m² başına',
+                'avgRentPriceLabel': 'Ortalama kiralama fiyatı m² başına',
+                'listingPeriodSaleLabel': 'İlan süresi (satış)',
+                'listingPeriodRentLabel': 'İlan süresi (kiralama)',
+                'yieldLabel': 'Getiri (Kazanç)',
+                'insightsTitle': 'Özet',
+                'generalDataTitle': 'Genel Veriler',
+                'houseTypeDataTitle': 'Yatak Odası Verileri',
+                'floorSegmentDataTitle': 'Kat Verileri',
+                'ageDataTitle': 'Gayrimenkul Yaşı Verileri',
+                'heatingDataTitle': 'Isıtma Türü Verileri',
+                'errorText': 'Veri yükleme hatası',
+                'backButton': '← Ana menüye dön',
+                'noDistrictOption': 'Tercih yok'
+            }
+        };
+
+        // Функция для получения локализованного текста
+        function getText(key) {
+            const locale = locales[currentLanguage] || locales['ru'];
+            return locale[key] || key;
+        }
+
+        // Обновление текста на странице
+        function updatePageText() {
+            // Обновляем заголовок страницы
+            document.title = getText('pageTitleTag');
+            
+            // Обновляем основные элементы
+            const elements = [
+                'slogan', 'pageTitle', 'countryLabel', 'countryPlaceholder', 'cityLabel', 'cityPlaceholder',
+                'countyLabel', 'countyPlaceholder', 'districtLabel', 'districtPlaceholder', 'confirmButtonText',
+                'selectedLocationTitle', 'adminIdsTitle', 'loadingText', 'currencySwitcherTitle', 'keyMetricsTitle',
+                'avgSalePriceLabel', 'avgRentPriceLabel', 'listingPeriodSaleLabel', 'listingPeriodRentLabel',
+                'yieldLabel', 'insightsTitle', 'generalDataTitle', 'houseTypeDataTitle', 'floorSegmentDataTitle',
+                'ageDataTitle', 'heatingDataTitle', 'errorText', 'backButton', 'noDistrictOption'
+            ];
+            
+            elements.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.textContent = getText(id);
+                }
+            });
+        }
+
+        // Initialize the page
+        async function init() {
+            const userData = getUserData();
+            if (!userData) {
+                updatePageText();
+                loadCountries();
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/user', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        telegram_id: userData.id,
+                        username: userData.username,
+                        tg_name: userData.tg_name,
+                        last_name: userData.last_name,
+                        language_code: userData.language_code || 'ru'
+                    })
+                });
+
+                if (response.ok) {
+                    const userInfo = await response.json();
+                    
+                    // Устанавливаем язык в зависимости от статуса пользователя
+                    if (userInfo.user_status === 'admin' && userInfo.language) {
+                        // Для админов используем язык из базы данных
+                        currentLanguage = userInfo.language;
+                    } else if (userData.language_code) {
+                        // Для обычных пользователей используем язык из Telegram
+                        currentLanguage = userData.language_code;
+                    }
+                }
+            } catch (error) {
+                // В случае ошибки используем язык из Telegram
+                if (userData.language_code) {
+                    currentLanguage = userData.language_code;
                 }
             }
             
@@ -3476,5 +3719,6 @@
         // Initialize when page loads
         document.addEventListener('DOMContentLoaded', init);
     </script>
+    <script src="/i18n-manager.js"></script>
 </body>
 </html>

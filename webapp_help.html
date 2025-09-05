@@ -2,7 +2,6 @@
 <html lang="ru">
 <head>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <script src="/i18n-manager.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title data-i18n-title="common.help">Помощь — Aaadviser</title>
@@ -22,14 +21,128 @@
 <body>
     <div class="container">
         <img src="logo-flt.png" alt="Aaadviser" class="logo" onclick="goToMainMenu()">
-        <div class="title" data-i18n="common.help">Помощь</div>
-        <button class="help-btn" onclick="aboutApp()"><span class="help-btn-icon">ℹ️</span>О приложении</button>
-        <button class="help-btn" onclick="showInstruction()"><span class="help-btn-icon">📖</span>Инструкция</button>
-        <button class="help-btn" onclick="showGeo()"><span class="help-btn-icon">🌍</span>Наша география</button>
-        <button class="help-btn" onclick="showSupport()"><span class="help-btn-icon">🛠️</span>Техническая поддержка</button>
-        <button class="back-btn" onclick="goToMainMenu()" data-i18n="common.back">Вернуться в главное меню</button>
+        <div class="title" id="helpTitle">Помощь</div>
+        <button class="help-btn" onclick="aboutApp()" id="aboutAppBtn"><span class="help-btn-icon">ℹ️</span>О приложении</button>
+        <button class="help-btn" onclick="showInstruction()" id="instructionBtn"><span class="help-btn-icon">📖</span>Инструкция</button>
+        <button class="help-btn" onclick="showGeo()" id="geographyBtn"><span class="help-btn-icon">🌍</span>Наша география</button>
+        <button class="help-btn" onclick="showSupport()" id="supportBtn"><span class="help-btn-icon">🛠️</span>Техническая поддержка</button>
+        <button class="back-btn" onclick="goToMainMenu()" id="backBtn">Вернуться в главное меню</button>
     </div>
     <script>
+        let currentLanguage = 'ru';
+
+        // Получаем данные пользователя
+        function getUserData() {
+            let tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
+            if (tg && tg.initDataUnsafe && tg.initDataUnsafe.user) {
+                return tg.initDataUnsafe.user;
+            }
+            return null;
+        }
+
+        // Локализации
+        const locales = {
+            'ru': {
+                'helpTitle': 'Помощь',
+                'aboutAppBtn': 'О приложении',
+                'instructionBtn': 'Инструкция',
+                'geographyBtn': 'Наша география',
+                'supportBtn': 'Техническая поддержка',
+                'backBtn': 'Вернуться в главное меню'
+            },
+            'en': {
+                'helpTitle': 'Help',
+                'aboutAppBtn': 'About the App',
+                'instructionBtn': 'Instructions',
+                'geographyBtn': 'Our Geography',
+                'supportBtn': 'Technical Support',
+                'backBtn': 'Back to Main Menu'
+            },
+            'de': {
+                'helpTitle': 'Hilfe',
+                'aboutAppBtn': 'Über die App',
+                'instructionBtn': 'Anleitung',
+                'geographyBtn': 'Unsere Geographie',
+                'supportBtn': 'Technischer Support',
+                'backBtn': 'Zurück zum Hauptmenü'
+            },
+            'fr': {
+                'helpTitle': 'Aide',
+                'aboutAppBtn': 'À propos de l\'app',
+                'instructionBtn': 'Instructions',
+                'geographyBtn': 'Notre géographie',
+                'supportBtn': 'Support technique',
+                'backBtn': 'Retour au menu principal'
+            },
+            'tr': {
+                'helpTitle': 'Yardım',
+                'aboutAppBtn': 'Uygulama Hakkında',
+                'instructionBtn': 'Talimatlar',
+                'geographyBtn': 'Coğrafyamız',
+                'supportBtn': 'Teknik Destek',
+                'backBtn': 'Ana Menüye Dön'
+            }
+        };
+
+        // Функция для получения локализованного текста
+        function getText(key) {
+            const locale = locales[currentLanguage] || locales['ru'];
+            return locale[key] || key;
+        }
+
+        // Обновление текста на странице
+        function updatePageText() {
+            document.getElementById('helpTitle').textContent = getText('helpTitle');
+            document.getElementById('aboutAppBtn').textContent = getText('aboutAppBtn');
+            document.getElementById('instructionBtn').textContent = getText('instructionBtn');
+            document.getElementById('geographyBtn').textContent = getText('geographyBtn');
+            document.getElementById('supportBtn').textContent = getText('supportBtn');
+            document.getElementById('backBtn').textContent = getText('backBtn');
+        }
+
+        // Инициализация
+        async function init() {
+            const userData = getUserData();
+            if (!userData) {
+                updatePageText();
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/user', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        telegram_id: userData.id,
+                        username: userData.username,
+                        tg_name: userData.tg_name,
+                        last_name: userData.last_name,
+                        language_code: userData.language_code || 'ru'
+                    })
+                });
+
+                if (response.ok) {
+                    const userInfo = await response.json();
+                    
+                    // Устанавливаем язык в зависимости от статуса пользователя
+                    if (userInfo.user_status === 'admin' && userInfo.language) {
+                        // Для админов используем язык из базы данных
+                        currentLanguage = userInfo.language;
+                    } else if (userData.language_code) {
+                        // Для обычных пользователей используем язык из Telegram
+                        currentLanguage = userData.language_code;
+                    }
+                }
+            } catch (error) {
+                // В случае ошибки используем язык из Telegram
+                if (userData.language_code) {
+                    currentLanguage = userData.language_code;
+                }
+            }
+            
+            updatePageText();
+        }
+
         function goToMainMenu() {
             window.location.href = '/webapp';
         }
@@ -45,6 +158,10 @@
         function showSupport() {
             window.location.href = '/webapp_support';
         }
+
+        // Запускаем инициализацию
+        init();
     </script>
+    <script src="/i18n-manager.js"></script>
 </body>
 </html> 
