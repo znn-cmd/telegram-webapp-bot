@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title data-i18n-title="reports.my_reports">Мои отчеты — Aaadviser</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <script src="static/i18n-manager.js"></script>
+    <script src="/static/i18n-manager.js"></script>
     <style>
         * {
             margin: 0;
@@ -422,7 +422,7 @@
         <!-- Логотип -->
         <div class="header">
             <img src="logo-flt.png" alt="Aaadviser Logo" class="logo" onclick="goToMainMenu()">
-            <div class="title" id="pageTitle" data-i18n="reports.title" data-i18n="reports.my_reports">Мои отчеты</div>
+            <div class="title" id="pageTitle" data-i18n="reports.title" data-i18n="reports.my_reports" data-i18n="reports.my_reports">Мои отчеты</div>
             <div class="subtitle" id="pageSubtitle">Управление вашими отчетами</div>
         </div>
 
@@ -464,8 +464,8 @@
                 <p id="deleteModalMessage">Вы уверены, что хотите удалить этот отчет? Это действие нельзя отменить.</p>
             </div>
             <div class="modal-actions">
-                <button class="modal-btn secondary" id="cancelDeleteBtn" data-i18n="common.cancel">Отмена</button>
-                <button class="modal-btn danger" id="confirmDeleteBtn" data-i18n="common.delete">Удалить</button>
+                <button class="modal-btn secondary" id="cancelDeleteBtn" data-i18n="common.cancel" data-i18n="common.cancel">Отмена</button>
+                <button class="modal-btn danger" id="confirmDeleteBtn" data-i18n="common.delete" data-i18n="common.delete">Удалить</button>
             </div>
         </div>
     </div>
@@ -933,13 +933,7 @@
         }
 
         // Запускаем инициализацию
-        async function initApp() {
-            const i18nManager = new I18nManager();
-            await i18nManager.init();
-            init();
-        }
-        
-        initApp();
+        init();
         
         // Добавляем обработчики событий для кнопок
         document.addEventListener('DOMContentLoaded', function() {

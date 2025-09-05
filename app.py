@@ -1020,9 +1020,9 @@ def api_currency_update():
         logger.error(f"❌ Ошибка при обновлении курсов валют: {e}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
-@app.route('/api/user/language', methods=['POST'])
-def api_user_language():
-    """Получение языка пользователя из таблицы users"""
+@app.route('/api/get_user_language', methods=['POST'])
+def api_get_user_language():
+    """Получение языка пользователя с учетом админ-статуса"""
     try:
         data = request.json or {}
         telegram_id = data.get('telegram_id')
@@ -1032,21 +1032,50 @@ def api_user_language():
         
         logger.info(f"🔍 Запрос языка пользователя для telegram_id: {telegram_id}")
         
-        # Получаем язык пользователя из базы данных
-        result = supabase.table('users').select('language').eq('telegram_id', telegram_id).execute()
+        # Получаем данные пользователя из базы данных
+        result = supabase.table('users').select('language, user_status').eq('telegram_id', telegram_id).execute()
         
         if result.data and len(result.data) > 0:
-            user_language = result.data[0].get('language', 'ru')  # По умолчанию русский
-            logger.info(f"✅ Получен язык пользователя: {user_language}")
+            user_data = result.data[0]
+            user_status = user_data.get('user_status')
+            user_language = user_data.get('language')
+            
+            # Логика определения языка согласно требованиям:
+            # 1. Для админов (user_status = 'admin') - язык из поля language
+            # 2. Для обычных пользователей - язык из Telegram или английский по умолчанию
+            
+            if user_status == 'admin' and user_language:
+                # Админ - используем язык из поля language
+                final_language = user_language if user_language in ['ru', 'en', 'de', 'fr', 'tr'] else 'en'
+                logger.info(f"✅ Админ {telegram_id}: язык из БД = {final_language}")
+            else:
+                # Обычный пользователь - используем язык из Telegram или английский
+                # Получаем язык из Telegram WebApp
+                telegram_language = data.get('telegram_language', 'en')
+                telegram_lang_code = telegram_language[:2] if telegram_language else 'en'
+                
+                # Мапим язык Telegram на поддерживаемые языки
+                if telegram_lang_code in ['ru', 'en', 'de', 'fr', 'tr']:
+                    final_language = telegram_lang_code
+                else:
+                    final_language = 'en'  # Fallback на английский
+                
+                logger.info(f"✅ Обычный пользователь {telegram_id}: Telegram язык = {telegram_lang_code}, финальный = {final_language}")
+            
             return jsonify({
                 'success': True,
-                'language': user_language
+                'language': final_language,
+                'is_admin': user_status == 'admin',
+                'user_status': user_status
             })
         else:
             logger.warning(f"⚠️ Пользователь с telegram_id {telegram_id} не найден")
+            # Для несуществующих пользователей используем английский
             return jsonify({
                 'success': True,
-                'language': 'ru'  # По умолчанию русский
+                'language': 'en',
+                'is_admin': False,
+                'user_status': None
             })
             
     except Exception as e:

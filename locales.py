@@ -145,260 +145,75 @@ locales = {
             'data_loaded': 'Данные загружены',
             'error_loading_data': 'Ошибка загрузки данных'
         },
-        'about': {
-            'title': 'О приложении',
-            'what_is': 'Что такое Aaadviser?',
-            'description': 'Aaadviser — это интеллектуальная платформа для анализа рынка недвижимости, которая помогает инвесторам и покупателям принимать обоснованные решения.',
-            'capabilities': 'Наши возможности:',
-            'capability_1': 'Детальный анализ цен в районе',
-            'capability_2': 'Статистика рынка недвижимости',
-            'capability_3': 'Сравнение с похожими объектами',
-            'capability_4': 'Прогноз изменения цен',
-            'capability_5': 'Рекомендации по инвестициям',
-            'capability_6': 'Сохранение отчетов',
-            'capability_7': 'Удобный мобильный интерфейс',
-            'how_it_works': 'Как это работает?',
-            'how_description': 'Просто введите адрес недвижимости, укажите количество спален и примерную цену. Наша система проанализирует рынок и предоставит подробный отчет с рекомендациями.',
-            'why_aaadviser': 'Почему Aaadviser?',
-            'why_description': 'Мы используем передовые технологии машинного обучения и большие данные для анализа рынка недвижимости, что позволяет получать точные и актуальные данные для принятия инвестиционных решений.'
-        },
-        'additional_data': {
-            'title': 'Дополнительные данные',
-            'subtitle': 'Укажите характеристики объекта для детального анализа',
-            'object_info': 'Информация об объекте',
-            'address': 'Адрес:',
-            'bedrooms': 'Спальни:',
-            'price': 'Цена:',
-            'loading': 'Загрузка...',
-            'age_label': 'Возраст объекта:',
-            'age_placeholder': 'Выберите возраст объекта...',
-            'floor_label': 'Этаж объекта:',
-            'floor_placeholder': 'Выберите этаж...',
-            'heating_label': 'Тип отопления:',
-            'heating_placeholder': 'Выберите тип отопления...',
-            'area_label': 'Площадь объекта, м²:',
-            'area_placeholder': 'Введите площадь объекта',
-            'continue': 'Продолжить',
-            'skip': 'Пропустить',
-            'loading_options': 'Загружаем опции...',
-            'error_loading': 'Произошла ошибка при загрузке данных',
-            'error_options': 'Ошибка загрузки опций:',
-            'fill_all_fields': 'Пожалуйста, заполните все поля или выберите "Не известно"',
-            'generating_report': 'Формируем полный отчет...',
-            'error_generation': 'Ошибка генерации отчета:'
-        },
         'admin': {
-            'publication': {
-                'title': 'Публикация для всех пользователей',
-                'placeholder': 'Введите текст публикации...\nПоддерживается форматирование, смайлы и оформление.',
-                'only_admins': 'Только администраторы',
-                'save_to_db': 'Сохранить в базу',
-                'auto_translate': 'Сделать автоперевод',
-                'test_send': 'Тестовая отправка',
-                'send': 'Отправить',
-                'enter_text': 'Введите текст публикации!',
-                'broadcast_completed': 'Рассылка завершена!',
-                'by_languages': 'По языкам:',
-                'error_sending': 'Ошибка:',
-                'network_error': 'Ошибка сети.',
-                'publication_sent': 'Публикация успешно отправлена!'
-            },
-            'settings': {
-                'title': 'Настройки API-ключей',
-                'key_name_placeholder': 'Имя ключа (key_name)',
-                'key_value_placeholder': 'Значение ключа (key_value)',
-                'add_key': 'Добавить ключ',
-                'loading': 'Загрузка...',
-                'key_added': 'Ключ успешно добавлен!',
-                'error_adding': 'Ошибка:',
-                'network_error': 'Ошибка сети.',
-                'error_loading_keys': 'Ошибка загрузки ключей.',
-                'no_keys': 'Нет новых ключей.'
-            },
-            'users': {
-                'title': 'Статистика пользователей',
-                'general_stats': 'Общая статистика',
-                'reports_stats': 'Отчёты пользователей',
-                'loading': 'Загрузка...',
-                'error_loading': 'Ошибка загрузки статистики',
-                'stats_loaded': 'Статистика успешно загружена!',
-                'total_users': 'Всего пользователей:',
-                'new_users_week': 'Новых за неделю:',
-                'new_users_month': 'Новых за месяц:',
-                'new_users_quarter': 'Новых за квартал:',
-                'new_users_year': 'Новых за год:',
-                'total_balance': 'Общий баланс:',
-                'expired_balance': 'Баланс с period_end < сегодня или null:',
-                'active_balance': 'Баланс остальных пользователей:',
-                'admin_count': 'Админов:',
-                'reports_week': 'Отчётов за неделю:',
-                'reports_month': 'Отчётов за месяц:',
-                'reports_quarter': 'Отчётов за квартал:',
-                'reports_year': 'Отчётов за год:',
-                'deleted_reports': 'Удалённых отчётов:',
-                'expired_reports_count': 'Отчётов пользователей с period_end < сегодня или null:',
-                'avg_expired_reports': 'Среднее отчётов на такого пользователя:',
-                'active_reports_count': 'Отчётов остальных пользователей:',
-                'active_reports_cost': 'Потрачено денег (full):',
-                'network_error': 'Ошибка сети'
-            },
-            'panel': {
-                'title': 'Админ-панель',
-                'make_balance_100': 'Сделать баланс 100',
-                'users': 'Пользователи',
-                'publication': 'Публикация',
-                'settings': 'Настройки',
-                'user_not_defined': 'Пользователь не определён. Откройте WebApp из Telegram.',
-                'balance_set': 'Баланс установлен: $100',
-                'balance_set_success': 'Баланс успешно установлен!',
-                'error_updating': 'Ошибка:',
-                'network_error': 'Ошибка сети.'
-            }
+            'title': 'Админ панель', 'users': 'Пользователи', 'publications': 'Публикации',
+            'settings': 'Настройки', 'statistics': 'Статистика', 'user_management': 'Управление пользователями',
+            'content_management': 'Управление контентом', 'system_settings': 'Системные настройки',
+            'backup': 'Резервное копирование', 'logs': 'Логи', 'security': 'Безопасность',
+            'make_balance_100': 'Сделать баланс 100', 'admin_panel': 'Админ-панель',
+            'user_stats': 'Статистика пользователей', 'publication_management': 'Управление публикациями',
+            'back_to_main': '← Вернуться в главное меню'
         },
-        'balance': {
-            'title': 'Баланс',
-            'top_up': 'Пополнить',
-            'tariffs': 'Тарифы',
-            'deposit_title': 'Пополнение баланса',
-            'deposit_description': 'Сервис находится еще на стадии разработки и функционального наполнения.<br><br>Чтобы пополнить баланс, запустите бота и он проведет вас:',
-            'statement': 'Выписка',
-            'statement_description': 'Здесь будут ваши расходы',
-            'tariffs_title': 'Тарифы',
-            'no_tariffs': 'Нет доступных тарифов.',
-            'error_loading_tariffs': 'Ошибка загрузки тарифов.',
-            'subscription': 'Подписка',
-            'one_time': 'Разовый',
-            'user_not_defined': 'Пользователь не определён.<br>Пожалуйста, откройте WebApp из Telegram.',
-            'hello': 'Здравствуйте,',
-            'your_balance': 'Ваш баланс:'
+        'main': {
+            'title': 'Главное меню', 'welcome': 'Добро пожаловать',
+            'quick_actions': 'Быстрые действия', 'recent_reports': 'Последние отчеты',
+            'popular_services': 'Популярные услуги', 'news': 'Новости',
+            'notifications': 'Уведомления', 'menu': 'Меню', 'home': 'Главная',
+            'reports': 'Отчеты', 'analytics': 'Аналитика', 'profile': 'Профиль',
+            'help': 'Помощь', 'settings': 'Настройки', 'slogan': 'Мгновенные аналитические отчеты по недвижимости',
+            'balance': 'Баланс', 'balance_amount': 'Баланс: $', 'top_up': 'Пополнить',
+            'region_analytics': 'Аналитика региона', 'object_evaluation': 'Оценка объекта',
+            'my_reports': 'Мои отчеты', 'referral_program': 'Реферальная программа',
+            'support': 'Поддержка', 'about': 'О нас', 'instruction': 'Инструкция',
+            'real_data': 'Реальные данные', 'additional_data': 'Дополнительные данные',
+            'geography': 'География', 'full_report': 'Полный отчет'
         },
-        'full_report': {
-            'title': 'Полный отчет',
-            'subtitle': 'Детальный анализ объекта недвижимости',
-            'generating': 'Формируем полный отчет...',
-            'please_wait': 'Пожалуйста, подождите',
-            'error_loading': 'Ошибка загрузки отчета',
-            'error_message': 'Произошла ошибка при формировании отчета',
-            'object_info': 'Информация об объекте',
-            'address': 'Адрес',
-            'bedrooms': 'Спальни',
-            'price': 'Цена',
-            'age': 'Возраст объекта',
-            'floor': 'Этаж',
-            'heating': 'Отопление',
-            'area': 'Площадь объекта',
-            'market_analysis': 'Рыночный анализ',
-            'price_comparison': 'Сравнение с рыночными ценами',
-            'by_age': 'По возрасту объекта:',
-            'by_floor': 'По этажу:',
-            'by_heating': 'По типу отопления:',
-            'final_comparison': 'Итоговое сравнение:',
-            'price_conclusion': 'Вывод по цене:',
-            'currency_info': 'Конвертация валют:',
-            'price_dynamics': 'Анализ динамики цен',
-            'price_trend': 'Тренд цен',
-            'price_change_3y': 'Изменение за 3 года',
-            'price_forecast': 'Прогноз на 3 месяца',
-            'price_chart': 'График изменения цен',
-            'trend_analysis': 'Анализ тренда:',
-            'trend_recommendation': 'Рекомендация:',
-            'rental_analysis': 'Анализ аренды',
-            'max_rental_rate': 'Максимальная ставка аренды',
-            'annual_rental_yield': 'Годовая доходность',
-            'rental_recommendation': 'Рекомендация по аренде',
-            'roi_analysis': 'ROI анализ',
-            'short_term_rental': 'Краткосрочная аренда (Airbnb)',
-            'monthly_income': 'Доход в месяц',
-            'long_term_rental': 'Долгосрочная аренда',
-            'annual_income': 'Доход в год',
-            'price_growth_5y': 'Рост цены (5 лет)',
-            'roi_with_rent': 'ROI с арендой',
-            'roi_without_rent': 'ROI без аренды',
-            'alternative_investments': 'Альтернативные инвестиции',
-            'macro_data': 'Макроэкономические данные',
-            'inflation': 'Инфляция',
-            'eur_try': 'Курс EUR/TRY',
-            'gdp_growth': 'Рост ВВП',
-            'refi_rate': 'Ставка рефинансирования',
-            'taxes_fees': 'Налоги и сборы',
-            'risks_liquidity': 'Риски и ликвидность',
-            'liquidity': 'Ликвидность',
-            'district': 'Район',
-            'economic_trends': 'Экономические тренды',
-            'economic_chart': 'График экономических показателей',
-            'download_pdf': 'Скачать PDF',
-            'save_report': 'Сохранить отчет',
-            'back': 'Назад',
-            'not_available': 'Недоступно',
-            'insufficient_data': 'Недостаточно данных для анализа трендов',
-            'trends_error': 'Ошибка загрузки данных о трендах',
-            'server_timeout': 'Превышено время ожидания ответа сервера',
-            'no_trend_data': 'Данные о трендах цен для данной локации отсутствуют'
-        },
-        'geography': {
-            'title': 'Наша география',
-            'where_we_work': 'Где мы работаем',
-            'description': 'Aaadviser предоставляет анализ рынка недвижимости в следующих регионах:',
-            'usa': 'США',
-            'usa_desc': 'Полный анализ рынка недвижимости во всех штатах, включая Нью-Йорк, Калифорнию, Техас, Флориду и другие популярные регионы.',
-            'canada': 'Канада',
-            'canada_desc': 'Анализ рынка в крупных городах: Торонто, Ванкувер, Монреаль, Калгари и других.',
-            'uk': 'Великобритания',
-            'uk_desc': 'Лондон, Манчестер, Бирмингем, Ливерпуль и другие города Англии, Шотландии, Уэльса.',
-            'australia': 'Австралия',
-            'australia_desc': 'Сидней, Мельбурн, Брисбен, Перт и другие крупные города Австралии.',
-            'germany': 'Германия',
-            'germany_desc': 'Берлин, Мюнхен, Гамбург, Франкфурт и другие немецкие города.',
-            'france': 'Франция',
-            'france_desc': 'Париж, Лион, Марсель, Тулуза и другие французские города.',
-            'expansion': 'Расширение географии',
-            'expansion_desc': 'Мы постоянно расширяем географию нашего сервиса. Если ваш регион пока не поддерживается, свяжитесь с нами для уточнения планов развития.',
-            'data_quality': 'Качество данных',
-            'quality_1': 'Актуальная информация о ценах',
-            'quality_2': 'Детальная статистика по районам',
-            'quality_3': 'Анализ трендов рынка',
-            'quality_4': 'Прогнозы изменения цен',
-            'quality_5': 'Сравнение с похожими объектами',
-            'property_types': 'Поддерживаемые типы недвижимости',
-            'type_1': 'Частные дома',
-            'type_2': 'Квартиры и кондоминиумы',
-            'type_3': 'Таунхаусы',
-            'type_4': 'Дуплексы',
-            'type_5': 'Многоквартирные дома'
+        'topup': {
+            'title': 'Пополнение баланса', 'current_balance': 'Текущий баланс',
+            'amount': 'Сумма пополнения', 'min_amount': 'Минимальная сумма: $1',
+            'payment_method': 'Способ оплаты', 'card': 'Банковская карта',
+            'crypto': 'Криптовалюта', 'pay': 'Оплатить', 'back': 'Назад'
         },
         'help': {
-            'title': 'Помощь',
-            'about_app': 'О приложении',
-            'instruction': 'Инструкция',
-            'geography': 'Наша география',
-            'support': 'Техническая поддержка',
-            'back_to_menu': 'Вернуться в главное меню'
+            'title': 'Помощь', 'faq': 'Часто задаваемые вопросы',
+            'contact_support': 'Связаться с поддержкой', 'back': 'Назад'
+        },
+        'support': {
+            'title': 'Поддержка', 'contact_us': 'Связаться с нами',
+            'email': 'Email', 'telegram': 'Telegram', 'back': 'Назад'
+        },
+        'about': {
+            'title': 'О нас', 'description': 'Описание компании',
+            'features': 'Возможности', 'back': 'Назад'
         },
         'instruction': {
-            'title': 'Инструкция',
-            'how_to_get_analysis': 'Как получить анализ недвижимости',
-            'step_1': 'Нажмите "Получить новый отчет" в главном меню',
-            'step_2': 'Введите полный адрес недвижимости (улица, дом, город)',
-            'step_3': 'Укажите количество спален в объекте',
-            'step_4': 'Введите примерную цену объекта в долларах',
-            'step_5': 'Дождитесь обработки данных (обычно 30-60 секунд)',
-            'step_6': 'Изучите подробный отчет с анализом рынка',
-            'what_includes_report': 'Что включает отчет?',
-            'include_1': 'Анализ цен в районе',
-            'include_2': 'Статистика рынка недвижимости',
-            'include_3': 'Сравнение с похожими объектами',
-            'include_4': 'Прогноз изменения цен',
-            'include_5': 'Рекомендации по инвестициям',
-            'additional_features': 'Дополнительные возможности',
-            'feature_1': 'Сохранение отчетов для последующего просмотра',
-            'feature_2': 'Доступ к отчетам с любого устройства',
-            'feature_3': 'Статистика рынка по регионам',
-            'feature_4': 'Поиск похожих объектов',
-            'tips_for_accuracy': 'Советы для точного анализа',
-            'tip_1': 'Указывайте точный адрес',
-            'tip_2': 'Используйте актуальную цену',
-            'tip_3': 'Учитывайте все спальни',
-            'tip_4': 'Проверяйте сохраненные отчеты'
+            'title': 'Инструкция', 'how_to_use': 'Как пользоваться',
+            'step_by_step': 'Пошаговая инструкция', 'back': 'Назад'
+        },
+        'referral': {
+            'title': 'Реферальная программа', 'your_code': 'Ваш код',
+            'invite_friends': 'Пригласите друзей', 'earnings': 'Заработок',
+            'back': 'Назад'
+        },
+        'my_reports': {
+            'title': 'Мои отчеты', 'no_reports': 'У вас пока нет отчетов',
+            'create_first': 'Создать первый отчет', 'back': 'Назад'
+        },
+        'real_data': {
+            'title': 'Реальные данные', 'description': 'Описание раздела',
+            'back': 'Назад'
+        },
+        'additional_data': {
+            'title': 'Дополнительные данные', 'description': 'Описание раздела',
+            'back': 'Назад'
+        },
+        'geography': {
+            'title': 'География', 'description': 'Описание раздела',
+            'back': 'Назад'
+        },
+        'full_report': {
+            'title': 'Полный отчет', 'generating': 'Генерация отчета...',
+            'back': 'Назад'
         }
     },
     'en': {
@@ -547,260 +362,75 @@ locales = {
             'data_loaded': 'Data loaded',
             'error_loading_data': 'Error loading data'
         },
-        'about': {
-            'title': 'About the App',
-            'what_is': 'What is Aaadviser?',
-            'description': 'Aaadviser is an intelligent real estate market analysis platform that helps investors and buyers make informed decisions.',
-            'capabilities': 'Our capabilities:',
-            'capability_1': 'Detailed price analysis in the area',
-            'capability_2': 'Real estate market statistics',
-            'capability_3': 'Comparison with similar properties',
-            'capability_4': 'Price change forecasts',
-            'capability_5': 'Investment recommendations',
-            'capability_6': 'Report saving',
-            'capability_7': 'Convenient mobile interface',
-            'how_it_works': 'How does it work?',
-            'how_description': 'Simply enter the property address, specify the number of bedrooms and approximate price. Our system will analyze the market and provide a detailed report with recommendations.',
-            'why_aaadviser': 'Why Aaadviser?',
-            'why_description': 'We use advanced machine learning technologies and big data for real estate market analysis, allowing us to obtain accurate and up-to-date data for making investment decisions.'
-        },
-        'additional_data': {
-            'title': 'Additional Data',
-            'subtitle': 'Specify property characteristics for detailed analysis',
-            'object_info': 'Property Information',
-            'address': 'Address:',
-            'bedrooms': 'Bedrooms:',
-            'price': 'Price:',
-            'loading': 'Loading...',
-            'age_label': 'Property Age:',
-            'age_placeholder': 'Select property age...',
-            'floor_label': 'Property Floor:',
-            'floor_placeholder': 'Select floor...',
-            'heating_label': 'Heating Type:',
-            'heating_placeholder': 'Select heating type...',
-            'area_label': 'Property Area, m²:',
-            'area_placeholder': 'Enter property area',
-            'continue': 'Continue',
-            'skip': 'Skip',
-            'loading_options': 'Loading options...',
-            'error_loading': 'An error occurred while loading data',
-            'error_options': 'Error loading options:',
-            'fill_all_fields': 'Please fill in all fields or select "Unknown"',
-            'generating_report': 'Generating full report...',
-            'error_generation': 'Error generating report:'
-        },
         'admin': {
-            'publication': {
-                'title': 'Publication for All Users',
-                'placeholder': 'Enter publication text...\nFormatting, emojis and styling are supported.',
-                'only_admins': 'Admins only',
-                'save_to_db': 'Save to database',
-                'auto_translate': 'Auto-translate',
-                'test_send': 'Test send',
-                'send': 'Send',
-                'enter_text': 'Enter publication text!',
-                'broadcast_completed': 'Broadcast completed!',
-                'by_languages': 'By languages:',
-                'error_sending': 'Error:',
-                'network_error': 'Network error.',
-                'publication_sent': 'Publication sent successfully!'
-            },
-            'settings': {
-                'title': 'API Keys Settings',
-                'key_name_placeholder': 'Key name (key_name)',
-                'key_value_placeholder': 'Key value (key_value)',
-                'add_key': 'Add key',
-                'loading': 'Loading...',
-                'key_added': 'Key added successfully!',
-                'error_adding': 'Error:',
-                'network_error': 'Network error.',
-                'error_loading_keys': 'Error loading keys.',
-                'no_keys': 'No new keys.'
-            },
-            'users': {
-                'title': 'User Statistics',
-                'general_stats': 'General Statistics',
-                'reports_stats': 'User Reports',
-                'loading': 'Loading...',
-                'error_loading': 'Error loading statistics',
-                'stats_loaded': 'Statistics loaded successfully!',
-                'total_users': 'Total users:',
-                'new_users_week': 'New this week:',
-                'new_users_month': 'New this month:',
-                'new_users_quarter': 'New this quarter:',
-                'new_users_year': 'New this year:',
-                'total_balance': 'Total balance:',
-                'expired_balance': 'Balance with period_end < today or null:',
-                'active_balance': 'Balance of other users:',
-                'admin_count': 'Admins:',
-                'reports_week': 'Reports this week:',
-                'reports_month': 'Reports this month:',
-                'reports_quarter': 'Reports this quarter:',
-                'reports_year': 'Reports this year:',
-                'deleted_reports': 'Deleted reports:',
-                'expired_reports_count': 'Reports of users with period_end < today or null:',
-                'avg_expired_reports': 'Average reports per such user:',
-                'active_reports_count': 'Reports of other users:',
-                'active_reports_cost': 'Money spent (full):',
-                'network_error': 'Network error'
-            },
-            'panel': {
-                'title': 'Admin Panel',
-                'make_balance_100': 'Set balance to 100',
-                'users': 'Users',
-                'publication': 'Publication',
-                'settings': 'Settings',
-                'user_not_defined': 'User not defined. Open WebApp from Telegram.',
-                'balance_set': 'Balance set: $100',
-                'balance_set_success': 'Balance set successfully!',
-                'error_updating': 'Error:',
-                'network_error': 'Network error.'
-            }
+            'title': 'Admin Panel', 'users': 'Users', 'publications': 'Publications',
+            'settings': 'Settings', 'statistics': 'Statistics', 'user_management': 'User Management',
+            'content_management': 'Content Management', 'system_settings': 'System Settings',
+            'backup': 'Backup', 'logs': 'Logs', 'security': 'Security',
+            'make_balance_100': 'Make Balance 100', 'admin_panel': 'Admin Panel',
+            'user_stats': 'User Statistics', 'publication_management': 'Publication Management',
+            'back_to_main': '← Back to Main Menu'
         },
-        'balance': {
-            'title': 'Balance',
-            'top_up': 'Top Up',
-            'tariffs': 'Tariffs',
-            'deposit_title': 'Balance Top Up',
-            'deposit_description': 'The service is still in development and functional filling stage.<br><br>To top up your balance, launch the bot and it will guide you:',
-            'statement': 'Statement',
-            'statement_description': 'Your expenses will be here',
-            'tariffs_title': 'Tariffs',
-            'no_tariffs': 'No available tariffs.',
-            'error_loading_tariffs': 'Error loading tariffs.',
-            'subscription': 'Subscription',
-            'one_time': 'One-time',
-            'user_not_defined': 'User not defined.<br>Please open WebApp from Telegram.',
-            'hello': 'Hello,',
-            'your_balance': 'Your balance:'
+        'main': {
+            'title': 'Main Menu', 'welcome': 'Welcome',
+            'quick_actions': 'Quick Actions', 'recent_reports': 'Recent Reports',
+            'popular_services': 'Popular Services', 'news': 'News',
+            'notifications': 'Notifications', 'menu': 'Menu', 'home': 'Home',
+            'reports': 'Reports', 'analytics': 'Analytics', 'profile': 'Profile',
+            'help': 'Help', 'settings': 'Settings', 'slogan': 'Instant real estate analytics reports',
+            'balance': 'Balance', 'balance_amount': 'Balance: $', 'top_up': 'Top Up',
+            'region_analytics': 'Region Analytics', 'object_evaluation': 'Object Evaluation',
+            'my_reports': 'My Reports', 'referral_program': 'Referral Program',
+            'support': 'Support', 'about': 'About', 'instruction': 'Instruction',
+            'real_data': 'Real Data', 'additional_data': 'Additional Data',
+            'geography': 'Geography', 'full_report': 'Full Report'
         },
-        'full_report': {
-            'title': 'Full Report',
-            'subtitle': 'Detailed property analysis',
-            'generating': 'Generating full report...',
-            'please_wait': 'Please wait',
-            'error_loading': 'Error loading report',
-            'error_message': 'An error occurred while generating the report',
-            'object_info': 'Property Information',
-            'address': 'Address',
-            'bedrooms': 'Bedrooms',
-            'price': 'Price',
-            'age': 'Property Age',
-            'floor': 'Floor',
-            'heating': 'Heating',
-            'area': 'Property Area',
-            'market_analysis': 'Market Analysis',
-            'price_comparison': 'Comparison with Market Prices',
-            'by_age': 'By property age:',
-            'by_floor': 'By floor:',
-            'by_heating': 'By heating type:',
-            'final_comparison': 'Final comparison:',
-            'price_conclusion': 'Price conclusion:',
-            'currency_info': 'Currency conversion:',
-            'price_dynamics': 'Price Dynamics Analysis',
-            'price_trend': 'Price Trend',
-            'price_change_3y': 'Change over 3 years',
-            'price_forecast': '3-month forecast',
-            'price_chart': 'Price Change Chart',
-            'trend_analysis': 'Trend analysis:',
-            'trend_recommendation': 'Recommendation:',
-            'rental_analysis': 'Rental Analysis',
-            'max_rental_rate': 'Maximum rental rate',
-            'annual_rental_yield': 'Annual rental yield',
-            'rental_recommendation': 'Rental recommendation',
-            'roi_analysis': 'ROI Analysis',
-            'short_term_rental': 'Short-term rental (Airbnb)',
-            'monthly_income': 'Monthly income',
-            'long_term_rental': 'Long-term rental',
-            'annual_income': 'Annual income',
-            'price_growth_5y': 'Price growth (5 years)',
-            'roi_with_rent': 'ROI with rent',
-            'roi_without_rent': 'ROI without rent',
-            'alternative_investments': 'Alternative Investments',
-            'macro_data': 'Macroeconomic Data',
-            'inflation': 'Inflation',
-            'eur_try': 'EUR/TRY Rate',
-            'gdp_growth': 'GDP Growth',
-            'refi_rate': 'Refinancing Rate',
-            'taxes_fees': 'Taxes and Fees',
-            'risks_liquidity': 'Risks and Liquidity',
-            'liquidity': 'Liquidity',
-            'district': 'District',
-            'economic_trends': 'Economic Trends',
-            'economic_chart': 'Economic Indicators Chart',
-            'download_pdf': 'Download PDF',
-            'save_report': 'Save Report',
-            'back': 'Back',
-            'not_available': 'Not Available',
-            'insufficient_data': 'Insufficient data for trend analysis',
-            'trends_error': 'Error loading trend data',
-            'server_timeout': 'Server response timeout exceeded',
-            'no_trend_data': 'Price trend data for this location is not available'
-        },
-        'geography': {
-            'title': 'Our Geography',
-            'where_we_work': 'Where We Work',
-            'description': 'Aaadviser provides real estate market analysis in the following regions:',
-            'usa': 'USA',
-            'usa_desc': 'Complete real estate market analysis in all states, including New York, California, Texas, Florida and other popular regions.',
-            'canada': 'Canada',
-            'canada_desc': 'Market analysis in major cities: Toronto, Vancouver, Montreal, Calgary and others.',
-            'uk': 'United Kingdom',
-            'uk_desc': 'London, Manchester, Birmingham, Liverpool and other cities in England, Scotland, Wales.',
-            'australia': 'Australia',
-            'australia_desc': 'Sydney, Melbourne, Brisbane, Perth and other major Australian cities.',
-            'germany': 'Germany',
-            'germany_desc': 'Berlin, Munich, Hamburg, Frankfurt and other German cities.',
-            'france': 'France',
-            'france_desc': 'Paris, Lyon, Marseille, Toulouse and other French cities.',
-            'expansion': 'Geography Expansion',
-            'expansion_desc': 'We are constantly expanding our service geography. If your region is not yet supported, contact us to clarify development plans.',
-            'data_quality': 'Data Quality',
-            'quality_1': 'Up-to-date price information',
-            'quality_2': 'Detailed district statistics',
-            'quality_3': 'Market trend analysis',
-            'quality_4': 'Price change forecasts',
-            'quality_5': 'Comparison with similar properties',
-            'property_types': 'Supported Property Types',
-            'type_1': 'Private houses',
-            'type_2': 'Apartments and condominiums',
-            'type_3': 'Townhouses',
-            'type_4': 'Duplexes',
-            'type_5': 'Multi-family houses'
+        'topup': {
+            'title': 'Top Up Balance', 'current_balance': 'Current Balance',
+            'amount': 'Top Up Amount', 'min_amount': 'Minimum Amount: $1',
+            'payment_method': 'Payment Method', 'card': 'Bank Card',
+            'crypto': 'Cryptocurrency', 'pay': 'Pay', 'back': 'Back'
         },
         'help': {
-            'title': 'Help',
-            'about_app': 'About the App',
-            'instruction': 'Instruction',
-            'geography': 'Our Geography',
-            'support': 'Technical Support',
-            'back_to_menu': 'Back to Main Menu'
+            'title': 'Help', 'faq': 'Frequently Asked Questions',
+            'contact_support': 'Contact Support', 'back': 'Back'
+        },
+        'support': {
+            'title': 'Support', 'contact_us': 'Contact Us',
+            'email': 'Email', 'telegram': 'Telegram', 'back': 'Back'
+        },
+        'about': {
+            'title': 'About', 'description': 'Company Description',
+            'features': 'Features', 'back': 'Back'
         },
         'instruction': {
-            'title': 'Instruction',
-            'how_to_get_analysis': 'How to Get Property Analysis',
-            'step_1': 'Click "Get New Report" in the main menu',
-            'step_2': 'Enter the full property address (street, house, city)',
-            'step_3': 'Specify the number of bedrooms in the property',
-            'step_4': 'Enter the approximate property price in dollars',
-            'step_5': 'Wait for data processing (usually 30-60 seconds)',
-            'step_6': 'Study the detailed report with market analysis',
-            'what_includes_report': 'What does the report include?',
-            'include_1': 'Price analysis in the area',
-            'include_2': 'Real estate market statistics',
-            'include_3': 'Comparison with similar properties',
-            'include_4': 'Price change forecast',
-            'include_5': 'Investment recommendations',
-            'additional_features': 'Additional Features',
-            'feature_1': 'Saving reports for later viewing',
-            'feature_2': 'Access to reports from any device',
-            'feature_3': 'Market statistics by regions',
-            'feature_4': 'Search for similar properties',
-            'tips_for_accuracy': 'Tips for Accurate Analysis',
-            'tip_1': 'Specify the exact address',
-            'tip_2': 'Use current price',
-            'tip_3': 'Consider all bedrooms',
-            'tip_4': 'Check saved reports'
+            'title': 'Instruction', 'how_to_use': 'How to Use',
+            'step_by_step': 'Step by Step Guide', 'back': 'Back'
+        },
+        'referral': {
+            'title': 'Referral Program', 'your_code': 'Your Code',
+            'invite_friends': 'Invite Friends', 'earnings': 'Earnings',
+            'back': 'Back'
+        },
+        'my_reports': {
+            'title': 'My Reports', 'no_reports': 'You have no reports yet',
+            'create_first': 'Create First Report', 'back': 'Back'
+        },
+        'real_data': {
+            'title': 'Real Data', 'description': 'Section Description',
+            'back': 'Back'
+        },
+        'additional_data': {
+            'title': 'Additional Data', 'description': 'Section Description',
+            'back': 'Back'
+        },
+        'geography': {
+            'title': 'Geography', 'description': 'Section Description',
+            'back': 'Back'
+        },
+        'full_report': {
+            'title': 'Full Report', 'generating': 'Generating Report...',
+            'back': 'Back'
         }
     },
     'de': {
@@ -949,39 +579,76 @@ locales = {
             'data_loaded': 'Daten geladen',
             'error_loading_data': 'Fehler beim Laden der Daten'
         },
+        'admin': {
+            'title': 'Admin-Panel', 'users': 'Benutzer', 'publications': 'Veröffentlichungen',
+            'settings': 'Einstellungen', 'statistics': 'Statistiken', 'user_management': 'Benutzerverwaltung',
+            'content_management': 'Inhaltsverwaltung', 'system_settings': 'Systemeinstellungen',
+            'backup': 'Backup', 'logs': 'Protokolle', 'security': 'Sicherheit',
+            'make_balance_100': 'Kontostand auf 100 setzen', 'admin_panel': 'Admin-Panel',
+            'user_stats': 'Benutzerstatistiken', 'publication_management': 'Veröffentlichungsverwaltung',
+            'back_to_main': '← Zurück zum Hauptmenü'
+        },
+        'main': {
+            'title': 'Hauptmenü', 'welcome': 'Willkommen',
+            'quick_actions': 'Schnellaktionen', 'recent_reports': 'Letzte Berichte',
+            'popular_services': 'Beliebte Dienste', 'news': 'Nachrichten',
+            'notifications': 'Benachrichtigungen', 'menu': 'Menü', 'home': 'Startseite',
+            'reports': 'Berichte', 'analytics': 'Analytik', 'profile': 'Profil',
+            'help': 'Hilfe', 'settings': 'Einstellungen', 'slogan': 'Sofortige Immobilien-Analyseberichte',
+            'balance': 'Kontostand', 'balance_amount': 'Kontostand: $', 'top_up': 'Aufladen',
+            'region_analytics': 'Regionsanalyse', 'object_evaluation': 'Objektbewertung',
+            'my_reports': 'Meine Berichte', 'referral_program': 'Empfehlungsprogramm',
+            'support': 'Support', 'about': 'Über uns', 'instruction': 'Anleitung',
+            'real_data': 'Echte Daten', 'additional_data': 'Zusätzliche Daten',
+            'geography': 'Geographie', 'full_report': 'Vollständiger Bericht'
+        },
+        'topup': {
+            'title': 'Kontostand aufladen', 'current_balance': 'Aktueller Kontostand',
+            'amount': 'Aufladebetrag', 'min_amount': 'Mindestbetrag: $1',
+            'payment_method': 'Zahlungsmethode', 'card': 'Bankkarte',
+            'crypto': 'Kryptowährung', 'pay': 'Bezahlen', 'back': 'Zurück'
+        },
+        'help': {
+            'title': 'Hilfe', 'faq': 'Häufig gestellte Fragen',
+            'contact_support': 'Support kontaktieren', 'back': 'Zurück'
+        },
+        'support': {
+            'title': 'Support', 'contact_us': 'Kontaktieren Sie uns',
+            'email': 'E-Mail', 'telegram': 'Telegram', 'back': 'Zurück'
+        },
         'about': {
-            'title': 'Über die App', 'what_is': 'Was ist Aaadviser?',
-            'description': 'Aaadviser ist eine intelligente Plattform für Immobilienmarktanalyse, die Investoren und Käufern hilft, fundierte Entscheidungen zu treffen.',
-            'capabilities': 'Unsere Möglichkeiten:', 'capability_1': 'Detaillierte Preisanalyse im Gebiet',
-            'capability_2': 'Immobilienmarktstatistik', 'capability_3': 'Vergleich mit ähnlichen Objekten',
-            'capability_4': 'Preisänderungsprognosen', 'capability_5': 'Investitionsempfehlungen',
-            'capability_6': 'Berichtsspeicherung', 'capability_7': 'Bequeme mobile Oberfläche',
-            'how_it_works': 'Wie funktioniert es?', 'how_description': 'Geben Sie einfach die Immobilienadresse ein, geben Sie die Anzahl der Schlafzimmer und den ungefähren Preis an. Unser System analysiert den Markt und stellt einen detaillierten Bericht mit Empfehlungen bereit.',
-            'why_aaadviser': 'Warum Aaadviser?', 'why_description': 'Wir verwenden fortschrittliche Technologien des maschinellen Lernens und Big Data für die Immobilienmarktanalyse, was es ermöglicht, genaue und aktuelle Daten für Investitionsentscheidungen zu erhalten.'
+            'title': 'Über uns', 'description': 'Firmenbeschreibung',
+            'features': 'Funktionen', 'back': 'Zurück'
+        },
+        'instruction': {
+            'title': 'Anleitung', 'how_to_use': 'Wie man verwendet',
+            'step_by_step': 'Schritt-für-Schritt-Anleitung', 'back': 'Zurück'
+        },
+        'referral': {
+            'title': 'Empfehlungsprogramm', 'your_code': 'Ihr Code',
+            'invite_friends': 'Freunde einladen', 'earnings': 'Verdienst',
+            'back': 'Zurück'
+        },
+        'my_reports': {
+            'title': 'Meine Berichte', 'no_reports': 'Sie haben noch keine Berichte',
+            'create_first': 'Ersten Bericht erstellen', 'back': 'Zurück'
+        },
+        'real_data': {
+            'title': 'Echte Daten', 'description': 'Abschnittsbeschreibung',
+            'back': 'Zurück'
         },
         'additional_data': {
-            'title': 'Zusätzliche Daten', 'subtitle': 'Geben Sie Objekteigenschaften für detaillierte Analyse an',
-            'object_info': 'Objektinformationen', 'address': 'Adresse:', 'bedrooms': 'Schlafzimmer:', 'price': 'Preis:',
-            'loading': 'Laden...', 'age_label': 'Objektalter:', 'age_placeholder': 'Objektalter auswählen...',
-            'floor_label': 'Objektetage:', 'floor_placeholder': 'Etage auswählen...',
-            'heating_label': 'Heizungstyp:', 'heating_placeholder': 'Heizungstyp auswählen...',
-            'area_label': 'Objektfläche, m²:', 'area_placeholder': 'Objektfläche eingeben',
-            'continue': 'Weiter', 'skip': 'Überspringen', 'loading_options': 'Optionen werden geladen...',
-            'error_loading': 'Fehler beim Laden der Daten', 'error_options': 'Fehler beim Laden der Optionen:',
-            'fill_all_fields': 'Bitte füllen Sie alle Felder aus oder wählen Sie "Unbekannt"',
-            'generating_report': 'Vollständiger Bericht wird erstellt...', 'error_generation': 'Fehler beim Erstellen des Berichts:'
+            'title': 'Zusätzliche Daten', 'description': 'Abschnittsbeschreibung',
+            'back': 'Zurück'
         },
-        'admin': {
-            'publication': {'title': 'Veröffentlichung für alle Benutzer', 'placeholder': 'Veröffentlichungstext eingeben...\nFormatierung, Emojis und Styling werden unterstützt.', 'only_admins': 'Nur Administratoren', 'save_to_db': 'In Datenbank speichern', 'auto_translate': 'Automatisch übersetzen', 'test_send': 'Testsendung', 'send': 'Senden', 'enter_text': 'Veröffentlichungstext eingeben!', 'broadcast_completed': 'Rundsendung abgeschlossen!', 'by_languages': 'Nach Sprachen:', 'error_sending': 'Fehler:', 'network_error': 'Netzwerkfehler.', 'publication_sent': 'Veröffentlichung erfolgreich gesendet!'},
-            'settings': {'title': 'API-Schlüssel-Einstellungen', 'key_name_placeholder': 'Schlüsselname (key_name)', 'key_value_placeholder': 'Schlüsselwert (key_value)', 'add_key': 'Schlüssel hinzufügen', 'loading': 'Laden...', 'key_added': 'Schlüssel erfolgreich hinzugefügt!', 'error_adding': 'Fehler:', 'network_error': 'Netzwerkfehler.', 'error_loading_keys': 'Fehler beim Laden der Schlüssel.', 'no_keys': 'Keine neuen Schlüssel.'},
-            'users': {'title': 'Benutzerstatistik', 'general_stats': 'Allgemeine Statistik', 'reports_stats': 'Benutzerberichte', 'loading': 'Laden...', 'error_loading': 'Fehler beim Laden der Statistik', 'stats_loaded': 'Statistik erfolgreich geladen!', 'total_users': 'Gesamtbenutzer:', 'new_users_week': 'Neu diese Woche:', 'new_users_month': 'Neu diesen Monat:', 'new_users_quarter': 'Neu dieses Quartal:', 'new_users_year': 'Neu dieses Jahr:', 'total_balance': 'Gesamtguthaben:', 'expired_balance': 'Guthaben mit period_end < heute oder null:', 'active_balance': 'Guthaben anderer Benutzer:', 'admin_count': 'Administratoren:', 'reports_week': 'Berichte diese Woche:', 'reports_month': 'Berichte diesen Monat:', 'reports_quarter': 'Berichte dieses Quartal:', 'reports_year': 'Berichte dieses Jahr:', 'deleted_reports': 'Gelöschte Berichte:', 'expired_reports_count': 'Berichte von Benutzern mit period_end < heute oder null:', 'avg_expired_reports': 'Durchschnittliche Berichte pro solchem Benutzer:', 'active_reports_count': 'Berichte anderer Benutzer:', 'active_reports_cost': 'Ausgegebenes Geld (full):', 'network_error': 'Netzwerkfehler'},
-            'panel': {'title': 'Admin-Panel', 'make_balance_100': 'Guthaben auf 100 setzen', 'users': 'Benutzer', 'publication': 'Veröffentlichung', 'settings': 'Einstellungen', 'user_not_defined': 'Benutzer nicht definiert. Öffnen Sie WebApp aus Telegram.', 'balance_set': 'Guthaben gesetzt: $100', 'balance_set_success': 'Guthaben erfolgreich gesetzt!', 'error_updating': 'Fehler:', 'network_error': 'Netzwerkfehler.'}
+        'geography': {
+            'title': 'Geographie', 'description': 'Abschnittsbeschreibung',
+            'back': 'Zurück'
         },
-        'balance': {'title': 'Guthaben', 'top_up': 'Aufladen', 'tariffs': 'Tarife', 'deposit_title': 'Guthaben aufladen', 'deposit_description': 'Der Service befindet sich noch in der Entwicklungs- und Funktionsfüllungsphase.<br><br>Um Ihr Guthaben aufzuladen, starten Sie den Bot und er wird Sie führen:', 'statement': 'Kontoauszug', 'statement_description': 'Ihre Ausgaben werden hier sein', 'tariffs_title': 'Tarife', 'no_tariffs': 'Keine verfügbaren Tarife.', 'error_loading_tariffs': 'Fehler beim Laden der Tarife.', 'subscription': 'Abonnement', 'one_time': 'Einmalig', 'user_not_defined': 'Benutzer nicht definiert.<br>Bitte öffnen Sie WebApp aus Telegram.', 'hello': 'Hallo,', 'your_balance': 'Ihr Guthaben:'},
-        'full_report': {'title': 'Vollständiger Bericht', 'subtitle': 'Detaillierte Immobilienanalyse', 'generating': 'Vollständiger Bericht wird erstellt...', 'please_wait': 'Bitte warten', 'error_loading': 'Fehler beim Laden des Berichts', 'error_message': 'Fehler beim Erstellen des Berichts', 'object_info': 'Immobilieninformationen', 'address': 'Adresse', 'bedrooms': 'Schlafzimmer', 'price': 'Preis', 'age': 'Immobilienalter', 'floor': 'Etage', 'heating': 'Heizung', 'area': 'Immobilienfläche', 'market_analysis': 'Marktanalyse', 'price_comparison': 'Vergleich mit Marktpreisen', 'by_age': 'Nach Immobilienalter:', 'by_floor': 'Nach Etage:', 'by_heating': 'Nach Heizungstyp:', 'final_comparison': 'Endvergleich:', 'price_conclusion': 'Preisfazit:', 'currency_info': 'Währungsumrechnung:', 'price_dynamics': 'Preisdynamik-Analyse', 'price_trend': 'Preistrend', 'price_change_3y': 'Änderung über 3 Jahre', 'price_forecast': '3-Monats-Prognose', 'price_chart': 'Preisänderungsdiagramm', 'trend_analysis': 'Trendanalyse:', 'trend_recommendation': 'Empfehlung:', 'rental_analysis': 'Mietanalyse', 'max_rental_rate': 'Maximale Mietrate', 'annual_rental_yield': 'Jährliche Mietrendite', 'rental_recommendation': 'Mietempfehlung', 'roi_analysis': 'ROI-Analyse', 'short_term_rental': 'Kurzzeitmiete (Airbnb)', 'monthly_income': 'Monatliches Einkommen', 'long_term_rental': 'Langzeitmiete', 'annual_income': 'Jährliches Einkommen', 'price_growth_5y': 'Preiswachstum (5 Jahre)', 'roi_with_rent': 'ROI mit Miete', 'roi_without_rent': 'ROI ohne Miete', 'alternative_investments': 'Alternative Investitionen', 'macro_data': 'Makroökonomische Daten', 'inflation': 'Inflation', 'eur_try': 'EUR/TRY-Kurs', 'gdp_growth': 'BIP-Wachstum', 'refi_rate': 'Refinanzierungssatz', 'taxes_fees': 'Steuern und Gebühren', 'risks_liquidity': 'Risiken und Liquidität', 'liquidity': 'Liquidität', 'district': 'Bezirk', 'economic_trends': 'Wirtschaftstrends', 'economic_chart': 'Wirtschaftsindikatoren-Diagramm', 'download_pdf': 'PDF herunterladen', 'save_report': 'Bericht speichern', 'back': 'Zurück', 'not_available': 'Nicht verfügbar', 'insufficient_data': 'Unzureichende Daten für Trendanalyse', 'trends_error': 'Fehler beim Laden der Trenddaten', 'server_timeout': 'Serverantwort-Timeout überschritten', 'no_trend_data': 'Preistrenddaten für diesen Standort sind nicht verfügbar'},
-        'geography': {'title': 'Unsere Geographie', 'where_we_work': 'Wo wir arbeiten', 'description': 'Aaadviser bietet Immobilienmarktanalyse in den folgenden Regionen:', 'usa': 'USA', 'usa_desc': 'Vollständige Immobilienmarktanalyse in allen Bundesstaaten, einschließlich New York, Kalifornien, Texas, Florida und anderen beliebten Regionen.', 'canada': 'Kanada', 'canada_desc': 'Marktanalyse in Großstädten: Toronto, Vancouver, Montreal, Calgary und andere.', 'uk': 'Vereinigtes Königreich', 'uk_desc': 'London, Manchester, Birmingham, Liverpool und andere Städte in England, Schottland, Wales.', 'australia': 'Australien', 'australia_desc': 'Sydney, Melbourne, Brisbane, Perth und andere große australische Städte.', 'germany': 'Deutschland', 'germany_desc': 'Berlin, München, Hamburg, Frankfurt und andere deutsche Städte.', 'france': 'Frankreich', 'france_desc': 'Paris, Lyon, Marseille, Toulouse und andere französische Städte.', 'expansion': 'Geographie-Erweiterung', 'expansion_desc': 'Wir erweitern ständig unsere Service-Geographie. Wenn Ihre Region noch nicht unterstützt wird, kontaktieren Sie uns zur Klärung der Entwicklungspläne.', 'data_quality': 'Datenqualität', 'quality_1': 'Aktuelle Preisinformationen', 'quality_2': 'Detaillierte Bezirksstatistik', 'quality_3': 'Markttrendanalyse', 'quality_4': 'Preisänderungsprognosen', 'quality_5': 'Vergleich mit ähnlichen Immobilien', 'property_types': 'Unterstützte Immobilientypen', 'type_1': 'Einfamilienhäuser', 'type_2': 'Wohnungen und Eigentumswohnungen', 'type_3': 'Reihenhäuser', 'type_4': 'Doppelhäuser', 'type_5': 'Mehrfamilienhäuser'},
-        'help': {'title': 'Hilfe', 'about_app': 'Über die App', 'instruction': 'Anleitung', 'geography': 'Unsere Geographie', 'support': 'Technischer Support', 'back_to_menu': 'Zurück zum Hauptmenü'},
-        'instruction': {'title': 'Anleitung', 'how_to_get_analysis': 'Wie man Immobilienanalyse erhält', 'step_1': 'Klicken Sie "Neuen Bericht erhalten" im Hauptmenü', 'step_2': 'Geben Sie die vollständige Immobilienadresse ein (Straße, Haus, Stadt)', 'step_3': 'Geben Sie die Anzahl der Schlafzimmer in der Immobilie an', 'step_4': 'Geben Sie den ungefähren Immobilienpreis in Dollar ein', 'step_5': 'Warten Sie auf die Datenverarbeitung (normalerweise 30-60 Sekunden)', 'step_6': 'Studieren Sie den detaillierten Bericht mit Marktanalyse', 'what_includes_report': 'Was umfasst der Bericht?', 'include_1': 'Preisanalyse im Gebiet', 'include_2': 'Immobilienmarktstatistik', 'include_3': 'Vergleich mit ähnlichen Immobilien', 'include_4': 'Preisänderungsprognose', 'include_5': 'Investitionsempfehlungen', 'additional_features': 'Zusätzliche Funktionen', 'feature_1': 'Speicherung von Berichten für späteren Betrachtung', 'feature_2': 'Zugriff auf Berichte von jedem Gerät', 'feature_3': 'Marktstatistik nach Regionen', 'feature_4': 'Suche nach ähnlichen Immobilien', 'tips_for_accuracy': 'Tipps für genaue Analyse', 'tip_1': 'Geben Sie die genaue Adresse an', 'tip_2': 'Verwenden Sie den aktuellen Preis', 'tip_3': 'Berücksichtigen Sie alle Schlafzimmer', 'tip_4': 'Überprüfen Sie gespeicherte Berichte'}
+        'full_report': {
+            'title': 'Vollständiger Bericht', 'generating': 'Bericht wird erstellt...',
+            'back': 'Zurück'
+        }
     },
     'fr': {
         'welcome_new': 'Bienvenue sur Aaadvisor : rapports analytiques immobiliers instantanés avec prévisions de prix et de rentabilité',
@@ -1129,14 +796,76 @@ locales = {
             'data_loaded': 'Données chargées',
             'error_loading_data': 'Erreur de chargement des données'
         },
-        'about': {'title': 'À propos de l\'app', 'what_is': 'Qu\'est-ce qu\'Aaadviser?', 'description': 'Aaadviser est une plateforme intelligente d\'analyse du marché immobilier qui aide les investisseurs et les acheteurs à prendre des décisions éclairées.', 'capabilities': 'Nos capacités:', 'capability_1': 'Analyse détaillée des prix dans la région', 'capability_2': 'Statistiques du marché immobilier', 'capability_3': 'Comparaison avec des propriétés similaires', 'capability_4': 'Prévisions de changement de prix', 'capability_5': 'Recommandations d\'investissement', 'capability_6': 'Sauvegarde des rapports', 'capability_7': 'Interface mobile pratique', 'how_it_works': 'Comment ça marche?', 'how_description': 'Entrez simplement l\'adresse de la propriété, spécifiez le nombre de chambres et le prix approximatif. Notre système analysera le marché et fournira un rapport détaillé avec des recommandations.', 'why_aaadviser': 'Pourquoi Aaadviser?', 'why_description': 'Nous utilisons des technologies avancées d\'apprentissage automatique et de big data pour l\'analyse du marché immobilier, permettant d\'obtenir des données précises et à jour pour la prise de décisions d\'investissement.'},
-        'additional_data': {'title': 'Données supplémentaires', 'subtitle': 'Spécifiez les caractéristiques de la propriété pour une analyse détaillée', 'object_info': 'Informations sur la propriété', 'address': 'Adresse:', 'bedrooms': 'Chambres:', 'price': 'Prix:', 'loading': 'Chargement...', 'age_label': 'Âge de la propriété:', 'age_placeholder': 'Sélectionner l\'âge de la propriété...', 'floor_label': 'Étage de la propriété:', 'floor_placeholder': 'Sélectionner l\'étage...', 'heating_label': 'Type de chauffage:', 'heating_placeholder': 'Sélectionner le type de chauffage...', 'area_label': 'Surface de la propriété, m²:', 'area_placeholder': 'Entrer la surface de la propriété', 'continue': 'Continuer', 'skip': 'Passer', 'loading_options': 'Chargement des options...', 'error_loading': 'Erreur lors du chargement des données', 'error_options': 'Erreur de chargement des options:', 'fill_all_fields': 'Veuillez remplir tous les champs ou sélectionner "Inconnu"', 'generating_report': 'Génération du rapport complet...', 'error_generation': 'Erreur de génération du rapport:'},
-        'admin': {'publication': {'title': 'Publication pour tous les utilisateurs', 'placeholder': 'Entrez le texte de publication...\nLe formatage, les emojis et le style sont pris en charge.', 'only_admins': 'Administrateurs uniquement', 'save_to_db': 'Sauvegarder en base', 'auto_translate': 'Traduction automatique', 'test_send': 'Envoi test', 'send': 'Envoyer', 'enter_text': 'Entrez le texte de publication!', 'broadcast_completed': 'Diffusion terminée!', 'by_languages': 'Par langues:', 'error_sending': 'Erreur:', 'network_error': 'Erreur réseau.', 'publication_sent': 'Publication envoyée avec succès!'}, 'settings': {'title': 'Paramètres des clés API', 'key_name_placeholder': 'Nom de la clé (key_name)', 'key_value_placeholder': 'Valeur de la clé (key_value)', 'add_key': 'Ajouter la clé', 'loading': 'Chargement...', 'key_added': 'Clé ajoutée avec succès!', 'error_adding': 'Erreur:', 'network_error': 'Erreur réseau.', 'error_loading_keys': 'Erreur de chargement des clés.', 'no_keys': 'Aucune nouvelle clé.'}, 'users': {'title': 'Statistiques des utilisateurs', 'general_stats': 'Statistiques générales', 'reports_stats': 'Rapports des utilisateurs', 'loading': 'Chargement...', 'error_loading': 'Erreur de chargement des statistiques', 'stats_loaded': 'Statistiques chargées avec succès!', 'total_users': 'Total des utilisateurs:', 'new_users_week': 'Nouveaux cette semaine:', 'new_users_month': 'Nouveaux ce mois:', 'new_users_quarter': 'Nouveaux ce trimestre:', 'new_users_year': 'Nouveaux cette année:', 'total_balance': 'Solde total:', 'expired_balance': 'Solde avec period_end < aujourd\'hui ou null:', 'active_balance': 'Solde des autres utilisateurs:', 'admin_count': 'Administrateurs:', 'reports_week': 'Rapports cette semaine:', 'reports_month': 'Rapports ce mois:', 'reports_quarter': 'Rapports ce trimestre:', 'reports_year': 'Rapports cette année:', 'deleted_reports': 'Rapports supprimés:', 'expired_reports_count': 'Rapports des utilisateurs avec period_end < aujourd\'hui ou null:', 'avg_expired_reports': 'Moyenne des rapports par tel utilisateur:', 'active_reports_count': 'Rapports des autres utilisateurs:', 'active_reports_cost': 'Argent dépensé (full):', 'network_error': 'Erreur réseau'}, 'panel': {'title': 'Panneau d\'administration', 'make_balance_100': 'Définir le solde à 100', 'users': 'Utilisateurs', 'publication': 'Publication', 'settings': 'Paramètres', 'user_not_defined': 'Utilisateur non défini. Ouvrez WebApp depuis Telegram.', 'balance_set': 'Solde défini: $100', 'balance_set_success': 'Solde défini avec succès!', 'error_updating': 'Erreur:', 'network_error': 'Erreur réseau.'}},
-        'balance': {'title': 'Solde', 'top_up': 'Recharger', 'tariffs': 'Tarifs', 'deposit_title': 'Rechargement du solde', 'deposit_description': 'Le service est encore en phase de développement et de remplissage fonctionnel.<br><br>Pour recharger votre solde, lancez le bot et il vous guidera:', 'statement': 'Relevé', 'statement_description': 'Vos dépenses seront ici', 'tariffs_title': 'Tarifs', 'no_tariffs': 'Aucun tarif disponible.', 'error_loading_tariffs': 'Erreur de chargement des tarifs.', 'subscription': 'Abonnement', 'one_time': 'Unique', 'user_not_defined': 'Utilisateur non défini.<br>Veuillez ouvrir WebApp depuis Telegram.', 'hello': 'Bonjour,', 'your_balance': 'Votre solde:'},
-        'full_report': {'title': 'Rapport complet', 'subtitle': 'Analyse détaillée de la propriété', 'generating': 'Génération du rapport complet...', 'please_wait': 'Veuillez patienter', 'error_loading': 'Erreur de chargement du rapport', 'error_message': 'Erreur lors de la génération du rapport', 'object_info': 'Informations sur la propriété', 'address': 'Adresse', 'bedrooms': 'Chambres', 'price': 'Prix', 'age': 'Âge de la propriété', 'floor': 'Étage', 'heating': 'Chauffage', 'area': 'Surface de la propriété', 'market_analysis': 'Analyse du marché', 'price_comparison': 'Comparaison avec les prix du marché', 'by_age': 'Par âge de la propriété:', 'by_floor': 'Par étage:', 'by_heating': 'Par type de chauffage:', 'final_comparison': 'Comparaison finale:', 'price_conclusion': 'Conclusion sur le prix:', 'currency_info': 'Conversion de devise:', 'price_dynamics': 'Analyse de la dynamique des prix', 'price_trend': 'Tendance des prix', 'price_change_3y': 'Changement sur 3 ans', 'price_forecast': 'Prévision sur 3 mois', 'price_chart': 'Graphique des changements de prix', 'trend_analysis': 'Analyse de tendance:', 'trend_recommendation': 'Recommandation:', 'rental_analysis': 'Analyse de location', 'max_rental_rate': 'Taux de location maximum', 'annual_rental_yield': 'Rendement locatif annuel', 'rental_recommendation': 'Recommandation de location', 'roi_analysis': 'Analyse ROI', 'short_term_rental': 'Location à court terme (Airbnb)', 'monthly_income': 'Revenus mensuels', 'long_term_rental': 'Location à long terme', 'annual_income': 'Revenus annuels', 'price_growth_5y': 'Croissance des prix (5 ans)', 'roi_with_rent': 'ROI avec location', 'roi_without_rent': 'ROI sans location', 'alternative_investments': 'Investissements alternatifs', 'macro_data': 'Données macroéconomiques', 'inflation': 'Inflation', 'eur_try': 'Taux EUR/TRY', 'gdp_growth': 'Croissance du PIB', 'refi_rate': 'Taux de refinancement', 'taxes_fees': 'Taxes et frais', 'risks_liquidity': 'Risques et liquidité', 'liquidity': 'Liquidité', 'district': 'District', 'economic_trends': 'Tendances économiques', 'economic_chart': 'Graphique des indicateurs économiques', 'download_pdf': 'Télécharger PDF', 'save_report': 'Sauvegarder le rapport', 'back': 'Retour', 'not_available': 'Non disponible', 'insufficient_data': 'Données insuffisantes pour l\'analyse de tendance', 'trends_error': 'Erreur de chargement des données de tendance', 'server_timeout': 'Délai d\'attente de réponse du serveur dépassé', 'no_trend_data': 'Données de tendance des prix pour cet emplacement non disponibles'},
-        'geography': {'title': 'Notre géographie', 'where_we_work': 'Où nous travaillons', 'description': 'Aaadviser fournit une analyse du marché immobilier dans les régions suivantes:', 'usa': 'États-Unis', 'usa_desc': 'Analyse complète du marché immobilier dans tous les États, y compris New York, Californie, Texas, Floride et d\'autres régions populaires.', 'canada': 'Canada', 'canada_desc': 'Analyse du marché dans les grandes villes: Toronto, Vancouver, Montréal, Calgary et autres.', 'uk': 'Royaume-Uni', 'uk_desc': 'Londres, Manchester, Birmingham, Liverpool et autres villes d\'Angleterre, d\'Écosse, du Pays de Galles.', 'australia': 'Australie', 'australia_desc': 'Sydney, Melbourne, Brisbane, Perth et autres grandes villes australiennes.', 'germany': 'Allemagne', 'germany_desc': 'Berlin, Munich, Hambourg, Francfort et autres villes allemandes.', 'france': 'France', 'france_desc': 'Paris, Lyon, Marseille, Toulouse et autres villes françaises.', 'expansion': 'Expansion géographique', 'expansion_desc': 'Nous élargissons constamment notre géographie de service. Si votre région n\'est pas encore prise en charge, contactez-nous pour clarifier les plans de développement.', 'data_quality': 'Qualité des données', 'quality_1': 'Informations de prix à jour', 'quality_2': 'Statistiques détaillées par district', 'quality_3': 'Analyse des tendances du marché', 'quality_4': 'Prévisions de changement de prix', 'quality_5': 'Comparaison avec des propriétés similaires', 'property_types': 'Types de propriétés pris en charge', 'type_1': 'Maisons privées', 'type_2': 'Appartements et condominiums', 'type_3': 'Maisons de ville', 'type_4': 'Duplexes', 'type_5': 'Maisons multifamiliales'},
-        'help': {'title': 'Aide', 'about_app': 'À propos de l\'app', 'instruction': 'Instruction', 'geography': 'Notre géographie', 'support': 'Support technique', 'back_to_menu': 'Retour au menu principal'},
-        'instruction': {'title': 'Instruction', 'how_to_get_analysis': 'Comment obtenir une analyse immobilière', 'step_1': 'Cliquez sur "Obtenir un nouveau rapport" dans le menu principal', 'step_2': 'Entrez l\'adresse complète de la propriété (rue, maison, ville)', 'step_3': 'Spécifiez le nombre de chambres dans la propriété', 'step_4': 'Entrez le prix approximatif de la propriété en dollars', 'step_5': 'Attendez le traitement des données (généralement 30-60 secondes)', 'step_6': 'Étudiez le rapport détaillé avec l\'analyse du marché', 'what_includes_report': 'Que comprend le rapport?', 'include_1': 'Analyse des prix dans la région', 'include_2': 'Statistiques du marché immobilier', 'include_3': 'Comparaison avec des propriétés similaires', 'include_4': 'Prévision de changement de prix', 'include_5': 'Recommandations d\'investissement', 'additional_features': 'Fonctionnalités supplémentaires', 'feature_1': 'Sauvegarde des rapports pour consultation ultérieure', 'feature_2': 'Accès aux rapports depuis n\'importe quel appareil', 'feature_3': 'Statistiques du marché par régions', 'feature_4': 'Recherche de propriétés similaires', 'tips_for_accuracy': 'Conseils pour une analyse précise', 'tip_1': 'Spécifiez l\'adresse exacte', 'tip_2': 'Utilisez le prix actuel', 'tip_3': 'Considérez toutes les chambres', 'tip_4': 'Vérifiez les rapports sauvegardés'}
+        'admin': {
+            'title': 'Panneau d\'administration', 'users': 'Utilisateurs', 'publications': 'Publications',
+            'settings': 'Paramètres', 'statistics': 'Statistiques', 'user_management': 'Gestion des utilisateurs',
+            'content_management': 'Gestion du contenu', 'system_settings': 'Paramètres système',
+            'backup': 'Sauvegarde', 'logs': 'Journaux', 'security': 'Sécurité',
+            'make_balance_100': 'Mettre le solde à 100', 'admin_panel': 'Panneau d\'administration',
+            'user_stats': 'Statistiques des utilisateurs', 'publication_management': 'Gestion des publications',
+            'back_to_main': '← Retour au menu principal'
+        },
+        'main': {
+            'title': 'Menu principal', 'welcome': 'Bienvenue',
+            'quick_actions': 'Actions rapides', 'recent_reports': 'Rapports récents',
+            'popular_services': 'Services populaires', 'news': 'Actualités',
+            'notifications': 'Notifications', 'menu': 'Menu', 'home': 'Accueil',
+            'reports': 'Rapports', 'analytics': 'Analytique', 'profile': 'Profil',
+            'help': 'Aide', 'settings': 'Paramètres', 'slogan': 'Rapports analytiques immobiliers instantanés',
+            'balance': 'Solde', 'balance_amount': 'Solde: $', 'top_up': 'Recharger',
+            'region_analytics': 'Analyse de région', 'object_evaluation': 'Évaluation d\'objet',
+            'my_reports': 'Mes rapports', 'referral_program': 'Programme de parrainage',
+            'support': 'Support', 'about': 'À propos', 'instruction': 'Instruction',
+            'real_data': 'Données réelles', 'additional_data': 'Données supplémentaires',
+            'geography': 'Géographie', 'full_report': 'Rapport complet'
+        },
+        'topup': {
+            'title': 'Recharger le solde', 'current_balance': 'Solde actuel',
+            'amount': 'Montant de recharge', 'min_amount': 'Montant minimum: $1',
+            'payment_method': 'Méthode de paiement', 'card': 'Carte bancaire',
+            'crypto': 'Cryptomonnaie', 'pay': 'Payer', 'back': 'Retour'
+        },
+        'help': {
+            'title': 'Aide', 'faq': 'Questions fréquemment posées',
+            'contact_support': 'Contacter le support', 'back': 'Retour'
+        },
+        'support': {
+            'title': 'Support', 'contact_us': 'Nous contacter',
+            'email': 'E-mail', 'telegram': 'Telegram', 'back': 'Retour'
+        },
+        'about': {
+            'title': 'À propos', 'description': 'Description de l\'entreprise',
+            'features': 'Fonctionnalités', 'back': 'Retour'
+        },
+        'instruction': {
+            'title': 'Instruction', 'how_to_use': 'Comment utiliser',
+            'step_by_step': 'Guide étape par étape', 'back': 'Retour'
+        },
+        'referral': {
+            'title': 'Programme de parrainage', 'your_code': 'Votre code',
+            'invite_friends': 'Inviter des amis', 'earnings': 'Gains',
+            'back': 'Retour'
+        },
+        'my_reports': {
+            'title': 'Mes rapports', 'no_reports': 'Vous n\'avez pas encore de rapports',
+            'create_first': 'Créer le premier rapport', 'back': 'Retour'
+        },
+        'real_data': {
+            'title': 'Données réelles', 'description': 'Description de la section',
+            'back': 'Retour'
+        },
+        'additional_data': {
+            'title': 'Données supplémentaires', 'description': 'Description de la section',
+            'back': 'Retour'
+        },
+        'geography': {
+            'title': 'Géographie', 'description': 'Description de la section',
+            'back': 'Retour'
+        },
+        'full_report': {
+            'title': 'Rapport complet', 'generating': 'Génération du rapport...',
+            'back': 'Retour'
+        }
     },
     'tr': {
         'welcome_new': 'Aaadvisor\'a hoş geldiniz: Anında gayrimenkul analiz raporları, fiyat ve kârlılık tahminleriyle',
@@ -1278,13 +1007,75 @@ locales = {
             'data_loaded': 'Veriler yüklendi',
             'error_loading_data': 'Veri yükleme hatası'
         },
-        'about': {'title': 'Uygulama Hakkında', 'what_is': 'Aaadviser nedir?', 'description': 'Aaadviser, yatırımcıların ve alıcıların bilinçli kararlar almasına yardımcı olan akıllı gayrimenkul pazar analizi platformudur.', 'capabilities': 'Yeteneklerimiz:', 'capability_1': 'Bölgede detaylı fiyat analizi', 'capability_2': 'Gayrimenkul pazar istatistikleri', 'capability_3': 'Benzer nesnelerle karşılaştırma', 'capability_4': 'Fiyat değişim tahminleri', 'capability_5': 'Yatırım önerileri', 'capability_6': 'Rapor kaydetme', 'capability_7': 'Kullanışlı mobil arayüz', 'how_it_works': 'Nasıl çalışır?', 'how_description': 'Sadece gayrimenkul adresini girin, yatak odası sayısını ve yaklaşık fiyatı belirtin. Sistemimiz pazarı analiz edecek ve önerilerle detaylı bir rapor sunacak.', 'why_aaadviser': 'Neden Aaadviser?', 'why_description': 'Gayrimenkul pazar analizi için gelişmiş makine öğrenmesi teknolojileri ve büyük veri kullanıyoruz, bu da yatırım kararları için doğru ve güncel veriler elde etmemizi sağlıyor.'},
-        'additional_data': {'title': 'Ek Veriler', 'subtitle': 'Detaylı analiz için nesne özelliklerini belirtin', 'object_info': 'Nesne Bilgileri', 'address': 'Adres:', 'bedrooms': 'Yatak Odaları:', 'price': 'Fiyat:', 'loading': 'Yükleniyor...', 'age_label': 'Nesne Yaşı:', 'age_placeholder': 'Nesne yaşını seçin...', 'floor_label': 'Nesne Katı:', 'floor_placeholder': 'Katı seçin...', 'heating_label': 'Isıtma Tipi:', 'heating_placeholder': 'Isıtma tipini seçin...', 'area_label': 'Nesne Alanı, m²:', 'area_placeholder': 'Nesne alanını girin', 'continue': 'Devam Et', 'skip': 'Atla', 'loading_options': 'Seçenekler yükleniyor...', 'error_loading': 'Veri yüklenirken hata oluştu', 'error_options': 'Seçenek yükleme hatası:', 'fill_all_fields': 'Lütfen tüm alanları doldurun veya "Bilinmiyor" seçin', 'generating_report': 'Tam rapor oluşturuluyor...', 'error_generation': 'Rapor oluşturma hatası:'},
-        'admin': {'publication': {'title': 'Tüm kullanıcılar için yayın', 'placeholder': 'Yayın metnini girin...\nBiçimlendirme, emojiler ve stil desteklenir.', 'only_admins': 'Sadece yöneticiler', 'save_to_db': 'Veritabanına kaydet', 'auto_translate': 'Otomatik çeviri', 'test_send': 'Test gönderimi', 'send': 'Gönder', 'enter_text': 'Yayın metnini girin!', 'broadcast_completed': 'Yayın tamamlandı!', 'by_languages': 'Dillere göre:', 'error_sending': 'Hata:', 'network_error': 'Ağ hatası.', 'publication_sent': 'Yayın başarıyla gönderildi!'}, 'settings': {'title': 'API Anahtarı Ayarları', 'key_name_placeholder': 'Anahtar adı (key_name)', 'key_value_placeholder': 'Anahtar değeri (key_value)', 'add_key': 'Anahtar ekle', 'loading': 'Yükleniyor...', 'key_added': 'Anahtar başarıyla eklendi!', 'error_adding': 'Hata:', 'network_error': 'Ağ hatası.', 'error_loading_keys': 'Anahtar yükleme hatası.', 'no_keys': 'Yeni anahtar yok.'}, 'users': {'title': 'Kullanıcı istatistikleri', 'general_stats': 'Genel istatistikler', 'reports_stats': 'Kullanıcı raporları', 'loading': 'Yükleniyor...', 'error_loading': 'İstatistik yükleme hatası', 'stats_loaded': 'İstatistikler başarıyla yüklendi!', 'total_users': 'Toplam kullanıcı:', 'new_users_week': 'Bu hafta yeni:', 'new_users_month': 'Bu ay yeni:', 'new_users_quarter': 'Bu çeyrek yeni:', 'new_users_year': 'Bu yıl yeni:', 'total_balance': 'Toplam bakiye:', 'expired_balance': 'period_end < bugün veya null olan bakiye:', 'active_balance': 'Diğer kullanıcıların bakiyesi:', 'admin_count': 'Yöneticiler:', 'reports_week': 'Bu hafta raporlar:', 'reports_month': 'Bu ay raporlar:', 'reports_quarter': 'Bu çeyrek raporlar:', 'reports_year': 'Bu yıl raporlar:', 'deleted_reports': 'Silinen raporlar:', 'expired_reports_count': 'period_end < bugün veya null olan kullanıcıların raporları:', 'avg_expired_reports': 'Böyle kullanıcı başına ortalama rapor:', 'active_reports_count': 'Diğer kullanıcıların raporları:', 'active_reports_cost': 'Harcanan para (full):', 'network_error': 'Ağ hatası'}, 'panel': {'title': 'Yönetici paneli', 'make_balance_100': 'Bakiyeyi 100 yap', 'users': 'Kullanıcılar', 'publication': 'Yayın', 'settings': 'Ayarlar', 'user_not_defined': 'Kullanıcı tanımlanmamış. Telegram\'dan WebApp\'i açın.', 'balance_set': 'Bakiye ayarlandı: $100', 'balance_set_success': 'Bakiye başarıyla ayarlandı!', 'error_updating': 'Hata:', 'network_error': 'Ağ hatası.'}},
-        'balance': {'title': 'Bakiye', 'top_up': 'Yükle', 'tariffs': 'Tarifeler', 'deposit_title': 'Bakiye yükleme', 'deposit_description': 'Hizmet hala geliştirme ve işlevsel doldurma aşamasında.<br><br>Bakiyenizi yüklemek için botu başlatın ve sizi yönlendirecek:', 'statement': 'Ekstre', 'statement_description': 'Giderleriniz burada olacak', 'tariffs_title': 'Tarifeler', 'no_tariffs': 'Mevcut tarife yok.', 'error_loading_tariffs': 'Tarife yükleme hatası.', 'subscription': 'Abonelik', 'one_time': 'Tek seferlik', 'user_not_defined': 'Kullanıcı tanımlanmamış.<br>Lütfen Telegram\'dan WebApp\'i açın.', 'hello': 'Merhaba,', 'your_balance': 'Bakiyeniz:'},
-        'full_report': {'title': 'Tam rapor', 'subtitle': 'Detaylı gayrimenkul analizi', 'generating': 'Tam rapor oluşturuluyor...', 'please_wait': 'Lütfen bekleyin', 'error_loading': 'Rapor yükleme hatası', 'error_message': 'Rapor oluşturulurken hata oluştu', 'object_info': 'Gayrimenkul bilgileri', 'address': 'Adres', 'bedrooms': 'Yatak Odaları', 'price': 'Fiyat', 'age': 'Gayrimenkul Yaşı', 'floor': 'Kat', 'heating': 'Isıtma', 'area': 'Gayrimenkul Alanı', 'market_analysis': 'Pazar analizi', 'price_comparison': 'Pazar fiyatlarıyla karşılaştırma', 'by_age': 'Gayrimenkul yaşına göre:', 'by_floor': 'Kata göre:', 'by_heating': 'Isıtma tipine göre:', 'final_comparison': 'Son karşılaştırma:', 'price_conclusion': 'Fiyat sonucu:', 'currency_info': 'Para birimi dönüşümü:', 'price_dynamics': 'Fiyat dinamikleri analizi', 'price_trend': 'Fiyat trendi', 'price_change_3y': '3 yılda değişim', 'price_forecast': '3 aylık tahmin', 'price_chart': 'Fiyat değişim grafiği', 'trend_analysis': 'Trend analizi:', 'trend_recommendation': 'Öneri:', 'rental_analysis': 'Kiralama analizi', 'max_rental_rate': 'Maksimum kiralama oranı', 'annual_rental_yield': 'Yıllık kiralama getirisi', 'rental_recommendation': 'Kiralama önerisi', 'roi_analysis': 'ROI analizi', 'short_term_rental': 'Kısa vadeli kiralama (Airbnb)', 'monthly_income': 'Aylık gelir', 'long_term_rental': 'Uzun vadeli kiralama', 'annual_income': 'Yıllık gelir', 'price_growth_5y': 'Fiyat büyümesi (5 yıl)', 'roi_with_rent': 'Kiralama ile ROI', 'roi_without_rent': 'Kiralama olmadan ROI', 'alternative_investments': 'Alternatif yatırımlar', 'macro_data': 'Makroekonomik veriler', 'inflation': 'Enflasyon', 'eur_try': 'EUR/TRY Kuru', 'gdp_growth': 'GSYİH Büyümesi', 'refi_rate': 'Refinansman Oranı', 'taxes_fees': 'Vergiler ve harçlar', 'risks_liquidity': 'Riskler ve likidite', 'liquidity': 'Likidite', 'district': 'İlçe', 'economic_trends': 'Ekonomik trendler', 'economic_chart': 'Ekonomik göstergeler grafiği', 'download_pdf': 'PDF İndir', 'save_report': 'Raporu kaydet', 'back': 'Geri', 'not_available': 'Mevcut değil', 'insufficient_data': 'Trend analizi için yetersiz veri', 'trends_error': 'Trend verilerini yükleme hatası', 'server_timeout': 'Sunucu yanıt zaman aşımı aşıldı', 'no_trend_data': 'Bu konum için fiyat trend verileri mevcut değil'},
-        'geography': {'title': 'Coğrafyamız', 'where_we_work': 'Nerede çalışıyoruz', 'description': 'Aaadviser aşağıdaki bölgelerde gayrimenkul pazar analizi sağlar:', 'usa': 'ABD', 'usa_desc': 'New York, Kaliforniya, Teksas, Florida ve diğer popüler bölgeler dahil tüm eyaletlerde tam gayrimenkul pazar analizi.', 'canada': 'Kanada', 'canada_desc': 'Büyük şehirlerde pazar analizi: Toronto, Vancouver, Montreal, Calgary ve diğerleri.', 'uk': 'Birleşik Krallık', 'uk_desc': 'Londra, Manchester, Birmingham, Liverpool ve İngiltere, İskoçya, Galler\'deki diğer şehirler.', 'australia': 'Avustralya', 'australia_desc': 'Sidney, Melbourne, Brisbane, Perth ve diğer büyük Avustralya şehirleri.', 'germany': 'Almanya', 'germany_desc': 'Berlin, Münih, Hamburg, Frankfurt ve diğer Alman şehirleri.', 'france': 'Fransa', 'france_desc': 'Paris, Lyon, Marsilya, Toulouse ve diğer Fransız şehirleri.', 'expansion': 'Coğrafya genişletme', 'expansion_desc': 'Hizmet coğrafyamızı sürekli genişletiyoruz. Bölgeniz henüz desteklenmiyorsa, geliştirme planlarını netleştirmek için bizimle iletişime geçin.', 'data_quality': 'Veri kalitesi', 'quality_1': 'Güncel fiyat bilgileri', 'quality_2': 'Detaylı ilçe istatistikleri', 'quality_3': 'Pazar trend analizi', 'quality_4': 'Fiyat değişim tahminleri', 'quality_5': 'Benzer gayrimenkullerle karşılaştırma', 'property_types': 'Desteklenen gayrimenkul türleri', 'type_1': 'Özel evler', 'type_2': 'Daireler ve kondominyumlar', 'type_3': 'Şehir evleri', 'type_4': 'Dubleksler', 'type_5': 'Çok aileli evler'},
-        'help': {'title': 'Yardım', 'about_app': 'Uygulama hakkında', 'instruction': 'Talimat', 'geography': 'Coğrafyamız', 'support': 'Teknik destek', 'back_to_menu': 'Ana menüye dön'},
-        'instruction': {'title': 'Talimat', 'how_to_get_analysis': 'Gayrimenkul analizi nasıl alınır', 'step_1': 'Ana menüde "Yeni rapor al"a tıklayın', 'step_2': 'Gayrimenkulün tam adresini girin (sokak, ev, şehir)', 'step_3': 'Gayrimenkuldeki yatak odası sayısını belirtin', 'step_4': 'Gayrimenkulün yaklaşık fiyatını dolar cinsinden girin', 'step_5': 'Veri işleme için bekleyin (genellikle 30-60 saniye)', 'step_6': 'Pazar analizi ile detaylı raporu inceleyin', 'what_includes_report': 'Rapor ne içerir?', 'include_1': 'Bölgede fiyat analizi', 'include_2': 'Gayrimenkul pazar istatistikleri', 'include_3': 'Benzer gayrimenkullerle karşılaştırma', 'include_4': 'Fiyat değişim tahmini', 'include_5': 'Yatırım önerileri', 'additional_features': 'Ek özellikler', 'feature_1': 'Raporları daha sonra görüntülemek için kaydetme', 'feature_2': 'Herhangi bir cihazdan raporlara erişim', 'feature_3': 'Bölgelere göre pazar istatistikleri', 'feature_4': 'Benzer gayrimenkulleri arama', 'tips_for_accuracy': 'Doğru analiz için ipuçları', 'tip_1': 'Tam adresi belirtin', 'tip_2': 'Güncel fiyatı kullanın', 'tip_3': 'Tüm yatak odalarını dikkate alın', 'tip_4': 'Kaydedilen raporları kontrol edin'}
+        'admin': {
+            'title': 'Yönetici Paneli', 'users': 'Kullanıcılar', 'publications': 'Yayınlar',
+            'settings': 'Ayarlar', 'statistics': 'İstatistikler', 'user_management': 'Kullanıcı Yönetimi',
+            'content_management': 'İçerik Yönetimi', 'system_settings': 'Sistem Ayarları',
+            'backup': 'Yedekleme', 'logs': 'Günlükler', 'security': 'Güvenlik',
+            'make_balance_100': 'Bakiyeyi 100 Yap', 'admin_panel': 'Yönetici Paneli',
+            'user_stats': 'Kullanıcı İstatistikleri', 'publication_management': 'Yayın Yönetimi',
+            'back_to_main': '← Ana Menüye Dön'
+        },
+        'main': {
+            'title': 'Ana Menü', 'welcome': 'Hoş Geldiniz',
+            'quick_actions': 'Hızlı İşlemler', 'recent_reports': 'Son Raporlar',
+            'popular_services': 'Popüler Hizmetler', 'news': 'Haberler',
+            'notifications': 'Bildirimler', 'menu': 'Menü', 'home': 'Ana Sayfa',
+            'reports': 'Raporlar', 'analytics': 'Analitik', 'profile': 'Profil',
+            'help': 'Yardım', 'settings': 'Ayarlar', 'slogan': 'Anında gayrimenkul analiz raporları',
+            'balance': 'Bakiye', 'balance_amount': 'Bakiye: $', 'top_up': 'Yükle',
+            'region_analytics': 'Bölge Analizi', 'object_evaluation': 'Nesne Değerlendirmesi',
+            'my_reports': 'Raporlarım', 'referral_program': 'Referans Programı',
+            'support': 'Destek', 'about': 'Hakkında', 'instruction': 'Talimat',
+            'real_data': 'Gerçek Veriler', 'additional_data': 'Ek Veriler',
+            'geography': 'Coğrafya', 'full_report': 'Tam Rapor'
+        },
+        'topup': {
+            'title': 'Bakiye Yükleme', 'current_balance': 'Mevcut Bakiye',
+            'amount': 'Yükleme Miktarı', 'min_amount': 'Minimum Miktar: $1',
+            'payment_method': 'Ödeme Yöntemi', 'card': 'Banka Kartı',
+            'crypto': 'Kripto Para', 'pay': 'Öde', 'back': 'Geri'
+        },
+        'help': {
+            'title': 'Yardım', 'faq': 'Sık Sorulan Sorular',
+            'contact_support': 'Destekle İletişim', 'back': 'Geri'
+        },
+        'support': {
+            'title': 'Destek', 'contact_us': 'Bizimle İletişim',
+            'email': 'E-posta', 'telegram': 'Telegram', 'back': 'Geri'
+        },
+        'about': {
+            'title': 'Hakkında', 'description': 'Şirket Açıklaması',
+            'features': 'Özellikler', 'back': 'Geri'
+        },
+        'instruction': {
+            'title': 'Talimat', 'how_to_use': 'Nasıl Kullanılır',
+            'step_by_step': 'Adım Adım Rehber', 'back': 'Geri'
+        },
+        'referral': {
+            'title': 'Referans Programı', 'your_code': 'Kodunuz',
+            'invite_friends': 'Arkadaşları Davet Et', 'earnings': 'Kazanç',
+            'back': 'Geri'
+        },
+        'my_reports': {
+            'title': 'Raporlarım', 'no_reports': 'Henüz raporunuz yok',
+            'create_first': 'İlk Raporu Oluştur', 'back': 'Geri'
+        },
+        'real_data': {
+            'title': 'Gerçek Veriler', 'description': 'Bölüm Açıklaması',
+            'back': 'Geri'
+        },
+        'additional_data': {
+            'title': 'Ek Veriler', 'description': 'Bölüm Açıklaması',
+            'back': 'Geri'
+        },
+        'geography': {
+            'title': 'Coğrafya', 'description': 'Bölüm Açıklaması',
+            'back': 'Geri'
+        },
+        'full_report': {
+            'title': 'Tam Rapor', 'generating': 'Rapor Oluşturuluyor...',
+            'back': 'Geri'
+        }
     }
 } 

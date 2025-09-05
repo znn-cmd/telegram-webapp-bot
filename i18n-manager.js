@@ -7,68 +7,34 @@ class I18nManager {
     }
 
     async init() {
-        this.currentLanguage = await this.getInitialLanguage();
+        this.currentLanguage = this.getInitialLanguage();
         await this.loadTranslations();
         this.applyTranslations();
         this.addLanguageSelector();
     }
 
-    async getInitialLanguage() {
-        const userData = this.getUserData();
-        if (userData) {
-            try {
-                // Получаем язык из Telegram WebApp для передачи на сервер
-                const telegramLanguage = window.Telegram && window.Telegram.WebApp && 
-                    window.Telegram.WebApp.initDataUnsafe && 
-                    window.Telegram.WebApp.initDataUnsafe.user && 
-                    window.Telegram.WebApp.initDataUnsafe.user.language_code ? 
-                    window.Telegram.WebApp.initDataUnsafe.user.language_code : 'en';
-
-                const response = await fetch('/api/get_user_language', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        telegram_id: userData.id,
-                        telegram_language: telegramLanguage
-                    })
-                });
-                
-                if (response.ok) {
-                    const data = await response.json();
-                    if (data.success && data.language && ['ru', 'en', 'de', 'fr', 'tr'].includes(data.language)) {
-                        console.log(`🌐 Язык определен сервером: ${data.language} (админ: ${data.is_admin})`);
-                        return data.language;
-                    }
-                }
-            } catch (error) {
-                console.warn('Failed to get user language from server:', error);
-            }
-        }
-
-        // Fallback: пытаемся получить язык из Telegram WebApp напрямую
+    getInitialLanguage() {
+        // Пытаемся получить язык из Telegram WebApp
         if (window.Telegram && window.Telegram.WebApp) {
             const tg = window.Telegram.WebApp;
             if (tg.initDataUnsafe && tg.initDataUnsafe.user && tg.initDataUnsafe.user.language_code) {
                 const lang = tg.initDataUnsafe.user.language_code.substring(0, 2);
                 if (['ru', 'en', 'de', 'fr', 'tr'].includes(lang)) {
-                    console.log(`🌐 Язык из Telegram WebApp: ${lang}`);
                     return lang;
                 }
             }
         }
 
-        // Fallback: пытаемся получить из localStorage
+        // Пытаемся получить из localStorage
         try {
             const stored = localStorage.getItem('aaadviser_language');
             if (stored && ['ru', 'en', 'de', 'fr', 'tr'].includes(stored)) {
-                console.log(`🌐 Язык из localStorage: ${stored}`);
                 return stored;
             }
         } catch (e) {}
 
-        // По умолчанию английский (как указано в требованиях)
-        console.log('🌐 Используется язык по умолчанию: en');
-        return 'en';
+        // По умолчанию русский
+        return 'ru';
     }
 
     async loadTranslations() {
@@ -630,7 +596,7 @@ class I18nManager {
         try {
             const userData = this.getUserData();
             if (userData) {
-                const response = await fetch('/api/set_language', {
+                await fetch('/api/set_language', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -638,13 +604,6 @@ class I18nManager {
                         language: language
                     })
                 });
-                
-                if (response.ok) {
-                    const data = await response.json();
-                    if (data.success) {
-                        console.log('Language preference saved successfully');
-                    }
-                }
             }
         } catch (error) {
             console.warn('Failed to save language preference:', error);

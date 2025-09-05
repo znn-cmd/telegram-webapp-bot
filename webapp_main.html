@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title data-i18n-title="main.title">Aaadviser - Главное меню</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <script src="static/i18n-manager.js"></script>
+    <script src="/static/i18n-manager.js"></script>
     <style>
         * {
             margin: 0;
@@ -431,7 +431,7 @@
         <div class="skeleton skeleton-user" id="userSkeleton"></div>
         <!-- Информация о пользователе -->
         <div class="user-info hidden" id="userInfo">
-            <div class="user-name" id="userName" data-i18n="common.loading">Загрузка...</div>
+            <div class="user-name" id="userName" data-i18n="common.loading" data-i18n="common.loading">Загрузка...</div>
             <div class="user-balance" style="margin-top: 10px;">
                 <span data-i18n="main.balance">Баланс:</span>
                 <span class="balance-amount" id="userBalance">$0</span>
@@ -448,7 +448,7 @@
                 <button class="lang-btn" data-lang="fr" onclick="selectLanguage('fr')">🇫🇷 Français</button>
                 <button class="lang-btn" data-lang="tr" onclick="selectLanguage('tr')">🇹🇷 Türkçe</button>
             </div>
-            <button class="menu-btn" id="confirmLangBtn" style="margin-top:15px;width:100%;" onclick="confirmLanguage()" data-i18n="common.confirm">Подтвердить</button>
+            <button class="menu-btn" id="confirmLangBtn" style="margin-top:15px;width:100%;" onclick="confirmLanguage()" data-i18n="common.confirm" data-i18n="common.confirm">Подтвердить</button>
         </div>
 
         <!-- Skeleton loading for menu -->
@@ -461,52 +461,52 @@
 
         <!-- Главное меню -->
         <div class="menu-section hidden" id="menuSection">
-            <div class="menu-title" id="menuTitle" data-i18n="main.menu_title">Главное меню</div>
+            <div class="menu-title" id="menuTitle" data-i18n="main.title" data-i18n="main.title">Главное меню</div>
             
             <!-- Новые кнопки сверху -->
             <button class="menu-btn fade-in" onclick="showRegionAnalytics()">
                 <span class="menu-btn-icon">🗺️</span>
-                <span class="menu-btn-text" id="regionAnalyticsBtn" data-i18n="reports.region_analytics">Аналитика региона</span>
-                <span class="menu-btn-description" id="regionAnalyticsDesc">Отчет по региону</span>
+                <span class="menu-btn-text" id="regionAnalyticsBtn" data-i18n="main.region_analytics" data-i18n="reports.region_analytics">Аналитика региона</span>
+                <span class="menu-btn-description" id="regionAnalyticsDesc" data-i18n="reports.region_analytics">Отчет по региону</span>
             </button>
 
             <button class="menu-btn fade-in" onclick="showObjectEvaluation()">
                 <span class="menu-btn-icon">🏠</span>
-                <span class="menu-btn-text" id="objectEvaluationBtn">Оценка объекта</span>
-                <span class="menu-btn-description" id="objectEvaluationDesc" data-i18n="reports.property_evaluation">Оценка недвижимости</span>
+                <span class="menu-btn-text" id="objectEvaluationBtn" data-i18n="main.object_evaluation" data-i18n="main.object_evaluation">Оценка объекта</span>
+                <span class="menu-btn-description" id="objectEvaluationDesc" data-i18n="reports.property_evaluation" data-i18n="reports.property_evaluation">Оценка недвижимости</span>
             </button>
 
             <button class="menu-btn fade-in" onclick="showMyReports()">
                 <span class="menu-btn-icon">📋</span>
-                <span class="menu-btn-text" id="myReportsBtn" data-i18n="reports.title" data-i18n="reports.my_reports">Мои отчеты</span>
-                <span class="menu-btn-description" id="myReportsDesc">Ваши созданные отчеты</span>
+                <span class="menu-btn-text" id="myReportsBtn" data-i18n="main.my_reports" data-i18n="reports.my_reports">Мои отчеты</span>
+                <span class="menu-btn-description" id="myReportsDesc" data-i18n="reports.my_reports">Ваши созданные отчеты</span>
             </button>
 
             <button class="menu-btn fade-in" onclick="showProfile()">
                 <span class="menu-btn-icon">👤</span>
-                <span class="menu-btn-text" id="profileBtn" data-i18n="profile.title">Личный кабинет</span>
-                <span class="menu-btn-description" id="profileDesc">Настройки и баланс</span>
+                <span class="menu-btn-text" id="profileBtn" data-i18n="main.profile" data-i18n="profile.title">Личный кабинет</span>
+                <span class="menu-btn-description" id="profileDesc" data-i18n="profile.title">Настройки и баланс</span>
             </button>
 
             <!-- Кнопка Помощь -->
             <button class="menu-btn fade-in" onclick="showHelp()">
                 <span class="menu-btn-icon">❓</span>
-                <span class="menu-btn-text" data-i18n="common.help">Помощь</span>
-                <span class="menu-btn-description">Ответы на вопросы и поддержка</span>
+                <span class="menu-btn-text" data-i18n="main.help" data-i18n="help.title">Помощь</span>
+                <span class="menu-btn-description" data-i18n="help.title">Ответы на вопросы и поддержка</span>
             </button>
 
             <!-- Кнопка Админ-панель -->
             <button class="menu-btn fade-in admin-panel-btn" onclick="showAdminPanel()">
                 <span class="menu-btn-icon">🛠️</span>
-                <span class="menu-btn-text">Админ-панель</span>
-                <span class="menu-btn-description">Управление и статистика</span>
+                <span class="menu-btn-text" data-i18n="admin.title" data-i18n="admin.admin_panel">Админ-панель</span>
+                <span class="menu-btn-description" data-i18n="admin.user_management">Управление и статистика</span>
             </button>
         </div>
 
         <!-- Загрузка -->
         <div id="loading" class="loading hidden">
             <div class="spinner"></div>
-            <p id="loadingText" data-i18n="common.loading">Загрузка...</p>
+            <p id="loadingText" data-i18n="common.loading" data-i18n="common.loading">Загрузка...</p>
         </div>
     </div>
 
@@ -885,13 +885,7 @@
         }
 
         // Запускаем инициализацию
-        async function initApp() {
-            const i18nManager = new I18nManager();
-            await i18nManager.init();
-            init();
-        }
-        
-        initApp();
+        init();
     </script>
 </body>
 </html> 

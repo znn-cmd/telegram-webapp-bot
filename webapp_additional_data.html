@@ -2,10 +2,10 @@
 <html lang="ru">
 <head>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <script src="static/i18n-manager.js"></script>
+    <script src="/i18n-manager.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title data-i18n-title="additional_data.title">Дополнительные данные объекта - Aaadviser</title>
+    <title>Дополнительные данные объекта - Aaadviser</title>
     <style>
         * {
             margin: 0;
@@ -226,72 +226,72 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1 data-i18n="additional_data.title">📋 Дополнительные данные</h1>
-            <p data-i18n="additional_data.subtitle">Укажите характеристики объекта для детального анализа</p>
+            <h1>📋 Дополнительные данные</h1>
+            <p>Укажите характеристики объекта для детального анализа</p>
         </div>
 
         <div class="content">
             <!-- Информация об объекте -->
             <div class="info-box">
-                <h3 data-i18n="additional_data.object_info">🏠 Информация об объекте</h3>
+                <h3>🏠 Информация об объекте</h3>
                 <div class="info-item">
-                    <span class="info-label" data-i18n="additional_data.address">Адрес:</span>
-                    <span class="info-value" id="object-address" data-i18n="additional_data.loading">Загрузка...</span>
+                    <span class="info-label">Адрес:</span>
+                    <span class="info-value" id="object-address" data-i18n="common.loading">Загрузка...</span>
                 </div>
                 <div class="info-item">
-                    <span class="info-label" data-i18n="additional_data.bedrooms">Спальни:</span>
-                    <span class="info-value" id="object-bedrooms" data-i18n="additional_data.loading">Загрузка...</span>
+                    <span class="info-label">Спальни:</span>
+                    <span class="info-value" id="object-bedrooms" data-i18n="common.loading">Загрузка...</span>
                 </div>
                 <div class="info-item">
-                    <span class="info-label" data-i18n="additional_data.price">Цена:</span>
-                    <span class="info-value" id="object-price" data-i18n="additional_data.loading">Загрузка...</span>
+                    <span class="info-label">Цена:</span>
+                    <span class="info-value" id="object-price" data-i18n="common.loading">Загрузка...</span>
                 </div>
             </div>
 
             <!-- Форма дополнительных данных -->
             <form id="additional-data-form">
                 <div class="form-group">
-                    <label for="age-select" data-i18n="additional_data.age">🏗️ Возраст объекта:</label>
+                    <label for="age-select">🏗️ Возраст объекта:</label>
                     <select id="age-select" name="age" required>
-                        <option value="" data-i18n="additional_data.age_select">Выберите возраст объекта...</option>
+                        <option value="">Выберите возраст объекта...</option>
                     </select>
                 </div>
 
                 <div class="form-group">
-                    <label for="floor-select" data-i18n="additional_data.floor">🏢 Этаж объекта:</label>
+                    <label for="floor-select">🏢 Этаж объекта:</label>
                     <select id="floor-select" name="floor" required>
-                        <option value="" data-i18n="additional_data.floor_select">Выберите этаж...</option>
+                        <option value="">Выберите этаж...</option>
                     </select>
                 </div>
 
                 <div class="form-group">
-                    <label for="heating-select" data-i18n="additional_data.heating">🔥 Тип отопления:</label>
+                    <label for="heating-select">🔥 Тип отопления:</label>
                     <select id="heating-select" name="heating" required>
-                        <option value="" data-i18n="additional_data.heating_select">Выберите тип отопления...</option>
+                        <option value="">Выберите тип отопления...</option>
                     </select>
                 </div>
 
                 <div class="form-group">
-                    <label for="area-input" data-i18n="additional_data.area">📐 Площадь объекта, м²:</label>
+                    <label for="area-input">📐 Площадь объекта, м²:</label>
                     <input type="number" id="area-input" name="area" min="20" max="1000" step="1" placeholder="Введите площадь объекта" required>
                 </div>
 
                 <div class="buttons">
-                    <button type="submit" class="btn btn-primary" data-i18n="additional_data.continue">
+                    <button type="submit" class="btn btn-primary">
                         ✅ Продолжить
                     </button>
-                    <button type="button" class="btn btn-secondary" onclick="skipAdditionalData()" data-i18n="additional_data.skip">
+                    <button type="button" class="btn btn-secondary" onclick="skipAdditionalData()">
                         ⏭️ Пропустить
                     </button>
                 </div>
             </form>
 
             <div id="loading" class="loading" style="display: none;">
-                <p data-i18n="additional_data.loading_options">🔄 Загружаем опции...</p>
+                <p>🔄 Загружаем опции...</p>
             </div>
 
             <div id="error" class="error" style="display: none;">
-                <p data-i18n="additional_data.error">❌ Произошла ошибка при загрузке данных</p>
+                <p>❌ Произошла ошибка при загрузке данных</p>
             </div>
         </div>
     </div>
@@ -367,7 +367,7 @@
                 console.error('Ошибка загрузки опций:', error);
                 document.getElementById('loading').style.display = 'none';
                 document.getElementById('error').style.display = 'block';
-                document.getElementById('error').innerHTML = `<p data-i18n="additional_data.error_loading_options">❌ Ошибка загрузки опций: ${error.message}</p>`;
+                document.getElementById('error').innerHTML = `<p>❌ Ошибка загрузки опций: ${error.message}</p>`;
             }
         }
 
@@ -409,7 +409,7 @@
             try {
                 // Показываем загрузку
                 document.getElementById('loading').style.display = 'block';
-                document.getElementById('loading').innerHTML = '<p data-i18n="additional_data.generating_report">🔄 Формируем полный отчет...</p>';
+                document.getElementById('loading').innerHTML = '<p>🔄 Формируем полный отчет...</p>';
 
                 // Формируем данные для отчета
                 const reportData = {
@@ -438,7 +438,7 @@
                 console.error('Ошибка генерации отчета:', error);
                 document.getElementById('loading').style.display = 'none';
                 document.getElementById('error').style.display = 'block';
-                document.getElementById('error').innerHTML = `<p data-i18n="additional_data.error_generating_report">❌ Ошибка генерации отчета: ${error.message}</p>`;
+                document.getElementById('error').innerHTML = `<p>❌ Ошибка генерации отчета: ${error.message}</p>`;
             }
         }
 

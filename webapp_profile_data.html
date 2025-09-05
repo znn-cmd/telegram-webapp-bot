@@ -2,6 +2,7 @@
 <html lang="ru">
 <head>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="/static/i18n-manager.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Личные данные — Aaadviser</title>
@@ -36,15 +37,15 @@
     <div class="container">
         <div class="title">Личные данные</div>
         <div id="fields"></div>
-        <button class="back-btn" onclick="goBack()" data-i18n="common.back">Назад</button>
+        <button class="back-btn" onclick="goBack()" data-i18n="common.back" data-i18n="common.back">Назад</button>
     </div>
     <div id="modal-bg" class="modal-bg" style="display:none;">
         <div class="modal">
             <div class="modal-title" id="modal-title"></div>
             <input type="text" id="modal-input" class="modal-input" />
             <div class="modal-btn-row">
-                <button class="modal-btn modal-btn-secondary" onclick="closeModal()" data-i18n="common.cancel">Отмена</button>
-                <button class="modal-btn modal-btn-primary" onclick="saveModal()" data-i18n="common.save">Сохранить</button>
+                <button class="modal-btn modal-btn-secondary" onclick="closeModal()" data-i18n="common.cancel" data-i18n="common.cancel">Отмена</button>
+                <button class="modal-btn modal-btn-primary" onclick="saveModal()" data-i18n="common.save" data-i18n="common.save">Сохранить</button>
             </div>
         </div>
     </div>
@@ -99,7 +100,7 @@
                         <div class='profile-field-label'>${f.label}</div>
                         <div class='profile-field-value${val==='пусто' ? ' profile-field-empty' : ''}'>${val}</div>
                     </div>
-                    <button class='edit-btn' onclick="openModal('${f.key}','${f.label}','${val.replace(/'/g, "&#39;")}')" title="Редактировать">
+                    <button class='edit-btn' onclick="openModal('${f.key}','${f.label}','${val.replace(/'/g, "&#39;")}')" title="Редактировать" data-i18n-title="common.edit">
                         ✏️
                     </button>
                 `;
