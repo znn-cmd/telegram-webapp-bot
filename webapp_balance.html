@@ -4,7 +4,7 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title data-i18n-title="profile.balance">Баланс — Aaadviser</title>
+    <title data-i18n-title="balance.title">Баланс — Aaadviser</title>
     <style>
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f8f9fa; margin: 0; }
         .container { max-width: 400px; margin: 40px auto; background: #fff; border-radius: 16px; box-shadow: 0 2px 12px rgba(102,126,234,0.10); padding: 32px 20px 24px 20px; text-align: center; }
@@ -135,11 +135,11 @@
 </head>
 <body>
     <div class="container">
-        <div class="title">Баланс</div>
+        <div class="title" data-i18n="balance.header">Баланс</div>
         <div id="balance-block" style="margin-bottom:22px;display:none;"></div>
-        <button class="balance-btn" onclick="showDeposit()">Пополнить</button>
-        <button class="balance-btn" onclick="showTariffs()">Тарифы</button>
-        <button class="back-btn" onclick="goBack()">Назад</button>
+        <button class="balance-btn" onclick="showDeposit()" data-i18n="balance.deposit">Пополнить</button>
+        <button class="balance-btn" onclick="showTariffs()" data-i18n="balance.tariffs">Тарифы</button>
+        <button class="back-btn" onclick="goBack()" data-i18n="common.back">Назад</button>
     </div>
     <div id="modal-bg" class="modal-bg" style="display:none;">
         <div class="modal">
@@ -149,10 +149,11 @@
             <div class="modal-title" id="modal-title"></div>
             <div class="modal-content" id="modal-content"></div>
             <div class="modal-btn-row">
-                <button class="modal-btn modal-btn-primary" onclick="closeModal()">OK</button>
+                <button class="modal-btn modal-btn-primary" onclick="closeModal()" data-i18n="common.ok">OK</button>
             </div>
         </div>
     </div>
+    <script src="i18n-manager.js"></script>
     <script>
         function goBack() {
             window.location.href = '/webapp_profile';
@@ -200,7 +201,9 @@
             document.getElementById('modal-bg').style.display = 'none';
         }
         // Баланс пользователя
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', async function() {
+            const i18nManager = new I18nManager();
+            await i18nManager.init();
             let tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
             if (tg) {
                 tg.ready();

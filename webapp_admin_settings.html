@@ -4,7 +4,7 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title data-i18n-title="common.settings">Настройки — Aaadviser Admin</title>
+    <title data-i18n-title="admin.settings.title">Настройки — Aaadviser Admin</title>
     <link rel="stylesheet" href="styles.css">
     <style>
         body { background: #f8f9fa; margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
@@ -29,19 +29,20 @@
 </head>
 <body>
     <div class="container">
-        <div class="admin-title">Настройки API-ключей</div>
+        <div class="admin-title" data-i18n="admin.settings.header">Настройки API-ключей</div>
         <form class="settings-form" onsubmit="addApiKey(event)">
-            <input class="settings-input" id="keyName" placeholder="Имя ключа (key_name)" required />
-            <input class="settings-input" id="keyValue" placeholder="Значение ключа (key_value)" required />
-            <button class="settings-btn" type="submit">Добавить ключ</button>
+            <input class="settings-input" id="keyName" data-i18n-placeholder="admin.settings.key_name_placeholder" placeholder="Имя ключа (key_name)" required />
+            <input class="settings-input" id="keyValue" data-i18n-placeholder="admin.settings.key_value_placeholder" placeholder="Значение ключа (key_value)" required />
+            <button class="settings-btn" type="submit" data-i18n="admin.settings.add_key">Добавить ключ</button>
         </form>
-        <div class="settings-list" id="keysList">Загрузка...</div>
+        <div class="settings-list" id="keysList" data-i18n="admin.settings.loading">Загрузка...</div>
         <div class="nav-btn-row">
-            <button class="nav-btn" onclick="goBack()">Назад</button>
-            <button class="nav-btn nav-btn-main" onclick="goToMainMenu()">В главное меню</button>
+            <button class="nav-btn" onclick="goBack()" data-i18n="common.back">Назад</button>
+            <button class="nav-btn nav-btn-main" onclick="goToMainMenu()" data-i18n="common.main_menu">В главное меню</button>
         </div>
     </div>
     <div id="toastContainer" class="toast-container"></div>
+    <script src="i18n-manager.js"></script>
     <script>
         function goBack() { window.history.back(); }
         function goToMainMenu() { window.location.href = '/webapp'; }
@@ -95,7 +96,11 @@
                 })
                 .catch(() => { document.getElementById('keysList').innerHTML = 'Ошибка сети.'; showToast('Ошибка сети', 'error'); });
         }
-        document.addEventListener('DOMContentLoaded', loadKeys);
+        document.addEventListener('DOMContentLoaded', async function() {
+            const i18nManager = new I18nManager();
+            await i18nManager.init();
+            loadKeys();
+        });
     </script>
 </body>
 </html> 

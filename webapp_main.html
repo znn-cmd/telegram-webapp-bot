@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aaadviser - Главное меню</title>
+    <title data-i18n-title="main.title">Aaadviser - Главное меню</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="i18n-manager.js"></script>
     <style>
         * {
             margin: 0;
@@ -423,7 +424,7 @@
         <!-- Логотип -->
         <div style="display:flex;flex-direction:column;align-items:center;margin-top:18px;margin-bottom:10px;">
             <img src="logo-sqv.png" alt="Aaadviser Logo" style="width:110px;height:auto;display:block;margin-bottom:8px;cursor:pointer;" onclick="goToMainMenu()" />
-            <div style="font-size:15px;color:#888;font-style:italic;" id="slogan">Инсайты рынка недвижимости</div>
+            <div style="font-size:15px;color:#888;font-style:italic;" id="slogan" data-i18n="main.slogan">Инсайты рынка недвижимости</div>
         </div>
 
         <!-- Skeleton loading for user info -->
@@ -432,7 +433,7 @@
         <div class="user-info hidden" id="userInfo">
             <div class="user-name" id="userName" data-i18n="common.loading">Загрузка...</div>
             <div class="user-balance" style="margin-top: 10px;">
-                <span>Баланс:</span>
+                <span data-i18n="main.balance">Баланс:</span>
                 <span class="balance-amount" id="userBalance">$0</span>
             </div>
         </div>
@@ -460,7 +461,7 @@
 
         <!-- Главное меню -->
         <div class="menu-section hidden" id="menuSection">
-            <div class="menu-title" id="menuTitle" data-i18n="main.title">Главное меню</div>
+            <div class="menu-title" id="menuTitle" data-i18n="main.menu_title">Главное меню</div>
             
             <!-- Новые кнопки сверху -->
             <button class="menu-btn fade-in" onclick="showRegionAnalytics()">
@@ -884,7 +885,13 @@
         }
 
         // Запускаем инициализацию
-        init();
+        async function initApp() {
+            const i18nManager = new I18nManager();
+            await i18nManager.init();
+            init();
+        }
+        
+        initApp();
     </script>
 </body>
 </html> 

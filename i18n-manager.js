@@ -7,13 +7,35 @@ class I18nManager {
     }
 
     async init() {
-        this.currentLanguage = this.getInitialLanguage();
+        this.currentLanguage = await this.getInitialLanguage();
         await this.loadTranslations();
         this.applyTranslations();
         this.addLanguageSelector();
     }
 
-    getInitialLanguage() {
+    async getInitialLanguage() {
+        // Сначала проверяем, является ли пользователь админом
+        const userData = this.getUserData();
+        if (userData) {
+            try {
+                const response = await fetch('/api/get_user_language', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ telegram_id: userData.id })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.success && data.language && ['ru', 'en', 'de', 'fr', 'tr'].includes(data.language)) {
+                        return data.language;
+                    }
+                }
+            } catch (error) {
+                console.warn('Failed to get user language from server:', error);
+            }
+        }
+
+        // Если не админ или не удалось получить язык из БД, используем логику для обычных пользователей
         // Пытаемся получить язык из Telegram WebApp
         if (window.Telegram && window.Telegram.WebApp) {
             const tg = window.Telegram.WebApp;
@@ -33,8 +55,8 @@ class I18nManager {
             }
         } catch (e) {}
 
-        // По умолчанию русский
-        return 'ru';
+        // По умолчанию английский (как указано в требованиях)
+        return 'en';
     }
 
     async loadTranslations() {
@@ -596,7 +618,7 @@ class I18nManager {
         try {
             const userData = this.getUserData();
             if (userData) {
-                await fetch('/api/set_language', {
+                const response = await fetch('/api/set_language', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -604,6 +626,13 @@ class I18nManager {
                         language: language
                     })
                 });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.success) {
+                        console.log('Language preference saved successfully');
+                    }
+                }
             }
         } catch (error) {
             console.warn('Failed to save language preference:', error);

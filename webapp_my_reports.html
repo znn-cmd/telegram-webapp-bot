@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title data-i18n-title="reports.my_reports">Мои отчеты — Aaadviser</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="i18n-manager.js"></script>
     <style>
         * {
             margin: 0;
@@ -932,7 +933,13 @@
         }
 
         // Запускаем инициализацию
-        init();
+        async function initApp() {
+            const i18nManager = new I18nManager();
+            await i18nManager.init();
+            init();
+        }
+        
+        initApp();
         
         // Добавляем обработчики событий для кнопок
         document.addEventListener('DOMContentLoaded', function() {

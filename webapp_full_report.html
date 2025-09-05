@@ -4,7 +4,7 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title data-i18n-title="reports.full_report">Полный отчет - Aaadviser</title>
+    <title data-i18n-title="full_report.title">Полный отчет - Aaadviser</title>
     <style>
         * {
             margin: 0;
@@ -479,52 +479,52 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>📊 Полный отчет</h1>
-            <p>Детальный анализ объекта недвижимости</p>
+            <h1 data-i18n="full_report.header">📊 Полный отчет</h1>
+            <p data-i18n="full_report.subtitle">Детальный анализ объекта недвижимости</p>
         </div>
 
         <div class="content">
             <div id="loading" class="loading">
-                <h3>🔄 Формируем полный отчет...</h3>
-                <p>Пожалуйста, подождите</p>
+                <h3 data-i18n="full_report.generating">🔄 Формируем полный отчет...</h3>
+                <p data-i18n="full_report.please_wait">Пожалуйста, подождите</p>
             </div>
 
             <div id="error" class="error" style="display: none;">
-                <h3>❌ Ошибка загрузки отчета</h3>
-                <p id="error-message">Произошла ошибка при формировании отчета</p>
+                <h3 data-i18n="full_report.error_loading">❌ Ошибка загрузки отчета</h3>
+                <p id="error-message" data-i18n="full_report.error_message">Произошла ошибка при формировании отчета</p>
             </div>
 
             <div id="report-content" style="display: none;">
                 <!-- Основная информация об объекте -->
                 <div class="section object-info">
-                    <h2>🏠 Информация об объекте</h2>
+                    <h2 data-i18n="full_report.object_info">🏠 Информация об объекте</h2>
                     <div class="info-grid">
                         <div class="info-item">
-                            <div class="info-label">Адрес</div>
+                            <div class="info-label" data-i18n="full_report.address">Адрес</div>
                             <div class="info-value" id="object-address">-</div>
                         </div>
                         <div class="info-item">
-                            <div class="info-label">Спальни</div>
+                            <div class="info-label" data-i18n="full_report.bedrooms">Спальни</div>
                             <div class="info-value" id="object-bedrooms">-</div>
                         </div>
                         <div class="info-item">
-                            <div class="info-label" data-i18n="reports.property_price">Цена</div>
+                            <div class="info-label" data-i18n="full_report.price">Цена</div>
                             <div class="info-value" id="object-price">-</div>
                         </div>
                         <div class="info-item">
-                            <div class="info-label">Возраст объекта</div>
+                            <div class="info-label" data-i18n="full_report.age">Возраст объекта</div>
                             <div class="info-value" id="object-age">-</div>
                         </div>
                         <div class="info-item">
-                            <div class="info-label">Этаж</div>
+                            <div class="info-label" data-i18n="full_report.floor">Этаж</div>
                             <div class="info-value" id="object-floor">-</div>
                         </div>
                         <div class="info-item">
-                            <div class="info-label">Отопление</div>
+                            <div class="info-label" data-i18n="full_report.heating">Отопление</div>
                             <div class="info-value" id="object-heating">-</div>
                         </div>
                         <div class="info-item">
-                            <div class="info-label">Площадь объекта</div>
+                            <div class="info-label" data-i18n="full_report.area">Площадь объекта</div>
                             <div class="info-value" id="object-area">-</div>
                         </div>
                     </div>
@@ -532,7 +532,7 @@
 
                 <!-- Рыночный анализ -->
                 <div class="section">
-                    <h2>📊 Рыночный анализ</h2>
+                    <h2 data-i18n="full_report.market_analysis">📊 Рыночный анализ</h2>
                     
                     <!-- Сравнение цен по критериям -->
                     <div class="price-comparison-section">
@@ -580,7 +580,7 @@
 
                 <!-- Анализ динамики цен -->
                 <div class="section">
-                    <h2>📊 Анализ динамики цен</h2>
+                    <h2 data-i18n="full_report.price_dynamics">📊 Анализ динамики цен</h2>
                     <div class="info-grid">
                         <div class="info-item">
                             <div class="info-label">Тренд цен</div>
@@ -619,7 +619,7 @@
 
                 <!-- Анализ аренды -->
                 <div class="section">
-                    <h2>🏠 Анализ аренды</h2>
+                    <h2 data-i18n="full_report.rental_analysis">🏠 Анализ аренды</h2>
                     <div class="info-grid">
                         <div class="info-item">
                             <div class="info-label">Максимальная ставка аренды</div>
@@ -737,13 +737,13 @@
 
                 <!-- Кнопки действий -->
                 <div class="buttons">
-                    <button class="btn btn-primary" onclick="downloadPDF()">
+                    <button class="btn btn-primary" onclick="downloadPDF()" data-i18n="full_report.download_pdf">
                         📥 Скачать PDF
                     </button>
-                    <button class="btn btn-secondary" onclick="saveReport()">
+                    <button class="btn btn-secondary" onclick="saveReport()" data-i18n="full_report.save_report">
                         💾 Сохранить отчет
                     </button>
-                    <button class="btn btn-secondary" onclick="goBack()">
+                    <button class="btn btn-secondary" onclick="goBack()" data-i18n="common.back">
                         ← Назад
                     </button>
                 </div>
@@ -1562,10 +1562,13 @@
         }
 
         // Загружаем отчет при загрузке страницы
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', async () => {
+            const i18nManager = new I18nManager();
+            await i18nManager.init();
             console.log('🚀 DOM загружен, вызываем loadFullReport');
             loadFullReport();
         });
     </script>
+    <script src="i18n-manager.js"></script>
 </body>
 </html>
