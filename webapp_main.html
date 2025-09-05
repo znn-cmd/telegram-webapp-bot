@@ -404,6 +404,19 @@
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
+
+        /* Стили для кнопки админ-панели */
+        .admin-panel-btn {
+            background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%) !important;
+            color: #222 !important;
+            border: 2px solid #e0a800;
+        }
+
+        .admin-panel-btn:hover {
+            background: linear-gradient(135deg, #ffb300 0%, #f57c00 100%) !important;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 193, 7, 0.3);
+        }
     </style>
 </head>
 <body>
@@ -483,7 +496,7 @@
             </button>
 
             <!-- Кнопка Админ-панель -->
-            <button class="menu-btn fade-in" onclick="showAdminPanel()">
+            <button class="menu-btn fade-in admin-panel-btn" onclick="showAdminPanel()">
                 <span class="menu-btn-icon">🛠️</span>
                 <span class="menu-btn-text">Админ-панель</span>
                 <span class="menu-btn-description">Управление и статистика</span>
