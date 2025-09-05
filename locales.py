@@ -202,6 +202,7 @@ locales = {
         },
         'main': {
             'title': 'Главное меню', 'welcome': 'Добро пожаловать',
+            'welcome_back': 'С возвращением',
             'quick_actions': 'Быстрые действия', 'recent_reports': 'Последние отчеты',
             'popular_services': 'Популярные услуги', 'news': 'Новости',
             'notifications': 'Уведомления', 'menu': 'Меню', 'home': 'Главная',
@@ -464,6 +465,7 @@ locales = {
         },
         'main': {
             'title': 'Main Menu', 'welcome': 'Welcome',
+            'welcome_back': 'Welcome back',
             'quick_actions': 'Quick Actions', 'recent_reports': 'Recent Reports',
             'popular_services': 'Popular Services', 'news': 'News',
             'notifications': 'Notifications', 'menu': 'Menu', 'home': 'Home',
@@ -727,6 +729,7 @@ locales = {
         },
         'main': {
             'title': 'Hauptmenü', 'welcome': 'Willkommen',
+            'welcome_back': 'Willkommen zurück',
             'quick_actions': 'Schnellaktionen', 'recent_reports': 'Letzte Berichte',
             'popular_services': 'Beliebte Dienste', 'news': 'Nachrichten',
             'notifications': 'Benachrichtigungen', 'menu': 'Menü', 'home': 'Startseite',
@@ -990,6 +993,7 @@ locales = {
         },
         'main': {
             'title': 'Menu principal', 'welcome': 'Bienvenue',
+            'welcome_back': 'Bon retour',
             'quick_actions': 'Actions rapides', 'recent_reports': 'Rapports récents',
             'popular_services': 'Services populaires', 'news': 'Actualités',
             'notifications': 'Notifications', 'menu': 'Menu', 'home': 'Accueil',
@@ -1247,6 +1251,7 @@ locales = {
         },
         'main': {
             'title': 'Ana Menü', 'welcome': 'Hoş Geldiniz',
+            'welcome_back': 'Tekrar hoş geldiniz',
             'quick_actions': 'Hızlı İşlemler', 'recent_reports': 'Son Raporlar',
             'popular_services': 'Popüler Hizmetler', 'news': 'Haberler',
             'notifications': 'Bildirimler', 'menu': 'Menü', 'home': 'Ana Sayfa',
