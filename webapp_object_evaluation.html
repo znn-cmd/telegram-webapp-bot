@@ -3848,8 +3848,8 @@
         tg.ready();
         tg.expand();
 
-        // Current language
-        let currentLanguage = 'ru';
+        // Current language - удаляем дублирование
+        // let currentLanguage = 'ru';
 
         // Selected location data
         let selectedLocation = {
@@ -3878,7 +3878,8 @@
             currency: 'EUR'  // По умолчанию EUR
         };
 
-        // Localization data
+        // Localization data - удаляем дублирование
+        /*
         const locales = {
             'ru': {
                 'slogan': 'Инсайты рынка недвижимости',
@@ -8292,8 +8293,9 @@
             }
         }
 
-        // Start initialization when page loads
-        document.addEventListener('DOMContentLoaded', init);
+        // Start initialization when page loads - удаляем старый вызов
+        // document.addEventListener('DOMContentLoaded', init);
+        */
 
         // Generate consolidated assessment block with market analysis (только для админов)
         async function generateConsolidatedAssessment(data) {
@@ -10039,8 +10041,10 @@
                 'noDistrictOption': 'Tercih yok'
             }
         };
+        */
 
-        // Функция для получения локализованного текста
+        // Функция для получения локализованного текста - удаляем дублирование
+        /*
         function getText(key) {
             const locale = locales[currentLanguage] || locales['ru'];
             return locale[key] || key;
@@ -10080,6 +10084,8 @@
             const userData = getUserData();
             if (!userData) {
                 updatePageText();
+                loadCountries();
+                initializeInputs();
                 return;
             }
 
@@ -10116,6 +10122,41 @@
             }
             
             updatePageText();
+            loadCountries();
+            initializeInputs();
+        }
+
+        // Инициализация полей ввода
+        function initializeInputs() {
+            // Initialize price input
+            const priceInput = document.getElementById('priceObjectInput');
+            if (priceInput) {
+                priceInput.addEventListener('input', function() {
+                    selectedListingTypes.price = this.value ? parseFloat(this.value) : null;
+                    updateConfirmButton();
+                    
+                    // Recalculate object summary if data is already loaded
+                    if (window.currentSummaryData) {
+                        console.log('🔄 Price changed, recalculating object summary...');
+                        recalculateObjectSummary();
+                    }
+                });
+            }
+            
+            // Initialize area input
+            const areaInput = document.getElementById('areaObjectInput');
+            if (areaInput) {
+                areaInput.addEventListener('input', function() {
+                    selectedListingTypes.area = this.value ? parseFloat(this.value) : null;
+                    updateConfirmButton();
+                    
+                    // Recalculate object summary if data is already loaded
+                    if (window.currentSummaryData) {
+                        console.log('🔄 Area changed, recalculating object summary...');
+                        recalculateObjectSummary();
+                    }
+                });
+            }
         }
 
         // Запускаем локализацию при загрузке страницы
