@@ -83,7 +83,7 @@ SUPABASE_URL=https://dzllnnohurlzjyabgsft.supabase.co
 SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR6bGxubm9odXJsemp5YWJnc2Z0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA5NDgwMjcsImV4cCI6MjA2NjUyNDAyN30.sJCIeeIm0Ye1JbAdw5HzfAMe8QLgQomArK8yoppuevQ
 
 # WebApp URL (замените после деплоя)
-WEBAPP_URL=aaadviser.pro
+WEBAPP_URL=aaadvisor-zaicevn.amvera.io
 ```
 
 ## Результаты тестирования
@@ -99,7 +99,7 @@ WEBAPP_URL=aaadviser.pro
 1. **Убедитесь, что все файлы загружены на Amvera**
 2. **Проверьте, что переменные окружения установлены корректно**
 3. **Мониторьте логи развертывания на предмет ошибок**
-4. **Проверьте доступность приложения по адресу: https://aaadviser.pro**
+4. **Проверьте доступность приложения по адресу: https://aaadvisor-zaicevn.amvera.io**
 
 ## Статус
 
