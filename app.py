@@ -206,6 +206,13 @@ def safe_db_operation(operation, max_retries=3, retry_delay=2):
     return None
 
 # Flask маршруты для WebApp
+# Маршрут для корневого пути - перенаправление на webapp
+@app.route('/')
+def index():
+    """Корневой маршрут - перенаправление на главную страницу webapp"""
+    from flask import redirect, url_for
+    return redirect('/webapp')
+
 @app.route('/webapp')
 def webapp():
     """Главное меню WebApp"""
@@ -260,6 +267,11 @@ def webapp_my_reports():
 def health():
     """Эндпоинт для проверки здоровья приложения"""
     return jsonify({"status": "ok", "message": "Telegram WebApp Bot is running"})
+
+@app.route('/favicon.ico')
+def favicon():
+    """Обработка favicon.ico"""
+    return send_from_directory('.', 'logo-flt.png', mimetype='image/png')
 
 @app.route('/logo-sqv.png')
 def serve_logo():
