@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Aaadviser - Главное меню</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="/i18n-manager.js"></script>
     <style>
         * {
             margin: 0;
@@ -432,7 +433,7 @@
         <div class="user-info hidden" id="userInfo">
             <div class="user-name" id="userName" data-i18n="common.loading">Загрузка...</div>
             <div class="user-balance" style="margin-top: 10px;">
-                <span id="balanceLabel">Баланс:</span>
+                <span>Баланс:</span>
                 <span class="balance-amount" id="userBalance">$0</span>
             </div>
         </div>
@@ -490,15 +491,15 @@
             <!-- Кнопка Помощь -->
             <button class="menu-btn fade-in" onclick="showHelp()">
                 <span class="menu-btn-icon">❓</span>
-                <span class="menu-btn-text" id="helpBtn" data-i18n="common.help">Помощь</span>
-                <span class="menu-btn-description" id="helpDesc">Ответы на вопросы и поддержка</span>
+                <span class="menu-btn-text" data-i18n="common.help">Помощь</span>
+                <span class="menu-btn-description">Ответы на вопросы и поддержка</span>
             </button>
 
             <!-- Кнопка Админ-панель -->
             <button class="menu-btn fade-in admin-panel-btn" onclick="showAdminPanel()">
                 <span class="menu-btn-icon">🛠️</span>
-                <span class="menu-btn-text" id="adminPanelBtn">Админ-панель</span>
-                <span class="menu-btn-description" id="adminPanelDesc">Управление и статистика</span>
+                <span class="menu-btn-text">Админ-панель</span>
+                <span class="menu-btn-description">Управление и статистика</span>
             </button>
         </div>
 
@@ -581,10 +582,6 @@
                 'menuTitle': 'Главное меню',
                 'profileBtn': 'Личный кабинет',
                 'profileDesc': 'Настройки и баланс',
-                'helpBtn': 'Помощь',
-                'helpDesc': 'Ответы на вопросы и поддержка',
-                'adminPanelBtn': 'Админ-панель',
-                'adminPanelDesc': 'Управление и статистика',
                 'welcome_new': 'Добро пожаловать в Aaadvisor',
                 'welcome_back': 'С возвращением!',
                 'regionAnalyticsBtn': 'Аналитика региона',
@@ -596,11 +593,7 @@
                 'error_loading': 'Ошибка загрузки данных',
                 'error_network': 'Ошибка сети. Проверьте соединение.',
                 'success_language': 'Язык успешно изменен',
-                'success_welcome': 'Добро пожаловать!',
-                'guest': 'Гость',
-                'user_not_defined': 'Пользователь не определён. Откройте WebApp из Telegram.',
-                'user': 'Пользователь',
-                'confirm': 'Подтвердить'
+                'success_welcome': 'Добро пожаловать!'
             },
             'en': {
                 'slogan': 'Real Estate Market Insights',
@@ -610,10 +603,6 @@
                 'menuTitle': 'Main menu',
                 'profileBtn': 'Profile',
                 'profileDesc': 'Settings and balance',
-                'helpBtn': 'Help',
-                'helpDesc': 'Answers to questions and support',
-                'adminPanelBtn': 'Admin Panel',
-                'adminPanelDesc': 'Management and statistics',
                 'welcome_new': 'Welcome to Aaadvisor',
                 'welcome_back': 'Welcome back!',
                 'regionAnalyticsBtn': 'Region Analytics',
@@ -625,11 +614,7 @@
                 'error_loading': 'Error loading data',
                 'error_network': 'Network error. Check your connection.',
                 'success_language': 'Language changed successfully',
-                'success_welcome': 'Welcome!',
-                'guest': 'Guest',
-                'user_not_defined': 'User not defined. Open WebApp from Telegram.',
-                'user': 'User',
-                'confirm': 'Confirm'
+                'success_welcome': 'Welcome!'
             },
             'de': {
                 'slogan': 'Immobilienmarkt-Einblicke',
@@ -639,10 +624,6 @@
                 'menuTitle': 'Hauptmenü',
                 'profileBtn': 'Profil',
                 'profileDesc': 'Einstellungen und Kontostand',
-                'helpBtn': 'Hilfe',
-                'helpDesc': 'Antworten auf Fragen und Unterstützung',
-                'adminPanelBtn': 'Admin-Panel',
-                'adminPanelDesc': 'Verwaltung und Statistiken',
                 'welcome_new': 'Willkommen bei Aaadvisor',
                 'welcome_back': 'Willkommen zurück!',
                 'regionAnalyticsBtn': 'Regionsanalyse',
@@ -654,11 +635,7 @@
                 'error_loading': 'Fehler beim Laden der Daten',
                 'error_network': 'Netzwerkfehler. Überprüfen Sie Ihre Verbindung.',
                 'success_language': 'Sprache erfolgreich geändert',
-                'success_welcome': 'Willkommen!',
-                'guest': 'Gast',
-                'user_not_defined': 'Benutzer nicht definiert. Öffnen Sie WebApp aus Telegram.',
-                'user': 'Benutzer',
-                'confirm': 'Bestätigen'
+                'success_welcome': 'Willkommen!'
             },
             'fr': {
                 'slogan': 'Aperçus du marché immobilier',
@@ -668,10 +645,6 @@
                 'menuTitle': 'Menu principal',
                 'profileBtn': 'Profil',
                 'profileDesc': 'Paramètres et solde',
-                'helpBtn': 'Aide',
-                'helpDesc': 'Réponses aux questions et support',
-                'adminPanelBtn': 'Panneau admin',
-                'adminPanelDesc': 'Gestion et statistiques',
                 'welcome_new': 'Bienvenue sur Aaadvisor',
                 'welcome_back': 'Bon retour!',
                 'regionAnalyticsBtn': 'Analyse de région',
@@ -683,11 +656,7 @@
                 'error_loading': 'Erreur de chargement des données',
                 'error_network': 'Erreur réseau. Vérifiez votre connexion.',
                 'success_language': 'Langue changée avec succès',
-                'success_welcome': 'Bienvenue!',
-                'guest': 'Invité',
-                'user_not_defined': 'Utilisateur non défini. Ouvrez WebApp depuis Telegram.',
-                'user': 'Utilisateur',
-                'confirm': 'Confirmer'
+                'success_welcome': 'Bienvenue!'
             },
             'tr': {
                 'slogan': 'Gayrimenkul Piyasası İçgörüleri',
@@ -697,10 +666,6 @@
                 'menuTitle': 'Ana menü',
                 'profileBtn': 'Profil',
                 'profileDesc': 'Ayarlar ve bakiye',
-                'helpBtn': 'Yardım',
-                'helpDesc': 'Sorulara cevaplar ve destek',
-                'adminPanelBtn': 'Admin paneli',
-                'adminPanelDesc': 'Yönetim ve istatistikler',
                 'welcome_new': 'Aaadvisor\'a hoş geldiniz',
                 'welcome_back': 'Tekrar hoş geldiniz!',
                 'regionAnalyticsBtn': 'Bölge Analizi',
@@ -712,11 +677,7 @@
                 'error_loading': 'Veri yükleme hatası',
                 'error_network': 'Ağ hatası. Bağlantınızı kontrol edin.',
                 'success_language': 'Dil başarıyla değiştirildi',
-                'success_welcome': 'Hoş geldiniz!',
-                'guest': 'Misafir',
-                'user_not_defined': 'Kullanıcı tanımlanmadı. WebApp\'i Telegram\'dan açın.',
-                'user': 'Kullanıcı',
-                'confirm': 'Onayla'
+                'success_welcome': 'Hoş geldiniz!'
             }
         };
 
@@ -739,16 +700,7 @@
             document.getElementById('objectEvaluationDesc').textContent = getText('objectEvaluationDesc');
             document.getElementById('myReportsBtn').textContent = getText('myReportsBtn');
             document.getElementById('myReportsDesc').textContent = getText('myReportsDesc');
-            document.getElementById('helpBtn').textContent = getText('helpBtn');
-            document.getElementById('helpDesc').textContent = getText('helpDesc');
-            document.getElementById('adminPanelBtn').textContent = getText('adminPanelBtn');
-            document.getElementById('adminPanelDesc').textContent = getText('adminPanelDesc');
             document.getElementById('loadingText').textContent = getText('loading');
-            document.getElementById('balanceLabel').textContent = getText('balance');
-            
-            // Обновляем кнопку подтверждения языка
-            const confirmBtn = document.getElementById('confirmLangBtn');
-            if (confirmBtn) confirmBtn.textContent = getText('confirm');
         }
 
         // Установка языка
@@ -796,10 +748,10 @@
             document.getElementById('userInfo').classList.add('hidden');
 
             if (!userData) {
-                document.getElementById('userName').textContent = getText('guest');
+                document.getElementById('userName').textContent = 'Гость';
                 document.getElementById('userSkeleton').classList.add('hidden');
                 document.getElementById('userInfo').classList.remove('hidden');
-                showToast(getText('user_not_defined'), 'error', 6000);
+                showToast('Пользователь не определён. Откройте WebApp из Telegram.', 'error', 6000);
                 return;
             }
 
@@ -819,20 +771,6 @@
                 if (response.ok) {
                     const userInfo = await response.json();
 
-                    // Устанавливаем язык в зависимости от статуса пользователя
-                    if (userInfo.user_status === 'admin' && userInfo.language) {
-                        // Для админов используем язык из базы данных
-                        currentLanguage = userInfo.language;
-                        selectedLanguage = currentLanguage;
-                    } else if (userData.language_code) {
-                        // Для обычных пользователей используем язык из Telegram
-                        currentLanguage = userData.language_code;
-                        selectedLanguage = currentLanguage;
-                    }
-                    
-                    // Обновляем текст на странице с новым языком
-                    updatePageText();
-
                     // Скрыть выбор языка, если уже выбран
                     if (userInfo.language) {
                         document.getElementById('languageSelector').classList.add('hidden');
@@ -841,7 +779,7 @@
                     }
 
                     // Приветствие
-                    const welcomeMessage = userInfo.welcome || userInfo.tg_name || getText('user');
+                    const welcomeMessage = userInfo.welcome || userInfo.tg_name || 'Пользователь';
                     document.getElementById('userName').textContent = welcomeMessage;
 
                     // Баланс с цветовой индикацией
@@ -862,7 +800,7 @@
                     throw new Error(err.error || 'Failed to load user data');
                 }
             } catch (error) {
-                document.getElementById('userName').textContent = userData.tg_name || getText('user');
+                document.getElementById('userName').textContent = userData.tg_name || 'Пользователь';
                 showToast(getText('error_loading') + ': ' + (error.message || ''), 'error', 6000);
             } finally {
                 document.getElementById('userSkeleton').classList.add('hidden');
@@ -949,6 +887,5 @@
         // Запускаем инициализацию
         init();
     </script>
-    <script src="/i18n-manager.js"></script>
 </body>
 </html> 

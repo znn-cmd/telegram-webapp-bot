@@ -2,9 +2,10 @@
 <html lang="ru">
 <head>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="/i18n-manager.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title id="pageTitleTag">Дополнительные данные объекта - Aaadviser</title>
+    <title>Дополнительные данные объекта - Aaadviser</title>
     <style>
         * {
             margin: 0;
@@ -225,24 +226,24 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1 id="pageTitle">📋 Дополнительные данные</h1>
-            <p id="pageDescription">Укажите характеристики объекта для детального анализа</p>
+            <h1>📋 Дополнительные данные</h1>
+            <p>Укажите характеристики объекта для детального анализа</p>
         </div>
 
         <div class="content">
             <!-- Информация об объекте -->
             <div class="info-box">
-                <h3 id="objectInfoTitle">🏠 Информация об объекте</h3>
+                <h3>🏠 Информация об объекте</h3>
                 <div class="info-item">
-                    <span class="info-label" id="addressLabel">Адрес:</span>
+                    <span class="info-label">Адрес:</span>
                     <span class="info-value" id="object-address" data-i18n="common.loading">Загрузка...</span>
                 </div>
                 <div class="info-item">
-                    <span class="info-label" id="bedroomsLabel">Спальни:</span>
+                    <span class="info-label">Спальни:</span>
                     <span class="info-value" id="object-bedrooms" data-i18n="common.loading">Загрузка...</span>
                 </div>
                 <div class="info-item">
-                    <span class="info-label" id="priceLabel">Цена:</span>
+                    <span class="info-label">Цена:</span>
                     <span class="info-value" id="object-price" data-i18n="common.loading">Загрузка...</span>
                 </div>
             </div>
@@ -250,47 +251,47 @@
             <!-- Форма дополнительных данных -->
             <form id="additional-data-form">
                 <div class="form-group">
-                    <label for="age-select" id="ageLabel">🏗️ Возраст объекта:</label>
+                    <label for="age-select">🏗️ Возраст объекта:</label>
                     <select id="age-select" name="age" required>
-                        <option value="" id="agePlaceholder">Выберите возраст объекта...</option>
+                        <option value="">Выберите возраст объекта...</option>
                     </select>
                 </div>
 
                 <div class="form-group">
-                    <label for="floor-select" id="floorLabel">🏢 Этаж объекта:</label>
+                    <label for="floor-select">🏢 Этаж объекта:</label>
                     <select id="floor-select" name="floor" required>
-                        <option value="" id="floorPlaceholder">Выберите этаж...</option>
+                        <option value="">Выберите этаж...</option>
                     </select>
                 </div>
 
                 <div class="form-group">
-                    <label for="heating-select" id="heatingLabel">🔥 Тип отопления:</label>
+                    <label for="heating-select">🔥 Тип отопления:</label>
                     <select id="heating-select" name="heating" required>
-                        <option value="" id="heatingPlaceholder">Выберите тип отопления...</option>
+                        <option value="">Выберите тип отопления...</option>
                     </select>
                 </div>
 
                 <div class="form-group">
-                    <label for="area-input" id="areaLabel">📐 Площадь объекта, м²:</label>
+                    <label for="area-input">📐 Площадь объекта, м²:</label>
                     <input type="number" id="area-input" name="area" min="20" max="1000" step="1" placeholder="Введите площадь объекта" required>
                 </div>
 
                 <div class="buttons">
-                    <button type="submit" class="btn btn-primary" id="continueBtn">
+                    <button type="submit" class="btn btn-primary">
                         ✅ Продолжить
                     </button>
-                    <button type="button" class="btn btn-secondary" onclick="skipAdditionalData()" id="skipBtn">
+                    <button type="button" class="btn btn-secondary" onclick="skipAdditionalData()">
                         ⏭️ Пропустить
                     </button>
                 </div>
             </form>
 
             <div id="loading" class="loading" style="display: none;">
-                <p id="loadingText">🔄 Загружаем опции...</p>
+                <p>🔄 Загружаем опции...</p>
             </div>
 
             <div id="error" class="error" style="display: none;">
-                <p id="errorText">❌ Произошла ошибка при загрузке данных</p>
+                <p>❌ Произошла ошибка при загрузке данных</p>
             </div>
         </div>
     </div>
@@ -299,9 +300,9 @@
         // Получаем данные из URL параметров
         const urlParams = new URLSearchParams(window.location.search);
         const objectData = {
-            address: urlParams.get('address') || getText('notSpecified'),
-            bedrooms: urlParams.get('bedrooms') || getText('notSpecified'),
-            price: urlParams.get('price') || getText('notSpecified'),
+            address: urlParams.get('address') || 'Не указано',
+            bedrooms: urlParams.get('bedrooms') || 'Не указано',
+            price: urlParams.get('price') || 'Не указано',
             telegram_id: urlParams.get('telegram_id') || null,
             location_codes: JSON.parse(urlParams.get('location_codes') || '{}')
         };
@@ -360,13 +361,13 @@
 
                     document.getElementById('loading').style.display = 'none';
                 } else {
-                    throw new Error(data.error || getText('unknownError'));
+                    throw new Error(data.error || 'Неизвестная ошибка');
                 }
             } catch (error) {
                 console.error('Ошибка загрузки опций:', error);
                 document.getElementById('loading').style.display = 'none';
                 document.getElementById('error').style.display = 'block';
-                document.getElementById('error').innerHTML = `<p>${getText('optionsError')} ${error.message}</p>`;
+                document.getElementById('error').innerHTML = `<p>❌ Ошибка загрузки опций: ${error.message}</p>`;
             }
         }
 
@@ -384,7 +385,7 @@
 
             // Проверяем, что выбраны все поля
             if (!additionalData.age || !additionalData.floor || !additionalData.heating || !additionalData.area) {
-                alert(getText('fillAllFields'));
+                alert('Пожалуйста, заполните все поля или выберите "Не известно"');
                 return;
             }
 
@@ -408,7 +409,7 @@
             try {
                 // Показываем загрузку
                 document.getElementById('loading').style.display = 'block';
-                document.getElementById('loading').innerHTML = `<p>${getText('generatingReport')}</p>`;
+                document.getElementById('loading').innerHTML = '<p>🔄 Формируем полный отчет...</p>';
 
                 // Формируем данные для отчета
                 const reportData = {
@@ -437,267 +438,12 @@
                 console.error('Ошибка генерации отчета:', error);
                 document.getElementById('loading').style.display = 'none';
                 document.getElementById('error').style.display = 'block';
-                document.getElementById('error').innerHTML = `<p>${getText('reportError')} ${error.message}</p>`;
+                document.getElementById('error').innerHTML = `<p>❌ Ошибка генерации отчета: ${error.message}</p>`;
             }
         }
 
         // Загружаем опции при загрузке страницы
         document.addEventListener('DOMContentLoaded', loadAdditionalDataOptions);
     </script>
-
-    <!-- Локализация -->
-    <script>
-        let currentLanguage = 'ru';
-        
-        // Получаем данные пользователя из Telegram
-        async function getUserData() {
-            try {
-                const userData = window.Telegram.WebApp.initDataUnsafe.user;
-                if (!userData) {
-                    console.warn('Данные пользователя Telegram недоступны');
-                    return null;
-                }
-                return userData;
-            } catch (error) {
-                console.error('Ошибка получения данных пользователя:', error);
-                return null;
-            }
-        }
-        
-        // Словари локализации
-        const locales = {
-            ru: {
-                pageTitleTag: 'Дополнительные данные объекта - Aaadviser',
-                pageTitle: '📋 Дополнительные данные',
-                pageDescription: 'Укажите характеристики объекта для детального анализа',
-                objectInfoTitle: '🏠 Информация об объекте',
-                addressLabel: 'Адрес:',
-                bedroomsLabel: 'Спальни:',
-                priceLabel: 'Цена:',
-                ageLabel: '🏗️ Возраст объекта:',
-                agePlaceholder: 'Выберите возраст объекта...',
-                floorLabel: '🏢 Этаж объекта:',
-                floorPlaceholder: 'Выберите этаж...',
-                heatingLabel: '🔥 Тип отопления:',
-                heatingPlaceholder: 'Выберите тип отопления...',
-                areaLabel: '📐 Площадь объекта, м²:',
-                areaPlaceholder: 'Введите площадь объекта',
-                continueBtn: '✅ Продолжить',
-                skipBtn: '⏭️ Пропустить',
-                loadingText: '🔄 Загружаем опции...',
-                errorText: '❌ Произошла ошибка при загрузке данных',
-                notSpecified: 'Не указано',
-                fillAllFields: 'Пожалуйста, заполните все поля или выберите "Не известно"',
-                generatingReport: '🔄 Формируем полный отчет...',
-                reportError: '❌ Ошибка генерации отчета:',
-                optionsError: '❌ Ошибка загрузки опций:',
-                unknownError: 'Неизвестная ошибка'
-            },
-            en: {
-                pageTitleTag: 'Additional Property Data - Aaadviser',
-                pageTitle: '📋 Additional Data',
-                pageDescription: 'Specify property characteristics for detailed analysis',
-                objectInfoTitle: '🏠 Property Information',
-                addressLabel: 'Address:',
-                bedroomsLabel: 'Bedrooms:',
-                priceLabel: 'Price:',
-                ageLabel: '🏗️ Property Age:',
-                agePlaceholder: 'Select property age...',
-                floorLabel: '🏢 Floor:',
-                floorPlaceholder: 'Select floor...',
-                heatingLabel: '🔥 Heating Type:',
-                heatingPlaceholder: 'Select heating type...',
-                areaLabel: '📐 Property Area, m²:',
-                areaPlaceholder: 'Enter property area',
-                continueBtn: '✅ Continue',
-                skipBtn: '⏭️ Skip',
-                loadingText: '🔄 Loading options...',
-                errorText: '❌ An error occurred while loading data',
-                notSpecified: 'Not specified',
-                fillAllFields: 'Please fill in all fields or select "Not known"',
-                generatingReport: '🔄 Generating full report...',
-                reportError: '❌ Report generation error:',
-                optionsError: '❌ Options loading error:',
-                unknownError: 'Unknown error'
-            },
-            de: {
-                pageTitleTag: 'Zusätzliche Objektdaten - Aaadviser',
-                pageTitle: '📋 Zusätzliche Daten',
-                pageDescription: 'Geben Sie Objekteigenschaften für detaillierte Analyse an',
-                objectInfoTitle: '🏠 Objektinformationen',
-                addressLabel: 'Adresse:',
-                bedroomsLabel: 'Schlafzimmer:',
-                priceLabel: 'Preis:',
-                ageLabel: '🏗️ Objektalter:',
-                agePlaceholder: 'Objektalter auswählen...',
-                floorLabel: '🏢 Etage:',
-                floorPlaceholder: 'Etage auswählen...',
-                heatingLabel: '🔥 Heizungstyp:',
-                heatingPlaceholder: 'Heizungstyp auswählen...',
-                areaLabel: '📐 Objektfläche, m²:',
-                areaPlaceholder: 'Objektfläche eingeben',
-                continueBtn: '✅ Fortfahren',
-                skipBtn: '⏭️ Überspringen',
-                loadingText: '🔄 Optionen werden geladen...',
-                errorText: '❌ Fehler beim Laden der Daten',
-                notSpecified: 'Nicht angegeben',
-                fillAllFields: 'Bitte füllen Sie alle Felder aus oder wählen Sie "Nicht bekannt"',
-                generatingReport: '🔄 Vollständigen Bericht erstellen...',
-                reportError: '❌ Berichterstellungsfehler:',
-                optionsError: '❌ Optionen-Ladefehler:',
-                unknownError: 'Unbekannter Fehler'
-            },
-            fr: {
-                pageTitleTag: 'Données supplémentaires du bien - Aaadviser',
-                pageTitle: '📋 Données supplémentaires',
-                pageDescription: 'Spécifiez les caractéristiques du bien pour une analyse détaillée',
-                objectInfoTitle: '🏠 Informations sur le bien',
-                addressLabel: 'Adresse:',
-                bedroomsLabel: 'Chambres:',
-                priceLabel: 'Prix:',
-                ageLabel: '🏗️ Âge du bien:',
-                agePlaceholder: 'Sélectionnez l\'âge du bien...',
-                floorLabel: '🏢 Étage:',
-                floorPlaceholder: 'Sélectionnez l\'étage...',
-                heatingLabel: '🔥 Type de chauffage:',
-                heatingPlaceholder: 'Sélectionnez le type de chauffage...',
-                areaLabel: '📐 Surface du bien, m²:',
-                areaPlaceholder: 'Entrez la surface du bien',
-                continueBtn: '✅ Continuer',
-                skipBtn: '⏭️ Passer',
-                loadingText: '🔄 Chargement des options...',
-                errorText: '❌ Une erreur s\'est produite lors du chargement des données',
-                notSpecified: 'Non spécifié',
-                fillAllFields: 'Veuillez remplir tous les champs ou sélectionner "Non connu"',
-                generatingReport: '🔄 Génération du rapport complet...',
-                reportError: '❌ Erreur de génération du rapport:',
-                optionsError: '❌ Erreur de chargement des options:',
-                unknownError: 'Erreur inconnue'
-            },
-            tr: {
-                pageTitleTag: 'Ek Mülk Verileri - Aaadviser',
-                pageTitle: '📋 Ek Veriler',
-                pageDescription: 'Detaylı analiz için mülk özelliklerini belirtin',
-                objectInfoTitle: '🏠 Mülk Bilgileri',
-                addressLabel: 'Adres:',
-                bedroomsLabel: 'Yatak odası:',
-                priceLabel: 'Fiyat:',
-                ageLabel: '🏗️ Mülk yaşı:',
-                agePlaceholder: 'Mülk yaşını seçin...',
-                floorLabel: '🏢 Kat:',
-                floorPlaceholder: 'Katı seçin...',
-                heatingLabel: '🔥 Isıtma tipi:',
-                heatingPlaceholder: 'Isıtma tipini seçin...',
-                areaLabel: '📐 Mülk alanı, m²:',
-                areaPlaceholder: 'Mülk alanını girin',
-                continueBtn: '✅ Devam et',
-                skipBtn: '⏭️ Atla',
-                loadingText: '🔄 Seçenekler yükleniyor...',
-                errorText: '❌ Veri yüklenirken hata oluştu',
-                notSpecified: 'Belirtilmemiş',
-                fillAllFields: 'Lütfen tüm alanları doldurun veya "Bilinmiyor" seçin',
-                generatingReport: '🔄 Tam rapor oluşturuluyor...',
-                reportError: '❌ Rapor oluşturma hatası:',
-                optionsError: '❌ Seçenek yükleme hatası:',
-                unknownError: 'Bilinmeyen hata'
-            }
-        };
-        
-        // Функция получения текста по ключу
-        function getText(key) {
-            return locales[currentLanguage][key] || key;
-        }
-        
-        // Функция обновления текста на странице
-        function updatePageText() {
-            // Обновляем title
-            document.getElementById('pageTitleTag').textContent = getText('pageTitleTag');
-            
-            // Обновляем основные элементы
-            const elements = [
-                'pageTitle', 'pageDescription', 'objectInfoTitle', 'addressLabel', 'bedroomsLabel', 'priceLabel',
-                'ageLabel', 'floorLabel', 'heatingLabel', 'areaLabel', 'continueBtn', 'skipBtn', 'loadingText', 'errorText'
-            ];
-            
-            elements.forEach(id => {
-                const element = document.getElementById(id);
-                if (element) {
-                    element.textContent = getText(id);
-                }
-            });
-            
-            // Обновляем placeholder для input
-            const areaInput = document.getElementById('area-input');
-            if (areaInput) {
-                areaInput.placeholder = getText('areaPlaceholder');
-            }
-            
-            // Обновляем placeholder для select элементов
-            const agePlaceholder = document.getElementById('agePlaceholder');
-            if (agePlaceholder) {
-                agePlaceholder.textContent = getText('agePlaceholder');
-            }
-            
-            const floorPlaceholder = document.getElementById('floorPlaceholder');
-            if (floorPlaceholder) {
-                floorPlaceholder.textContent = getText('floorPlaceholder');
-            }
-            
-            const heatingPlaceholder = document.getElementById('heatingPlaceholder');
-            if (heatingPlaceholder) {
-                heatingPlaceholder.textContent = getText('heatingPlaceholder');
-            }
-        }
-        
-        // Функция инициализации локализации
-        async function initLocalization() {
-            try {
-                const userData = await getUserData();
-                if (userData && userData.language_code) {
-                    // Проверяем, является ли пользователь админом
-                    const response = await fetch('/api/user', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            telegram_id: userData.id,
-                            username: userData.username,
-                            tg_name: userData.first_name,
-                            last_name: userData.last_name,
-                            language_code: userData.language_code
-                        })
-                    });
-                    
-                    if (response.ok) {
-                        const userInfo = await response.json();
-                        
-                        // Устанавливаем язык в зависимости от статуса пользователя
-                        if (userInfo.user_status === 'admin' && userInfo.language) {
-                            // Для админов используем язык из базы данных
-                            currentLanguage = userInfo.language;
-                        } else if (userData.language_code) {
-                            // Для обычных пользователей используем язык из Telegram
-                            currentLanguage = userData.language_code;
-                        }
-                        
-                        // Обновляем текст на странице с новым языком
-                        updatePageText();
-                    }
-                }
-            } catch (error) {
-                console.error('Ошибка инициализации локализации:', error);
-                // Используем русский язык по умолчанию
-                currentLanguage = 'ru';
-                updatePageText();
-            }
-        }
-        
-        // Инициализируем локализацию при загрузке страницы
-        document.addEventListener('DOMContentLoaded', () => {
-            initLocalization();
-        });
-    </script>
-    <script src="/i18n-manager.js"></script>
 </body>
 </html>
