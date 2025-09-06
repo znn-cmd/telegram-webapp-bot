@@ -1133,7 +1133,7 @@
         tg.expand();
 
         // Current language
-        let currentLanguage = 'ru';
+        let currentLanguage = 'en';
 
         // Selected location data
         let selectedLocation = {
@@ -3459,14 +3459,12 @@
         }
 
         // Initialize the page
-        function init() {
-            // Set language based on Telegram WebApp
-            if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
-                const userLang = tg.initDataUnsafe.user.language_code;
-                if (userLang && locales[userLang]) {
-                    currentLanguage = userLang;
-                }
-            }
+        async function init() {
+            // Получаем язык пользователя через API с учетом новой логики
+            userLanguage = await getUserLanguage();
+            currentLanguage = userLanguage;
+            
+            console.log(`🌐 Инициализация страницы с языком: ${currentLanguage}`);
             
             // Update page text
             updatePageText();

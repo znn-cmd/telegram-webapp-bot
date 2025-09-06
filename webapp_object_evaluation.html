@@ -8232,7 +8232,13 @@
         }
 
         // Initialize page
-        function init() {
+        async function init() {
+            // Получаем язык пользователя через API с учетом новой логики
+            await getUserLanguage();
+            currentLanguage = userLanguage;
+            
+            console.log(`🌐 Инициализация страницы с языком: ${currentLanguage}`);
+            
             updatePageText();
             loadCountries();
             
