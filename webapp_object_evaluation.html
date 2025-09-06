@@ -3893,6 +3893,7 @@
                 'cityPlaceholder': 'Сначала выберите страну',
                 'countyPlaceholder': 'Сначала выберите город',
                 'districtPlaceholder': 'Сначала выберите область',
+                'noDistrictOption': 'Не имеет значения',
                 'confirmButtonText': 'Подтвердить выбор',
                 'backButton': '← Вернуться в главное меню',
                 'selectedLocationTitle': 'Выбранная локация:',
@@ -4040,6 +4041,7 @@
                 'cityPlaceholder': 'First select country',
                 'countyPlaceholder': 'First select city',
                 'districtPlaceholder': 'First select region',
+                'noDistrictOption': 'Not applicable',
                 'confirmButtonText': 'Confirm selection',
                 'backButton': '← Back to main menu',
                 'selectedLocationTitle': 'Selected location:',
@@ -4192,6 +4194,7 @@
                 'cityPlaceholder': 'Zuerst Land auswählen',
                 'countyPlaceholder': 'Zuerst Stadt auswählen',
                 'districtPlaceholder': 'Zuerst Region auswählen',
+                'noDistrictOption': 'Nicht relevant',
                 'confirmButtonText': 'Auswahl bestätigen',
                 'backButton': '← Zurück zum Hauptmenü',
                 'selectedLocationTitle': 'Ausgewählte Lage:',
@@ -4275,6 +4278,7 @@
                 'cityPlaceholder': 'D\'abord sélectionner un pays',
                 'countyPlaceholder': 'D\'abord sélectionner une ville',
                 'districtPlaceholder': 'D\'abord sélectionner une région',
+                'noDistrictOption': 'Non applicable',
                 'confirmButtonText': 'Confirmer la sélection',
                 'backButton': '← Retour au menu principal',
                 'selectedLocationTitle': 'Emplacement sélectionné :',
@@ -4334,6 +4338,7 @@
                 'cityPlaceholder': 'Önce ülke seçin',
                 'countyPlaceholder': 'Önce şehir seçin',
                 'districtPlaceholder': 'Önce bölge seçin',
+                'noDistrictOption': 'Geçerli değil',
                 'confirmButtonText': 'Seçimi onayla',
                 'backButton': '← Ana menüye dön',
                 'selectedLocationTitle': 'Seçilen konum:',
@@ -4421,6 +4426,7 @@
                 'cityPlaceholder': 'D\'abord sélectionner un pays',
                 'countyPlaceholder': 'D\'abord sélectionner une ville',
                 'districtPlaceholder': 'D\'abord sélectionner une région',
+                'noDistrictOption': 'Non applicable',
                 'confirmButtonText': 'Confirmer la sélection',
                 'backButton': '← Retour au menu principal',
                 'selectedLocationTitle': 'Emplacement sélectionné :',
@@ -4480,6 +4486,7 @@
                 'cityPlaceholder': 'Önce ülke seçin',
                 'countyPlaceholder': 'Önce şehir seçin',
                 'districtPlaceholder': 'Önce bölge seçin',
+                'noDistrictOption': 'Geçerli değil',
                 'confirmButtonText': 'Seçimi onayla',
                 'backButton': '← Ana menüye dön',
                 'selectedLocationTitle': 'Seçilen konum:',
@@ -5117,7 +5124,7 @@
                     // Add "не имеет значения" option
                     const noDistrictOption = document.createElement('option');
                     noDistrictOption.value = 'none';
-                    noDistrictOption.textContent = 'Не имеет значения';
+                    noDistrictOption.textContent = getText('noDistrictOption');
                     districtSelect.appendChild(noDistrictOption);
                     
                     console.log('📍 Adding districts:', data.districts);
@@ -6070,14 +6077,10 @@
             html += '<div class="market-analysis-text-content">';
             
             // Sale analysis in unified style (like "Вывод прогноза")
-            html += `<p><strong>Продажа:</strong> при площади ${avgSaleArea} м² (среднее значение по проданным объектам) `;
-            html += `и минимальной цене ${formatValue(saleMinPrice, 'price')}/м² срок продажи составляет ~${saleMinPeriod} дней; `;
-            html += `при максимальной цене ${formatValue(saleMaxPrice, 'price')}/м² - срок продажи до ${saleMaxPeriod} дней.</p>`;
+            html += `<p><strong>${getText('saleAnalysisText').replace('{area}', avgSaleArea).replace('{minPrice}', formatValue(saleMinPrice, 'price')).replace('{minDays}', saleMinPeriod).replace('{maxPrice}', formatValue(saleMaxPrice, 'price')).replace('{maxDays}', saleMaxPeriod)}</p>`;
             
             // Rent analysis in unified style (like "Вывод прогноза")  
-            html += `<p><strong>Аренда:</strong> при площади ${avgRentArea} м² (среднее значение по сданным в аренду объектам) `;
-            html += `минимальная цена ${formatValue(rentMinPrice, 'price')}/м² срок сдачи ~${rentMinPeriod} дней; `;
-            html += `при максимальной цене ${formatValue(rentMaxPrice, 'price')}/м² срок до ${rentMaxPeriod} дней.</p>`;
+            html += `<p><strong>${getText('rentAnalysisText').replace('{area}', avgRentArea).replace('{minPrice}', formatValue(rentMinPrice, 'price')).replace('{minDays}', rentMinPeriod).replace('{maxPrice}', formatValue(rentMaxPrice, 'price')).replace('{maxDays}', rentMaxPeriod)}</p>`;
             
             html += '</div></div>';
             
