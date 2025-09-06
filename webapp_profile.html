@@ -338,7 +338,107 @@
         tg.ready();
 
         let userData = null;
+        let currentLanguage = 'en';
         let selectedLanguage = 'ru';
+
+        // Localization data
+        const locales = {
+            'ru': {
+                'profile.title': 'Личный кабинет',
+                'profile.balance': 'Баланс',
+                'profile.balance_amount': 'Баланс: $',
+                'profile.referral_program': 'Реферальная программа',
+                'profile.edit_profile': 'Редактировать профиль',
+                'common.settings': 'Настройки',
+                'profile.transaction_history': 'История транзакций',
+                'common.back': 'Вернуться в главное меню'
+            },
+            'en': {
+                'profile.title': 'Personal Account',
+                'profile.balance': 'Balance',
+                'profile.balance_amount': 'Balance: $',
+                'profile.referral_program': 'Referral Program',
+                'profile.edit_profile': 'Edit Profile',
+                'common.settings': 'Settings',
+                'profile.transaction_history': 'Transaction History',
+                'common.back': 'Back to main menu'
+            },
+            'de': {
+                'profile.title': 'Persönlicher Bereich',
+                'profile.balance': 'Guthaben',
+                'profile.balance_amount': 'Guthaben: $',
+                'profile.referral_program': 'Empfehlungsprogramm',
+                'profile.edit_profile': 'Profil bearbeiten',
+                'common.settings': 'Einstellungen',
+                'profile.transaction_history': 'Transaktionsverlauf',
+                'common.back': 'Zurück zum Hauptmenü'
+            },
+            'fr': {
+                'profile.title': 'Compte Personnel',
+                'profile.balance': 'Solde',
+                'profile.balance_amount': 'Solde: $',
+                'profile.referral_program': 'Programme de Parrainage',
+                'profile.edit_profile': 'Modifier le Profil',
+                'common.settings': 'Paramètres',
+                'profile.transaction_history': 'Historique des Transactions',
+                'common.back': 'Retour au menu principal'
+            },
+            'tr': {
+                'profile.title': 'Kişisel Hesap',
+                'profile.balance': 'Bakiye',
+                'profile.balance_amount': 'Bakiye: $',
+                'profile.referral_program': 'Referans Programı',
+                'profile.edit_profile': 'Profili Düzenle',
+                'common.settings': 'Ayarlar',
+                'profile.transaction_history': 'İşlem Geçmişi',
+                'common.back': 'Ana menüye dön'
+            }
+        };
+
+        // Функция для получения локализованного текста
+        function getText(key) {
+            const locale = locales[currentLanguage] || locales['en'];
+            return locale[key] || key;
+        }
+
+        // Функция для получения языка пользователя
+        async function getUserLanguage() {
+            if (window.Telegram && window.Telegram.WebApp) {
+                const tg = window.Telegram.WebApp;
+                if (tg.initDataUnsafe && tg.initDataUnsafe.user && tg.initDataUnsafe.user.id) {
+                    try {
+                        const response = await fetch('/api/user/language', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                telegram_id: tg.initDataUnsafe.user.id,
+                                language_code: tg.initDataUnsafe.user.language_code
+                            })
+                        });
+                        if (response.ok) {
+                            const data = await response.json();
+                            if (data.success) {
+                                console.log(`🌐 Язык определен: ${data.language} (статус: ${data.user_status})`);
+                                return data.language;
+                            }
+                        }
+                    } catch (error) {
+                        console.warn('Ошибка при получении языка пользователя:', error);
+                    }
+                }
+            }
+            return 'en'; // Default to English
+        }
+
+        // Функция для обновления текста на странице
+        function updatePageText() {
+            document.querySelectorAll('[data-i18n]').forEach(element => {
+                const key = element.getAttribute('data-i18n');
+                if (key) {
+                    element.textContent = getText(key);
+                }
+            });
+        }
 
         // Получаем данные пользователя
         function getUserData() {
@@ -360,6 +460,11 @@
                 showMessage('Пользователь не определен. Откройте WebApp из Telegram.', 'error');
                 return;
             }
+
+            // Получаем язык пользователя
+            currentLanguage = await getUserLanguage();
+            console.log(`🌐 Инициализация страницы с языком: ${currentLanguage}`);
+            updatePageText();
 
             try {
                 const response = await fetch('/api/user', {

@@ -27,36 +27,192 @@
 <body>
     <div class="container">
         <img src="logo-flt.png" alt="Aaadviser" class="logo" onclick="goToMainMenu()">
-        <div class="title">О приложении</div>
+        <div class="title" data-i18n="about.title">О приложении</div>
         
         <div class="content">
-            <h3>Что такое Aaadviser?</h3>
-            <p>Aaadviser — это интеллектуальная платформа для анализа рынка недвижимости, которая помогает инвесторам и покупателям принимать обоснованные решения.</p>
+            <h3 data-i18n="about.what_is">Что такое Aaadviser?</h3>
+            <p data-i18n="about.description">Aaadviser — это интеллектуальная платформа для анализа рынка недвижимости, которая помогает инвесторам и покупателям принимать обоснованные решения.</p>
             
-            <h3>Наши возможности:</h3>
+            <h3 data-i18n="about.features">Наши возможности:</h3>
             <ul>
-                <li>📊 Детальный анализ цен в районе</li>
-                <li>📈 Статистика рынка недвижимости</li>
-                <li>🏠 Сравнение с похожими объектами</li>
-                <li>🔮 Прогноз изменения цен</li>
-                <li>💡 Рекомендации по инвестициям</li>
-                <li>📋 Сохранение отчетов</li>
-                <li>📱 Удобный мобильный интерфейс</li>
+                <li data-i18n="about.feature1">📊 Детальный анализ цен в районе</li>
+                <li data-i18n="about.feature2">📈 Статистика рынка недвижимости</li>
+                <li data-i18n="about.feature3">🏠 Сравнение с похожими объектами</li>
+                <li data-i18n="about.feature4">🔮 Прогноз изменения цен</li>
+                <li data-i18n="about.feature5">💡 Рекомендации по инвестициям</li>
+                <li data-i18n="about.feature6">📋 Сохранение отчетов</li>
+                <li data-i18n="about.feature7">📱 Удобный мобильный интерфейс</li>
             </ul>
             
-            <h3>Как это работает?</h3>
-            <p>Просто введите адрес недвижимости, укажите количество спален и примерную цену. Наша система проанализирует рынок и предоставит подробный отчет с рекомендациями.</p>
+            <h3 data-i18n="about.how_works">Как это работает?</h3>
+            <p data-i18n="about.how_works_desc">Просто введите адрес недвижимости, укажите количество спален и примерную цену. Наша система проанализирует рынок и предоставит подробный отчет с рекомендациями.</p>
             
-            <h3>Почему Aaadviser?</h3>
-            <p>Мы используем передовые технологии машинного обучения и большие данные для анализа рынка недвижимости, что позволяет получать точные и актуальные данные для принятия инвестиционных решений.</p>
+            <h3 data-i18n="about.why_us">Почему Aaadviser?</h3>
+            <p data-i18n="about.why_us_desc">Мы используем передовые технологии машинного обучения и большие данные для анализа рынка недвижимости, что позволяет получать точные и актуальные данные для принятия инвестиционных решений.</p>
         </div>
         
         <div class="nav-buttons">
-            <button class="nav-btn back-btn" onclick="goBack()">← Назад</button>
-            <button class="nav-btn" onclick="goToMainMenu()">В главное меню</button>
+            <button class="nav-btn back-btn" onclick="goBack()" data-i18n="common.back">← Назад</button>
+            <button class="nav-btn" onclick="goToMainMenu()" data-i18n="common.main_menu">В главное меню</button>
         </div>
     </div>
     <script>
+        let currentLanguage = 'en';
+
+        // Localization data
+        const locales = {
+            'ru': {
+                'about.title': 'О приложении',
+                'about.what_is': 'Что такое Aaadviser?',
+                'about.description': 'Aaadviser — это интеллектуальная платформа для анализа рынка недвижимости, которая помогает инвесторам и покупателям принимать обоснованные решения.',
+                'about.features': 'Наши возможности:',
+                'about.feature1': '📊 Детальный анализ цен в районе',
+                'about.feature2': '📈 Статистика рынка недвижимости',
+                'about.feature3': '🏠 Сравнение с похожими объектами',
+                'about.feature4': '🔮 Прогноз изменения цен',
+                'about.feature5': '💡 Рекомендации по инвестициям',
+                'about.feature6': '📋 Сохранение отчетов',
+                'about.feature7': '📱 Удобный мобильный интерфейс',
+                'about.how_works': 'Как это работает?',
+                'about.how_works_desc': 'Просто введите адрес недвижимости, укажите количество спален и примерную цену. Наша система проанализирует рынок и предоставит подробный отчет с рекомендациями.',
+                'about.why_us': 'Почему Aaadviser?',
+                'about.why_us_desc': 'Мы используем передовые технологии машинного обучения и большие данные для анализа рынка недвижимости, что позволяет получать точные и актуальные данные для принятия инвестиционных решений.',
+                'common.back': '← Назад',
+                'common.main_menu': 'В главное меню'
+            },
+            'en': {
+                'about.title': 'About the app',
+                'about.what_is': 'What is Aaadviser?',
+                'about.description': 'Aaadviser is an intelligent real estate market analysis platform that helps investors and buyers make informed decisions.',
+                'about.features': 'Our features:',
+                'about.feature1': '📊 Detailed price analysis in the area',
+                'about.feature2': '📈 Real estate market statistics',
+                'about.feature3': '🏠 Comparison with similar properties',
+                'about.feature4': '🔮 Price change forecasts',
+                'about.feature5': '💡 Investment recommendations',
+                'about.feature6': '📋 Report saving',
+                'about.feature7': '📱 Convenient mobile interface',
+                'about.how_works': 'How does it work?',
+                'about.how_works_desc': 'Simply enter the property address, specify the number of bedrooms and approximate price. Our system will analyze the market and provide a detailed report with recommendations.',
+                'about.why_us': 'Why Aaadviser?',
+                'about.why_us_desc': 'We use advanced machine learning technologies and big data for real estate market analysis, which allows us to get accurate and up-to-date data for making investment decisions.',
+                'common.back': '← Back',
+                'common.main_menu': 'To main menu'
+            },
+            'de': {
+                'about.title': 'Über die App',
+                'about.what_is': 'Was ist Aaadviser?',
+                'about.description': 'Aaadviser ist eine intelligente Plattform zur Immobilienmarktanalyse, die Investoren und Käufern hilft, fundierte Entscheidungen zu treffen.',
+                'about.features': 'Unsere Funktionen:',
+                'about.feature1': '📊 Detaillierte Preisanalyse in der Region',
+                'about.feature2': '📈 Immobilienmarktstatistiken',
+                'about.feature3': '🏠 Vergleich mit ähnlichen Objekten',
+                'about.feature4': '🔮 Preisänderungsprognosen',
+                'about.feature5': '💡 Investitionsempfehlungen',
+                'about.feature6': '📋 Berichtsspeicherung',
+                'about.feature7': '📱 Benutzerfreundliche mobile Oberfläche',
+                'about.how_works': 'Wie funktioniert es?',
+                'about.how_works_desc': 'Geben Sie einfach die Immobilienadresse ein, geben Sie die Anzahl der Schlafzimmer und den ungefähren Preis an. Unser System analysiert den Markt und liefert einen detaillierten Bericht mit Empfehlungen.',
+                'about.why_us': 'Warum Aaadviser?',
+                'about.why_us_desc': 'Wir verwenden fortschrittliche Machine-Learning-Technologien und Big Data für die Immobilienmarktanalyse, was es uns ermöglicht, genaue und aktuelle Daten für Investitionsentscheidungen zu erhalten.',
+                'common.back': '← Zurück',
+                'common.main_menu': 'Zum Hauptmenü'
+            },
+            'fr': {
+                'about.title': 'À propos de l\'app',
+                'about.what_is': 'Qu\'est-ce qu\'Aaadviser?',
+                'about.description': 'Aaadviser est une plateforme intelligente d\'analyse du marché immobilier qui aide les investisseurs et les acheteurs à prendre des décisions éclairées.',
+                'about.features': 'Nos fonctionnalités:',
+                'about.feature1': '📊 Analyse détaillée des prix dans la région',
+                'about.feature2': '📈 Statistiques du marché immobilier',
+                'about.feature3': '🏠 Comparaison avec des propriétés similaires',
+                'about.feature4': '🔮 Prévisions de changement de prix',
+                'about.feature5': '💡 Recommandations d\'investissement',
+                'about.feature6': '📋 Sauvegarde de rapports',
+                'about.feature7': '📱 Interface mobile pratique',
+                'about.how_works': 'Comment ça marche?',
+                'about.how_works_desc': 'Entrez simplement l\'adresse de la propriété, spécifiez le nombre de chambres et le prix approximatif. Notre système analysera le marché et fournira un rapport détaillé avec des recommandations.',
+                'about.why_us': 'Pourquoi Aaadviser?',
+                'about.why_us_desc': 'Nous utilisons des technologies avancées d\'apprentissage automatique et de big data pour l\'analyse du marché immobilier, ce qui nous permet d\'obtenir des données précises et à jour pour prendre des décisions d\'investissement.',
+                'common.back': '← Retour',
+                'common.main_menu': 'Au menu principal'
+            },
+            'tr': {
+                'about.title': 'Uygulama hakkında',
+                'about.what_is': 'Aaadviser nedir?',
+                'about.description': 'Aaadviser, yatırımcıların ve alıcıların bilinçli kararlar almasına yardımcı olan akıllı bir gayrimenkul pazar analizi platformudur.',
+                'about.features': 'Özelliklerimiz:',
+                'about.feature1': '📊 Bölgede detaylı fiyat analizi',
+                'about.feature2': '📈 Gayrimenkul pazar istatistikleri',
+                'about.feature3': '🏠 Benzer mülklerle karşılaştırma',
+                'about.feature4': '🔮 Fiyat değişim tahminleri',
+                'about.feature5': '💡 Yatırım önerileri',
+                'about.feature6': '📋 Rapor kaydetme',
+                'about.feature7': '📱 Kullanışlı mobil arayüz',
+                'about.how_works': 'Nasıl çalışır?',
+                'about.how_works_desc': 'Sadece mülk adresini girin, yatak odası sayısını ve yaklaşık fiyatı belirtin. Sistemimiz pazarı analiz edecek ve önerilerle birlikte detaylı bir rapor sağlayacaktır.',
+                'about.why_us': 'Neden Aaadviser?',
+                'about.why_us_desc': 'Gayrimenkul pazar analizi için gelişmiş makine öğrenmesi teknolojileri ve büyük veri kullanıyoruz, bu da yatırım kararları için doğru ve güncel veriler elde etmemizi sağlıyor.',
+                'common.back': '← Geri',
+                'common.main_menu': 'Ana menüye'
+            }
+        };
+
+        // Функция для получения локализованного текста
+        function getText(key) {
+            const locale = locales[currentLanguage] || locales['en'];
+            return locale[key] || key;
+        }
+
+        // Функция для получения языка пользователя
+        async function getUserLanguage() {
+            if (window.Telegram && window.Telegram.WebApp) {
+                const tg = window.Telegram.WebApp;
+                if (tg.initDataUnsafe && tg.initDataUnsafe.user && tg.initDataUnsafe.user.id) {
+                    try {
+                        const response = await fetch('/api/user/language', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                telegram_id: tg.initDataUnsafe.user.id,
+                                language_code: tg.initDataUnsafe.user.language_code
+                            })
+                        });
+                        if (response.ok) {
+                            const data = await response.json();
+                            if (data.success) {
+                                console.log(`🌐 Язык определен: ${data.language} (статус: ${data.user_status})`);
+                                return data.language;
+                            }
+                        }
+                    } catch (error) {
+                        console.warn('Ошибка при получении языка пользователя:', error);
+                    }
+                }
+            }
+            return 'en'; // Default to English
+        }
+
+        // Функция для обновления текста на странице
+        function updatePageText() {
+            document.querySelectorAll('[data-i18n]').forEach(element => {
+                const key = element.getAttribute('data-i18n');
+                if (key) {
+                    element.textContent = getText(key);
+                }
+            });
+        }
+
+        // Инициализация
+        async function init() {
+            currentLanguage = await getUserLanguage();
+            console.log(`🌐 Инициализация страницы с языком: ${currentLanguage}`);
+            updatePageText();
+        }
+
+        // Запускаем инициализацию при загрузке страницы
+        document.addEventListener('DOMContentLoaded', init);
+
         function goToMainMenu() {
             window.location.href = '/webapp';
         }

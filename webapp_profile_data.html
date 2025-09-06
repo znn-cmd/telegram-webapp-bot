@@ -34,7 +34,7 @@
 </head>
 <body>
     <div class="container">
-        <div class="title">Личные данные</div>
+        <div class="title" data-i18n="profile_data.title">Личные данные</div>
         <div id="fields"></div>
         <button class="back-btn" onclick="goBack()" data-i18n="common.back">Назад</button>
     </div>
@@ -50,14 +50,170 @@
     </div>
     <div id="toast" class="toast"></div>
     <script>
+        let currentLanguage = 'en';
+
+        // Localization data
+        const locales = {
+            'ru': {
+                'profile_data.title': 'Личные данные',
+                'profile_data.first_name': 'Имя',
+                'profile_data.last_name': 'Фамилия',
+                'profile_data.phone': 'Телефон',
+                'profile_data.email': 'Email',
+                'profile_data.website': 'Website',
+                'profile_data.company': 'Компания',
+                'profile_data.about_me': 'О себе',
+                'profile_data.empty': 'пусто',
+                'profile_data.edit': 'Редактировать',
+                'profile_data.edit_title': 'Редактировать:',
+                'profile_data.saved': 'Сохранено!',
+                'profile_data.save_error': 'Ошибка сохранения:',
+                'profile_data.connection_error': 'Ошибка соединения',
+                'profile_data.load_error': 'Ошибка загрузки данных',
+                'profile_data.user_not_found': 'Пользователь не определён',
+                'common.back': 'Назад',
+                'common.cancel': 'Отмена',
+                'common.save': 'Сохранить'
+            },
+            'en': {
+                'profile_data.title': 'Personal Data',
+                'profile_data.first_name': 'First Name',
+                'profile_data.last_name': 'Last Name',
+                'profile_data.phone': 'Phone',
+                'profile_data.email': 'Email',
+                'profile_data.website': 'Website',
+                'profile_data.company': 'Company',
+                'profile_data.about_me': 'About Me',
+                'profile_data.empty': 'empty',
+                'profile_data.edit': 'Edit',
+                'profile_data.edit_title': 'Edit:',
+                'profile_data.saved': 'Saved!',
+                'profile_data.save_error': 'Save error:',
+                'profile_data.connection_error': 'Connection error',
+                'profile_data.load_error': 'Data loading error',
+                'profile_data.user_not_found': 'User not found',
+                'common.back': 'Back',
+                'common.cancel': 'Cancel',
+                'common.save': 'Save'
+            },
+            'de': {
+                'profile_data.title': 'Persönliche Daten',
+                'profile_data.first_name': 'Vorname',
+                'profile_data.last_name': 'Nachname',
+                'profile_data.phone': 'Telefon',
+                'profile_data.email': 'E-Mail',
+                'profile_data.website': 'Website',
+                'profile_data.company': 'Unternehmen',
+                'profile_data.about_me': 'Über mich',
+                'profile_data.empty': 'leer',
+                'profile_data.edit': 'Bearbeiten',
+                'profile_data.edit_title': 'Bearbeiten:',
+                'profile_data.saved': 'Gespeichert!',
+                'profile_data.save_error': 'Speicherfehler:',
+                'profile_data.connection_error': 'Verbindungsfehler',
+                'profile_data.load_error': 'Datenladefehler',
+                'profile_data.user_not_found': 'Benutzer nicht gefunden',
+                'common.back': 'Zurück',
+                'common.cancel': 'Abbrechen',
+                'common.save': 'Speichern'
+            },
+            'fr': {
+                'profile_data.title': 'Données Personnelles',
+                'profile_data.first_name': 'Prénom',
+                'profile_data.last_name': 'Nom de famille',
+                'profile_data.phone': 'Téléphone',
+                'profile_data.email': 'E-mail',
+                'profile_data.website': 'Site web',
+                'profile_data.company': 'Entreprise',
+                'profile_data.about_me': 'À propos de moi',
+                'profile_data.empty': 'vide',
+                'profile_data.edit': 'Modifier',
+                'profile_data.edit_title': 'Modifier:',
+                'profile_data.saved': 'Enregistré!',
+                'profile_data.save_error': 'Erreur de sauvegarde:',
+                'profile_data.connection_error': 'Erreur de connexion',
+                'profile_data.load_error': 'Erreur de chargement des données',
+                'profile_data.user_not_found': 'Utilisateur non trouvé',
+                'common.back': 'Retour',
+                'common.cancel': 'Annuler',
+                'common.save': 'Enregistrer'
+            },
+            'tr': {
+                'profile_data.title': 'Kişisel Veriler',
+                'profile_data.first_name': 'Ad',
+                'profile_data.last_name': 'Soyad',
+                'profile_data.phone': 'Telefon',
+                'profile_data.email': 'E-posta',
+                'profile_data.website': 'Web sitesi',
+                'profile_data.company': 'Şirket',
+                'profile_data.about_me': 'Hakkımda',
+                'profile_data.empty': 'boş',
+                'profile_data.edit': 'Düzenle',
+                'profile_data.edit_title': 'Düzenle:',
+                'profile_data.saved': 'Kaydedildi!',
+                'profile_data.save_error': 'Kaydetme hatası:',
+                'profile_data.connection_error': 'Bağlantı hatası',
+                'profile_data.load_error': 'Veri yükleme hatası',
+                'profile_data.user_not_found': 'Kullanıcı bulunamadı',
+                'common.back': 'Geri',
+                'common.cancel': 'İptal',
+                'common.save': 'Kaydet'
+            }
+        };
+
+        // Функция для получения локализованного текста
+        function getText(key) {
+            const locale = locales[currentLanguage] || locales['en'];
+            return locale[key] || key;
+        }
+
+        // Функция для получения языка пользователя
+        async function getUserLanguage() {
+            if (window.Telegram && window.Telegram.WebApp) {
+                const tg = window.Telegram.WebApp;
+                if (tg.initDataUnsafe && tg.initDataUnsafe.user && tg.initDataUnsafe.user.id) {
+                    try {
+                        const response = await fetch('/api/user/language', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                telegram_id: tg.initDataUnsafe.user.id,
+                                language_code: tg.initDataUnsafe.user.language_code
+                            })
+                        });
+                        if (response.ok) {
+                            const data = await response.json();
+                            if (data.success) {
+                                console.log(`🌐 Язык определен: ${data.language} (статус: ${data.user_status})`);
+                                return data.language;
+                            }
+                        }
+                    } catch (error) {
+                        console.warn('Ошибка при получении языка пользователя:', error);
+                    }
+                }
+            }
+            return 'en'; // Default to English
+        }
+
+        // Функция для обновления текста на странице
+        function updatePageText() {
+            document.querySelectorAll('[data-i18n]').forEach(element => {
+                const key = element.getAttribute('data-i18n');
+                if (key) {
+                    element.textContent = getText(key);
+                }
+            });
+        }
+
         const FIELD_MAP = [
-            { key: 'first_name', label: 'Имя' },
-            { key: 'last_name', label: 'Фамилия' },
-            { key: 'phone', label: 'Телефон' },
-            { key: 'email', label: 'Email' },
-            { key: 'website', label: 'Website' },
-            { key: 'company', label: 'Компания' },
-            { key: 'about_me', label: 'О себе' }
+            { key: 'first_name', labelKey: 'profile_data.first_name' },
+            { key: 'last_name', labelKey: 'profile_data.last_name' },
+            { key: 'phone', labelKey: 'profile_data.phone' },
+            { key: 'email', labelKey: 'profile_data.email' },
+            { key: 'website', labelKey: 'profile_data.website' },
+            { key: 'company', labelKey: 'profile_data.company' },
+            { key: 'about_me', labelKey: 'profile_data.about_me' }
         ];
         let userData = null;
         let currentEditField = null;
@@ -72,8 +228,8 @@
         }
         function openModal(fieldKey, fieldLabel, currentValue) {
             currentEditField = fieldKey;
-            document.getElementById('modal-title').textContent = 'Редактировать: ' + fieldLabel;
-            document.getElementById('modal-input').value = currentValue === 'пусто' ? '' : currentValue;
+            document.getElementById('modal-title').textContent = getText('profile_data.edit_title') + ' ' + fieldLabel;
+            document.getElementById('modal-input').value = currentValue === getText('profile_data.empty') ? '' : currentValue;
             document.getElementById('modal-bg').style.display = 'flex';
             setTimeout(() => document.getElementById('modal-input').focus(), 100);
         }
@@ -91,15 +247,15 @@
             const fieldsDiv = document.getElementById('fields');
             fieldsDiv.innerHTML = '';
             FIELD_MAP.forEach(f => {
-                const val = data[f.key] && data[f.key].trim() ? data[f.key] : 'пусто';
+                const val = data[f.key] && data[f.key].trim() ? data[f.key] : getText('profile_data.empty');
                 const block = document.createElement('div');
                 block.className = 'profile-field-block';
                 block.innerHTML = `
                     <div class='profile-field-content'>
-                        <div class='profile-field-label'>${f.label}</div>
-                        <div class='profile-field-value${val==='пусто' ? ' profile-field-empty' : ''}'>${val}</div>
+                        <div class='profile-field-label'>${getText(f.labelKey)}</div>
+                        <div class='profile-field-value${val===getText('profile_data.empty') ? ' profile-field-empty' : ''}'>${val}</div>
                     </div>
-                    <button class='edit-btn' onclick="openModal('${f.key}','${f.label}','${val.replace(/'/g, "&#39;")}')" title="Редактировать">
+                    <button class='edit-btn' onclick="openModal('${f.key}','${getText(f.labelKey)}','${val.replace(/'/g, "&#39;")}')" title="${getText('profile_data.edit')}">
                         ✏️
                     </button>
                 `;
@@ -123,18 +279,18 @@
                         userData[field] = value;
                     }
                     renderFields(userData);
-                    showToast('Сохранено!');
+                    showToast(getText('profile_data.saved'));
                 } else {
-                    showToast('Ошибка сохранения: ' + (resp.error || 'Неизвестная ошибка'));
+                    showToast(getText('profile_data.save_error') + ' ' + (resp.error || 'Неизвестная ошибка'));
                 }
             })
             .catch((error) => {
                 console.error('Error updating field:', error);
-                showToast('Ошибка соединения');
+                showToast(getText('profile_data.connection_error'));
             });
         }
         // Получение пользователя (как в других разделах)
-        (function init() {
+        (async function init() {
             let tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
             if (tg) { tg.ready(); tg.expand && tg.expand(); }
             userData = tg && tg.initDataUnsafe && tg.initDataUnsafe.user ? tg.initDataUnsafe.user : null;
@@ -142,9 +298,15 @@
                 try { userData = JSON.parse(localStorage.getItem('aaadviser_user')); } catch (e) { userData = null; }
             }
             if (!userData || !userData.id) {
-                showToast('Пользователь не определён');
+                showToast(getText('profile_data.user_not_found'));
                 return;
             }
+
+            // Получаем язык пользователя
+            currentLanguage = await getUserLanguage();
+            console.log(`🌐 Инициализация страницы с языком: ${currentLanguage}`);
+            updatePageText();
+
             fetch('/api/user_profile', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -156,10 +318,10 @@
                     Object.assign(userData, resp.profile);
                     renderFields(userData);
                 } else {
-                    showToast('Ошибка загрузки данных');
+                    showToast(getText('profile_data.load_error'));
                 }
             })
-            .catch(() => showToast('Ошибка соединения'));
+            .catch(() => showToast(getText('profile_data.connection_error')));
         })();
     </script>
 </body>

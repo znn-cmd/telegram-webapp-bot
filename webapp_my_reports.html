@@ -502,7 +502,10 @@
                 'noAddress': 'Адрес не указан',
                 'noPrice': 'Цена не указана',
                 'noArea': 'Площадь не указана',
-                'noBedrooms': 'Количество комнат не указано'
+                'noBedrooms': 'Количество комнат не указано',
+                'property_evaluation': 'Оценка объекта',
+                'property_analysis': 'Анализ объекта',
+                'market_analysis': 'Анализ рынка'
             },
             'en': {
                 'pageTitle': 'My Reports',
@@ -525,7 +528,10 @@
                 'noAddress': 'Address not specified',
                 'noPrice': 'Price not specified',
                 'noArea': 'Area not specified',
-                'noBedrooms': 'Bedrooms not specified'
+                'noBedrooms': 'Bedrooms not specified',
+                'property_evaluation': 'Property Evaluation',
+                'property_analysis': 'Property Analysis',
+                'market_analysis': 'Market Analysis'
             },
             'de': {
                 'pageTitle': 'Meine Berichte',
@@ -548,7 +554,10 @@
                 'noAddress': 'Adresse nicht angegeben',
                 'noPrice': 'Preis nicht angegeben',
                 'noArea': 'Fläche nicht angegeben',
-                'noBedrooms': 'Schlafzimmer nicht angegeben'
+                'noBedrooms': 'Schlafzimmer nicht angegeben',
+                'property_evaluation': 'Immobilienbewertung',
+                'property_analysis': 'Immobilienanalyse',
+                'market_analysis': 'Marktanalyse'
             },
             'fr': {
                 'pageTitle': 'Mes Rapports',
@@ -571,7 +580,10 @@
                 'noAddress': 'Adresse non spécifiée',
                 'noPrice': 'Prix non spécifié',
                 'noArea': 'Surface non spécifiée',
-                'noBedrooms': 'Chambres non spécifiées'
+                'noBedrooms': 'Chambres non spécifiées',
+                'property_evaluation': 'Évaluation de propriété',
+                'property_analysis': 'Analyse de propriété',
+                'market_analysis': 'Analyse de marché'
             },
             'tr': {
                 'pageTitle': 'Raporlarım',
@@ -594,7 +606,10 @@
                 'noAddress': 'Adres belirtilmemiş',
                 'noPrice': 'Fiyat belirtilmemiş',
                 'noArea': 'Alan belirtilmemiş',
-                'noBedrooms': 'Yatak odası sayısı belirtilmemiş'
+                'noBedrooms': 'Yatak odası sayısı belirtilmemiş',
+                'property_evaluation': 'Gayrimenkul Değerlendirmesi',
+                'property_analysis': 'Gayrimenkul Analizi',
+                'market_analysis': 'Piyasa Analizi'
             }
         };
 
@@ -744,12 +759,7 @@
             const createdAt = new Date(report.created_at).toLocaleDateString();
             
             // Преобразование типа отчета
-            const reportTypeMap = {
-                'property_evaluation': 'Оценка объекта',
-                'property_analysis': 'Анализ объекта',
-                'market_analysis': 'Анализ рынка'
-            };
-            const reportType = reportTypeMap[report.report_type] || report.report_type;
+            const reportType = getText(report.report_type);
 
             reportDiv.innerHTML = `
                 <div class="report-header">

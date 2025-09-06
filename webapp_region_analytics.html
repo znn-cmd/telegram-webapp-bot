@@ -953,7 +953,7 @@
             
             <!-- Currency Switcher -->
             <div class="currency-switcher" id="currencySwitcher" style="display: none;">
-                <div class="currency-switcher-title">Валюта отображения:</div>
+                <div class="currency-switcher-title" id="currencySwitcherTitle">Валюта отображения:</div>
                 <div class="currency-buttons">
                     <button class="currency-btn active" data-currency="TRY" onclick="switchCurrency('TRY')">
                         <span class="currency-icon">₺</span>
@@ -1175,6 +1175,7 @@
                 'heatingDataTitle': 'Данные по типу отопления',
                 'loadingText': 'Загрузка данных...',
                 'errorText': 'Ошибка загрузки данных',
+                'currencyDisplay': 'Валюта отображения:',
                 'totalProperties': 'Всего объектов:',
                 'averagePrice': 'Средняя цена:',
                 'priceRange': 'Диапазон цен:',
@@ -1215,6 +1216,7 @@
                 'heatingDataTitle': 'Heating Type Data',
                 'loadingText': 'Loading data...',
                 'errorText': 'Error loading data',
+                'currencyDisplay': 'Display currency:',
                 'totalProperties': 'Total properties:',
                 'averagePrice': 'Average price:',
                 'priceRange': 'Price range:',
@@ -1255,6 +1257,7 @@
                 'heatingDataTitle': 'Heizungstyp-Daten',
                 'loadingText': 'Daten werden geladen...',
                 'errorText': 'Fehler beim Laden der Daten',
+                'currencyDisplay': 'Anzeigewährung:',
                 'totalProperties': 'Gesamtobjekte:',
                 'averagePrice': 'Durchschnittspreis:',
                 'priceRange': 'Preisbereich:',
@@ -1295,6 +1298,7 @@
                 'heatingDataTitle': 'Données du type de chauffage',
                 'loadingText': 'Chargement des données...',
                 'errorText': 'Erreur de chargement des données',
+                'currencyDisplay': 'Devise d\'affichage:',
                 'totalProperties': 'Total des propriétés :',
                 'averagePrice': 'Prix moyen :',
                 'priceRange': 'Fourchette de prix :',
@@ -1335,6 +1339,7 @@
                 'heatingDataTitle': 'Isıtma Tipi Verileri',
                 'loadingText': 'Veriler yükleniyor...',
                 'errorText': 'Veri yükleme hatası',
+                'currencyDisplay': 'Görüntüleme para birimi:',
                 'totalProperties': 'Toplam mülk:',
                 'averagePrice': 'Ortalama fiyat:',
                 'priceRange': 'Fiyat aralığı:',
@@ -2249,6 +2254,12 @@
             const errorText = document.getElementById('errorText');
             if (errorText) {
                 errorText.textContent = getText('errorText');
+            }
+            
+            // Update currency switcher title
+            const currencySwitcherTitle = document.getElementById('currencySwitcherTitle');
+            if (currencySwitcherTitle) {
+                currencySwitcherTitle.textContent = getText('currencyDisplay');
             }
             
             // Update key metrics labels

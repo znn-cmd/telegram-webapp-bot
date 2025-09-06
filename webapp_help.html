@@ -29,6 +29,128 @@
         <button class="back-btn" onclick="goToMainMenu()" data-i18n="common.back">Вернуться в главное меню</button>
     </div>
     <script>
+        let currentLanguage = 'en';
+
+        // Localization data
+        const locales = {
+            'ru': {
+                'common.help': 'Помощь',
+                'help.about_app': 'О приложении',
+                'help.instruction': 'Инструкция',
+                'help.geography': 'Наша география',
+                'help.support': 'Техническая поддержка',
+                'common.back': 'Вернуться в главное меню'
+            },
+            'en': {
+                'common.help': 'Help',
+                'help.about_app': 'About the app',
+                'help.instruction': 'Instructions',
+                'help.geography': 'Our geography',
+                'help.support': 'Technical support',
+                'common.back': 'Back to main menu'
+            },
+            'de': {
+                'common.help': 'Hilfe',
+                'help.about_app': 'Über die App',
+                'help.instruction': 'Anleitung',
+                'help.geography': 'Unsere Geographie',
+                'help.support': 'Technischer Support',
+                'common.back': 'Zurück zum Hauptmenü'
+            },
+            'fr': {
+                'common.help': 'Aide',
+                'help.about_app': 'À propos de l\'app',
+                'help.instruction': 'Instructions',
+                'help.geography': 'Notre géographie',
+                'help.support': 'Support technique',
+                'common.back': 'Retour au menu principal'
+            },
+            'tr': {
+                'common.help': 'Yardım',
+                'help.about_app': 'Uygulama hakkında',
+                'help.instruction': 'Talimatlar',
+                'help.geography': 'Coğrafyamız',
+                'help.support': 'Teknik destek',
+                'common.back': 'Ana menüye dön'
+            }
+        };
+
+        // Функция для получения локализованного текста
+        function getText(key) {
+            const locale = locales[currentLanguage] || locales['en'];
+            return locale[key] || key;
+        }
+
+        // Функция для получения языка пользователя
+        async function getUserLanguage() {
+            if (window.Telegram && window.Telegram.WebApp) {
+                const tg = window.Telegram.WebApp;
+                if (tg.initDataUnsafe && tg.initDataUnsafe.user && tg.initDataUnsafe.user.id) {
+                    try {
+                        const response = await fetch('/api/user/language', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                telegram_id: tg.initDataUnsafe.user.id,
+                                language_code: tg.initDataUnsafe.user.language_code
+                            })
+                        });
+                        if (response.ok) {
+                            const data = await response.json();
+                            if (data.success) {
+                                console.log(`🌐 Язык определен: ${data.language} (статус: ${data.user_status})`);
+                                return data.language;
+                            }
+                        }
+                    } catch (error) {
+                        console.warn('Ошибка при получении языка пользователя:', error);
+                    }
+                }
+            }
+            return 'en'; // Default to English
+        }
+
+        // Функция для обновления текста на странице
+        function updatePageText() {
+            document.querySelectorAll('[data-i18n]').forEach(element => {
+                const key = element.getAttribute('data-i18n');
+                if (key) {
+                    element.textContent = getText(key);
+                }
+            });
+            
+            // Обновляем кнопки помощи
+            const aboutBtn = document.querySelector('button[onclick="aboutApp()"]');
+            if (aboutBtn) {
+                aboutBtn.innerHTML = `<span class="help-btn-icon">ℹ️</span>${getText('help.about_app')}`;
+            }
+            
+            const instructionBtn = document.querySelector('button[onclick="showInstruction()"]');
+            if (instructionBtn) {
+                instructionBtn.innerHTML = `<span class="help-btn-icon">📖</span>${getText('help.instruction')}`;
+            }
+            
+            const geoBtn = document.querySelector('button[onclick="showGeo()"]');
+            if (geoBtn) {
+                geoBtn.innerHTML = `<span class="help-btn-icon">🌍</span>${getText('help.geography')}`;
+            }
+            
+            const supportBtn = document.querySelector('button[onclick="showSupport()"]');
+            if (supportBtn) {
+                supportBtn.innerHTML = `<span class="help-btn-icon">🛠️</span>${getText('help.support')}`;
+            }
+        }
+
+        // Инициализация
+        async function init() {
+            currentLanguage = await getUserLanguage();
+            console.log(`🌐 Инициализация страницы с языком: ${currentLanguage}`);
+            updatePageText();
+        }
+
+        // Запускаем инициализацию при загрузке страницы
+        document.addEventListener('DOMContentLoaded', init);
+
         function goToMainMenu() {
             window.location.href = '/webapp';
         }
