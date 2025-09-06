@@ -1188,7 +1188,23 @@
                 'yieldLabel': 'Yield (Доходность)',
                 'insightsTitle': 'Саммари',
                 'insightsLoading': 'Анализируем данные...',
-                'insightsError': 'Ошибка при анализе данных'
+                'insightsError': 'Ошибка при анализе данных',
+                'noValue': 'Не имеет значения',
+                
+                // Keys for trends chart
+                'marketTrendsTitle': 'Тренд цен',
+                'chart_title': 'График трендов',
+                'sale_button': 'Цена м² продажи',
+                'rent_button': 'Цена м² аренды',
+                'chart_info': 'Показаны данные до текущего месяца и один месяц вперед',
+                
+                // Keys for forecast chart
+                'forecast_chart_title': 'График прогноза цен и аренды',
+                'forecast_chart_info': 'Прогноз на основе текущего и будущих месяцев',
+                
+                // Keys for object summary
+                'objectSummaryTitle': 'Вывод по объекту',
+                'marketAnalysisTitle': 'Анализ рынка'
             },
             'en': {
                 'slogan': 'Real Estate Market Insights',
@@ -1229,7 +1245,23 @@
                 'yieldLabel': 'Yield (Return)',
                 'insightsTitle': 'Summary',
                 'insightsLoading': 'Analyzing data...',
-                'insightsError': 'Error analyzing data'
+                'insightsError': 'Error analyzing data',
+                'noValue': 'No value',
+                
+                // Keys for trends chart
+                'marketTrendsTitle': 'Price Trends',
+                'chart_title': 'Trends Chart',
+                'sale_button': 'Sale Price per m²',
+                'rent_button': 'Rent Price per m²',
+                'chart_info': 'Data shown up to current month and one month ahead',
+                
+                // Keys for forecast chart
+                'forecast_chart_title': 'Price and Rent Forecast Chart',
+                'forecast_chart_info': 'Forecast based on current and future months',
+                
+                // Keys for object summary
+                'objectSummaryTitle': 'Object Summary',
+                'marketAnalysisTitle': 'Market Analysis'
             },
             'de': {
                 'slogan': 'Immobilienmarkt-Einblicke',
@@ -1270,7 +1302,23 @@
                 'yieldLabel': 'Yield (Rendite)',
                 'insightsTitle': 'Zusammenfassung',
                 'insightsLoading': 'Daten werden analysiert...',
-                'insightsError': 'Fehler bei der Datenanalyse'
+                'insightsError': 'Fehler bei der Datenanalyse',
+                'noValue': 'Kein Wert',
+                
+                // Keys for trends chart
+                'marketTrendsTitle': 'Preistrends',
+                'chart_title': 'Trends-Diagramm',
+                'sale_button': 'Verkaufspreis pro m²',
+                'rent_button': 'Mietpreis pro m²',
+                'chart_info': 'Daten bis zum aktuellen Monat und einen Monat voraus angezeigt',
+                
+                // Keys for forecast chart
+                'forecast_chart_title': 'Preis- und Miet-Prognose-Diagramm',
+                'forecast_chart_info': 'Prognose basierend auf aktuellen und zukünftigen Monaten',
+                
+                // Keys for object summary
+                'objectSummaryTitle': 'Objektzusammenfassung',
+                'marketAnalysisTitle': 'Marktanalyse'
             },
             'fr': {
                 'slogan': 'Aperçus du marché immobilier',
@@ -1311,7 +1359,23 @@
                 'yieldLabel': 'Yield (Rendement)',
                 'insightsTitle': 'Résumé',
                 'insightsLoading': 'Analyse des données...',
-                'insightsError': 'Erreur lors de l\'analyse des données'
+                'insightsError': 'Erreur lors de l\'analyse des données',
+                'noValue': 'Aucune valeur',
+                
+                // Keys for trends chart
+                'marketTrendsTitle': 'Tendances des prix',
+                'chart_title': 'Graphique des tendances',
+                'sale_button': 'Prix de vente par m²',
+                'rent_button': 'Prix de location par m²',
+                'chart_info': 'Données affichées jusqu\'au mois actuel et un mois à venir',
+                
+                // Keys for forecast chart
+                'forecast_chart_title': 'Graphique de prévision des prix et loyers',
+                'forecast_chart_info': 'Prévision basée sur les mois actuels et futurs',
+                
+                // Keys for object summary
+                'objectSummaryTitle': 'Résumé de l\'objet',
+                'marketAnalysisTitle': 'Analyse du marché'
             },
             'tr': {
                 'slogan': 'Gayrimenkul Piyasa İçgörüleri',
@@ -1352,7 +1416,23 @@
                 'yieldLabel': 'Yield (Getiri)',
                 'insightsTitle': 'Özet',
                 'insightsLoading': 'Veriler analiz ediliyor...',
-                'insightsError': 'Veri analizi hatası'
+                'insightsError': 'Veri analizi hatası',
+                'noValue': 'Değer yok',
+                
+                // Keys for trends chart
+                'marketTrendsTitle': 'Fiyat Trendleri',
+                'chart_title': 'Trend Grafiği',
+                'sale_button': 'm² Satış Fiyatı',
+                'rent_button': 'm² Kiralama Fiyatı',
+                'chart_info': 'Mevcut aya kadar ve bir ay ileriye dair veriler gösterilmektedir',
+                
+                // Keys for forecast chart
+                'forecast_chart_title': 'Fiyat ve Kira Tahmin Grafiği',
+                'forecast_chart_info': 'Mevcut ve gelecek aylara dayalı tahmin',
+                
+                // Keys for object summary
+                'objectSummaryTitle': 'Nesne Özeti',
+                'marketAnalysisTitle': 'Piyasa Analizi'
             }
         };
 
@@ -2421,7 +2501,7 @@
                     // Add "No value" option
                     const noValueOption = document.createElement('option');
                     noValueOption.value = 'none';
-                    noValueOption.textContent = 'Не имеет значения';
+                    noValueOption.textContent = getText('noValue');
                     districtSelect.appendChild(noValueOption);
                     
                     data.districts.forEach(([id, name]) => {
@@ -2542,7 +2622,7 @@
             
             // Update selected location
             selectedLocation.district_id = districtId === 'none' ? null : districtId;
-            selectedLocation.district_name = districtId === 'none' ? 'Не имеет значения' : districtName;
+            selectedLocation.district_name = districtId === 'none' ? getText('noValue') : districtName;
             
             updateConfirmButton();
         }
