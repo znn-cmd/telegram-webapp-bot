@@ -4015,7 +4015,10 @@
                 'subscribeInstructions': 'Перейдите к боту @Aaadviser_pay_bot',
                 'followInstructions': 'Следуйте инструкциям для подключения',
                 'needHelp': 'Нужна помощь?',
-                'contactSupport': 'Свяжитесь с нашей поддержкой: @Aaadviser_support_bot'
+                'contactSupport': 'Свяжитесь с нашей поддержкой: @Aaadviser_support_bot',
+                'selectPropertyType': 'Выберите тип недвижимости',
+                'detailedDataTitle': 'Детальные данные (только для администраторов)',
+                'detailedTrendsDataTitle': 'Детальные данные трендов'
             },
             'en': {
                 'slogan': 'Real Estate Market Insights',
@@ -4156,7 +4159,10 @@
                 'subscribeInstructions': 'Go to bot @Aaadviser_pay_bot',
                 'followInstructions': 'Follow the connection instructions',
                 'needHelp': 'Need help?',
-                'contactSupport': 'Contact our support: @Aaadviser_support_bot'
+                'contactSupport': 'Contact our support: @Aaadviser_support_bot',
+                'selectPropertyType': 'Select property type',
+                'detailedDataTitle': 'Detailed data (administrators only)',
+                'detailedTrendsDataTitle': 'Detailed trends data'
             },
             'de': {
                 'slogan': 'Immobilienmarkt-Einblicke',
@@ -4217,7 +4223,10 @@
                 'modalTitle': 'Bericht teilen',
                 'modalDescription': 'Kopieren Sie den Link, um den Bericht zu teilen',
                 'copyButtonText': 'Kopieren',
-                'closeButtonText': 'Schließen'
+                'closeButtonText': 'Schließen',
+                'selectPropertyType': 'Immobilientyp auswählen',
+                'detailedDataTitle': 'Detaillierte Daten (nur für Administratoren)',
+                'detailedTrendsDataTitle': 'Detaillierte Trenddaten'
             },
             'fr': {
                 'slogan': 'Aperçus du marché immobilier',
@@ -4336,6 +4345,9 @@
                 'selectFloor': 'Kat seçin',
                 'selectAge': 'Yaş seçin',
                 'selectHeating': 'Isıtma tipi seçin',
+                'selectPropertyType': 'Gayrimenkul türü seçin',
+                'detailedDataTitle': 'Detaylı veriler (sadece yöneticiler için)',
+                'detailedTrendsDataTitle': 'Detaylı trend verileri',
                 'propertyTypesTitle': 'Gayrimenkul Türleri',
                 'saveShareButtonText': 'Kaydet ve paylaş',
                 'modalTitle': 'Raporu paylaş',
@@ -4848,12 +4860,12 @@
         // Get placeholder text for select dropdowns
         function getSelectPlaceholder(category) {
             const placeholders = {
-                'house_type': 'количество спален',
-                'floor_segment': 'этаж',
-                'age': 'возраст объекта',
-                'heating': 'тип отопления'
+                'house_type': getText('selectBedrooms'),
+                'floor_segment': getText('selectFloor'),
+                'age': getText('selectAge'),
+                'heating': getText('selectHeating')
             };
-            return placeholders[category] || 'тип недвижимости';
+            return placeholders[category] || getText('selectPropertyType');
         }
 
         // Reset listing type selection
@@ -6145,27 +6157,27 @@
             }
             
             let html = '<div class="admin-data-accordion">';
-            html += '<h4 class="accordion-title">Детальные данные (только для администраторов)</h4>';
+            html += '<h4 class="accordion-title">' + getText('detailedDataTitle') + '</h4>';
             html += '<div class="accordion-container">';
             
             // House Type Data Accordion
             if (data.house_type_data && data.house_type_data.length > 0) {
-                html += generateCategoryAccordion('house_type_data', 'Данные по количеству спален', data.house_type_data);
+                html += generateCategoryAccordion('house_type_data', getText('houseTypeDataTitle'), data.house_type_data);
             }
             
             // Floor Segment Data Accordion
             if (data.floor_segment_data && data.floor_segment_data.length > 0) {
-                html += generateCategoryAccordion('floor_segment_data', 'Данные по этажу', data.floor_segment_data);
+                html += generateCategoryAccordion('floor_segment_data', getText('floorSegmentDataTitle'), data.floor_segment_data);
             }
             
             // Age Data Accordion
             if (data.age_data && data.age_data.length > 0) {
-                html += generateCategoryAccordion('age_data', 'Данные по возрасту объектов', data.age_data);
+                html += generateCategoryAccordion('age_data', getText('ageDataTitle'), data.age_data);
             }
             
             // Heating Data Accordion
             if (data.heating_data && data.heating_data.length > 0) {
-                html += generateCategoryAccordion('heating_data', 'Данные по типу отопления', data.heating_data);
+                html += generateCategoryAccordion('heating_data', getText('heatingDataTitle'), data.heating_data);
             }
             
             html += '</div></div>';
@@ -6448,7 +6460,7 @@
                     
                     <!-- Таблица со всеми записями трендов -->
                     <div class="trends-table-section">
-                        <h4 class="trends-table-title">Детальные данные трендов</h4>
+                        <h4 class="trends-table-title">${getText('detailedTrendsDataTitle')}</h4>
                         <div class="trends-table-container" id="trendsTableContainer">
                             <!-- Тренды будут загружены асинхронно -->
                         </div>
