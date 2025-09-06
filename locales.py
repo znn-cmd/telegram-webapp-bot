@@ -143,7 +143,10 @@ locales = {
             },
             'loading_data': 'Загрузка данных...',
             'data_loaded': 'Данные загружены',
-            'error_loading_data': 'Ошибка загрузки данных'
+            'error_loading_data': 'Ошибка загрузки данных',
+            'unit_days': 'дней',
+            'unit_years': 'лет',
+            'unit_square_meters': 'м²'
         }
     },
     'en': {
@@ -290,7 +293,10 @@ locales = {
             },
             'loading_data': 'Loading data...',
             'data_loaded': 'Data loaded',
-            'error_loading_data': 'Error loading data'
+            'error_loading_data': 'Error loading data',
+            'unit_days': 'days',
+            'unit_years': 'years',
+            'unit_square_meters': 'm²'
         }
     },
     'de': {
@@ -437,7 +443,10 @@ locales = {
             },
             'loading_data': 'Daten werden geladen...',
             'data_loaded': 'Daten geladen',
-            'error_loading_data': 'Fehler beim Laden der Daten'
+            'error_loading_data': 'Fehler beim Laden der Daten',
+            'unit_days': 'Tage',
+            'unit_years': 'Jahre',
+            'unit_square_meters': 'm²'
         }
     },
     'fr': {
@@ -584,7 +593,10 @@ locales = {
             },
             'loading_data': 'Chargement des données...',
             'data_loaded': 'Données chargées',
-            'error_loading_data': 'Erreur de chargement des données'
+            'error_loading_data': 'Erreur de chargement des données',
+            'unit_days': 'jours',
+            'unit_years': 'ans',
+            'unit_square_meters': 'm²'
         }
     },
     'tr': {
@@ -725,7 +737,10 @@ locales = {
             },
             'loading_data': 'Veriler yükleniyor...',
             'data_loaded': 'Veriler yüklendi',
-            'error_loading_data': 'Veri yükleme hatası'
+            'error_loading_data': 'Veri yükleme hatası',
+            'unit_days': 'gün',
+            'unit_years': 'yıl',
+            'unit_square_meters': 'm²'
         }
     }
 } 
