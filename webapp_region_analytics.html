@@ -1438,7 +1438,16 @@
 
         // Get localized text
         function getText(key) {
-            return locales[currentLanguage][key] || key;
+            if (!currentLanguage) {
+                console.warn(`Current language not set, using default 'en' for key: ${key}`);
+                currentLanguage = 'en';
+            }
+            
+            const result = locales[currentLanguage][key] || key;
+            if (result === key) {
+                console.warn(`Translation not found for key: ${key}, language: ${currentLanguage}`);
+            }
+            return result;
         }
 
         // Sort fields by priority for structured data display
@@ -2762,6 +2771,14 @@
         // Load region data from API
         async function loadRegionData() {
             try {
+                // Ensure language is set before loading data
+                if (!currentLanguage) {
+                    console.log('Language not set, initializing...');
+                    userLanguage = await getUserLanguage();
+                    currentLanguage = userLanguage;
+                    console.log(`🌐 Language set to: ${currentLanguage}`);
+                }
+                
                 // Show data section and loading state
                 const regionDataSection = document.getElementById('regionDataSection');
                 const loadingState = document.getElementById('loadingState');
@@ -3627,6 +3644,8 @@
             currentLanguage = userLanguage;
             
             console.log(`🌐 Initializing page with language: ${currentLanguage}`);
+            console.log(`🌐 Available locales:`, Object.keys(locales));
+            console.log(`🌐 Current locale keys:`, Object.keys(locales[currentLanguage] || {}));
             
             // Update page text
             updatePageText();
