@@ -396,6 +396,33 @@
         let lastReportBedrooms = '';
         let lastReportPrice = '';
         let currentReportData = null; // Для хранения данных текущего отчета
+        
+        // Language detection
+        let currentLanguage = 'ru'; // Default language
+        
+        // Function to get user language
+        async function getUserLanguage() {
+            try {
+                const telegramUser = window.Telegram?.WebApp?.initDataUnsafe?.user;
+                if (telegramUser) {
+                    const response = await fetch('/api/user/language', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            telegram_id: telegramUser.id,
+                            language_code: telegramUser.language_code || 'en'
+                        })
+                    });
+                    if (response.ok) {
+                        const data = await response.json();
+                        currentLanguage = data.language || 'en';
+                    }
+                }
+            } catch (error) {
+                console.error('Error getting user language:', error);
+                currentLanguage = 'en';
+            }
+        }
 
         // Progress Bar Functions
         function showProgressBar(text, progress = 0) {
@@ -449,7 +476,9 @@
                         'report_sent_error': 'Ошибка отправки отчета',
                         'connection_send_error': 'Ошибка соединения при отправке',
                         'fill_all_fields': 'Пожалуйста, заполните все поля',
-                        'report_data_error': 'Ошибка: данные отчета не найдены'
+                        'report_data_error': 'Ошибка: данные отчета не найдены',
+                        'free_report_transition': 'Для вас отчет бесплатный! Переходим к сбору дополнительных данных...',
+                        'funds_deducted_transition': 'Средства успешно списаны. Переходим к сбору дополнительных данных...'
                     },
                     'client_modal': {
                         'title': 'Отправить отчет клиенту',
@@ -457,6 +486,126 @@
                         'client_username_placeholder': 'Telegram username (без @)',
                         'cancel': 'Отмена',
                         'send': 'Отправить'
+                    }
+                },
+                'en': {
+                    'progress': {
+                        'checking_balance': 'Checking balance...',
+                        'generating_report': 'Generating full report...',
+                        'sending_to_client': 'Sending report to client...',
+                        'processing_request': 'Processing request...'
+                    },
+                    'notifications': {
+                        'report_copied': 'Report data copied to clipboard!',
+                        'copy_error': 'Copy to clipboard error',
+                        'balance_check_error': 'Balance check error',
+                        'deduction_error': 'Balance deduction error',
+                        'connection_error': 'Connection error when generating report',
+                        'report_generated': 'Full report generated!',
+                        'report_sent_success': 'Report successfully sent to client!',
+                        'report_sent_error': 'Report sending error',
+                        'connection_send_error': 'Connection error when sending',
+                        'fill_all_fields': 'Please fill in all fields',
+                        'report_data_error': 'Error: report data not found',
+                        'free_report_transition': 'The report is free for you! Transitioning to additional data collection...',
+                        'funds_deducted_transition': 'Funds successfully deducted. Transitioning to additional data collection...'
+                    },
+                    'client_modal': {
+                        'title': 'Send report to client',
+                        'client_name_placeholder': 'Client name',
+                        'client_username_placeholder': 'Telegram username (without @)',
+                        'cancel': 'Cancel',
+                        'send': 'Send'
+                    }
+                },
+                'de': {
+                    'progress': {
+                        'checking_balance': 'Kontostand wird überprüft...',
+                        'generating_report': 'Vollständiger Bericht wird erstellt...',
+                        'sending_to_client': 'Bericht wird an Kunden gesendet...',
+                        'processing_request': 'Anfrage wird verarbeitet...'
+                    },
+                    'notifications': {
+                        'report_copied': 'Berichtsdaten in die Zwischenablage kopiert!',
+                        'copy_error': 'Fehler beim Kopieren in die Zwischenablage',
+                        'balance_check_error': 'Kontostand-Prüfungsfehler',
+                        'deduction_error': 'Kontostand-Abzugsfehler',
+                        'connection_error': 'Verbindungsfehler beim Erstellen des Berichts',
+                        'report_generated': 'Vollständiger Bericht erstellt!',
+                        'report_sent_success': 'Bericht erfolgreich an Kunden gesendet!',
+                        'report_sent_error': 'Bericht-Sendefehler',
+                        'connection_send_error': 'Verbindungsfehler beim Senden',
+                        'fill_all_fields': 'Bitte füllen Sie alle Felder aus',
+                        'report_data_error': 'Fehler: Berichtsdaten nicht gefunden',
+                        'free_report_transition': 'Der Bericht ist für Sie kostenlos! Übergang zur Sammlung zusätzlicher Daten...',
+                        'funds_deducted_transition': 'Mittel erfolgreich abgezogen. Übergang zur Sammlung zusätzlicher Daten...'
+                    },
+                    'client_modal': {
+                        'title': 'Bericht an Kunden senden',
+                        'client_name_placeholder': 'Kundenname',
+                        'client_username_placeholder': 'Telegram-Benutzername (ohne @)',
+                        'cancel': 'Abbrechen',
+                        'send': 'Senden'
+                    }
+                },
+                'fr': {
+                    'progress': {
+                        'checking_balance': 'Vérification du solde...',
+                        'generating_report': 'Génération du rapport complet...',
+                        'sending_to_client': 'Envoi du rapport au client...',
+                        'processing_request': 'Traitement de la demande...'
+                    },
+                    'notifications': {
+                        'report_copied': 'Données du rapport copiées dans le presse-papiers!',
+                        'copy_error': 'Erreur de copie dans le presse-papiers',
+                        'balance_check_error': 'Erreur de vérification du solde',
+                        'deduction_error': 'Erreur de déduction du solde',
+                        'connection_error': 'Erreur de connexion lors de la génération du rapport',
+                        'report_generated': 'Rapport complet généré!',
+                        'report_sent_success': 'Rapport envoyé avec succès au client!',
+                        'report_sent_error': 'Erreur d\'envoi du rapport',
+                        'connection_send_error': 'Erreur de connexion lors de l\'envoi',
+                        'fill_all_fields': 'Veuillez remplir tous les champs',
+                        'report_data_error': 'Erreur: données du rapport non trouvées',
+                        'free_report_transition': 'Le rapport est gratuit pour vous! Transition vers la collecte de données supplémentaires...',
+                        'funds_deducted_transition': 'Fonds déduits avec succès. Transition vers la collecte de données supplémentaires...'
+                    },
+                    'client_modal': {
+                        'title': 'Envoyer le rapport au client',
+                        'client_name_placeholder': 'Nom du client',
+                        'client_username_placeholder': 'Nom d\'utilisateur Telegram (sans @)',
+                        'cancel': 'Annuler',
+                        'send': 'Envoyer'
+                    }
+                },
+                'tr': {
+                    'progress': {
+                        'checking_balance': 'Bakiye kontrol ediliyor...',
+                        'generating_report': 'Tam rapor oluşturuluyor...',
+                        'sending_to_client': 'Rapor müşteriye gönderiliyor...',
+                        'processing_request': 'İstek işleniyor...'
+                    },
+                    'notifications': {
+                        'report_copied': 'Rapor verileri panoya kopyalandı!',
+                        'copy_error': 'Panoya kopyalama hatası',
+                        'balance_check_error': 'Bakiye kontrol hatası',
+                        'deduction_error': 'Bakiye kesinti hatası',
+                        'connection_error': 'Rapor oluşturulurken bağlantı hatası',
+                        'report_generated': 'Tam rapor oluşturuldu!',
+                        'report_sent_success': 'Rapor müşteriye başarıyla gönderildi!',
+                        'report_sent_error': 'Rapor gönderme hatası',
+                        'connection_send_error': 'Gönderirken bağlantı hatası',
+                        'fill_all_fields': 'Lütfen tüm alanları doldurun',
+                        'report_data_error': 'Hata: rapor verileri bulunamadı',
+                        'free_report_transition': 'Rapor sizin için ücretsiz! Ek veri toplamaya geçiliyor...',
+                        'funds_deducted_transition': 'Fonlar başarıyla kesildi. Ek veri toplamaya geçiliyor...'
+                    },
+                    'client_modal': {
+                        'title': 'Raporu müşteriye gönder',
+                        'client_name_placeholder': 'Müşteri adı',
+                        'client_username_placeholder': 'Telegram kullanıcı adı (@ olmadan)',
+                        'cancel': 'İptal',
+                        'send': 'Gönder'
                     }
                 }
             };
@@ -877,7 +1026,7 @@
         // Новая функция: вызывается по клику на 'Да, продолжить' в модалке
         async function onConfirmFullReport(address, bedrooms, price, telegram_id, isFree, fullReportPrice, balance) {
             if (isFree) {
-                showToast('Для вас отчет бесплатный! Переходим к сбору дополнительных данных...', 'success');
+                showToast(getLocalizedText('notifications.free_report_transition'), 'success');
                 // Переходим на страницу сбора дополнительных данных
                 goToAdditionalDataPage(address, bedrooms, price, telegram_id);
                 return;
@@ -894,7 +1043,7 @@
                     const deductData = await deductRes.json();
                     hideProgressBar();
                     if (deductData.success) {
-                        showToast('Средства успешно списаны. Переходим к сбору дополнительных данных...', 'success');
+                        showToast(getLocalizedText('notifications.funds_deducted_transition'), 'success');
                         // Переходим на страницу сбора дополнительных данных
                         goToAdditionalDataPage(address, bedrooms, price, telegram_id);
                     } else if (deductData.error === 'Insufficient balance') {
@@ -1587,6 +1736,11 @@
                 });
             }
         }, 100);
+        
+        // Initialize language on page load
+        document.addEventListener('DOMContentLoaded', async function() {
+            await getUserLanguage();
+        });
     </script>
 </body>
 </html> 

@@ -593,6 +593,9 @@
                 'error_loading': 'Ошибка загрузки данных',
                 'error_network': 'Ошибка сети. Проверьте соединение.',
                 'success_language': 'Язык успешно изменен',
+                'toast_region_analytics': 'Переход к аналитике региона...',
+                'toast_object_evaluation': 'Переход к оценке объекта...',
+                'toast_my_reports': 'Переход к вашим отчетам...',
                 'success_welcome': 'Добро пожаловать!'
             },
             'en': {
@@ -615,6 +618,9 @@
                 'error_loading': 'Error loading data',
                 'error_network': 'Network error. Check your connection.',
                 'success_language': 'Language changed successfully',
+                'toast_region_analytics': 'Transitioning to region analytics...',
+                'toast_object_evaluation': 'Transitioning to object evaluation...',
+                'toast_my_reports': 'Transitioning to your reports...',
                 'success_welcome': 'Welcome!'
             },
             'de': {
@@ -637,6 +643,9 @@
                 'error_loading': 'Fehler beim Laden der Daten',
                 'error_network': 'Netzwerkfehler. Überprüfen Sie Ihre Verbindung.',
                 'success_language': 'Sprache erfolgreich geändert',
+                'toast_region_analytics': 'Übergang zur Regionalanalyse...',
+                'toast_object_evaluation': 'Übergang zur Objektbewertung...',
+                'toast_my_reports': 'Übergang zu Ihren Berichten...',
                 'success_welcome': 'Willkommen!'
             },
             'fr': {
@@ -659,6 +668,9 @@
                 'error_loading': 'Erreur de chargement des données',
                 'error_network': 'Erreur réseau. Vérifiez votre connexion.',
                 'success_language': 'Langue changée avec succès',
+                'toast_region_analytics': 'Transition vers l\'analyse régionale...',
+                'toast_object_evaluation': 'Transition vers l\'évaluation d\'objet...',
+                'toast_my_reports': 'Transition vers vos rapports...',
                 'success_welcome': 'Bienvenue!'
             },
             'tr': {
@@ -681,6 +693,9 @@
                 'error_loading': 'Veri yükleme hatası',
                 'error_network': 'Ağ hatası. Bağlantınızı kontrol edin.',
                 'success_language': 'Dil başarıyla değiştirildi',
+                'toast_region_analytics': 'Bölge analizine geçiliyor...',
+                'toast_object_evaluation': 'Nesne değerlendirmesine geçiliyor...',
+                'toast_my_reports': 'Raporlarınıza geçiliyor...',
                 'success_welcome': 'Hoş geldiniz!'
             }
         };
@@ -883,21 +898,21 @@
         // Функция перехода к аналитике региона
         function showRegionAnalytics() {
             showLoading();
-            showToast('Переход к аналитике региона...', 'info');
+            showToast(getText('toast_region_analytics'), 'info');
             window.location.href = '/webapp_region_analytics';
         }
 
         // Функция перехода к оценке объекта
         function showObjectEvaluation() {
             showLoading();
-            showToast('Переход к оценке объекта...', 'info');
+            showToast(getText('toast_object_evaluation'), 'info');
             window.location.href = '/webapp_object_evaluation';
         }
 
         // Функция перехода к моим отчетам
         function showMyReports() {
             showLoading();
-            showToast('Переход к вашим отчетам...', 'info');
+            showToast(getText('toast_my_reports'), 'info');
             window.location.href = '/webapp_my_reports';
         }
 
