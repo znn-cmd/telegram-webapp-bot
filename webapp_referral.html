@@ -47,6 +47,143 @@
         <button class="back-btn" onclick="goToProfile()" data-i18n="referral.back_to_profile">Назад в профиль</button>
     </div>
     <script>
+        // Локализация
+        let currentLanguage = 'en';
+        
+        const locales = {
+            'ru': {
+                'profile.referral_program': 'Реферальная программа',
+                'referral.your_code': 'Ваш реферальный код:',
+                'common.copy': 'Копировать',
+                'referral.loading_terms': 'Загрузка условий...',
+                'referral.invited_users': 'Приглашённые пользователи:',
+                'common.loading': 'Загрузка...',
+                'referral.back_to_profile': 'Назад в профиль',
+                'referral.link_copied': 'Ссылка скопирована!',
+                'referral.copy_error': 'Ошибка копирования',
+                'referral.user_not_defined': 'Пользователь не определён',
+                'referral.open_from_telegram': 'Пожалуйста, откройте WebApp из Telegram.',
+                'referral.completed': 'Выполнил',
+                'referral.not_completed': 'Не выполнил',
+                'referral.no_invited_users': 'Пока нет приглашённых пользователей.',
+                'referral.terms_error': 'Ошибка загрузки условий.'
+            },
+            'en': {
+                'profile.referral_program': 'Referral Program',
+                'referral.your_code': 'Your referral code:',
+                'common.copy': 'Copy',
+                'referral.loading_terms': 'Loading terms...',
+                'referral.invited_users': 'Invited users:',
+                'common.loading': 'Loading...',
+                'referral.back_to_profile': 'Back to profile',
+                'referral.link_copied': 'Link copied!',
+                'referral.copy_error': 'Copy error',
+                'referral.user_not_defined': 'User not defined',
+                'referral.open_from_telegram': 'Please open WebApp from Telegram.',
+                'referral.completed': 'Completed',
+                'referral.not_completed': 'Not completed',
+                'referral.no_invited_users': 'No invited users yet.',
+                'referral.terms_error': 'Error loading terms.'
+            },
+            'de': {
+                'profile.referral_program': 'Empfehlungsprogramm',
+                'referral.your_code': 'Ihr Empfehlungscode:',
+                'common.copy': 'Kopieren',
+                'referral.loading_terms': 'Bedingungen werden geladen...',
+                'referral.invited_users': 'Eingeladene Benutzer:',
+                'common.loading': 'Laden...',
+                'referral.back_to_profile': 'Zurück zum Profil',
+                'referral.link_copied': 'Link kopiert!',
+                'referral.copy_error': 'Kopierfehler',
+                'referral.user_not_defined': 'Benutzer nicht definiert',
+                'referral.open_from_telegram': 'Bitte öffnen Sie WebApp aus Telegram.',
+                'referral.completed': 'Abgeschlossen',
+                'referral.not_completed': 'Nicht abgeschlossen',
+                'referral.no_invited_users': 'Noch keine eingeladenen Benutzer.',
+                'referral.terms_error': 'Fehler beim Laden der Bedingungen.'
+            },
+            'fr': {
+                'profile.referral_program': 'Programme de Parrainage',
+                'referral.your_code': 'Votre code de parrainage:',
+                'common.copy': 'Copier',
+                'referral.loading_terms': 'Chargement des conditions...',
+                'referral.invited_users': 'Utilisateurs invités:',
+                'common.loading': 'Chargement...',
+                'referral.back_to_profile': 'Retour au profil',
+                'referral.link_copied': 'Lien copié!',
+                'referral.copy_error': 'Erreur de copie',
+                'referral.user_not_defined': 'Utilisateur non défini',
+                'referral.open_from_telegram': 'Veuillez ouvrir WebApp depuis Telegram.',
+                'referral.completed': 'Terminé',
+                'referral.not_completed': 'Non terminé',
+                'referral.no_invited_users': 'Aucun utilisateur invité pour le moment.',
+                'referral.terms_error': 'Erreur lors du chargement des conditions.'
+            },
+            'tr': {
+                'profile.referral_program': 'Referans Programı',
+                'referral.your_code': 'Referans kodunuz:',
+                'common.copy': 'Kopyala',
+                'referral.loading_terms': 'Şartlar yükleniyor...',
+                'referral.invited_users': 'Davet edilen kullanıcılar:',
+                'common.loading': 'Yükleniyor...',
+                'referral.back_to_profile': 'Profile geri dön',
+                'referral.link_copied': 'Bağlantı kopyalandı!',
+                'referral.copy_error': 'Kopyalama hatası',
+                'referral.user_not_defined': 'Kullanıcı tanımlanmamış',
+                'referral.open_from_telegram': 'Lütfen WebApp\'i Telegram\'dan açın.',
+                'referral.completed': 'Tamamlandı',
+                'referral.not_completed': 'Tamamlanmadı',
+                'referral.no_invited_users': 'Henüz davet edilen kullanıcı yok.',
+                'referral.terms_error': 'Şartlar yüklenirken hata.'
+            }
+        };
+        
+        function getText(key) {
+            return locales[currentLanguage][key] || key;
+        }
+        
+        // Получение языка пользователя
+        async function getUserLanguage() {
+            try {
+                const telegramUser = window.Telegram?.WebApp?.initDataUnsafe?.user;
+                if (telegramUser) {
+                    const response = await fetch('/api/user/language', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            telegram_id: telegramUser.id,
+                            language_code: telegramUser.language_code || 'en'
+                        })
+                    });
+                    if (response.ok) {
+                        const data = await response.json();
+                        currentLanguage = data.language || 'en';
+                    }
+                }
+            } catch (error) {
+                console.error('Error getting user language:', error);
+                currentLanguage = 'en';
+            }
+        }
+        
+        // Обновление текста на странице
+        function updatePageText() {
+            document.querySelector('[data-i18n="profile.referral_program"]').textContent = getText('profile.referral_program');
+            document.querySelector('[data-i18n="referral.your_code"]').textContent = getText('referral.your_code');
+            document.querySelector('[data-i18n="common.copy"]').textContent = getText('common.copy');
+            document.querySelector('[data-i18n="referral.invited_users"]').textContent = getText('referral.invited_users');
+            document.querySelector('[data-i18n="referral.back_to_profile"]').textContent = getText('referral.back_to_profile');
+        }
+        
+        // Инициализация страницы
+        async function init() {
+            await getUserLanguage();
+            updatePageText();
+        }
+        
+        // Инициализация при загрузке страницы
+        document.addEventListener('DOMContentLoaded', init);
+        
         function goToProfile() {
             window.location.href = '/webapp_profile';
         }

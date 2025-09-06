@@ -29,20 +29,151 @@
 </head>
 <body>
     <div class="container">
-        <div class="admin-title">Настройки API-ключей</div>
+        <div class="admin-title" data-i18n="admin.settings_title">Настройки API-ключей</div>
         <form class="settings-form" onsubmit="addApiKey(event)">
-            <input class="settings-input" id="keyName" placeholder="Имя ключа (key_name)" required />
-            <input class="settings-input" id="keyValue" placeholder="Значение ключа (key_value)" required />
-            <button class="settings-btn" type="submit">Добавить ключ</button>
+            <input class="settings-input" id="keyName" placeholder="Имя ключа (key_name)" required data-i18n-placeholder="admin.key_name_placeholder" />
+            <input class="settings-input" id="keyValue" placeholder="Значение ключа (key_value)" required data-i18n-placeholder="admin.key_value_placeholder" />
+            <button class="settings-btn" type="submit" data-i18n="admin.add_key">Добавить ключ</button>
         </form>
-        <div class="settings-list" id="keysList">Загрузка...</div>
+        <div class="settings-list" id="keysList" data-i18n="common.loading">Загрузка...</div>
         <div class="nav-btn-row">
-            <button class="nav-btn" onclick="goBack()">Назад</button>
-            <button class="nav-btn nav-btn-main" onclick="goToMainMenu()">В главное меню</button>
+            <button class="nav-btn" onclick="goBack()" data-i18n="common.back">Назад</button>
+            <button class="nav-btn nav-btn-main" onclick="goToMainMenu()" data-i18n="common.main_menu">В главное меню</button>
         </div>
     </div>
     <div id="toastContainer" class="toast-container"></div>
     <script>
+        // Локализация
+        let currentLanguage = 'en';
+        
+        const locales = {
+            'ru': {
+                'common.settings': 'Настройки',
+                'admin.settings_title': 'Настройки API-ключей',
+                'admin.key_name_placeholder': 'Имя ключа (key_name)',
+                'admin.key_value_placeholder': 'Значение ключа (key_value)',
+                'admin.add_key': 'Добавить ключ',
+                'common.loading': 'Загрузка...',
+                'common.back': 'Назад',
+                'common.main_menu': 'В главное меню',
+                'admin.key_added_success': 'Ключ успешно добавлен!',
+                'admin.error': 'Ошибка',
+                'admin.add_key_error': 'Не удалось добавить ключ.',
+                'admin.network_error': 'Ошибка сети.',
+                'admin.load_keys_error': 'Ошибка загрузки ключей.',
+                'admin.no_keys': 'Нет новых ключей.'
+            },
+            'en': {
+                'common.settings': 'Settings',
+                'admin.settings_title': 'API Keys Settings',
+                'admin.key_name_placeholder': 'Key name (key_name)',
+                'admin.key_value_placeholder': 'Key value (key_value)',
+                'admin.add_key': 'Add Key',
+                'common.loading': 'Loading...',
+                'common.back': 'Back',
+                'common.main_menu': 'To main menu',
+                'admin.key_added_success': 'Key successfully added!',
+                'admin.error': 'Error',
+                'admin.add_key_error': 'Failed to add key.',
+                'admin.network_error': 'Network error.',
+                'admin.load_keys_error': 'Error loading keys.',
+                'admin.no_keys': 'No new keys.'
+            },
+            'de': {
+                'common.settings': 'Einstellungen',
+                'admin.settings_title': 'API-Schlüssel Einstellungen',
+                'admin.key_name_placeholder': 'Schlüsselname (key_name)',
+                'admin.key_value_placeholder': 'Schlüsselwert (key_value)',
+                'admin.add_key': 'Schlüssel hinzufügen',
+                'common.loading': 'Laden...',
+                'common.back': 'Zurück',
+                'common.main_menu': 'Zum Hauptmenü',
+                'admin.key_added_success': 'Schlüssel erfolgreich hinzugefügt!',
+                'admin.error': 'Fehler',
+                'admin.add_key_error': 'Schlüssel konnte nicht hinzugefügt werden.',
+                'admin.network_error': 'Netzwerkfehler.',
+                'admin.load_keys_error': 'Fehler beim Laden der Schlüssel.',
+                'admin.no_keys': 'Keine neuen Schlüssel.'
+            },
+            'fr': {
+                'common.settings': 'Paramètres',
+                'admin.settings_title': 'Paramètres des clés API',
+                'admin.key_name_placeholder': 'Nom de la clé (key_name)',
+                'admin.key_value_placeholder': 'Valeur de la clé (key_value)',
+                'admin.add_key': 'Ajouter une clé',
+                'common.loading': 'Chargement...',
+                'common.back': 'Retour',
+                'common.main_menu': 'Au menu principal',
+                'admin.key_added_success': 'Clé ajoutée avec succès!',
+                'admin.error': 'Erreur',
+                'admin.add_key_error': 'Impossible d\'ajouter la clé.',
+                'admin.network_error': 'Erreur réseau.',
+                'admin.load_keys_error': 'Erreur lors du chargement des clés.',
+                'admin.no_keys': 'Aucune nouvelle clé.'
+            },
+            'tr': {
+                'common.settings': 'Ayarlar',
+                'admin.settings_title': 'API Anahtarları Ayarları',
+                'admin.key_name_placeholder': 'Anahtar adı (key_name)',
+                'admin.key_value_placeholder': 'Anahtar değeri (key_value)',
+                'admin.add_key': 'Anahtar Ekle',
+                'common.loading': 'Yükleniyor...',
+                'common.back': 'Geri',
+                'common.main_menu': 'Ana menüye',
+                'admin.key_added_success': 'Anahtar başarıyla eklendi!',
+                'admin.error': 'Hata',
+                'admin.add_key_error': 'Anahtar eklenemedi.',
+                'admin.network_error': 'Ağ hatası.',
+                'admin.load_keys_error': 'Anahtarlar yüklenirken hata.',
+                'admin.no_keys': 'Yeni anahtar yok.'
+            }
+        };
+        
+        function getText(key) {
+            return locales[currentLanguage][key] || key;
+        }
+        
+        // Получение языка пользователя
+        async function getUserLanguage() {
+            try {
+                const telegramUser = window.Telegram?.WebApp?.initDataUnsafe?.user;
+                if (telegramUser) {
+                    const response = await fetch('/api/user/language', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            telegram_id: telegramUser.id,
+                            language_code: telegramUser.language_code || 'en'
+                        })
+                    });
+                    if (response.ok) {
+                        const data = await response.json();
+                        currentLanguage = data.language || 'en';
+                    }
+                }
+            } catch (error) {
+                console.error('Error getting user language:', error);
+                currentLanguage = 'en';
+            }
+        }
+        
+        // Обновление текста на странице
+        function updatePageText() {
+            document.querySelector('[data-i18n="admin.settings_title"]').textContent = getText('admin.settings_title');
+            document.querySelector('[data-i18n="admin.add_key"]').textContent = getText('admin.add_key');
+            document.querySelector('[data-i18n="common.back"]').textContent = getText('common.back');
+            document.querySelector('[data-i18n="common.main_menu"]').textContent = getText('common.main_menu');
+        }
+        
+        // Инициализация страницы
+        async function init() {
+            await getUserLanguage();
+            updatePageText();
+        }
+        
+        // Инициализация при загрузке страницы
+        document.addEventListener('DOMContentLoaded', init);
+        
         function goBack() { window.history.back(); }
         function goToMainMenu() { window.location.href = '/webapp'; }
         function showToast(message, type = 'success', duration = 2500) {
@@ -69,31 +200,31 @@
                     document.getElementById('keyName').value = '';
                     document.getElementById('keyValue').value = '';
                     loadKeys();
-                    showToast('Ключ успешно добавлен!', 'success');
+                    showToast(getText('admin.key_added_success'), 'success');
                 } else {
-                    alert('Ошибка: ' + (data.error || 'Не удалось добавить ключ.'));
-                    showToast('Ошибка: ' + (data.error || 'Не удалось добавить ключ.'), 'error');
+                    alert(getText('admin.error') + ': ' + (data.error || getText('admin.add_key_error')));
+                    showToast(getText('admin.error') + ': ' + (data.error || getText('admin.add_key_error')), 'error');
                 }
             })
-            .catch(() => { alert('Ошибка сети.'); showToast('Ошибка сети', 'error'); });
+            .catch(() => { alert(getText('admin.network_error')); showToast(getText('admin.network_error'), 'error'); });
         }
         function loadKeys() {
             fetch('/api/admin_list_apikeys')
                 .then(res => res.json())
                 .then(data => {
                     if (!data || !Array.isArray(data.keys)) {
-                        document.getElementById('keysList').innerHTML = 'Ошибка загрузки ключей.';
-                        showToast('Ошибка загрузки ключей', 'error');
+                        document.getElementById('keysList').innerHTML = getText('admin.load_keys_error');
+                        showToast(getText('admin.load_keys_error'), 'error');
                         return;
                     }
                     if (data.keys.length === 0) {
-                        document.getElementById('keysList').innerHTML = 'Нет новых ключей.';
-                        showToast('Нет новых ключей', 'info');
+                        document.getElementById('keysList').innerHTML = getText('admin.no_keys');
+                        showToast(getText('admin.no_keys'), 'info');
                         return;
                     }
                     document.getElementById('keysList').innerHTML = data.keys.map(k => `<b>${k.key_name}</b>: <span style='color:#555;'>${k.key_value}</span>`).join('<br>');
                 })
-                .catch(() => { document.getElementById('keysList').innerHTML = 'Ошибка сети.'; showToast('Ошибка сети', 'error'); });
+                .catch(() => { document.getElementById('keysList').innerHTML = getText('admin.network_error'); showToast(getText('admin.network_error'), 'error'); });
         }
         document.addEventListener('DOMContentLoaded', loadKeys);
     </script>
