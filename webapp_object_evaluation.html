@@ -5410,13 +5410,17 @@
                             headers: {
                                 'Content-Type': 'application/json',
                             },
-                            body: JSON.stringify({ telegram_id: user.id })
+                            body: JSON.stringify({ 
+                                telegram_id: user.id,
+                                language_code: user.language_code
+                            })
                         });
                         
                         const data = await response.json();
                         if (data.success) {
                             userLanguage = data.language;
                             currentLanguage = data.language;
+                            console.log(`🌐 User language loaded: ${userLanguage} (статус: ${data.user_status})`);
                             updatePageText();
                         }
                     }

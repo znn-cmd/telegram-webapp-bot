@@ -7,20 +7,37 @@ class I18nManager {
     }
 
     async init() {
-        this.currentLanguage = this.getInitialLanguage();
+        this.currentLanguage = await this.getInitialLanguage();
         await this.loadTranslations();
         this.applyTranslations();
         this.addLanguageSelector();
     }
 
-    getInitialLanguage() {
+    async getInitialLanguage() {
         // Пытаемся получить язык из Telegram WebApp
         if (window.Telegram && window.Telegram.WebApp) {
             const tg = window.Telegram.WebApp;
-            if (tg.initDataUnsafe && tg.initDataUnsafe.user && tg.initDataUnsafe.user.language_code) {
-                const lang = tg.initDataUnsafe.user.language_code.substring(0, 2);
-                if (['ru', 'en', 'de', 'fr', 'tr'].includes(lang)) {
-                    return lang;
+            if (tg.initDataUnsafe && tg.initDataUnsafe.user && tg.initDataUnsafe.user.id) {
+                try {
+                    // Запрашиваем язык пользователя с учетом новой логики
+                    const response = await fetch('/api/user/language', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ 
+                            telegram_id: tg.initDataUnsafe.user.id,
+                            language_code: tg.initDataUnsafe.user.language_code
+                        })
+                    });
+                    
+                    if (response.ok) {
+                        const data = await response.json();
+                        if (data.success) {
+                            console.log(`🌐 Язык определен: ${data.language} (статус: ${data.user_status})`);
+                            return data.language;
+                        }
+                    }
+                } catch (error) {
+                    console.warn('Ошибка при получении языка пользователя:', error);
                 }
             }
         }
@@ -33,8 +50,8 @@ class I18nManager {
             }
         } catch (e) {}
 
-        // По умолчанию русский
-        return 'ru';
+        // По умолчанию английский
+        return 'en';
     }
 
     async loadTranslations() {
@@ -596,7 +613,7 @@ class I18nManager {
         try {
             const userData = this.getUserData();
             if (userData) {
-                await fetch('/api/set_language', {
+                const response = await fetch('/api/set_language', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -604,6 +621,13 @@ class I18nManager {
                         language: language
                     })
                 });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log(`🌐 Язык обновлен в базе данных: ${language} (статус: ${data.user_status})`);
+                } else {
+                    console.warn('Failed to save language preference to database');
+                }
             }
         } catch (error) {
             console.warn('Failed to save language preference:', error);

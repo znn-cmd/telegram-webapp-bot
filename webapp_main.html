@@ -727,6 +727,8 @@
                     });
                     
                     if (response.ok) {
+                        const data = await response.json();
+                        console.log(`🌐 Язык обновлен: ${currentLanguage} (статус: ${data.user_status})`);
                         showToast(getText('success_language'), 'success');
                     } else {
                         showToast(getText('error_loading'), 'error');
@@ -763,12 +765,18 @@
                         username: userData.username,
                         tg_name: userData.tg_name,
                         last_name: userData.last_name,
-                        language_code: userData.language_code || currentLanguage
+                        language_code: userData.language_code || 'en'  // По умолчанию английский
                     })
                 });
 
                 if (response.ok) {
                     const userInfo = await response.json();
+
+                    // Обновляем текущий язык согласно новой логике
+                    currentLanguage = userInfo.language || userInfo.language_code || 'en';
+                    
+                    // Логируем для отладки
+                    console.log(`🌐 Язык пользователя определен: ${currentLanguage} (статус: ${userInfo.user_status})`);
 
                     // Скрыть выбор языка, если уже выбран
                     if (userInfo.language) {

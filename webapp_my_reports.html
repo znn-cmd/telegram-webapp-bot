@@ -914,7 +914,7 @@
                         username: userData.username,
                         tg_name: userData.tg_name,
                         last_name: userData.last_name,
-                        language_code: userData.language_code || 'ru'
+                        language_code: userData.language_code || 'en'
                     })
                 });
 
@@ -924,7 +924,7 @@
                 }
             } catch (error) {
                 console.error('Error getting user language:', error);
-                currentLanguage = userData?.language_code || 'ru';
+                currentLanguage = userData?.language_code || 'en';
             }
 
             updatePageText();

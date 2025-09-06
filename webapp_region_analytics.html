@@ -1577,8 +1577,8 @@
                 // Get telegram_id from Telegram WebApp
                 const telegramId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id;
                 if (!telegramId) {
-                    console.log('No telegram_id available, using default language: ru');
-                    return 'ru';
+                    console.log('No telegram_id available, using default language: en');
+                    return 'en';
                 }
                 
                 const response = await fetch('/api/user/language', {
@@ -1586,21 +1586,24 @@
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ telegram_id: telegramId })
+                    body: JSON.stringify({ 
+                        telegram_id: telegramId,
+                        language_code: window.Telegram?.WebApp?.initDataUnsafe?.user?.language_code
+                    })
                 });
                 
                 const data = await response.json();
                 if (data.success) {
                     userLanguage = data.language;
-                    console.log('User language loaded:', userLanguage);
+                    console.log(`🌐 User language loaded: ${userLanguage} (статус: ${data.user_status})`);
                     return userLanguage;
                 } else {
-                    console.log('Failed to get user language, using default: ru');
-                    return 'ru';
+                    console.log('Failed to get user language, using default: en');
+                    return 'en';
                 }
             } catch (error) {
                 console.error('Error getting user language:', error);
-                return 'ru';
+                return 'en';
             }
         }
         
