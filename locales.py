@@ -147,7 +147,10 @@ locales = {
             'unit_days': 'дней',
             'unit_years': 'лет',
             'unit_square_meters': 'м²'
-        }
+        },
+        'unit_days': 'дней',
+        'unit_years': 'лет',
+        'unit_square_meters': 'м²'
     },
     'en': {
         'welcome_new': 'Welcome to Aaadvisor: instant real estate analytics reports with price and profitability forecasts',
@@ -297,7 +300,10 @@ locales = {
             'unit_days': 'days',
             'unit_years': 'years',
             'unit_square_meters': 'm²'
-        }
+        },
+        'unit_days': 'days',
+        'unit_years': 'years',
+        'unit_square_meters': 'm²'
     },
     'de': {
         'welcome_new': 'Willkommen bei Aaadvisor: Sofortige Immobilien-Analyseberichte mit Preis- und Rentabilitätsprognosen',
@@ -447,7 +453,10 @@ locales = {
             'unit_days': 'Tage',
             'unit_years': 'Jahre',
             'unit_square_meters': 'm²'
-        }
+        },
+        'unit_days': 'Tage',
+        'unit_years': 'Jahre',
+        'unit_square_meters': 'm²'
     },
     'fr': {
         'welcome_new': 'Bienvenue sur Aaadvisor : rapports analytiques immobiliers instantanés avec prévisions de prix et de rentabilité',
@@ -597,7 +606,10 @@ locales = {
             'unit_days': 'jours',
             'unit_years': 'ans',
             'unit_square_meters': 'm²'
-        }
+        },
+        'unit_days': 'jours',
+        'unit_years': 'ans',
+        'unit_square_meters': 'm²'
     },
     'tr': {
         'welcome_new': 'Aaadvisor\'a hoş geldiniz: Anında gayrimenkul analiz raporları, fiyat ve kârlılık tahminleriyle',
@@ -741,6 +753,9 @@ locales = {
             'unit_days': 'gün',
             'unit_years': 'yıl',
             'unit_square_meters': 'm²'
-        }
+        },
+        'unit_days': 'gün',
+        'unit_years': 'yıl',
+        'unit_square_meters': 'm²'
     }
 } 
