@@ -4902,12 +4902,6 @@ def api_user_balance():
         logger.error(f"Error getting/updating user balance: {e}")
         return jsonify({'error': 'Internal error'}), 500
 
-# Маршрут для раздачи i18n-manager.js
-@app.route('/i18n-manager.js')
-def serve_i18n_manager():
-    """Раздача файла i18n-manager.js"""
-    return send_from_directory('.', 'i18n-manager.js')
-
 # === Перемещаем эти маршруты выше запуска Flask ===
 @app.route('/api/full_report_access', methods=['POST'])
 def api_full_report_access():
