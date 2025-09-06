@@ -2222,6 +2222,40 @@
             }
         }
 
+        // Helper function to get unit text from local labels
+        function getUnitText(unitKey) {
+            const language = currentLanguage || userLanguage || 'en';
+            const labels = {
+                'ru': {
+                    'unit_days': 'дней',
+                    'unit_years': 'лет',
+                    'unit_square_meters': 'м²'
+                },
+                'en': {
+                    'unit_days': 'days',
+                    'unit_years': 'years',
+                    'unit_square_meters': 'm²'
+                },
+                'de': {
+                    'unit_days': 'Tage',
+                    'unit_years': 'Jahre',
+                    'unit_square_meters': 'm²'
+                },
+                'fr': {
+                    'unit_days': 'jours',
+                    'unit_years': 'ans',
+                    'unit_square_meters': 'm²'
+                },
+                'tr': {
+                    'unit_days': 'gün',
+                    'unit_years': 'yıl',
+                    'unit_square_meters': 'm²'
+                }
+            };
+            
+            return labels[language]?.[unitKey] || unitKey;
+        }
+
         // Helper function to format field values
         function formatFieldValue(key, value) {
             if (value === null || value === undefined) {
@@ -2270,7 +2304,8 @@
                 key.includes('duration') || key.includes('Duration') ||
                 key.includes('listing_period') || key.includes('Listing_Period')) {
                 if (typeof value === 'number') {
-                    return `${value} ${getText('unit_days')}`;
+                    const unitText = getUnitText('unit_days');
+                    return `${value} ${unitText}`;
                 }
                 return value;
             }
@@ -2279,7 +2314,8 @@
             if (key.includes('age') || key.includes('Age') ||
                 key.includes('average_age') || key.includes('Average_Age')) {
                 if (typeof value === 'number') {
-                    return `${value} ${getText('unit_years')}`;
+                    const unitText = getUnitText('unit_years');
+                    return `${value} ${unitText}`;
                 }
                 return value;
             }
@@ -2291,7 +2327,8 @@
                 if (typeof value === 'number') {
                     // Convert to selected currency if rates are available
                     const convertedValue = convertCurrency(value);
-                    return formatCurrency(convertedValue, currentCurrency) + '/' + getText('unit_square_meters');
+                    const unitText = getUnitText('unit_square_meters');
+                    return formatCurrency(convertedValue, currentCurrency) + '/' + unitText;
                 }
                 return value;
             }
@@ -2300,7 +2337,8 @@
             if (key.includes('area') || key.includes('Area') ||
                 key.includes('comparable_area') || key.includes('Comparable_Area')) {
                 if (typeof value === 'number') {
-                    return `${value.toLocaleString(userLocale)} ${getText('unit_square_meters')}`;
+                    const unitText = getUnitText('unit_square_meters');
+                    return `${value.toLocaleString(userLocale)} ${unitText}`;
                 }
                 return value;
             }
