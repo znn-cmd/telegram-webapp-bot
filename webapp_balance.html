@@ -135,11 +135,11 @@
 </head>
 <body>
     <div class="container">
-        <div class="title">Баланс</div>
+        <div class="title" data-i18n="profile.balance">Баланс</div>
         <div id="balance-block" style="margin-bottom:22px;display:none;"></div>
-        <button class="balance-btn" onclick="showDeposit()">Пополнить</button>
-        <button class="balance-btn" onclick="showTariffs()">Тарифы</button>
-        <button class="back-btn" onclick="goBack()">Назад</button>
+        <button class="balance-btn" onclick="showDeposit()" data-i18n="balance.deposit">Пополнить</button>
+        <button class="balance-btn" onclick="showTariffs()" data-i18n="balance.tariffs">Тарифы</button>
+        <button class="back-btn" onclick="goBack()" data-i18n="common.back">Назад</button>
     </div>
     <div id="modal-bg" class="modal-bg" style="display:none;">
         <div class="modal">
@@ -154,17 +154,168 @@
         </div>
     </div>
     <script>
+        // Локализация
+        let currentLanguage = 'en';
+        
+        const locales = {
+            'ru': {
+                'profile.balance': 'Баланс',
+                'balance.deposit': 'Пополнить',
+                'balance.tariffs': 'Тарифы',
+                'common.back': 'Назад',
+                'balance.deposit_title': 'Пополнение баланса',
+                'balance.deposit_message': 'Сервис находится еще на стадии разработки и функционального наполнения.',
+                'balance.deposit_instruction': 'Чтобы пополнить баланс, запустите бота и он проведет вас',
+                'balance.statement_title': 'Выписка',
+                'balance.statement_message': 'Здесь будут ваши расходы',
+                'balance.subscription': 'Подписка',
+                'balance.one_time': 'Разовый',
+                'balance.tariff_default': 'Тариф',
+                'balance.tariffs_title': 'Тарифы',
+                'balance.no_tariffs': 'Нет доступных тарифов.',
+                'balance.tariffs_error': 'Ошибка загрузки тарифов.',
+                'balance.user_not_defined': 'Пользователь не определён.',
+                'balance.open_from_telegram': 'Пожалуйста, откройте WebApp из Telegram.',
+                'balance.user_default': 'Пользователь'
+            },
+            'en': {
+                'profile.balance': 'Balance',
+                'balance.deposit': 'Deposit',
+                'balance.tariffs': 'Tariffs',
+                'common.back': 'Back',
+                'balance.deposit_title': 'Balance Deposit',
+                'balance.deposit_message': 'The service is still in development and functional filling stage.',
+                'balance.deposit_instruction': 'To top up your balance, launch the bot and it will guide you',
+                'balance.statement_title': 'Statement',
+                'balance.statement_message': 'Your expenses will be here',
+                'balance.subscription': 'Subscription',
+                'balance.one_time': 'One-time',
+                'balance.tariff_default': 'Tariff',
+                'balance.tariffs_title': 'Tariffs',
+                'balance.no_tariffs': 'No available tariffs.',
+                'balance.tariffs_error': 'Error loading tariffs.',
+                'balance.user_not_defined': 'User not defined.',
+                'balance.open_from_telegram': 'Please open WebApp from Telegram.',
+                'balance.user_default': 'User'
+            },
+            'de': {
+                'profile.balance': 'Guthaben',
+                'balance.deposit': 'Einzahlen',
+                'balance.tariffs': 'Tarife',
+                'common.back': 'Zurück',
+                'balance.deposit_title': 'Guthaben einzahlen',
+                'balance.deposit_message': 'Der Service befindet sich noch in der Entwicklungs- und Funktionsfüllungsphase.',
+                'balance.deposit_instruction': 'Um Ihr Guthaben aufzuladen, starten Sie den Bot und er wird Sie führen',
+                'balance.statement_title': 'Kontoauszug',
+                'balance.statement_message': 'Ihre Ausgaben werden hier sein',
+                'balance.subscription': 'Abonnement',
+                'balance.one_time': 'Einmalig',
+                'balance.tariff_default': 'Tarif',
+                'balance.tariffs_title': 'Tarife',
+                'balance.no_tariffs': 'Keine verfügbaren Tarife.',
+                'balance.tariffs_error': 'Fehler beim Laden der Tarife.',
+                'balance.user_not_defined': 'Benutzer nicht definiert.',
+                'balance.open_from_telegram': 'Bitte öffnen Sie WebApp aus Telegram.',
+                'balance.user_default': 'Benutzer'
+            },
+            'fr': {
+                'profile.balance': 'Solde',
+                'balance.deposit': 'Dépôt',
+                'balance.tariffs': 'Tarifs',
+                'common.back': 'Retour',
+                'balance.deposit_title': 'Dépôt de solde',
+                'balance.deposit_message': 'Le service est encore en phase de développement et de remplissage fonctionnel.',
+                'balance.deposit_instruction': 'Pour recharger votre solde, lancez le bot et il vous guidera',
+                'balance.statement_title': 'Relevé',
+                'balance.statement_message': 'Vos dépenses seront ici',
+                'balance.subscription': 'Abonnement',
+                'balance.one_time': 'Unique',
+                'balance.tariff_default': 'Tarif',
+                'balance.tariffs_title': 'Tarifs',
+                'balance.no_tariffs': 'Aucun tarif disponible.',
+                'balance.tariffs_error': 'Erreur lors du chargement des tarifs.',
+                'balance.user_not_defined': 'Utilisateur non défini.',
+                'balance.open_from_telegram': 'Veuillez ouvrir WebApp depuis Telegram.',
+                'balance.user_default': 'Utilisateur'
+            },
+            'tr': {
+                'profile.balance': 'Bakiye',
+                'balance.deposit': 'Yatır',
+                'balance.tariffs': 'Tarifeler',
+                'common.back': 'Geri',
+                'balance.deposit_title': 'Bakiye Yatırma',
+                'balance.deposit_message': 'Hizmet hala geliştirme ve işlevsel doldurma aşamasında.',
+                'balance.deposit_instruction': 'Bakiyenizi yüklemek için botu başlatın ve sizi yönlendirecek',
+                'balance.statement_title': 'Ekstre',
+                'balance.statement_message': 'Giderleriniz burada olacak',
+                'balance.subscription': 'Abonelik',
+                'balance.one_time': 'Tek seferlik',
+                'balance.tariff_default': 'Tarife',
+                'balance.tariffs_title': 'Tarifeler',
+                'balance.no_tariffs': 'Mevcut tarife yok.',
+                'balance.tariffs_error': 'Tarifeler yüklenirken hata.',
+                'balance.user_not_defined': 'Kullanıcı tanımlanmamış.',
+                'balance.open_from_telegram': 'Lütfen WebApp\'i Telegram\'dan açın.',
+                'balance.user_default': 'Kullanıcı'
+            }
+        };
+        
+        function getText(key) {
+            return locales[currentLanguage][key] || key;
+        }
+        
+        // Получение языка пользователя
+        async function getUserLanguage() {
+            try {
+                const telegramUser = window.Telegram?.WebApp?.initDataUnsafe?.user;
+                if (telegramUser) {
+                    const response = await fetch('/api/user/language', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            telegram_id: telegramUser.id,
+                            language_code: telegramUser.language_code || 'en'
+                        })
+                    });
+                    if (response.ok) {
+                        const data = await response.json();
+                        currentLanguage = data.language || 'en';
+                    }
+                }
+            } catch (error) {
+                console.error('Error getting user language:', error);
+                currentLanguage = 'en';
+            }
+        }
+        
+        // Обновление текста на странице
+        function updatePageText() {
+            document.querySelector('[data-i18n="profile.balance"]').textContent = getText('profile.balance');
+            document.querySelector('[data-i18n="balance.deposit"]').textContent = getText('balance.deposit');
+            document.querySelector('[data-i18n="balance.tariffs"]').textContent = getText('balance.tariffs');
+            document.querySelector('[data-i18n="common.back"]').textContent = getText('common.back');
+        }
+        
+        // Инициализация страницы
+        async function init() {
+            await getUserLanguage();
+            updatePageText();
+        }
+        
+        // Инициализация при загрузке страницы
+        document.addEventListener('DOMContentLoaded', init);
+        
         function goBack() {
             window.location.href = '/webapp_profile';
         }
         function showDeposit() {
-            showModal('Пополнение баланса',
-                'Сервис находится еще на стадии разработки и функционального наполнения.<br><br>' +
-                'Чтобы пополнить баланс, запустите бота и он проведет вас: <a href="https://t.me/Aaadviser_pay_bot" target="_blank" style="color:#667eea;font-weight:500;">@Aaadviser_pay_bot</a>'
+            showModal(getText('balance.deposit_title'),
+                getText('balance.deposit_message') + '<br><br>' +
+                getText('balance.deposit_instruction') + ': <a href="https://t.me/Aaadviser_pay_bot" target="_blank" style="color:#667eea;font-weight:500;">@Aaadviser_pay_bot</a>'
             );
         }
         function showStatement() {
-            showModal('Выписка', 'Здесь будут ваши расходы');
+            showModal(getText('balance.statement_title'), getText('balance.statement_message'));
         }
         function showTariffs() {
             fetch('/api/tariffs')
@@ -173,20 +324,20 @@
                     if (Array.isArray(data.tariffs) && data.tariffs.length > 0) {
                         let html = '';
                         data.tariffs.forEach((tariff, idx) => {
-                            let type = (tariff.tariff_type === 'subscription') ? 'Подписка' : 'Разовый';
+                            let type = (tariff.tariff_type === 'subscription') ? getText('balance.subscription') : getText('balance.one_time');
                             html += `<div class='tariff-card'>
-                                <div class='tariff-title'>${tariff.description || tariff.name || 'Тариф'}</div>
+                                <div class='tariff-title'>${tariff.description || tariff.name || getText('balance.tariff_default')}</div>
                                 <div class='tariff-price'>${tariff.price ? '$' + tariff.price : ''}</div>
                                 <div class='tariff-type'>${type}</div>
                             </div>`;
                         });
                         html += `<button id='tariffs-back-btn' onclick='closeModal()' data-i18n="common.back">Назад</button>`;
-                        showModal('Тарифы', html, true);
+                        showModal(getText('balance.tariffs_title'), html, true);
                     } else {
-                        showModal('Тарифы', 'Нет доступных тарифов.', true);
+                        showModal(getText('balance.tariffs_title'), getText('balance.no_tariffs'), true);
                     }
                 })
-                .catch(() => showModal('Тарифы', 'Ошибка загрузки тарифов.', true));
+                .catch(() => showModal(getText('balance.tariffs_title'), getText('balance.tariffs_error'), true));
         }
         function showModal(title, content, showLogo) {
             document.getElementById('modal-title').textContent = title;
@@ -215,7 +366,7 @@
                 }
             }
             if (!userData || !userData.id) {
-                document.getElementById('balance-block').innerHTML = `<div style='color:#c33;background:#fee;border-radius:10px;padding:18px 10px;font-size:1.1em;'>Пользователь не определён.<br>Пожалуйста, откройте WebApp из Telegram.</div>`;
+                document.getElementById('balance-block').innerHTML = `<div style='color:#c33;background:#fee;border-radius:10px;padding:18px 10px;font-size:1.1em;'>${getText('balance.user_not_defined')}<br>${getText('balance.open_from_telegram')}</div>`;
                 document.getElementById('balance-block').style.display = '';
                 return;
             }
@@ -227,7 +378,7 @@
             .then(res => res.json())
             .then(data => {
                 if (data) {
-                    let name = data.tg_name && data.tg_name.trim() ? data.tg_name : (data.username ? '@' + data.username : 'Пользователь');
+                    let name = data.tg_name && data.tg_name.trim() ? data.tg_name : (data.username ? '@' + data.username : getText('balance.user_default'));
                     let balance = typeof data.balance === 'number' ? data.balance : 0;
                     document.getElementById('balance-block').innerHTML = `
                         <div class='profile-balance-block'>

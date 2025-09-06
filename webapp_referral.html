@@ -32,19 +32,19 @@
     <div class="container">
         <div class="title" data-i18n="profile.referral_program">Реферальная программа</div>
         <div class="ref-code-block">
-            <div class="ref-code-label">Ваш реферальный код:</div>
+            <div class="ref-code-label" data-i18n="referral.your_code">Ваш реферальный код:</div>
             <div class="ref-code-value" id="inviteCode">...</div>
             <div class="ref-link-block">
                 <span class="ref-link" id="refLink">...</span>
                 <button class="copy-btn" onclick="copyRefLink()" data-i18n="common.copy">Копировать</button>
             </div>
         </div>
-        <div class="ref-terms" id="refTerms">Загрузка условий...</div>
+        <div class="ref-terms" id="refTerms" data-i18n="referral.loading_terms">Загрузка условий...</div>
         <div class="invited-list">
-            <div class="invited-title">Приглашённые пользователи:</div>
+            <div class="invited-title" data-i18n="referral.invited_users">Приглашённые пользователи:</div>
             <div id="invitedUsers" data-i18n="common.loading">Загрузка...</div>
         </div>
-        <button class="back-btn" onclick="goToProfile()">Назад в профиль</button>
+        <button class="back-btn" onclick="goToProfile()" data-i18n="referral.back_to_profile">Назад в профиль</button>
     </div>
     <script>
         function goToProfile() {
@@ -53,9 +53,9 @@
         function copyRefLink() {
             const refLink = document.getElementById('refLink').textContent;
             navigator.clipboard.writeText(refLink).then(() => {
-                alert('Ссылка скопирована!');
+                alert(getText('referral.link_copied'));
             }, () => {
-                alert('Ошибка копирования');
+                alert(getText('referral.copy_error'));
             });
         }
         document.addEventListener('DOMContentLoaded', function() {
@@ -66,9 +66,9 @@
                 try { userData = JSON.parse(localStorage.getItem('aaadviser_user')); } catch (e) { userData = null; }
             }
             if (!userData || !userData.id) {
-                document.getElementById('inviteCode').textContent = 'Пользователь не определён';
+                document.getElementById('inviteCode').textContent = getText('referral.user_not_defined');
                 document.getElementById('refLink').textContent = '-';
-                document.getElementById('refTerms').textContent = 'Пожалуйста, откройте WebApp из Telegram.';
+                document.getElementById('refTerms').textContent = getText('referral.open_from_telegram');
                 document.getElementById('invitedUsers').textContent = '-';
                 return;
             }
@@ -84,16 +84,16 @@
                 document.getElementById('refTerms').textContent = data.referral_terms || '-';
                 if (Array.isArray(data.invited) && data.invited.length > 0) {
                     document.getElementById('invitedUsers').innerHTML = data.invited.map(u =>
-                        `<div class='invited-item'><span class='invited-name'>${u.tg_name || u.username || u.telegram_id}</span><span class='invited-status ${u.completed ? 'status-done' : 'status-pending'}'>${u.completed ? 'Выполнил' : 'Не выполнил'}</span></div>`
+                        `<div class='invited-item'><span class='invited-name'>${u.tg_name || u.username || u.telegram_id}</span><span class='invited-status ${u.completed ? 'status-done' : 'status-pending'}'>${u.completed ? getText('referral.completed') : getText('referral.not_completed')}</span></div>`
                     ).join('');
                 } else {
-                    document.getElementById('invitedUsers').textContent = 'Пока нет приглашённых пользователей.';
+                    document.getElementById('invitedUsers').textContent = getText('referral.no_invited_users');
                 }
             })
             .catch(() => {
                 document.getElementById('inviteCode').textContent = '-';
                 document.getElementById('refLink').textContent = '-';
-                document.getElementById('refTerms').textContent = 'Ошибка загрузки условий.';
+                document.getElementById('refTerms').textContent = getText('referral.terms_error');
                 document.getElementById('invitedUsers').textContent = '-';
             });
         });

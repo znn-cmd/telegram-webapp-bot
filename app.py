@@ -68,24 +68,30 @@ if not supabase_url or not supabase_key:
 import httpx
 from httpx import TimeoutException, ConnectTimeout
 
+# Создаем HTTP клиент с увеличенными таймаутами для Supabase
 http_client = httpx.Client(
     timeout=httpx.Timeout(
-        connect=30.0,  # Таймаут на установку соединения
-        read=60.0,     # Таймаут на чтение
-        write=30.0,    # Таймаут на запись
-        pool=30.0      # Таймаут пула соединений
+        connect=60.0,  # Увеличенный таймаут на установку соединения
+        read=120.0,   # Увеличенный таймаут на чтение
+        write=60.0,   # Увеличенный таймаут на запись
+        pool=60.0     # Увеличенный таймаут пула соединений
     ),
     limits=httpx.Limits(
-        max_keepalive_connections=20,
-        max_connections=100
+        max_keepalive_connections=10,
+        max_connections=50
     )
 )
 
 # Инициализация Supabase с кастомным клиентом
-supabase: Client = create_client(
-    supabase_url, 
-    supabase_key
-)
+try:
+    supabase: Client = create_client(
+        supabase_url, 
+        supabase_key
+    )
+    logger.info("✅ Supabase клиент создан успешно")
+except Exception as e:
+    logger.error(f"❌ Ошибка создания Supabase клиента: {e}")
+    raise
 
 # Токен бота
 TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
@@ -177,7 +183,7 @@ GOOGLE_MAPS_TIMEOUT = int(os.getenv('GOOGLE_MAPS_TIMEOUT', '30'))  # Увели�
 #     # application.run_polling(allowed_updates=Update.ALL_TYPES)
 
 # Функция для безопасного выполнения операций с базой данных
-def safe_db_operation(operation, max_retries=3, retry_delay=2):
+def safe_db_operation(operation, max_retries=5, retry_delay=5):
     """
     Безопасно выполняет операцию с базой данных с retry логикой
     
@@ -192,6 +198,11 @@ def safe_db_operation(operation, max_retries=3, retry_delay=2):
     for attempt in range(max_retries):
         try:
             logger.info(f"🔄 Попытка подключения к БД {attempt + 1}/{max_retries}")
+            
+            # Добавляем небольшую задержку перед каждой попыткой
+            if attempt > 0:
+                time.sleep(1)
+            
             result = operation()
             logger.info(f"✅ Успешное подключение к БД на попытке {attempt + 1}")
             return result
@@ -206,7 +217,13 @@ def safe_db_operation(operation, max_retries=3, retry_delay=2):
                 return None
         except Exception as e:
             logger.error(f"Database operation error: {e}")
-            return None
+            if attempt < max_retries - 1:
+                logger.info(f"⏳ Ожидание {retry_delay} секунд перед следующей попыткой...")
+                time.sleep(retry_delay)
+                continue
+            else:
+                logger.error(f"Database operation failed after {max_retries} attempts: {e}")
+                return None
     return None
 
 # Проверка подключения к Supabase при запуске
@@ -9289,4 +9306,14 @@ def api_test_api_keys():
 
 
 if __name__ == '__main__':
+    # Дополнительная проверка подключения к Supabase перед запуском
+    logger.info("🔍 Финальная проверка подключения к Supabase...")
+    final_test = safe_db_operation(
+        lambda: supabase.table('users').select('id').limit(1).execute()
+    )
+    if final_test is not None:
+        logger.info("✅ Финальная проверка подключения к Supabase успешна")
+    else:
+        logger.error("❌ Финальная проверка подключения к Supabase не удалась")
+    
     run_flask()
