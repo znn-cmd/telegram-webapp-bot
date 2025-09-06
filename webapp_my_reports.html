@@ -422,19 +422,19 @@
         <div class="header">
             <img src="logo-flt.png" alt="Aaadviser Logo" class="logo" onclick="goToMainMenu()">
             <div class="title" id="pageTitle" data-i18n="reports.title" data-i18n="reports.my_reports">Мои отчеты</div>
-            <div class="subtitle" id="pageSubtitle">Управление вашими отчетами</div>
+            <div class="subtitle" id="pageSubtitle" data-i18n="reports.subtitle">Управление вашими отчетами</div>
         </div>
 
         <!-- Загрузка -->
         <div id="loading" class="loading">
             <div class="spinner"></div>
-            <p id="loadingText">Загрузка отчетов...</p>
+            <p id="loadingText" data-i18n="reports.loading">Загрузка отчетов...</p>
         </div>
 
         <!-- Пустое состояние -->
         <div id="emptyState" class="empty-state hidden">
             <div class="empty-state-icon">📋</div>
-            <div class="empty-state-title" id="emptyTitle">Отчеты не найдены</div>
+            <div class="empty-state-title" id="emptyTitle" data-i18n="reports.empty_title">Отчеты не найдены</div>
             <div class="empty-state-description" id="emptyDescription">
                 У вас пока нет сохраненных отчетов. Создайте первый отчет в главном меню.
             </div>
@@ -456,11 +456,11 @@
     <div id="deleteModal" class="modal-overlay" style="display: none;">
         <div class="modal">
             <div class="modal-header">
-                <div class="modal-title" id="deleteModalTitle">Подтверждение удаления</div>
+                <div class="modal-title" id="deleteModalTitle" data-i18n="reports.delete_confirm_title">Подтверждение удаления</div>
                 <button class="modal-close" id="closeDeleteModalBtn">×</button>
             </div>
             <div class="modal-content">
-                <p id="deleteModalMessage">Вы уверены, что хотите удалить этот отчет? Это действие нельзя отменить.</p>
+                <p id="deleteModalMessage" data-i18n="reports.delete_confirm_message">Вы уверены, что хотите удалить этот отчет? Это действие нельзя отменить.</p>
             </div>
             <div class="modal-actions">
                 <button class="modal-btn secondary" id="cancelDeleteBtn" data-i18n="common.cancel">Отмена</button>
@@ -505,7 +505,14 @@
                 'noBedrooms': 'Количество комнат не указано',
                 'property_evaluation': 'Оценка объекта',
                 'property_analysis': 'Анализ объекта',
-                'market_analysis': 'Анализ рынка'
+                'market_analysis': 'Анализ рынка',
+                
+                // Additional keys for HTML elements
+                'reports.subtitle': 'Управление вашими отчетами',
+                'reports.loading': 'Загрузка отчетов...',
+                'reports.empty_title': 'Отчеты не найдены',
+                'reports.delete_confirm_title': 'Подтверждение удаления',
+                'reports.delete_confirm_message': 'Вы уверены, что хотите удалить этот отчет? Это действие нельзя отменить.'
             },
             'en': {
                 'pageTitle': 'My Reports',
@@ -531,7 +538,14 @@
                 'noBedrooms': 'Bedrooms not specified',
                 'property_evaluation': 'Property Evaluation',
                 'property_analysis': 'Property Analysis',
-                'market_analysis': 'Market Analysis'
+                'market_analysis': 'Market Analysis',
+                
+                // Additional keys for HTML elements
+                'reports.subtitle': 'Manage your reports',
+                'reports.loading': 'Loading reports...',
+                'reports.empty_title': 'No reports found',
+                'reports.delete_confirm_title': 'Confirm deletion',
+                'reports.delete_confirm_message': 'Are you sure you want to delete this report? This action cannot be undone.'
             },
             'de': {
                 'pageTitle': 'Meine Berichte',
@@ -557,7 +571,14 @@
                 'noBedrooms': 'Schlafzimmer nicht angegeben',
                 'property_evaluation': 'Immobilienbewertung',
                 'property_analysis': 'Immobilienanalyse',
-                'market_analysis': 'Marktanalyse'
+                'market_analysis': 'Marktanalyse',
+                
+                // Additional keys for HTML elements
+                'reports.subtitle': 'Verwalten Sie Ihre Berichte',
+                'reports.loading': 'Berichte werden geladen...',
+                'reports.empty_title': 'Keine Berichte gefunden',
+                'reports.delete_confirm_title': 'Löschung bestätigen',
+                'reports.delete_confirm_message': 'Sind Sie sicher, dass Sie diesen Bericht löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden.'
             },
             'fr': {
                 'pageTitle': 'Mes Rapports',
@@ -583,7 +604,14 @@
                 'noBedrooms': 'Chambres non spécifiées',
                 'property_evaluation': 'Évaluation de propriété',
                 'property_analysis': 'Analyse de propriété',
-                'market_analysis': 'Analyse de marché'
+                'market_analysis': 'Analyse de marché',
+                
+                // Additional keys for HTML elements
+                'reports.subtitle': 'Gérer vos rapports',
+                'reports.loading': 'Chargement des rapports...',
+                'reports.empty_title': 'Aucun rapport trouvé',
+                'reports.delete_confirm_title': 'Confirmer la suppression',
+                'reports.delete_confirm_message': 'Êtes-vous sûr de vouloir supprimer ce rapport ? Cette action ne peut pas être annulée.'
             },
             'tr': {
                 'pageTitle': 'Raporlarım',
@@ -609,7 +637,14 @@
                 'noBedrooms': 'Yatak odası sayısı belirtilmemiş',
                 'property_evaluation': 'Gayrimenkul Değerlendirmesi',
                 'property_analysis': 'Gayrimenkul Analizi',
-                'market_analysis': 'Piyasa Analizi'
+                'market_analysis': 'Piyasa Analizi',
+                
+                // Additional keys for HTML elements
+                'reports.subtitle': 'Raporlarınızı yönetin',
+                'reports.loading': 'Raporlar yükleniyor...',
+                'reports.empty_title': 'Rapor bulunamadı',
+                'reports.delete_confirm_title': 'Silme onayı',
+                'reports.delete_confirm_message': 'Bu raporu silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.'
             }
         };
 

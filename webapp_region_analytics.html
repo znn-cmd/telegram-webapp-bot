@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aaadviser - Аналитика региона</title>
+    <title>Aaadviser - <span data-i18n="pageTitle">Аналитика региона</span></title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         * {
@@ -881,7 +881,7 @@
         <!-- Header with Logo -->
         <div class="header">
             <img src="logo-flt.png" alt="Aaadviser Logo" class="logo" onclick="goToMainMenu()" />
-            <div class="slogan" id="slogan">Инсайты рынка недвижимости</div>
+            <div class="slogan" id="slogan" data-i18n="slogan">Инсайты рынка недвижимости</div>
         </div>
 
         <!-- Page Title -->
@@ -889,55 +889,55 @@
 
         <!-- Page Description -->
         <div class="page-description" id="pageDescription">
-                            Получите детальный анализ рынка недвижимости в выбранном регионе
+                            <span data-i18n="pageDescription">Получите детальный анализ рынка недвижимости в выбранном регионе</span>
         </div>
 
         <!-- Location Selection Section -->
         <div class="location-section">
             <!-- Country Selection -->
             <div class="location-group">
-                <label class="location-label" id="countryLabel">Страна:</label>
+                <label class="location-label" id="countryLabel" data-i18n="countryLabel">Страна:</label>
                 <select class="location-select" id="countrySelect" onchange="onCountryChange()">
-                    <option value="" id="countryPlaceholder">Выберите страну</option>
+                    <option value="" id="countryPlaceholder" data-i18n="countryPlaceholder">Выберите страну</option>
                 </select>
             </div>
 
             <!-- City Selection -->
             <div class="location-group">
-                <label class="location-label" id="cityLabel">Город:</label>
+                <label class="location-label" id="cityLabel" data-i18n="cityLabel">Город:</label>
                 <select class="location-select" id="citySelect" onchange="onCityChange()" disabled>
-                    <option value="" id="cityPlaceholder">Сначала выберите страну</option>
+                    <option value="" id="cityPlaceholder" data-i18n="cityPlaceholder">Сначала выберите страну</option>
                 </select>
             </div>
 
             <!-- County Selection -->
             <div class="location-group">
-                <label class="location-label" id="countyLabel">Область/Регион:</label>
+                <label class="location-label" id="countyLabel" data-i18n="countyLabel">Область/Регион:</label>
                 <select class="location-select" id="countySelect" onchange="onCountyChange()" disabled>
-                    <option value="" id="countyPlaceholder">Сначала выберите город</option>
+                    <option value="" id="countyPlaceholder" data-i18n="countyPlaceholder">Сначала выберите город</option>
                 </select>
             </div>
 
             <!-- District Selection -->
             <div class="location-group">
-                <label class="location-label" id="districtLabel">Район:</label>
+                <label class="location-label" id="districtLabel" data-i18n="districtLabel">Район:</label>
                 <select class="location-select" id="districtSelect" onchange="onDistrictChange()" disabled>
-                    <option value="" id="districtPlaceholder">Сначала выберите область</option>
+                    <option value="" id="districtPlaceholder" data-i18n="districtPlaceholder">Сначала выберите область</option>
                 </select>
             </div>
 
             <!-- Confirm Button -->
             <button class="confirm-button" id="confirmButton" onclick="confirmLocationSelection()" disabled>
-                <span id="confirmButtonText">Подтвердить выбор</span>
+                <span id="confirmButtonText" data-i18n="confirmButtonText">Подтвердить выбор</span>
             </button>
         </div>
 
         <!-- Selected Location Display -->
         <div class="selected-location" id="selectedLocation">
-            <div class="selected-location-title" id="selectedLocationTitle">Выбранная локация:</div>
+            <div class="selected-location-title" id="selectedLocationTitle" data-i18n="selectedLocationTitle">Выбранная локация:</div>
             <div class="selected-location-text" id="selectedLocationText"></div>
             <div class="admin-ids" id="adminIds" style="display: none;">
-                <div class="admin-ids-title" id="adminIdsTitle">ID для админов:</div>
+                <div class="admin-ids-title" id="adminIdsTitle" data-i18n="adminIdsTitle">ID для админов:</div>
                 <div class="admin-ids-text" id="adminIdsText"></div>
             </div>
         </div>
@@ -948,12 +948,12 @@
             <!-- Loading State -->
             <div class="loading-state" id="loadingState">
                 <div class="loading-spinner"></div>
-                <div class="loading-text" id="loadingText">Загрузка данных...</div>
+                <div class="loading-text" id="loadingText" data-i18n="loadingText">Загрузка данных...</div>
             </div>
             
             <!-- Currency Switcher -->
             <div class="currency-switcher" id="currencySwitcher" style="display: none;">
-                <div class="currency-switcher-title" id="currencySwitcherTitle">Валюта отображения:</div>
+                <div class="currency-switcher-title" id="currencySwitcherTitle" data-i18n="currencyDisplay">Валюта отображения:</div>
                 <div class="currency-buttons">
                     <button class="currency-btn active" data-currency="TRY" onclick="switchCurrency('TRY')">
                         <span class="currency-icon">₺</span>
@@ -976,12 +976,12 @@
 
             <!-- Key Metrics Cards -->
             <div class="key-metrics-section" id="keyMetricsSection" style="display: none;">
-                <h3 class="key-metrics-title" id="keyMetricsTitle">Ключевые показатели</h3>
+                <h3 class="key-metrics-title" id="keyMetricsTitle" data-i18n="keyMetricsTitle">Ключевые показатели</h3>
                 <div class="key-metrics-grid">
                     <!-- Average Sale Price per m² -->
                     <div class="key-metric-card">
                         <div class="metric-content">
-                            <div class="metric-label" id="avgSalePriceLabel">Средняя цена продажи за м²</div>
+                            <div class="metric-label" id="avgSalePriceLabel" data-i18n="avgSalePriceLabel">Средняя цена продажи за м²</div>
                             <div class="metric-value" id="avgSalePrice">-</div>
                         </div>
                     </div>
@@ -989,7 +989,7 @@
                     <!-- Average Rent Price per m² -->
                     <div class="key-metric-card">
                         <div class="metric-content">
-                            <div class="metric-label" id="avgRentPriceLabel">Средняя цена аренды за м²</div>
+                            <div class="metric-label" id="avgRentPriceLabel" data-i18n="avgRentPriceLabel">Средняя цена аренды за м²</div>
                             <div class="metric-value" id="avgRentPrice">-</div>
                         </div>
                     </div>
@@ -997,7 +997,7 @@
                     <!-- Listing Period Sale -->
                     <div class="key-metric-card">
                         <div class="metric-content">
-                            <div class="metric-label" id="listingPeriodSaleLabel">Период размещения (продажа)</div>
+                            <div class="metric-label" id="listingPeriodSaleLabel" data-i18n="listingPeriodSaleLabel">Период размещения (продажа)</div>
                             <div class="metric-value" id="listingPeriodSale">-</div>
                         </div>
                     </div>
@@ -1005,7 +1005,7 @@
                     <!-- Listing Period Rent -->
                     <div class="key-metric-card">
                         <div class="metric-content">
-                            <div class="metric-label" id="listingPeriodRentLabel">Период размещения (аренда)</div>
+                            <div class="metric-label" id="listingPeriodRentLabel" data-i18n="listingPeriodRentLabel">Период размещения (аренда)</div>
                             <div class="metric-value" id="listingPeriodRent">-</div>
                         </div>
                     </div>
@@ -1014,7 +1014,7 @@
                 <!-- Yield Card - Full Width -->
                 <div class="yield-card">
                     <div class="yield-content">
-                        <div class="yield-label" id="yieldLabel">Yield (Доходность)</div>
+                        <div class="yield-label" id="yieldLabel" data-i18n="yieldLabel">Yield (Доходность)</div>
                         <div class="yield-value" id="yieldValue">-</div>
                     </div>
                 </div>
@@ -1024,7 +1024,7 @@
             <div class="insights-section" id="insightsSection" style="display: none;">
                 <div class="insights-card">
                     <div class="insights-header">
-                        <div class="insights-title" id="insightsTitle">Саммари</div>
+                        <div class="insights-title" id="insightsTitle" data-i18n="insightsTitle">Саммари</div>
                     </div>
                     <div class="insights-content" id="insightsContent">
                         <div class="insights-loading" id="insightsLoading">
@@ -1047,7 +1047,7 @@
                      <div class="data-card-header" onclick="toggleAccordion('generalDataCard')">
                          <div style="display: flex; align-items: center;">
                              <div class="data-card-icon"></div>
-                             <div class="data-card-title" id="generalDataTitle">Общие данные</div>
+                             <div class="data-card-title" id="generalDataTitle" data-i18n="generalDataTitle">Общие данные</div>
                          </div>
                          <div class="data-card-toggle expanded" id="generalDataToggle">▲</div>
                      </div>
@@ -1706,7 +1706,7 @@
                 const data = await response.json();
                 if (data.success) {
                     userLanguage = data.language;
-                    console.log(`🌐 User language loaded from fallback: ${userLanguage} (статус: ${data.user_status})`);
+                    console.log(`🌐 User language loaded from fallback: ${userLanguage} (status: ${data.user_status})`);
                     return userLanguage;
                 } else {
                     console.log('Failed to get user language, using default: en');
@@ -1726,22 +1726,22 @@
                     countryName.includes('türkiye') || countryName.includes('türkei') || 
                     countryName.includes('turquie')) {
                     currentCurrency = 'TRY';
-                    console.log('🇹🇷 Турция выбрана, устанавливаем валюту TRY');
+                    console.log('🇹🇷 Turkey selected, setting currency TRY');
                 } else if (countryName.includes('germany') || countryName.includes('германия') || 
                            countryName.includes('deutschland') || countryName.includes('allemagne')) {
                     currentCurrency = 'EUR';
-                    console.log('🇩🇪 Германия выбрана, устанавливаем валюту EUR');
+                    console.log('🇩🇪 Germany selected, setting currency EUR');
                 } else if (countryName.includes('france') || countryName.includes('франция') || 
                            countryName.includes('frankreich')) {
                     currentCurrency = 'EUR';
-                    console.log('🇫🇷 Франция выбрана, устанавливаем валюту EUR');
+                    console.log('🇫🇷 France selected, setting currency EUR');
                 } else if (countryName.includes('russia') || countryName.includes('россия') || 
                            countryName.includes('russland') || countryName.includes('russie')) {
                     currentCurrency = 'RUB';
-                    console.log('🇷🇺 Россия выбрана, устанавливаем валюту RUB');
+                    console.log('🇷🇺 Russia selected, setting currency RUB');
                 } else {
                     currentCurrency = 'USD';
-                    console.log('🌍 Другая страна, устанавливаем валюту USD');
+                    console.log('🌍 Other country selected, setting currency USD');
                 }
                 
                 // Update active button
@@ -1866,7 +1866,7 @@
 
         // Recalculate all displayed values
         function recalculateAllValues() {
-            console.log('🔄 Пересчет всех значений для валюты:', currentCurrency);
+            console.log('🔄 Recalculating all values for currency:', currentCurrency);
             
             // Update key metrics
             updateKeyMetricsCurrency();
@@ -1877,7 +1877,7 @@
 
         // Update key metrics with new currency
         function updateKeyMetricsCurrency() {
-            console.log('💰 Обновление ключевых метрик для валюты:', currentCurrency);
+            console.log('💰 Updating key metrics for currency:', currentCurrency);
             
             // Пересчитываем и обновляем ключевые метрики
             if (window.lastGeneralData) {
@@ -1890,7 +1890,7 @@
 
         // Update all data tables with new currency
         function updateDataTablesCurrency() {
-            console.log('📊 Обновление всех таблиц данных для валюты:', currentCurrency);
+            console.log('📊 Updating all data tables for currency:', currentCurrency);
             
             // Пересчитываем и обновляем все таблицы данных (но не перезагружаем insights)
             if (window.lastRegionData) {
@@ -1980,7 +1980,12 @@
                     'price_for_rent': 'Цена аренды',
                     'count_for_sale': 'Количество для продажи',
                     'unit_price_for_sale': 'Цена за м² продажи',
-                    'unit_price_for_rent': 'Цена за м² аренды'
+                    'unit_price_for_rent': 'Цена за м² аренды',
+                    
+                    // Units of measurement
+                    'unit_years': 'лет',
+                    'unit_days': 'дней',
+                    'unit_square_meters': 'м²'
                 },
                 'en': {
                     'average_age_for_sale': 'Average age for sale (years)',
@@ -2012,7 +2017,12 @@
                     'price_for_rent': 'Price For Rent',
                     'count_for_sale': 'Count For Sale',
                     'unit_price_for_sale': 'Unit Price For Sale',
-                    'unit_price_for_rent': 'Unit Price For Rent'
+                    'unit_price_for_rent': 'Unit Price For Rent',
+                    
+                    // Units of measurement
+                    'unit_years': 'years',
+                    'unit_days': 'days',
+                    'unit_square_meters': 'm²'
                 },
                 'de': {
                     'average_age_for_sale': 'Durchschnittsalter für Verkauf (Jahre)',
@@ -2044,7 +2054,12 @@
                     'price_for_rent': 'Mietpreis',
                     'count_for_sale': 'Anzahl für Verkauf',
                     'unit_price_for_sale': 'Preis pro m² Verkauf',
-                    'unit_price_for_rent': 'Preis pro m² Miete'
+                    'unit_price_for_rent': 'Preis pro m² Miete',
+                    
+                    // Units of measurement
+                    'unit_years': 'Jahre',
+                    'unit_days': 'Tage',
+                    'unit_square_meters': 'm²'
                 },
                 'fr': {
                     'average_age_for_sale': 'Âge moyen pour la vente (années)',
@@ -2076,13 +2091,18 @@
                     'price_for_rent': 'Prix de location',
                     'count_for_sale': 'Nombre pour vente',
                     'unit_price_for_sale': 'Prix par m² vente',
-                    'unit_price_for_rent': 'Prix par m² location'
+                    'unit_price_for_rent': 'Prix par m² location',
+                    
+                    // Units of measurement
+                    'unit_years': 'ans',
+                    'unit_days': 'jours',
+                    'unit_square_meters': 'm²'
                 },
                 'tr': {
-                    'average_age_for_sale': 'Satış için ortalama yaş (yıl)',
-                    'average_age_for_rent': 'Kiralama için ortalama yaş (yıl)',
-                    'listing_period_for_sale': 'Satış için ilan süresi (gün)',
-                    'listing_period_for_rent': 'Kiralama için ilan süresi (gün)',
+                    'average_age_for_sale': 'Satış için ortalama yaş',
+                    'average_age_for_rent': 'Kiralama için ortalama yaş',
+                    'listing_period_for_sale': 'Satış için ilan süresi',
+                    'listing_period_for_rent': 'Kiralama için ilan süresi',
                     'max_unit_price_for_sale': 'Satış için m² başına maksimum fiyat',
                     'min_unit_price_for_sale': 'Satış için m² başına minimum fiyat',
                     'max_unit_price_for_rent': 'Kiralama için m² başına maksimum fiyat',
@@ -2108,7 +2128,12 @@
                     'price_for_rent': 'Kiralama Fiyatı',
                     'count_for_sale': 'Satış Sayısı',
                     'unit_price_for_sale': 'm² Satış Fiyatı',
-                    'unit_price_for_rent': 'm² Kiralama Fiyatı'
+                    'unit_price_for_rent': 'm² Kiralama Fiyatı',
+                    
+                    // Units of measurement
+                    'unit_years': 'yıl',
+                    'unit_days': 'gün',
+                    'unit_square_meters': 'm²'
                 }
             };
             
@@ -2216,17 +2241,7 @@
                 key.includes('duration') || key.includes('Duration') ||
                 key.includes('listing_period') || key.includes('Listing_Period')) {
                 if (typeof value === 'number') {
-                    if (isTurkey) {
-                        return `${value} gün`;
-                    } else if (userLocale === 'de-DE') {
-                        return `${value} Tage`;
-                    } else if (userLocale === 'fr-FR') {
-                        return `${value} jours`;
-                    } else if (userLocale === 'ru-RU') {
-                        return `${value} дней`;
-                    } else {
-                        return `${value} days`;
-                    }
+                    return `${value} ${getText('unit_days')}`;
                 }
                 return value;
             }
@@ -2235,17 +2250,7 @@
             if (key.includes('age') || key.includes('Age') ||
                 key.includes('average_age') || key.includes('Average_Age')) {
                 if (typeof value === 'number') {
-                    if (isTurkey) {
-                        return `${value} yıl`;
-                    } else if (userLocale === 'de-DE') {
-                        return `${value} Jahre`;
-                    } else if (userLocale === 'fr-FR') {
-                        return `${value} ans`;
-                    } else if (userLocale === 'ru-RU') {
-                        return `${value} лет`;
-                    } else {
-                        return `${value} years`;
-                    }
+                    return `${value} ${getText('unit_years')}`;
                 }
                 return value;
             }
@@ -2257,7 +2262,7 @@
                 if (typeof value === 'number') {
                     // Convert to selected currency if rates are available
                     const convertedValue = convertCurrency(value);
-                    return formatCurrency(convertedValue, currentCurrency) + '/m²';
+                    return formatCurrency(convertedValue, currentCurrency) + '/' + getText('unit_square_meters');
                 }
                 return value;
             }
@@ -2266,7 +2271,7 @@
             if (key.includes('area') || key.includes('Area') ||
                 key.includes('comparable_area') || key.includes('Comparable_Area')) {
                 if (typeof value === 'number') {
-                    return `${value.toLocaleString(userLocale)} m²`;
+                    return `${value.toLocaleString(userLocale)} ${getText('unit_square_meters')}`;
                 }
                 return value;
             }
@@ -2980,7 +2985,7 @@
         // Get AI insights for the region data
         async function getRegionInsights(regionData) {
             try {
-                console.log('🧠 Запрашиваем AI-вывод для данных региона');
+                console.log('🧠 Requesting AI insights for region data');
                 
                 // Show insights section
                 const insightsSection = document.getElementById('insightsSection');
@@ -3023,7 +3028,7 @@
                     const insightsTextElement = document.getElementById('insightsText');
                     insightsTextElement.textContent = data.insights;
                     
-                    console.log('✅ AI-вывод получен:', data.insights);
+                    console.log('✅ AI insights received:', data.insights);
                 } else {
                     throw new Error(data.error || 'Unknown error');
                 }
@@ -3621,7 +3626,7 @@
             userLanguage = await getUserLanguage();
             currentLanguage = userLanguage;
             
-            console.log(`🌐 Инициализация страницы с языком: ${currentLanguage}`);
+            console.log(`🌐 Initializing page with language: ${currentLanguage}`);
             
             // Update page text
             updatePageText();

@@ -22,10 +22,10 @@
     <div class="container">
         <img src="logo-flt.png" alt="Aaadviser" class="logo" onclick="goToMainMenu()">
         <div class="title" data-i18n="common.help">Помощь</div>
-        <button class="help-btn" onclick="aboutApp()"><span class="help-btn-icon">ℹ️</span>О приложении</button>
-        <button class="help-btn" onclick="showInstruction()"><span class="help-btn-icon">📖</span>Инструкция</button>
-        <button class="help-btn" onclick="showGeo()"><span class="help-btn-icon">🌍</span>Наша география</button>
-        <button class="help-btn" onclick="showSupport()"><span class="help-btn-icon">🛠️</span>Техническая поддержка</button>
+        <button class="help-btn" onclick="aboutApp()"><span class="help-btn-icon">ℹ️</span><span data-i18n="help.about_app">О приложении</span></button>
+        <button class="help-btn" onclick="showInstruction()"><span class="help-btn-icon">📖</span><span data-i18n="help.instruction">Инструкция</span></button>
+        <button class="help-btn" onclick="showGeo()"><span class="help-btn-icon">🌍</span><span data-i18n="help.geography">Наша география</span></button>
+        <button class="help-btn" onclick="showSupport()"><span class="help-btn-icon">🛠️</span><span data-i18n="help.support">Техническая поддержка</span></button>
         <button class="back-btn" onclick="goToMainMenu()" data-i18n="common.back">Вернуться в главное меню</button>
     </div>
     <script>
@@ -98,12 +98,12 @@
                         if (response.ok) {
                             const data = await response.json();
                             if (data.success) {
-                                console.log(`🌐 Язык определен: ${data.language} (статус: ${data.user_status})`);
+                                console.log(`🌐 Language determined: ${data.language} (status: ${data.user_status})`);
                                 return data.language;
                             }
                         }
                     } catch (error) {
-                        console.warn('Ошибка при получении языка пользователя:', error);
+                        console.warn('Error getting user language:', error);
                     }
                 }
             }

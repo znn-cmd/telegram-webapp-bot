@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aaadviser - Оценка объекта</title>
+    <title>Aaadviser - <span data-i18n="pageTitle">Оценка объекта</span></title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="/i18n-manager.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -3662,87 +3662,87 @@
         <!-- Логотип -->
         <div style="display:flex;flex-direction:column;align-items:center;margin-top:18px;margin-bottom:10px;">
             <img src="logo-flt.png" alt="Aaadviser Logo" style="width:110px;height:auto;display:block;margin-bottom:8px;cursor:pointer;" onclick="goToMainMenu()" />
-            <div style="font-size:15px;color:#888;font-style:italic;" id="slogan">Инсайты рынка недвижимости</div>
+            <div style="font-size:15px;color:#888;font-style:italic;" id="slogan" data-i18n="slogan">Инсайты рынка недвижимости</div>
         </div>
 
         <!-- Заголовок страницы -->
-        <div class="page-title" id="pageTitle">Оценка объекта</div>
-        <div class="page-description" id="pageDescription">Получите профессиональную оценку стоимости недвижимости в выбранном регионе</div>
+        <div class="page-title" id="pageTitle" data-i18n="pageTitle">Оценка объекта</div>
+        <div class="page-description" id="pageDescription" data-i18n="pageDescription">Получите профессиональную оценку стоимости недвижимости в выбранном регионе</div>
 
         <!-- Форма выбора локации -->
         <div class="location-form" id="locationForm">
             <div class="form-group">
-                <label for="countrySelect" id="countryLabel">Страна:</label>
+                <label for="countrySelect" id="countryLabel" data-i18n="countryLabel">Страна:</label>
                 <select id="countrySelect" onchange="onCountryChange()">
-                    <option value="" id="countryPlaceholder">Выберите страну</option>
+                    <option value="" id="countryPlaceholder" data-i18n="countryPlaceholder">Выберите страну</option>
                 </select>
             </div>
 
             <div class="form-group">
-                <label for="citySelect" id="cityLabel">Город:</label>
+                <label for="citySelect" id="cityLabel" data-i18n="cityLabel">Город:</label>
                 <select id="citySelect" disabled onchange="onCityChange()">
-                    <option value="" id="cityPlaceholder">Сначала выберите страну</option>
+                    <option value="" id="cityPlaceholder" data-i18n="cityPlaceholder">Сначала выберите страну</option>
                 </select>
             </div>
 
             <div class="form-group">
-                <label for="countySelect" id="countyLabel">Область/Регион:</label>
+                <label for="countySelect" id="countyLabel" data-i18n="countyLabel">Область/Регион:</label>
                 <select id="countySelect" disabled onchange="onCountyChange()">
-                    <option value="" id="countyPlaceholder">Сначала выберите город</option>
+                    <option value="" id="countyPlaceholder" data-i18n="countyPlaceholder">Сначала выберите город</option>
                 </select>
             </div>
 
             <div class="form-group">
-                <label for="districtSelect" id="districtLabel">Район:</label>
+                <label for="districtSelect" id="districtLabel" data-i18n="districtLabel">Район:</label>
                 <select id="districtSelect" disabled onchange="onDistrictChange()">
-                    <option value="" id="districtPlaceholder">Сначала выберите область</option>
+                    <option value="" id="districtPlaceholder" data-i18n="districtPlaceholder">Сначала выберите область</option>
                 </select>
             </div>
 
                             <!-- Listing Type Selection -->
                 <div class="listing-type-section" id="listingTypeSection" style="display: none;">
-                    <div class="listing-type-title" id="listingTypeTitle">Выберите тип недвижимости для анализа:</div>
+                    <div class="listing-type-title" id="listingTypeTitle" data-i18n="listingTypeTitle">Выберите тип недвижимости для анализа:</div>
                     
                     <!-- House Type Listing Types -->
                     <div class="listing-type-group">
-                        <div class="listing-type-subtitle" id="houseTypeSubtitle">Количество спален:</div>
+                        <div class="listing-type-subtitle" id="houseTypeSubtitle" data-i18n="houseTypeSubtitle">Количество спален:</div>
                         <select class="listing-type-select" id="houseTypeSelect">
-                            <option value="" id="houseTypePlaceholder">Выберите количество спален</option>
+                            <option value="" id="houseTypePlaceholder" data-i18n="selectBedrooms">Выберите количество спален</option>
                         </select>
                     </div>
 
                     <!-- Floor Segment Listing Types -->
                     <div class="listing-type-group">
-                        <div class="listing-type-subtitle" id="floorSegmentSubtitle">Этаж:</div>
+                        <div class="listing-type-subtitle" id="floorSegmentSubtitle" data-i18n="floorSegmentSubtitle">Этаж:</div>
                         <select class="listing-type-select" id="floorSegmentSelect">
-                            <option value="" id="floorSegmentPlaceholder">Выберите этаж</option>
+                            <option value="" id="floorSegmentPlaceholder" data-i18n="selectFloor">Выберите этаж</option>
                         </select>
                     </div>
 
                     <!-- Age Data Listing Types -->
                     <div class="listing-type-group">
-                        <div class="listing-type-subtitle" id="ageDataSubtitle">Возраст объекта:</div>
+                        <div class="listing-type-subtitle" id="ageDataSubtitle" data-i18n="ageDataSubtitle">Возраст объекта:</div>
                         <select class="listing-type-select" id="ageDataSelect">
-                            <option value="" id="ageDataPlaceholder">Выберите возраст объекта</option>
+                            <option value="" id="ageDataPlaceholder" data-i18n="selectAge">Выберите возраст объекта</option>
                         </select>
                     </div>
 
                     <!-- Heating Data Listing Types -->
                     <div class="listing-type-group">
-                        <div class="listing-type-subtitle" id="heatingDataSubtitle">Тип отопления:</div>
+                        <div class="listing-type-subtitle" id="heatingDataSubtitle" data-i18n="heatingDataSubtitle">Тип отопления:</div>
                         <select class="listing-type-select" id="heatingDataSelect">
-                            <option value="" id="heatingDataPlaceholder">Выберите тип отопления</option>
+                            <option value="" id="heatingDataPlaceholder" data-i18n="selectHeating">Выберите тип отопления</option>
                         </select>
                     </div>
 
                     <!-- Price Object -->
                     <div class="listing-type-group">
-                        <div class="listing-type-subtitle" id="priceObjectSubtitle">Цена объекта:</div>
-                        <input type="number" id="priceObjectInput" class="listing-type-input" placeholder="Введите цену">
+                        <div class="listing-type-subtitle" id="priceObjectSubtitle" data-i18n="priceObjectSubtitle">Цена объекта:</div>
+                        <input type="number" id="priceObjectInput" class="listing-type-input" placeholder="Введите цену" data-i18n-placeholder="pricePlaceholder">
                         
                         <!-- Currency Selection -->
                         <div class="currency-buttons-container">
-                            <div class="currency-buttons-title" id="currencyTitle">Выберите валюту:</div>
+                            <div class="currency-buttons-title" id="currencyTitle" data-i18n="currencyTitle">Выберите валюту:</div>
                             <div class="currency-buttons">
                                 <button type="button" class="currency-button" data-currency="TRY">
                                     <span class="currency-symbol">₺</span>
@@ -3759,24 +3759,24 @@
 
                     <!-- Area Object -->
                     <div class="listing-type-group">
-                        <div class="listing-type-subtitle" id="areaObjectSubtitle">Площадь объекта (м²):</div>
-                        <input type="number" id="areaObjectInput" class="listing-type-input" placeholder="Введите площадь" min="10" max="1000">
+                        <div class="listing-type-subtitle" id="areaObjectSubtitle" data-i18n="areaObjectSubtitle">Площадь объекта (м²):</div>
+                        <input type="number" id="areaObjectInput" class="listing-type-input" placeholder="Введите площадь" min="10" max="1000" data-i18n-placeholder="areaPlaceholder">
                     </div>
                 </div>
 
             <button class="confirm-button" id="confirmButton" onclick="confirmLocation()" disabled>
-                <span id="confirmButtonText">Подтвердить выбор</span>
+                <span id="confirmButtonText" data-i18n="confirmButtonText">Подтвердить выбор</span>
             </button>
         </div>
 
         <!-- Выбранная локация -->
         <div class="selected-location" id="selectedLocation" style="display: none;">
-            <div class="location-title" id="selectedLocationTitle">Выбранная локация:</div>
+            <div class="location-title" id="selectedLocationTitle" data-i18n="selectedLocationTitle">Выбранная локация:</div>
             <div class="location-details" id="locationDetails"></div>
             
             <!-- Выбранные характеристики недвижимости -->
             <div class="selected-property-types" id="selectedPropertyTypes" style="display: none;">
-                <div class="property-types-title" id="propertyTypesTitle">Выбранные характеристики недвижимости:</div>
+                <div class="property-types-title" id="propertyTypesTitle" data-i18n="propertyTypesTitle">Выбранные характеристики недвижимости:</div>
                 <div class="property-types-details" id="propertyTypesDetails"></div>
             </div>
             
@@ -3808,13 +3808,13 @@
 
         <!-- Save and Share Button -->
         <button class="save-share-button" id="saveShareButton" onclick="saveAndShareReport()">
-            <span id="saveShareButtonText">Сохранить и поделиться отчетом</span>
+            <span id="saveShareButtonText" data-i18n="saveShareButtonText">Сохранить и поделиться отчетом</span>
         </button>
 
         <!-- Error State -->
         <div class="error-state" id="errorState" style="display: none;">
             <div class="error-icon">❌</div>
-            <div class="error-text" id="errorText">Ошибка загрузки данных</div>
+            <div class="error-text" id="errorText" data-i18n="errorText">Ошибка загрузки данных</div>
         </div>
 
         <!-- Back Button -->
@@ -4018,7 +4018,15 @@
                 'contactSupport': 'Свяжитесь с нашей поддержкой: @Aaadviser_support_bot',
                 'selectPropertyType': 'Выберите тип недвижимости',
                 'detailedDataTitle': 'Детальные данные (только для администраторов)',
-                'detailedTrendsDataTitle': 'Детальные данные трендов'
+                'detailedTrendsDataTitle': 'Детальные данные трендов',
+                
+                // Units of measurement
+                'unit_years': 'лет',
+                'unit_days': 'дней',
+                'unit_square_meters': 'м²',
+                
+                // Trends analysis
+                'trendsAnalysisTitle': 'Вывод по тренду'
             },
             'en': {
                 'slogan': 'Real Estate Market Insights',
@@ -4162,7 +4170,15 @@
                 'contactSupport': 'Contact our support: @Aaadviser_support_bot',
                 'selectPropertyType': 'Select property type',
                 'detailedDataTitle': 'Detailed data (administrators only)',
-                'detailedTrendsDataTitle': 'Detailed trends data'
+                'detailedTrendsDataTitle': 'Detailed trends data',
+                
+                // Units of measurement
+                'unit_years': 'years',
+                'unit_days': 'days',
+                'unit_square_meters': 'm²',
+                
+                // Trends analysis
+                'trendsAnalysisTitle': 'Trend Analysis'
             },
             'de': {
                 'slogan': 'Immobilienmarkt-Einblicke',
@@ -4226,7 +4242,26 @@
                 'closeButtonText': 'Schließen',
                 'selectPropertyType': 'Immobilientyp auswählen',
                 'detailedDataTitle': 'Detaillierte Daten (nur für Administratoren)',
-                'detailedTrendsDataTitle': 'Detaillierte Trenddaten'
+                'detailedTrendsDataTitle': 'Detaillierte Trenddaten',
+                
+                // Market indicators
+                'marketIndicatorsTitle': 'Marktindikatoren',
+                'saleHeader': 'Verkauf',
+                'rentHeader': 'Vermietung',
+                'comparableAreaForSaleLabel': 'Vergleichbare Fläche',
+                'comparableAreaForRentLabel': 'Vergleichbare Fläche',
+                'listingPeriodForSaleLabel': 'Angebotsdauer',
+                'listingPeriodForRentLabel': 'Angebotsdauer',
+                'unitPriceForSaleLabel': 'Einheitspreis',
+                'unitPriceForRentLabel': 'Einheitspreis',
+                
+                // Units of measurement
+                'unit_years': 'Jahre',
+                'unit_days': 'Tage',
+                'unit_square_meters': 'm²',
+                
+                // Trends analysis
+                'trendsAnalysisTitle': 'Trendanalyse'
             },
             'fr': {
                 'slogan': 'Aperçus du marché immobilier',
@@ -4266,7 +4301,26 @@
                 'yieldLabel': 'Rendement',
                 'insightsTitle': 'Résumé',
                 'insightsLoading': 'Analyse des données...',
-                'insightsError': 'Erreur lors de l\'analyse des données'
+                'insightsError': 'Erreur lors de l\'analyse des données',
+                
+                // Market indicators
+                'marketIndicatorsTitle': 'Indicateurs de marché',
+                'saleHeader': 'Vente',
+                'rentHeader': 'Location',
+                'comparableAreaForSaleLabel': 'Surface comparable',
+                'comparableAreaForRentLabel': 'Surface comparable',
+                'listingPeriodForSaleLabel': 'Durée d\'inscription',
+                'listingPeriodForRentLabel': 'Durée d\'inscription',
+                'unitPriceForSaleLabel': 'Prix unitaire',
+                'unitPriceForRentLabel': 'Prix unitaire',
+                
+                // Units of measurement
+                'unit_years': 'ans',
+                'unit_days': 'jours',
+                'unit_square_meters': 'm²',
+                
+                // Trends analysis
+                'trendsAnalysisTitle': 'Analyse des tendances'
             },
             'tr': {
                 'slogan': 'Gayrimenkul Piyasa İçgörüleri',
@@ -4393,7 +4447,26 @@
                 'yieldLabel': 'Rendement',
                 'insightsTitle': 'Résumé',
                 'insightsLoading': 'Analyse des données...',
-                'insightsError': 'Erreur lors de l\'analyse des données'
+                'insightsError': 'Erreur lors de l\'analyse des données',
+                
+                // Market indicators
+                'marketIndicatorsTitle': 'Indicateurs de marché',
+                'saleHeader': 'Vente',
+                'rentHeader': 'Location',
+                'comparableAreaForSaleLabel': 'Surface comparable',
+                'comparableAreaForRentLabel': 'Surface comparable',
+                'listingPeriodForSaleLabel': 'Durée d\'inscription',
+                'listingPeriodForRentLabel': 'Durée d\'inscription',
+                'unitPriceForSaleLabel': 'Prix unitaire',
+                'unitPriceForRentLabel': 'Prix unitaire',
+                
+                // Units of measurement
+                'unit_years': 'ans',
+                'unit_days': 'jours',
+                'unit_square_meters': 'm²',
+                
+                // Trends analysis
+                'trendsAnalysisTitle': 'Analyse des tendances'
             },
             'tr': {
                 'slogan': 'Gayrimenkul Piyasa İçgörüleri',
@@ -4471,7 +4544,15 @@
                 'comparableAreaForRentLabel': 'Karşılaştırılabilir alan',
                 'countForRentLabel': 'Kiralama için sayı',
                 'listingPeriodForRentLabel': 'Kiralamaya kadar süre',
-                'unitPriceForRentLabel': 'Birim fiyat'
+                'unitPriceForRentLabel': 'Birim fiyat',
+                
+                // Units of measurement
+                'unit_years': 'yıl',
+                'unit_days': 'gün',
+                'unit_square_meters': 'm²',
+                
+                // Trends analysis
+                'trendsAnalysisTitle': 'Trend Analizi'
             }
         };
 
@@ -4729,7 +4810,7 @@
         // Load available listing types for each data category
         async function loadListingTypes() {
             try {
-                console.log('🔄 Загружаем доступные listing_type для выбранной локации...');
+                console.log('🔄 Loading available listing_type for selected location...');
                 
                 // Get current location values
                 const countrySelect = document.getElementById('countrySelect');
@@ -4739,7 +4820,7 @@
                 
                 // Check if all required location fields are filled
                 if (!countrySelect.value || !citySelect.value || !countySelect.value) {
-                    console.log('❌ Не все обязательные поля локации заполнены, пропускаем загрузку listing_type');
+                    console.log('❌ Not all required location fields are filled, skipping listing_type loading');
                     return;
                 }
                 
@@ -4816,7 +4897,7 @@
                     console.error('❌ Failed to load heating data listing types:', heatingDataData.error);
                 }
                 
-                console.log('✅ Все listing_type загружены для выбранной локации');
+                console.log('✅ All listing_type loaded for selected location');
                 
                 // Load property trends for the selected location
                 const trendsLocationData = {
@@ -5434,7 +5515,7 @@
                         if (data.success) {
                             userLanguage = data.language;
                             currentLanguage = data.language;
-                            console.log(`🌐 User language loaded: ${userLanguage} (статус: ${data.user_status})`);
+                            console.log(`🌐 User language loaded: ${userLanguage} (status: ${data.user_status})`);
                             updatePageText();
                         }
                     }
@@ -6042,7 +6123,7 @@
                 if (summary.comparable_area_for_sale) {
                     const area = summary.comparable_area_for_sale;
                 const avgArea = Math.round((area.min + area.max) / 2);
-                html += `<div class="cell-value">${avgArea} м²</div>`;
+                html += `<div class="cell-value">${avgArea} ${getText('unit_square_meters')}</div>`;
             } else {
                 html += '<div class="cell-value">-</div>';
             }
@@ -6052,7 +6133,7 @@
                 if (summary.comparable_area_for_rent) {
                     const area = summary.comparable_area_for_rent;
                 const avgArea = Math.round((area.min + area.max) / 2);
-                html += `<div class="cell-value">${avgArea} м²</div>`;
+                html += `<div class="cell-value">${avgArea} ${getText('unit_square_meters')}</div>`;
             } else {
                 html += '<div class="cell-value">-</div>';
             }
@@ -6065,7 +6146,7 @@
             html += `<div class="cell-label">${getText('listingPeriodForSaleLabel')}:</div>`;
             if (summary.listing_period_for_sale) {
                 const period = summary.listing_period_for_sale;
-                html += `<div class="cell-value">${period.min} – ${period.max} дней</div>`;
+                html += `<div class="cell-value">${period.min} – ${period.max} ${getText('unit_days')}</div>`;
             } else {
                 html += '<div class="cell-value">-</div>';
             }
@@ -6074,7 +6155,7 @@
             html += `<div class="cell-label">${getText('listingPeriodForRentLabel')}:</div>`;
                 if (summary.listing_period_for_rent) {
                     const period = summary.listing_period_for_rent;
-                html += `<div class="cell-value">${period.min} – ${period.max} дней</div>`;
+                html += `<div class="cell-value">${period.min} – ${period.max} ${getText('unit_days')}</div>`;
             } else {
                 html += '<div class="cell-value">-</div>';
             }
@@ -6413,7 +6494,7 @@
             let basePrices = null;
             try {
                 basePrices = await getBasePricesFromTables();
-                console.log('💰 Базовые цены для карточки трендов:', basePrices);
+                console.log('💰 Base prices for trends card:', basePrices);
             } catch (error) {
                 console.error('❌ Ошибка получения базовых цен для карточки, используем fallback:', error);
             }
@@ -6439,7 +6520,7 @@
                             let displayValue = currentTrend.trend_value;
                             if (basePrices && type === 'price_trend') {
                                 displayValue = basePrices.sale_price; // Используем базовую цену продажи
-                                console.log(`💰 Использую базовую цену для карточки: ${displayValue}`);
+                                console.log(`💰 Using base price for card: ${displayValue}`);
                             }
                             
                             return `
@@ -6641,7 +6722,7 @@
         async function prepareTrendsWithHistoricalPrices(trends) {
             if (!trends || trends.length === 0) return [];
             
-            console.log('💰 Начинаем расчет цен с новой логикой: базовые цены из 4 таблиц');
+            console.log('💰 Starting price calculation with new logic: base prices from 4 tables');
             
             // Сортируем тренды по дате (новые сначала)
             const sortedTrends = trends.sort((a, b) => {
@@ -6659,7 +6740,7 @@
             let basePrices = null;
             try {
                 basePrices = await getBasePricesFromTables();
-                console.log('💰 Базовые цены получены:', basePrices);
+                console.log('💰 Base prices received:', basePrices);
             } catch (error) {
                 console.error('❌ Ошибка получения базовых цен, используем fallback:', error);
                 // Fallback: используем данные из property_trends для текущего месяца
@@ -6669,7 +6750,7 @@
                         sale_price: parseFloat(currentTrend.unit_price_for_sale) || 0,
                         rent_price: parseFloat(currentTrend.unit_price_for_rent) || 0
                     };
-                    console.log('🔄 Использованы fallback базовые цены:', basePrices);
+                    console.log('🔄 Using fallback base prices:', basePrices);
                 }
             }
             
@@ -6700,7 +6781,7 @@
                         rentPrice: basePrices.rent_price,
                         isCalculated: true // Помечаем как рассчитанное
                     });
-                    console.log(`💰 Базовые цены для текущего месяца ${year}-${month}: продажа ${basePrices.sale_price} ₺/м², аренда ${basePrices.rent_price} ₺/м²`);
+                    console.log(`💰 Base prices for current month ${year}-${month}: sale ${basePrices.sale_price} ₺/m², rent ${basePrices.rent_price} ₺/m²`);
                     
                 } else if (isFutureMonth) {
                     // Для будущих месяцев рассчитываем ПРОГРЕССИВНО
@@ -6727,7 +6808,7 @@
                             trend.price_change_rent
                         );
                         
-                        console.log(`🚀 Прогрессивный расчет для ${year}-${month}: продажа ${calculatedSalePrice} ₺/м², аренда ${calculatedRentPrice} ₺/м²`);
+                        console.log(`🚀 Progressive calculation for ${year}-${month}: sale ${calculatedSalePrice} ₺/m², rent ${calculatedRentPrice} ₺/m²`);
                     }
                     
                     priceCache.set(cacheKey, {
@@ -6761,7 +6842,7 @@
                             trend.price_change_rent
                         );
                         
-                        console.log(`⏪ Рекурсивный расчет для ${year}-${month}: продажа ${calculatedSalePrice} ₺/м², аренда ${calculatedRentPrice} ₺/м²`);
+                        console.log(`⏪ Recursive calculation for ${year}-${month}: sale ${calculatedSalePrice} ₺/m², rent ${calculatedRentPrice} ₺/m²`);
                     }
                     
                     priceCache.set(cacheKey, {
@@ -6791,7 +6872,7 @@
                 return trend;
             });
             
-            console.log('📊 Тренды с новой логикой расчета:', updatedTrends.length, 'записей');
+            console.log('📊 Trends with new calculation logic:', updatedTrends.length, 'records');
             return updatedTrends;
         }
         
@@ -6808,7 +6889,7 @@
                 throw new Error('Локация не выбрана');
             }
             
-            console.log('💰 Запрос базовых цен из 4 таблиц для локации:', location);
+            console.log('💰 Requesting base prices from 4 tables for location:', location);
             
             const response = await fetch('/api/base_prices', {
                 method: 'POST',
@@ -6970,7 +7051,7 @@
             
             // Подготавливаем тренды с рассчитанными историческими ценами
             const trendsWithHistoricalPrices = await prepareTrendsWithHistoricalPrices(trends);
-            console.log('🔢 Тренды с историческими ценами подготовлены:', trendsWithHistoricalPrices.length, 'записей');
+            console.log('🔢 Trends with historical prices prepared:', trendsWithHistoricalPrices.length, 'records');
             
             // Фильтруем тренды по диапазону дат (с учетом статуса админа)
             const filteredTrends = filterTrendsByDateRange(trendsWithHistoricalPrices, isAdmin);
@@ -7192,7 +7273,7 @@
             
             // Формируем аналитический вывод
             let analysis = '<div class="trends-analysis-section">';
-            analysis += '<h4 class="trends-analysis-title">Вывод по тренду</h4>';
+            analysis += `<h4 class="trends-analysis-title">${getText('trendsAnalysisTitle')}</h4>`;
             analysis += '<div class="trends-analysis-content">';
             
             if (salePriceGrowth > 0 && rentPriceGrowth > 0) {
@@ -7890,11 +7971,11 @@
                             currencyDate = date.toLocaleDateString('ru-RU');
                         }
                         
-                        console.log(`💱 Exchange rate: 1 EUR = ${eurToTryRate} TRY, 1 TRY = ${tryToEurRate} EUR (от ${currencyDate})`);
+                        console.log(`💱 Exchange rate: 1 EUR = ${eurToTryRate} TRY, 1 TRY = ${tryToEurRate} EUR (from ${currencyDate})`);
                     }
                 }
             } catch (error) {
-                console.log('⚠️ Не удалось получить курс валют, используем примерные значения');
+                console.log('⚠️ Failed to get exchange rates, using approximate values');
                 // Используем примерный курс TRY к EUR как fallback
                 tryToEurRate = 0.03; // Примерно 1 TRY = 0.03 EUR
                 currencyDate = 'примерный';
@@ -8251,7 +8332,7 @@
             await getUserLanguage();
             currentLanguage = userLanguage;
             
-            console.log(`🌐 Инициализация страницы с языком: ${currentLanguage}`);
+            console.log(`🌐 Initializing page with language: ${currentLanguage}`);
             
             updatePageText();
             loadCountries();
