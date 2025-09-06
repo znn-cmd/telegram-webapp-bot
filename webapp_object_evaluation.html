@@ -4556,9 +4556,64 @@
             }
         };
 
+        // Helper function to get unit text from local labels
+        function getUnitText(unitKey) {
+            const language = currentLanguage || userLanguage || 'en';
+            const labels = {
+                'ru': {
+                    'unit_days': 'дней',
+                    'unit_years': 'лет',
+                    'unit_square_meters': 'м²'
+                },
+                'en': {
+                    'unit_days': 'days',
+                    'unit_years': 'years',
+                    'unit_square_meters': 'm²'
+                },
+                'de': {
+                    'unit_days': 'Tage',
+                    'unit_years': 'Jahre',
+                    'unit_square_meters': 'm²'
+                },
+                'fr': {
+                    'unit_days': 'jours',
+                    'unit_years': 'ans',
+                    'unit_square_meters': 'm²'
+                },
+                'tr': {
+                    'unit_days': 'gün',
+                    'unit_years': 'yıl',
+                    'unit_square_meters': 'm²'
+                }
+            };
+            
+            return labels[language]?.[unitKey] || unitKey;
+        }
+
         // Get localized text
         function getText(key) {
-            return locales[currentLanguage][key] || key;
+            // Try to use i18nManager first if available
+            if (window.i18nManager && window.i18nManager.getTranslation) {
+                const translation = window.i18nManager.getTranslation(key);
+                if (translation && translation !== key) {
+                    return translation;
+                }
+            }
+            
+            // Fallback to local locales
+            const language = currentLanguage || userLanguage || 'en';
+            
+            // Check if locales object exists and has the language
+            if (!locales || !locales[language]) {
+                console.warn(`Locales not available for language: ${language}, using key: ${key}`);
+                return key;
+            }
+            
+            const result = locales[language][key] || key;
+            if (result === key) {
+                console.warn(`Translation not found for key: ${key}, language: ${language}`);
+            }
+            return result;
         }
 
         // Update page text based on current language
@@ -6123,7 +6178,7 @@
                 if (summary.comparable_area_for_sale) {
                     const area = summary.comparable_area_for_sale;
                 const avgArea = Math.round((area.min + area.max) / 2);
-                html += `<div class="cell-value">${avgArea} ${getText('unit_square_meters')}</div>`;
+                html += `<div class="cell-value">${avgArea} ${getUnitText('unit_square_meters')}</div>`;
             } else {
                 html += '<div class="cell-value">-</div>';
             }
@@ -6133,7 +6188,7 @@
                 if (summary.comparable_area_for_rent) {
                     const area = summary.comparable_area_for_rent;
                 const avgArea = Math.round((area.min + area.max) / 2);
-                html += `<div class="cell-value">${avgArea} ${getText('unit_square_meters')}</div>`;
+                html += `<div class="cell-value">${avgArea} ${getUnitText('unit_square_meters')}</div>`;
             } else {
                 html += '<div class="cell-value">-</div>';
             }
@@ -6146,7 +6201,7 @@
             html += `<div class="cell-label">${getText('listingPeriodForSaleLabel')}:</div>`;
             if (summary.listing_period_for_sale) {
                 const period = summary.listing_period_for_sale;
-                html += `<div class="cell-value">${period.min} – ${period.max} ${getText('unit_days')}</div>`;
+                html += `<div class="cell-value">${period.min} – ${period.max} ${getUnitText('unit_days')}</div>`;
             } else {
                 html += '<div class="cell-value">-</div>';
             }
@@ -6155,7 +6210,7 @@
             html += `<div class="cell-label">${getText('listingPeriodForRentLabel')}:</div>`;
                 if (summary.listing_period_for_rent) {
                     const period = summary.listing_period_for_rent;
-                html += `<div class="cell-value">${period.min} – ${period.max} ${getText('unit_days')}</div>`;
+                html += `<div class="cell-value">${period.min} – ${period.max} ${getUnitText('unit_days')}</div>`;
             } else {
                 html += '<div class="cell-value">-</div>';
             }
