@@ -1666,6 +1666,32 @@
                     return 'en';
                 }
                 
+                // Сначала попробуем получить язык через /api/user (основной endpoint)
+                try {
+                    const userResponse = await fetch('/api/user', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ 
+                            telegram_id: telegramId,
+                            language_code: window.Telegram?.WebApp?.initDataUnsafe?.user?.language_code
+                        })
+                    });
+                    
+                    if (userResponse.ok) {
+                        const userData = await userResponse.json();
+                        if (userData.language_determined) {
+                            userLanguage = userData.language;
+                            console.log(`🌐 User language loaded from /api/user: ${userLanguage}`);
+                            return userLanguage;
+                        }
+                    }
+                } catch (error) {
+                    console.log('Failed to get language from /api/user, trying fallback...');
+                }
+                
+                // Fallback: используем /api/user/language
                 const response = await fetch('/api/user/language', {
                     method: 'POST',
                     headers: {
@@ -1680,7 +1706,7 @@
                 const data = await response.json();
                 if (data.success) {
                     userLanguage = data.language;
-                    console.log(`🌐 User language loaded: ${userLanguage} (статус: ${data.user_status})`);
+                    console.log(`🌐 User language loaded from fallback: ${userLanguage} (статус: ${data.user_status})`);
                     return userLanguage;
                 } else {
                     console.log('Failed to get user language, using default: en');

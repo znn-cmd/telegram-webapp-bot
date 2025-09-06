@@ -191,10 +191,14 @@ def safe_db_operation(operation, max_retries=3, retry_delay=2):
     """
     for attempt in range(max_retries):
         try:
-            return operation()
+            logger.info(f"🔄 Попытка подключения к БД {attempt + 1}/{max_retries}")
+            result = operation()
+            logger.info(f"✅ Успешное подключение к БД на попытке {attempt + 1}")
+            return result
         except (TimeoutException, ConnectTimeout) as e:
             logger.warning(f"Database timeout on attempt {attempt + 1}/{max_retries}: {e}")
             if attempt < max_retries - 1:
+                logger.info(f"⏳ Ожидание {retry_delay} секунд перед следующей попыткой...")
                 time.sleep(retry_delay)
                 continue
             else:
@@ -204,6 +208,19 @@ def safe_db_operation(operation, max_retries=3, retry_delay=2):
             logger.error(f"Database operation error: {e}")
             return None
     return None
+
+# Проверка подключения к Supabase при запуске
+try:
+    logger.info("🔍 Проверка подключения к Supabase...")
+    test_result = safe_db_operation(
+        lambda: supabase.table('users').select('id').limit(1).execute()
+    )
+    if test_result is not None:
+        logger.info("✅ Подключение к Supabase успешно установлено")
+    else:
+        logger.error("❌ Не удалось подключиться к Supabase")
+except Exception as e:
+    logger.error(f"❌ Ошибка при проверке подключения к Supabase: {e}")
 
 # Flask маршруты для WebApp
 # Маршрут для корневого пути - перенаправление на webapp
@@ -362,6 +379,7 @@ def api_user():
             'balance': user.get('balance', 0),
             'telegram_id': user.get('telegram_id'),
             'user_status': user.get('user_status', None),
+            'language_determined': True  # Флаг что язык уже определен
         })
     else:
         # Новый пользователь - используем язык из Telegram
@@ -409,7 +427,8 @@ def api_user():
             'languages': locales[lang]['language_names'],
             'balance': 0,
             'telegram_id': telegram_id,
-            'invite_code': invite_code
+            'invite_code': invite_code,
+            'language_determined': True  # Флаг что язык уже определен
         })
 
 @app.route('/api/user_profile', methods=['POST'])
@@ -468,11 +487,19 @@ def api_set_language():
     
     # Получаем статус пользователя
     try:
-        user_result = supabase.table('users').select('user_status').eq('telegram_id', telegram_id).execute()
+        user_result = safe_db_operation(
+            lambda: supabase.table('users').select('user_status').eq('telegram_id', telegram_id).execute()
+        )
+        if user_result is None:
+            return jsonify({'error': 'Database connection error'}), 500
         user_status = user_result.data[0].get('user_status') if user_result.data else None
         
         # Обновляем язык пользователя
-        supabase.table('users').update({'language': language}).eq('telegram_id', telegram_id).execute()
+        update_result = safe_db_operation(
+            lambda: supabase.table('users').update({'language': language}).eq('telegram_id', telegram_id).execute()
+        )
+        if update_result is None:
+            return jsonify({'error': 'Database connection error'}), 500
         
         logger.info(f"🌐 Язык обновлен для пользователя {telegram_id}: {language} (статус: {user_status})")
         
@@ -1089,7 +1116,12 @@ def api_user_language():
         logger.info(f"🔍 Запрос языка пользователя для telegram_id: {telegram_id}")
         
         # Получаем полные данные пользователя из базы данных
-        result = supabase.table('users').select('language, user_status').eq('telegram_id', telegram_id).execute()
+        result = safe_db_operation(
+            lambda: supabase.table('users').select('language, user_status').eq('telegram_id', telegram_id).execute()
+        )
+        
+        if result is None:
+            return jsonify({'success': False, 'error': 'Database connection error'}), 500
         
         if result.data and len(result.data) > 0:
             user = result.data[0]
