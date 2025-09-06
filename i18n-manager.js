@@ -91,7 +91,8 @@ class I18nManager {
                     'about': 'О нас', 'contact': 'Контакты', 'privacy': 'Конфиденциальность',
                     'terms': 'Условия', 'language': 'Язык', 'currency': 'Валюта',
                     'timezone': 'Часовой пояс', 'notifications': 'Уведомления',
-                    'dark_mode': 'Темная тема', 'light_mode': 'Светлая тема'
+                    'dark_mode': 'Темная тема', 'light_mode': 'Светлая тема',
+                    'unit_days': 'дней', 'unit_years': 'лет', 'unit_square_meters': 'м²'
                 },
                 'profile': {
                     'title': 'Личный кабинет', 'personal_info': 'Личная информация',
@@ -165,7 +166,8 @@ class I18nManager {
                     'about': 'About', 'contact': 'Contact', 'privacy': 'Privacy',
                     'terms': 'Terms', 'language': 'Language', 'currency': 'Currency',
                     'timezone': 'Timezone', 'notifications': 'Notifications',
-                    'dark_mode': 'Dark Mode', 'light_mode': 'Light Mode'
+                    'dark_mode': 'Dark Mode', 'light_mode': 'Light Mode',
+                    'unit_days': 'days', 'unit_years': 'years', 'unit_square_meters': 'm²'
                 },
                 'profile': {
                     'title': 'Profile', 'personal_info': 'Personal Information',
@@ -240,7 +242,8 @@ class I18nManager {
                     'about': 'Über uns', 'contact': 'Kontakt', 'privacy': 'Datenschutz',
                     'terms': 'Bedingungen', 'language': 'Sprache', 'currency': 'Währung',
                     'timezone': 'Zeitzone', 'notifications': 'Benachrichtigungen',
-                    'dark_mode': 'Dunkler Modus', 'light_mode': 'Heller Modus'
+                    'dark_mode': 'Dunkler Modus', 'light_mode': 'Heller Modus',
+                    'unit_days': 'Tage', 'unit_years': 'Jahre', 'unit_square_meters': 'm²'
                 },
                 'profile': {
                     'title': 'Profil', 'personal_info': 'Persönliche Informationen',
@@ -315,7 +318,8 @@ class I18nManager {
                     'about': 'À propos', 'contact': 'Contact', 'privacy': 'Confidentialité',
                     'terms': 'Conditions', 'language': 'Langue', 'currency': 'Devise',
                     'timezone': 'Fuseau horaire', 'notifications': 'Notifications',
-                    'dark_mode': 'Mode sombre', 'light_mode': 'Mode clair'
+                    'dark_mode': 'Mode sombre', 'light_mode': 'Mode clair',
+                    'unit_days': 'jours', 'unit_years': 'ans', 'unit_square_meters': 'm²'
                 },
                 'profile': {
                     'title': 'Profil', 'personal_info': 'Informations personnelles',
@@ -390,7 +394,8 @@ class I18nManager {
                     'about': 'Hakkında', 'contact': 'İletişim', 'privacy': 'Gizlilik',
                     'terms': 'Şartlar', 'language': 'Dil', 'currency': 'Para birimi',
                     'timezone': 'Saat dilimi', 'notifications': 'Bildirimler',
-                    'dark_mode': 'Karanlık mod', 'light_mode': 'Aydınlık mod'
+                    'dark_mode': 'Karanlık mod', 'light_mode': 'Aydınlık mod',
+                    'unit_days': 'gün', 'unit_years': 'yıl', 'unit_square_meters': 'm²'
                 },
                 'profile': {
                     'title': 'Profil', 'personal_info': 'Kişisel bilgiler',

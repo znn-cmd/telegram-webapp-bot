@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Aaadviser - <span data-i18n="pageTitle">Аналитика региона</span></title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="i18n-manager.js"></script>
     <style>
         * {
             margin: 0;
@@ -1438,14 +1439,26 @@
 
         // Get localized text
         function getText(key) {
-            if (!currentLanguage) {
-                console.warn(`Current language not set, using default 'en' for key: ${key}`);
-                currentLanguage = 'en';
+            // Try to use i18nManager first if available
+            if (window.i18nManager && window.i18nManager.getTranslation) {
+                const translation = window.i18nManager.getTranslation(key);
+                if (translation && translation !== key) {
+                    return translation;
+                }
             }
             
-            const result = locales[currentLanguage][key] || key;
+            // Fallback to local locales
+            const language = currentLanguage || userLanguage || 'en';
+            
+            // Check if locales object exists and has the language
+            if (!locales || !locales[language]) {
+                console.warn(`Locales not available for language: ${language}, using key: ${key}`);
+                return key;
+            }
+            
+            const result = locales[language][key] || key;
             if (result === key) {
-                console.warn(`Translation not found for key: ${key}, language: ${currentLanguage}`);
+                console.warn(`Translation not found for key: ${key}, language: ${language}`);
             }
             return result;
         }
@@ -2213,6 +2226,13 @@
         function formatFieldValue(key, value) {
             if (value === null || value === undefined) {
                 return 'N/A';
+            }
+            
+            // Ensure language is available before formatting
+            const language = currentLanguage || userLanguage || 'en';
+            if (!locales || !locales[language]) {
+                console.warn(`Cannot format value for key ${key}: locales not available for language ${language}`);
+                return value.toString();
             }
             
             // Get user's selected country for currency and locale formatting
@@ -3639,9 +3659,17 @@
 
         // Initialize the page
         async function init() {
-            // Получаем язык пользователя через API с учетом новой логики
-            userLanguage = await getUserLanguage();
-            currentLanguage = userLanguage;
+            // Wait for i18nManager to be ready
+            if (window.i18nManager) {
+                await window.i18nManager.init();
+                currentLanguage = window.i18nManager.currentLanguage;
+                console.log(`🌐 Using i18nManager language: ${currentLanguage}`);
+            } else {
+                // Fallback to local language detection
+                userLanguage = await getUserLanguage();
+                currentLanguage = userLanguage;
+                console.log(`🌐 Using local language detection: ${currentLanguage}`);
+            }
             
             console.log(`🌐 Initializing page with language: ${currentLanguage}`);
             console.log(`🌐 Available locales:`, Object.keys(locales));
