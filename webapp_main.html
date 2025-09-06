@@ -539,7 +539,7 @@
         if (userData && userData.id) {
             localStorage.setItem('telegram_id', userData.id);
         }
-        currentLanguage = (userData && userData.language_code) ? userData.language_code : 'ru';
+        currentLanguage = (userData && userData.language_code) ? userData.language_code : 'en';
         selectedLanguage = currentLanguage;
 
         // Toast notification system
@@ -700,6 +700,15 @@
             document.getElementById('myReportsBtn').textContent = getText('myReportsBtn');
             document.getElementById('myReportsDesc').textContent = getText('myReportsDesc');
             document.getElementById('loadingText').textContent = getText('loading');
+            
+            // Обновляем элементы баланса
+            const balanceLabel = document.querySelector('.balance-label');
+            if (balanceLabel) {
+                balanceLabel.textContent = getText('balance');
+            }
+            
+            // Приветственное сообщение обновляется отдельно в loadUserData()
+            // Здесь мы не перезаписываем его, чтобы сохранить персонализированное сообщение
         }
 
         // Установка языка
@@ -714,6 +723,10 @@
             try {
                 currentLanguage = selectedLanguage;
                 updatePageText();
+                
+                // Обновляем приветственное сообщение
+                const welcomeMessage = getText('welcome_back');
+                document.getElementById('userName').textContent = welcomeMessage;
                 
                 // Сохраняем выбор языка в базу
                 if (userData) {
@@ -778,6 +791,9 @@
                     // Логируем для отладки
                     console.log(`🌐 Язык пользователя определен: ${currentLanguage} (статус: ${userInfo.user_status})`);
 
+                    // Обновляем текст на странице с новым языком
+                    updatePageText();
+
                     // Скрыть выбор языка, если уже выбран
                     if (userInfo.language) {
                         document.getElementById('languageSelector').classList.add('hidden');
@@ -785,8 +801,8 @@
                         document.getElementById('languageSelector').classList.remove('hidden');
                     }
 
-                    // Приветствие
-                    const welcomeMessage = userInfo.welcome || userInfo.tg_name || 'Пользователь';
+                    // Приветствие - используем локализованное сообщение
+                    const welcomeMessage = getText('welcome_back');
                     document.getElementById('userName').textContent = welcomeMessage;
 
                     // Баланс с цветовой индикацией
