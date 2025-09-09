@@ -5446,7 +5446,32 @@
 
         // Get localized text
         function getText(key) {
-            return locales[currentLanguage][key] || key;
+            const result = locales[currentLanguage] && locales[currentLanguage][key] ? locales[currentLanguage][key] : key;
+            // Debug logging for troubleshooting
+            if (result === key && key !== 'slogan') {
+                console.warn(`🔍 Missing translation for key "${key}" in language "${currentLanguage}"`);
+            }
+            return result;
+        }
+
+        // Update all elements with data-i18n attributes
+        function updateDataI18nElements() {
+            const elements = document.querySelectorAll('[data-i18n]');
+            elements.forEach(element => {
+                const key = element.getAttribute('data-i18n');
+                if (key) {
+                    element.textContent = getText(key);
+                }
+            });
+            
+            // Update placeholders
+            const placeholderElements = document.querySelectorAll('[data-i18n-placeholder]');
+            placeholderElements.forEach(element => {
+                const key = element.getAttribute('data-i18n-placeholder');
+                if (key) {
+                    element.placeholder = getText(key);
+                }
+            });
         }
 
         // Update page text based on current language
@@ -5548,6 +5573,68 @@
             if (priceObjectInput) { priceObjectInput.placeholder = getText('pricePlaceholder'); }
             const areaObjectInput = document.getElementById('areaObjectInput');
             if (areaObjectInput) { areaObjectInput.placeholder = getText('areaPlaceholder'); }
+            
+            // Update form section labels and elements
+            const listingTypeTitle = document.getElementById('listingTypeTitle');
+            if (listingTypeTitle) { listingTypeTitle.textContent = getText('listingTypeTitle'); }
+            
+            const houseTypeSubtitle = document.getElementById('houseTypeSubtitle');
+            if (houseTypeSubtitle) { houseTypeSubtitle.textContent = getText('houseTypeSubtitle'); }
+            
+            const floorSegmentSubtitle = document.getElementById('floorSegmentSubtitle');
+            if (floorSegmentSubtitle) { floorSegmentSubtitle.textContent = getText('floorSegmentSubtitle'); }
+            
+            const ageDataSubtitle = document.getElementById('ageDataSubtitle');
+            if (ageDataSubtitle) { ageDataSubtitle.textContent = getText('ageDataSubtitle'); }
+            
+            const heatingDataSubtitle = document.getElementById('heatingDataSubtitle');
+            if (heatingDataSubtitle) { heatingDataSubtitle.textContent = getText('heatingDataSubtitle'); }
+            
+            const priceObjectSubtitle = document.getElementById('priceObjectSubtitle');
+            if (priceObjectSubtitle) { priceObjectSubtitle.textContent = getText('priceObjectSubtitle'); }
+            
+            const currencyTitle = document.getElementById('currencyTitle');
+            if (currencyTitle) { currencyTitle.textContent = getText('currencyTitle'); }
+            
+            const areaObjectSubtitle = document.getElementById('areaObjectSubtitle');
+            if (areaObjectSubtitle) { areaObjectSubtitle.textContent = getText('areaObjectSubtitle'); }
+            
+            // Update select options text
+            const selectBedrooms = document.getElementById('selectBedrooms');
+            if (selectBedrooms && selectBedrooms.options && selectBedrooms.options[0]) {
+                selectBedrooms.options[0].textContent = getText('selectBedrooms');
+            }
+            
+            const selectFloor = document.getElementById('selectFloor');
+            if (selectFloor && selectFloor.options && selectFloor.options[0]) {
+                selectFloor.options[0].textContent = getText('selectFloor');
+            }
+            
+            const selectAge = document.getElementById('selectAge');
+            if (selectAge && selectAge.options && selectAge.options[0]) {
+                selectAge.options[0].textContent = getText('selectAge');
+            }
+            
+            const selectHeating = document.getElementById('selectHeating');
+            if (selectHeating && selectHeating.options && selectHeating.options[0]) {
+                selectHeating.options[0].textContent = getText('selectHeating');
+            }
+            
+            // Update other labels
+            const propertyTypesTitle = document.getElementById('propertyTypesTitle');
+            if (propertyTypesTitle) { propertyTypesTitle.textContent = getText('propertyTypesTitle'); }
+            
+            const detailedTrendsDataTitle = document.getElementById('detailedTrendsDataTitle');
+            if (detailedTrendsDataTitle) { detailedTrendsDataTitle.textContent = getText('detailedTrendsDataTitle'); }
+            
+            const marketTrendsTitle = document.getElementById('marketTrendsTitle');
+            if (marketTrendsTitle) { marketTrendsTitle.textContent = getText('marketTrendsTitle'); }
+            
+            const saveShareButtonText = document.getElementById('saveShareButtonText');
+            if (saveShareButtonText) { saveShareButtonText.textContent = getText('saveShareButtonText'); }
+            
+            // Update all elements with data-i18n attributes
+            updateDataI18nElements();
             
             // Update placeholder texts
             const houseTypePlaceholder = document.getElementById('houseTypePlaceholder');
