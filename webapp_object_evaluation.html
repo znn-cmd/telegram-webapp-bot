@@ -4083,6 +4083,7 @@
                 'largerAreaText': 'имеет большую площадь чем большинство объектов на рынке',
                 'smallerAreaText': 'имеет меньшую площадь чем большинство объектов на рынке',
                 'forecastBasedOnText': 'Прогноз на основе',
+                'forecastMonthsInfo': '${months} месяцев (предыдущий + текущий + будущие)',
                 
                 // Currency and additional analysis texts
                 'exchangeRateText': 'Курс',
@@ -4328,6 +4329,7 @@
                 'largerAreaText': 'has larger area than most properties on the market',
                 'smallerAreaText': 'has smaller area than most properties on the market',
                 'forecastBasedOnText': 'Forecast based on',
+                'forecastMonthsInfo': '${months} months (previous + current + future)',
                 
                 // Currency and additional analysis texts
                 'exchangeRateText': 'Rate',
@@ -4573,6 +4575,7 @@
                 'largerAreaText': 'hat größere Fläche als die meisten Objekte am Markt',
                 'smallerAreaText': 'hat kleinere Fläche als die meisten Objekte am Markt',
                 'forecastBasedOnText': 'Prognose basiert auf',
+                'forecastMonthsInfo': '${months} Monate (vorherige + aktuelle + zukünftige)',
                 
                 // Currency and additional analysis texts
                 'exchangeRateText': 'Kurs',
@@ -4770,6 +4773,7 @@
                 'largerAreaText': 'a une superficie plus grande que la plupart des propriétés sur le marché',
                 'smallerAreaText': 'a une superficie plus petite que la plupart des propriétés sur le marché',
                 'forecastBasedOnText': 'Prévision basée sur',
+                'forecastMonthsInfo': '${months} mois (précédent + actuel + futurs)',
                 
                 // Currency and additional analysis texts
                 'exchangeRateText': 'Taux',
@@ -4974,6 +4978,7 @@
                 'largerAreaText': 'pazardaki çoğu mülkten daha büyük alana sahip',
                 'smallerAreaText': 'pazardaki çoğu mülkten daha küçük alana sahip',
                 'forecastBasedOnText': 'Tahmin temeli',
+                'forecastMonthsInfo': '${months} ay (önceki + mevcut + gelecek)',
                 
                 // Currency and additional analysis texts
                 'exchangeRateText': 'Kur',
@@ -5010,7 +5015,32 @@
                 'priceTrendLabel': 'Fiyat Trendi',
                 'yieldTrendLabel': 'Getiri Trendi',
                 'countTrendLabel': 'Sayı Trendi',
-                'generalTrendLabel': 'Genel Trend'
+                'generalTrendLabel': 'Genel Trend',
+                
+                // Missing additional keys
+                'marketTrendsTitle': 'Piyasa Trendleri',
+                'trendsFilterInfo': '${totalCount} trendden ${filteredCount} gösteriliyor',
+                'linkCopied': 'Bağlantı kopyalandı!',
+                'savingReport': 'Rapor kaydediliyor...',
+                'errorSaving': 'Rapor kaydetme hatası',
+                'marketComparisonTitle': 'Piyasa Karşılaştırması',
+                'priceComparisonLabel': 'm² başına fiyat:',
+                'areaComparisonLabel': 'Alan:',
+                'priceCloseToMarket': 'Nesneniz (${userPrice}) piyasaya yakın (${marketMin} – ${marketMax}).',
+                'priceAboveMarket': 'Nesneniz (${userPrice}) piyasadan ${percent}% yüksek.',
+                'priceBelowMarket': 'Nesneniz (${userPrice}) piyasadan ${percent}% düşük.',
+                'areaMatchesMarket': 'Nesneniz (${userArea} m²) piyasa talebine uygun (${marketMin}–${marketMax} m²).',
+                'areaBelowMarket': 'Nesneniz (${userArea} m²) piyasa talebinden küçük (${marketMin}–${marketMax} m²).',
+                'areaAboveMarket': 'Nesneniz (${userArea} m²) piyasa talebinden büyük (${marketMin}–${marketMax} m²).',
+                'consolidatedAssessmentTitle': 'Konsolide Değerlendirme',
+                'salePriceTitle': 'm² başına fiyat (Satış Birim Fiyatı):',
+                'rentPriceTitle': 'm² başına kiralama fiyatı (Kiralama Birim Fiyatı):',
+                'yieldTitle': 'Getiri:',
+                'consolidatedAverageLabel': 'Konsolide ortalama:',
+                'bedroomsLabel': 'Yatak Odası',
+                'floorLabel': 'Kat',
+                'ageLabel': 'Yaş',
+                'heatingLabel': 'Isıtma'
             },
             'fr': {
                 'slogan': 'Aperçus du marché immobilier',
@@ -5171,6 +5201,7 @@
                 'largerAreaText': 'a une superficie plus grande que la plupart des propriétés sur le marché',
                 'smallerAreaText': 'a une superficie plus petite que la plupart des propriétés sur le marché',
                 'forecastBasedOnText': 'Prévision basée sur',
+                'forecastMonthsInfo': '${months} mois (précédent + actuel + futurs)',
                 
                 // Currency and additional analysis texts
                 'exchangeRateText': 'Taux',
@@ -5372,6 +5403,7 @@
                 'largerAreaText': 'pazardaki çoğu mülkten daha büyük alana sahip',
                 'smallerAreaText': 'pazardaki çoğu mülkten daha küçük alana sahip',
                 'forecastBasedOnText': 'Tahmin temeli',
+                'forecastMonthsInfo': '${months} ay (önceki + mevcut + gelecek)',
                 
                 // Currency and additional analysis texts
                 'exchangeRateText': 'Kur',
@@ -7963,7 +7995,7 @@
             const currentMonth = currentDate.getMonth() + 1;
             
             html += `<tr class="filter-info"><td colspan="6" style="text-align: center; font-size: 11px; color: #666; background: #f8f9fa; padding: 4px;">
-                Показано ${filteredTrends.length} из ${trends.length} трендов
+                ${getText('trendsFilterInfo').replace('${filteredCount}', filteredTrends.length).replace('${totalCount}', trends.length)}
             </td></tr>`;
             
             filteredTrends.forEach((trend, index) => {
@@ -8551,7 +8583,7 @@
             
             // Добавляем информацию о прогнозе
             forecastHtml += `<tr class="forecast-info"><td colspan="4" style="text-align: center; font-size: 11px; color: #666; background: #f8f9fa; padding: 4px;">
-                ${getText('forecastBasedOnText')} ${forecastTrends.length} месяцев (предыдущий + текущий + будущие)
+                ${getText('forecastBasedOnText')} ${getText('forecastMonthsInfo').replace('${months}', forecastTrends.length)}
             </td></tr>`;
             
             forecastTrends.forEach((trend, index) => {
