@@ -64,41 +64,18 @@ supabase_key = os.getenv("SUPABASE_ANON_KEY")
 if not supabase_url or not supabase_key:
     raise RuntimeError("SUPABASE_URL и SUPABASE_ANON_KEY должны быть заданы в переменных окружения!")
 
-# Создаем HTTP клиент с увеличенными таймаутами и retry логикой
+# Импортируем исключения для обработки таймаутов
 import httpx
 from httpx import TimeoutException, ConnectTimeout
 
-# Создаем HTTP клиент с увеличенными таймаутами для Supabase
-http_client = httpx.Client(
-    timeout=httpx.Timeout(
-        connect=60.0,  # Увеличенный таймаут на установку соединения
-        read=120.0,   # Увеличенный таймаут на чтение
-        write=60.0,   # Увеличенный таймаут на запись
-        pool=60.0     # Увеличенный таймаут пула соединений
-    ),
-    limits=httpx.Limits(
-        max_keepalive_connections=10,
-        max_connections=50
-    )
-)
-
-# Инициализация Supabase с кастомным HTTP клиентом
+# Инициализация Supabase с увеличенными таймаутами
 try:
-    # Создаем Supabase клиент с кастомным HTTP клиентом для увеличенных таймаутов
-    from supabase.client import ClientOptions
-    
-    options = ClientOptions(
-        postgrest_client_timeout=120,  # Таймаут для PostgREST запросов
-        storage_client_timeout=120,    # Таймаут для Storage запросов
-        edge_function_client_timeout=120  # Таймаут для Edge Functions
-    )
-    
+    # Создаем Supabase клиент с базовыми настройками (таймауты обрабатываются на уровне safe_db_operation)
     supabase: Client = create_client(
         supabase_url, 
-        supabase_key,
-        options=options
+        supabase_key
     )
-    logger.info("✅ Supabase клиент создан успешно с увеличенными таймаутами")
+    logger.info("✅ Supabase клиент создан успешно")
 except Exception as e:
     logger.error(f"❌ Ошибка создания Supabase клиента: {e}")
     raise
@@ -217,13 +194,18 @@ def safe_db_operation(operation, max_retries=5, retry_delay=5):
             logger.info(f"✅ Успешное подключение к БД на попытке {attempt + 1}")
             return result
         except (TimeoutException, ConnectTimeout, ConnectionError, OSError) as e:
-            logger.warning(f"Database timeout on attempt {attempt + 1}/{max_retries}: {e}")
+            error_msg = str(e)
+            if "handshake operation timed out" in error_msg or "timed out" in error_msg:
+                logger.warning(f"SSL/Network timeout on attempt {attempt + 1}/{max_retries}: {error_msg}")
+            else:
+                logger.warning(f"Database connection error on attempt {attempt + 1}/{max_retries}: {error_msg}")
+            
             if attempt < max_retries - 1:
                 logger.info(f"⏳ Ожидание {retry_delay} секунд перед следующей попыткой...")
                 time.sleep(retry_delay)
                 continue
             else:
-                logger.error(f"Database operation failed after {max_retries} attempts: {e}")
+                logger.error(f"Database operation failed after {max_retries} attempts: {error_msg}")
                 return None
         except Exception as e:
             logger.error(f"Database operation error: {e}")
