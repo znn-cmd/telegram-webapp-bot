@@ -6,224 +6,38 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Личные данные — Aaadviser</title>
     <style>
-        body { 
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
-            background: #f8f9fa; 
-            margin: 0; 
-        }
-        .container { 
-            max-width: 400px; 
-            margin: 20px auto; 
-            background: #fff; 
-            border-radius: 16px; 
-            box-shadow: 0 2px 12px rgba(102,126,234,0.10); 
-            padding: 24px 20px 20px 20px; 
-            text-align: center; 
-        }
-        .title { 
-            font-size: 1.3em; 
-            font-weight: bold; 
-            margin-bottom: 16px; 
-            color: #333; 
-        }
-        .avatar-section {
-            margin-bottom: 24px;
-            position: relative;
-            display: inline-block;
-        }
-        .avatar-image {
-            width: 120px;
-            height: 120px;
-            border-radius: 60px;
-            object-fit: cover;
-            border: 3px solid #667eea;
-            box-shadow: 0 4px 12px rgba(102,126,234,0.15);
-        }
-        .avatar-upload {
-            position: absolute;
-            bottom: 0;
-            right: 0;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border: none;
-            border-radius: 50%;
-            width: 36px;
-            height: 36px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            color: white;
-            box-shadow: 0 2px 8px rgba(102,126,234,0.20);
-            transition: transform 0.2s;
-        }
-        .avatar-upload:hover {
-            transform: scale(1.1);
-        }
-        .avatar-input {
-            display: none;
-        }
-        .profile-field-block { 
-            background: #f8f9fa; 
-            border-radius: 10px; 
-            padding: 12px 14px; 
-            margin-bottom: 12px; 
-            text-align: left; 
-            box-shadow: 0 2px 8px rgba(102,126,234,0.06); 
-            display: flex; 
-            align-items: center; 
-            justify-content: space-between; 
-        }
-        .profile-field-content { 
-            flex: 1; 
-        }
-        .profile-field-label { 
-            font-size: 14px; 
-            color: #667eea; 
-            font-weight: 600; 
-            margin-bottom: 2px; 
-        }
-        .profile-field-value { 
-            font-size: 15px; 
-            color: #222; 
-        }
-        .profile-field-empty { 
-            color: #bbb; 
-            font-style: italic; 
-        }
-        .edit-btn { 
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
-            color: #fff; 
-            border: none; 
-            border-radius: 8px; 
-            padding: 8px 12px; 
-            font-size: 14px; 
-            font-weight: 500; 
-            cursor: pointer; 
-            transition: all 0.2s; 
-            box-shadow: 0 2px 8px rgba(102,126,234,0.10); 
-            display: flex; 
-            align-items: center; 
-            gap: 6px; 
-            min-width: 40px; 
-            height: 40px; 
-            justify-content: center; 
-        }
-        .edit-btn:hover { 
-            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%); 
-            transform: translateY(-1px);
-        }
-        .back-btn { 
-            margin-top: 20px; 
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
-            color: #fff; 
-            border: none; 
-            border-radius: 10px; 
-            padding: 14px 28px; 
-            font-size: 1em; 
-            font-weight: 500; 
-            cursor: pointer; 
-            transition: all 0.2s; 
-            width: 100%; 
-        }
-        .back-btn:hover { 
-            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%); 
-        }
-        .modal-bg { 
-            position: fixed; 
-            top: 0; 
-            left: 0; 
-            width: 100vw; 
-            height: 100vh; 
-            background: rgba(0,0,0,0.25); 
-            z-index: 1000; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-        }
-        .modal { 
-            background: #fff; 
-            border-radius: 14px; 
-            box-shadow: 0 4px 24px rgba(102,126,234,0.18); 
-            padding: 28px 22px 22px 22px; 
-            min-width: 280px; 
-            max-width: 90vw; 
-            text-align: left; 
-            box-sizing: border-box;
-        }
-        .modal-title { 
-            font-size: 1.1em; 
-            font-weight: bold; 
-            color: #333; 
-            margin-bottom: 14px; 
-        }
-        .modal-input { 
-            width: 100%; 
-            padding: 12px 14px; 
-            border: 1px solid #ddd; 
-            border-radius: 8px; 
-            font-size: 15px; 
-            margin-bottom: 18px; 
-            background: #f8f9fa; 
-            box-sizing: border-box; 
-        }
-        .modal-btn-row { 
-            display: flex; 
-            gap: 12px; 
-        }
-        .modal-btn { 
-            flex: 1; 
-            padding: 12px 0; 
-            border: none; 
-            border-radius: 8px; 
-            font-size: 15px; 
-            font-weight: 600; 
-            cursor: pointer; 
-        }
-        .modal-btn-primary { 
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
-            color: #fff; 
-        }
-        .modal-btn-primary:hover { 
-            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%); 
-        }
-        .modal-btn-secondary { 
-            background: #f1f1f1; 
-            color: #333; 
-            border: 1px solid #ddd; 
-        }
-        .modal-btn-secondary:hover { 
-            background: #e2e2e2; 
-        }
-        .toast { 
-            background: #fff; 
-            border-radius: 10px; 
-            padding: 14px 18px; 
-            color: #333; 
-            box-shadow: 0 2px 8px rgba(102,126,234,0.10); 
-            position: fixed; 
-            top: 30px; 
-            left: 50%; 
-            transform: translateX(-50%); 
-            z-index: 2000; 
-            font-size: 15px; 
-            font-weight: 500; 
-            display: none; 
-        }
-        .toast.show { 
-            display: block; 
-        }
-        .social-links-section {
-            margin-top: 24px;
-            padding-top: 24px;
-            border-top: 1px solid #eee;
-        }
-        .social-links-title {
-            font-size: 16px;
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 16px;
-            text-align: left;
-        }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f8f9fa; margin: 0; }
+        .container { max-width: 400px; margin: 20px auto; background: #fff; border-radius: 16px; box-shadow: 0 2px 12px rgba(102,126,234,0.10); padding: 24px 20px 20px 20px; text-align: center; }
+        .title { font-size: 1.3em; font-weight: bold; margin-bottom: 16px; color: #333; }
+        .profile-field-block { background: #f8f9fa; border-radius: 10px; padding: 12px 14px; margin-bottom: 12px; text-align: left; box-shadow: 0 2px 8px rgba(102,126,234,0.06); display: flex; align-items: center; justify-content: space-between; }
+        .avatar-section { text-align: center; margin-bottom: 20px; }
+        .avatar-container { position: relative; display: inline-block; margin-bottom: 15px; }
+        .avatar-image { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 4px solid #667eea; box-shadow: 0 4px 12px rgba(102,126,234,0.15); }
+        .avatar-placeholder { width: 120px; height: 120px; border-radius: 50%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; font-size: 48px; color: white; border: 4px solid #667eea; }
+        .avatar-upload-btn { position: absolute; bottom: -5px; right: -5px; width: 36px; height: 36px; border-radius: 50%; background: #667eea; color: white; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 16px; box-shadow: 0 2px 8px rgba(102,126,234,0.3); }
+        .avatar-upload-btn:hover { background: #5a6fd8; }
+        .file-input { display: none; }
+        .profile-field-content { flex: 1; }
+        .profile-field-label { font-size: 14px; color: #667eea; font-weight: 600; margin-bottom: 2px; }
+        .profile-field-value { font-size: 15px; color: #222; }
+        .profile-field-empty { color: #bbb; font-style: italic; }
+        .edit-btn { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; border: none; border-radius: 8px; padding: 8px 12px; font-size: 14px; font-weight: 500; cursor: pointer; transition: background 0.2s; box-shadow: 0 2px 8px rgba(102,126,234,0.10); display: flex; align-items: center; gap: 6px; min-width: 40px; height: 40px; justify-content: center; }
+        .edit-btn:hover { background: linear-gradient(135deg, #764ba2 0%, #667eea 100%); }
+        .back-btn { margin-top: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; border: none; border-radius: 10px; padding: 14px 28px; font-size: 1em; font-weight: 500; cursor: pointer; transition: background 0.2s; width: 100%; }
+        .back-btn:hover { background: linear-gradient(135deg, #764ba2 0%, #667eea 100%); }
+        .modal-bg { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.25); z-index: 1000; display: flex; align-items: center; justify-content: center; }
+        .modal { background: #fff; border-radius: 14px; box-shadow: 0 4px 24px rgba(102,126,234,0.18); padding: 28px 22px 22px 22px; min-width: 280px; max-width: 90vw; text-align: left; box-sizing: border-box; }
+        .modal-title { font-size: 1.1em; font-weight: bold; color: #333; margin-bottom: 14px; }
+        .modal-input { width: 100%; padding: 12px 14px; border: 1px solid #ddd; border-radius: 8px; font-size: 15px; margin-bottom: 18px; background: #f8f9fa; box-sizing: border-box; }
+        .modal-textarea { width: 100%; padding: 12px 14px; border: 1px solid #ddd; border-radius: 8px; font-size: 15px; margin-bottom: 18px; background: #f8f9fa; box-sizing: border-box; min-height: 80px; resize: vertical; font-family: inherit; }
+        .modal-btn-row { display: flex; gap: 12px; }
+        .modal-btn { flex: 1; padding: 12px 0; border: none; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; }
+        .modal-btn-primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; }
+        .modal-btn-primary:hover { background: linear-gradient(135deg, #764ba2 0%, #667eea 100%); }
+        .modal-btn-secondary { background: #f1f1f1; color: #333; border: 1px solid #ddd; }
+        .modal-btn-secondary:hover { background: #e2e2e2; }
+        .toast { background: #fff; border-radius: 10px; padding: 14px 18px; color: #333; box-shadow: 0 2px 8px rgba(102,126,234,0.10); position: fixed; top: 30px; left: 50%; transform: translateX(-50%); z-index: 2000; font-size: 15px; font-weight: 500; display: none; }
+        .toast.show { display: block; }
     </style>
 </head>
 <body>
@@ -232,28 +46,28 @@
         
         <!-- Avatar Section -->
         <div class="avatar-section">
-            <img id="avatarImage" src="/user/default-avatar.png" alt="Profile" class="avatar-image">
-            <label for="avatarInput" class="avatar-upload" title="Upload Photo">📷</label>
-            <input type="file" id="avatarInput" class="avatar-input" accept="image/*">
+            <div class="avatar-container">
+                <div id="avatarDisplay" class="avatar-placeholder">👤</div>
+                <button class="avatar-upload-btn" onclick="triggerFileUpload()" title="Загрузить фото">📷</button>
+                <input type="file" id="avatarInput" class="file-input" accept="image/*" onchange="handleAvatarUpload(event)">
+            </div>
         </div>
-
+        
         <div id="fields"></div>
         <button class="back-btn" onclick="goBack()" data-i18n="common.back">Назад</button>
     </div>
-
     <div id="modal-bg" class="modal-bg" style="display:none;">
         <div class="modal">
             <div class="modal-title" id="modal-title"></div>
-            <input type="text" id="modal-input" class="modal-input" />
+            <input type="text" id="modal-input" class="modal-input" style="display: none;" />
+            <textarea id="modal-textarea" class="modal-textarea" style="display: none;"></textarea>
             <div class="modal-btn-row">
                 <button class="modal-btn modal-btn-secondary" onclick="closeModal()" data-i18n="common.cancel">Отмена</button>
                 <button class="modal-btn modal-btn-primary" onclick="saveModal()" data-i18n="common.save">Сохранить</button>
             </div>
         </div>
     </div>
-
     <div id="toast" class="toast"></div>
-
     <script>
         let currentLanguage = 'en';
 
@@ -268,11 +82,11 @@
                 'profile_data.about_me': 'Обо мне',
                 'profile_data.phone': 'Телефон',
                 'profile_data.email': 'Почта',
-                'profile_data.whatsapp_url': 'WhatsApp',
-                'profile_data.telegram_url': 'Telegram',
-                'profile_data.facebook_url': 'Facebook',
-                'profile_data.instagram_url': 'Instagram',
-                'profile_data.social_links': 'Социальные сети',
+                'profile_data.whatsapp_link': 'WhatsApp ссылка',
+                'profile_data.telegram_link': 'Telegram ссылка',
+                'profile_data.facebook_link': 'Facebook ссылка',
+                'profile_data.instagram_link': 'Instagram ссылка',
+                'profile_data.avatar': 'Фото',
                 'profile_data.empty': 'пусто',
                 'profile_data.edit': 'Редактировать',
                 'profile_data.edit_title': 'Редактировать:',
@@ -282,6 +96,7 @@
                 'profile_data.load_error': 'Ошибка загрузки данных',
                 'profile_data.user_not_found': 'Пользователь не определён',
                 'profile_data.avatar_upload_error': 'Ошибка загрузки фото',
+                'profile_data.avatar_uploaded': 'Фото загружено!',
                 'common.back': 'Назад',
                 'common.cancel': 'Отмена',
                 'common.save': 'Сохранить'
@@ -295,11 +110,11 @@
                 'profile_data.about_me': 'About Me',
                 'profile_data.phone': 'Phone',
                 'profile_data.email': 'Email',
-                'profile_data.whatsapp_url': 'WhatsApp',
-                'profile_data.telegram_url': 'Telegram',
-                'profile_data.facebook_url': 'Facebook',
-                'profile_data.instagram_url': 'Instagram',
-                'profile_data.social_links': 'Social Links',
+                'profile_data.whatsapp_link': 'WhatsApp Link',
+                'profile_data.telegram_link': 'Telegram Link',
+                'profile_data.facebook_link': 'Facebook Link',
+                'profile_data.instagram_link': 'Instagram Link',
+                'profile_data.avatar': 'Photo',
                 'profile_data.empty': 'empty',
                 'profile_data.edit': 'Edit',
                 'profile_data.edit_title': 'Edit:',
@@ -309,24 +124,25 @@
                 'profile_data.load_error': 'Data loading error',
                 'profile_data.user_not_found': 'User not found',
                 'profile_data.avatar_upload_error': 'Photo upload error',
+                'profile_data.avatar_uploaded': 'Photo uploaded!',
                 'common.back': 'Back',
                 'common.cancel': 'Cancel',
                 'common.save': 'Save'
             },
             'de': {
                 'profile_data.title': 'Persönliche Daten',
-                'profile_data.full_name': 'Vor- und Nachname',
+                'profile_data.full_name': 'Vollständiger Name',
                 'profile_data.position': 'Position',
                 'profile_data.company_name': 'Firmenname',
-                'profile_data.website_url': 'Webseite URL',
+                'profile_data.website_url': 'Website-URL',
                 'profile_data.about_me': 'Über mich',
                 'profile_data.phone': 'Telefon',
                 'profile_data.email': 'E-Mail',
-                'profile_data.whatsapp_url': 'WhatsApp',
-                'profile_data.telegram_url': 'Telegram',
-                'profile_data.facebook_url': 'Facebook',
-                'profile_data.instagram_url': 'Instagram',
-                'profile_data.social_links': 'Soziale Netzwerke',
+                'profile_data.whatsapp_link': 'WhatsApp-Link',
+                'profile_data.telegram_link': 'Telegram-Link',
+                'profile_data.facebook_link': 'Facebook-Link',
+                'profile_data.instagram_link': 'Instagram-Link',
+                'profile_data.avatar': 'Foto',
                 'profile_data.empty': 'leer',
                 'profile_data.edit': 'Bearbeiten',
                 'profile_data.edit_title': 'Bearbeiten:',
@@ -335,52 +151,54 @@
                 'profile_data.connection_error': 'Verbindungsfehler',
                 'profile_data.load_error': 'Datenladefehler',
                 'profile_data.user_not_found': 'Benutzer nicht gefunden',
-                'profile_data.avatar_upload_error': 'Fehler beim Hochladen des Fotos',
+                'profile_data.avatar_upload_error': 'Foto-Upload-Fehler',
+                'profile_data.avatar_uploaded': 'Foto hochgeladen!',
                 'common.back': 'Zurück',
                 'common.cancel': 'Abbrechen',
                 'common.save': 'Speichern'
             },
             'fr': {
                 'profile_data.title': 'Données Personnelles',
-                'profile_data.full_name': 'Nom et prénom',
+                'profile_data.full_name': 'Nom complet',
                 'profile_data.position': 'Poste',
                 'profile_data.company_name': 'Nom de l\'entreprise',
-                'profile_data.website_url': 'Site web URL',
+                'profile_data.website_url': 'URL du site web',
                 'profile_data.about_me': 'À propos de moi',
                 'profile_data.phone': 'Téléphone',
                 'profile_data.email': 'E-mail',
-                'profile_data.whatsapp_url': 'WhatsApp',
-                'profile_data.telegram_url': 'Telegram',
-                'profile_data.facebook_url': 'Facebook',
-                'profile_data.instagram_url': 'Instagram',
-                'profile_data.social_links': 'Réseaux sociaux',
+                'profile_data.whatsapp_link': 'Lien WhatsApp',
+                'profile_data.telegram_link': 'Lien Telegram',
+                'profile_data.facebook_link': 'Lien Facebook',
+                'profile_data.instagram_link': 'Lien Instagram',
+                'profile_data.avatar': 'Photo',
                 'profile_data.empty': 'vide',
                 'profile_data.edit': 'Modifier',
                 'profile_data.edit_title': 'Modifier:',
                 'profile_data.saved': 'Enregistré!',
-                'profile_data.save_error': 'Erreur d\'enregistrement:',
+                'profile_data.save_error': 'Erreur de sauvegarde:',
                 'profile_data.connection_error': 'Erreur de connexion',
                 'profile_data.load_error': 'Erreur de chargement des données',
                 'profile_data.user_not_found': 'Utilisateur non trouvé',
-                'profile_data.avatar_upload_error': 'Erreur de téléchargement de la photo',
+                'profile_data.avatar_upload_error': 'Erreur de téléchargement de photo',
+                'profile_data.avatar_uploaded': 'Photo téléchargée!',
                 'common.back': 'Retour',
                 'common.cancel': 'Annuler',
                 'common.save': 'Enregistrer'
             },
             'tr': {
                 'profile_data.title': 'Kişisel Veriler',
-                'profile_data.full_name': 'Ad ve Soyad',
+                'profile_data.full_name': 'Tam Ad',
                 'profile_data.position': 'Pozisyon',
                 'profile_data.company_name': 'Şirket Adı',
                 'profile_data.website_url': 'Website URL',
                 'profile_data.about_me': 'Hakkımda',
                 'profile_data.phone': 'Telefon',
                 'profile_data.email': 'E-posta',
-                'profile_data.whatsapp_url': 'WhatsApp',
-                'profile_data.telegram_url': 'Telegram',
-                'profile_data.facebook_url': 'Facebook',
-                'profile_data.instagram_url': 'Instagram',
-                'profile_data.social_links': 'Sosyal Medya',
+                'profile_data.whatsapp_link': 'WhatsApp Linki',
+                'profile_data.telegram_link': 'Telegram Linki',
+                'profile_data.facebook_link': 'Facebook Linki',
+                'profile_data.instagram_link': 'Instagram Linki',
+                'profile_data.avatar': 'Fotoğraf',
                 'profile_data.empty': 'boş',
                 'profile_data.edit': 'Düzenle',
                 'profile_data.edit_title': 'Düzenle:',
@@ -390,32 +208,12 @@
                 'profile_data.load_error': 'Veri yükleme hatası',
                 'profile_data.user_not_found': 'Kullanıcı bulunamadı',
                 'profile_data.avatar_upload_error': 'Fotoğraf yükleme hatası',
+                'profile_data.avatar_uploaded': 'Fotoğraf yüklendi!',
                 'common.back': 'Geri',
                 'common.cancel': 'İptal',
                 'common.save': 'Kaydet'
             }
         };
-
-        // Field configuration
-        const FIELD_MAP = [
-            { key: 'full_name', labelKey: 'profile_data.full_name' },
-            { key: 'position', labelKey: 'profile_data.position' },
-            { key: 'company_name', labelKey: 'profile_data.company_name' },
-            { key: 'website_url', labelKey: 'profile_data.website_url' },
-            { key: 'about_me', labelKey: 'profile_data.about_me' },
-            { key: 'phone', labelKey: 'profile_data.phone' },
-            { key: 'email', labelKey: 'profile_data.email' }
-        ];
-
-        const SOCIAL_FIELDS = [
-            { key: 'whatsapp_url', labelKey: 'profile_data.whatsapp_url' },
-            { key: 'telegram_url', labelKey: 'profile_data.telegram_url' },
-            { key: 'facebook_url', labelKey: 'profile_data.facebook_url' },
-            { key: 'instagram_url', labelKey: 'profile_data.instagram_url' }
-        ];
-
-        let userData = null;
-        let currentEditField = null;
 
         // Функция для получения локализованного текста
         function getText(key) {
@@ -462,42 +260,125 @@
             });
         }
 
+        const FIELD_MAP = [
+            { key: 'full_name', labelKey: 'profile_data.full_name' },
+            { key: 'position', labelKey: 'profile_data.position' },
+            { key: 'company_name', labelKey: 'profile_data.company_name' },
+            { key: 'website_url', labelKey: 'profile_data.website_url' },
+            { key: 'about_me', labelKey: 'profile_data.about_me', isTextarea: true },
+            { key: 'phone', labelKey: 'profile_data.phone' },
+            { key: 'email', labelKey: 'profile_data.email' },
+            { key: 'whatsapp_link', labelKey: 'profile_data.whatsapp_link' },
+            { key: 'telegram_link', labelKey: 'profile_data.telegram_link' },
+            { key: 'facebook_link', labelKey: 'profile_data.facebook_link' },
+            { key: 'instagram_link', labelKey: 'profile_data.instagram_link' }
+        ];
+        let userData = null;
+        let currentEditField = null;
+
+        // Avatar functions
+        function triggerFileUpload() {
+            document.getElementById('avatarInput').click();
+        }
+
+        function updateAvatarDisplay(avatarFilename) {
+            const avatarDisplay = document.getElementById('avatarDisplay');
+            if (avatarFilename) {
+                avatarDisplay.innerHTML = `<img src="/user/${userData.id}/${avatarFilename}" class="avatar-image" alt="Avatar">`;
+            } else {
+                avatarDisplay.innerHTML = '👤';
+                avatarDisplay.className = 'avatar-placeholder';
+            }
+        }
+
+        async function handleAvatarUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            // Validate file type
+            if (!file.type.startsWith('image/')) {
+                showToast(getText('profile_data.avatar_upload_error') + ': ' + 'Invalid file type');
+                return;
+            }
+
+            // Validate file size (max 5MB)
+            if (file.size > 5 * 1024 * 1024) {
+                showToast(getText('profile_data.avatar_upload_error') + ': ' + 'File too large');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('avatar', file);
+            formData.append('telegram_id', userData.id);
+
+            try {
+                const response = await fetch('/api/user_avatar', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    userData.avatar_filename = result.filename;
+                    updateAvatarDisplay(result.filename);
+                    showToast(getText('profile_data.avatar_uploaded'));
+                } else {
+                    showToast(getText('profile_data.avatar_upload_error') + ': ' + (result.error || 'Unknown error'));
+                }
+            } catch (error) {
+                console.error('Avatar upload error:', error);
+                showToast(getText('profile_data.connection_error'));
+            }
+        }
         function showToast(msg) {
             const toast = document.getElementById('toast');
             toast.textContent = msg;
             toast.classList.add('show');
             setTimeout(() => toast.classList.remove('show'), 2500);
         }
-
         function goBack() {
             window.location.href = '/webapp_profile';
         }
-
-        function openModal(fieldKey, fieldLabel, currentValue) {
+        function openModal(fieldKey, fieldLabel, currentValue, isTextarea = false) {
             currentEditField = fieldKey;
             document.getElementById('modal-title').textContent = getText('profile_data.edit_title') + ' ' + fieldLabel;
-            document.getElementById('modal-input').value = currentValue === getText('profile_data.empty') ? '' : currentValue;
+            
+            const input = document.getElementById('modal-input');
+            const textarea = document.getElementById('modal-textarea');
+            
+            if (isTextarea) {
+                input.style.display = 'none';
+                textarea.style.display = 'block';
+                textarea.value = currentValue === getText('profile_data.empty') ? '' : currentValue;
+                setTimeout(() => textarea.focus(), 100);
+            } else {
+                textarea.style.display = 'none';
+                input.style.display = 'block';
+                input.value = currentValue === getText('profile_data.empty') ? '' : currentValue;
+                setTimeout(() => input.focus(), 100);
+            }
+            
             document.getElementById('modal-bg').style.display = 'flex';
-            setTimeout(() => document.getElementById('modal-input').focus(), 100);
         }
-
         function closeModal() {
             document.getElementById('modal-bg').style.display = 'none';
             currentEditField = null;
         }
-
         function saveModal() {
-            const value = document.getElementById('modal-input').value.trim();
+            const input = document.getElementById('modal-input');
+            const textarea = document.getElementById('modal-textarea');
+            const value = (textarea.style.display === 'block' ? textarea.value : input.value).trim();
             if (!currentEditField) return;
             updateField(currentEditField, value);
             closeModal();
         }
-
         function renderFields(data) {
             const fieldsDiv = document.getElementById('fields');
             fieldsDiv.innerHTML = '';
-
-            // Main fields
+            
+            // Update avatar display
+            updateAvatarDisplay(data.avatar_filename);
+            
             FIELD_MAP.forEach(f => {
                 const val = data[f.key] && data[f.key].trim() ? data[f.key] : getText('profile_data.empty');
                 const block = document.createElement('div');
@@ -507,42 +388,13 @@
                         <div class='profile-field-label'>${getText(f.labelKey)}</div>
                         <div class='profile-field-value${val===getText('profile_data.empty') ? ' profile-field-empty' : ''}'>${val}</div>
                     </div>
-                    <button class='edit-btn' onclick="openModal('${f.key}','${getText(f.labelKey)}','${val.replace(/'/g, "&#39;")}')" title="${getText('profile_data.edit')}">
+                    <button class='edit-btn' onclick="openModal('${f.key}','${getText(f.labelKey)}','${val.replace(/'/g, "&#39;")}', ${f.isTextarea || false})" title="${getText('profile_data.edit')}">
                         ✏️
                     </button>
                 `;
                 fieldsDiv.appendChild(block);
             });
-
-            // Social links section
-            const socialSection = document.createElement('div');
-            socialSection.className = 'social-links-section';
-            socialSection.innerHTML = `<div class="social-links-title">${getText('profile_data.social_links')}</div>`;
-
-            SOCIAL_FIELDS.forEach(f => {
-                const val = data[f.key] && data[f.key].trim() ? data[f.key] : getText('profile_data.empty');
-                const block = document.createElement('div');
-                block.className = 'profile-field-block';
-                block.innerHTML = `
-                    <div class='profile-field-content'>
-                        <div class='profile-field-label'>${getText(f.labelKey)}</div>
-                        <div class='profile-field-value${val===getText('profile_data.empty') ? ' profile-field-empty' : ''}'>${val}</div>
-                    </div>
-                    <button class='edit-btn' onclick="openModal('${f.key}','${getText(f.labelKey)}','${val.replace(/'/g, "&#39;")}')" title="${getText('profile_data.edit')}">
-                        ✏️
-                    </button>
-                `;
-                socialSection.appendChild(block);
-            });
-
-            fieldsDiv.appendChild(socialSection);
-
-            // Update avatar if exists
-            if (data.avatar_path) {
-                document.getElementById('avatarImage').src = data.avatar_path;
-            }
         }
-
         function updateField(field, value) {
             if (!userData || !userData.id) return;
             fetch('/api/user_profile', {
@@ -553,6 +405,7 @@
             .then(res => res.json())
             .then(resp => {
                 if (resp.success) {
+                    // Обновляем данные из ответа сервера
                     if (resp.profile) {
                         Object.assign(userData, resp.profile);
                     } else {
@@ -561,7 +414,7 @@
                     renderFields(userData);
                     showToast(getText('profile_data.saved'));
                 } else {
-                    showToast(getText('profile_data.save_error') + ' ' + (resp.error || ''));
+                    showToast(getText('profile_data.save_error') + ' ' + (resp.error || 'Неизвестная ошибка'));
                 }
             })
             .catch((error) => {
@@ -569,38 +422,7 @@
                 showToast(getText('profile_data.connection_error'));
             });
         }
-
-        // Handle avatar upload
-        document.getElementById('avatarInput').addEventListener('change', function(e) {
-            if (!userData || !userData.id) return;
-            
-            const file = e.target.files[0];
-            if (!file) return;
-
-            const formData = new FormData();
-            formData.append('avatar', file);
-            formData.append('telegram_id', userData.id);
-
-            fetch('/api/upload_avatar', {
-                method: 'POST',
-                body: formData
-            })
-            .then(res => res.json())
-            .then(resp => {
-                if (resp.success) {
-                    document.getElementById('avatarImage').src = resp.avatar_path + '?t=' + new Date().getTime();
-                    userData.avatar_path = resp.avatar_path;
-                    showToast(getText('profile_data.saved'));
-                } else {
-                    showToast(getText('profile_data.avatar_upload_error'));
-                }
-            })
-            .catch(() => {
-                showToast(getText('profile_data.avatar_upload_error'));
-            });
-        });
-
-        // Initialize
+        // Получение пользователя (как в других разделах)
         (async function init() {
             let tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
             if (tg) { tg.ready(); tg.expand && tg.expand(); }
@@ -613,7 +435,7 @@
                 return;
             }
 
-            // Get user language
+            // Получаем язык пользователя
             currentLanguage = await getUserLanguage();
             console.log(`🌐 Инициализация страницы с языком: ${currentLanguage}`);
             updatePageText();
@@ -636,4 +458,4 @@
         })();
     </script>
 </body>
-</html>
+</html> 

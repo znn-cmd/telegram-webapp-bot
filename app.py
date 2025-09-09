@@ -58,13 +58,6 @@ except ImportError:
 # Инициализация Flask приложения
 app = Flask(__name__)
 
-# Configure upload folder for user avatars
-app.config['UPLOAD_FOLDER'] = 'user'
-
-# Register blueprints
-from routes import user_profile
-app.register_blueprint(user_profile)
-
 # Инициализация Supabase с улучшенными настройками
 supabase_url = os.getenv("SUPABASE_URL")
 supabase_key = os.getenv("SUPABASE_ANON_KEY")
@@ -470,7 +463,7 @@ def api_user_profile():
     
     # Проверяем, есть ли данные для обновления
     update_data = {}
-    for field in ['first_name', 'last_name', 'phone', 'email', 'website', 'company', 'position', 'about_me']:
+    for field in ['full_name', 'position', 'company_name', 'website_url', 'about_me', 'phone', 'email', 'whatsapp_link', 'telegram_link', 'facebook_link', 'instagram_link']:
         if field in data:
             update_data[field] = data[field]
     
@@ -480,7 +473,7 @@ def api_user_profile():
             supabase.table('users').update(update_data).eq('telegram_id', telegram_id).execute()
         
         # Получаем обновленные данные
-        result = supabase.table('users').select('first_name, last_name, photo_url, phone, email, website, company, position, about_me').eq('telegram_id', telegram_id).execute()
+        result = supabase.table('users').select('full_name, position, company_name, website_url, about_me, phone, email, whatsapp_link, telegram_link, facebook_link, instagram_link, avatar_filename').eq('telegram_id', telegram_id).execute()
         if result.data and len(result.data) > 0:
             return jsonify({'success': True, 'profile': result.data[0]})
         else:
@@ -488,6 +481,61 @@ def api_user_profile():
     except Exception as e:
         logger.error(f"Error updating/fetching user profile: {e}")
         return jsonify({'error': 'Internal error'}), 500
+
+@app.route('/api/user_avatar', methods=['POST'])
+def api_user_avatar():
+    """Загрузка аватара пользователя"""
+    try:
+        telegram_id = request.form.get('telegram_id')
+        if not telegram_id:
+            return jsonify({'success': False, 'error': 'telegram_id required'}), 400
+        
+        telegram_id = int(telegram_id)
+        
+        if 'avatar' not in request.files:
+            return jsonify({'success': False, 'error': 'No avatar file'}), 400
+        
+        file = request.files['avatar']
+        if file.filename == '':
+            return jsonify({'success': False, 'error': 'No file selected'}), 400
+        
+        # Проверяем тип файла
+        if not file.content_type.startswith('image/'):
+            return jsonify({'success': False, 'error': 'Invalid file type'}), 400
+        
+        # Создаем папку для пользователя
+        user_folder = os.path.join('user', str(telegram_id))
+        os.makedirs(user_folder, exist_ok=True)
+        
+        # Генерируем уникальное имя файла
+        import uuid
+        file_extension = os.path.splitext(file.filename)[1].lower()
+        if not file_extension:
+            file_extension = '.jpg'
+        filename = f"avatar_{uuid.uuid4().hex[:8]}{file_extension}"
+        filepath = os.path.join(user_folder, filename)
+        
+        # Сохраняем файл
+        file.save(filepath)
+        
+        # Обновляем запись в базе данных
+        supabase.table('users').update({'avatar_filename': filename}).eq('telegram_id', telegram_id).execute()
+        
+        return jsonify({'success': True, 'filename': filename})
+        
+    except Exception as e:
+        logger.error(f"Error uploading avatar: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/user/<int:telegram_id>/<filename>')
+def serve_user_avatar(telegram_id, filename):
+    """Отдача аватара пользователя"""
+    try:
+        user_folder = os.path.join('user', str(telegram_id))
+        return send_from_directory(user_folder, filename)
+    except Exception as e:
+        logger.error(f"Error serving avatar: {e}")
+        return '', 404
 
 @app.route('/api/set_language', methods=['POST'])
 def api_set_language():
