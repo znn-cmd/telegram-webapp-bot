@@ -4034,7 +4034,21 @@
                 'unit_square_meters': 'м²',
                 
                 // Trends analysis
-                'trendsAnalysisTitle': 'Вывод по тренду'
+                'trendsAnalysisTitle': 'Вывод по тренду',
+                
+                // Table headers for trends
+                'priceChangeLabel': 'Изм-ие цены',
+                'yieldLabel': 'Доходность',
+                'forecastSaleLabel': 'Прогноз продажи',
+                'forecastRentLabel': 'Прогноз аренды',
+                'forecastYieldLabel': 'Прогноз доходности',
+                'dateLabel': 'Дата',
+                
+                // Chart labels
+                'saleForecastTooltip': 'Прогноз продажи',
+                'rentForecastTooltip': 'Прогноз аренды',
+                'saleForecastYAxis': 'Прогноз продажи',
+                'rentForecastYAxis': 'Прогноз аренды'
             },
             'en': {
                 'slogan': 'Real Estate Market Insights',
@@ -4194,7 +4208,21 @@
                 'unit_square_meters': 'm²',
                 
                 // Trends analysis
-                'trendsAnalysisTitle': 'Trend Analysis'
+                'trendsAnalysisTitle': 'Trend Analysis',
+                
+                // Table headers for trends
+                'priceChangeLabel': 'Price Change',
+                'yieldLabel': 'Yield',
+                'forecastSaleLabel': 'Sale Forecast',
+                'forecastRentLabel': 'Rent Forecast',
+                'forecastYieldLabel': 'Yield Forecast',
+                'dateLabel': 'Date',
+                
+                // Chart labels
+                'saleForecastTooltip': 'Sale Forecast',
+                'rentForecastTooltip': 'Rent Forecast',
+                'saleForecastYAxis': 'Sale Forecast',
+                'rentForecastYAxis': 'Rent Forecast'
             },
             'de': {
                 'slogan': 'Immobilienmarkt-Einblicke',
@@ -4354,7 +4382,21 @@
                 'unit_square_meters': 'm²',
                 
                 // Trends analysis
-                'trendsAnalysisTitle': 'Trendanalyse'
+                'trendsAnalysisTitle': 'Trendanalyse',
+                
+                // Table headers for trends
+                'priceChangeLabel': 'Preisänderung',
+                'yieldLabel': 'Rendite',
+                'forecastSaleLabel': 'Verkaufsprognose',
+                'forecastRentLabel': 'Mietprognose', 
+                'forecastYieldLabel': 'Renditeprognose',
+                'dateLabel': 'Datum',
+                
+                // Chart labels
+                'saleForecastTooltip': 'Verkaufsprognose',
+                'rentForecastTooltip': 'Mietprognose',
+                'saleForecastYAxis': 'Verkaufsprognose',
+                'rentForecastYAxis': 'Mietprognose'
             },
             'fr': {
                 'slogan': 'Aperçus du marché immobilier',
@@ -4413,7 +4455,21 @@
                 'unit_square_meters': 'm²',
                 
                 // Trends analysis
-                'trendsAnalysisTitle': 'Analyse des tendances'
+                'trendsAnalysisTitle': 'Analyse des tendances',
+                
+                // Table headers for trends
+                'priceChangeLabel': 'Changement de prix',
+                'yieldLabel': 'Rendement',
+                'forecastSaleLabel': 'Prévision de vente',
+                'forecastRentLabel': 'Prévision de location',
+                'forecastYieldLabel': 'Prévision de rendement',
+                'dateLabel': 'Date',
+                
+                // Chart labels
+                'saleForecastTooltip': 'Prévision de vente',
+                'rentForecastTooltip': 'Prévision de location',
+                'saleForecastYAxis': 'Prévision de vente',
+                'rentForecastYAxis': 'Prévision de location'
             },
             'tr': {
                 'slogan': 'Gayrimenkul Piyasa İçgörüleri',
@@ -4559,7 +4615,21 @@
                 'unit_square_meters': 'm²',
                 
                 // Trends analysis
-                'trendsAnalysisTitle': 'Analyse des tendances'
+                'trendsAnalysisTitle': 'Analyse des tendances',
+                
+                // Table headers for trends
+                'priceChangeLabel': 'Changement de prix',
+                'yieldLabel': 'Rendement',
+                'forecastSaleLabel': 'Prévision de vente',
+                'forecastRentLabel': 'Prévision de location',
+                'forecastYieldLabel': 'Prévision de rendement',
+                'dateLabel': 'Date',
+                
+                // Chart labels
+                'saleForecastTooltip': 'Prévision de vente',
+                'rentForecastTooltip': 'Prévision de location',
+                'saleForecastYAxis': 'Prévision de vente',
+                'rentForecastYAxis': 'Prévision de location'
             },
             'tr': {
                 'slogan': 'Gayrimenkul Piyasa İçgörüleri',
@@ -4675,7 +4745,21 @@
                 
                 // Keys for sale and rent labels
                 'saleLabel': 'Satış:',
-                'rentLabel': 'Kiralama:'
+                'rentLabel': 'Kiralama:',
+                
+                // Table headers for trends
+                'priceChangeLabel': 'Fiyat Değişimi',
+                'yieldLabel': 'Getiri',
+                'forecastSaleLabel': 'Satış Tahmini',
+                'forecastRentLabel': 'Kiralama Tahmini',
+                'forecastYieldLabel': 'Getiri Tahmini',
+                'dateLabel': 'Tarih',
+                
+                // Chart labels
+                'saleForecastTooltip': 'Satış Tahmini',
+                'rentForecastTooltip': 'Kiralama Tahmini',
+                'saleForecastYAxis': 'Satış Tahmini',
+                'rentForecastYAxis': 'Kiralama Tahmini'
             }
         };
 
@@ -5946,7 +6030,7 @@
                 const yieldMin = summary.yield.min;
                 const yieldMax = summary.yield.max;
                 
-                analysis += `<p><strong>Доходность</strong> составляет ${yieldMin.toFixed(2)}% – ${yieldMax.toFixed(2)}%.</p>`;
+                analysis += `<p><strong>${getText('yieldLabel')}</strong> составляет ${yieldMin.toFixed(2)}% – ${yieldMax.toFixed(2)}%.</p>`;
             }
             
             analysis += '</div>';
@@ -7196,12 +7280,12 @@
             
             let html = '<table class="trends-table">';
             html += '<thead><tr>';
-            html += '<th data-i18n="balance.date">Дата</th>';
+            html += `<th>${getText('dateLabel')}</th>`;
             html += `<th>${getText('saleLabel')}<br>(₺/${getText('unit_square_meters')})</th>`;
-            html += `<th>Изм-ие цены<br>${getText('saleLabel').toLowerCase()}</th>`;
+            html += `<th>${getText('priceChangeLabel')}<br>${getText('saleLabel').toLowerCase()}</th>`;
             html += `<th>${getText('rentLabel')}<br>(₺/${getText('unit_square_meters')})</th>`;
-            html += `<th>Изм-ие цены<br>${getText('rentLabel').toLowerCase()}</th>`;
-            html += '<th>Доходность</th>';
+            html += `<th>${getText('priceChangeLabel')}<br>${getText('rentLabel').toLowerCase()}</th>`;
+            html += `<th>${getText('yieldLabel')}</th>`;
             html += '</tr></thead><tbody>';
             
             // Добавляем информацию о фильтрации
@@ -7413,7 +7497,7 @@
                 analysis += `С ${firstMonthName} по ${lastMonthName} ${firstMonth.property_year} года `;
                 analysis += `цены на продажу выросли примерно на ${salePriceGrowth.toFixed(1)}%, `;
                 analysis += `аренда — на ${rentPriceGrowth.toFixed(1)}%. `;
-                analysis += `Доходность держится в диапазоне ${minYield.toFixed(1)}–${maxYield.toFixed(1)}%, `;
+                analysis += `${getText('yieldLabel')} держится в диапазоне ${minYield.toFixed(1)}–${maxYield.toFixed(1)}%, `;
                 analysis += `показывая привлекательность инвестиций. `;
                 
                 if (yieldTrend) {
@@ -7430,11 +7514,11 @@
                 if (rentPriceGrowth > 0) {
                     analysis += `аренда выросла на ${rentPriceGrowth.toFixed(1)}%. `;
                 }
-                analysis += `Доходность в диапазоне ${minYield.toFixed(1)}–${maxYield.toFixed(1)}% `;
+                analysis += `${getText('yieldLabel')} в диапазоне ${minYield.toFixed(1)}–${maxYield.toFixed(1)}% `;
                 analysis += `сохраняет привлекательность для инвесторов.`;
             } else {
                 analysis += `Рынок недвижимости демонстрирует стабильность. `;
-                analysis += `Доходность в диапазоне ${minYield.toFixed(1)}–${maxYield.toFixed(1)}% `;
+                analysis += `${getText('yieldLabel')} в диапазоне ${minYield.toFixed(1)}–${maxYield.toFixed(1)}% `;
                 analysis += `показывает устойчивость инвестиционного потенциала.`;
             }
             
@@ -7776,14 +7860,14 @@
             
             // Формируем таблицу прогноза
             let forecastHtml = '<div class="forecast-table-section">';
-            forecastHtml += '<h4 class="forecast-table-title">Прогноз цены и аренды</h4>';
+            forecastHtml += `<h4 class="forecast-table-title">${getText('forecastSaleLabel')} и ${getText('forecastRentLabel')}</h4>`;
             forecastHtml += '<div class="forecast-table-container">';
             forecastHtml += '<table class="forecast-table">';
             forecastHtml += '<thead><tr>';
-            forecastHtml += '<th data-i18n="balance.date">Дата</th>';
-            forecastHtml += `<th>Прогноз ${getText('saleLabel').toLowerCase()}<br>(₺/${getText('unit_square_meters')})</th>`;
-            forecastHtml += `<th>Прогноз ${getText('rentLabel').toLowerCase()}<br>(₺/${getText('unit_square_meters')})</th>`;
-            forecastHtml += '<th>Прогноз доходности</th>';
+            forecastHtml += `<th>${getText('dateLabel')}</th>`;
+            forecastHtml += `<th>${getText('forecastSaleLabel')}<br>(₺/${getText('unit_square_meters')})</th>`;
+            forecastHtml += `<th>${getText('forecastRentLabel')}<br>(₺/${getText('unit_square_meters')})</th>`;
+            forecastHtml += `<th>${getText('forecastYieldLabel')}</th>`;
             forecastHtml += '</tr></thead><tbody>';
             
             // Добавляем информацию о прогнозе
@@ -7942,7 +8026,7 @@
                     'title': 'Вывод прогноза',
                     'sale': `${getText('saleLabel')} ожидается стабильный рост цен с ${formatValue(firstSalePrice, 'price')}/м² в ${firstMonthName} ${firstMonth.property_year} до ${formatValue(lastSalePrice, 'price')}/м² в ${lastMonthName} ${lastMonth.property_year} (+${salePriceGrowth.toFixed(1)}% за ${forecastTrends.length} месяцев).`,
                     'rent': `${getText('rentLabel')} прогнозируется увеличение с ${formatValue(firstRentPrice, 'price')}/м² до ${formatValue(lastRentPrice, 'price')}/м² (+${rentPriceGrowth.toFixed(1)}%).`,
-                    'yield': `Доходность: остаётся на уровне ${minYield.toFixed(1)}–${maxYield.toFixed(1)}%, с лёгким ${yieldTrend === 'снижение' ? 'снижением' : yieldTrend === 'рост' ? 'ростом' : 'изменением'} к ${lastMonthName} ${lastMonth.property_year} года.`
+                    'yield': `${getText('yieldLabel')}: остаётся на уровне ${minYield.toFixed(1)}–${maxYield.toFixed(1)}%, с лёгким ${yieldTrend === 'снижение' ? 'снижением' : yieldTrend === 'рост' ? 'ростом' : 'изменением'} к ${lastMonthName} ${lastMonth.property_year} года.`
                 },
                 'en': {
                     'title': 'Forecast Analysis',
@@ -9280,9 +9364,9 @@
                                 label: function(context) {
                                     const value = context.parsed.y;
                                     if (chartType === 'sale') {
-                                        return `Прогноз продажи: ₺${value.toLocaleString('ru-RU', { minimumFractionDigits: 2 })}/м²`;
+                                        return `${getText('saleForecastTooltip')}: ₺${value.toLocaleString('ru-RU', { minimumFractionDigits: 2 })}/${getText('unit_square_meters')}`;
                                     } else {
-                                        return `Прогноз аренды: ₺${value.toLocaleString('ru-RU', { minimumFractionDigits: 2 })}/м²`;
+                                        return `${getText('rentForecastTooltip')}: ₺${value.toLocaleString('ru-RU', { minimumFractionDigits: 2 })}/${getText('unit_square_meters')}`;
                                     }
                                 }
                             }
@@ -9315,7 +9399,7 @@
                             display: true,
                             title: {
                                 display: true,
-                                text: chartType === 'sale' ? 'Прогноз продажи (₺/м²)' : 'Прогноз аренды (₺/м²)',
+                                text: chartType === 'sale' ? `${getText('saleForecastYAxis')} (₺/${getText('unit_square_meters')})` : `${getText('rentForecastYAxis')} (₺/${getText('unit_square_meters')})`,
                                 color: '#495057',
                                 font: {
                                     size: 12,
@@ -9795,9 +9879,9 @@
                                 label: function(context) {
                                     const value = context.parsed.y;
                                     if (chartType === 'sale') {
-                                        return `Прогноз продажи: ₺${value.toLocaleString('ru-RU', { minimumFractionDigits: 2 })}/м²`;
+                                        return `${getText('saleForecastTooltip')}: ₺${value.toLocaleString('ru-RU', { minimumFractionDigits: 2 })}/${getText('unit_square_meters')}`;
                                     } else {
-                                        return `Прогноз аренды: ₺${value.toLocaleString('ru-RU', { minimumFractionDigits: 2 })}/м²`;
+                                        return `${getText('rentForecastTooltip')}: ₺${value.toLocaleString('ru-RU', { minimumFractionDigits: 2 })}/${getText('unit_square_meters')}`;
                                     }
                                 }
                             }
@@ -9830,7 +9914,7 @@
                             display: true,
                             title: {
                                 display: true,
-                                text: chartType === 'sale' ? 'Прогноз продажи (₺/м²)' : 'Прогноз аренды (₺/м²)',
+                                text: chartType === 'sale' ? `${getText('saleForecastYAxis')} (₺/${getText('unit_square_meters')})` : `${getText('rentForecastYAxis')} (₺/${getText('unit_square_meters')})`,
                                 color: '#495057',
                                 font: {
                                     size: 12,
