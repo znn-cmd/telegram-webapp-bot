@@ -4009,6 +4009,10 @@
                 'propertyPriceLabel': 'Цена объекта:',
                 'propertyAreaLabel': 'Площадь объекта:',
                 
+                // Ключи для продажи и аренды
+                'saleLabel': 'Продажа:',
+                'rentLabel': 'Аренда:',
+                
                 // Ключи для сообщения о подписке
                 'subscriptionRequiredTitle': 'Функция долгосрочного прогноза стоимости объекта доступна только для пользователей с активной подпиской.',
                 'subscriptionBenefits': 'Что даёт подписка:',
@@ -4165,6 +4169,10 @@
                 'propertyPriceLabel': 'Property price:',
                 'propertyAreaLabel': 'Property area:',
                 
+                // Keys for sale and rent labels
+                'saleLabel': 'Sale:',
+                'rentLabel': 'Rent:',
+                
                 // Keys for subscription message
                 'subscriptionRequiredTitle': 'Long-term property value forecasting is only available for users with an active subscription.',
                 'subscriptionBenefits': 'What subscription gives you:',
@@ -4295,7 +4303,11 @@
                 
                 // Keys for property labels
                 'propertyPriceLabel': 'Objektpreis:',
-                'propertyAreaLabel': 'Objektfläche:'
+                'propertyAreaLabel': 'Objektfläche:',
+                
+                // Keys for sale and rent labels
+                'saleLabel': 'Verkauf:',
+                'rentLabel': 'Vermietung:'
             },
             'fr': {
                 'slogan': 'Aperçus du marché immobilier',
@@ -4612,7 +4624,11 @@
                 
                 // Keys for property labels
                 'propertyPriceLabel': 'Nesne fiyatı:',
-                'propertyAreaLabel': 'Nesne alanı:'
+                'propertyAreaLabel': 'Nesne alanı:',
+                
+                // Keys for sale and rent labels
+                'saleLabel': 'Satış:',
+                'rentLabel': 'Kiralama:'
             }
         };
 
@@ -5862,7 +5878,7 @@
                 const period = summary.listing_period_for_sale;
                 const price = summary.min_unit_price_for_sale;
                 
-                analysis += `<p><strong>Продажа:</strong> востребованная площадь ${area.min}–${area.max} м², `;
+                analysis += `<p><strong>${getText('saleLabel')}</strong> востребованная площадь ${area.min}–${area.max} ${getText('unit_square_meters')}, `;
                 analysis += `срок экспозиции ${period.min}–${period.max} дней, `;
                 analysis += `цена за м² ${formatValue(price.min, 'price')} – ${formatValue(price.max, 'price')}.</p>`;
             }
@@ -5873,9 +5889,9 @@
                 const period = summary.listing_period_for_rent;
                 const price = summary.min_unit_price_for_rent;
                 
-                analysis += `<p><strong>Аренда:</strong> самая востребованная площадь ${area.min}–${area.max} м², `;
+                analysis += `<p><strong>${getText('rentLabel')}</strong> самая востребованная площадь ${area.min}–${area.max} ${getText('unit_square_meters')}, `;
                 analysis += `срок экспозиции ${period.min}–${period.max} дней, `;
-                analysis += `ставка ${formatValue(price.min, 'price')} – ${formatValue(price.max, 'price')} за м².</p>`;
+                analysis += `ставка ${formatValue(price.min, 'price')} – ${formatValue(price.max, 'price')} за ${getText('unit_square_meters')}.</p>`;
             }
             
             // Yield analysis
@@ -6075,14 +6091,23 @@
             html += '<div class="market-analysis-text-content">';
             
             // Sale analysis in unified style (like "Вывод прогноза")
-            html += `<p><strong>Продажа:</strong> при площади ${avgSaleArea} м² (среднее значение по проданным объектам) `;
-            html += `и минимальной цене ${formatValue(saleMinPrice, 'price')}/м² срок продажи составляет ~${saleMinPeriod} дней; `;
-            html += `при максимальной цене ${formatValue(saleMaxPrice, 'price')}/м² - срок продажи до ${saleMaxPeriod} дней.</p>`;
+            // Используем локализованный текст для анализа продажи и аренды
+            const saleAnalysisText = getText('saleAnalysisText')
+                .replace('{area}', avgSaleArea)
+                .replace('{minPrice}', formatValue(saleMinPrice, 'price'))
+                .replace('{minDays}', saleMinPeriod)
+                .replace('{maxPrice}', formatValue(saleMaxPrice, 'price'))
+                .replace('{maxDays}', saleMaxPeriod);
             
-            // Rent analysis in unified style (like "Вывод прогноза")  
-            html += `<p><strong>Аренда:</strong> при площади ${avgRentArea} м² (среднее значение по сданным в аренду объектам) `;
-            html += `минимальная цена ${formatValue(rentMinPrice, 'price')}/м² срок сдачи ~${rentMinPeriod} дней; `;
-            html += `при максимальной цене ${formatValue(rentMaxPrice, 'price')}/м² срок до ${rentMaxPeriod} дней.</p>`;
+            const rentAnalysisText = getText('rentAnalysisText')
+                .replace('{area}', avgRentArea)
+                .replace('{minPrice}', formatValue(rentMinPrice, 'price'))
+                .replace('{minDays}', rentMinPeriod)
+                .replace('{maxPrice}', formatValue(rentMaxPrice, 'price'))
+                .replace('{maxDays}', rentMaxPeriod);
+            
+            html += `<p>${saleAnalysisText}</p>`;
+            html += `<p>${rentAnalysisText}</p>`;
             
             html += '</div></div>';
             
@@ -6589,8 +6614,8 @@
                                     <div class="trend-value">${formatTrendValue(displayValue, type)}</div>
                                     <div class="trend-details">
                                         <div class="trend-change">
-                                            ${currentTrend.price_change_sale ? `Продажа: ${formatPercentage(currentTrend.price_change_sale)}` : ''}
-                                            ${currentTrend.price_change_rent ? `Аренда: ${formatPercentage(currentTrend.price_change_rent)}` : ''}
+                                            ${currentTrend.price_change_sale ? `${getText('saleLabel')} ${formatPercentage(currentTrend.price_change_sale)}` : ''}
+                                            ${currentTrend.price_change_rent ? `${getText('rentLabel')} ${formatPercentage(currentTrend.price_change_rent)}` : ''}
                                             ${formatCurrentMonthDate(currentTrend)}
                                         </div>
                                     </div>
@@ -7868,8 +7893,8 @@
             const analysisTexts = {
                 'ru': {
                     'title': 'Вывод прогноза',
-                    'sale': `Продажа: ожидается стабильный рост цен с ${formatValue(firstSalePrice, 'price')}/м² в ${firstMonthName} ${firstMonth.property_year} до ${formatValue(lastSalePrice, 'price')}/м² в ${lastMonthName} ${lastMonth.property_year} (+${salePriceGrowth.toFixed(1)}% за ${forecastTrends.length} месяцев).`,
-                    'rent': `Аренда: прогнозируется увеличение с ${formatValue(firstRentPrice, 'price')}/м² до ${formatValue(lastRentPrice, 'price')}/м² (+${rentPriceGrowth.toFixed(1)}%).`,
+                    'sale': `${getText('saleLabel')} ожидается стабильный рост цен с ${formatValue(firstSalePrice, 'price')}/м² в ${firstMonthName} ${firstMonth.property_year} до ${formatValue(lastSalePrice, 'price')}/м² в ${lastMonthName} ${lastMonth.property_year} (+${salePriceGrowth.toFixed(1)}% за ${forecastTrends.length} месяцев).`,
+                    'rent': `${getText('rentLabel')} прогнозируется увеличение с ${formatValue(firstRentPrice, 'price')}/м² до ${formatValue(lastRentPrice, 'price')}/м² (+${rentPriceGrowth.toFixed(1)}%).`,
                     'yield': `Доходность: остаётся на уровне ${minYield.toFixed(1)}–${maxYield.toFixed(1)}%, с лёгким ${yieldTrend === 'снижение' ? 'снижением' : yieldTrend === 'рост' ? 'ростом' : 'изменением'} к ${lastMonthName} ${lastMonth.property_year} года.`
                 },
                 'en': {
