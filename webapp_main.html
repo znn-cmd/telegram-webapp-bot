@@ -64,6 +64,32 @@
             transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .user-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #667eea;
+            box-shadow: 0 2px 8px rgba(102,126,234,0.15);
+        }
+        
+        .user-avatar-placeholder {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            color: white;
+            border: 3px solid #667eea;
         }
 
         .user-info:hover {
@@ -430,8 +456,12 @@
         <div class="skeleton skeleton-user" id="userSkeleton"></div>
         <!-- Информация о пользователе -->
         <div class="user-info hidden" id="userInfo">
+            <!-- Аватар пользователя -->
+            <div id="userAvatarContainer">
+                <div class="user-avatar-placeholder" id="userAvatarPlaceholder">👤</div>
+            </div>
             <div class="user-name" id="userName" data-i18n="common.loading">Загрузка...</div>
-            <div class="user-balance" style="margin-top: 10px;">
+            <div class="user-balance">
                 <span data-i18n="balance">Баланс:</span>
                 <span class="balance-amount" id="userBalance">$0</span>
             </div>
@@ -796,6 +826,33 @@
             }
         }
 
+        // Функция обновления аватара пользователя
+        function updateUserAvatar(avatarFilename, telegramId) {
+            const avatarContainer = document.getElementById('userAvatarContainer');
+            const placeholder = document.getElementById('userAvatarPlaceholder');
+            
+            if (avatarFilename && telegramId) {
+                // Если есть аватар, показываем изображение
+                const avatarImg = document.createElement('img');
+                avatarImg.src = `/user/${telegramId}/${avatarFilename}`;
+                avatarImg.className = 'user-avatar';
+                avatarImg.alt = 'User Avatar';
+                avatarImg.onerror = function() {
+                    // Если изображение не загрузилось, показываем placeholder
+                    this.style.display = 'none';
+                    placeholder.style.display = 'flex';
+                };
+                
+                // Заменяем placeholder на изображение
+                placeholder.style.display = 'none';
+                avatarContainer.innerHTML = '';
+                avatarContainer.appendChild(avatarImg);
+            } else {
+                // Если нет аватара, показываем placeholder
+                placeholder.style.display = 'flex';
+            }
+        }
+
         // Загрузка данных пользователя и баланса
         async function loadUserData() {
             document.getElementById('userSkeleton').classList.remove('hidden');
@@ -853,6 +910,9 @@
                     } else {
                         balanceElement.classList.remove('balance-low');
                     }
+
+                    // Отображение аватара пользователя
+                    updateUserAvatar(userInfo.avatar_filename, userInfo.telegram_id);
 
                     // Показываем приветственное сообщение только для новых пользователей
                     if (userInfo.is_new_user) {

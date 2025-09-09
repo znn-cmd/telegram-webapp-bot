@@ -396,6 +396,7 @@ def api_user():
             'balance': user.get('balance', 0),
             'telegram_id': user.get('telegram_id'),
             'user_status': user.get('user_status', None),
+            'avatar_filename': user.get('avatar_filename'),
             'language_determined': True  # Флаг что язык уже определен
         })
     else:
