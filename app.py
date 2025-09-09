@@ -82,13 +82,23 @@ http_client = httpx.Client(
     )
 )
 
-# Инициализация Supabase с кастомным клиентом
+# Инициализация Supabase с кастомным HTTP клиентом
 try:
+    # Создаем Supabase клиент с кастомным HTTP клиентом для увеличенных таймаутов
+    from supabase.client import ClientOptions
+    
+    options = ClientOptions(
+        postgrest_client_timeout=120,  # Таймаут для PostgREST запросов
+        storage_client_timeout=120,    # Таймаут для Storage запросов
+        edge_function_client_timeout=120  # Таймаут для Edge Functions
+    )
+    
     supabase: Client = create_client(
         supabase_url, 
-        supabase_key
+        supabase_key,
+        options=options
     )
-    logger.info("✅ Supabase клиент создан успешно")
+    logger.info("✅ Supabase клиент создан успешно с увеличенными таймаутами")
 except Exception as e:
     logger.error(f"❌ Ошибка создания Supabase клиента: {e}")
     raise
@@ -206,7 +216,7 @@ def safe_db_operation(operation, max_retries=5, retry_delay=5):
             result = operation()
             logger.info(f"✅ Успешное подключение к БД на попытке {attempt + 1}")
             return result
-        except (TimeoutException, ConnectTimeout) as e:
+        except (TimeoutException, ConnectTimeout, ConnectionError, OSError) as e:
             logger.warning(f"Database timeout on attempt {attempt + 1}/{max_retries}: {e}")
             if attempt < max_retries - 1:
                 logger.info(f"⏳ Ожидание {retry_delay} секунд перед следующей попыткой...")
