@@ -20,9 +20,9 @@
         .profile-field-content { flex: 1; }
         .profile-field-label { font-size: 14px; color: #667eea; font-weight: 600; margin-bottom: 2px; }
         .profile-field-value { font-size: 15px; color: #222; }
-        .profile-field-empty { color: #bbb; font-style: italic; }
-        .edit-btn { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; border: none; border-radius: 8px; padding: 8px 12px; font-size: 14px; font-weight: 500; cursor: pointer; transition: background 0.2s; box-shadow: 0 2px 8px rgba(102,126,234,0.10); display: flex; align-items: center; gap: 6px; min-width: 40px; height: 40px; justify-content: center; }
-        .edit-btn:hover { background: linear-gradient(135deg, #764ba2 0%, #667eea 100%); }
+        .profile-field-empty { color: #999; font-style: italic; opacity: 0.8; }
+        .edit-btn { background: transparent; color: #667eea; border: 2px solid #667eea; border-radius: 8px; padding: 8px 12px; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 6px; min-width: 40px; height: 40px; justify-content: center; }
+        .edit-btn:hover { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; border-color: #764ba2; }
         .back-btn { margin-top: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; border: none; border-radius: 10px; padding: 14px 28px; font-size: 1em; font-weight: 500; cursor: pointer; transition: background 0.2s; width: 100%; }
         .back-btn:hover { background: linear-gradient(135deg, #764ba2 0%, #667eea 100%); }
         .modal-bg { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.25); z-index: 1000; display: flex; align-items: center; justify-content: center; }
@@ -97,6 +97,17 @@
                 'profile_data.user_not_found': 'Пользователь не определён',
                 'profile_data.avatar_upload_error': 'Ошибка загрузки фото',
                 'profile_data.avatar_uploaded': 'Фото загружено!',
+                'profile_data.placeholder.full_name': 'Иванов Иван Иванович',
+                'profile_data.placeholder.position': 'Риэлтор / Менеджер по продажам',
+                'profile_data.placeholder.company_name': 'ООО "Недвижимость Плюс"',
+                'profile_data.placeholder.website_url': 'https://mycompany.ru',
+                'profile_data.placeholder.about_me': 'Опытный специалист в сфере недвижимости с 5-летним стажем. Помогаю клиентам найти идеальное жилье.',
+                'profile_data.placeholder.phone': '+7 (999) 123-45-67',
+                'profile_data.placeholder.email': 'ivan.ivanov@example.ru',
+                'profile_data.placeholder.whatsapp_link': 'https://wa.me/79991234567',
+                'profile_data.placeholder.telegram_link': 'https://t.me/ivan_realtor',
+                'profile_data.placeholder.facebook_link': 'https://facebook.com/ivan.realtor',
+                'profile_data.placeholder.instagram_link': 'https://instagram.com/ivan_realtor',
                 'common.back': 'Назад',
                 'common.cancel': 'Отмена',
                 'common.save': 'Сохранить'
@@ -125,6 +136,17 @@
                 'profile_data.user_not_found': 'User not found',
                 'profile_data.avatar_upload_error': 'Photo upload error',
                 'profile_data.avatar_uploaded': 'Photo uploaded!',
+                'profile_data.placeholder.full_name': 'John Smith',
+                'profile_data.placeholder.position': 'Real Estate Agent / Sales Manager',
+                'profile_data.placeholder.company_name': 'Prime Properties LLC',
+                'profile_data.placeholder.website_url': 'https://mycompany.com',
+                'profile_data.placeholder.about_me': 'Experienced real estate professional with 5 years of expertise. I help clients find their perfect home.',
+                'profile_data.placeholder.phone': '+1 (555) 123-4567',
+                'profile_data.placeholder.email': 'john.smith@example.com',
+                'profile_data.placeholder.whatsapp_link': 'https://wa.me/15551234567',
+                'profile_data.placeholder.telegram_link': 'https://t.me/john_realtor',
+                'profile_data.placeholder.facebook_link': 'https://facebook.com/john.realtor',
+                'profile_data.placeholder.instagram_link': 'https://instagram.com/john_realtor',
                 'common.back': 'Back',
                 'common.cancel': 'Cancel',
                 'common.save': 'Save'
@@ -153,6 +175,17 @@
                 'profile_data.user_not_found': 'Benutzer nicht gefunden',
                 'profile_data.avatar_upload_error': 'Foto-Upload-Fehler',
                 'profile_data.avatar_uploaded': 'Foto hochgeladen!',
+                'profile_data.placeholder.full_name': 'Hans Müller',
+                'profile_data.placeholder.position': 'Immobilienmakler / Verkaufsleiter',
+                'profile_data.placeholder.company_name': 'Müller Immobilien GmbH',
+                'profile_data.placeholder.website_url': 'https://meinefirma.de',
+                'profile_data.placeholder.about_me': 'Erfahrener Immobilienspezialist mit 5 Jahren Expertise. Ich helfe Kunden, ihr perfektes Zuhause zu finden.',
+                'profile_data.placeholder.phone': '+49 (030) 123-4567',
+                'profile_data.placeholder.email': 'hans.mueller@beispiel.de',
+                'profile_data.placeholder.whatsapp_link': 'https://wa.me/4930123456',
+                'profile_data.placeholder.telegram_link': 'https://t.me/hans_immobilien',
+                'profile_data.placeholder.facebook_link': 'https://facebook.com/hans.immobilien',
+                'profile_data.placeholder.instagram_link': 'https://instagram.com/hans_immobilien',
                 'common.back': 'Zurück',
                 'common.cancel': 'Abbrechen',
                 'common.save': 'Speichern'
@@ -181,6 +214,17 @@
                 'profile_data.user_not_found': 'Utilisateur non trouvé',
                 'profile_data.avatar_upload_error': 'Erreur de téléchargement de photo',
                 'profile_data.avatar_uploaded': 'Photo téléchargée!',
+                'profile_data.placeholder.full_name': 'Pierre Dubois',
+                'profile_data.placeholder.position': 'Agent Immobilier / Directeur Commercial',
+                'profile_data.placeholder.company_name': 'Dubois Immobilier SARL',
+                'profile_data.placeholder.website_url': 'https://monentreprise.fr',
+                'profile_data.placeholder.about_me': 'Professionnel expérimenté de l\'immobilier avec 5 ans d\'expertise. J\'aide mes clients à trouver leur maison parfaite.',
+                'profile_data.placeholder.phone': '+33 1 23 45 67 89',
+                'profile_data.placeholder.email': 'pierre.dubois@exemple.fr',
+                'profile_data.placeholder.whatsapp_link': 'https://wa.me/33123456789',
+                'profile_data.placeholder.telegram_link': 'https://t.me/pierre_immobilier',
+                'profile_data.placeholder.facebook_link': 'https://facebook.com/pierre.immobilier',
+                'profile_data.placeholder.instagram_link': 'https://instagram.com/pierre_immobilier',
                 'common.back': 'Retour',
                 'common.cancel': 'Annuler',
                 'common.save': 'Enregistrer'
@@ -209,6 +253,17 @@
                 'profile_data.user_not_found': 'Kullanıcı bulunamadı',
                 'profile_data.avatar_upload_error': 'Fotoğraf yükleme hatası',
                 'profile_data.avatar_uploaded': 'Fotoğraf yüklendi!',
+                'profile_data.placeholder.full_name': 'Ahmet Yılmaz',
+                'profile_data.placeholder.position': 'Emlak Danışmanı / Satış Müdürü',
+                'profile_data.placeholder.company_name': 'Yılmaz Emlak Ltd. Şti.',
+                'profile_data.placeholder.website_url': 'https://sirketim.com.tr',
+                'profile_data.placeholder.about_me': '5 yıllık deneyime sahip emlak uzmanı. Müşterilerime mükemmel ev bulmalarında yardımcı oluyorum.',
+                'profile_data.placeholder.phone': '+90 (212) 123-4567',
+                'profile_data.placeholder.email': 'ahmet.yilmaz@ornek.com.tr',
+                'profile_data.placeholder.whatsapp_link': 'https://wa.me/902121234567',
+                'profile_data.placeholder.telegram_link': 'https://t.me/ahmet_emlak',
+                'profile_data.placeholder.facebook_link': 'https://facebook.com/ahmet.emlak',
+                'profile_data.placeholder.instagram_link': 'https://instagram.com/ahmet_emlak',
                 'common.back': 'Geri',
                 'common.cancel': 'İptal',
                 'common.save': 'Kaydet'
@@ -380,15 +435,17 @@
             updateAvatarDisplay(data.avatar_filename);
             
             FIELD_MAP.forEach(f => {
-                const val = data[f.key] && data[f.key].trim() ? data[f.key] : getText('profile_data.empty');
+                const hasValue = data[f.key] && data[f.key].trim();
+                const val = hasValue ? data[f.key] : getText(`profile_data.placeholder.${f.key}`);
+                const isEmpty = !hasValue;
                 const block = document.createElement('div');
                 block.className = 'profile-field-block';
                 block.innerHTML = `
                     <div class='profile-field-content'>
                         <div class='profile-field-label'>${getText(f.labelKey)}</div>
-                        <div class='profile-field-value${val===getText('profile_data.empty') ? ' profile-field-empty' : ''}'>${val}</div>
+                        <div class='profile-field-value${isEmpty ? ' profile-field-empty' : ''}'>${val}</div>
                     </div>
-                    <button class='edit-btn' onclick="openModal('${f.key}','${getText(f.labelKey)}','${val.replace(/'/g, "&#39;")}', ${f.isTextarea || false})" title="${getText('profile_data.edit')}">
+                    <button class='edit-btn' onclick="openModal('${f.key}','${getText(f.labelKey)}','${hasValue ? val.replace(/'/g, "&#39;") : ''}', ${f.isTextarea || false})" title="${getText('profile_data.edit')}">
                         ✏️
                     </button>
                 `;
