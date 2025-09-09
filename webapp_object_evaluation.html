@@ -4033,6 +4033,29 @@
                 'unit_days': 'дней',
                 'unit_square_meters': 'м²',
                 
+                // Forecast table
+                'forecast_price_rent_title': 'Прогноз цены и аренды',
+                'forecast_date': 'Дата',
+                'forecast_sale_title': 'Прогноз продажи',
+                'forecast_rent_title': 'Прогноз аренды',
+                'forecast_yield_title': 'Прогноз доходности',
+                'forecast_info': 'Прогноз на основе {months} месяцев (предыдущий + текущий + будущие)',
+                
+                // Forecast analysis section
+                'current_cost_title': 'Текущая стоимость',
+                'forecast_cost_title': 'Прогнозная стоимость',
+                'key_metrics_title': 'Ключевые показатели',
+                'avg_yield_label': 'Средняя доходность',
+                'roi_period_label': 'ROI за период',
+                'payback_period_label': 'Срок окупаемости',
+                'forecast_period_label': 'Период прогноза',
+                'forecast_price_title': 'Прогноз цен',
+                'market_price_label': 'Расчетная цена текущего рынка',
+                'price_growth_label': 'Рост цены',
+                'rent_growth_label': 'Рост аренды',
+                'exchange_rate_label': 'Курс',
+                'unit_months': 'мес.',
+                
                 // Trends analysis
                 'trendsAnalysisTitle': 'Вывод по тренду'
             },
@@ -4193,6 +4216,29 @@
                 'unit_days': 'days',
                 'unit_square_meters': 'm²',
                 
+                // Forecast table
+                'forecast_price_rent_title': 'Price and Rent Forecast',
+                'forecast_date': 'Date',
+                'forecast_sale_title': 'Sale Forecast',
+                'forecast_rent_title': 'Rent Forecast',
+                'forecast_yield_title': 'Yield Forecast',
+                'forecast_info': 'Forecast based on {months} months (previous + current + future)',
+                
+                // Forecast analysis section
+                'current_cost_title': 'Current Cost',
+                'forecast_cost_title': 'Forecast Cost',
+                'key_metrics_title': 'Key Metrics',
+                'avg_yield_label': 'Average Yield',
+                'roi_period_label': 'ROI for Period',
+                'payback_period_label': 'Payback Period',
+                'forecast_period_label': 'Forecast Period',
+                'forecast_price_title': 'Price Forecast',
+                'market_price_label': 'Calculated Current Market Price',
+                'price_growth_label': 'Price Growth',
+                'rent_growth_label': 'Rent Growth',
+                'exchange_rate_label': 'Rate',
+                'unit_months': 'mos.',
+                
                 // Trends analysis
                 'trendsAnalysisTitle': 'Trend Analysis'
             },
@@ -4275,6 +4321,29 @@
                 'unit_years': 'Jahre',
                 'unit_days': 'Tage',
                 'unit_square_meters': 'm²',
+                
+                // Forecast table
+                'forecast_price_rent_title': 'Preis- und Mietprognose',
+                'forecast_date': 'Datum',
+                'forecast_sale_title': 'Verkaufsprognose',
+                'forecast_rent_title': 'Mietprognose',
+                'forecast_yield_title': 'Renditeprognose',
+                'forecast_info': 'Prognose basierend auf {months} Monaten (vorherige + aktuelle + zukünftige)',
+                
+                // Forecast analysis section
+                'current_cost_title': 'Aktuelle Kosten',
+                'forecast_cost_title': 'Prognostizierte Kosten',
+                'key_metrics_title': 'Wichtige Kennzahlen',
+                'avg_yield_label': 'Durchschnittliche Rendite',
+                'roi_period_label': 'ROI für Zeitraum',
+                'payback_period_label': 'Amortisationszeit',
+                'forecast_period_label': 'Prognosezeitraum',
+                'forecast_price_title': 'Preisprognose',
+                'market_price_label': 'Berechneter aktueller Marktpreis',
+                'price_growth_label': 'Preiswachstum',
+                'rent_growth_label': 'Mietwachstum',
+                'exchange_rate_label': 'Kurs',
+                'unit_months': 'Mon.',
                 
                 // Trends analysis
                 'trendsAnalysisTitle': 'Trendanalyse',
@@ -4596,6 +4665,29 @@
                 'unit_years': 'yıl',
                 'unit_days': 'gün',
                 'unit_square_meters': 'm²',
+                
+                // Forecast table
+                'forecast_price_rent_title': 'Fiyat ve Kira Tahmini',
+                'forecast_date': 'Tarih',
+                'forecast_sale_title': 'Satış Tahmini',
+                'forecast_rent_title': 'Kira Tahmini',
+                'forecast_yield_title': 'Getiri Tahmini',
+                'forecast_info': '{months} ay temelinde tahmin (önceki + mevcut + gelecek)',
+                
+                // Forecast analysis section
+                'current_cost_title': 'Mevcut Maliyet',
+                'forecast_cost_title': 'Tahmini Maliyet',
+                'key_metrics_title': 'Ana Göstergeler',
+                'avg_yield_label': 'Ortalama Getiri',
+                'roi_period_label': 'Dönem ROI\'si',
+                'payback_period_label': 'Geri Ödeme Süresi',
+                'forecast_period_label': 'Tahmin Dönemi',
+                'forecast_price_title': 'Fiyat Tahmini',
+                'market_price_label': 'Hesaplanan Mevcut Piyasa Fiyatı',
+                'price_growth_label': 'Fiyat Artışı',
+                'rent_growth_label': 'Kira Artışı',
+                'exchange_rate_label': 'Kur',
+                'unit_months': 'ay',
                 
                 // Trends analysis
                 'trendsAnalysisTitle': 'Trend Analizi',
@@ -7729,19 +7821,19 @@
             
             // Формируем таблицу прогноза
             let forecastHtml = '<div class="forecast-table-section">';
-            forecastHtml += '<h4 class="forecast-table-title">Прогноз цены и аренды</h4>';
+            forecastHtml += `<h4 class="forecast-table-title">${getText('forecast_price_rent_title')}</h4>`;
             forecastHtml += '<div class="forecast-table-container">';
             forecastHtml += '<table class="forecast-table">';
             forecastHtml += '<thead><tr>';
-            forecastHtml += '<th data-i18n="balance.date">Дата</th>';
-            forecastHtml += '<th>Прогноз продажи<br>(₺/м²)</th>';
-            forecastHtml += '<th>Прогноз аренды<br>(₺/м²)</th>';
-            forecastHtml += '<th>Прогноз доходности</th>';
+            forecastHtml += `<th>${getText('forecast_date')}</th>`;
+            forecastHtml += `<th>${getText('forecast_sale_title')}<br>(₺/м²)</th>`;
+            forecastHtml += `<th>${getText('forecast_rent_title')}<br>(₺/м²)</th>`;
+            forecastHtml += `<th>${getText('forecast_yield_title')}</th>`;
             forecastHtml += '</tr></thead><tbody>';
             
             // Добавляем информацию о прогнозе
             forecastHtml += `<tr class="forecast-info"><td colspan="4" style="text-align: center; font-size: 11px; color: #666; background: #f8f9fa; padding: 4px;">
-                Прогноз на основе ${forecastTrends.length} месяцев (предыдущий + текущий + будущие)
+                ${getText('forecast_info').replace('{months}', forecastTrends.length)}
             </td></tr>`;
             
             forecastTrends.forEach((trend, index) => {
@@ -8156,26 +8248,25 @@
             
             const futureMonthName = monthNamesList[futureTrend.property_month - 1] || '';
             
-            // Формируем тексты на разных языках
+            // Используем локализованные тексты через getText()
             const forecastTexts = {
-                'ru': {
-                    'title': 'Прогноз цен',
-                    'currentPrice': 'Текущая стоимость',
-                    'futurePrice': 'Прогнозная стоимость',
-                    'userSaleLabel': 'Цена продажи',
-                    'marketSaleLabel': 'Расчетная цена текущего рынка',
-                    'rentLabel': 'Ставка аренды',
-                    'metricsTitle': 'Ключевые показатели',
-                    'priceGrowth': 'Рост цены',
-                    'rentGrowth': 'Рост аренды', 
-                    'avgYield': 'Средняя доходность',
-                    'totalROI': 'ROI за период',
-                    'paybackPeriod': 'Срок окупаемости',
-                    'forecastPeriod': 'Период прогноза',
-                    'years': 'лет',
-                    'months': 'мес.',
-                    'date': `${futureMonthName} ${futureTrend.property_year}`,
-                    'currencyInfo': `Курс: 1 EUR = ₺${(1 / tryToEurRate).toFixed(2)}`
+                'title': getText('forecast_price_title') || 'Прогноз цен',
+                'currentPrice': getText('current_cost_title'),
+                'futurePrice': getText('forecast_cost_title'),
+                'userSaleLabel': getText('saleLabel'),
+                'marketSaleLabel': getText('market_price_label') || 'Расчетная цена текущего рынка',
+                'rentLabel': getText('rentLabel'),
+                'metricsTitle': getText('key_metrics_title'),
+                'priceGrowth': getText('price_growth_label') || 'Рост цены',
+                'rentGrowth': getText('rent_growth_label') || 'Рост аренды', 
+                'avgYield': getText('avg_yield_label'),
+                'totalROI': getText('roi_period_label'),
+                'paybackPeriod': getText('payback_period_label'),
+                'forecastPeriod': getText('forecast_period_label'),
+                'years': getText('unit_years'),
+                'months': getText('unit_months') || 'мес.',
+                'date': `${futureMonthName} ${futureTrend.property_year}`,
+                'currencyInfo': `${getText('exchange_rate_label') || 'Курс'}: 1 EUR = ₺${(1 / tryToEurRate).toFixed(2)}`
                 },
                 'en': {
                     'title': 'Price Forecast',
