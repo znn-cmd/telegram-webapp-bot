@@ -58,6 +58,13 @@ except ImportError:
 # Инициализация Flask приложения
 app = Flask(__name__)
 
+# Configure upload folder for user avatars
+app.config['UPLOAD_FOLDER'] = 'user'
+
+# Register blueprints
+from routes import user_profile
+app.register_blueprint(user_profile)
+
 # Инициализация Supabase с улучшенными настройками
 supabase_url = os.getenv("SUPABASE_URL")
 supabase_key = os.getenv("SUPABASE_ANON_KEY")
