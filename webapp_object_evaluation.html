@@ -4111,7 +4111,15 @@
                 'priceTrendLabel': 'Тренд цен',
                 'yieldTrendLabel': 'Тренд доходности',
                 'countTrendLabel': 'Тренд количества',
-                'generalTrendLabel': 'Общий тренд'
+                'generalTrendLabel': 'Общий тренд',
+                
+                // Chart axis and tooltip labels
+                'salePriceAxisLabel': 'Цена продажи (₺/м²)',
+                'rentPriceAxisLabel': 'Цена аренды (₺/м²)',
+                'salePriceTooltip': 'Цена продажи',
+                'rentPriceTooltip': 'Цена аренды',
+                'yourObjectLabel': 'Ваш объект',
+                'andText': 'и'
             },
             'en': {
                 'slogan': 'Real Estate Market Insights',
@@ -4348,7 +4356,15 @@
                 'priceTrendLabel': 'Price Trend',
                 'yieldTrendLabel': 'Yield Trend',
                 'countTrendLabel': 'Count Trend',
-                'generalTrendLabel': 'General Trend'
+                'generalTrendLabel': 'General Trend',
+                
+                // Chart axis and tooltip labels
+                'salePriceAxisLabel': 'Sale Price (₺/m²)',
+                'rentPriceAxisLabel': 'Rent Price (₺/m²)',
+                'salePriceTooltip': 'Sale Price',
+                'rentPriceTooltip': 'Rent Price',
+                'yourObjectLabel': 'Your Object',
+                'andText': 'and'
             },
             'de': {
                 'slogan': 'Immobilienmarkt-Einblicke',
@@ -4585,7 +4601,15 @@
                 'priceTrendLabel': 'Preistrend',
                 'yieldTrendLabel': 'Renditetrend',
                 'countTrendLabel': 'Anzahltrend',
-                'generalTrendLabel': 'Allgemeiner Trend'
+                'generalTrendLabel': 'Allgemeiner Trend',
+                
+                // Chart axis and tooltip labels
+                'salePriceAxisLabel': 'Verkaufspreis (₺/m²)',
+                'rentPriceAxisLabel': 'Mietpreis (₺/m²)',
+                'salePriceTooltip': 'Verkaufspreis',
+                'rentPriceTooltip': 'Mietpreis',
+                'yourObjectLabel': 'Ihr Objekt',
+                'andText': 'und'
             },
             'fr': {
                 'slogan': 'Aperçus du marché immobilier',
@@ -4774,7 +4798,15 @@
                 'priceTrendLabel': 'Tendance des prix',
                 'yieldTrendLabel': 'Tendance des rendements',
                 'countTrendLabel': 'Tendance des quantités',
-                'generalTrendLabel': 'Tendance générale'
+                'generalTrendLabel': 'Tendance générale',
+                
+                // Chart axis and tooltip labels
+                'salePriceAxisLabel': 'Prix de vente (₺/m²)',
+                'rentPriceAxisLabel': 'Prix de location (₺/m²)',
+                'salePriceTooltip': 'Prix de vente',
+                'rentPriceTooltip': 'Prix de location',
+                'yourObjectLabel': 'Votre objet',
+                'andText': 'et'
             },
             'tr': {
                 'slogan': 'Gayrimenkul Piyasa İçgörüleri',
@@ -5050,7 +5082,15 @@
                 'priceTrendLabel': 'Tendance des prix',
                 'yieldTrendLabel': 'Tendance des rendements',
                 'countTrendLabel': 'Tendance des quantités',
-                'generalTrendLabel': 'Tendance générale'
+                'generalTrendLabel': 'Tendance générale',
+                
+                // Chart axis and tooltip labels
+                'salePriceAxisLabel': 'Prix de vente (₺/m²)',
+                'rentPriceAxisLabel': 'Prix de location (₺/m²)',
+                'salePriceTooltip': 'Prix de vente',
+                'rentPriceTooltip': 'Prix de location',
+                'yourObjectLabel': 'Votre objet',
+                'andText': 'et'
             },
             'tr': {
                 'slogan': 'Gayrimenkul Piyasa İçgörüleri',
@@ -5243,7 +5283,15 @@
                 'priceTrendLabel': 'Fiyat Trendi',
                 'yieldTrendLabel': 'Getiri Trendi',
                 'countTrendLabel': 'Sayı Trendi',
-                'generalTrendLabel': 'Genel Trend'
+                'generalTrendLabel': 'Genel Trend',
+                
+                // Chart axis and tooltip labels
+                'salePriceAxisLabel': 'Satış Fiyatı (₺/m²)',
+                'rentPriceAxisLabel': 'Kiralama Fiyatı (₺/m²)',
+                'salePriceTooltip': 'Satış Fiyatı',
+                'rentPriceTooltip': 'Kiralama Fiyatı',
+                'yourObjectLabel': 'Nesneniz',
+                'andText': 've'
             }
         };
 
@@ -8290,7 +8338,7 @@
                     }
                     
                     if (priceAnalysis && areaAnalysis) {
-                        textSummary = `<div class="object-analysis-text">Ваш объект ${priceAnalysis} и ${areaAnalysis}.</div>`;
+                        textSummary = `<div class="object-analysis-text">${getText('yourObjectLabel')} ${priceAnalysis} ${getText('andText')} ${areaAnalysis}.</div>`;
                     }
                     
                     html += textSummary;
@@ -9619,9 +9667,9 @@
                                 label: function(context) {
                                     const value = context.parsed.y;
                                     if (chartType === 'sale') {
-                                        return `Цена продажи: ₺${value.toLocaleString('ru-RU', { minimumFractionDigits: 2 })}/м²`;
+                                        return `${getText('salePriceTooltip')}: ₺${value.toLocaleString('ru-RU', { minimumFractionDigits: 2 })}/м²`;
                                     } else {
-                                        return `Цена аренды: ₺${value.toLocaleString('ru-RU', { minimumFractionDigits: 2 })}/м²`;
+                                        return `${getText('rentPriceTooltip')}: ₺${value.toLocaleString('ru-RU', { minimumFractionDigits: 2 })}/м²`;
                                     }
                                 }
                             }
@@ -9654,7 +9702,7 @@
                             display: true,
                             title: {
                                 display: true,
-                                text: chartType === 'sale' ? 'Цена продажи (₺/м²)' : 'Цена аренды (₺/м²)',
+                                text: chartType === 'sale' ? getText('salePriceAxisLabel') : getText('rentPriceAxisLabel'),
                                 color: '#495057',
                                 font: {
                                     size: 12,
@@ -9705,10 +9753,20 @@
         
         // Подготовка данных для графика
         function prepareChartData(trends, chartType) {
-            const monthNames = [
-                'Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн',
-                'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'
-            ];
+            const monthNames = {
+                'ru': ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн',
+                       'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'],
+                'en': ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+                       'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                'de': ['Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun',
+                       'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez'],
+                'fr': ['jan', 'fév', 'mar', 'avr', 'mai', 'juin',
+                       'juil', 'août', 'sep', 'oct', 'nov', 'déc'],
+                'tr': ['Oca', 'Şub', 'Mar', 'Nis', 'May', 'Haz',
+                       'Tem', 'Ağu', 'Eyl', 'Eki', 'Kas', 'Ara']
+            };
+            const currentLang = currentLanguage || 'ru';
+            const monthList = monthNames[currentLang] || monthNames['ru'];
             
             // Дополнительная фильтрация для обеспечения правильного порядка
             const sortedTrends = trends.sort((a, b) => {
@@ -9719,7 +9777,7 @@
             });
             
             const labels = sortedTrends.map(trend => {
-                const monthName = monthNames[trend.property_month - 1] || trend.property_month;
+                const monthName = monthList[trend.property_month - 1] || trend.property_month;
                 return `${monthName} ${trend.property_year}`;
             });
             
@@ -9954,10 +10012,20 @@
         
         // Подготовка данных для графика прогноза
         function prepareForecastChartData(forecastTrends, chartType) {
-            const monthNames = [
-                'Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн',
-                'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'
-            ];
+            const monthNames = {
+                'ru': ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн',
+                       'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'],
+                'en': ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+                       'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                'de': ['Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun',
+                       'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez'],
+                'fr': ['jan', 'fév', 'mar', 'avr', 'mai', 'juin',
+                       'juil', 'août', 'sep', 'oct', 'nov', 'déc'],
+                'tr': ['Oca', 'Şub', 'Mar', 'Nis', 'May', 'Haz',
+                       'Tem', 'Ağu', 'Eyl', 'Eki', 'Kas', 'Ara']
+            };
+            const currentLang = currentLanguage || 'ru';
+            const monthList = monthNames[currentLang] || monthNames['ru'];
             
             // Дополнительная фильтрация для обеспечения правильного порядка
             const sortedTrends = forecastTrends.sort((a, b) => {
@@ -9968,7 +10036,7 @@
             });
             
             const labels = sortedTrends.map(trend => {
-                const monthName = monthNames[trend.property_month - 1] || trend.property_month;
+                const monthName = monthList[trend.property_month - 1] || trend.property_month;
                 return `${monthName} ${trend.property_year}`;
             });
             
@@ -10170,10 +10238,20 @@
         function prepareChartDataForSave(trends, chartType) {
             if (!trends || trends.length === 0) return null;
             
-            const monthNames = [
-                'Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн',
-                'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'
-            ];
+            const monthNames = {
+                'ru': ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн',
+                       'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'],
+                'en': ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+                       'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                'de': ['Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun',
+                       'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez'],
+                'fr': ['jan', 'fév', 'mar', 'avr', 'mai', 'juin',
+                       'juil', 'août', 'sep', 'oct', 'nov', 'déc'],
+                'tr': ['Oca', 'Şub', 'Mar', 'Nis', 'May', 'Haz',
+                       'Tem', 'Ağu', 'Eyl', 'Eki', 'Kas', 'Ara']
+            };
+            const currentLang = currentLanguage || 'ru';
+            const monthList = monthNames[currentLang] || monthNames['ru'];
             
             // Сортируем тренды по дате
             const sortedTrends = trends.sort((a, b) => {
@@ -10248,9 +10326,9 @@
                                 label: function(context) {
                                     const value = context.parsed.y;
                                     if (chartType === 'sale') {
-                                        return `Цена продажи: ₺${value.toLocaleString('ru-RU', { minimumFractionDigits: 2 })}/м²`;
+                                        return `${getText('salePriceTooltip')}: ₺${value.toLocaleString('ru-RU', { minimumFractionDigits: 2 })}/м²`;
                                     } else {
-                                        return `Цена аренды: ₺${value.toLocaleString('ru-RU', { minimumFractionDigits: 2 })}/м²`;
+                                        return `${getText('rentPriceTooltip')}: ₺${value.toLocaleString('ru-RU', { minimumFractionDigits: 2 })}/м²`;
                                     }
                                 }
                             }
@@ -10283,7 +10361,7 @@
                             display: true,
                             title: {
                                 display: true,
-                                text: chartType === 'sale' ? 'Цена продажи (₺/м²)' : 'Цена аренды (₺/м²)',
+                                text: chartType === 'sale' ? getText('salePriceAxisLabel') : getText('rentPriceAxisLabel'),
                                 color: '#495057',
                                 font: {
                                     size: 12,
@@ -10321,10 +10399,20 @@
         function prepareForecastChartDataForSave(forecastTrends, chartType) {
             if (!forecastTrends || forecastTrends.length === 0) return null;
             
-            const monthNames = [
-                'Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн',
-                'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'
-            ];
+            const monthNames = {
+                'ru': ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн',
+                       'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'],
+                'en': ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+                       'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                'de': ['Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun',
+                       'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez'],
+                'fr': ['jan', 'fév', 'mar', 'avr', 'mai', 'juin',
+                       'juil', 'août', 'sep', 'oct', 'nov', 'déc'],
+                'tr': ['Oca', 'Şub', 'Mar', 'Nis', 'May', 'Haz',
+                       'Tem', 'Ağu', 'Eyl', 'Eki', 'Kas', 'Ara']
+            };
+            const currentLang = currentLanguage || 'ru';
+            const monthList = monthNames[currentLang] || monthNames['ru'];
             
             // Сортируем тренды по дате
             const sortedTrends = forecastTrends.sort((a, b) => {
@@ -10335,7 +10423,7 @@
             });
             
             const labels = sortedTrends.map(trend => {
-                const monthName = monthNames[trend.property_month - 1] || trend.property_month;
+                const monthName = monthList[trend.property_month - 1] || trend.property_month;
                 return `${monthName} ${trend.property_year}`;
             });
             
