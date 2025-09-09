@@ -4005,6 +4005,10 @@
                 'objectAreaLabel': 'Площадь объекта:',
                 'exchangeRateLabel': 'Курс конвертации:',
                 
+                // Ключи для подписей свойств
+                'propertyPriceLabel': 'Цена объекта:',
+                'propertyAreaLabel': 'Площадь объекта:',
+                
                 // Ключи для сообщения о подписке
                 'subscriptionRequiredTitle': 'Функция долгосрочного прогноза стоимости объекта доступна только для пользователей с активной подпиской.',
                 'subscriptionBenefits': 'Что даёт подписка:',
@@ -4157,6 +4161,10 @@
                 'forecast_chart_title': 'Price and Rent Forecast Chart',
                 'forecast_chart_info': 'Forecast based on current and future months',
                 
+                // Keys for property labels
+                'propertyPriceLabel': 'Property price:',
+                'propertyAreaLabel': 'Property area:',
+                
                 // Keys for subscription message
                 'subscriptionRequiredTitle': 'Long-term property value forecasting is only available for users with an active subscription.',
                 'subscriptionBenefits': 'What subscription gives you:',
@@ -4261,7 +4269,33 @@
                 'unit_square_meters': 'm²',
                 
                 // Trends analysis
-                'trendsAnalysisTitle': 'Trendanalyse'
+                'trendsAnalysisTitle': 'Trendanalyse',
+                
+                // Keys for market analysis text
+                'marketAnalysisTitle': 'Marktanalyse',
+                'saleAnalysisText': 'Verkauf: bei einer Fläche von {area} m² (Durchschnittswert für verkaufte Objekte) und einem Mindestpreis von {minPrice}/m² beträgt die Verkaufsdauer ~{minDays} Tage; bei einem Höchstpreis von {maxPrice}/m² - Verkaufsdauer bis zu {maxDays} Tage.',
+                'rentAnalysisText': 'Vermietung: bei einer Fläche von {area} m² (Durchschnittswert für vermietete Objekte) Mindestpreis {minPrice}/m², Vermietungsdauer ~{minDays} Tage; bei einem Höchstpreis von {maxPrice}/m² Dauer bis zu {maxDays} Tage.',
+                
+                // Keys for trends chart
+                'chart_title': 'Trend-Diagramm',
+                'sale_button': 'Verkaufspreis pro m²',
+                'rent_button': 'Mietpreis pro m²',
+                'chart_info': 'Daten bis zum aktuellen Monat und einen Monat voraus angezeigt',
+                
+                // Keys for forecast chart
+                'forecast_chart_title': 'Preis- und Miet-Prognosediagramm',
+                'forecast_chart_info': 'Prognose basierend auf aktuellen und zukünftigen Monaten',
+                
+                // Keys for object summary
+                'objectSummaryTitle': 'Objektzusammenfassung',
+                'objectPricePerM2Label': 'Preis pro m² Ihres Objekts:',
+                'objectCurrencyLabel': 'Objektwährung:',
+                'objectAreaLabel': 'Objektfläche:',
+                'exchangeRateLabel': 'Wechselkurs:',
+                
+                // Keys for property labels
+                'propertyPriceLabel': 'Objektpreis:',
+                'propertyAreaLabel': 'Objektfläche:'
             },
             'fr': {
                 'slogan': 'Aperçus du marché immobilier',
@@ -4552,7 +4586,33 @@
                 'unit_square_meters': 'm²',
                 
                 // Trends analysis
-                'trendsAnalysisTitle': 'Trend Analizi'
+                'trendsAnalysisTitle': 'Trend Analizi',
+                
+                // Keys for market analysis text
+                'marketAnalysisTitle': 'Piyasa Analizi',
+                'saleAnalysisText': 'Satış: {area} m² alan (satılan mülklerin ortalama değeri) ve {minPrice}/m² minimum fiyat ile satış süresi ~{minDays} gün; {maxPrice}/m² maksimum fiyat ile satış süresi {maxDays} güne kadar.',
+                'rentAnalysisText': 'Kiralama: {area} m² alan (kiralanan mülklerin ortalama değeri) {minPrice}/m² minimum fiyat, kiralama süresi ~{minDays} gün; {maxPrice}/m² maksimum fiyat ile süre {maxDays} güne kadar.',
+                
+                // Keys for trends chart
+                'chart_title': 'Trend Grafiği',
+                'sale_button': 'm² Satış Fiyatı',
+                'rent_button': 'm² Kiralama Fiyatı',
+                'chart_info': 'Mevcut ay ve bir ay ileriye kadar veriler gösterilir',
+                
+                // Keys for forecast chart
+                'forecast_chart_title': 'Fiyat ve Kiralama Tahmin Grafiği',
+                'forecast_chart_info': 'Mevcut ve gelecek aylara dayalı tahmin',
+                
+                // Keys for object summary
+                'objectSummaryTitle': 'Nesne Özeti',
+                'objectPricePerM2Label': 'Nesnenizin m² fiyatı:',
+                'objectCurrencyLabel': 'Nesne para birimi:',
+                'objectAreaLabel': 'Nesne alanı:',
+                'exchangeRateLabel': 'Döviz kuru:',
+                
+                // Keys for property labels
+                'propertyPriceLabel': 'Nesne fiyatı:',
+                'propertyAreaLabel': 'Nesne alanı:'
             }
         };
 
@@ -5280,7 +5340,7 @@
                     const currencySymbol = currencySymbols[selectedListingTypes.currency] || '';
                     html += `
                         <div class="property-type-item">
-                            <span class="property-type-label">Цена объекта:</span>
+                            <span class="property-type-label">${getText('propertyPriceLabel')}</span>
                             <span class="property-type-value">${currencySymbol}${selectedListingTypes.price}</span>
                         </div>
                     `;
@@ -5289,8 +5349,8 @@
                 if (selectedListingTypes.area) {
                     html += `
                         <div class="property-type-item">
-                            <span class="property-type-label">Площадь объекта:</span>
-                            <span class="property-type-value">${selectedListingTypes.area} м²</span>
+                            <span class="property-type-label">${getText('propertyAreaLabel')}</span>
+                            <span class="property-type-value">${selectedListingTypes.area} ${getText('unit_square_meters')}</span>
                         </div>
                     `;
                 }
