@@ -569,7 +569,8 @@
         if (userData && userData.id) {
             localStorage.setItem('telegram_id', userData.id);
         }
-        currentLanguage = (userData && userData.language_code) ? userData.language_code : 'en';
+        // НЕ устанавливаем язык здесь - он будет определен сервером в loadLocalizedMenu()
+        currentLanguage = 'en'; // Временно английский до загрузки с сервера
         selectedLanguage = currentLanguage;
 
         // Toast notification system
@@ -1044,43 +1045,19 @@
                 if (response.ok) {
                     const userInfo = await response.json();
 
-                    // Определяем язык согласно новой логике
-                    let determinedLanguage = 'en'; // По умолчанию английский
-                    
-                    if (userInfo.user_status === 'admin' && userInfo.language) {
-                        // Для админов используем язык из базы данных
-                        determinedLanguage = userInfo.language;
-                        console.log('👑 Админ: используем язык из БД:', determinedLanguage);
-                    } else if (userData && userData.language_code) {
-                        // Для обычных пользователей используем язык из Telegram
-                        const telegramLang = userData.language_code.substring(0, 2);
-                        const supportedLanguages = ['ru', 'en', 'de', 'fr', 'tr'];
-                        determinedLanguage = supportedLanguages.includes(telegramLang) ? telegramLang : 'en';
-                        console.log('👤 Пользователь: используем язык из Telegram:', determinedLanguage);
-                    }
-                    
-                    currentLanguage = determinedLanguage;
-                    selectedLanguage = currentLanguage;
-                    
+                    // Язык уже определен в loadLocalizedMenu(), не переопределяем его здесь
                     // Логируем для отладки
-                    console.log(`🌐 Язык пользователя определен: ${currentLanguage} (статус: ${userInfo.user_status})`);
+                    console.log(`🌐 Пользователь загружен: ${userInfo.user_status}, текущий язык: ${currentLanguage}`);
 
-                    // Обновляем текст на странице с новым языком
-                    updatePageText();
-                    
-                    // Обновляем выбранную кнопку языка
+                    // Обновляем выбранную кнопку языка (если еще не обновлена)
                     document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('selected'));
                     const selectedBtn = document.querySelector(`[data-lang="${currentLanguage}"]`);
                     if (selectedBtn) {
                         selectedBtn.classList.add('selected');
                     }
 
-                    // Скрываем/показываем выбор языка (показываем только если язык не определен автоматически)
-                    if (userInfo.language || (userData && userData.language_code)) {
-                        document.getElementById('languageSelector').classList.add('hidden');
-                    } else {
-                        document.getElementById('languageSelector').classList.remove('hidden');
-                    }
+                    // Всегда скрываем селектор языка в главном меню - язык теперь выбирается в личном кабинете
+                    document.getElementById('languageSelector').classList.add('hidden');
 
                     // Приветствие - используем локализованное сообщение
                     const welcomeMessage = getText('welcome_back');

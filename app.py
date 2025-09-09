@@ -323,25 +323,29 @@ def serve_report(filename):
 def determine_user_language(user, telegram_language_code):
     """
     Определяет язык пользователя согласно новой логике:
-    - Для админов: использует language из базы данных
-    - Для обычных пользователей: использует language_code из Telegram
+    - Всегда используется language из базы данных (для всех пользователей)
+    - Если язык не установлен в БД: используется язык из Telegram как fallback
     - Если язык не поддерживается: английский по умолчанию
     """
-    user_status = user.get('user_status') if user else None
+    user_db_language = user.get('language') if user else None
     
-    # Если пользователь админ, используем язык из базы данных
-    if user_status == 'admin':
-        admin_language = user.get('language')
-        if admin_language and admin_language in locales:
-            return admin_language
-        # Если у админа нет языка в базе, используем английский
-        return 'en'
+    logger.info(f"🔍 Определение языка: db_language={user_db_language}, telegram_code={telegram_language_code}")
     
-    # Для обычных пользователей используем язык из Telegram
+    # Приоритет 1: Язык из базы данных (для всех пользователей)
+    if user_db_language and user_db_language in locales:
+        logger.info(f"✅ Используем язык из БД: {user_db_language}")
+        return user_db_language
+    
+    # Приоритет 2: Fallback на язык из Telegram (если не установлен в БД)
     if telegram_language_code:
         telegram_lang = telegram_language_code[:2]
         if telegram_lang in locales:
+            logger.info(f"🔄 Язык не установлен в БД, используем Telegram: {telegram_lang}")
             return telegram_lang
+        else:
+            logger.info(f"⚠️ Язык Telegram не поддерживается ({telegram_lang}): используем английский")
+    else:
+        logger.info(f"⚠️ Нет языка в БД и Telegram: используем английский")
     
     # По умолчанию английский
     return 'en'
@@ -1227,23 +1231,10 @@ def api_user_language():
             user = result.data[0]
             user_status = user.get('user_status')
             
-            # Определяем язык согласно новой логике
-            if user_status == 'admin':
-                # Для админов используем язык из базы данных
-                user_language = user.get('language', 'en')
-                logger.info(f"👑 Админ {telegram_id}: используем язык из базы: {user_language}")
-            else:
-                # Для обычных пользователей используем язык из Telegram
-                telegram_lang = data.get('language_code', 'en')
-                if telegram_lang:
-                    telegram_lang = telegram_lang[:2]
-                    if telegram_lang in locales:
-                        user_language = telegram_lang
-                    else:
-                        user_language = 'en'
-                else:
-                    user_language = 'en'
-                logger.info(f"👤 Пользователь {telegram_id}: используем язык из Telegram: {user_language}")
+            # Используем новую единую логику определения языка
+            telegram_lang = data.get('language_code', 'en')
+            user_language = determine_user_language(user, telegram_lang)
+            logger.info(f"👤 Пользователь {telegram_id} (статус: {user_status}): определен язык: {user_language}")
             
             return jsonify({
                 'success': True,

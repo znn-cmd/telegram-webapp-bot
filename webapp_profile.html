@@ -108,6 +108,12 @@
             font-size: 20px;
             margin-right: 10px;
         }
+        .profile-btn-desc {
+            margin-top: 4px;
+            font-size: 13px;
+            opacity: 0.8;
+            font-weight: normal;
+        }
         .profile-btn-coop { 
             display: none !important; 
         }
@@ -295,6 +301,15 @@
                 <span data-i18n="profile.edit_profile">Редактировать профиль</span>
             </button>
             
+            <!-- Кнопка выбора языка -->
+            <button class="profile-btn" onclick="showLanguageModal()">
+                <span class="profile-btn-icon">🌐</span>
+                <span data-i18n="profile.language_settings">Язык интерфейса</span>
+                <div class="profile-btn-desc">
+                    <span id="currentLanguageDisplay" data-i18n="profile.current_language">Текущий: Русский</span>
+                </div>
+            </button>
+            
             <button class="profile-btn admin-only" onclick="showSettings()">
                 <span class="profile-btn-icon">⚙️</span>
                 <span data-i18n="common.settings">Настройки</span>
@@ -355,6 +370,8 @@
                 'profile.balance_amount': 'Баланс: $',
                 'profile.referral_program': 'Реферальная программа',
                 'profile.edit_profile': 'Редактировать профиль',
+                'profile.language_settings': 'Язык интерфейса',
+                'profile.current_language': 'Текущий: Русский',
                 'common.settings': 'Настройки',
                 'profile.transaction_history': 'История транзакций',
                 'common.back': 'Вернуться в главное меню'
@@ -365,6 +382,8 @@
                 'profile.balance_amount': 'Balance: $',
                 'profile.referral_program': 'Referral Program',
                 'profile.edit_profile': 'Edit Profile',
+                'profile.language_settings': 'Interface Language',
+                'profile.current_language': 'Current: English',
                 'common.settings': 'Settings',
                 'profile.transaction_history': 'Transaction History',
                 'common.back': 'Back to main menu'
@@ -375,6 +394,8 @@
                 'profile.balance_amount': 'Guthaben: $',
                 'profile.referral_program': 'Empfehlungsprogramm',
                 'profile.edit_profile': 'Profil bearbeiten',
+                'profile.language_settings': 'Oberflächensprache',
+                'profile.current_language': 'Aktuell: Deutsch',
                 'common.settings': 'Einstellungen',
                 'profile.transaction_history': 'Transaktionsverlauf',
                 'common.back': 'Zurück zum Hauptmenü'
@@ -385,6 +406,8 @@
                 'profile.balance_amount': 'Solde: $',
                 'profile.referral_program': 'Programme de Parrainage',
                 'profile.edit_profile': 'Modifier le Profil',
+                'profile.language_settings': 'Langue de l\'Interface',
+                'profile.current_language': 'Actuel: Français',
                 'common.settings': 'Paramètres',
                 'profile.transaction_history': 'Historique des Transactions',
                 'common.back': 'Retour au menu principal'
@@ -395,6 +418,8 @@
                 'profile.balance_amount': 'Bakiye: $',
                 'profile.referral_program': 'Referans Programı',
                 'profile.edit_profile': 'Profili Düzenle',
+                'profile.language_settings': 'Arayüz Dili',
+                'profile.current_language': 'Mevcut: Türkçe',
                 'common.settings': 'Ayarlar',
                 'profile.transaction_history': 'İşlem Geçmişi',
                 'common.back': 'Ana menüye dön'
@@ -550,6 +575,17 @@
         function showModal() {
             document.getElementById('modal-bg').style.display = 'flex';
         }
+        
+        function showLanguageModal() {
+            // Устанавливаем текущий язык как выбранный
+            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('selected'));
+            const currentBtn = document.querySelector(`[data-lang="${currentLanguage}"]`);
+            if (currentBtn) {
+                currentBtn.classList.add('selected');
+                selectedLanguage = currentLanguage;
+            }
+            showModal();
+        }
 
         function closeModal() {
             document.getElementById('modal-bg').style.display = 'none';
@@ -592,10 +628,39 @@
                 showMessage('Ошибка сети', 'error');
             }
         }
+        
+        // Функция для обновления отображения текущего языка
+        function updateCurrentLanguageDisplay() {
+            const languageNames = {
+                'ru': 'Русский',
+                'en': 'English', 
+                'de': 'Deutsch',
+                'fr': 'Français',
+                'tr': 'Türkçe'
+            };
+            
+            const displayElement = document.getElementById('currentLanguageDisplay');
+            if (displayElement && currentLanguage) {
+                const languageName = languageNames[currentLanguage] || 'English';
+                
+                // Получаем локализованный префикс
+                const prefixes = {
+                    'ru': 'Текущий:',
+                    'en': 'Current:',
+                    'de': 'Aktuell:',
+                    'fr': 'Actuel:',
+                    'tr': 'Mevcut:'
+                };
+                
+                const prefix = prefixes[currentLanguage] || 'Current:';
+                displayElement.textContent = `${prefix} ${languageName}`;
+            }
+        }
 
         // Инициализация
         document.addEventListener('DOMContentLoaded', function() {
             loadProfileData();
+            updateCurrentLanguageDisplay();
         });
     </script>
 </body>
