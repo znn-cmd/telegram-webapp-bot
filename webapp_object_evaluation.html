@@ -5040,139 +5040,73 @@
                 'bedroomsLabel': 'Yatak Odası',
                 'floorLabel': 'Kat',
                 'ageLabel': 'Yaş',
-                'heatingLabel': 'Isıtma'
-            }
-        };
-
-        // Get localized text
-        function getText(key) {
-            return locales[currentLanguage][key] || key;
-        }
-
-        // Update page text based on current language
-        function updatePageText() {
-            document.getElementById('slogan').textContent = getText('slogan');
-            document.getElementById('pageTitle').textContent = getText('pageTitle');
-            document.getElementById('pageDescription').textContent = getText('pageDescription');
-            document.getElementById('countryLabel').textContent = getText('countryLabel');
-            document.getElementById('cityLabel').textContent = getText('cityLabel');
-            document.getElementById('countyLabel').textContent = getText('countyLabel');
-            document.getElementById('districtLabel').textContent = getText('districtLabel');
-            document.getElementById('countryPlaceholder').textContent = getText('countryPlaceholder');
-            document.getElementById('cityPlaceholder').textContent = getText('cityPlaceholder');
-            document.getElementById('countyPlaceholder').textContent = getText('countyPlaceholder');
-            document.getElementById('districtPlaceholder').textContent = getText('districtPlaceholder');
-            document.getElementById('confirmButtonText').textContent = getText('confirmButtonText');
-            document.getElementById('backButton').textContent = getText('backButton');
-            document.getElementById('selectedLocationTitle').textContent = getText('selectedLocationTitle');
-            document.getElementById('adminIdsTitle').textContent = getText('adminIdsTitle');
-            
-            // Update new data section elements
-            const dataSectionTitle = document.getElementById('dataSectionTitle');
-            if (dataSectionTitle) {
-                dataSectionTitle.textContent = getText('dataSectionTitle');
-            }
-            
-            const generalDataTitle = document.getElementById('generalDataTitle');
-            if (generalDataTitle) {
-                generalDataTitle.textContent = getText('generalDataTitle');
-            }
-            
-            const houseTypeDataTitle = document.getElementById('houseTypeDataTitle');
-            if (houseTypeDataTitle) {
-                houseTypeDataTitle.textContent = getText('houseTypeDataTitle');
-            }
-            
-            const floorSegmentDataTitle = document.getElementById('floorSegmentDataTitle');
-            if (floorSegmentDataTitle) {
-                floorSegmentDataTitle.textContent = getText('floorSegmentDataTitle');
-            }
-            
-            const ageDataTitle = document.getElementById('ageDataTitle');
-            if (ageDataTitle) {
-                ageDataTitle.textContent = getText('ageDataTitle');
-            }
-            
-            const heatingDataTitle = document.getElementById('heatingDataTitle');
-            if (heatingDataTitle) {
-                heatingDataTitle.textContent = getText('heatingDataTitle');
-            }
-            
-            // Update loading and error texts
-            const loadingText = document.getElementById('loadingText');
-            if (loadingText) {
-                loadingText.textContent = getText('loadingText');
-            }
-            
-            const errorText = document.getElementById('errorText');
-            if (errorText) {
-                errorText.textContent = getText('errorText');
-            }
-            
-            // Update placeholders
-            const priceObjectInput = document.getElementById('priceObjectInput');
-            if (priceObjectInput) { priceObjectInput.placeholder = getText('pricePlaceholder'); }
-            const areaObjectInput = document.getElementById('areaObjectInput');
-            if (areaObjectInput) { areaObjectInput.placeholder = getText('areaPlaceholder'); }
-            
-            // Update placeholder texts
-            const houseTypePlaceholder = document.getElementById('houseTypePlaceholder');
-            if (houseTypePlaceholder) { houseTypePlaceholder.textContent = getText('selectBedrooms'); }
-            const floorSegmentPlaceholder = document.getElementById('floorSegmentPlaceholder');
-            if (floorSegmentPlaceholder) { floorSegmentPlaceholder.textContent = getText('selectFloor'); }
-            const ageDataPlaceholder = document.getElementById('ageDataPlaceholder');
-            if (ageDataPlaceholder) { ageDataPlaceholder.textContent = getText('selectAge'); }
-            const heatingDataPlaceholder = document.getElementById('heatingDataPlaceholder');
-            if (heatingDataPlaceholder) { heatingDataPlaceholder.textContent = getText('selectHeating'); }
-            
-            // Update subtitles
-            const priceObjectSubtitle = document.getElementById('priceObjectSubtitle');
-            if (priceObjectSubtitle) { priceObjectSubtitle.textContent = getText('priceObjectSubtitle'); }
-            const areaObjectSubtitle = document.getElementById('areaObjectSubtitle');
-            if (areaObjectSubtitle) { areaObjectSubtitle.textContent = getText('areaObjectSubtitle'); }
-            const currencyTitle = document.getElementById('currencyTitle');
-            if (currencyTitle) { currencyTitle.textContent = getText('currencyTitle'); }
-            
-            // Update listing type elements
-            const listingTypeTitle = document.getElementById('listingTypeTitle');
-            if (listingTypeTitle) { listingTypeTitle.textContent = getText('listingTypeTitle'); }
-            const houseTypeSubtitle = document.getElementById('houseTypeSubtitle');
-            if (houseTypeSubtitle) { houseTypeSubtitle.textContent = getText('houseTypeSubtitle'); }
-            const floorSegmentSubtitle = document.getElementById('floorSegmentSubtitle');
-            if (floorSegmentSubtitle) { floorSegmentSubtitle.textContent = getText('floorSegmentSubtitle'); }
-            const ageDataSubtitle = document.getElementById('ageDataSubtitle');
-            if (ageDataSubtitle) { ageDataSubtitle.textContent = getText('ageDataSubtitle'); }
-            const heatingDataSubtitle = document.getElementById('heatingDataSubtitle');
-            if (heatingDataSubtitle) { heatingDataSubtitle.textContent = getText('heatingDataSubtitle'); }
-        }
-
-        // Initialize localization
-        function initLocalization() {
-            updatePageText();
-        }
-
-        // Initialize page
-        async function init() {
-            // Получаем язык пользователя через API с учетом новой логики
-            await getUserLanguage();
-            currentLanguage = userLanguage;
-            
-            console.log(`🌐 Initializing page with language: ${currentLanguage}`);
-            
-            updatePageText();
-            loadCountries();
-            
-            // Initialize price input
-            const priceInput = document.getElementById('priceObjectInput');
-            if (priceInput) {
-                priceInput.addEventListener('input', function() {
-                    selectedListingTypes.price = this.value ? parseFloat(this.value) : null;
-                    updateConfirmButton();
-                    
-                    // Recalculate object summary if data is already loaded
-                    if (window.currentSummaryData) {
-                        console.log('🔄 Price changed, recalculating object summary...');
-                        recalculateObjectSummary();
+                'heatingLabel': 'Isıtma',
+                
+                // Additional keys from second section
+                'insightsTitle': 'Özet',
+                'insightsLoading': 'Veriler analiz ediliyor...',
+                'insightsError': 'Veri analizi hatası',
+                
+                // Subscription keys
+                'subscriptionRequiredTitle': 'Uzun vadeli mülk değeri tahmin fonksiyonu yalnızca aktif aboneliği olan kullanıcılar için kullanılabilir.',
+                'subscriptionBenefits': 'Abonelik size ne verir:',
+                'subscriptionBenefit1': '12 ay öncesine kadar mülk fiyat tahmini',
+                'subscriptionBenefit2': 'Ek analitik veriler',
+                'subscriptionBenefit3': 'Ek servis özellikleri',
+                'howToSubscribe': 'Nasıl abone olunur:',
+                'subscribeInstructions': '@Aaadviser_pay_bot botuna gidin',
+                'followInstructions': 'Bağlantı talimatlarını takip edin',
+                'needHelp': 'Yardıma mı ihtiyacınız var?',
+                'contactSupport': 'Destek ekibimizle iletişime geçin: @Aaadviser_support_bot',
+                
+                // Market indicators
+                'saleHeader': 'Satış',
+                'rentHeader': 'Kiralama',
+                'indicatorLabel': 'Gösterge',
+                'minValueLabel': 'Minimum değer',
+                'maxValueLabel': 'Maksimum değer',
+                'comparableAreaForSaleLabel': 'Karşılaştırılabilir alan',
+                'countForSaleLabel': 'Satış için sayı',
+                'listingPeriodForSaleLabel': 'Satışa kadar süre',
+                'unitPriceForSaleLabel': 'Birim fiyat',
+                'comparableAreaForRentLabel': 'Karşılaştırılabilir alan',
+                'countForRentLabel': 'Kiralama için sayı',
+                'listingPeriodForRentLabel': 'Kiralamaya kadar süre',
+                'unitPriceForRentLabel': 'Birim fiyat',
+                
+                // Object summary
+                'objectPricePerM2Label': 'Nesnenizin m² fiyatı:',
+                'objectCurrencyLabel': 'Nesne para birimi:',
+                'objectAreaLabel': 'Nesne alanı:',
+                'exchangeRateLabel': 'Döviz kuru:',
+                'propertyPriceLabel': 'Nesne fiyatı:',
+                'propertyAreaLabel': 'Nesne alanı:',
+                'saleLabel': 'Satış:',
+                'rentLabel': 'Kiralama:'
+            },
+            'fr': {
+                'slogan': 'Aperçus du marché immobilier',
+                'pageTitle': 'Évaluation d\'objet',
+                'pageDescription': 'Obtenez une évaluation professionnelle de propriété dans la région sélectionnée',
+                'countryLabel': 'Pays :',
+                'cityLabel': 'Ville :',
+                'countyLabel': 'Région/Zone :',
+                'districtLabel': 'District :',
+                'countryPlaceholder': 'Sélectionner un pays',
+                'cityPlaceholder': 'D\'abord sélectionner un pays',
+                'countyPlaceholder': 'D\'abord sélectionner une ville',
+                'districtPlaceholder': 'D\'abord sélectionner une région',
+                'confirmButtonText': 'Confirmer la sélection',
+                'backButton': '← Retour au menu principal',
+                'selectedLocationTitle': 'Emplacement sélectionné :',
+                'adminIdsTitle': 'IDs pour les administrateurs :',
+                'loading': 'Chargement...',
+                'errorLoading': 'Erreur de chargement des données',
+                'dataSectionTitle': 'Analyse des données régionales',
+                'generalDataTitle': 'Données générales',
+                'houseTypeDataTitle': 'Données du nombre de chambres',
+                'floorSegmentDataTitle': 'Données d\'étage',
+                'ageDataTitle': 'Données d\'âge',
                 'heatingDataTitle': 'Données du type de chauffage',
                 'loadingText': 'Chargement des données...',
                 'errorText': 'Erreur de chargement des données',
@@ -5347,208 +5281,6 @@
                 'rentPriceTooltip': 'Prix de location',
                 'yourObjectLabel': 'Votre objet',
                 'andText': 'et'
-            },
-            'tr': {
-                'slogan': 'Gayrimenkul Piyasa İçgörüleri',
-                'pageTitle': 'Nesne Değerlendirmesi',
-                'pageDescription': 'Seçilen bölgede profesyonel gayrimenkul değerlendirmesi alın',
-                'countryLabel': 'Ülke:',
-                'cityLabel': 'Şehir:',
-                'countyLabel': 'Bölge/Alan:',
-                'districtLabel': 'İlçe:',
-                'countryPlaceholder': 'Ülke seçin',
-                'cityPlaceholder': 'Önce ülke seçin',
-                'countyPlaceholder': 'Önce şehir seçin',
-                'districtPlaceholder': 'Önce bölge seçin',
-                'confirmButtonText': 'Seçimi onayla',
-                'backButton': '← Ana menüye dön',
-                'selectedLocationTitle': 'Seçilen konum:',
-                'adminIdsTitle': 'Yöneticiler için ID\'ler:',
-                'loading': 'Yükleniyor...',
-                'errorLoading': 'Veri yükleme hatası',
-                'dataSectionTitle': 'Bölgesel Veri Analizi',
-                'generalDataTitle': 'Genel Veriler',
-                'houseTypeDataTitle': 'Yatak Odası Sayısı Verileri',
-                'floorSegmentDataTitle': 'Kat Verileri',
-                'ageDataTitle': 'Yaş Verileri',
-                'heatingDataTitle': 'Isıtma Tipi Verileri',
-                'loadingText': 'Veriler yükleniyor...',
-                'errorText': 'Veri yükleme hatası',
-                'totalProperties': 'Toplam mülk:',
-                'averagePrice': 'Ortalama fiyat:',
-                'priceRange': 'Fiyat aralığı:',
-                'noDataAvailable': 'Veri mevcut değil',
-                'keyMetricsTitle': 'Ana Metrikler',
-                'avgSalePriceLabel': 'm² başına ortalama satış fiyatı',
-                'avgRentPriceLabel': 'm² başına ortalama kiralama fiyatı',
-                'listingPeriodSaleLabel': 'İlan süresi (satış)',
-                'listingPeriodRentLabel': 'İlan süresi (kiralama)',
-                'yieldLabel': 'Getiri',
-                'insightsTitle': 'Özet',
-                'insightsLoading': 'Veriler analiz ediliyor...',
-                'insightsError': 'Veri analizi hatası',
-                
-                // Keys for trends chart
-                'chart_title': 'Trend Grafiği',
-                'sale_button': 'm² Satış Fiyatı',
-                'rent_button': 'm² Kiralama Fiyatı',
-                'chart_info': 'Mevcut ay ve bir ay ileriye kadar veriler gösterilir',
-                
-                // Keys for forecast chart
-                'forecast_chart_title': 'Fiyat ve Kiralama Tahmin Grafiği',
-                'forecast_chart_info': 'Mevcut ve gelecek aylara dayalı tahmin',
-                
-                // Abonelik mesajı için anahtarlar
-                'subscriptionRequiredTitle': 'Uzun vadeli mülk değeri tahmin fonksiyonu yalnızca aktif aboneliği olan kullanıcılar için kullanılabilir.',
-                'subscriptionBenefits': 'Abonelik size ne verir:',
-                'subscriptionBenefit1': '12 ay öncesine kadar mülk fiyat tahmini',
-                'subscriptionBenefit2': 'Ek analitik veriler',
-                'subscriptionBenefit3': 'Ek servis özellikleri',
-                'howToSubscribe': 'Nasıl abone olunur:',
-                'subscribeInstructions': '@Aaadviser_pay_bot botuna gidin',
-                'followInstructions': 'Bağlantı talimatlarını takip edin',
-                'needHelp': 'Yardıma mı ihtiyacınız var?',
-                'contactSupport': 'Destek ekibimizle iletişime geçin: @Aaadviser_support_bot',
-                
-                // "Piyasa Göstergeleri" tablosu için anahtarlar
-                'marketIndicatorsTitle': 'Piyasa Göstergeleri',
-                'saleHeader': 'Satış',
-                'rentHeader': 'Kiralama',
-                'indicatorLabel': 'Gösterge',
-                'minValueLabel': 'Minimum değer',
-                'maxValueLabel': 'Maksimum değer',
-                'comparableAreaForSaleLabel': 'Karşılaştırılabilir alan',
-                'countForSaleLabel': 'Satış için sayı',
-                'listingPeriodForSaleLabel': 'Satışa kadar süre',
-                'unitPriceForSaleLabel': 'Birim fiyat',
-                'comparableAreaForRentLabel': 'Karşılaştırılabilir alan',
-                'countForRentLabel': 'Kiralama için sayı',
-                'listingPeriodForRentLabel': 'Kiralamaya kadar süre',
-                'unitPriceForRentLabel': 'Birim fiyat',
-                
-                // Units of measurement
-                'unit_years': 'yıl',
-                'unit_days': 'gün',
-                'unit_square_meters': 'm²',
-                
-                // Trends analysis
-                'trendsAnalysisTitle': 'Trend Analizi',
-                
-                // Keys for market analysis text
-                'marketAnalysisTitle': 'Piyasa Analizi',
-                'saleAnalysisText': 'Satış: {area} m² alan (satılan mülklerin ortalama değeri) ve {minPrice}/m² minimum fiyat ile satış süresi ~{minDays} gün; {maxPrice}/m² maksimum fiyat ile satış süresi {maxDays} güne kadar.',
-                'rentAnalysisText': 'Kiralama: {area} m² alan (kiralanan mülklerin ortalama değeri) {minPrice}/m² minimum fiyat, kiralama süresi ~{minDays} gün; {maxPrice}/m² maksimum fiyat ile süre {maxDays} güne kadar.',
-                
-                // Keys for trends chart
-                'chart_title': 'Trend Grafiği',
-                'sale_button': 'm² Satış Fiyatı',
-                'rent_button': 'm² Kiralama Fiyatı',
-                'chart_info': 'Mevcut ay ve bir ay ileriye kadar veriler gösterilir',
-                
-                // Keys for forecast chart
-                'forecast_chart_title': 'Fiyat ve Kiralama Tahmin Grafiği',
-                'forecast_chart_info': 'Mevcut ve gelecek aylara dayalı tahmin',
-                
-                // Keys for object summary
-                'objectSummaryTitle': 'Nesne Özeti',
-                'objectPricePerM2Label': 'Nesnenizin m² fiyatı:',
-                'objectCurrencyLabel': 'Nesne para birimi:',
-                'objectAreaLabel': 'Nesne alanı:',
-                'exchangeRateLabel': 'Döviz kuru:',
-                
-                // Keys for property labels
-                'propertyPriceLabel': 'Nesne fiyatı:',
-                'propertyAreaLabel': 'Nesne alanı:',
-                
-                // Keys for sale and rent labels
-                'saleLabel': 'Satış:',
-                'rentLabel': 'Kiralama:',
-                
-                // Table headers for trends
-                'priceChangeLabel': 'Fiyat Değişimi',
-                'yieldLabel': 'Getiri',
-                'forecastSaleLabel': 'Satış Tahmini',
-                'forecastRentLabel': 'Kiralama Tahmini',
-                'forecastYieldLabel': 'Getiri Tahmini',
-                'dateLabel': 'Tarih',
-                
-                // Chart labels
-                'saleForecastTooltip': 'Satış Tahmini',
-                'rentForecastTooltip': 'Kiralama Tahmini',
-                'saleForecastYAxis': 'Satış Tahmini',
-                'rentForecastYAxis': 'Kiralama Tahmini',
-                
-                // Price forecast block labels
-                'priceForecastTitle': 'Fiyat Tahmini',
-                'currentPriceLabel': 'Mevcut Değer',
-                'futurePriceLabel': 'Tahmin Edilen Değer',
-                'userSalePriceLabel': 'Satış Fiyatı',
-                'marketSalePriceLabel': 'Mevcut Pazar Fiyatı',
-                'rentRateLabel': 'Kiralama Oranı',
-                'keyMetricsLabel': 'Anahtar Göstergeler',
-                'priceGrowthLabel': 'Fiyat Artışı',
-                'rentGrowthLabel': 'Kira Artışı',
-                'avgYieldLabel': 'Ortalama Getiri',
-                'totalROILabel': 'Dönem ROI',
-                'paybackPeriodLabel': 'Geri Ödeme Süresi',
-                'forecastPeriodLabel': 'Tahmin Dönemi',
-                'yearsUnit': 'yıl',
-                'monthsUnit': 'ay',
-                'toYourPriceLabel': 'fiyatınıza göre',
-                
-                // Object comparison labels
-                'vsMinMarketPriceLabel': 'vs. min. pazar fiyatı',
-                'vsMaxMarketPriceLabel': 'vs. maks. pazar fiyatı',
-                'vsAvgAreaLabel': 'vs. ort. alan',
-                'estimatedRentLabel': 'Tahmini kira',
-                
-                // Analysis texts
-                'marketStabilityText': 'Emlak piyasası istikrar göstermektedir',
-                'marketGrowthText': 'Emlak piyasası hem satışlarda hem de kiralamada istikrarlı büyüme göstermektedir',
-                'cheaperThanBothText': 'hem minimum hem de maksimum pazar fiyatlarından daha ucuz',
-                'expensiveThanBothText': 'hem minimum hem de maksimum pazar fiyatlarından daha pahalı',
-                'betweenMinMaxText': 'minimumdan pahalı ama maksimum pazar fiyatından ucuz',
-                'largerAreaText': 'pazardaki çoğu mülkten daha büyük alana sahip',
-                'smallerAreaText': 'pazardaki çoğu mülkten daha küçük alana sahip',
-                'forecastBasedOnText': 'Tahmin temeli',
-                'forecastMonthsInfo': '${months} ay (önceki + mevcut + gelecek)',
-                
-                // Currency and additional analysis texts
-                'exchangeRateText': 'Kur',
-                'fromToText': 'İtibaren',
-                'byToText': 'kadar',
-                'yearText': 'yılı',
-                'salesPricesGrewText': 'satış fiyatları yaklaşık olarak arttı',
-                'rentGrewText': 'kira —',
-                'showingInvestmentAttractivenessText': 'yatırım çekiciliği gösteriyor',
-                'currentTrendIndicatesText': 'Mevcut trend gösteriyor',
-                'stabilityText': 'istikrar',
-                'gradualIncreaseText': 'kademeli artış',
-                'gradualDecreaseText': 'kademeli azalma',
-                'yieldStabilityText': 'getiri, ancak olumlu dinamik devam ediyor',
-                'mixedDynamicsText': 'Emlak piyasası karışık dinamik gösteriyor',
-                'salesPricesGrewByText': 'Satış fiyatları arttı',
-                'rentGrewByText': 'kira arttı',
-                'maintainsAttractivenessText': 'yatırımcılar için çekiciliği koruyor',
-                'yieldRangeText': 'aralığında kalıyor',
-                'investmentPotentialText': 'yatırım potansiyelinin istikrarını gösteriyor',
-                
-                // Chart axis labels
-                'monthAxisLabel': 'Ay',
-                
-                // Trend types
-                'priceTrendLabel': 'Fiyat Trendi',
-                'yieldTrendLabel': 'Getiri Trendi',
-                'countTrendLabel': 'Sayı Trendi',
-                'generalTrendLabel': 'Genel Trend',
-                
-                // Chart axis and tooltip labels
-                'salePriceAxisLabel': 'Satış Fiyatı (₺/m²)',
-                'rentPriceAxisLabel': 'Kiralama Fiyatı (₺/m²)',
-                'salePriceTooltip': 'Satış Fiyatı',
-                'rentPriceTooltip': 'Kiralama Fiyatı',
-                'yourObjectLabel': 'Nesneniz',
-                'andText': 've'
             }
         };
 
