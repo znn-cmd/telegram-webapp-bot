@@ -5053,26 +5053,126 @@
         function updatePageText() {
             document.getElementById('slogan').textContent = getText('slogan');
             document.getElementById('pageTitle').textContent = getText('pageTitle');
-                'pageDescription': 'Obtenez une évaluation professionnelle de propriété dans la région sélectionnée',
-                'countryLabel': 'Pays :',
-                'cityLabel': 'Ville :',
-                'countyLabel': 'Région/Zone :',
-                'districtLabel': 'District :',
-                'countryPlaceholder': 'Sélectionner un pays',
-                'cityPlaceholder': 'D\'abord sélectionner un pays',
-                'countyPlaceholder': 'D\'abord sélectionner une ville',
-                'districtPlaceholder': 'D\'abord sélectionner une région',
-                'confirmButtonText': 'Confirmer la sélection',
-                'backButton': '← Retour au menu principal',
-                'selectedLocationTitle': 'Emplacement sélectionné :',
-                'adminIdsTitle': 'IDs pour les administrateurs :',
-                'loading': 'Chargement...',
-                'errorLoading': 'Erreur de chargement des données',
-                'dataSectionTitle': 'Analyse des données régionales',
-                'generalDataTitle': 'Données générales',
-                'houseTypeDataTitle': 'Données du nombre de chambres',
-                'floorSegmentDataTitle': 'Données d\'étage',
-                'ageDataTitle': 'Données d\'âge',
+            document.getElementById('pageDescription').textContent = getText('pageDescription');
+            document.getElementById('countryLabel').textContent = getText('countryLabel');
+            document.getElementById('cityLabel').textContent = getText('cityLabel');
+            document.getElementById('countyLabel').textContent = getText('countyLabel');
+            document.getElementById('districtLabel').textContent = getText('districtLabel');
+            document.getElementById('countryPlaceholder').textContent = getText('countryPlaceholder');
+            document.getElementById('cityPlaceholder').textContent = getText('cityPlaceholder');
+            document.getElementById('countyPlaceholder').textContent = getText('countyPlaceholder');
+            document.getElementById('districtPlaceholder').textContent = getText('districtPlaceholder');
+            document.getElementById('confirmButtonText').textContent = getText('confirmButtonText');
+            document.getElementById('backButton').textContent = getText('backButton');
+            document.getElementById('selectedLocationTitle').textContent = getText('selectedLocationTitle');
+            document.getElementById('adminIdsTitle').textContent = getText('adminIdsTitle');
+            
+            // Update new data section elements
+            const dataSectionTitle = document.getElementById('dataSectionTitle');
+            if (dataSectionTitle) {
+                dataSectionTitle.textContent = getText('dataSectionTitle');
+            }
+            
+            const generalDataTitle = document.getElementById('generalDataTitle');
+            if (generalDataTitle) {
+                generalDataTitle.textContent = getText('generalDataTitle');
+            }
+            
+            const houseTypeDataTitle = document.getElementById('houseTypeDataTitle');
+            if (houseTypeDataTitle) {
+                houseTypeDataTitle.textContent = getText('houseTypeDataTitle');
+            }
+            
+            const floorSegmentDataTitle = document.getElementById('floorSegmentDataTitle');
+            if (floorSegmentDataTitle) {
+                floorSegmentDataTitle.textContent = getText('floorSegmentDataTitle');
+            }
+            
+            const ageDataTitle = document.getElementById('ageDataTitle');
+            if (ageDataTitle) {
+                ageDataTitle.textContent = getText('ageDataTitle');
+            }
+            
+            const heatingDataTitle = document.getElementById('heatingDataTitle');
+            if (heatingDataTitle) {
+                heatingDataTitle.textContent = getText('heatingDataTitle');
+            }
+            
+            // Update loading and error texts
+            const loadingText = document.getElementById('loadingText');
+            if (loadingText) {
+                loadingText.textContent = getText('loadingText');
+            }
+            
+            const errorText = document.getElementById('errorText');
+            if (errorText) {
+                errorText.textContent = getText('errorText');
+            }
+            
+            // Update placeholders
+            const priceObjectInput = document.getElementById('priceObjectInput');
+            if (priceObjectInput) { priceObjectInput.placeholder = getText('pricePlaceholder'); }
+            const areaObjectInput = document.getElementById('areaObjectInput');
+            if (areaObjectInput) { areaObjectInput.placeholder = getText('areaPlaceholder'); }
+            
+            // Update placeholder texts
+            const houseTypePlaceholder = document.getElementById('houseTypePlaceholder');
+            if (houseTypePlaceholder) { houseTypePlaceholder.textContent = getText('selectBedrooms'); }
+            const floorSegmentPlaceholder = document.getElementById('floorSegmentPlaceholder');
+            if (floorSegmentPlaceholder) { floorSegmentPlaceholder.textContent = getText('selectFloor'); }
+            const ageDataPlaceholder = document.getElementById('ageDataPlaceholder');
+            if (ageDataPlaceholder) { ageDataPlaceholder.textContent = getText('selectAge'); }
+            const heatingDataPlaceholder = document.getElementById('heatingDataPlaceholder');
+            if (heatingDataPlaceholder) { heatingDataPlaceholder.textContent = getText('selectHeating'); }
+            
+            // Update subtitles
+            const priceObjectSubtitle = document.getElementById('priceObjectSubtitle');
+            if (priceObjectSubtitle) { priceObjectSubtitle.textContent = getText('priceObjectSubtitle'); }
+            const areaObjectSubtitle = document.getElementById('areaObjectSubtitle');
+            if (areaObjectSubtitle) { areaObjectSubtitle.textContent = getText('areaObjectSubtitle'); }
+            const currencyTitle = document.getElementById('currencyTitle');
+            if (currencyTitle) { currencyTitle.textContent = getText('currencyTitle'); }
+            
+            // Update listing type elements
+            const listingTypeTitle = document.getElementById('listingTypeTitle');
+            if (listingTypeTitle) { listingTypeTitle.textContent = getText('listingTypeTitle'); }
+            const houseTypeSubtitle = document.getElementById('houseTypeSubtitle');
+            if (houseTypeSubtitle) { houseTypeSubtitle.textContent = getText('houseTypeSubtitle'); }
+            const floorSegmentSubtitle = document.getElementById('floorSegmentSubtitle');
+            if (floorSegmentSubtitle) { floorSegmentSubtitle.textContent = getText('floorSegmentSubtitle'); }
+            const ageDataSubtitle = document.getElementById('ageDataSubtitle');
+            if (ageDataSubtitle) { ageDataSubtitle.textContent = getText('ageDataSubtitle'); }
+            const heatingDataSubtitle = document.getElementById('heatingDataSubtitle');
+            if (heatingDataSubtitle) { heatingDataSubtitle.textContent = getText('heatingDataSubtitle'); }
+        }
+
+        // Initialize localization
+        function initLocalization() {
+            updatePageText();
+        }
+
+        // Initialize page
+        async function init() {
+            // Получаем язык пользователя через API с учетом новой логики
+            await getUserLanguage();
+            currentLanguage = userLanguage;
+            
+            console.log(`🌐 Initializing page with language: ${currentLanguage}`);
+            
+            updatePageText();
+            loadCountries();
+            
+            // Initialize price input
+            const priceInput = document.getElementById('priceObjectInput');
+            if (priceInput) {
+                priceInput.addEventListener('input', function() {
+                    selectedListingTypes.price = this.value ? parseFloat(this.value) : null;
+                    updateConfirmButton();
+                    
+                    // Recalculate object summary if data is already loaded
+                    if (window.currentSummaryData) {
+                        console.log('🔄 Price changed, recalculating object summary...');
+                        recalculateObjectSummary();
                 'heatingDataTitle': 'Données du type de chauffage',
                 'loadingText': 'Chargement des données...',
                 'errorText': 'Erreur de chargement des données',
