@@ -1,4 +1,4 @@
-# Aaadvisor Landing Page - Конфигурационные файлы
+# Aaadviser Landing Page - Конфигурационные файлы
 
 ## Nginx конфигурация (nginx.conf)
 
@@ -384,7 +384,7 @@ networks:
 
 ### .github/workflows/deploy.yml
 ```yaml
-name: Deploy Aaadvisor Landing
+name: Deploy Aaadviser Landing
 
 on:
   push:
@@ -451,7 +451,7 @@ jobs:
 
 set -e
 
-echo "🚀 Начинаем развертывание Aaadvisor Landing Page..."
+echo "🚀 Начинаем развертывание Aaadviser Landing Page..."
 
 # Проверяем наличие необходимых файлов
 if [ ! -f "index.html" ]; then
@@ -496,7 +496,7 @@ echo "🌐 Сайт доступен по адресу: https://your-domain.com"
 
 set -e
 
-echo "🔧 Установка Aaadvisor Landing Page..."
+echo "🔧 Установка Aaadviser Landing Page..."
 
 # Обновляем систему
 echo "📦 Обновляем систему..."
@@ -571,7 +571,7 @@ echo "🔒 Для настройки SSL выполните: sudo certbot --ngin
 ```ini
 # /etc/systemd/system/aaadvisor-landing.service
 [Unit]
-Description=Aaadvisor Landing Page
+Description=Aaadviser Landing Page
 After=network.target
 
 [Service]

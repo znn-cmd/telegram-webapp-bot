@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aaadvisor – Инструмент для риэлторов</title>
+    <title>Aaadviser – Инструмент для риэлторов</title>
     <meta name="description" content="Закрывайте больше сделок: отчеты для клиентов с прогнозом цен и расчетом доходности недвижимости">
     <link rel="stylesheet" href="styles/main.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -15,8 +15,8 @@
         <div class="container">
             <div class="header-content">
                 <div class="logo">
-                    <img src="../logo-only.png" alt="Aaadvisor" class="logo-img">
-                    <span class="logo-text">Aaadvisor</span>
+                    <img src="../logo-only.png" alt="Aaadviser" class="logo-img">
+                    <span class="logo-text">Aaadviser</span>
                 </div>
                 <nav class="nav">
                     <div class="language-selector">
@@ -36,7 +36,8 @@
         <div class="container">
             <div class="hero-content">
                 <div class="hero-text">
-                    <h1 class="hero-title" data-i18n="hero.title">Закрывайте больше сделок с Aaadvisor</h1>
+                    <p class="hero-banner" data-i18n="hero.banner">Аналитический сервис недвижимости Турции, Испании, Португалии</p>
+                    <h1 class="hero-title" data-i18n="hero.title">Закрывайте больше сделок по недвижимости с Aaadviser</h1>
                     <p class="hero-subtitle" data-i18n="hero.subtitle">
                         Покажите клиенту точные цифры: стоимость объекта, прогноз роста цен и расчет доходности. 
                         Профессиональный отчет за 1 минуту прямо в Telegram.
@@ -55,31 +56,62 @@
                             <span data-i18n="hero.feature3">Прогноз цен</span>
                         </div>
                     </div>
-                                         <a href="https://t.me/Aaadviser_bot" class="btn btn-primary btn-large">
-                         <span data-i18n="hero.cta">Получить отчет бесплатно</span>
-                     </a>
+                    <div class="hero-actions">
+                        <a href="https://t.me/Aaadviser_bot" class="btn btn-primary btn-large">
+                            <span data-i18n="hero.cta">Получить отчет бесплатно</span>
+                        </a>
+                        <button class="btn btn-sample-small" onclick="openSampleReport()" data-i18n="sample.button">Пример отчета</button>
+                    </div>
                     <p class="hero-note" data-i18n="hero.note">Бесплатно • Без регистрации • Мгновенно</p>
                 </div>
                 <div class="hero-visual">
-                    <div class="app-preview">
-                        <img src="../logo-flt.png" alt="Aaadvisor отчет" class="preview-img">
-                        <div class="preview-overlay">
-                            <div class="preview-stats">
-                                <div class="stat-item">
-                                    <span class="stat-value">€450,000</span>
-                                    <span class="stat-label" data-i18n="preview.price">Стоимость</span>
-                                </div>
-                                <div class="stat-item">
-                                    <span class="stat-value">+12%</span>
-                                    <span class="stat-label" data-i18n="preview.growth">Рост за год</span>
-                                </div>
-                                <div class="stat-item">
-                                    <span class="stat-value">6.8%</span>
-                                    <span class="stat-label" data-i18n="preview.yield">Доходность</span>
-                                </div>
-                            </div>
+                    <div class="report-preview-container">
+                        <div class="report-preview-scroll">
+                            <img src="20250902125608.png" alt="Отчет Aaadviser" class="preview-report-full">
+                        </div>
+                        <div class="report-logo-overlay">
+                            <img src="../logo-flt.png" alt="Aaadviser логотип" class="preview-logo">
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SEO Content Section -->
+    <section class="seo-content">
+        <div class="container">
+            <h2 class="section-title" data-i18n="seo.h2.analytics">Аналитика недвижимости: как аргументировать цену и ROI</h2>
+            <p class="section-subtitle" data-i18n="seo.p.analytics">Покажите клиенту цифры: рыночные сравнения, медианные цены, ликвидность и ROI. Aaadviser генерирует аналитический отчет за 1 минуту в Telegram.</p>
+
+            <h2 class="section-title" data-i18n="seo.h2.price_forecast">Прогноз цен на недвижимость 2025: Турция, Испания, Португалия</h2>
+            <p class="section-subtitle" data-i18n="seo.p.price_forecast">Используем исторические ряды и экономические индикаторы, чтобы оценить рост цен на 1–3 года вперед по ключевым локациям.</p>
+
+            <h2 class="section-title" data-i18n="seo.h2.yield">Доходность недвижимости и расчет доходности аренды</h2>
+            <p class="section-subtitle" data-i18n="seo.p.yield">Считаем валовую и чистую доходность, окупаемость и чувствительность к ставке аренды. Помогает инвесторам принимать решения.</p>
+
+            <h2 class="section-title" data-i18n="seo.h2.tools_for_realtors">Цифровые инструменты для риэлтора и агентства</h2>
+            <p class="section-subtitle" data-i18n="seo.p.tools_for_realtors">Автоматические аналитические отчеты, визуализации трендов, аргументы для переговоров — все для роста конверсии и доверия клиентов.</p>
+
+            <h2 class="section-title" data-i18n="seo.h2.geo_analytics">Геоаналитика: Турция, Испания, Португалия</h2>
+            <div class="benefits-grid">
+                <div class="benefit-card">
+                    <h3 data-i18n="seo.h3.turkey">Недвижимость Турции: аналитика и доходность аренды</h3>
+                    <ul>
+                        
+                    </ul>
+                </div>
+                <div class="benefit-card">
+                    <h3 data-i18n="seo.h3.spain">Недвижимость Испании: прогноз цен 2025 и ROI</h3>
+                    <ul>
+                        
+                    </ul>
+                </div>
+                <div class="benefit-card">
+                    <h3 data-i18n="seo.h3.portugal">Недвижимость Португалии: аналитика рынка и доходность</h3>
+                    <ul>
+                       
+                    </ul>
                 </div>
             </div>
         </div>
@@ -88,7 +120,7 @@
     <!-- Benefits Section -->
     <section class="benefits">
         <div class="container">
-            <h2 class="section-title" data-i18n="benefits.title">Почему риэлторы выбирают Aaadvisor</h2>
+            <h2 class="section-title" data-i18n="benefits.title">Почему риэлторы выбирают Aaadviser</h2>
             <p class="section-subtitle" data-i18n="benefits.subtitle">Инструмент, который помогает закрывать сделки быстрее и с большим доверием</p>
             
             <div class="benefits-grid">
@@ -163,26 +195,31 @@
                      </a>
                 </div>
                 <div class="report-visual">
-                    <div class="report-mockup">
-                        <div class="mockup-header">
-                            <img src="../logo-only.png" alt="Aaadvisor" class="mockup-logo">
-                            <span class="mockup-title">Аналитический отчет</span>
-                        </div>
-                        <div class="mockup-content">
-                            <div class="mockup-section">
-                                <h4>Объект недвижимости</h4>
-                                <p>2-комнатная квартира, 75 м²</p>
-                                <p>Барселона, район Эшампле</p>
+                    <div class="report-gallery">
+                        <div class="gallery-container">
+                            <div class="gallery-slides">
+                                <div class="gallery-slide active">
+                                    <img src="curmrkt.png" alt="Текущий рынок" class="gallery-img">
+                                </div>
+                                <div class="gallery-slide">
+                                    <img src="mrkttrnd.png" alt="Тренды рынка" class="gallery-img">
+                                </div>
+                                <div class="gallery-slide">
+                                    <img src="mrktftr.png" alt="Прогноз рынка" class="gallery-img">
+                                </div>
+                                <div class="gallery-slide">
+                                    <img src="mrktfnlrpt.png" alt="Финальный отчет" class="gallery-img">
+                                </div>
                             </div>
-                            <div class="mockup-section">
-                                <h4>Рыночная стоимость</h4>
-                                <p class="mockup-price">€450,000</p>
-                                <p class="mockup-growth">+8.5% за год</p>
+                            <div class="gallery-controls">
+                                <button class="gallery-btn gallery-prev">‹</button>
+                                <button class="gallery-btn gallery-next">›</button>
                             </div>
-                            <div class="mockup-section">
-                                <h4>Доходность аренды</h4>
-                                <p class="mockup-yield">6.8% годовых</p>
-                                <p>€2,550/месяц</p>
+                            <div class="gallery-dots">
+                                <span class="gallery-dot active" data-slide="0"></span>
+                                <span class="gallery-dot" data-slide="1"></span>
+                                <span class="gallery-dot" data-slide="2"></span>
+                                <span class="gallery-dot" data-slide="3"></span>
                             </div>
                         </div>
                     </div>
@@ -194,7 +231,7 @@
     <!-- Before/After Section -->
     <section class="before-after">
         <div class="container">
-            <h2 class="section-title" data-i18n="comparison.title">До и После Aaadvisor</h2>
+            <h2 class="section-title" data-i18n="comparison.title">До и После Aaadviser</h2>
             <div class="comparison-grid">
                 <div class="comparison-card before">
                     <div class="comparison-header">
@@ -238,32 +275,92 @@
                     <div class="stat-label" data-i18n="social.stats.realtors">Риэлторов используют</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-number">2x</div>
-                    <div class="stat-label" data-i18n="social.stats.faster">Быстрее закрываются сделки</div>
+                    <div class="stat-number">258</div>
+                    <div class="stat-label" data-i18n="social.stats.reports">Отчетов в месяц делается</div>
                 </div>
             </div>
             
-            <div class="testimonials">
-                <div class="testimonial-card">
-                    <div class="testimonial-content">
-                        <p data-i18n="social.testimonial1.text">"Теперь я показываю клиентам точные цифры и прогнозы. Сделки закрываются в 2 раза быстрее, а доверие клиентов выросло значительно."</p>
-                        <div class="testimonial-author">
-                            <div class="author-info">
-                                <strong data-i18n="social.testimonial1.name">Анна Петрова</strong>
-                                <span data-i18n="social.testimonial1.position">Риэлтор, Барселона</span>
+            <div class="testimonials-carousel">
+                <div class="testimonials-container">
+                    <div class="testimonials-track">
+                        <div class="testimonial-card active">
+                            <div class="testimonial-content">
+                                <p data-i18n="social.testimonial1.text">"Теперь я показываю клиентам точные цифры и прогнозы. Сделки закрываются в 2 раза быстрее, а доверие клиентов выросло значительно."</p>
+                                <div class="testimonial-author">
+                                    <div class="author-info">
+                                        <strong data-i18n="social.testimonial1.name">Анна Петрова</strong>
+                                        <span data-i18n="social.testimonial1.position">Риэлтор, Барселона</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="testimonial-card">
+                            <div class="testimonial-content">
+                                <p data-i18n="social.testimonial2.text">"Aaadviser помогает обосновать цену объективно. Клиенты видят, что мы не просто продаем, а даем профессиональную консультацию."</p>
+                                <div class="testimonial-author">
+                                    <div class="author-info">
+                                        <strong data-i18n="social.testimonial2.name">Сергей Иванов</strong>
+                                        <span data-i18n="social.testimonial2.position">Агентство недвижимости, Лиссабон</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="testimonial-card">
+                            <div class="testimonial-content">
+                                <p data-i18n="social.testimonial3.text">"С Aaadviser стало намного проще обосновывать клиентам цену. Они видят реальные данные рынка и понимают справедливость цены."</p>
+                                <div class="testimonial-author">
+                                    <div class="author-info">
+                                        <strong data-i18n="social.testimonial3.name">Мехмет Йылдыз</strong>
+                                        <span data-i18n="social.testimonial3.position">Риэлтор, Анталия</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="testimonial-card">
+                            <div class="testimonial-content">
+                                <p data-i18n="social.testimonial4.text">"Теперь я лучше понимаю, по какой цене брать квартиры на продажу. Аналитика Aaadviser помогает принимать правильные решения."</p>
+                                <div class="testimonial-author">
+                                    <div class="author-info">
+                                        <strong data-i18n="social.testimonial4.name">Карлос Мендес</strong>
+                                        <span data-i18n="social.testimonial4.position">Риэлтор, Мадрид</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="testimonial-card">
+                            <div class="testimonial-content">
+                                <p data-i18n="social.testimonial5.text">"Клиенты больше доверяют при переговорах, когда видят профессиональные отчеты. Это значительно ускоряет процесс продажи."</p>
+                                <div class="testimonial-author">
+                                    <div class="author-info">
+                                        <strong data-i18n="social.testimonial5.name">Айше Демир</strong>
+                                        <span data-i18n="social.testimonial5.position">Риэлтор, Стамбул</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="testimonial-card">
+                            <div class="testimonial-content">
+                                <p data-i18n="social.testimonial6.text">"Отчеты Aaadviser помогают объяснить клиентам рыночную ситуацию. Они видят, что цена обоснована данными, а не просто словами."</p>
+                                <div class="testimonial-author">
+                                    <div class="author-info">
+                                        <strong data-i18n="social.testimonial6.name">Мария Силва</strong>
+                                        <span data-i18n="social.testimonial6.position">Риэлтор, Порту</span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="testimonial-card">
-                    <div class="testimonial-content">
-                        <p data-i18n="social.testimonial2.text">"Aaadvisor помогает обосновать цену объективно. Клиенты видят, что мы не просто продаем, а даем профессиональную консультацию."</p>
-                        <div class="testimonial-author">
-                            <div class="author-info">
-                                <strong data-i18n="social.testimonial2.name">Сергей Иванов</strong>
-                                <span data-i18n="social.testimonial2.position">Агентство недвижимости, Лиссабон</span>
-                            </div>
-                        </div>
+                    <div class="testimonials-controls">
+                        <button class="testimonials-btn testimonials-prev">‹</button>
+                        <button class="testimonials-btn testimonials-next">›</button>
+                    </div>
+                    <div class="testimonials-dots">
+                        <span class="testimonials-dot active" data-slide="0"></span>
+                        <span class="testimonials-dot" data-slide="1"></span>
+                        <span class="testimonials-dot" data-slide="2"></span>
+                        <span class="testimonials-dot" data-slide="3"></span>
+                        <span class="testimonials-dot" data-slide="4"></span>
+                        <span class="testimonials-dot" data-slide="5"></span>
                     </div>
                 </div>
             </div>
@@ -276,7 +373,7 @@
             <div class="cta-content">
                 <h2 class="cta-title" data-i18n="cta.title">Покажите клиенту выгоду сделки уже сегодня</h2>
                 <p class="cta-subtitle" data-i18n="cta.subtitle">
-                    Получите бесплатный доступ к Aaadvisor и начните использовать профессиональные отчеты в работе
+                    Получите бесплатный доступ к Aaadviser и начните использовать профессиональные отчеты в работе
                 </p>
                 <div class="cta-features">
                     <div class="cta-feature">
@@ -292,9 +389,12 @@
                         <span data-i18n="cta.feature3">Работает в Telegram</span>
                     </div>
                 </div>
-                                 <a href="https://t.me/Aaadviser_bot" class="btn btn-primary btn-large btn-glow">
-                     <span data-i18n="cta.button">Запустить в Telegram</span>
-                 </a>
+                <div class="cta-actions">
+                    <a href="https://t.me/Aaadviser_bot" class="btn btn-primary btn-large btn-glow">
+                        <span data-i18n="cta.button">Запустить в Telegram</span>
+                    </a>
+                    <button class="btn btn-sample-small" onclick="openSampleReport()" data-i18n="sample.button">Пример отчета</button>
+                </div>
                 <p class="cta-note" data-i18n="cta.note">Без регистрации • Без ограничений • Сразу в работе</p>
             </div>
         </div>
@@ -304,22 +404,22 @@
      <section class="faq-section">
          <div class="container">
              <h2 class="section-title" data-i18n="faq.title">Часто задаваемые вопросы</h2>
-             <p class="section-subtitle" data-i18n="faq.subtitle">Ответы на самые популярные вопросы о Aaadvisor</p>
+             <p class="section-subtitle" data-i18n="faq.subtitle">Ответы на самые популярные вопросы о Aaadviser</p>
              
              <div class="faq-grid">
                  <div class="faq-item">
                      <div class="faq-question">
-                         <h3 data-i18n="faq.q1">Как работает Aaadvisor?</h3>
+                         <h3 data-i18n="faq.q1">Как работает Aaadviser?</h3>
                          <span class="faq-toggle">+</span>
                      </div>
                      <div class="faq-answer">
-                         <p data-i18n="faq.a1">Aaadvisor — это Telegram бот, который анализирует недвижимость в Турции, Испании и Португалии. Просто отправьте адрес объекта, и бот создаст профессиональный отчет с анализом рынка, прогнозом цен и расчетом доходности за 1 минуту.</p>
+                         <p data-i18n="faq.a1">Aaadviser — это Telegram бот, который анализирует недвижимость в Турции, Испании и Португалии. Просто отправьте адрес объекта, и бот создаст профессиональный отчет с анализом рынка, прогнозом цен и расчетом доходности за 1 минуту.</p>
                      </div>
                  </div>
                  
                  <div class="faq-item">
                      <div class="faq-question">
-                         <h3 data-i18n="faq.q2">Какие данные анализирует Aaadvisor?</h3>
+                         <h3 data-i18n="faq.q2">Какие данные анализирует Aaadviser?</h3>
                          <span class="faq-toggle">+</span>
                      </div>
                      <div class="faq-answer">
@@ -333,17 +433,17 @@
                          <span class="faq-toggle">+</span>
                      </div>
                      <div class="faq-answer">
-                         <p data-i18n="faq.a3">В настоящее время Aaadvisor доступен бесплатно в тестовом режиме. Вы можете получить неограниченное количество отчетов без регистрации и без ограничений.</p>
+                         <p data-i18n="faq.a3">В настоящее время Aaadviser доступен бесплатно в тестовом режиме. Вы можете получить неограниченное количество отчетов без регистрации и без ограничений.</p>
                      </div>
                  </div>
                  
                  <div class="faq-item">
                      <div class="faq-question">
-                         <h3 data-i18n="faq.q4">В каких странах работает Aaadvisor?</h3>
+                         <h3 data-i18n="faq.q4">В каких странах работает Aaadviser?</h3>
                          <span class="faq-toggle">+</span>
                      </div>
                      <div class="faq-answer">
-                         <p data-i18n="faq.a4">Сейчас Aaadvisor работает с недвижимостью в Турции, Испании и Португалии. Мы постоянно расширяем географию и добавляем новые рынки.</p>
+                         <p data-i18n="faq.a4">Сейчас Aaadviser работает с недвижимостью в Турции, Испании и Португалии. Мы постоянно расширяем географию и добавляем новые рынки.</p>
                      </div>
                  </div>
                  
@@ -363,7 +463,7 @@
                          <span class="faq-toggle">+</span>
                      </div>
                      <div class="faq-answer">
-                         <p data-i18n="faq.a6">Да! Отчеты Aaadvisor предназначены именно для работы с клиентами. Они содержат профессиональную аналитику, которую можно показывать покупателям для обоснования цены и потенциальной доходности.</p>
+                         <p data-i18n="faq.a6">Да! Отчеты Aaadviser предназначены именно для работы с клиентами. Они содержат профессиональную аналитику, которую можно показывать покупателям для обоснования цены и потенциальной доходности.</p>
                      </div>
                  </div>
                  
@@ -397,14 +497,657 @@
          </div>
      </section>
 
-     <!-- Footer -->
+     <!-- Blog Section -->
+     <section class="blog-section" id="blog">
+         <div class="container">
+             <h2 class="section-title" data-i18n="blog.title">Блог Aaadviser: аналитика и практические советы</h2>
+             <p class="section-subtitle" data-i18n="blog.subtitle">Полезные материалы для риэлторов и инвесторов: аргументация цены, прогнозы рынков, доходность и кейсы</p>
+
+             <div class="blog-grid">
+                 <details class="blog-post">
+                     <summary>
+                         <span class="blog-title" data-i18n="blog.article1.title">Как риэлтору аргументировать цену недвижимости цифрами: 5 проверенных способов</span>
+                         <span class="blog-meta">5 min</span>
+                     </summary>
+                     <div class="blog-content">
+                         <h4 data-i18n="blog.article1.intro.h">Введение</h4>
+                         <p data-i18n="blog.article1.intro.p1">Каждый риэлтор сталкивался с ситуацией: клиент сомневается, торгуется или откладывает решение о покупке. Главная причина — отсутствие объективных аргументов. Клиенты хотят видеть цифры и факты.</p>
+                         <p data-i18n="blog.article1.intro.p2">>70% покупателей принимают решение быстрее при наличии аналитики: прогнозов цен, расчетов доходности и сравнений. Аргументация цифрами — ключевой инструмент риэлтора.</p>
+                         <p data-i18n="blog.article1.intro.p3">В статье — 5 способов обосновать цену цифрами и как Aaadviser помогает закрывать сделки быстрее.</p>
+
+                         <h4 data-i18n="blog.article1.p1.h">1. Сравнение с аналогичными объектами</h4>
+                         <ul>
+                             <li data-i18n="blog.article1.p1.l1">Стоимость аналогов в районе</li>
+                             <li data-i18n="blog.article1.p1.l2">Цена за м²</li>
+                             <li data-i18n="blog.article1.p1.l3">Разница в инфраструктуре и характеристиках</li>
+                         </ul>
+                         <p data-i18n="blog.article1.p1.p">В Aaadviser сравнения формируются автоматически в отчете.</p>
+
+                         <h4 data-i18n="blog.article1.p2.h">2. Прогноз роста цен</h4>
+                         <p data-i18n="blog.article1.p2.p1">Ожидание роста стоимости ускоряет решение. Важны динамика, планы застройки, инфраструктура, экономика.</p>
+                         <p data-i18n="blog.article1.p2.p2">В отчетах Aaadviser прогноз строится по историческим данным и трендам.</p>
+
+                         <h4 data-i18n="blog.article1.p3.h">3. Расчет доходности аренды</h4>
+                         <p data-i18n="blog.article1.p3.p1">Покажите доход при долгосрочной и краткосрочной аренде и срок окупаемости. Конкретные цифры (например, 7–10% годовых) снимают сомнения.</p>
+                         <p data-i18n="blog.article1.p3.p2">В Aaadviser расчет доступен в один клик.</p>
+
+                         <h4 data-i18n="blog.article1.p4.h">4. Динамика рынка недвижимости</h4>
+                         <p data-i18n="blog.article1.p4.p">Покажите график цен за 3–5 лет, спрос/предложение и тенденции по районам. Простая визуализация работает сильнее слов. Aaadviser формирует наглядные графики.</p>
+
+                         <h4 data-i18n="blog.article1.p5.h">5. Инвестиционная привлекательность</h4>
+                         <p data-i18n="blog.article1.p5.p">Поясните макрофакторы и почему сейчас выгоднее покупать. В отчетах Aaadviser есть раздел «Рекомендации по инвестициям».</p>
+
+                         <h4 data-i18n="blog.article1.cases.h">Кейсы</h4>
+                         <ul>
+                             <li data-i18n="blog.article1.cases.l1">Анталия: прогноз +25% за 3 года и аренда 8% — решение за 2 дня.</li>
+                             <li data-i18n="blog.article1.cases.l2">Лиссабон: презентация инвестору — сделка €500 000 без долгих переговоров.</li>
+                         </ul>
+
+                         <h4 data-i18n="blog.article1.outro.h">Заключение</h4>
+                         <ul>
+                             <li data-i18n="blog.article1.outro.l1">Сравнение с аналогами</li>
+                             <li data-i18n="blog.article1.outro.l2">Прогноз роста цен</li>
+                             <li data-i18n="blog.article1.outro.l3">Расчет доходности аренды</li>
+                             <li data-i18n="blog.article1.outro.l4">Динамика рынка</li>
+                             <li data-i18n="blog.article1.outro.l5">Рекомендации по инвестициям</li>
+                         </ul>
+                         <p><a href="https://t.me/Aaadviser_bot" class="blog-actions">Получить отчет бесплатно в Telegram →</a></p>
+                        <p><button class="btn btn-sample-small" onclick="openSampleReport()" data-i18n="sample.button">Пример отчета</button></p>
+                     </div>
+                 </details>
+
+                 <details class="blog-post">
+                     <summary>
+                         <span class="blog-title" data-i18n="blog.article2.title">Прогноз цен на недвижимость в Турции 2025: стоит ли инвестировать</span>
+                         <span class="blog-meta">6 min</span>
+                     </summary>
+                     <div class="blog-content">
+                         <h4 data-i18n="blog.article2.intro.h">Введение</h4>
+                         <p data-i18n="blog.article2.intro.p1">Турецкий рынок привлекает инвесторов: высокий спрос на аренду, доступные цены, сильные локации. В 2025 году ключевой вопрос — динамика цен.</p>
+
+                         <h4 data-i18n="blog.article2.p1.h">1. Текущая ситуация</h4>
+                         <ul>
+                             <li data-i18n="blog.article2.p1.l1">Рост 70–100% за 3 года по регионам</li>
+                             <li data-i18n="blog.article2.p1.l2">Лидеры: Анталия, Аланья, Стамбул, Измир</li>
+                             <li data-i18n="blog.article2.p1.l3">Факторы: миграция, спрос на аренду, ограниченное предложение</li>
+                         </ul>
+                         <p data-i18n="blog.article2.p1.p">В 2024 рост замедлился до 10–15% годовых, но динамика устойчивая (данные Aaadviser).</p>
+
+                         <h4 data-i18n="blog.article2.p2.h">2. Факторы 2025</h4>
+                         <ul>
+                             <li data-i18n="blog.article2.p2.l1">Спрос иностранцев и программы ВНЖ</li>
+                             <li data-i18n="blog.article2.p2.l2">Рост турпотока и краткосрочной аренды</li>
+                             <li data-i18n="blog.article2.p2.l3">Новые проекты не покрывают спрос в топ-локациях</li>
+                             <li data-i18n="blog.article2.p2.l4">Инфляция и лира — недвижимость как защитный актив</li>
+                         </ul>
+
+                         <h4 data-i18n="blog.article2.p3.h">3. Прогноз по регионам</h4>
+                         <ul>
+                             <li data-i18n="blog.article2.p3.l1">Анталия: +12–15%</li>
+                             <li data-i18n="blog.article2.p3.l2">Аланья: +10–12%</li>
+                             <li data-i18n="blog.article2.p3.l3">Стамбул: +8–10%</li>
+                             <li data-i18n="blog.article2.p3.l4">Измир: +6–9%</li>
+                             <li data-i18n="blog.article2.p3.l5">Менее туристические регионы: +4–6%</li>
+                         </ul>
+
+                         <h4 data-i18n="blog.article2.p4.h">4. Инвестиционная доходность</h4>
+                         <ul>
+                             <li data-i18n="blog.article2.p4.l1">Долгосрочная аренда: 5–7% годовых</li>
+                             <li data-i18n="blog.article2.p4.l2">Краткосрочная аренда: 8–12% годовых</li>
+                             <li data-i18n="blog.article2.p4.l3">Окупаемость: 8–12 лет</li>
+                         </ul>
+                         <p data-i18n="blog.article2.p4.p">Комбинация роста и аренды дает 15–18% совокупного ROI.</p>
+
+                         <h4 data-i18n="blog.article2.p5.h">5. Как помогает Aaadviser</h4>
+                         <ul>
+                             <li data-i18n="blog.article2.p5.l1">Прогноз цен на 1–3 года</li>
+                             <li data-i18n="blog.article2.p5.l2">Расчет доходности аренды</li>
+                             <li data-i18n="blog.article2.p5.l3">Сравнение аналогов</li>
+                             <li data-i18n="blog.article2.p5.l4">Рекомендации по инвестициям</li>
+                         </ul>
+
+                         <p><a href="https://t.me/Aaadviser_bot" class="blog-actions">Получить прогноз по объекту бесплатно →</a></p>
+                     </div>
+                 </details>
+
+                 <details class="blog-post">
+                     <summary>
+                         <span class="blog-title" data-i18n="blog.article3.title">Доходность аренды в Испании: обзор по регионам</span>
+                         <span class="blog-meta">7 min</span>
+                     </summary>
+                     <div class="blog-content">
+                         <h4 data-i18n="blog.article3.intro.h">Введение</h4>
+                         <p data-i18n="blog.article3.intro.p1">Испания остается одним из самых привлекательных рынков недвижимости в Европе. Для покупателей ключевой вопрос — доходность от аренды.</p>
+                         <p data-i18n="blog.article3.intro.p2">Риэлторы, которые показывают цифры — доходность, срок окупаемости, прогноз цен — повышают доверие и конверсию.</p>
+
+                         <h4 data-i18n="blog.article3.p1.h">1. Средние показатели по Испании</h4>
+                         <ul>
+                             <li data-i18n="blog.article3.p1.l1">Долгосрочная аренда: 4–6% годовых</li>
+                             <li data-i18n="blog.article3.p1.l2">Краткосрочная аренда: 6–10% годовых</li>
+                             <li data-i18n="blog.article3.p1.l3">Окупаемость: 10–14 лет</li>
+                         </ul>
+
+                         <h4 data-i18n="blog.article3.p2.h">2. Доходность по регионам</h4>
+                         <ul>
+                             <li data-i18n="blog.article3.p2.l1">Барселона: 4–5%</li>
+                             <li data-i18n="blog.article3.p2.l2">Мадрид: 4–6%</li>
+                             <li data-i18n="blog.article3.p2.l3">Коста-Бланка: 6–8%</li>
+                             <li data-i18n="blog.article3.p2.l4">Коста-дель-Соль: 7–10%</li>
+                             <li data-i18n="blog.article3.p2.l5">Валенсия: 5–7%</li>
+                             <li data-i18n="blog.article3.p2.l6">Канарские острова: 8–12%</li>
+                         </ul>
+
+                         <h4 data-i18n="blog.article3.p3.h">3. Факторы влияния</h4>
+                         <ul>
+                             <li data-i18n="blog.article3.p3.l1">Туристический поток</li>
+                             <li data-i18n="blog.article3.p3.l2">Стоимость недвижимости</li>
+                             <li data-i18n="blog.article3.p3.l3">Сезонность</li>
+                             <li data-i18n="blog.article3.p3.l4">Налогообложение</li>
+                         </ul>
+
+                         <h4 data-i18n="blog.article3.p4.h">4. Как помогает Aaadviser</h4>
+                         <p data-i18n="blog.article3.p4.p">Автоматизирует расчеты: прогноз цен, доходность аренды, сравнение районов, рекомендации.</p>
+                         <p data-i18n="blog.article3.p4.example">Пример: Апартаменты в Аликанте (€150 000) — долгосрочная аренда 6%, краткосрочная 9%, прогноз роста +7% = ROI 15% годовых.</p>
+
+                         <p><a href="https://t.me/Aaadviser_bot" class="blog-actions">Получить отчет в Telegram →</a></p>
+                     </div>
+                 </details>
+
+                 <details class="blog-post">
+                     <summary>
+                         <span class="blog-title" data-i18n="blog.article4.title">Цифры вместо слов: почему клиенты доверяют аналитическим отчетам</span>
+                         <span class="blog-meta">6 min</span>
+                     </summary>
+                     <div class="blog-content">
+                         <h4 data-i18n="blog.article4.intro.h">Введение</h4>
+                         <p data-i18n="blog.article4.intro.p1">Рынок недвижимости становится конкурентным. Клиентам нужны факты, цифры и доказательства, а не просто слова риэлтора.</p>
+                         <p data-i18n="blog.article4.intro.p2">>65% покупателей доверяют отчетам больше, чем устным аргументам агента.</p>
+
+                         <h4 data-i18n="blog.article4.p1.h">1. Клиенты устали от общих слов</h4>
+                         <p data-i18n="blog.article4.p1.p">Фразы «цены растут», «выгодное вложение» звучат банально. Без конкретики появляются сомнения в справедливости цены.</p>
+
+                         <h4 data-i18n="blog.article4.p2.h">2. Цифры создают объективность</h4>
+                         <p data-i18n="blog.article4.p2.p">Данные воспринимаются как независимое мнение эксперта. Клиенту проще обосновать решение для семьи.</p>
+
+                         <h4 data-i18n="blog.article4.p3.h">3. Как цифры ускоряют сделки</h4>
+                         <ul>
+                             <li data-i18n="blog.article4.p3.l1">Прогноз роста мотивирует купить сейчас</li>
+                             <li data-i18n="blog.article4.p3.l2">Расчет доходности показывает выгоду</li>
+                             <li data-i18n="blog.article4.p3.l3">Сравнение помогает выбрать быстрее</li>
+                         </ul>
+                         <p data-i18n="blog.article4.p3.p">Сделки с отчетами заключаются на 40% быстрее.</p>
+
+                         <h4 data-i18n="blog.article4.p4.h">4. Как работает отчет Aaadviser</h4>
+                         <ul>
+                             <li data-i18n="blog.article4.p4.l1">Текущие цены и аналоги</li>
+                             <li data-i18n="blog.article4.p4.l2">Прогноз роста на 1–3 года</li>
+                             <li data-i18n="blog.article4.p4.l3">Расчет доходности аренды</li>
+                             <li data-i18n="blog.article4.p4.l4">Рекомендации по инвестициям</li>
+                         </ul>
+
+                         <p><a href="https://t.me/Aaadviser_bot" class="blog-actions">Получить бесплатный отчет →</a></p>
+                     </div>
+                 </details>
+
+                 <details class="blog-post">
+                     <summary>
+                         <span class="blog-title" data-i18n="blog.article5.title">Ошибки риэлторов без аналитики: почему сделки уходят конкурентам</span>
+                         <span class="blog-meta">8 min</span>
+                     </summary>
+                     <div class="blog-content">
+                         <h4 data-i18n="blog.article5.intro.h">Введение</h4>
+                         <p data-i18n="blog.article5.intro.p1">Многие агенты работают «по-старинке» — объясняют устно, без цифр. Итог: сделки срываются, клиенты уходят к конкурентам с аналитикой.</p>
+
+                         <h4 data-i18n="blog.article5.p1.h">Ошибка №1: устные аргументы вместо цифр</h4>
+                         <p data-i18n="blog.article5.p1.p">Клиенту сложно доверять словам. Без отчета клиент ищет информацию и может уйти к другому агенту.</p>
+
+                         <h4 data-i18n="blog.article5.p2.h">Ошибка №2: игнорирование доходности</h4>
+                         <p data-i18n="blog.article5.p2.p">Инвесторы ждут расчетов ROI, срока окупаемости, дохода от аренды. Без данных решение откладывается.</p>
+
+                         <h4 data-i18n="blog.article5.p3.h">Ошибка №3: отсутствие прогноза</h4>
+                         <p data-i18n="blog.article5.p3.p">Фраза «цены растут» не работает. Нужен график роста и прогноз на будущее.</p>
+
+                         <h4 data-i18n="blog.article5.p4.h">Ошибка №4: отсутствие сравнений</h4>
+                         <p data-i18n="blog.article5.p4.p">Клиенты хотят понимать выгоду предложения. Без аналогов клиент ищет их сам и выбирает конкурентов.</p>
+
+                         <h4 data-i18n="blog.article5.p5.h">Ошибка №5: долгие переговоры</h4>
+                         <p data-i18n="blog.article5.p5.p">Без аналитики клиенту трудно принять решение. Сделка откладывается, появляется конкурент с цифрами.</p>
+
+                         <h4 data-i18n="blog.article5.cases.h">Кейсы</h4>
+                         <ul>
+                             <li data-i18n="blog.article5.cases.l1">Агент в Мадриде потерял клиента, который выбрал риэлтора с отчетом</li>
+                             <li data-i18n="blog.article5.cases.l2">Риэлтор в Анталии убедил инвестора за день, показав отчет Aaadviser</li>
+                         </ul>
+
+                         <p><a href="https://t.me/Aaadviser_bot" class="blog-actions">Попробовать бесплатно →</a></p>
+                     </div>
+                 </details>
+
+                 <details class="blog-post">
+                     <summary>
+                         <span class="blog-title" data-i18n="blog.article6.title">Сравнение недвижимости разных районов: как аргументировать выбор клиенту</span>
+                         <span class="blog-meta">6 min</span>
+                     </summary>
+                     <div class="blog-content">
+                         <h4 data-i18n="blog.article6.intro.h">Введение</h4>
+                         <p data-i18n="blog.article6.intro.p1">Часто клиенты выбирают между несколькими районами. Одни ближе к центру, другие — к морю, третьи — дешевле.</p>
+                         <p data-i18n="blog.article6.intro.p2">Задача риэлтора — показать, где покупка будет оптимальной и выгодной, опираясь не на слова, а на цифры.</p>
+
+                         <h4 data-i18n="blog.article6.p1.h">1. Почему клиенты колеблются</h4>
+                         <ul>
+                             <li data-i18n="blog.article6.p1.l1">Не понимают разницы в доходности</li>
+                             <li data-i18n="blog.article6.p1.l2">Смотрят только на цену «за квартиру», а не на цену за м²</li>
+                             <li data-i18n="blog.article6.p1.l3">Сравнивают субъективно («мне нравится район»)</li>
+                         </ul>
+                         <p data-i18n="blog.article6.p1.p">👉 Риэлтору важно перевести выбор в плоскость цифр.</p>
+
+                         <h4 data-i18n="blog.article6.p2.h">2. Какие показатели сравнивать</h4>
+                         <ul>
+                             <li data-i18n="blog.article6.p2.l1">Средняя цена за м²</li>
+                             <li data-i18n="blog.article6.p2.l2">Динамика роста цен по району</li>
+                             <li data-i18n="blog.article6.p2.l3">Доходность долгосрочной аренды</li>
+                             <li data-i18n="blog.article6.p2.l4">Срок окупаемости</li>
+                             <li data-i18n="blog.article6.p2.l5">Развитие инфраструктуры</li>
+                         </ul>
+
+                         <h4 data-i18n="blog.article6.p3.h">3. Пример кейса</h4>
+                         <p data-i18n="blog.article6.p3.p1">Клиент выбирал между районом Коньяалты и Лара (Анталия).</p>
+                         <p data-i18n="blog.article6.p3.p2">Отчет Aaadviser показал:</p>
+                         <ul>
+                             <li data-i18n="blog.article6.p3.l1">Коньяалты: €1 550/м², прогноз роста 10%</li>
+                             <li data-i18n="blog.article6.p3.l2">Лара: €1 700/м², прогноз роста 14%</li>
+                         </ul>
+                         <p data-i18n="blog.article6.p3.p3">👉 Клиент выбрал Лара, понимая, что ROI выше.</p>
+
+                         <h4 data-i18n="blog.article6.outro.h">Заключение</h4>
+                         <p data-i18n="blog.article6.outro.p1">Сравнение районов на цифрах помогает клиенту выбрать уверенно. Риэлтор выглядит экспертом, а сделка проходит быстрее.</p>
+                         <p><a href="https://t.me/Aaadviser_bot" class="blog-actions" data-i18n="blog.article6.cta">Сделайте сравнение в Aaadviser: Получить отчет</a></p>
+                     </div>
+                 </details>
+
+                 <details class="blog-post">
+                     <summary>
+                         <span class="blog-title" data-i18n="blog.article7.title">Почему цифровые отчеты работают лучше устных аргументов риэлтора</span>
+                         <span class="blog-meta">5 min</span>
+                     </summary>
+                     <div class="blog-content">
+                         <h4 data-i18n="blog.article7.intro.h">Введение</h4>
+                         <p data-i18n="blog.article7.intro.p1">Слова риэлтора — это мнение. Отчёт с цифрами — это факт.</p>
+                         <p data-i18n="blog.article7.intro.p2">Именно поэтому клиенты доверяют аналитике и графикам больше, чем устным аргументам.</p>
+
+                         <h4 data-i18n="blog.article7.p1.h">1. Психология клиента</h4>
+                         <ul>
+                             <li data-i18n="blog.article7.p1.l1">Устные аргументы воспринимаются как «продажа»</li>
+                             <li data-i18n="blog.article7.p1.l2">Цифры воспринимаются как объективная информация</li>
+                             <li data-i18n="blog.article7.p1.l3">Графики усиливают доверие, так как «визуально доказаны»</li>
+                         </ul>
+
+                         <h4 data-i18n="blog.article7.p2.h">2. Чем отчеты выигрывают у устных аргументов</h4>
+                         <ul>
+                             <li data-i18n="blog.article7.p2.l1">Долговечность — клиент может пересмотреть отчет дома</li>
+                             <li data-i18n="blog.article7.p2.l2">Обоснованность — все данные собраны из рынка</li>
+                             <li data-i18n="blog.article7.p2.l3">Авторитетность — риэлтор выглядит экспертом</li>
+                             <li data-i18n="blog.article7.p2.l4">Минимизация торга — цена обоснована цифрами</li>
+                         </ul>
+
+                         <h4 data-i18n="blog.article7.p3.h">3. Пример</h4>
+                         <p data-i18n="blog.article7.p3.p1">Риэлтор сказал: «Цены в Португалии будут расти».</p>
+                         <p data-i18n="blog.article7.p3.p2">Клиент усомнился.</p>
+                         <p data-i18n="blog.article7.p3.p3">Риэлтор показал отчет Aaadviser: график роста цен за 5 лет и прогноз на +8% в год.</p>
+                         <p data-i18n="blog.article7.p3.p4">👉 Клиент согласился, что рост реален.</p>
+
+                         <h4 data-i18n="blog.article7.outro.h">Заключение</h4>
+                         <p data-i18n="blog.article7.outro.p1">Цифровые отчеты делают переговоры объективными. Клиенты доверяют данным и принимают решения быстрее.</p>
+                         <p><a href="https://t.me/Aaadviser_bot" class="blog-actions" data-i18n="blog.article7.cta">Сделайте отчет в Aaadviser: Попробовать бесплатно</a></p>
+                     </div>
+                 </details>
+
+                 <details class="blog-post">
+                     <summary>
+                         <span class="blog-title" data-i18n="blog.article8.title">Как аналитика помогает продавать квартиры премиум-класса</span>
+                         <span class="blog-meta">7 min</span>
+                     </summary>
+                     <div class="blog-content">
+                         <h4 data-i18n="blog.article8.intro.h">Введение</h4>
+                         <p data-i18n="blog.article8.intro.p1">Работа с премиум-клиентами требует особого подхода. Здесь не работают стандартные аргументы — клиенты ожидают профессионализма и точных данных.</p>
+                         <p data-i18n="blog.article8.intro.p2">Аналитика и отчёты помогают риэлтору обосновывать цену, показывать инвестиционный потенциал и выстраивать доверие на уровне эксперта.</p>
+
+                         <h4 data-i18n="blog.article8.p1.h">1. Особенности премиум-сегмента</h4>
+                         <ul>
+                             <li data-i18n="blog.article8.p1.l1">Высокая цена сделки → выше уровень сомнений</li>
+                             <li data-i18n="blog.article8.p1.l2">Конкуренция между агентствами</li>
+                             <li data-i18n="blog.article8.p1.l3">Требования клиентов к качеству информации</li>
+                         </ul>
+
+                         <h4 data-i18n="blog.article8.p2.h">2. Почему аналитика особенно важна</h4>
+                         <ul>
+                             <li data-i18n="blog.article8.p2.l1">Покупатели премиум-сегмента хотят видеть факты</li>
+                             <li data-i18n="blog.article8.p2.l2">Сравнение с мировыми рынками повышает доверие</li>
+                             <li data-i18n="blog.article8.p2.l3">Цифры помогают обосновать премию за локацию и инфраструктуру</li>
+                         </ul>
+
+                         <h4 data-i18n="blog.article8.p3.h">3. Пример кейса</h4>
+                         <p data-i18n="blog.article8.p3.p1">Апартаменты €800 000 в Барселоне.</p>
+                         <p data-i18n="blog.article8.p3.p2">Клиент сомневался.</p>
+                         <p data-i18n="blog.article8.p3.p3">Отчет Aaadviser показал:</p>
+                         <ul>
+                             <li data-i18n="blog.article8.p3.l1">рост цен +9% за 3 года</li>
+                             <li data-i18n="blog.article8.p3.l2">доходность аренды 5%</li>
+                             <li data-i18n="blog.article8.p3.l3">аналоги в районе €780–830 тыс.</li>
+                         </ul>
+                         <p data-i18n="blog.article8.p3.p4">👉 Клиент подписал сделку без долгих переговоров.</p>
+
+                         <h4 data-i18n="blog.article8.outro.h">Заключение</h4>
+                         <p data-i18n="blog.article8.outro.p1">В премиум-сегменте аналитика превращает риэлтора в консультанта.</p>
+                         <p data-i18n="blog.article8.outro.p2">С цифрами сделки проходят быстрее и с меньшими уступками.</p>
+                         <p><a href="https://t.me/Aaadviser_bot" class="blog-actions" data-i18n="blog.article8.cta">Используйте Aaadviser для премиум-клиентов: Получить отчет</a></p>
+                     </div>
+                 </details>
+
+                 <details class="blog-post">
+                     <summary>
+                         <span class="blog-title" data-i18n="blog.article9.title">Как риэлтору показать клиенту справедливую цену квартиры</span>
+                         <span class="blog-meta">6 min</span>
+                     </summary>
+                     <div class="blog-content">
+                         <h4 data-i18n="blog.article9.intro.h">Введение</h4>
+                         <p data-i18n="blog.article9.intro.p1">Одна из самых частых проблем при переговорах — клиент считает, что цена завышена. Без цифр и фактов риэлтору приходится спорить и уговаривать. Это снижает доверие и замедляет сделку.</p>
+                         <p data-i18n="blog.article9.intro.p2">Чтобы показать клиенту, что цена справедливая, нужен объективный анализ рынка: сравнение аналогов, динамика цен, прогнозы. В этой статье разберём, как правильно обосновывать стоимость и как сервис Aaadviser решает эту задачу за 1 минуту.</p>
+
+                         <h4 data-i18n="blog.article9.p1.h">1. Почему клиенты сомневаются в цене</h4>
+                         <ul>
+                             <li data-i18n="blog.article9.p1.l1">Нет понимания цен по району</li>
+                             <li data-i18n="blog.article9.p1.l2">Опасение переплатить</li>
+                             <li data-i18n="blog.article9.p1.l3">Желание поторговаться</li>
+                             <li data-i18n="blog.article9.p1.l4">Недостаток доверия к словам риэлтора</li>
+                         </ul>
+                         <p data-i18n="blog.article9.p1.p">👉 Если цена не подкреплена фактами, клиент ищет другие варианты.</p>
+
+                         <h4 data-i18n="blog.article9.p2.h">2. Методы обоснования справедливой цены</h4>
+                         <ul>
+                             <li data-i18n="blog.article9.p2.l1">Сравнение с аналогичными объектами</li>
+                             <li data-i18n="blog.article9.p2.l2">Показ средней цены за м² в районе</li>
+                             <li data-i18n="blog.article9.p2.l3">Динамика цен за последние годы</li>
+                             <li data-i18n="blog.article9.p2.l4">Прогноз роста стоимости</li>
+                             <li data-i18n="blog.article9.p2.l5">Сравнение арендной доходности</li>
+                         </ul>
+                         <p data-i18n="blog.article9.p2.p">📊 Всё это позволяет клиенту увидеть, что цена соответствует рынку.</p>
+
+                         <h4 data-i18n="blog.article9.p3.h">3. Пример: как это делает Aaadviser</h4>
+                         <p data-i18n="blog.article9.p3.p1">Квартира €150 000 в Анталии:</p>
+                         <ul>
+                             <li data-i18n="blog.article9.p3.l1">аналоги в районе: €145–155 тыс.</li>
+                             <li data-i18n="blog.article9.p3.l2">средняя цена за м²: €1 450 (у объекта €1 470)</li>
+                             <li data-i18n="blog.article9.p3.l3">прогноз роста: +12% за 2 года</li>
+                         </ul>
+                         <p data-i18n="blog.article9.p3.p2">👉 Клиент видит, что цена в рынке и решение обоснованное.</p>
+
+                         <h4 data-i18n="blog.article9.outro.h">Заключение</h4>
+                         <p data-i18n="blog.article9.outro.p1">Справедливая цена = цифры + факты.</p>
+                         <p data-i18n="blog.article9.outro.p2">Риэлтор, который показывает аналитику, вызывает доверие и быстрее закрывает сделки.</p>
+                         <p><a href="https://t.me/Aaadviser_bot" class="blog-actions" data-i18n="blog.article9.cta">Проверьте цену вашего объекта через Aaadviser: Получить отчет</a></p>
+                     </div>
+                 </details>
+
+                 <details class="blog-post">
+                     <summary>
+                         <span class="blog-title" data-i18n="blog.article10.title">ROI недвижимости в Испании: что должен знать каждый инвестор</span>
+                         <span class="blog-meta">8 min</span>
+                     </summary>
+                     <div class="blog-content">
+                         <h4 data-i18n="blog.article10.intro.h">Введение</h4>
+                         <p data-i18n="blog.article10.intro.p1">Испания — один из самых популярных рынков недвижимости в Европе. Клиентов интересует не только покупка для жизни, но и инвестиционная привлекательность.</p>
+                         <p data-i18n="blog.article10.intro.p2">Главный показатель для инвесторов — ROI (Return on Investment), или доходность инвестиций.</p>
+                         <p data-i18n="blog.article10.intro.p3">В этой статье разберём, как рассчитывается ROI недвижимости в Испании, какие регионы наиболее выгодны и как сервис Aaadviser помогает риэлторам показать эти цифры клиенту.</p>
+
+                         <h4 data-i18n="blog.article10.p1.h">1. Что такое ROI в недвижимости</h4>
+                         <p data-i18n="blog.article10.p1.p1">ROI — это показатель, который отражает, насколько быстро окупается объект.</p>
+                         <p data-i18n="blog.article10.p1.p2">Формула:</p>
+                         <p data-i18n="blog.article10.p1.p3">ROI = (Доход от аренды + Рост стоимости) ÷ Стоимость объекта × 100%</p>
+
+                         <h4 data-i18n="blog.article10.p2.h">2. Средний ROI по Испании</h4>
+                         <ul>
+                             <li data-i18n="blog.article10.p2.l1">Мадрид: ROI 4–6%</li>
+                             <li data-i18n="blog.article10.p2.l2">Барселона: ROI 3–5% (высокие цены, ниже доходность)</li>
+                             <li data-i18n="blog.article10.p2.l3">Коста-Бланка: ROI 6–8%</li>
+                             <li data-i18n="blog.article10.p2.l4">Коста-дель-Соль: ROI 7–9%</li>
+                             <li data-i18n="blog.article10.p2.l5">Канарские острова: ROI 8–10%</li>
+                         </ul>
+                         <p data-i18n="blog.article10.p2.p">👉 Средний ROI в Испании: 5–8% годовых.</p>
+
+                         <h4 data-i18n="blog.article10.p3.h">3. Факторы, влияющие на ROI</h4>
+                         <ul>
+                             <li data-i18n="blog.article10.p3.l1">Цена за м²</li>
+                             <li data-i18n="blog.article10.p3.l2">Потенциал роста цен в регионе</li>
+                             <li data-i18n="blog.article10.p3.l3">Спрос на аренду</li>
+                             <li data-i18n="blog.article10.p3.l4">Развитие инфраструктуры</li>
+                         </ul>
+
+                         <h4 data-i18n="blog.article10.p4.h">4. Пример расчета ROI</h4>
+                         <p data-i18n="blog.article10.p4.p1">Апартаменты €200 000 в Валенсии:</p>
+                         <ul>
+                             <li data-i18n="blog.article10.p4.l1">аренда €9 000 в год (4,5%)</li>
+                             <li data-i18n="blog.article10.p4.l2">рост стоимости +6% (€12 000)</li>
+                         </ul>
+                         <p data-i18n="blog.article10.p4.p2">👉 ROI = (9 000 + 12 000) ÷ 200 000 × 100% = 10,5%</p>
+
+                         <h4 data-i18n="blog.article10.p5.h">5. Как помогает Aaadviser</h4>
+                         <p data-i18n="blog.article10.p5.p1">Сервис рассчитывает ROI автоматически:</p>
+                         <ul>
+                             <li data-i18n="blog.article10.p5.l1">долгосрочная аренда,</li>
+                             <li data-i18n="blog.article10.p5.l2">прогноз роста цен,</li>
+                             <li data-i18n="blog.article10.p5.l3">сравнение с аналогами.</li>
+                         </ul>
+                         <p data-i18n="blog.article10.p5.p2">📊 Риэлтор получает готовый отчет и сразу показывает клиенту ROI объекта.</p>
+
+                         <h4 data-i18n="blog.article10.outro.h">Заключение</h4>
+                         <p data-i18n="blog.article10.outro.p1">ROI — ключевой показатель для инвестора. Испания даёт в среднем 5–8% годовых, а в туристических регионах до 10%.</p>
+                         <p data-i18n="blog.article10.outro.p2">Риэлтор, который умеет показать ROI, получает доверие клиента и заключает сделки быстрее.</p>
+                         <p><a href="https://t.me/Aaadviser_bot" class="blog-actions" data-i18n="blog.article10.cta">Сделайте расчет ROI через Aaadviser: Получить отчет</a></p>
+                     </div>
+                 </details>
+
+                 <details class="blog-post">
+                     <summary>
+                         <span class="blog-title" data-i18n="blog.article11.title">Точные цифры вместо «кажется»: как убедить клиента купить быстрее</span>
+                         <span class="blog-meta">6 min</span>
+                     </summary>
+                     <div class="blog-content">
+                         <h4 data-i18n="blog.article11.intro.h">Введение</h4>
+                         <p data-i18n="blog.article11.intro.p1">Одно из главных возражений покупателей: «Нужно подумать».</p>
+                         <p data-i18n="blog.article11.intro.p2">Проблема в том, что решение затягивается, а сделка уходит конкурентам.</p>
+                         <p data-i18n="blog.article11.intro.p3">Лучший способ ускорить процесс — показать клиенту точные цифры, которые превращают эмоции в факты.</p>
+
+                         <h4 data-i18n="blog.article11.p1.h">1. Почему клиенты тянут время</h4>
+                         <ul>
+                             <li data-i18n="blog.article11.p1.l1">Сомневаются в цене</li>
+                             <li data-i18n="blog.article11.p1.l2">Боятся переплатить</li>
+                             <li data-i18n="blog.article11.p1.l3">Не уверены в доходности</li>
+                             <li data-i18n="blog.article11.p1.l4">Хочется «сравнить с другими»</li>
+                         </ul>
+                         <p data-i18n="blog.article11.p1.p">👉 Без цифр клиент всегда выбирает осторожность.</p>
+
+                         <h4 data-i18n="blog.article11.p2.h">2. Как цифры ускоряют сделку</h4>
+                         <ul>
+                             <li data-i18n="blog.article11.p2.l1">Сравнение аналогов → снимает сомнения по цене</li>
+                             <li data-i18n="blog.article11.p2.l2">Прогноз роста цен → мотивирует купить сейчас</li>
+                             <li data-i18n="blog.article11.p2.l3">ROI и доходность → превращают эмоцию в инвестицию</li>
+                             <li data-i18n="blog.article11.p2.l4">Графики рынка → показывают тренд роста</li>
+                         </ul>
+
+                         <h4 data-i18n="blog.article11.p3.h">3. Пример</h4>
+                         <p data-i18n="blog.article11.p3.p1">Риэлтор показывал квартиру €180 000. Клиент хотел «подумать».</p>
+                         <p data-i18n="blog.article11.p3.p2">Отчет Aaadviser показал:</p>
+                         <ul>
+                             <li data-i18n="blog.article11.p3.l1">прогноз роста 12% за 2 года,</li>
+                             <li data-i18n="blog.article11.p3.l2">доходность аренды 6%,</li>
+                             <li data-i18n="blog.article11.p3.l3">аналоги €175–185 тыс.</li>
+                         </ul>
+                         <p data-i18n="blog.article11.p3.p3">👉 Клиент купил через неделю.</p>
+
+                         <h4 data-i18n="blog.article11.outro.h">Заключение</h4>
+                         <p data-i18n="blog.article11.outro.p1">Цифры = уверенность. Когда риэлтор показывает аналитику, клиент перестаёт откладывать решение.</p>
+                         <p data-i18n="blog.article11.outro.p2">Сделка ускоряется, а конкурентам не остаётся шансов.</p>
+                         <p><a href="https://t.me/Aaadviser_bot" class="blog-actions" data-i18n="blog.article11.cta">Убедите клиента цифрами: Сделать отчет бесплатно</a></p>
+                     </div>
+                 </details>
+
+                 <details class="blog-post">
+                     <summary>
+                         <span class="blog-title" data-i18n="blog.article12.title">Как риэлтору продать объект дороже с помощью аналитического отчета</span>
+                         <span class="blog-meta">7 min</span>
+                     </summary>
+                     <div class="blog-content">
+                         <h4 data-i18n="blog.article12.intro.h">Введение</h4>
+                         <p data-i18n="blog.article12.intro.p1">Многие риэлторы боятся выставлять объект дороже рынка, опасаясь, что клиент уйдёт. Но правильно поданная аналитика позволяет обосновать премию в цене и заключить сделку без скидок.</p>
+
+                         <h4 data-i18n="blog.article12.p1.h">1. Почему клиенты готовы платить дороже</h4>
+                         <ul>
+                             <li data-i18n="blog.article12.p1.l1">Видят перспективу роста стоимости</li>
+                             <li data-i18n="blog.article12.p1.l2">Понимают доходность аренды</li>
+                             <li data-i18n="blog.article12.p1.l3">Убеждаются, что цена в рынке по сравнению с аналогами</li>
+                             <li data-i18n="blog.article12.p1.l4">Ценят район и инфраструктуру</li>
+                         </ul>
+
+                         <h4 data-i18n="blog.article12.p2.h">2. Как работает аналитика</h4>
+                         <ul>
+                             <li data-i18n="blog.article12.p2.l1">Сравнение с аналогами → цена не выглядит завышенной</li>
+                             <li data-i18n="blog.article12.p2.l2">Прогноз роста → клиент понимает, что объект подорожает</li>
+                             <li data-i18n="blog.article12.p2.l3">ROI → высокая доходность компенсирует цену</li>
+                             <li data-i18n="blog.article12.p2.l4">Рекомендации → показывают инвестиционный потенциал</li>
+                         </ul>
+
+                         <h4 data-i18n="blog.article12.p3.h">3. Пример</h4>
+                         <p data-i18n="blog.article12.p3.p1">Апартаменты €250 000 в Лиссабоне.</p>
+                         <p data-i18n="blog.article12.p3.p2">Продавец хотел продать за €265 000.</p>
+                         <p data-i18n="blog.article12.p3.p3">Отчет Aaadviser показал:</p>
+                         <ul>
+                             <li data-i18n="blog.article12.p3.l1">аналоги €240–260 тыс.</li>
+                             <li data-i18n="blog.article12.p3.l2">прогноз роста +9% за 2 года</li>
+                             <li data-i18n="blog.article12.p3.l3">ROI 7%</li>
+                         </ul>
+                         <p data-i18n="blog.article12.p3.p4">👉 Клиент согласился на €263 000, понимая выгоду.</p>
+
+                         <h4 data-i18n="blog.article12.outro.h">Заключение</h4>
+                         <p data-i18n="blog.article12.outro.p1">С аналитикой риэлтор может обосновать цену выше рынка.</p>
+                         <p data-i18n="blog.article12.outro.p2">Клиент платит дороже, но чувствует, что покупает выгодный актив.</p>
+                         <p><a href="https://t.me/Aaadviser_bot" class="blog-actions" data-i18n="blog.article12.cta">Продайте дороже с помощью Aaadviser: Получить отчет</a></p>
+                     </div>
+                 </details>
+             </div>
+         </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section class="pricing-section">
+        <div class="container">
+            <h2 class="section-title" data-i18n="pricing.title">Цены и тарифы Aaadviser 2.0</h2>
+            <p class="section-subtitle" data-i18n="pricing.subtitle">Сейчас тестируется модель Aaadviser 2.0. Первые две недели после регистрации бесплатно для всех!</p>
+            
+            <div class="pricing-grid">
+                <!-- Free Plan -->
+                <div class="pricing-card free-plan">
+                    <div class="plan-header">
+                        <h3 data-i18n="pricing.free.title">Базовый функционал</h3>
+                        <div class="plan-price">
+                            <span class="price-amount" data-i18n="pricing.free.price">Бесплатно</span>
+                            <span class="price-period" data-i18n="pricing.free.period">навсегда</span>
+                        </div>
+                    </div>
+                    <div class="plan-features">
+                        <ul>
+                            <li data-i18n="pricing.free.feature1">Оценка региона</li>
+                            <li data-i18n="pricing.free.feature2">Оценка объекта</li>
+                            <li data-i18n="pricing.free.feature3">Прогноз доходности</li>
+                            <li data-i18n="pricing.free.feature4">Исторические данные с 2018 года</li>
+                        </ul>
+                    </div>
+                    <div class="plan-cta">
+                        <a href="https://t.me/Aaadviser_bot" class="btn btn-outline" data-i18n="pricing.free.cta">Начать бесплатно</a>
+                    </div>
+                </div>
+
+                <!-- Pro Plan -->
+                <div class="pricing-card pro-plan featured">
+                    <div class="plan-badge" data-i18n="pricing.pro.badge">Рекомендуется</div>
+                    <div class="plan-header">
+                        <h3 data-i18n="pricing.pro.title">Полный функционал</h3>
+                        <div class="plan-price">
+                            <span class="price-amount">$200</span>
+                            <span class="price-period" data-i18n="pricing.pro.period">в месяц</span>
+                        </div>
+                    </div>
+                    <div class="plan-features">
+                        <ul>
+                            <li data-i18n="pricing.pro.feature1">Все функции базового плана</li>
+                            <li data-i18n="pricing.pro.feature2">Сохранение отчетов</li>
+                            <li data-i18n="pricing.pro.feature3">Возможность делиться отчетами</li>
+                            <li data-i18n="pricing.pro.feature4">Персонализация отчетов</li>
+                            <li data-i18n="pricing.pro.feature5">Информация о риэлторе (фото, контакты)</li>
+                            <li data-i18n="pricing.pro.feature6">Сохранение отчетов на 5 языках</li>
+                        </ul>
+                    </div>
+                    <div class="plan-cta">
+                        <a href="https://t.me/Aaadviser_bot" class="btn btn-primary" data-i18n="pricing.pro.cta">Выбрать Pro</a>
+                    </div>
+                </div>
+
+                <!-- Testing Period -->
+                <div class="pricing-card testing-plan">
+                    <div class="plan-header">
+                        <h3 data-i18n="pricing.testing.title">Период тестирования</h3>
+                        <div class="plan-price">
+                            <span class="price-amount" data-i18n="pricing.testing.price">Бесплатно</span>
+                            <span class="price-period" data-i18n="pricing.testing.period">2 недели</span>
+                        </div>
+                    </div>
+                    <div class="plan-features">
+                        <ul>
+                            <li data-i18n="pricing.testing.feature1">Полный доступ ко всем функциям</li>
+                            <li data-i18n="pricing.testing.feature2">Тестирование новых возможностей</li>
+                            <li data-i18n="pricing.testing.feature3">Обратная связь и улучшения</li>
+                            <li data-i18n="pricing.testing.feature4">Приоритетная поддержка</li>
+                        </ul>
+                    </div>
+                    <div class="plan-cta">
+                        <a href="https://t.me/Aaadviser_bot" class="btn btn-secondary" data-i18n="pricing.testing.cta">Присоединиться к тестированию</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pricing-note">
+                <p data-i18n="pricing.note">После завершения тестирования базовый функционал останется бесплатным навсегда. Полный функционал будет доступен по подписке.</p>
+            </div>
+
+            <div class="sample-report-section">
+                <h3 data-i18n="sample.title">Посмотрите пример отчета</h3>
+                <p data-i18n="sample.subtitle">Посмотрите, как выглядит  аналитический отчет Aaadviser 2.0</p>
+                <button class="btn btn-sample" onclick="openSampleReport()" data-i18n="sample.button">Посмотреть пример отчета</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sample Report Modal -->
+    <div id="sampleReportModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 data-i18n="sample.modal.title">Пример аналитического отчета</h2>
+                <button class="modal-close" onclick="closeSampleReport()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <iframe id="sampleReportFrame" src="sample.htm" frameborder="0"></iframe>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
     <footer class="footer">
         <div class="container">
             <div class="footer-content">
                 <div class="footer-main">
                     <div class="footer-logo">
-                        <img src="../logo-only.png" alt="Aaadvisor" class="footer-logo-img">
-                        <span class="footer-logo-text">Aaadvisor</span>
+                        <img src="../logo-only.png" alt="Aaadviser" class="footer-logo-img">
+                        <span class="footer-logo-text">Aaadviser</span>
                     </div>
                     <p class="footer-description" data-i18n="footer.description">
                         Профессиональные аналитические отчеты для риэлторов. 
@@ -413,25 +1156,19 @@
                 </div>
                 <div class="footer-links">
                     <div class="footer-section">
-                        <h4 data-i18n="footer.info.title">Информация</h4>
+                        <h4 data-i18n="footer.support.title">Поддержка</h4>
                         <ul>
-                            <li><a href="#" data-i18n="footer.info.privacy">Политика конфиденциальности</a></li>
-                            <li><a href="#" data-i18n="footer.info.terms">Условия использования</a></li>
-                            <li><a href="#" data-i18n="footer.info.legal">Юридическая информация</a></li>
+                            <li><a href="https://t.me/Aaadviser_support" data-i18n="footer.support.telegram">Telegram канал поддержки</a></li>
                         </ul>
                     </div>
                     <div class="footer-section">
-                        <h4 data-i18n="footer.support.title">Поддержка</h4>
-                        <ul>
-                                                         <li><a href="https://t.me/Aaadviser_support" data-i18n="footer.support.telegram">Telegram канал</a></li>
-                            <li><a href="#" data-i18n="footer.support.feedback">Отзывы и предложения</a></li>
-                            <li><a href="#" data-i18n="footer.support.help">Помощь</a></li>
-                        </ul>
+                        <h4 data-i18n="footer.version.title">О сервисе</h4>
+                        <p data-i18n="footer.version.text">Сервис дорабатывается и сейчас запущена версия 2.0. В период её тестирования функционал всем открыт. Мы будем благодарны за рекомендации, замечания или пожелания о работе сервиса и логики аналитики. Принимаем их через <a href="https://t.me/Aaadviser_support">бота поддержки</a>.</p>
                     </div>
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; 2024 Aaadvisor. <span data-i18n="footer.rights">Все права защищены.</span></p>
+                <p>&copy; 2024 Aaadviser. <span data-i18n="footer.rights">Все права защищены.</span></p>
             </div>
         </div>
     </footer>

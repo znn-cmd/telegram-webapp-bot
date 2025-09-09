@@ -233,6 +233,12 @@
         .hidden {
             display: none;
         }
+        .admin-only {
+            display: none;
+        }
+        .is-admin .admin-only {
+            display: flex;
+        }
         .loading {
             text-align: center;
             padding: 40px;
@@ -289,12 +295,12 @@
                 <span data-i18n="profile.edit_profile">Редактировать профиль</span>
             </button>
             
-            <button class="profile-btn" onclick="showSettings()">
+            <button class="profile-btn admin-only" onclick="showSettings()">
                 <span class="profile-btn-icon">⚙️</span>
                 <span data-i18n="common.settings">Настройки</span>
             </button>
             
-            <button class="profile-btn" onclick="showTransactionHistory()">
+            <button class="profile-btn admin-only" onclick="showTransactionHistory()">
                 <span class="profile-btn-icon">📊</span>
                 <span data-i18n="profile.transaction_history">История транзакций</span>
             </button>
@@ -496,6 +502,14 @@
         // Отображаем данные профиля
         function displayProfileData(userInfo) {
             document.getElementById('balanceAmount').textContent = userInfo.balance || 0;
+            
+            // Check if user is admin and show/hide admin-only elements
+            const profileContent = document.getElementById('profileContent');
+            if (userInfo.user_status === 'admin') {
+                profileContent.classList.add('is-admin');
+            } else {
+                profileContent.classList.remove('is-admin');
+            }
         }
 
         // Показываем сообщения

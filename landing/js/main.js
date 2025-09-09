@@ -1,4 +1,4 @@
-// Main JavaScript for Aaadvisor Landing Page
+// Main JavaScript for Aaadviser Landing Page
 document.addEventListener('DOMContentLoaded', function() {
     
     // Smooth scrolling for anchor links
@@ -199,7 +199,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 box-shadow: 0 4px 12px rgba(0,0,0,0.15);
                 border-left: 4px solid #667eea;
                 animation: slideInRight 0.3s ease;
-                max-width: 300px;
+                max-width: 500px;
             }
             
             .notification-success {
@@ -395,6 +395,151 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize FAQ
     initFAQ();
 
+    // Report Gallery functionality
+    function initReportGallery() {
+        const gallery = document.querySelector('.report-gallery');
+        if (!gallery) return;
+
+        const slides = gallery.querySelectorAll('.gallery-slide');
+        const dots = gallery.querySelectorAll('.gallery-dot');
+        const prevBtn = gallery.querySelector('.gallery-prev');
+        const nextBtn = gallery.querySelector('.gallery-next');
+        
+        let currentSlide = 0;
+        let autoSlideInterval;
+
+        function showSlide(index) {
+            slides.forEach((slide, i) => {
+                slide.classList.toggle('active', i === index);
+            });
+            dots.forEach((dot, i) => {
+                dot.classList.toggle('active', i === index);
+            });
+            currentSlide = index;
+        }
+
+        function nextSlide() {
+            const next = (currentSlide + 1) % slides.length;
+            showSlide(next);
+        }
+
+        function prevSlide() {
+            const prev = (currentSlide - 1 + slides.length) % slides.length;
+            showSlide(prev);
+        }
+
+        function startAutoSlide() {
+            autoSlideInterval = setInterval(nextSlide, 4000);
+        }
+
+        function stopAutoSlide() {
+            clearInterval(autoSlideInterval);
+        }
+
+        // Event listeners
+        nextBtn.addEventListener('click', () => {
+            nextSlide();
+            stopAutoSlide();
+            startAutoSlide();
+        });
+
+        prevBtn.addEventListener('click', () => {
+            prevSlide();
+            stopAutoSlide();
+            startAutoSlide();
+        });
+
+        dots.forEach((dot, index) => {
+            dot.addEventListener('click', () => {
+                showSlide(index);
+                stopAutoSlide();
+                startAutoSlide();
+            });
+        });
+
+        // Auto-slide on hover
+        gallery.addEventListener('mouseenter', stopAutoSlide);
+        gallery.addEventListener('mouseleave', startAutoSlide);
+
+        // Start auto-slide
+        startAutoSlide();
+    }
+
+    // Testimonials Carousel functionality
+    function initTestimonialsCarousel() {
+        const carousel = document.querySelector('.testimonials-carousel');
+        if (!carousel) return;
+
+        const track = carousel.querySelector('.testimonials-track');
+        const cards = carousel.querySelectorAll('.testimonial-card');
+        const dots = carousel.querySelectorAll('.testimonials-dot');
+        const prevBtn = carousel.querySelector('.testimonials-prev');
+        const nextBtn = carousel.querySelector('.testimonials-next');
+        
+        let currentSlide = 0;
+        let autoSlideInterval;
+
+        function showSlide(index) {
+            cards.forEach((card, i) => {
+                card.classList.toggle('active', i === index);
+            });
+            dots.forEach((dot, i) => {
+                dot.classList.toggle('active', i === index);
+            });
+            currentSlide = index;
+        }
+
+        function nextSlide() {
+            const next = (currentSlide + 1) % cards.length;
+            showSlide(next);
+        }
+
+        function prevSlide() {
+            const prev = (currentSlide - 1 + cards.length) % cards.length;
+            showSlide(prev);
+        }
+
+        function startAutoSlide() {
+            autoSlideInterval = setInterval(nextSlide, 5000);
+        }
+
+        function stopAutoSlide() {
+            clearInterval(autoSlideInterval);
+        }
+
+        // Event listeners
+        nextBtn.addEventListener('click', () => {
+            nextSlide();
+            stopAutoSlide();
+            startAutoSlide();
+        });
+
+        prevBtn.addEventListener('click', () => {
+            prevSlide();
+            stopAutoSlide();
+            startAutoSlide();
+        });
+
+        dots.forEach((dot, index) => {
+            dot.addEventListener('click', () => {
+                showSlide(index);
+                stopAutoSlide();
+                startAutoSlide();
+            });
+        });
+
+        // Auto-slide on hover
+        carousel.addEventListener('mouseenter', stopAutoSlide);
+        carousel.addEventListener('mouseleave', startAutoSlide);
+
+        // Start auto-slide
+        startAutoSlide();
+    }
+
+    // Initialize galleries and carousels
+    initReportGallery();
+    initTestimonialsCarousel();
+
     // Add tooltip styles
     const tooltipStyles = `
         <style>
@@ -432,10 +577,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Console welcome message
     console.log(`
-        🏠 Aaadvisor Landing Page
+        🏠 Aaadviser Landing Page
         ========================
         
-        Welcome to the Aaadvisor landing page!
+        Welcome to the Aaadviser landing page!
         
         Features:
         ✅ Multi-language support (RU, EN, DE, FR, TR)
@@ -447,3 +592,44 @@ document.addEventListener('DOMContentLoaded', function() {
         For support, contact: https://t.me/Aaadviser_support
     `);
 });
+
+// Sample Report Modal Functions
+function openSampleReport() {
+    const modal = document.getElementById('sampleReportModal');
+    const iframe = document.getElementById('sampleReportFrame');
+    
+    // Show modal
+    modal.style.display = 'block';
+    document.body.style.overflow = 'hidden'; // Prevent background scrolling
+    
+    // Reload iframe to ensure fresh content
+    iframe.src = iframe.src;
+    
+    // Add escape key listener
+    document.addEventListener('keydown', handleEscapeKey);
+}
+
+function closeSampleReport() {
+    const modal = document.getElementById('sampleReportModal');
+    
+    // Hide modal
+    modal.style.display = 'none';
+    document.body.style.overflow = 'auto'; // Restore scrolling
+    
+    // Remove escape key listener
+    document.removeEventListener('keydown', handleEscapeKey);
+}
+
+function handleEscapeKey(event) {
+    if (event.key === 'Escape') {
+        closeSampleReport();
+    }
+}
+
+// Close modal when clicking outside of it
+window.onclick = function(event) {
+    const modal = document.getElementById('sampleReportModal');
+    if (event.target === modal) {
+        closeSampleReport();
+    }
+}

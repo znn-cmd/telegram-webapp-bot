@@ -1,128 +1,128 @@
-# Aaadvisor Landing Page - SEO Оптимизация
+# Aaadviser Landing Page - SEO Оптимизация
 
 ## Мета-теги для всех языков
 
 ### Русский (ru)
 ```html
-<title>Aaadvisor – Инструмент для риэлторов | Аналитика недвижимости</title>
-<meta name="description" content="Закрывайте больше сделок с Aaadvisor: профессиональные отчеты по недвижимости с прогнозом цен и расчетом доходности. Работает в Telegram.">
+<title>Aaadviser – Инструмент для риэлторов | Аналитика недвижимости</title>
+<meta name="description" content="Закрывайте больше сделок с Aaadviser: профессиональные отчеты по недвижимости с прогнозом цен и расчетом доходности. Работает в Telegram.">
 <meta name="keywords" content="недвижимость, риэлтор, аналитика, отчеты, прогноз цен, доходность, Турция, Испания, Португалия, Telegram бот">
-<meta name="author" content="Aaadvisor">
+<meta name="author" content="Aaadviser">
 <meta name="robots" content="index, follow">
 <meta name="language" content="ru">
 
 <!-- Open Graph -->
-<meta property="og:title" content="Aaadvisor – Инструмент для риэлторов">
+<meta property="og:title" content="Aaadviser – Инструмент для риэлторов">
 <meta property="og:description" content="Закрывайте больше сделок с профессиональными отчетами по недвижимости">
 <meta property="og:image" content="https://your-domain.com/logo-flt.png">
 <meta property="og:url" content="https://your-domain.com">
 <meta property="og:type" content="website">
-<meta property="og:site_name" content="Aaadvisor">
+<meta property="og:site_name" content="Aaadviser">
 <meta property="og:locale" content="ru_RU">
 
 <!-- Twitter Card -->
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Aaadvisor – Инструмент для риэлторов">
+<meta name="twitter:title" content="Aaadviser – Инструмент для риэлторов">
 <meta name="twitter:description" content="Закрывайте больше сделок с профессиональными отчетами по недвижимости">
 <meta name="twitter:image" content="https://your-domain.com/logo-flt.png">
 ```
 
 ### English (en)
 ```html
-<title>Aaadvisor – Real Estate Tool for Realtors | Property Analytics</title>
-<meta name="description" content="Close more deals with Aaadvisor: professional real estate reports with price forecasts and yield calculations. Works in Telegram.">
+<title>Aaadviser – Real Estate Tool for Realtors | Property Analytics</title>
+<meta name="description" content="Close more deals with Aaadviser: professional real estate reports with price forecasts and yield calculations. Works in Telegram.">
 <meta name="keywords" content="real estate, realtor, analytics, reports, price forecast, yield, Turkey, Spain, Portugal, Telegram bot">
-<meta name="author" content="Aaadvisor">
+<meta name="author" content="Aaadviser">
 <meta name="robots" content="index, follow">
 <meta name="language" content="en">
 
 <!-- Open Graph -->
-<meta property="og:title" content="Aaadvisor – Real Estate Tool for Realtors">
+<meta property="og:title" content="Aaadviser – Real Estate Tool for Realtors">
 <meta property="og:description" content="Close more deals with professional real estate reports">
 <meta property="og:image" content="https://your-domain.com/logo-flt.png">
 <meta property="og:url" content="https://your-domain.com">
 <meta property="og:type" content="website">
-<meta property="og:site_name" content="Aaadvisor">
+<meta property="og:site_name" content="Aaadviser">
 <meta property="og:locale" content="en_US">
 
 <!-- Twitter Card -->
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Aaadvisor – Real Estate Tool for Realtors">
+<meta name="twitter:title" content="Aaadviser – Real Estate Tool for Realtors">
 <meta name="twitter:description" content="Close more deals with professional real estate reports">
 <meta name="twitter:image" content="https://your-domain.com/logo-flt.png">
 ```
 
 ### Deutsch (de)
 ```html
-<title>Aaadvisor – Immobilien-Tool für Makler | Immobilien-Analyse</title>
-<meta name="description" content="Schließen Sie mehr Deals mit Aaadvisor: professionelle Immobilienberichte mit Preisprognosen und Renditeberechnungen. Funktioniert in Telegram.">
+<title>Aaadviser – Immobilien-Tool für Makler | Immobilien-Analyse</title>
+<meta name="description" content="Schließen Sie mehr Deals mit Aaadviser: professionelle Immobilienberichte mit Preisprognosen und Renditeberechnungen. Funktioniert in Telegram.">
 <meta name="keywords" content="Immobilien, Makler, Analyse, Berichte, Preisprognose, Rendite, Türkei, Spanien, Portugal, Telegram Bot">
-<meta name="author" content="Aaadvisor">
+<meta name="author" content="Aaadviser">
 <meta name="robots" content="index, follow">
 <meta name="language" content="de">
 
 <!-- Open Graph -->
-<meta property="og:title" content="Aaadvisor – Immobilien-Tool für Makler">
+<meta property="og:title" content="Aaadviser – Immobilien-Tool für Makler">
 <meta property="og:description" content="Schließen Sie mehr Deals mit professionellen Immobilienberichten">
 <meta property="og:image" content="https://your-domain.com/logo-flt.png">
 <meta property="og:url" content="https://your-domain.com">
 <meta property="og:type" content="website">
-<meta property="og:site_name" content="Aaadvisor">
+<meta property="og:site_name" content="Aaadviser">
 <meta property="og:locale" content="de_DE">
 
 <!-- Twitter Card -->
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Aaadvisor – Immobilien-Tool für Makler">
+<meta name="twitter:title" content="Aaadviser – Immobilien-Tool für Makler">
 <meta name="twitter:description" content="Schließen Sie mehr Deals mit professionellen Immobilienberichten">
 <meta name="twitter:image" content="https://your-domain.com/logo-flt.png">
 ```
 
 ### Français (fr)
 ```html
-<title>Aaadvisor – Outil Immobilier pour Agents | Analyse Immobilière</title>
-<meta name="description" content="Concluez plus de transactions avec Aaadvisor: rapports immobiliers professionnels avec prévisions de prix et calculs de rendement. Fonctionne dans Telegram.">
+<title>Aaadviser – Outil Immobilier pour Agents | Analyse Immobilière</title>
+<meta name="description" content="Concluez plus de transactions avec Aaadviser: rapports immobiliers professionnels avec prévisions de prix et calculs de rendement. Fonctionne dans Telegram.">
 <meta name="keywords" content="immobilier, agent, analyse, rapports, prévision prix, rendement, Turquie, Espagne, Portugal, bot Telegram">
-<meta name="author" content="Aaadvisor">
+<meta name="author" content="Aaadviser">
 <meta name="robots" content="index, follow">
 <meta name="language" content="fr">
 
 <!-- Open Graph -->
-<meta property="og:title" content="Aaadvisor – Outil Immobilier pour Agents">
+<meta property="og:title" content="Aaadviser – Outil Immobilier pour Agents">
 <meta property="og:description" content="Concluez plus de transactions avec des rapports immobiliers professionnels">
 <meta property="og:image" content="https://your-domain.com/logo-flt.png">
 <meta property="og:url" content="https://your-domain.com">
 <meta property="og:type" content="website">
-<meta property="og:site_name" content="Aaadvisor">
+<meta property="og:site_name" content="Aaadviser">
 <meta property="og:locale" content="fr_FR">
 
 <!-- Twitter Card -->
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Aaadvisor – Outil Immobilier pour Agents">
+<meta name="twitter:title" content="Aaadviser – Outil Immobilier pour Agents">
 <meta name="twitter:description" content="Concluez plus de transactions avec des rapports immobiliers professionnels">
 <meta name="twitter:image" content="https://your-domain.com/logo-flt.png">
 ```
 
 ### Türkçe (tr)
 ```html
-<title>Aaadvisor – Emlakçılar için Araç | Gayrimenkul Analizi</title>
-<meta name="description" content="Aaadvisor ile daha fazla anlaşma kapatın: fiyat tahminleri ve getiri hesaplamaları ile profesyonel gayrimenkul raporları. Telegram'da çalışır.">
+<title>Aaadviser – Emlakçılar için Araç | Gayrimenkul Analizi</title>
+<meta name="description" content="Aaadviser ile daha fazla anlaşma kapatın: fiyat tahminleri ve getiri hesaplamaları ile profesyonel gayrimenkul raporları. Telegram'da çalışır.">
 <meta name="keywords" content="gayrimenkul, emlakçı, analiz, raporlar, fiyat tahmini, getiri, Türkiye, İspanya, Portekiz, Telegram bot">
-<meta name="author" content="Aaadvisor">
+<meta name="author" content="Aaadviser">
 <meta name="robots" content="index, follow">
 <meta name="language" content="tr">
 
 <!-- Open Graph -->
-<meta property="og:title" content="Aaadvisor – Emlakçılar için Araç">
+<meta property="og:title" content="Aaadviser – Emlakçılar için Araç">
 <meta property="og:description" content="Profesyonel gayrimenkul raporları ile daha fazla anlaşma kapatın">
 <meta property="og:image" content="https://your-domain.com/logo-flt.png">
 <meta property="og:url" content="https://your-domain.com">
 <meta property="og:type" content="website">
-<meta property="og:site_name" content="Aaadvisor">
+<meta property="og:site_name" content="Aaadviser">
 <meta property="og:locale" content="tr_TR">
 
 <!-- Twitter Card -->
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Aaadvisor – Emlakçılar için Araç">
+<meta name="twitter:title" content="Aaadviser – Emlakçılar için Araç">
 <meta name="twitter:description" content="Profesyonel gayrimenkul raporları ile daha fazla anlaşma kapatın">
 <meta name="twitter:image" content="https://your-domain.com/logo-flt.png">
 ```
@@ -135,7 +135,7 @@
 {
   "@context": "https://schema.org",
   "@type": "Organization",
-  "name": "Aaadvisor",
+  "name": "Aaadviser",
   "url": "https://your-domain.com",
   "logo": "https://your-domain.com/logo-flt.png",
   "description": "Professional real estate analytics tool for realtors",
@@ -158,7 +158,7 @@
 {
   "@context": "https://schema.org",
   "@type": "WebSite",
-  "name": "Aaadvisor",
+  "name": "Aaadviser",
   "url": "https://your-domain.com",
   "description": "Professional real estate analytics tool for realtors",
   "potentialAction": {
@@ -176,7 +176,7 @@
 {
   "@context": "https://schema.org",
   "@type": "SoftwareApplication",
-  "name": "Aaadvisor",
+  "name": "Aaadviser",
   "applicationCategory": "BusinessApplication",
   "operatingSystem": "Telegram",
   "description": "Professional real estate analytics tool that helps realtors close more deals with detailed reports",
@@ -252,7 +252,7 @@ Crawl-delay: 1
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="Aaadvisor">
+<meta name="apple-mobile-web-app-title" content="Aaadviser">
 ```
 
 ### Производительность
@@ -343,7 +343,7 @@ Crawl-delay: 1
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
   gtag('config', 'GA_MEASUREMENT_ID', {
-    'page_title': 'Aaadvisor Landing Page',
+    'page_title': 'Aaadviser Landing Page',
     'page_location': window.location.href,
     'custom_map': {
       'custom_parameter_1': 'language',
