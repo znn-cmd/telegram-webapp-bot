@@ -2,9 +2,10 @@
 <html lang="ru">
 <head>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="/i18n-manager.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Админ-панель — Aaadviser</title>
+    <title>Aaadviser - <span data-i18n="admin.title">Админ-панель</span></title>
     <link rel="stylesheet" href="styles.css">
     <style>
         body { background: #f8f9fa; margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
@@ -30,30 +31,126 @@
 <body>
     <div class="container">
         <img src="/logo-flt.png" alt="Aaadviser Logo" class="admin-logo" />
-        <div class="admin-title">Админ-панель</div>
+        <div class="admin-title" data-i18n="admin.title">Админ-панель</div>
         <button class="admin-btn admin-btn-yellow" onclick="makeBalance100()">
             <span class="admin-btn-icon">💰</span>
-            <span>Сделать баланс 100</span>
+            <span data-i18n="admin.make_balance_100">Сделать баланс 100</span>
         </button>
         <button class="admin-btn" onclick="showUsersStats()">
             <span class="admin-btn-icon">👥</span>
-            <span>Пользователи</span>
+            <span data-i18n="admin.users">Пользователи</span>
         </button>
         <button class="admin-btn" onclick="showPublication()">
             <span class="admin-btn-icon">📢</span>
-            <span>Публикация</span>
+            <span data-i18n="admin.publication">Публикация</span>
         </button>
         <button class="admin-btn" onclick="showSettings()">
             <span class="admin-btn-icon">⚙️</span>
-            <span>Настройки</span>
+            <span data-i18n="admin.settings">Настройки</span>
         </button>
         <div class="nav-btn-row">
-            <button class="nav-btn" onclick="goBack()">Назад</button>
-            <button class="nav-btn nav-btn-main" onclick="goToMainMenu()">В главное меню</button>
+            <button class="nav-btn" onclick="goBack()" data-i18n="common.back">Назад</button>
+            <button class="nav-btn nav-btn-main" onclick="goToMainMenu()" data-i18n="common.main_menu">В главное меню</button>
         </div>
     </div>
     <div id="toastContainer" class="toast-container"></div>
     <script>
+        // Локализация
+        const locales = {
+            'ru': {
+                'admin.title': 'Админ-панель',
+                'admin.make_balance_100': 'Сделать баланс 100',
+                'admin.users': 'Пользователи',
+                'admin.publication': 'Публикация',
+                'admin.settings': 'Настройки',
+                'common.back': 'Назад',
+                'common.main_menu': 'В главное меню',
+                'admin.balance_updated': 'Баланс обновлён до 100',
+                'admin.balance_error': 'Ошибка обновления баланса',
+                'admin.user_not_found': 'Пользователь не определён. Откройте WebApp из Telegram.'
+            },
+            'en': {
+                'admin.title': 'Admin Panel',
+                'admin.make_balance_100': 'Set Balance to 100',
+                'admin.users': 'Users',
+                'admin.publication': 'Publication',
+                'admin.settings': 'Settings',
+                'common.back': 'Back',
+                'common.main_menu': 'To Main Menu',
+                'admin.balance_updated': 'Balance updated to 100',
+                'admin.balance_error': 'Error updating balance',
+                'admin.user_not_found': 'User not identified. Open WebApp from Telegram.'
+            },
+            'de': {
+                'admin.title': 'Admin-Panel',
+                'admin.make_balance_100': 'Kontostand auf 100 setzen',
+                'admin.users': 'Benutzer',
+                'admin.publication': 'Veröffentlichung',
+                'admin.settings': 'Einstellungen',
+                'common.back': 'Zurück',
+                'common.main_menu': 'Zum Hauptmenü',
+                'admin.balance_updated': 'Kontostand auf 100 aktualisiert',
+                'admin.balance_error': 'Fehler beim Aktualisieren des Kontostands',
+                'admin.user_not_found': 'Benutzer nicht identifiziert. Öffnen Sie WebApp aus Telegram.'
+            },
+            'fr': {
+                'admin.title': 'Panneau d\'Administration',
+                'admin.make_balance_100': 'Définir le Solde à 100',
+                'admin.users': 'Utilisateurs',
+                'admin.publication': 'Publication',
+                'admin.settings': 'Paramètres',
+                'common.back': 'Retour',
+                'common.main_menu': 'Au Menu Principal',
+                'admin.balance_updated': 'Solde mis à jour à 100',
+                'admin.balance_error': 'Erreur de mise à jour du solde',
+                'admin.user_not_found': 'Utilisateur non identifié. Ouvrez WebApp depuis Telegram.'
+            },
+            'tr': {
+                'admin.title': 'Yönetici Paneli',
+                'admin.make_balance_100': 'Bakiyeyi 100 Yap',
+                'admin.users': 'Kullanıcılar',
+                'admin.publication': 'Yayın',
+                'admin.settings': 'Ayarlar',
+                'common.back': 'Geri',
+                'common.main_menu': 'Ana Menüye',
+                'admin.balance_updated': 'Bakiye 100\'e güncellendi',
+                'admin.balance_error': 'Bakiye güncelleme hatası',
+                'admin.user_not_found': 'Kullanıcı tanımlanmadı. WebApp\'i Telegram\'dan açın.'
+            }
+        };
+
+        let currentLanguage = 'ru';
+
+        // Получение локализованного текста
+        function getText(key) {
+            return locales[currentLanguage][key] || key;
+        }
+
+        // Обновление текста на странице
+        function updatePageText() {
+            document.querySelectorAll('[data-i18n]').forEach(element => {
+                const key = element.getAttribute('data-i18n');
+                if (key) {
+                    element.textContent = getText(key);
+                }
+            });
+
+            // Обновляем title страницы
+            document.title = `Aaadviser - ${getText('admin.title')}`;
+        }
+
+        // Инициализация локализации
+        async function initLocalization() {
+            if (window.i18nManager) {
+                currentLanguage = await window.i18nManager.init();
+                window.i18nManager.setTranslations(locales);
+                window.i18nManager.updatePageText();
+            } else {
+                // Fallback если i18nManager не загрузился
+                updatePageText();
+            }
+        }
+
         function goBack() { window.history.back(); }
         function goToMainMenu() { window.location.href = '/webapp'; }
         function showToast(message, type = 'success', duration = 2500) {
@@ -71,7 +168,7 @@
                 try { userData = JSON.parse(localStorage.getItem('aaadviser_user')); } catch (e) { userData = null; }
             }
             if (!userData || !userData.id) {
-                alert('Пользователь не определён. Откройте WebApp из Telegram.');
+                alert(getText('admin.user_not_found'));
                 return;
             }
             const btn = event.target.closest('button');
@@ -84,19 +181,25 @@
             .then(res => res.json())
             .then(data => {
                 if (data.success) {
-                    btn.textContent = 'Баланс установлен: $100';
-                    showToast('Баланс успешно установлен!', 'success');
-                    setTimeout(() => { btn.textContent = 'Сделать баланс 100'; btn.disabled = false; }, 2000);
+                    btn.textContent = 'Balance: $100';
+                    showToast(getText('admin.balance_updated'), 'success');
+                    setTimeout(() => { 
+                        btn.innerHTML = `<span class="admin-btn-icon">💰</span><span data-i18n="admin.make_balance_100">${getText('admin.make_balance_100')}</span>`;
+                        btn.disabled = false; 
+                    }, 2000);
                 } else {
-                    showToast('Ошибка: ' + (data.error || 'Не удалось обновить баланс.'), 'error');
+                    showToast(getText('admin.balance_error') + ': ' + (data.error || ''), 'error');
                     btn.disabled = false;
                 }
             })
-            .catch(() => { showToast('Ошибка сети.', 'error'); btn.disabled = false; });
+            .catch(() => { showToast(getText('admin.balance_error'), 'error'); btn.disabled = false; });
         }
         function showUsersStats() { window.location.href = '/webapp_admin_users'; }
         function showPublication() { window.location.href = '/webapp_admin_publication'; }
         function showSettings() { window.location.href = '/webapp_admin_settings'; }
+
+        // Инициализация при загрузке страницы
+        document.addEventListener('DOMContentLoaded', initLocalization);
     </script>
 </body>
 </html> 

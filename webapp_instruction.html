@@ -2,9 +2,10 @@
 <html lang="ru">
 <head>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="/i18n-manager.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Инструкция — Aaadviser</title>
+    <title>Aaadviser - <span data-i18n="instruction.title">Инструкция</span></title>
     <style>
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f8f9fa; margin: 0; }
         .container { max-width: 400px; margin: 40px auto; background: #fff; border-radius: 16px; box-shadow: 0 2px 12px rgba(102,126,234,0.10); padding: 32px 20px 24px 20px; text-align: center; }
@@ -28,73 +29,259 @@
 <body>
     <div class="container">
         <img src="logo-flt.png" alt="Aaadviser" class="logo" onclick="goToMainMenu()">
-        <div class="title">Инструкция</div>
+        <div class="title" data-i18n="instruction.title">Инструкция</div>
         
         <div class="content">
-            <h3>Как получить анализ недвижимости</h3>
+            <h3 data-i18n="instruction.how_to_get_analysis">Как получить анализ недвижимости</h3>
             
             <div class="step">
-                <span class="step-number">1.</span> Нажмите "Получить новый отчет" в главном меню
+                <span class="step-number">1.</span> <span data-i18n="instruction.step1">Нажмите "Получить новый отчет" в главном меню</span>
             </div>
             
             <div class="step">
-                <span class="step-number">2.</span> Введите полный адрес недвижимости (улица, дом, город)
+                <span class="step-number">2.</span> <span data-i18n="instruction.step2">Введите полный адрес недвижимости (улица, дом, город)</span>
             </div>
             
             <div class="step">
-                <span class="step-number">3.</span> Укажите количество спален в объекте
+                <span class="step-number">3.</span> <span data-i18n="instruction.step3">Укажите количество спален в объекте</span>
             </div>
             
             <div class="step">
-                <span class="step-number">4.</span> Введите примерную цену объекта в долларах
+                <span class="step-number">4.</span> <span data-i18n="instruction.step4">Введите примерную цену объекта в долларах</span>
             </div>
             
             <div class="step">
-                <span class="step-number">5.</span> Дождитесь обработки данных (обычно 30-60 секунд)
+                <span class="step-number">5.</span> <span data-i18n="instruction.step5">Дождитесь обработки данных (обычно 30-60 секунд)</span>
             </div>
             
             <div class="step">
-                <span class="step-number">6.</span> Изучите подробный отчет с анализом рынка
+                <span class="step-number">6.</span> <span data-i18n="instruction.step6">Изучите подробный отчет с анализом рынка</span>
             </div>
             
-            <h3>Что включает отчет?</h3>
+            <h3 data-i18n="instruction.report_includes">Что включает отчет?</h3>
             <ul>
-                <li>📊 Анализ цен в районе</li>
-                <li>📈 Статистика рынка недвижимости</li>
-                <li>🏠 Сравнение с похожими объектами</li>
-                <li>🔮 Прогноз изменения цен</li>
-                <li>💡 Рекомендации по инвестициям</li>
+                <li data-i18n="instruction.feature1">📊 Анализ цен в районе</li>
+                <li data-i18n="instruction.feature2">📈 Статистика рынка недвижимости</li>
+                <li data-i18n="instruction.feature3">🏠 Сравнение с похожими объектами</li>
+                <li data-i18n="instruction.feature4">🔮 Прогноз изменения цен</li>
+                <li data-i18n="instruction.feature5">💡 Рекомендации по инвестициям</li>
             </ul>
             
-            <h3>Дополнительные возможности</h3>
+            <h3 data-i18n="instruction.additional_features">Дополнительные возможности</h3>
             <ul>
-                <li>💾 Сохранение отчетов для последующего просмотра</li>
-                <li>📱 Доступ к отчетам с любого устройства</li>
-                <li>📊 Статистика рынка по регионам</li>
-                <li>🔍 Поиск похожих объектов</li>
+                <li data-i18n="instruction.additional1">💾 Сохранение отчетов для последующего просмотра</li>
+                <li data-i18n="instruction.additional2">📱 Доступ к отчетам с любого устройства</li>
+                <li data-i18n="instruction.additional3">📊 Статистика рынка по регионам</li>
+                <li data-i18n="instruction.additional4">🔍 Поиск похожих объектов</li>
             </ul>
-            
-            <h3>Советы для точного анализа</h3>
+
+            <h3 data-i18n="instruction.tips">Советы для точного анализа</h3>
             <ul>
-                <li>✅ Указывайте точный адрес</li>
-                <li>✅ Используйте актуальную цену</li>
-                <li>✅ Учитывайте все спальни</li>
-                <li>✅ Проверяйте сохраненные отчеты</li>
+                <li data-i18n="instruction.tip1">✅ Указывайте точный адрес</li>
+                <li data-i18n="instruction.tip2">✅ Используйте актуальную цену</li>
+                <li data-i18n="instruction.tip3">✅ Учитывайте все спальни</li>
+                <li data-i18n="instruction.tip4">✅ Проверяйте сохраненные отчеты</li>
             </ul>
+
+            <p data-i18n="instruction.support_note">Если у вас возникли вопросы, обратитесь в нашу службу поддержки через раздел "Помощь" в главном меню.</p>
         </div>
         
         <div class="nav-buttons">
-            <button class="nav-btn back-btn" onclick="goBack()">← Назад</button>
-            <button class="nav-btn" onclick="goToMainMenu()">В главное меню</button>
+            <button class="nav-btn back-btn" onclick="goBack()" data-i18n="common.back">Назад</button>
+            <button class="nav-btn" onclick="goToMainMenu()" data-i18n="common.main_menu">В главное меню</button>
         </div>
     </div>
     <script>
+        // Локализация
+        const locales = {
+            'ru': {
+                'instruction.title': 'Инструкция',
+                'instruction.how_to_get_analysis': 'Как получить анализ недвижимости',
+                'instruction.step1': 'Нажмите "Получить новый отчет" в главном меню',
+                'instruction.step2': 'Введите полный адрес недвижимости (улица, дом, город)',
+                'instruction.step3': 'Укажите количество спален в объекте',
+                'instruction.step4': 'Введите примерную цену объекта в долларах',
+                'instruction.step5': 'Дождитесь обработки данных (обычно 30-60 секунд)',
+                'instruction.step6': 'Изучите подробный отчет с анализом рынка',
+                'instruction.report_includes': 'Что включает отчет?',
+                'instruction.feature1': '📊 Анализ цен в районе',
+                'instruction.feature2': '📈 Статистика рынка недвижимости',
+                'instruction.feature3': '🏠 Сравнение с похожими объектами',
+                'instruction.feature4': '🔮 Прогноз изменения цен',
+                'instruction.feature5': '💡 Рекомендации по инвестициям',
+                'instruction.additional_features': 'Дополнительные возможности',
+                'instruction.additional1': '💾 Сохранение отчетов для последующего просмотра',
+                'instruction.additional2': '📱 Доступ к отчетам с любого устройства',
+                'instruction.additional3': '📊 Статистика рынка по регионам',
+                'instruction.additional4': '🔍 Поиск похожих объектов',
+                'instruction.tips': 'Советы для точного анализа',
+                'instruction.tip1': '✅ Указывайте точный адрес',
+                'instruction.tip2': '✅ Используйте актуальную цену',
+                'instruction.tip3': '✅ Учитывайте все спальни',
+                'instruction.tip4': '✅ Проверяйте сохраненные отчеты',
+                'instruction.support_note': 'Если у вас возникли вопросы, обратитесь в нашу службу поддержки через раздел "Помощь" в главном меню.',
+                'common.back': 'Назад',
+                'common.main_menu': 'В главное меню'
+            },
+            'en': {
+                'instruction.title': 'Instructions',
+                'instruction.how_to_get_analysis': 'How to get real estate analysis',
+                'instruction.step1': 'Click "Get new report" in the main menu',
+                'instruction.step2': 'Enter the full property address (street, house, city)',
+                'instruction.step3': 'Specify the number of bedrooms in the property',
+                'instruction.step4': 'Enter the approximate price of the property in dollars',
+                'instruction.step5': 'Wait for data processing (usually 30-60 seconds)',
+                'instruction.step6': 'Study the detailed report with market analysis',
+                'instruction.report_includes': 'What does the report include?',
+                'instruction.feature1': '📊 Price analysis in the area',
+                'instruction.feature2': '📈 Real estate market statistics',
+                'instruction.feature3': '🏠 Comparison with similar properties',
+                'instruction.feature4': '🔮 Price change forecast',
+                'instruction.feature5': '💡 Investment recommendations',
+                'instruction.additional_features': 'Additional features',
+                'instruction.additional1': '💾 Save reports for later viewing',
+                'instruction.additional2': '📱 Access reports from any device',
+                'instruction.additional3': '📊 Market statistics by regions',
+                'instruction.additional4': '🔍 Search for similar properties',
+                'instruction.tips': 'Tips for accurate analysis',
+                'instruction.tip1': '✅ Specify exact address',
+                'instruction.tip2': '✅ Use current price',
+                'instruction.tip3': '✅ Account for all bedrooms',
+                'instruction.tip4': '✅ Check saved reports',
+                'instruction.support_note': 'If you have questions, contact our support service through the "Help" section in the main menu.',
+                'common.back': 'Back',
+                'common.main_menu': 'To Main Menu'
+            },
+            'de': {
+                'instruction.title': 'Anleitung',
+                'instruction.how_to_get_analysis': 'Wie man eine Immobilienanalyse erhält',
+                'instruction.step1': 'Klicken Sie auf "Neuen Bericht erstellen" im Hauptmenü',
+                'instruction.step2': 'Geben Sie die vollständige Immobilienadresse ein (Straße, Haus, Stadt)',
+                'instruction.step3': 'Geben Sie die Anzahl der Schlafzimmer in der Immobilie an',
+                'instruction.step4': 'Geben Sie den ungefähren Preis der Immobilie in Dollar ein',
+                'instruction.step5': 'Warten Sie auf die Datenverarbeitung (normalerweise 30-60 Sekunden)',
+                'instruction.step6': 'Studieren Sie den detaillierten Bericht mit Marktanalyse',
+                'instruction.report_includes': 'Was enthält der Bericht?',
+                'instruction.feature1': '📊 Preisanalyse in der Gegend',
+                'instruction.feature2': '📈 Immobilienmarktstatistiken',
+                'instruction.feature3': '🏠 Vergleich mit ähnlichen Immobilien',
+                'instruction.feature4': '🔮 Preisentwicklungsprognose',
+                'instruction.feature5': '💡 Investitionsempfehlungen',
+                'instruction.additional_features': 'Zusätzliche Funktionen',
+                'instruction.additional1': '💾 Berichte für spätere Ansicht speichern',
+                'instruction.additional2': '📱 Zugriff auf Berichte von jedem Gerät',
+                'instruction.additional3': '📊 Marktstatistiken nach Regionen',
+                'instruction.additional4': '🔍 Suche nach ähnlichen Immobilien',
+                'instruction.tips': 'Tipps für genaue Analyse',
+                'instruction.tip1': '✅ Genaue Adresse angeben',
+                'instruction.tip2': '✅ Aktuellen Preis verwenden',
+                'instruction.tip3': '✅ Alle Schlafzimmer berücksichtigen',
+                'instruction.tip4': '✅ Gespeicherte Berichte überprüfen',
+                'instruction.support_note': 'Bei Fragen wenden Sie sich über den Bereich "Hilfe" im Hauptmenü an unseren Support-Service.',
+                'common.back': 'Zurück',
+                'common.main_menu': 'Zum Hauptmenü'
+            },
+            'fr': {
+                'instruction.title': 'Instructions',
+                'instruction.how_to_get_analysis': 'Comment obtenir une analyse immobilière',
+                'instruction.step1': 'Cliquez sur "Obtenir un nouveau rapport" dans le menu principal',
+                'instruction.step2': 'Entrez l\'adresse complète de la propriété (rue, maison, ville)',
+                'instruction.step3': 'Spécifiez le nombre de chambres dans la propriété',
+                'instruction.step4': 'Entrez le prix approximatif de la propriété en dollars',
+                'instruction.step5': 'Attendez le traitement des données (généralement 30-60 secondes)',
+                'instruction.step6': 'Étudiez le rapport détaillé avec analyse de marché',
+                'instruction.report_includes': 'Que comprend le rapport ?',
+                'instruction.feature1': '📊 Analyse des prix dans la région',
+                'instruction.feature2': '📈 Statistiques du marché immobilier',
+                'instruction.feature3': '🏠 Comparaison avec des propriétés similaires',
+                'instruction.feature4': '🔮 Prévision de changement de prix',
+                'instruction.feature5': '💡 Recommandations d\'investissement',
+                'instruction.additional_features': 'Fonctionnalités supplémentaires',
+                'instruction.additional1': '💾 Sauvegarder les rapports pour consultation ultérieure',
+                'instruction.additional2': '📱 Accès aux rapports depuis n\'importe quel appareil',
+                'instruction.additional3': '📊 Statistiques de marché par régions',
+                'instruction.additional4': '🔍 Recherche de propriétés similaires',
+                'instruction.tips': 'Conseils pour une analyse précise',
+                'instruction.tip1': '✅ Spécifier l\'adresse exacte',
+                'instruction.tip2': '✅ Utiliser le prix actuel',
+                'instruction.tip3': '✅ Tenir compte de toutes les chambres',
+                'instruction.tip4': '✅ Vérifier les rapports sauvegardés',
+                'instruction.support_note': 'Si vous avez des questions, contactez notre service d\'assistance via la section "Aide" du menu principal.',
+                'common.back': 'Retour',
+                'common.main_menu': 'Au Menu Principal'
+            },
+            'tr': {
+                'instruction.title': 'Talimatlar',
+                'instruction.how_to_get_analysis': 'Gayrimenkul analizi nasıl alınır',
+                'instruction.step1': 'Ana menüde "Yeni rapor al" seçeneğine tıklayın',
+                'instruction.step2': 'Mülkün tam adresini girin (sokak, ev, şehir)',
+                'instruction.step3': 'Mülkteki yatak odası sayısını belirtin',
+                'instruction.step4': 'Mülkün yaklaşık fiyatını dolar olarak girin',
+                'instruction.step5': 'Veri işlenmesini bekleyin (genellikle 30-60 saniye)',
+                'instruction.step6': 'Pazar analizi ile ayrıntılı raporu inceleyin',
+                'instruction.report_includes': 'Rapor neleri içerir?',
+                'instruction.feature1': '📊 Bölgedeki fiyat analizi',
+                'instruction.feature2': '📈 Gayrimenkul piyasası istatistikleri',
+                'instruction.feature3': '🏠 Benzer mülklerle karşılaştırma',
+                'instruction.feature4': '🔮 Fiyat değişikliği tahmini',
+                'instruction.feature5': '💡 Yatırım önerileri',
+                'instruction.additional_features': 'Ek özellikler',
+                'instruction.additional1': '💾 Raporları daha sonra görüntülemek için kaydet',
+                'instruction.additional2': '📱 Herhangi bir cihazdan raporlara erişim',
+                'instruction.additional3': '📊 Bölgelere göre pazar istatistikleri',
+                'instruction.additional4': '🔍 Benzer mülk arama',
+                'instruction.tips': 'Doğru analiz için ipuçları',
+                'instruction.tip1': '✅ Tam adres belirtin',
+                'instruction.tip2': '✅ Güncel fiyat kullanın',
+                'instruction.tip3': '✅ Tüm yatak odalarını hesaba katın',
+                'instruction.tip4': '✅ Kaydedilen raporları kontrol edin',
+                'instruction.support_note': 'Sorularınız varsa, ana menüdeki "Yardım" bölümünden destek servisimize başvurun.',
+                'common.back': 'Geri',
+                'common.main_menu': 'Ana Menüye'
+            }
+        };
+
+        let currentLanguage = 'ru';
+
+        // Получение локализованного текста
+        function getText(key) {
+            return locales[currentLanguage][key] || key;
+        }
+
+        // Обновление текста на странице
+        function updatePageText() {
+            document.querySelectorAll('[data-i18n]').forEach(element => {
+                const key = element.getAttribute('data-i18n');
+                if (key) {
+                    element.textContent = getText(key);
+                }
+            });
+
+            // Обновляем title страницы
+            document.title = `Aaadviser - ${getText('instruction.title')}`;
+        }
+
+        // Инициализация локализации
+        async function initLocalization() {
+            if (window.i18nManager) {
+                currentLanguage = await window.i18nManager.init();
+                window.i18nManager.setTranslations(locales);
+                window.i18nManager.updatePageText();
+            } else {
+                // Fallback если i18nManager не загрузился
+                updatePageText();
+            }
+        }
+
         function goToMainMenu() {
             window.location.href = '/webapp';
         }
         function goBack() {
             window.location.href = '/webapp_help';
         }
+
+        // Инициализация при загрузке страницы
+        document.addEventListener('DOMContentLoaded', initLocalization);
     </script>
 </body>
 </html> 
