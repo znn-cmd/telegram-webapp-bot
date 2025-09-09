@@ -330,17 +330,17 @@
     <!-- Language Selection Modal -->
     <div id="modal-bg" class="modal-bg" style="display:none;">
         <div class="modal">
-            <div class="modal-title" data-i18n="common.language">Выберите язык</div>
+            <div class="modal-title" id="languageModalTitle">Выберите язык</div>
             <div class="language-buttons">
-                <button class="lang-btn selected" data-lang="ru" onclick="selectLanguage('ru')">🇷🇺 Русский</button>
-                <button class="lang-btn" data-lang="en" onclick="selectLanguage('en')">🇺🇸 English</button>
-                <button class="lang-btn" data-lang="de" onclick="selectLanguage('de')">🇩🇪 Deutsch</button>
-                <button class="lang-btn" data-lang="fr" onclick="selectLanguage('fr')">🇫🇷 Français</button>
-                <button class="lang-btn" data-lang="tr" onclick="selectLanguage('tr')">🇹🇷 Türkçe</button>
+                <button class="lang-btn selected" data-lang="ru" onclick="selectLanguage('ru')">Русский</button>
+                <button class="lang-btn" data-lang="en" onclick="selectLanguage('en')">English</button>
+                <button class="lang-btn" data-lang="de" onclick="selectLanguage('de')">Deutsch</button>
+                <button class="lang-btn" data-lang="fr" onclick="selectLanguage('fr')">Français</button>
+                <button class="lang-btn" data-lang="tr" onclick="selectLanguage('tr')">Türkçe</button>
             </div>
             <div class="modal-btn-row">
-                <button class="modal-btn modal-btn-secondary" onclick="closeModal()" data-i18n="common.cancel">Отмена</button>
-                <button class="modal-btn modal-btn-primary" onclick="confirmLanguage()" data-i18n="common.confirm">Подтвердить</button>
+                <button class="modal-btn modal-btn-secondary" onclick="closeModal()" id="cancelBtn">Отмена</button>
+                <button class="modal-btn modal-btn-primary" onclick="confirmLanguage()" id="confirmBtn">Подтвердить</button>
             </div>
         </div>
     </div>
@@ -372,6 +372,12 @@
                 'profile.edit_profile': 'Редактировать профиль',
                 'profile.language_settings': 'Язык интерфейса',
                 'profile.current_language': 'Текущий: Русский',
+                'common.language': 'Выберите язык',
+                'common.cancel': 'Отмена',
+                'common.confirm': 'Подтвердить',
+                'messages.language_changed': 'Язык успешно изменен',
+                'messages.language_error': 'Ошибка сохранения языка',
+                'messages.network_error': 'Ошибка сети',
                 'common.settings': 'Настройки',
                 'profile.transaction_history': 'История транзакций',
                 'common.back': 'Вернуться в главное меню'
@@ -384,6 +390,12 @@
                 'profile.edit_profile': 'Edit Profile',
                 'profile.language_settings': 'Interface Language',
                 'profile.current_language': 'Current: English',
+                'common.language': 'Select Language',
+                'common.cancel': 'Cancel',
+                'common.confirm': 'Confirm',
+                'messages.language_changed': 'Language changed successfully',
+                'messages.language_error': 'Error saving language',
+                'messages.network_error': 'Network error',
                 'common.settings': 'Settings',
                 'profile.transaction_history': 'Transaction History',
                 'common.back': 'Back to main menu'
@@ -396,6 +408,12 @@
                 'profile.edit_profile': 'Profil bearbeiten',
                 'profile.language_settings': 'Oberflächensprache',
                 'profile.current_language': 'Aktuell: Deutsch',
+                'common.language': 'Sprache wählen',
+                'common.cancel': 'Abbrechen',
+                'common.confirm': 'Bestätigen',
+                'messages.language_changed': 'Sprache erfolgreich geändert',
+                'messages.language_error': 'Fehler beim Speichern der Sprache',
+                'messages.network_error': 'Netzwerkfehler',
                 'common.settings': 'Einstellungen',
                 'profile.transaction_history': 'Transaktionsverlauf',
                 'common.back': 'Zurück zum Hauptmenü'
@@ -408,6 +426,12 @@
                 'profile.edit_profile': 'Modifier le Profil',
                 'profile.language_settings': 'Langue de l\'Interface',
                 'profile.current_language': 'Actuel: Français',
+                'common.language': 'Sélectionner la langue',
+                'common.cancel': 'Annuler',
+                'common.confirm': 'Confirmer',
+                'messages.language_changed': 'Langue changée avec succès',
+                'messages.language_error': 'Erreur de sauvegarde de la langue',
+                'messages.network_error': 'Erreur réseau',
                 'common.settings': 'Paramètres',
                 'profile.transaction_history': 'Historique des Transactions',
                 'common.back': 'Retour au menu principal'
@@ -420,6 +444,12 @@
                 'profile.edit_profile': 'Profili Düzenle',
                 'profile.language_settings': 'Arayüz Dili',
                 'profile.current_language': 'Mevcut: Türkçe',
+                'common.language': 'Dil seçin',
+                'common.cancel': 'İptal',
+                'common.confirm': 'Onayla',
+                'messages.language_changed': 'Dil başarıyla değiştirildi',
+                'messages.language_error': 'Dil kaydetme hatası',
+                'messages.network_error': 'Ağ hatası',
                 'common.settings': 'Ayarlar',
                 'profile.transaction_history': 'İşlem Geçmişi',
                 'common.back': 'Ana menüye dön'
@@ -430,6 +460,29 @@
         function getText(key) {
             const locale = locales[currentLanguage] || locales['en'];
             return locale[key] || key;
+        }
+        
+        // Функция для обновления локализации на странице
+        function updatePageText() {
+            // Обновляем элементы с data-i18n атрибутами
+            document.querySelectorAll('[data-i18n]').forEach(element => {
+                const key = element.getAttribute('data-i18n');
+                if (key) {
+                    element.textContent = getText(key);
+                }
+            });
+            
+            // Обновляем модальное окно языков
+            const modalTitle = document.getElementById('languageModalTitle');
+            const cancelBtn = document.getElementById('cancelBtn');
+            const confirmBtn = document.getElementById('confirmBtn');
+            
+            if (modalTitle) modalTitle.textContent = getText('common.language');
+            if (cancelBtn) cancelBtn.textContent = getText('common.cancel');
+            if (confirmBtn) confirmBtn.textContent = getText('common.confirm');
+            
+            // Обновляем отображение текущего языка
+            updateCurrentLanguageDisplay();
         }
 
         // Функция для получения языка пользователя
@@ -577,6 +630,9 @@
         }
         
         function showLanguageModal() {
+            // Обновляем тексты модального окна перед показом
+            updatePageText();
+            
             // Устанавливаем текущий язык как выбранный
             document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('selected'));
             const currentBtn = document.querySelector(`[data-lang="${currentLanguage}"]`);
@@ -611,9 +667,12 @@
                     });
                     
                     if (response.ok) {
-                        showMessage('Язык успешно изменен', 'success');
+                        // Обновляем currentLanguage перед показом сообщения
+                        currentLanguage = selectedLanguage;
+                        updatePageText();
+                        showMessage(getText('messages.language_changed'), 'success');
                     } else {
-                        showMessage('Ошибка сохранения языка', 'error');
+                        showMessage(getText('messages.language_error'), 'error');
                     }
                 }
                 
@@ -625,7 +684,7 @@
                 }, 1000);
                 
             } catch (error) {
-                showMessage('Ошибка сети', 'error');
+                showMessage(getText('messages.network_error'), 'error');
             }
         }
         
