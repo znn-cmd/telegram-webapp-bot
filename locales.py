@@ -3,9 +3,21 @@ locales = {
         'welcome_new': 'Добро пожаловать в Aaadvisor: мгновенные аналитические отчеты по недвижимости с прогнозами цены и рентабельности',
         'welcome_back': 'С возвращением!',
         'choose_language': 'Пожалуйста, выберите язык для дальнейшего общения:',
-        'menu': [
-            'Личный кабинет'
-        ],
+        'menu': {
+            'title': 'Главное меню',
+            'region_analytics': 'Аналитика региона',
+            'region_analytics_desc': 'Отчет по региону',
+            'object_evaluation': 'Оценка объекта', 
+            'object_evaluation_desc': 'Оценка недвижимости',
+            'my_reports': 'Мои отчеты',
+            'my_reports_desc': 'Ваши созданные отчеты',
+            'profile': 'Личный кабинет',
+            'profile_desc': 'Настройки и баланс',
+            'help': 'Помощь',
+            'help_desc': 'Ответы на вопросы и поддержка',
+            'admin_panel': 'Админ-панель',
+            'admin_panel_desc': 'Управление и статистика'
+        },
         'new_buttons': {
             'region_analytics': 'Аналитика региона',
             'object_evaluation': 'Оценка объекта'
@@ -156,9 +168,21 @@ locales = {
         'welcome_new': 'Welcome to Aaadvisor: instant real estate analytics reports with price and profitability forecasts',
         'welcome_back': 'Welcome back!',
         'choose_language': 'Please select your preferred language:',
-        'menu': [
-            'Profile'
-        ],
+        'menu': {
+            'title': 'Main Menu',
+            'region_analytics': 'Region Analytics',
+            'region_analytics_desc': 'Region Report',
+            'object_evaluation': 'Object Evaluation',
+            'object_evaluation_desc': 'Property Evaluation',
+            'my_reports': 'My Reports',
+            'my_reports_desc': 'Your created reports',
+            'profile': 'Profile',
+            'profile_desc': 'Settings and balance',
+            'help': 'Help',
+            'help_desc': 'Answers and support',
+            'admin_panel': 'Admin Panel',
+            'admin_panel_desc': 'Management and statistics'
+        },
         'new_buttons': {
             'region_analytics': 'Region Analytics',
             'object_evaluation': 'Object Evaluation'
@@ -309,9 +333,21 @@ locales = {
         'welcome_new': 'Willkommen bei Aaadvisor: Sofortige Immobilien-Analyseberichte mit Preis- und Rentabilitätsprognosen',
         'welcome_back': 'Willkommen zurück!',
         'choose_language': 'Bitte wählen Sie Ihre bevorzugte Sprache:',
-        'menu': [
-            'Profil'
-        ],
+        'menu': {
+            'title': 'Hauptmenü',
+            'region_analytics': 'Regionsanalyse',
+            'region_analytics_desc': 'Regionsbericht',
+            'object_evaluation': 'Objektbewertung',
+            'object_evaluation_desc': 'Immobilienbewertung',
+            'my_reports': 'Meine Berichte',
+            'my_reports_desc': 'Ihre erstellten Berichte',
+            'profile': 'Profil',
+            'profile_desc': 'Einstellungen und Kontostand',
+            'help': 'Hilfe',
+            'help_desc': 'Antworten und Unterstützung',
+            'admin_panel': 'Admin-Panel',
+            'admin_panel_desc': 'Verwaltung und Statistiken'
+        },
         'new_buttons': {
             'region_analytics': 'Regionsanalyse',
             'object_evaluation': 'Objektbewertung'
@@ -462,9 +498,21 @@ locales = {
         'welcome_new': 'Bienvenue sur Aaadvisor : rapports analytiques immobiliers instantanés avec prévisions de prix et de rentabilité',
         'welcome_back': 'Bon retour !',
         'choose_language': 'Veuillez choisir votre langue préférée :',
-        'menu': [
-            'Profil'
-        ],
+        'menu': {
+            'title': 'Menu Principal',
+            'region_analytics': 'Analyse de Région',
+            'region_analytics_desc': 'Rapport de région',
+            'object_evaluation': 'Évaluation d\'Objet',
+            'object_evaluation_desc': 'Évaluation immobilière',
+            'my_reports': 'Mes Rapports',
+            'my_reports_desc': 'Vos rapports créés',
+            'profile': 'Profil',
+            'profile_desc': 'Paramètres et solde',
+            'help': 'Aide',
+            'help_desc': 'Réponses et support',
+            'admin_panel': 'Panneau d\'Administration',
+            'admin_panel_desc': 'Gestion et statistiques'
+        },
         'new_buttons': {
             'region_analytics': 'Analyse de région',
             'object_evaluation': 'Évaluation d\'objet'
@@ -615,9 +663,21 @@ locales = {
         'welcome_new': 'Aaadvisor\'a hoş geldiniz: Anında gayrimenkul analiz raporları, fiyat ve kârlılık tahminleriyle',
         'welcome_back': 'Tekrar hoş geldiniz!',
         'choose_language': 'Lütfen tercih ettiğiniz dili seçin:',
-        'menu': [
-            'Profil'
-        ],
+        'menu': {
+            'title': 'Ana Menü',
+            'region_analytics': 'Bölge Analizi',
+            'region_analytics_desc': 'Bölge raporu',
+            'object_evaluation': 'Nesne Değerlendirmesi',
+            'object_evaluation_desc': 'Gayrimenkul değerlendirmesi',
+            'my_reports': 'Raporlarım',
+            'my_reports_desc': 'Oluşturduğunuz raporlar',
+            'profile': 'Profil',
+            'profile_desc': 'Ayarlar ve bakiye',
+            'help': 'Yardım',
+            'help_desc': 'Cevaplar ve destek',
+            'admin_panel': 'Yönetici Paneli',
+            'admin_panel_desc': 'Yönetim ve istatistikler'
+        },
         'new_buttons': {
             'region_analytics': 'Bölge Analizi',
             'object_evaluation': 'Nesne Değerlendirmesi'

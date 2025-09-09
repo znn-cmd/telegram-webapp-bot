@@ -587,11 +587,38 @@ def api_set_language():
 
 @app.route('/api/menu', methods=['POST'])
 def api_menu():
+    """API endpoint для получения локализованного меню"""
     data = request.json or {}
-    language = data.get('language', 'en')
-    if language not in locales:
-        language = 'en'
-    return jsonify({'menu': locales[language]['menu']})
+    telegram_id = data.get('telegram_id')
+    language_code = data.get('language_code', 'en')
+    
+    # Определяем язык пользователя
+    if telegram_id:
+        try:
+            # Получаем информацию о пользователе из БД
+            user_result = safe_db_operation(
+                lambda: supabase.table('users').select('language, user_status').eq('telegram_id', telegram_id).execute()
+            )
+            
+            if user_result and user_result.data:
+                user = user_result.data[0]
+                language = determine_user_language(user, language_code)
+            else:
+                language = language_code[:2] if language_code[:2] in locales else 'en'
+        except Exception as e:
+            logger.error(f"Ошибка при определении языка пользователя: {e}")
+            language = language_code[:2] if language_code[:2] in locales else 'en'
+    else:
+        language = language_code[:2] if language_code[:2] in locales else 'en'
+    
+    # Возвращаем локализованное меню
+    menu_data = locales.get(language, locales['en']).get('menu', {})
+    
+    return jsonify({
+        'menu': menu_data,
+        'language': language,
+        'supported_languages': list(locales.keys())
+    })
 
 @app.route('/api/locations/countries', methods=['GET'])
 def api_locations_countries():
