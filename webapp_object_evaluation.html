@@ -3908,9 +3908,6 @@
             <div class="error-text" id="errorText" data-i18n="errorText">Ошибка загрузки данных</div>
         </div>
 
-        <!-- Back Button -->
-        <a href="/webapp_main" class="back-button" id="backButton">← Вернуться в главное меню</a>
-
         <!-- Modal for sharing report -->
         <div class="modal-overlay" id="shareModal">
             <div class="modal-content">
@@ -10811,6 +10808,9 @@
         // Global variable to store current report language
         let currentReportLanguage = 'ru'; // Default to Russian
 
+        // Global variable to store selected report language
+        let selectedReportLanguage = 'ru'; // Default to Russian
+
         // Function to set report language
         function setReportLanguage(lang) {
             // Update active button state
@@ -10822,13 +10822,13 @@
             });
 
             // Store the selected language
-            currentReportLanguage = lang;
+            selectedReportLanguage = lang;
 
-            // Preview report in selected language without saving
+            // Preview report in selected language
             previewReportLanguage(lang);
         }
 
-        // Function to preview report content in selected language
+        // Function to preview report in selected language without saving
         function previewReportLanguage(lang) {
             // Get all elements with data-i18n attribute within the report content
             const reportElements = document.querySelectorAll('#dataContent [data-i18n]');
@@ -10846,7 +10846,7 @@
             previewDynamicContent(lang);
         }
 
-        // Function to preview dynamic content in selected language
+        // Function to preview dynamic content (charts, tables, etc.)
         function previewDynamicContent(lang) {
             // Update charts labels and titles if they exist
             if (typeof myChart !== 'undefined' && myChart) {
@@ -10884,33 +10884,16 @@
         }
 
         // Modified saveAndShareReport function to use selected language
-        function saveAndShareReport() {
-            // Ensure we have a language selected
-            if (!currentReportLanguage) {
-                alert('Пожалуйста, выберите язык отчета перед сохранением');
-                return;
-            }
-
-            try {
-                // Save report with the selected language
-                const reportData = {
-                    language: currentReportLanguage,
-                    content: document.getElementById('dataContent').innerHTML,
-                    // Add any other report data you need to save
-                };
-
-                // Here you can add your actual save logic
-                console.log('Saving report in language:', currentReportLanguage);
-                
-                // Show success message
-                alert('Отчет успешно сохранен');
-                
-                // You can add sharing functionality here if needed
-                
-            } catch (error) {
-                console.error('Error saving report:', error);
-                alert('Произошла ошибка при сохранении отчета');
-            }
+        const originalSaveAndShareReport = saveAndShareReport;
+        saveAndShareReport = function() {
+            // Use the selected language when saving
+            const reportData = {
+                ...collectReportData(), // Assuming this function exists to collect report data
+                language: selectedReportLanguage
+            };
+            
+            // Call the original function with the language-specific data
+            originalSaveAndShareReport(reportData);
         };
     </script>
 </body>
