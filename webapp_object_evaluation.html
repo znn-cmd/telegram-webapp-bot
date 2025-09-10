@@ -3937,6 +3937,137 @@
         tg.ready();
         tg.expand();
 
+        // Global variables for location data
+        let selectedCountry = '';
+        let selectedCity = '';
+        let selectedRegion = '';
+        let selectedDistrict = '';
+        let locationData = null;
+
+        // Загрузка локаций при инициализации страницы
+        async function loadLocations() {
+            try {
+                const response = await fetch('/api/locations');
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.success) {
+                        locationData = data.data;
+                        initializeLocationSelectors();
+                    } else {
+                        console.error('Ошибка загрузки локаций:', data.error);
+                    }
+                } else {
+                    console.error('Ошибка при запросе локаций:', response.status);
+                }
+            } catch (error) {
+                console.error('Ошибка при загрузке локаций:', error);
+            }
+        }
+
+        // Инициализация селекторов локаций
+        function initializeLocationSelectors() {
+            if (!locationData) return;
+
+            // Заполняем список стран
+            const countrySelect = document.getElementById('countrySelect');
+            countrySelect.innerHTML = '<option value="" selected disabled>Выберите страну</option>';
+            locationData.countries.forEach(country => {
+                const option = document.createElement('option');
+                option.value = country;
+                option.textContent = country;
+                countrySelect.appendChild(option);
+            });
+
+            // Очищаем остальные селекторы
+            document.getElementById('citySelect').innerHTML = '<option value="" selected disabled>Сначала выберите страну</option>';
+            document.getElementById('regionSelect').innerHTML = '<option value="" selected disabled>Сначала выберите город</option>';
+            document.getElementById('districtSelect').innerHTML = '<option value="" selected disabled>Сначала выберите область</option>';
+        }
+
+        // Обработчики изменения селекторов
+        document.getElementById('countrySelect').addEventListener('change', function(e) {
+            selectedCountry = e.target.value;
+            updateCitySelect();
+        });
+
+        document.getElementById('citySelect').addEventListener('change', function(e) {
+            selectedCity = e.target.value;
+            updateRegionSelect();
+        });
+
+        document.getElementById('regionSelect').addEventListener('change', function(e) {
+            selectedRegion = e.target.value;
+            updateDistrictSelect();
+        });
+
+        document.getElementById('districtSelect').addEventListener('change', function(e) {
+            selectedDistrict = e.target.value;
+        });
+
+        // Обновление списка городов
+        function updateCitySelect() {
+            const citySelect = document.getElementById('citySelect');
+            citySelect.innerHTML = '<option value="" selected disabled>Выберите город</option>';
+            
+            if (selectedCountry && locationData.cities[selectedCountry]) {
+                locationData.cities[selectedCountry].forEach(city => {
+                    const option = document.createElement('option');
+                    option.value = city;
+                    option.textContent = city;
+                    citySelect.appendChild(option);
+                });
+            }
+
+            // Сбрасываем зависимые селекторы
+            document.getElementById('regionSelect').innerHTML = '<option value="" selected disabled>Сначала выберите город</option>';
+            document.getElementById('districtSelect').innerHTML = '<option value="" selected disabled>Сначала выберите область</option>';
+            selectedCity = '';
+            selectedRegion = '';
+            selectedDistrict = '';
+        }
+
+        // Обновление списка регионов
+        function updateRegionSelect() {
+            const regionSelect = document.getElementById('regionSelect');
+            regionSelect.innerHTML = '<option value="" selected disabled>Выберите область</option>';
+            
+            const cityKey = `${selectedCountry}:${selectedCity}`;
+            if (selectedCity && locationData.regions[cityKey]) {
+                locationData.regions[cityKey].forEach(region => {
+                    const option = document.createElement('option');
+                    option.value = region;
+                    option.textContent = region;
+                    regionSelect.appendChild(option);
+                });
+            }
+
+            // Сбрасываем зависимый селектор
+            document.getElementById('districtSelect').innerHTML = '<option value="" selected disabled>Сначала выберите область</option>';
+            selectedRegion = '';
+            selectedDistrict = '';
+        }
+
+        // Обновление списка районов
+        function updateDistrictSelect() {
+            const districtSelect = document.getElementById('districtSelect');
+            districtSelect.innerHTML = '<option value="" selected disabled>Выберите район</option>';
+            
+            const regionKey = `${selectedCountry}:${selectedCity}:${selectedRegion}`;
+            if (selectedRegion && locationData.districts[regionKey]) {
+                locationData.districts[regionKey].forEach(district => {
+                    const option = document.createElement('option');
+                    option.value = district;
+                    option.textContent = district;
+                    districtSelect.appendChild(option);
+                });
+            }
+            
+            selectedDistrict = '';
+        }
+
+        // Загружаем локации при загрузке страницы
+        document.addEventListener('DOMContentLoaded', loadLocations);
+
         // Current language
         let currentLanguage = 'ru';
 
