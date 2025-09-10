@@ -3087,36 +3087,6 @@
             color: #721c24;
         }
 
-        /* Language Selection Buttons */
-        .language-buttons {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-
-        .lang-select-btn {
-            padding: 8px 12px;
-            border: 2px solid #667eea;
-            border-radius: 20px;
-            background: white;
-            color: #667eea;
-            cursor: pointer;
-            font-size: 14px;
-            transition: all 0.3s ease;
-        }
-
-        .lang-select-btn:hover {
-            background: #667eea;
-            color: white;
-            transform: translateY(-2px);
-        }
-
-        .lang-select-btn.active {
-            background: #667eea;
-            color: white;
-        }
-
         /* Save and Share Button Styles */
         .save-share-button {
             display: none;
@@ -3147,6 +3117,55 @@
             cursor: not-allowed;
             transform: none;
             box-shadow: none;
+        }
+
+        /* Report Language Selection Styles */
+        .report-actions-block {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            margin: 2rem 0;
+            padding: 1.5rem;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            background-color: #f8f9fa;
+        }
+
+        .language-selection-header {
+            margin: 0;
+            color: #333;
+            font-size: 1.1rem;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .language-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            justify-content: center;
+        }
+
+        .language-button {
+            padding: 0.5rem 1rem;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            background-color: white;
+            color: #495057;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .language-button:hover {
+            background-color: #e9ecef;
+            border-color: #ced4da;
+        }
+
+        .language-button.active {
+            background-color: #e7f5ff;
+            border-color: #339af0;
+            color: #1971c2;
         }
 
         /* Modal Styles */
@@ -3836,29 +3855,20 @@
             </div>
         </div>
 
-        <!-- Language Selection -->
-        <div class="language-buttons" id="reportLanguageButtons">
-            <button class="lang-select-btn active" onclick="setReportLanguage('ru')" title="Русский">
-                🇷🇺 RU
-            </button>
-            <button class="lang-select-btn" onclick="setReportLanguage('en')" title="English">
-                🇺🇸 EN
-            </button>
-            <button class="lang-select-btn" onclick="setReportLanguage('de')" title="Deutsch">
-                🇩🇪 DE
-            </button>
-            <button class="lang-select-btn" onclick="setReportLanguage('fr')" title="Français">
-                🇫🇷 FR
-            </button>
-            <button class="lang-select-btn" onclick="setReportLanguage('tr')" title="Türkçe">
-                🇹🇷 TR
+        <!-- Report Language and Save Block -->
+        <div class="report-actions-block" id="reportActionsBlock" style="display: none;">
+            <h3 class="language-selection-header" data-i18n="selectReportLanguage">Выберите язык отчета перед сохранением</h3>
+            <div class="language-buttons">
+                <button class="language-button" onclick="switchReportLanguage('ru')" data-lang="ru">Русский</button>
+                <button class="language-button" onclick="switchReportLanguage('en')" data-lang="en">English</button>
+                <button class="language-button" onclick="switchReportLanguage('de')" data-lang="de">Deutsch</button>
+                <button class="language-button" onclick="switchReportLanguage('fr')" data-lang="fr">Français</button>
+                <button class="language-button" onclick="switchReportLanguage('tr')" data-lang="tr">Türkçe</button>
+            </div>
+            <button class="save-share-button" id="saveShareButton" onclick="saveAndShareReport()">
+                <span id="saveShareButtonText" data-i18n="saveShareButtonText">Сохранить и поделиться отчетом</span>
             </button>
         </div>
-
-        <!-- Save and Share Button -->
-        <button class="save-share-button" id="saveShareButton" onclick="saveAndShareReport()">
-            <span id="saveShareButtonText" data-i18n="saveShareButtonText">Сохранить и поделиться отчетом</span>
-        </button>
 
         <!-- Error State -->
         <div class="error-state" id="errorState" style="display: none;">
@@ -4224,6 +4234,7 @@
                 'saleHeader': 'Sale',
                 'rentHeader': 'Rent',
                 'currencyTitle': 'Select currency:',
+                'selectReportLanguage': 'Choose report language before saving',
                 'saveShareButtonText': 'Save and share report',
                 'modalTitle': 'Report saved',
                 'modalDescription': 'Your report has been successfully saved. You can copy the link and share it with others.',
@@ -10151,6 +10162,9 @@
                 // Get report content
                 const reportContent = extractReportContent();
                 
+                // Get selected language or default to Russian
+                const reportLanguage = window.selectedReportLanguage || 'ru';
+                
                 // Get location info
                 const locationInfo = getLocationInfo();
                 
@@ -10741,40 +10755,66 @@
             }
         }
 
-        // Handle report language selection
-        function setReportLanguage(lang) {
-            // Update button states
-            document.querySelectorAll('.lang-select-btn').forEach(btn => {
+        // Show report actions block when report is loaded
+        function showSaveButton() {
+            const actionsBlock = document.getElementById('reportActionsBlock');
+            if (actionsBlock) {
+                actionsBlock.style.display = 'flex';
+            }
+        }
+
+        // Switch report language
+        function switchReportLanguage(lang) {
+            // Remove active class from all buttons
+            document.querySelectorAll('.language-button').forEach(btn => {
                 btn.classList.remove('active');
             });
-            document.querySelector(`.lang-select-btn[onclick*="${lang}"]`).classList.add('active');
-
-            // Update report content language
-            if (window.i18nManager) {
-                window.i18nManager.setLanguage(lang);
+            
+            // Add active class to selected button
+            const selectedBtn = document.querySelector(`.language-button[data-lang="${lang}"]`);
+            if (selectedBtn) {
+                selectedBtn.classList.add('active');
             }
 
-            // Update report content
-            updateReportContent(lang);
+            // Store selected language for the report
+            window.selectedReportLanguage = lang;
+
+            // Update report content with new language
+            updateReportLanguage(lang);
         }
 
-        // Update report content based on selected language
-        function updateReportContent(lang) {
-            // Store current language for report generation
-            window.currentReportLanguage = lang;
+        // Update report language
+        function updateReportLanguage(lang) {
+            // Get all elements with data-i18n attribute within the report content
+            const reportContent = document.querySelector('.report-content');
+            if (!reportContent) return;
 
-            // Refresh the report content if it exists
-            if (window.lastGeneratedReport) {
-                generateReport(window.lastGeneratedReport);
-            }
+            const i18nElements = reportContent.querySelectorAll('[data-i18n]');
+            i18nElements.forEach(element => {
+                const key = element.getAttribute('data-i18n');
+                // Get translation for the selected language
+                const translation = getTranslation(key, lang);
+                if (translation) {
+                    element.textContent = translation;
+                }
+            });
         }
 
-        // Show save button when report is loaded
-        function showSaveButton() {
-            const saveButton = document.getElementById('saveShareButton');
-            if (saveButton) {
-                saveButton.style.display = 'block';
-            }
+        // Get translation for a specific key and language
+        function getTranslation(key, lang) {
+            const translations = {
+                'ru': russianTranslations,
+                'en': englishTranslations,
+                'de': germanTranslations,
+                'fr': frenchTranslations,
+                'tr': turkishTranslations
+            };
+            
+            const langTranslations = translations[lang];
+            if (!langTranslations) return null;
+
+            return langTranslations[key] || null;
+        }
         }
 
 
