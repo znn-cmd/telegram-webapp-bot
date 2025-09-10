@@ -14,8 +14,8 @@ from api_functions import (
 # Загружаем переменные окружения
 load_dotenv()
 
-app = Flask(__name__)
-CORS(app)  # Разрешаем CORS для WebApp
+app = Flask(__name__, static_url_path='')
+CORS(app, resources={r"/api/*": {"origins": "*"}})  # Разрешаем CORS для API
 
 @app.route('/api/generate-report', methods=['POST'])
 def generate_report():
@@ -215,54 +215,68 @@ def latest_currency():
 @app.route('/api/locations/countries', methods=['GET'])
 def get_countries():
     """Получение списка стран"""
+    print("🌍 Получен запрос на получение списка стран")
     try:
         with open('static_locations.json', 'r', encoding='utf-8') as f:
             locations = json.load(f)
+            countries = locations.get('countries', [])
+            print(f"📋 Загружено {len(countries)} стран")
             return jsonify({
                 'success': True,
-                'countries': locations.get('countries', [])
+                'countries': countries
             })
     except Exception as e:
+        print(f"❌ Ошибка при загрузке списка стран: {e}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
 @app.route('/api/locations/cities', methods=['POST'])
 def get_cities():
     """Получение списка городов для выбранной страны"""
+    print("🏙️ Получен запрос на получение списка городов")
     try:
         data = request.get_json()
         country_id = data.get('country_id')
+        print(f"🔍 Запрошены города для страны с ID: {country_id}")
         
         if not country_id:
+            print("❌ ID страны не указан")
             return jsonify({'success': False, 'error': 'Country ID not provided'}), 400
             
         with open('static_locations.json', 'r', encoding='utf-8') as f:
             locations = json.load(f)
             cities = locations.get('cities', {}).get(str(country_id), [])
+            print(f"📋 Загружено {len(cities)} городов для страны {country_id}")
             return jsonify({
                 'success': True,
                 'cities': cities
             })
     except Exception as e:
+        print(f"❌ Ошибка при загрузке списка городов: {e}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
 @app.route('/api/locations/regions', methods=['POST'])
 def get_regions():
     """Получение списка регионов для выбранного города"""
+    print("🏘️ Получен запрос на получение списка регионов")
     try:
         data = request.get_json()
         city_id = data.get('city_id')
+        print(f"🔍 Запрошены регионы для города с ID: {city_id}")
         
         if not city_id:
+            print("❌ ID города не указан")
             return jsonify({'success': False, 'error': 'City ID not provided'}), 400
             
         with open('static_locations.json', 'r', encoding='utf-8') as f:
             locations = json.load(f)
             regions = locations.get('regions', {}).get(str(city_id), [])
+            print(f"📋 Загружено {len(regions)} регионов для города {city_id}")
             return jsonify({
                 'success': True,
                 'regions': regions
             })
     except Exception as e:
+        print(f"❌ Ошибка при загрузке списка регионов: {e}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
 @app.route('/health', methods=['GET'])
@@ -273,7 +287,19 @@ def health_check():
 @app.route('/<path:filename>')
 def serve_static(filename):
     """Serve static files"""
-    return send_from_directory('.', filename)
+    try:
+        return send_from_directory('.', filename)
+    except Exception as e:
+        print(f"Error serving static file {filename}: {e}")
+        return f"File not found: {filename}", 404
+
+@app.after_request
+def after_request(response):
+    """Add CORS headers to all responses"""
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+    response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
+    return response
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
