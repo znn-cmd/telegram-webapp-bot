@@ -3089,38 +3089,41 @@
 
         /* Report Actions Container Styles */
         .report-actions-container {
-            margin-top: 30px;
-            padding: 20px;
+            margin-top: 25px;
+            padding: 15px;
             background: #f8f9fa;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
         }
 
         .language-selection-title {
             text-align: center;
-            margin-bottom: 15px;
+            margin-bottom: 12px;
             color: #2d3748;
-            font-size: 18px;
-            font-weight: 600;
+            font-size: 16px;
+            font-weight: 500;
         }
 
         .language-buttons-container {
             display: flex;
             justify-content: center;
-            gap: 10px;
+            gap: 8px;
             flex-wrap: wrap;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
 
         .language-button {
-            padding: 8px 16px;
-            border: 2px solid #667eea;
-            border-radius: 6px;
+            padding: 6px 12px;
+            min-width: 45px;
+            border: 1px solid #667eea;
+            border-radius: 4px;
             background: white;
             color: #667eea;
-            font-weight: 500;
+            font-weight: 600;
+            font-size: 14px;
             cursor: pointer;
             transition: all 0.2s ease;
+            text-transform: uppercase;
         }
 
         .language-button:hover {
@@ -3132,7 +3135,7 @@
         .language-button.active {
             background: #667eea;
             color: white;
-            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+            box-shadow: 0 2px 4px rgba(102, 126, 234, 0.2);
         }
 
         /* Save and Share Button Styles */
@@ -3858,14 +3861,14 @@
         <div class="report-actions-container" id="reportActionsContainer" style="display: none;">
             <h3 class="language-selection-title" data-i18n="reports.select_report_language">Выберите язык отчета перед сохранением</h3>
             <div class="language-buttons-container">
-                <button class="language-button" data-lang="ru" onclick="setReportLanguage('ru')">Русский</button>
-                <button class="language-button" data-lang="en" onclick="setReportLanguage('en')">English</button>
-                <button class="language-button" data-lang="de" onclick="setReportLanguage('de')">Deutsch</button>
-                <button class="language-button" data-lang="fr" onclick="setReportLanguage('fr')">Français</button>
-                <button class="language-button" data-lang="tr" onclick="setReportLanguage('tr')">Türkçe</button>
+                <button class="language-button" data-lang="ru" onclick="setReportLanguage('ru')">RU</button>
+                <button class="language-button" data-lang="en" onclick="setReportLanguage('en')">EN</button>
+                <button class="language-button" data-lang="de" onclick="setReportLanguage('de')">DE</button>
+                <button class="language-button" data-lang="fr" onclick="setReportLanguage('fr')">FR</button>
+                <button class="language-button" data-lang="tr" onclick="setReportLanguage('tr')">TR</button>
             </div>
             <button class="save-share-button" id="saveShareButton" onclick="saveAndShareReport()">
-                <span id="saveShareButtonText" data-i18n="saveShareButtonText">Сохранить и поделиться отчетом</span>
+                <span id="saveShareButtonText" data-i18n="reports.save_report">Сохранить отчет</span>
             </button>
         </div>
 
