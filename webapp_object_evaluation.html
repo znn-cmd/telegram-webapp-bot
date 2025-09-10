@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Aaadviser - <span data-i18n="pageTitle">Оценка объекта</span></title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <script src="i18n-manager.js"></script>
+    <script src="/i18n-manager.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         * {
@@ -3087,6 +3087,54 @@
             color: #721c24;
         }
 
+        /* Report Actions Container Styles */
+        .report-actions-container {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .language-selection-title {
+            text-align: center;
+            margin-bottom: 15px;
+            color: #2d3748;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .language-buttons-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .language-button {
+            padding: 8px 16px;
+            border: 2px solid #667eea;
+            border-radius: 6px;
+            background: white;
+            color: #667eea;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .language-button:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        .language-button.active {
+            background: #667eea;
+            color: white;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+        }
+
         /* Save and Share Button Styles */
         .save-share-button {
             display: none;
@@ -3117,55 +3165,6 @@
             cursor: not-allowed;
             transform: none;
             box-shadow: none;
-        }
-
-        /* Report Language Selection Styles */
-        .report-actions-block {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 1rem;
-            margin: 2rem 0;
-            padding: 1.5rem;
-            border: 1px solid #e0e0e0;
-            border-radius: 8px;
-            background-color: #f8f9fa;
-        }
-
-        .language-selection-header {
-            margin: 0;
-            color: #333;
-            font-size: 1.1rem;
-            font-weight: 600;
-            text-align: center;
-        }
-
-        .language-buttons {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-            justify-content: center;
-        }
-
-        .language-button {
-            padding: 0.5rem 1rem;
-            border: 1px solid #dee2e6;
-            border-radius: 4px;
-            background-color: white;
-            color: #495057;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .language-button:hover {
-            background-color: #e9ecef;
-            border-color: #ced4da;
-        }
-
-        .language-button.active {
-            background-color: #e7f5ff;
-            border-color: #339af0;
-            color: #1971c2;
         }
 
         /* Modal Styles */
@@ -3855,15 +3854,15 @@
             </div>
         </div>
 
-        <!-- Report Language and Save Block -->
-        <div class="report-actions-block" id="reportActionsBlock" style="display: none;">
-            <h3 class="language-selection-header" data-i18n="selectReportLanguage">Выберите язык отчета перед сохранением</h3>
-            <div class="language-buttons">
-                <button class="language-button" onclick="switchReportLanguage('ru')" data-lang="ru">Русский</button>
-                <button class="language-button" onclick="switchReportLanguage('en')" data-lang="en">English</button>
-                <button class="language-button" onclick="switchReportLanguage('de')" data-lang="de">Deutsch</button>
-                <button class="language-button" onclick="switchReportLanguage('fr')" data-lang="fr">Français</button>
-                <button class="language-button" onclick="switchReportLanguage('tr')" data-lang="tr">Türkçe</button>
+        <!-- Report Language Selection and Save Button Container -->
+        <div class="report-actions-container" id="reportActionsContainer" style="display: none;">
+            <h3 class="language-selection-title" data-i18n="reports.select_report_language">Выберите язык отчета перед сохранением</h3>
+            <div class="language-buttons-container">
+                <button class="language-button" data-lang="ru" onclick="setReportLanguage('ru')">Русский</button>
+                <button class="language-button" data-lang="en" onclick="setReportLanguage('en')">English</button>
+                <button class="language-button" data-lang="de" onclick="setReportLanguage('de')">Deutsch</button>
+                <button class="language-button" data-lang="fr" onclick="setReportLanguage('fr')">Français</button>
+                <button class="language-button" data-lang="tr" onclick="setReportLanguage('tr')">Türkçe</button>
             </div>
             <button class="save-share-button" id="saveShareButton" onclick="saveAndShareReport()">
                 <span id="saveShareButtonText" data-i18n="saveShareButtonText">Сохранить и поделиться отчетом</span>
@@ -4234,7 +4233,6 @@
                 'saleHeader': 'Sale',
                 'rentHeader': 'Rent',
                 'currencyTitle': 'Select currency:',
-                'selectReportLanguage': 'Choose report language before saving',
                 'saveShareButtonText': 'Save and share report',
                 'modalTitle': 'Report saved',
                 'modalDescription': 'Your report has been successfully saved. You can copy the link and share it with others.',
@@ -5508,31 +5506,19 @@
         // Load countries from API
         async function loadCountries() {
             try {
-                const response = await fetch('http://localhost:8080/api/locations/countries');
+                const response = await fetch('/api/locations/countries');
                 const data = await response.json();
                 
                 if (data.success) {
                     const countrySelect = document.getElementById('countrySelect');
-                    if (!countrySelect) {
-                        console.error('Country select element not found');
-                        return;
-                    }
-                    
                     countrySelect.innerHTML = `<option value="">${getText('countryPlaceholder')}</option>`;
                     
-                    if (Array.isArray(data.countries)) {
-                        data.countries.forEach(country => {
-                            if (country && Array.isArray(country) && country.length >= 2) {
-                                const [id, name] = country;
-                                const option = document.createElement('option');
-                                option.value = id;
-                                option.textContent = name;
-                                countrySelect.appendChild(option);
-                            }
-                        });
-                    } else {
-                        console.error('Invalid countries data format:', data.countries);
-                    }
+                    data.countries.forEach(([id, name]) => {
+                        const option = document.createElement('option');
+                        option.value = id;
+                        option.textContent = name;
+                        countrySelect.appendChild(option);
+                    });
                 } else {
                     console.error('Failed to load countries:', data.error);
                 }
@@ -5543,13 +5529,8 @@
 
         // Load cities based on selected country
         async function loadCities(countryId) {
-            if (!countryId) {
-                console.error('Country ID not provided');
-                return;
-            }
-
             try {
-                const response = await fetch('http://localhost:8080/api/locations/cities', {
+                const response = await fetch('/api/locations/cities', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -5561,26 +5542,14 @@
                 
                 if (data.success) {
                     const citySelect = document.getElementById('citySelect');
-                    if (!citySelect) {
-                        console.error('City select element not found');
-                        return;
-                    }
-                    
                     citySelect.innerHTML = `<option value="">${getText('cityPlaceholder')}</option>`;
                     
-                    if (Array.isArray(data.cities)) {
-                        data.cities.forEach(city => {
-                            if (city && Array.isArray(city) && city.length >= 2) {
-                                const [id, name] = city;
-                                const option = document.createElement('option');
-                                option.value = id;
-                                option.textContent = name;
-                                citySelect.appendChild(option);
-                            }
-                        });
-                    } else {
-                        console.error('Invalid cities data format:', data.cities);
-                    }
+                    data.cities.forEach(([id, name]) => {
+                        const option = document.createElement('option');
+                        option.value = id;
+                        option.textContent = name;
+                        citySelect.appendChild(option);
+                    });
                     
                     citySelect.disabled = false;
                 } else {
@@ -5594,7 +5563,7 @@
         // Load counties based on selected city
         async function loadCounties(cityId) {
             try {
-                const response = await fetch('http://localhost:8080/api/locations/regions', {
+                const response = await fetch('/api/locations/counties', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -5608,23 +5577,16 @@
                     const countySelect = document.getElementById('countySelect');
                     countySelect.innerHTML = `<option value="">${getText('countyPlaceholder')}</option>`;
                     
-                    if (Array.isArray(data.regions)) {
-                        data.regions.forEach(region => {
-                            if (region && Array.isArray(region) && region.length >= 2) {
-                                const [id, name] = region;
-                                const option = document.createElement('option');
-                                option.value = id;
-                                option.textContent = name;
-                                countySelect.appendChild(option);
-                            }
-                        });
-                    } else {
-                        console.error('Invalid regions data format:', data.regions);
-                    }
+                    data.counties.forEach(([id, name]) => {
+                        const option = document.createElement('option');
+                        option.value = id;
+                        option.textContent = name;
+                        countySelect.appendChild(option);
+                    });
                     
                     countySelect.disabled = false;
                 } else {
-                    console.error('Failed to load regions:', data.error);
+                    console.error('Failed to load cities:', data.error);
                 }
             } catch (error) {
                 console.error('Error loading cities:', error);
@@ -5868,7 +5830,7 @@
             console.log('🔄 Loading districts for county_id:', countyId);
             
             try {
-                const response = await fetch('http://localhost:8080/api/locations/districts', {
+                const response = await fetch('/api/locations/districts', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -10198,9 +10160,6 @@
                 // Get report content
                 const reportContent = extractReportContent();
                 
-                // Get selected language or default to Russian
-                const reportLanguage = window.selectedReportLanguage || 'ru';
-                
                 // Get location info
                 const locationInfo = getLocationInfo();
                 
@@ -10791,66 +10750,12 @@
             }
         }
 
-        // Show report actions block when report is loaded
+        // Show save button when report is loaded
         function showSaveButton() {
-            const actionsBlock = document.getElementById('reportActionsBlock');
-            if (actionsBlock) {
-                actionsBlock.style.display = 'flex';
+            const saveButton = document.getElementById('saveShareButton');
+            if (saveButton) {
+                saveButton.style.display = 'block';
             }
-        }
-
-        // Switch report language
-        function switchReportLanguage(lang) {
-            // Remove active class from all buttons
-            document.querySelectorAll('.language-button').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            
-            // Add active class to selected button
-            const selectedBtn = document.querySelector(`.language-button[data-lang="${lang}"]`);
-            if (selectedBtn) {
-                selectedBtn.classList.add('active');
-            }
-
-            // Store selected language for the report
-            window.selectedReportLanguage = lang;
-
-            // Update report content with new language
-            updateReportLanguage(lang);
-        }
-
-        // Update report language
-        function updateReportLanguage(lang) {
-            // Get all elements with data-i18n attribute within the report content
-            const reportContent = document.querySelector('.report-content');
-            if (!reportContent) return;
-
-            const i18nElements = reportContent.querySelectorAll('[data-i18n]');
-            i18nElements.forEach(element => {
-                const key = element.getAttribute('data-i18n');
-                // Get translation for the selected language
-                const translation = getTranslation(key, lang);
-                if (translation) {
-                    element.textContent = translation;
-                }
-            });
-        }
-
-        // Get translation for a specific key and language
-        function getTranslation(key, lang) {
-            const translations = {
-                'ru': russianTranslations,
-                'en': englishTranslations,
-                'de': germanTranslations,
-                'fr': frenchTranslations,
-                'tr': turkishTranslations
-            };
-            
-            const langTranslations = translations[lang];
-            if (!langTranslations) return null;
-
-            return langTranslations[key] || null;
-        }
         }
 
 
@@ -10869,6 +10774,90 @@
                 closeShareModal();
             }
         });
+
+        // Global variable to store current report language
+        let currentReportLanguage = 'ru'; // Default to Russian
+
+        // Function to set report language
+        function setReportLanguage(lang) {
+            // Update active button state
+            document.querySelectorAll('.language-button').forEach(button => {
+                button.classList.remove('active');
+                if (button.getAttribute('data-lang') === lang) {
+                    button.classList.add('active');
+                }
+            });
+
+            // Store the selected language
+            currentReportLanguage = lang;
+
+            // Update report content language
+            updateReportLanguage(lang);
+        }
+
+        // Function to update report content language
+        function updateReportLanguage(lang) {
+            // Get all elements with data-i18n attribute within the report content
+            const reportElements = document.querySelectorAll('#dataContent [data-i18n]');
+            
+            reportElements.forEach(element => {
+                const key = element.getAttribute('data-i18n');
+                // Get translation for the selected language
+                const translation = i18n.getMessage(key, lang);
+                if (translation) {
+                    element.textContent = translation;
+                }
+            });
+
+            // Update any dynamic content that needs translation
+            updateDynamicContent(lang);
+        }
+
+        // Function to update dynamic content (charts, tables, etc.)
+        function updateDynamicContent(lang) {
+            // Update charts labels and titles if they exist
+            if (typeof myChart !== 'undefined' && myChart) {
+                const chartData = myChart.data;
+                // Update chart labels based on language
+                chartData.labels = chartData.labels.map(label => {
+                    const key = `chart_label_${label}`;
+                    return i18n.getMessage(key, lang) || label;
+                });
+                myChart.update();
+            }
+
+            // Update market indicators table if it exists
+            const marketTable = document.getElementById('marketIndicatorsTable');
+            if (marketTable) {
+                const headers = marketTable.querySelectorAll('th[data-i18n]');
+                headers.forEach(header => {
+                    const key = header.getAttribute('data-i18n');
+                    const translation = i18n.getMessage(key, lang);
+                    if (translation) {
+                        header.textContent = translation;
+                    }
+                });
+            }
+        }
+
+        // Modified showSaveButton function to show language selector
+        function showSaveButton() {
+            const actionsContainer = document.getElementById('reportActionsContainer');
+            if (actionsContainer) {
+                actionsContainer.style.display = 'block';
+                // Set default language button as active
+                setReportLanguage('ru');
+            }
+        }
+
+        // Modified saveAndShareReport function to use selected language
+        const originalSaveAndShareReport = saveAndShareReport;
+        saveAndShareReport = function() {
+            // Set the report language before saving
+            updateReportLanguage(currentReportLanguage);
+            // Call the original function
+            originalSaveAndShareReport();
+        };
     </script>
 </body>
 </html>
