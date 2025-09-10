@@ -3109,7 +3109,13 @@
             justify-content: center;
             gap: 8px;
             flex-wrap: wrap;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
+        }
+
+        .action-buttons-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
         }
 
         .language-button {
@@ -3138,23 +3144,20 @@
             box-shadow: 0 2px 4px rgba(102, 126, 234, 0.2);
         }
 
-        /* Save and Share Button Styles */
+        /* Action Buttons Styles */
         .save-share-button {
-            display: none;
             width: 100%;
-            padding: 15px 20px;
+            padding: 12px 20px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
-            border-radius: 12px;
+            border-radius: 8px;
             font-size: 16px;
-            font-weight: 600;
-            text-align: center;
-            margin-top: 20px;
-            margin-bottom: 10px;
+            font-weight: 500;
             cursor: pointer;
             transition: all 0.3s ease;
             box-shadow: 0 4px 15px rgba(102, 126, 234, 0.2);
+            text-align: center;
         }
 
         .save-share-button:hover {
@@ -3168,6 +3171,28 @@
             cursor: not-allowed;
             transform: none;
             box-shadow: none;
+        }
+
+        .return-button {
+            width: 100%;
+            padding: 12px 20px;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .return-button:hover {
+            background: #218838;
+            transform: translateY(-2px);
         }
 
         /* Modal Styles */
@@ -3867,9 +3892,14 @@
                 <button class="language-button" data-lang="fr" onclick="setReportLanguage('fr')">FR</button>
                 <button class="language-button" data-lang="tr" onclick="setReportLanguage('tr')">TR</button>
             </div>
-            <button class="save-share-button" id="saveShareButton" onclick="saveAndShareReport()">
-                <span id="saveShareButtonText" data-i18n="reports.save_report">Сохранить отчет</span>
-            </button>
+            <div class="action-buttons-container">
+                <button class="save-share-button" id="saveShareButton" onclick="saveAndShareReport()">
+                    <span id="saveShareButtonText" data-i18n="reports.save_report">Сохранить отчет</span>
+                </button>
+                <button class="return-button" onclick="returnToMainMenu()">
+                    <span data-i18n="common.return_to_main">← Вернуться в главное меню</span>
+                </button>
+            </div>
         </div>
 
         <!-- Error State -->
