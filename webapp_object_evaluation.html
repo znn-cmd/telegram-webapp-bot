@@ -4339,7 +4339,11 @@
                 'salePriceTooltip': 'Цена продажи',
                 'rentPriceTooltip': 'Цена аренды',
                 'yourObjectLabel': 'Ваш объект',
-                'andText': 'и'
+                'andText': 'и',
+                
+                // Report language selection
+                'select_report_language': 'Выберите язык отчета перед сохранением',
+                'save_report': 'Сохранить отчет'
             },
             'en': {
                 'slogan': 'Real Estate Market Insights',
@@ -4585,7 +4589,11 @@
                 'salePriceTooltip': 'Sale Price',
                 'rentPriceTooltip': 'Rent Price',
                 'yourObjectLabel': 'Your Object',
-                'andText': 'and'
+                'andText': 'and',
+                
+                // Report language selection
+                'select_report_language': 'Select report language before saving',
+                'save_report': 'Save Report'
             },
             'de': {
                 'slogan': 'Immobilienmarkt-Einblicke',
@@ -4831,7 +4839,11 @@
                 'salePriceTooltip': 'Verkaufspreis',
                 'rentPriceTooltip': 'Mietpreis',
                 'yourObjectLabel': 'Ihr Objekt',
-                'andText': 'und'
+                'andText': 'und',
+                
+                // Report language selection
+                'select_report_language': 'Berichtssprache vor dem Speichern auswählen',
+                'save_report': 'Bericht speichern'
             },
             'fr': {
                 'slogan': 'Aperçus du marché immobilier',
@@ -5029,7 +5041,11 @@
                 'salePriceTooltip': 'Prix de vente',
                 'rentPriceTooltip': 'Prix de location',
                 'yourObjectLabel': 'Votre objet',
-                'andText': 'et'
+                'andText': 'et',
+                
+                // Report language selection
+                'select_report_language': 'Sélectionnez la langue du rapport avant de sauvegarder',
+                'save_report': 'Sauvegarder le rapport'
             },
             'tr': {
                 'slogan': 'Gayrimenkul Piyasa İçgörüleri',
@@ -5301,7 +5317,11 @@
                 'propertyPriceLabel': 'Nesne fiyatı:',
                 'propertyAreaLabel': 'Nesne alanı:',
                 'saleLabel': 'Satış:',
-                'rentLabel': 'Kiralama:'
+                'rentLabel': 'Kiralama:',
+                
+                // Report language selection
+                'select_report_language': 'Kaydetmeden önce rapor dilini seçin',
+                'save_report': 'Raporu Kaydet'
             },
             'fr': {
                 'slogan': 'Aperçus du marché immobilier',
@@ -5661,6 +5681,17 @@
             const closeButtonText = document.getElementById('closeButtonText');
             if (closeButtonText) {
                 closeButtonText.textContent = getText('closeButtonText');
+            }
+            
+            // Update report language selection elements
+            const languageSelectionTitle = document.querySelector('.language-selection-title');
+            if (languageSelectionTitle) {
+                languageSelectionTitle.textContent = getText('select_report_language');
+            }
+            
+            const saveReportButtonText = document.getElementById('saveShareButtonText');
+            if (saveReportButtonText) {
+                saveReportButtonText.textContent = getText('save_report');
             }
         }
 

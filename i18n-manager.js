@@ -124,7 +124,6 @@ class I18nManager {
                 },
                 'reports': {
                     'title': 'Отчеты', 'my_reports': 'Мои отчеты', 'create_report': 'Создать отчет',
-                    'select_report_language': 'Выберите язык отчета перед сохранением',
                     'report_details': 'Детали отчета', 'report_type': 'Тип отчета',
                     'property_evaluation': 'Оценка недвижимости', 'market_analysis': 'Анализ рынка',
                     'investment_analysis': 'Инвестиционный анализ', 'region_analytics': 'Аналитика региона',
@@ -200,7 +199,6 @@ class I18nManager {
                 },
                 'reports': {
                     'title': 'Reports', 'my_reports': 'My Reports', 'create_report': 'Create Report',
-                    'select_report_language': 'Select report language before saving',
                     'report_details': 'Report Details', 'report_type': 'Report Type',
                     'property_evaluation': 'Property Evaluation', 'market_analysis': 'Market Analysis',
                     'investment_analysis': 'Investment Analysis', 'region_analytics': 'Region Analytics',
@@ -277,7 +275,6 @@ class I18nManager {
                 },
                 'reports': {
                     'title': 'Berichte', 'my_reports': 'Meine Berichte', 'create_report': 'Bericht erstellen',
-                    'select_report_language': 'Wählen Sie die Berichtssprache vor dem Speichern',
                     'report_details': 'Berichtsdetails', 'report_type': 'Berichtstyp',
                     'property_evaluation': 'Immobilienbewertung', 'market_analysis': 'Marktanalyse',
                     'investment_analysis': 'Investitionsanalyse', 'region_analytics': 'Regionsanalytik',
@@ -354,7 +351,6 @@ class I18nManager {
                 },
                 'reports': {
                     'title': 'Rapports', 'my_reports': 'Mes rapports', 'create_report': 'Créer un rapport',
-                    'select_report_language': 'Sélectionnez la langue du rapport avant de sauvegarder',
                     'report_details': 'Détails du rapport', 'report_type': 'Type de rapport',
                     'property_evaluation': 'Évaluation immobilière', 'market_analysis': 'Analyse de marché',
                     'investment_analysis': 'Analyse d\'investissement', 'region_analytics': 'Analytique de région',
@@ -431,7 +427,6 @@ class I18nManager {
                 },
                 'reports': {
                     'title': 'Raporlar', 'my_reports': 'Raporlarım', 'create_report': 'Rapor oluştur',
-                    'select_report_language': 'Kaydetmeden önce rapor dilini seçin',
                     'report_details': 'Rapor detayları', 'report_type': 'Rapor türü',
                     'property_evaluation': 'Emlak değerlendirmesi', 'market_analysis': 'Pazar analizi',
                     'investment_analysis': 'Yatırım analizi', 'region_analytics': 'Bölge analitiği',
