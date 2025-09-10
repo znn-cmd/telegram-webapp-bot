@@ -3087,6 +3087,36 @@
             color: #721c24;
         }
 
+        /* Language Selection Buttons */
+        .language-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .lang-select-btn {
+            padding: 8px 12px;
+            border: 2px solid #667eea;
+            border-radius: 20px;
+            background: white;
+            color: #667eea;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .lang-select-btn:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .lang-select-btn.active {
+            background: #667eea;
+            color: white;
+        }
+
         /* Save and Share Button Styles */
         .save-share-button {
             display: none;
@@ -3804,6 +3834,25 @@
                     <!-- Market indicators data will be populated here -->
                 </div>
             </div>
+        </div>
+
+        <!-- Language Selection -->
+        <div class="language-buttons" id="reportLanguageButtons">
+            <button class="lang-select-btn active" onclick="setReportLanguage('ru')" title="Русский">
+                🇷🇺 RU
+            </button>
+            <button class="lang-select-btn" onclick="setReportLanguage('en')" title="English">
+                🇺🇸 EN
+            </button>
+            <button class="lang-select-btn" onclick="setReportLanguage('de')" title="Deutsch">
+                🇩🇪 DE
+            </button>
+            <button class="lang-select-btn" onclick="setReportLanguage('fr')" title="Français">
+                🇫🇷 FR
+            </button>
+            <button class="lang-select-btn" onclick="setReportLanguage('tr')" title="Türkçe">
+                🇹🇷 TR
+            </button>
         </div>
 
         <!-- Save and Share Button -->
@@ -10689,6 +10738,34 @@
             } catch (error) {
                 console.error('Error copying link:', error);
                 alert('Не удалось скопировать ссылку');
+            }
+        }
+
+        // Handle report language selection
+        function setReportLanguage(lang) {
+            // Update button states
+            document.querySelectorAll('.lang-select-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector(`.lang-select-btn[onclick*="${lang}"]`).classList.add('active');
+
+            // Update report content language
+            if (window.i18nManager) {
+                window.i18nManager.setLanguage(lang);
+            }
+
+            // Update report content
+            updateReportContent(lang);
+        }
+
+        // Update report content based on selected language
+        function updateReportContent(lang) {
+            // Store current language for report generation
+            window.currentReportLanguage = lang;
+
+            // Refresh the report content if it exists
+            if (window.lastGeneratedReport) {
+                generateReport(window.lastGeneratedReport);
             }
         }
 
