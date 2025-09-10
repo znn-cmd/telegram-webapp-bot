@@ -5868,7 +5868,7 @@
             console.log('🔄 Loading districts for county_id:', countyId);
             
             try {
-                const response = await fetch('/api/locations/districts', {
+                const response = await fetch('http://localhost:8080/api/locations/districts', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
