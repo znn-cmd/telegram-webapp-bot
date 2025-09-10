@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 import os
 import json
@@ -269,6 +269,11 @@ def get_regions():
 def health_check():
     """Проверка здоровья API"""
     return jsonify({'status': 'ok', 'message': 'API работает'})
+
+@app.route('/<path:filename>')
+def serve_static(filename):
+    """Serve static files"""
+    return send_from_directory('.', filename)
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
