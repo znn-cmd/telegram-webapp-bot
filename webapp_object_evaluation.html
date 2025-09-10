@@ -5513,14 +5513,26 @@
                 
                 if (data.success) {
                     const countrySelect = document.getElementById('countrySelect');
+                    if (!countrySelect) {
+                        console.error('Country select element not found');
+                        return;
+                    }
+                    
                     countrySelect.innerHTML = `<option value="">${getText('countryPlaceholder')}</option>`;
                     
-                    data.countries.forEach(([id, name]) => {
-                        const option = document.createElement('option');
-                        option.value = id;
-                        option.textContent = name;
-                        countrySelect.appendChild(option);
-                    });
+                    if (Array.isArray(data.countries)) {
+                        data.countries.forEach(country => {
+                            if (country && Array.isArray(country) && country.length >= 2) {
+                                const [id, name] = country;
+                                const option = document.createElement('option');
+                                option.value = id;
+                                option.textContent = name;
+                                countrySelect.appendChild(option);
+                            }
+                        });
+                    } else {
+                        console.error('Invalid countries data format:', data.countries);
+                    }
                 } else {
                     console.error('Failed to load countries:', data.error);
                 }
@@ -5531,6 +5543,11 @@
 
         // Load cities based on selected country
         async function loadCities(countryId) {
+            if (!countryId) {
+                console.error('Country ID not provided');
+                return;
+            }
+
             try {
                 const response = await fetch('/api/locations/cities', {
                     method: 'POST',
@@ -5544,14 +5561,26 @@
                 
                 if (data.success) {
                     const citySelect = document.getElementById('citySelect');
+                    if (!citySelect) {
+                        console.error('City select element not found');
+                        return;
+                    }
+                    
                     citySelect.innerHTML = `<option value="">${getText('cityPlaceholder')}</option>`;
                     
-                    data.cities.forEach(([id, name]) => {
-                        const option = document.createElement('option');
-                        option.value = id;
-                        option.textContent = name;
-                        citySelect.appendChild(option);
-                    });
+                    if (Array.isArray(data.cities)) {
+                        data.cities.forEach(city => {
+                            if (city && Array.isArray(city) && city.length >= 2) {
+                                const [id, name] = city;
+                                const option = document.createElement('option');
+                                option.value = id;
+                                option.textContent = name;
+                                citySelect.appendChild(option);
+                            }
+                        });
+                    } else {
+                        console.error('Invalid cities data format:', data.cities);
+                    }
                     
                     citySelect.disabled = false;
                 } else {
@@ -5565,7 +5594,7 @@
         // Load counties based on selected city
         async function loadCounties(cityId) {
             try {
-                const response = await fetch('/api/locations/counties', {
+                const response = await fetch('/api/locations/regions', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -5579,16 +5608,23 @@
                     const countySelect = document.getElementById('countySelect');
                     countySelect.innerHTML = `<option value="">${getText('countyPlaceholder')}</option>`;
                     
-                    data.counties.forEach(([id, name]) => {
-                        const option = document.createElement('option');
-                        option.value = id;
-                        option.textContent = name;
-                        countySelect.appendChild(option);
-                    });
+                    if (Array.isArray(data.regions)) {
+                        data.regions.forEach(region => {
+                            if (region && Array.isArray(region) && region.length >= 2) {
+                                const [id, name] = region;
+                                const option = document.createElement('option');
+                                option.value = id;
+                                option.textContent = name;
+                                countySelect.appendChild(option);
+                            }
+                        });
+                    } else {
+                        console.error('Invalid regions data format:', data.regions);
+                    }
                     
                     countySelect.disabled = false;
                 } else {
-                    console.error('Failed to load cities:', data.error);
+                    console.error('Failed to load regions:', data.error);
                 }
             } catch (error) {
                 console.error('Error loading cities:', error);

@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import os
+import json
 from dotenv import load_dotenv
 from api_functions import (
     generate_basic_report,
@@ -208,6 +209,59 @@ def latest_currency():
         currency_data = get_latest_currency_rates()
         return jsonify(currency_data)
         
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/locations/countries', methods=['GET'])
+def get_countries():
+    """Получение списка стран"""
+    try:
+        with open('static_locations.json', 'r', encoding='utf-8') as f:
+            locations = json.load(f)
+            return jsonify({
+                'success': True,
+                'countries': locations.get('countries', [])
+            })
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/locations/cities', methods=['POST'])
+def get_cities():
+    """Получение списка городов для выбранной страны"""
+    try:
+        data = request.get_json()
+        country_id = data.get('country_id')
+        
+        if not country_id:
+            return jsonify({'success': False, 'error': 'Country ID not provided'}), 400
+            
+        with open('static_locations.json', 'r', encoding='utf-8') as f:
+            locations = json.load(f)
+            cities = locations.get('cities', {}).get(str(country_id), [])
+            return jsonify({
+                'success': True,
+                'cities': cities
+            })
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/locations/regions', methods=['POST'])
+def get_regions():
+    """Получение списка регионов для выбранного города"""
+    try:
+        data = request.get_json()
+        city_id = data.get('city_id')
+        
+        if not city_id:
+            return jsonify({'success': False, 'error': 'City ID not provided'}), 400
+            
+        with open('static_locations.json', 'r', encoding='utf-8') as f:
+            locations = json.load(f)
+            regions = locations.get('regions', {}).get(str(city_id), [])
+            return jsonify({
+                'success': True,
+                'regions': regions
+            })
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
 
