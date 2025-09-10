@@ -162,18 +162,7 @@ locales = {
         },
         'unit_days': 'дней',
         'unit_years': 'лет',
-        'unit_square_meters': 'м²',
-        'report_language_selection': {
-            'title': 'Выберите язык отчета перед сохранением',
-            'language_buttons': {
-                'ru': 'Русский',
-                'en': 'Английский', 
-                'de': 'Немецкий',
-                'fr': 'Французский',
-                'tr': 'Турецкий'
-            },
-            'save_report': 'Сохранить отчет'
-        }
+        'unit_square_meters': 'м²'
     },
     'en': {
         'welcome_new': 'Welcome to Aaadvisor: instant real estate analytics reports with price and profitability forecasts',
@@ -338,18 +327,7 @@ locales = {
         },
         'unit_days': 'days',
         'unit_years': 'years',
-        'unit_square_meters': 'm²',
-        'report_language_selection': {
-            'title': 'Select report language before saving',
-            'language_buttons': {
-                'ru': 'Russian',
-                'en': 'English', 
-                'de': 'German',
-                'fr': 'French',
-                'tr': 'Turkish'
-            },
-            'save_report': 'Save Report'
-        }
+        'unit_square_meters': 'm²'
     },
     'de': {
         'welcome_new': 'Willkommen bei Aaadvisor: Sofortige Immobilien-Analyseberichte mit Preis- und Rentabilitätsprognosen',
@@ -514,18 +492,7 @@ locales = {
         },
         'unit_days': 'Tage',
         'unit_years': 'Jahre',
-        'unit_square_meters': 'm²',
-        'report_language_selection': {
-            'title': 'Berichtssprache vor dem Speichern wählen',
-            'language_buttons': {
-                'ru': 'Russisch',
-                'en': 'Englisch', 
-                'de': 'Deutsch',
-                'fr': 'Französisch',
-                'tr': 'Türkisch'
-            },
-            'save_report': 'Bericht speichern'
-        }
+        'unit_square_meters': 'm²'
     },
     'fr': {
         'welcome_new': 'Bienvenue sur Aaadvisor : rapports analytiques immobiliers instantanés avec prévisions de prix et de rentabilité',
@@ -690,18 +657,7 @@ locales = {
         },
         'unit_days': 'jours',
         'unit_years': 'ans',
-        'unit_square_meters': 'm²',
-        'report_language_selection': {
-            'title': 'Sélectionner la langue du rapport avant de sauvegarder',
-            'language_buttons': {
-                'ru': 'Russe',
-                'en': 'Anglais', 
-                'de': 'Allemand',
-                'fr': 'Français',
-                'tr': 'Turc'
-            },
-            'save_report': 'Sauvegarder le rapport'
-        }
+        'unit_square_meters': 'm²'
     },
     'tr': {
         'welcome_new': 'Aaadvisor\'a hoş geldiniz: Anında gayrimenkul analiz raporları, fiyat ve kârlılık tahminleriyle',
@@ -860,17 +816,6 @@ locales = {
         },
         'unit_days': 'gün',
         'unit_years': 'yıl',
-        'unit_square_meters': 'm²',
-        'report_language_selection': {
-            'title': 'Kaydetmeden önce rapor dilini seçin',
-            'language_buttons': {
-                'ru': 'Rusça',
-                'en': 'İngilizce', 
-                'de': 'Almanca',
-                'fr': 'Fransızca',
-                'tr': 'Türkçe'
-            },
-            'save_report': 'Raporu Kaydet'
-        }
+        'unit_square_meters': 'm²'
     }
 } 
