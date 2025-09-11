@@ -5414,8 +5414,10 @@ def api_save_html_report():
             # Обрабатываем и сохраняем фотографии
             saved_photos = []
             if property_info.get('photos'):
+                logger.info(f"Processing {len(property_info['photos'])} photos for report")
                 # Создаем папку для фотографий
                 os.makedirs(photos_dir, exist_ok=True)
+                logger.info(f"Created photos directory: {photos_dir}")
                 
                 for i, photo in enumerate(property_info['photos']):
                     try:
@@ -5443,6 +5445,8 @@ def api_save_html_report():
                             with open(photo_path, 'wb') as f:
                                 f.write(image_data)
                             
+                            logger.info(f"Saved photo: {photo_path} ({len(image_data)} bytes)")
+                            
                             # Сохраняем относительный путь для HTML
                             relative_photo_path = f"photos/{photo_filename}"
                             saved_photos.append({
@@ -5453,6 +5457,8 @@ def api_save_html_report():
                     except Exception as e:
                         logger.error(f"Error saving photo {i}: {e}")
                         continue
+            
+            logger.info(f"Successfully saved {len(saved_photos)} photos")
             
             # Генерируем блок фотографий
             photos_html = ''
@@ -6570,6 +6576,10 @@ def api_save_html_report():
                         <span class="info-label">Площадь объекта:</span>
                         <span class="info-value">{report_data.get('area', 'Не указано')}</span>
                     </div>
+                    {f'''<div class="info-item">
+                        <span class="info-label">Координаты:</span>
+                        <span class="info-value">{report_data.get('latitude', '')}, {report_data.get('longitude', '')}</span>
+                    </div>''' if report_data.get('latitude') and report_data.get('longitude') else ''}
                 </div>
             </div>
         </div>
