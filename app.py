@@ -5146,7 +5146,9 @@ def api_save_user_report():
 def api_save_html_report():
     """Сохраняет отчет как HTML файл в корпоративном стиле и возвращает ссылку"""
     data = request.json or {}
+    logger.info(f"=== SAVING HTML REPORT === Data keys: {list(data.keys())}")
     telegram_id_raw = data.get('telegram_id')
+    logger.info(f"Telegram ID: {telegram_id_raw}")
     if telegram_id_raw is None:
         return jsonify({'error': 'Invalid telegram_id'}), 400
     try:
@@ -5177,8 +5179,12 @@ def api_save_html_report():
         user_reports_dir = os.path.join('reports', str(telegram_id))
         report_dir = os.path.join(user_reports_dir, report_folder_id)
         
+        logger.info(f"Creating report directory structure: {report_dir}")
+        
         # Создаем папки если их нет
         os.makedirs(report_dir, exist_ok=True)
+        
+        logger.info(f"Successfully created directory: {report_dir}")
         
         # Пути для файлов
         filename = f"{report_folder_id}.html"
