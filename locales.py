@@ -162,7 +162,17 @@ locales = {
         },
         'unit_days': 'дней',
         'unit_years': 'лет',
-        'unit_square_meters': 'м²'
+        'unit_square_meters': 'м²',
+        'reportOptionsTitle': 'Дополнительные опции отчета',
+        'includeRealtorInfo': 'Добавить информацию риэлтора',
+        'includePropertyInfo': 'Добавить информацию объекта',
+        'propertyInfoModalTitle': 'Информация об объекте',
+        'propertyUrlLabel': 'Ссылка на объявление:',
+        'propertyPhotosLabel': 'Фотографии объекта:',
+        'photoUploadText': 'Нажмите или перетащите фотографии сюда',
+        'selectPhotos': 'Выбрать фото',
+        'save': 'Сохранить',
+        'cancel': 'Отмена'
     },
     'en': {
         'welcome_new': 'Welcome to Aaadvisor: instant real estate analytics reports with price and profitability forecasts',
@@ -327,7 +337,17 @@ locales = {
         },
         'unit_days': 'days',
         'unit_years': 'years',
-        'unit_square_meters': 'm²'
+        'unit_square_meters': 'm²',
+        'reportOptionsTitle': 'Additional Report Options',
+        'includeRealtorInfo': 'Include Realtor Information',
+        'includePropertyInfo': 'Include Property Information',
+        'propertyInfoModalTitle': 'Property Information',
+        'propertyUrlLabel': 'Property listing URL:',
+        'propertyPhotosLabel': 'Property photos:',
+        'photoUploadText': 'Click or drag photos here',
+        'selectPhotos': 'Select photos',
+        'save': 'Save',
+        'cancel': 'Cancel'
     },
     'de': {
         'welcome_new': 'Willkommen bei Aaadvisor: Sofortige Immobilien-Analyseberichte mit Preis- und Rentabilitätsprognosen',
@@ -492,7 +512,17 @@ locales = {
         },
         'unit_days': 'Tage',
         'unit_years': 'Jahre',
-        'unit_square_meters': 'm²'
+        'unit_square_meters': 'm²',
+        'reportOptionsTitle': 'Zusätzliche Berichtsoptionen',
+        'includeRealtorInfo': 'Maklerinformationen einschließen',
+        'includePropertyInfo': 'Objektinformationen einschließen',
+        'propertyInfoModalTitle': 'Objektinformationen',
+        'propertyUrlLabel': 'Immobilienanzeigen-URL:',
+        'propertyPhotosLabel': 'Objektfotos:',
+        'photoUploadText': 'Klicken oder Fotos hierher ziehen',
+        'selectPhotos': 'Fotos auswählen',
+        'save': 'Speichern',
+        'cancel': 'Abbrechen'
     },
     'fr': {
         'welcome_new': 'Bienvenue sur Aaadvisor : rapports analytiques immobiliers instantanés avec prévisions de prix et de rentabilité',
@@ -657,7 +687,17 @@ locales = {
         },
         'unit_days': 'jours',
         'unit_years': 'ans',
-        'unit_square_meters': 'm²'
+        'unit_square_meters': 'm²',
+        'reportOptionsTitle': 'Options de rapport supplémentaires',
+        'includeRealtorInfo': 'Inclure les informations de l\'agent immobilier',
+        'includePropertyInfo': 'Inclure les informations de la propriété',
+        'propertyInfoModalTitle': 'Informations de la propriété',
+        'propertyUrlLabel': 'URL de l\'annonce immobilière:',
+        'propertyPhotosLabel': 'Photos de la propriété:',
+        'photoUploadText': 'Cliquez ou glissez les photos ici',
+        'selectPhotos': 'Sélectionner des photos',
+        'save': 'Enregistrer',
+        'cancel': 'Annuler'
     },
     'tr': {
         'welcome_new': 'Aaadvisor\'a hoş geldiniz: Anında gayrimenkul analiz raporları, fiyat ve kârlılık tahminleriyle',
@@ -816,6 +856,16 @@ locales = {
         },
         'unit_days': 'gün',
         'unit_years': 'yıl',
-        'unit_square_meters': 'm²'
+        'unit_square_meters': 'm²',
+        'reportOptionsTitle': 'Ek Rapor Seçenekleri',
+        'includeRealtorInfo': 'Emlakçı Bilgilerini Ekle',
+        'includePropertyInfo': 'Mülk Bilgilerini Ekle',
+        'propertyInfoModalTitle': 'Mülk Bilgileri',
+        'propertyUrlLabel': 'Mülk ilanı URL\'si:',
+        'propertyPhotosLabel': 'Mülk fotoğrafları:',
+        'photoUploadText': 'Fotoğrafları buraya tıklayın veya sürükleyin',
+        'selectPhotos': 'Fotoğraf seç',
+        'save': 'Kaydet',
+        'cancel': 'İptal'
     }
 } 

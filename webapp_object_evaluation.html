@@ -3087,6 +3087,57 @@
             color: #721c24;
         }
 
+        /* Report Options Styles */
+        .report-options {
+            display: none;
+            margin: 20px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            border: 1px solid #e9ecef;
+        }
+
+        .report-options-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+
+        .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 8px;
+            transition: background-color 0.2s ease;
+        }
+
+        .checkbox-item:hover {
+            background-color: rgba(102, 126, 234, 0.1);
+        }
+
+        .checkbox-input {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: #667eea;
+        }
+
+        .checkbox-label {
+            font-size: 14px;
+            color: #495057;
+            cursor: pointer;
+            user-select: none;
+        }
+
         /* Save and Share Button Styles */
         .save-share-button {
             display: none;
@@ -3117,6 +3168,196 @@
             cursor: not-allowed;
             transform: none;
             box-shadow: none;
+        }
+
+        /* Property Info Modal Styles */
+        .property-info-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+        }
+
+        .property-info-modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .property-info-modal-close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #6c757d;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .property-info-modal-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+
+        .property-info-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-label {
+            font-size: 14px;
+            font-weight: 500;
+            color: #495057;
+        }
+
+        .form-input {
+            padding: 10px 12px;
+            border: 1px solid #ced4da;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.2s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .photo-upload-area {
+            border: 2px dashed #ced4da;
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .photo-upload-area:hover {
+            border-color: #667eea;
+            background-color: rgba(102, 126, 234, 0.05);
+        }
+
+        .photo-upload-area.dragover {
+            border-color: #667eea;
+            background-color: rgba(102, 126, 234, 0.1);
+        }
+
+        .photo-upload-text {
+            color: #6c757d;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .photo-upload-button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .photo-preview-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .photo-preview {
+            position: relative;
+            width: 80px;
+            height: 80px;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #e9ecef;
+        }
+
+        .photo-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .photo-preview-remove {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            background: rgba(220, 53, 69, 0.9);
+            color: white;
+            border: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            font-size: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+
+        .modal-button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .modal-button-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .modal-button-primary:hover {
+            background: #5a67d8;
+        }
+
+        .modal-button-secondary {
+            background: #e9ecef;
+            color: #495057;
+        }
+
+        .modal-button-secondary:hover {
+            background: #dee2e6;
         }
 
         /* Modal Styles */
@@ -3806,6 +4047,21 @@
             </div>
         </div>
 
+        <!-- Report Options -->
+        <div class="report-options" id="reportOptions">
+            <div class="report-options-title" data-i18n="reportOptionsTitle">Дополнительные опции отчета</div>
+            <div class="checkbox-group">
+                <label class="checkbox-item">
+                    <input type="checkbox" class="checkbox-input" id="includeRealtorInfo">
+                    <span class="checkbox-label" data-i18n="includeRealtorInfo">Добавить информацию риэлтора</span>
+                </label>
+                <label class="checkbox-item">
+                    <input type="checkbox" class="checkbox-input" id="includePropertyInfo">
+                    <span class="checkbox-label" data-i18n="includePropertyInfo">Добавить информацию объекта</span>
+                </label>
+            </div>
+        </div>
+
         <!-- Save and Share Button -->
         <button class="save-share-button" id="saveShareButton" onclick="saveAndShareReport()">
             <span id="saveShareButtonText" data-i18n="saveShareButtonText">Сохранить и поделиться отчетом</span>
@@ -3841,6 +4097,42 @@
                 </div>
             </div>
         </div>
+
+        <!-- Property Info Modal -->
+        <div class="property-info-modal" id="propertyInfoModal">
+            <div class="property-info-modal-content">
+                <button class="property-info-modal-close" onclick="closePropertyInfoModal()">×</button>
+                <div class="property-info-modal-title" data-i18n="propertyInfoModalTitle">Информация об объекте</div>
+                
+                <div class="property-info-form">
+                    <div class="form-group">
+                        <label class="form-label" data-i18n="propertyUrlLabel">Ссылка на объявление:</label>
+                        <input type="url" class="form-input" id="propertyUrl" placeholder="https://example.com/property">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" data-i18n="propertyPhotosLabel">Фотографии объекта:</label>
+                        <div class="photo-upload-area" id="photoUploadArea">
+                            <div class="photo-upload-text" data-i18n="photoUploadText">Нажмите или перетащите фотографии сюда</div>
+                            <button type="button" class="photo-upload-button" onclick="document.getElementById('photoInput').click()">
+                                <span data-i18n="selectPhotos">Выбрать фото</span>
+                            </button>
+                            <input type="file" id="photoInput" accept="image/*" multiple style="display: none;">
+                        </div>
+                        <div class="photo-preview-container" id="photoPreviewContainer"></div>
+                    </div>
+                </div>
+                
+                <div class="modal-actions">
+                    <button class="modal-button modal-button-primary" onclick="savePropertyInfo()">
+                        <span data-i18n="save">Сохранить</span>
+                    </button>
+                    <button class="modal-button modal-button-secondary" onclick="closePropertyInfoModal()">
+                        <span data-i18n="cancel">Отмена</span>
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -3851,6 +4143,12 @@
 
         // Current language
         let currentLanguage = 'ru';
+
+        // Property info storage
+        let propertyInfo = {
+            photos: [],
+            url: ''
+        };
 
         // Selected location data
         let selectedLocation = {
@@ -9104,6 +9402,10 @@
             updatePageText();
             loadCountries();
             
+            // Initialize additional components
+            setupCheckboxHandlers();
+            initPhotoUpload();
+            
             // Initialize price input
             const priceInput = document.getElementById('priceObjectInput');
             if (priceInput) {
@@ -10114,6 +10416,10 @@
                     telegramId = window.Telegram.WebApp.initDataUnsafe.user?.id;
                 }
                 
+                // Check additional options
+                const includeRealtorInfo = document.getElementById('includeRealtorInfo')?.checked || false;
+                const includePropertyInfo = document.getElementById('includePropertyInfo')?.checked || false;
+                
                 // Save report via API
                 const response = await fetch('/api/save_html_report', {
                     method: 'POST',
@@ -10124,7 +10430,10 @@
                         telegram_id: telegramId,
                         report_content: reportContent,
                         location_info: locationInfo,
-                        report_data: reportData
+                        report_data: reportData,
+                        include_realtor_info: includeRealtorInfo,
+                        include_property_info: includePropertyInfo,
+                        property_info: includePropertyInfo ? propertyInfo : null
                     })
                 });
                 
@@ -10695,25 +11004,143 @@
         // Show save button when report is loaded
         function showSaveButton() {
             const saveButton = document.getElementById('saveShareButton');
+            const reportOptions = document.getElementById('reportOptions');
             if (saveButton) {
                 saveButton.style.display = 'block';
+            }
+            if (reportOptions) {
+                reportOptions.style.display = 'block';
+            }
+        }
+
+        // Property Info Modal Functions
+        function openPropertyInfoModal() {
+            const modal = document.getElementById('propertyInfoModal');
+            modal.style.display = 'flex';
+        }
+
+        function closePropertyInfoModal() {
+            const modal = document.getElementById('propertyInfoModal');
+            modal.style.display = 'none';
+        }
+
+        function savePropertyInfo() {
+            const urlInput = document.getElementById('propertyUrl');
+            propertyInfo.url = urlInput.value;
+            closePropertyInfoModal();
+            
+            // Uncheck the checkbox since we've handled the modal
+            const checkbox = document.getElementById('includePropertyInfo');
+            if (checkbox) {
+                checkbox.checked = false;
+            }
+        }
+
+        // Photo upload handling
+        function initPhotoUpload() {
+            const photoInput = document.getElementById('photoInput');
+            const uploadArea = document.getElementById('photoUploadArea');
+            const previewContainer = document.getElementById('photoPreviewContainer');
+
+            photoInput.addEventListener('change', handlePhotoSelect);
+            
+            // Drag and drop functionality
+            uploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadArea.classList.add('dragover');
+            });
+            
+            uploadArea.addEventListener('dragleave', () => {
+                uploadArea.classList.remove('dragover');
+            });
+            
+            uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadArea.classList.remove('dragover');
+                const files = e.dataTransfer.files;
+                handlePhotoFiles(files);
+            });
+            
+            uploadArea.addEventListener('click', () => {
+                photoInput.click();
+            });
+        }
+
+        function handlePhotoSelect(event) {
+            const files = event.target.files;
+            handlePhotoFiles(files);
+        }
+
+        function handlePhotoFiles(files) {
+            Array.from(files).forEach(file => {
+                if (file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        propertyInfo.photos.push({
+                            name: file.name,
+                            data: e.target.result
+                        });
+                        updatePhotoPreview();
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+
+        function updatePhotoPreview() {
+            const previewContainer = document.getElementById('photoPreviewContainer');
+            previewContainer.innerHTML = '';
+            
+            propertyInfo.photos.forEach((photo, index) => {
+                const preview = document.createElement('div');
+                preview.className = 'photo-preview';
+                preview.innerHTML = `
+                    <img src="${photo.data}" alt="${photo.name}">
+                    <button class="photo-preview-remove" onclick="removePhoto(${index})">×</button>
+                `;
+                previewContainer.appendChild(preview);
+            });
+        }
+
+        function removePhoto(index) {
+            propertyInfo.photos.splice(index, 1);
+            updatePhotoPreview();
+        }
+
+        // Handle checkbox changes
+        function setupCheckboxHandlers() {
+            const realtorCheckbox = document.getElementById('includeRealtorInfo');
+            const propertyCheckbox = document.getElementById('includePropertyInfo');
+            
+            if (propertyCheckbox) {
+                propertyCheckbox.addEventListener('change', function() {
+                    if (this.checked) {
+                        openPropertyInfoModal();
+                    }
+                });
             }
         }
 
 
 
-        // Close modal when clicking outside
+        // Close modals when clicking outside
         document.addEventListener('click', function(event) {
-            const modal = document.getElementById('shareModal');
-            if (event.target === modal) {
+            const shareModal = document.getElementById('shareModal');
+            const propertyModal = document.getElementById('propertyInfoModal');
+            
+            if (event.target === shareModal) {
                 closeShareModal();
+            }
+            if (event.target === propertyModal) {
+                closePropertyInfoModal();
             }
         });
 
-        // Close modal with Escape key
+        // Close modals with Escape key
         document.addEventListener('keydown', function(event) {
             if (event.key === 'Escape') {
                 closeShareModal();
+                closePropertyInfoModal();
             }
         });
     </script>
