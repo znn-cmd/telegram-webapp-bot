@@ -3119,116 +3119,6 @@
             box-shadow: none;
         }
 
-        /* Report Language Selection Styles */
-        .report-language-selection {
-            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-            border: 2px solid #dee2e6;
-            border-radius: 16px;
-            padding: 25px;
-            margin: 20px 0;
-            text-align: center;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            animation: fadeIn 0.5s ease-out;
-        }
-
-        .report-lang-title {
-            font-size: 18px;
-            font-weight: 600;
-            color: #495057;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-
-        .report-lang-buttons {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
-            justify-content: center;
-            margin-bottom: 20px;
-        }
-
-        .report-lang-btn {
-            padding: 12px 20px;
-            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
-            border: 2px solid #dee2e6;
-            border-radius: 10px;
-            font-size: 14px;
-            font-weight: 500;
-            color: #495057;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            min-width: 140px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        .report-lang-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-            border-color: #28a745;
-            background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
-        }
-
-        .report-lang-btn.selected {
-            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-            color: white;
-            border-color: #28a745;
-            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
-            transform: scale(1.05);
-        }
-
-        .save-report-with-lang-btn {
-            width: 100%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 12px;
-            padding: 15px 20px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
-            animation: fadeIn 0.5s ease-out;
-            text-align: center;
-        }
-
-        .save-report-with-lang-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
-            background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
-        }
-
-        .save-report-with-lang-btn:disabled {
-            background: #6c757d;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-
-        @keyframes fadeIn {
-            from { 
-                opacity: 0; 
-                transform: translateY(-10px); 
-            }
-            to { 
-                opacity: 1; 
-                transform: translateY(0); 
-            }
-        }
-
-        /* Responsive design for language buttons */
-        @media (max-width: 768px) {
-            .report-lang-buttons {
-                flex-direction: column;
-                align-items: center;
-            }
-            
-            .report-lang-btn {
-                width: 100%;
-                max-width: 200px;
-            }
-        }
-
         /* Modal Styles */
         .modal-overlay {
             display: none;
@@ -3916,33 +3806,6 @@
             </div>
         </div>
 
-        <!-- Report Language Selection Block -->
-        <div class="report-language-selection" id="reportLanguageSelection" style="display: none;">
-            <div class="report-lang-title" id="reportLangTitle">
-                Выберите язык отчета перед сохранением
-            </div>
-            <div class="report-lang-buttons" id="reportLangButtons">
-                <button class="report-lang-btn" data-lang="ru" onclick="selectReportLanguage('ru')">
-                    Русский
-                </button>
-                <button class="report-lang-btn" data-lang="en" onclick="selectReportLanguage('en')">
-                    Английский
-                </button>
-                <button class="report-lang-btn" data-lang="de" onclick="selectReportLanguage('de')">
-                    Немецкий
-                </button>
-                <button class="report-lang-btn" data-lang="fr" onclick="selectReportLanguage('fr')">
-                    Французский
-                </button>
-                <button class="report-lang-btn" data-lang="tr" onclick="selectReportLanguage('tr')">
-                    Турецкий
-                </button>
-            </div>
-            <button class="save-report-with-lang-btn" id="saveReportWithLangBtn" onclick="saveReportWithSelectedLanguage()" style="display: none;">
-                <span id="saveReportWithLangBtnText">Сохранить и поделиться отчетом</span>
-            </button>
-        </div>
-
         <!-- Save and Share Button -->
         <button class="save-share-button" id="saveShareButton" onclick="saveAndShareReport()">
             <span id="saveShareButtonText" data-i18n="saveShareButtonText">Сохранить и поделиться отчетом</span>
@@ -4172,7 +4035,6 @@
                 
                 // Trends analysis
                 'trendsAnalysisTitle': 'Вывод по тренду',
-                'forecastAnalysisTitle': 'Вывод прогноза',
                 
                 // Table headers for trends
                 'priceChangeLabel': 'Изм-ие цены',
@@ -4258,20 +4120,7 @@
                 'salePriceTooltip': 'Цена продажи',
                 'rentPriceTooltip': 'Цена аренды',
                 'yourObjectLabel': 'Ваш объект',
-                'andText': 'и',
-                
-                // Report language selection
-                'reportLanguageSelectionTitle': 'Выберите язык отчета перед сохранением',
-                'reportLanguageButtons': {
-                    'ru': 'Русский',
-                    'en': 'Английский',
-                    'de': 'Немецкий',
-                    'fr': 'Французский',
-                    'tr': 'Турецкий'
-                },
-                'saveReportButton': 'Сохранить и поделиться отчетом',
-                'savingReport': 'Сохранение отчета...',
-                'errorSaving': 'Ошибка при сохранении отчета'
+                'andText': 'и'
             },
             'en': {
                 'slogan': 'Real Estate Market Insights',
@@ -4432,7 +4281,6 @@
                 
                 // Trends analysis
                 'trendsAnalysisTitle': 'Trend Analysis',
-                'forecastAnalysisTitle': 'Forecast Analysis',
                 
                 // Table headers for trends
                 'priceChangeLabel': 'Price Change',
@@ -4518,20 +4366,7 @@
                 'salePriceTooltip': 'Sale Price',
                 'rentPriceTooltip': 'Rent Price',
                 'yourObjectLabel': 'Your Object',
-                'andText': 'and',
-                
-                // Report language selection
-                'reportLanguageSelectionTitle': 'Select report language before saving',
-                'reportLanguageButtons': {
-                    'ru': 'Russian',
-                    'en': 'English',
-                    'de': 'German',
-                    'fr': 'French',
-                    'tr': 'Turkish'
-                },
-                'saveReportButton': 'Save and Share Report',
-                'savingReport': 'Saving report...',
-                'errorSaving': 'Error saving report'
+                'andText': 'and'
             },
             'de': {
                 'slogan': 'Immobilienmarkt-Einblicke',
@@ -4615,7 +4450,6 @@
                 
                 // Trends analysis
                 'trendsAnalysisTitle': 'Trendanalyse',
-                'forecastAnalysisTitle': 'Prognose-Analyse',
                 
                 // Keys for market analysis text
                 'marketAnalysisTitle': 'Marktanalyse',
@@ -4693,7 +4527,6 @@
                 
                 // Trends analysis
                 'trendsAnalysisTitle': 'Trendanalyse',
-                'forecastAnalysisTitle': 'Prognose-Analyse',
                 
                 // Table headers for trends
                 'priceChangeLabel': 'Preisänderung',
@@ -4779,20 +4612,7 @@
                 'salePriceTooltip': 'Verkaufspreis',
                 'rentPriceTooltip': 'Mietpreis',
                 'yourObjectLabel': 'Ihr Objekt',
-                'andText': 'und',
-                
-                // Report language selection
-                'reportLanguageSelectionTitle': 'Berichtssprache vor dem Speichern auswählen',
-                'reportLanguageButtons': {
-                    'ru': 'Russisch',
-                    'en': 'Englisch',
-                    'de': 'Deutsch',
-                    'fr': 'Französisch',
-                    'tr': 'Türkisch'
-                },
-                'saveReportButton': 'Bericht speichern und teilen',
-                'savingReport': 'Bericht wird gespeichert...',
-                'errorSaving': 'Fehler beim Speichern des Berichts'
+                'andText': 'und'
             },
             'fr': {
                 'slogan': 'Aperçus du marché immobilier',
@@ -4905,7 +4725,6 @@
                 
                 // Trends analysis
                 'trendsAnalysisTitle': 'Analyse des tendances',
-                'forecastAnalysisTitle': 'Analyse des prévisions',
                 
                 // Table headers for trends
                 'priceChangeLabel': 'Changement de prix',
@@ -5112,7 +4931,6 @@
                 
                 // Trends analysis
                 'trendsAnalysisTitle': 'Trend Analizi',
-                'forecastAnalysisTitle': 'Tahmin Analizi',
                 
                 // Table headers for trends
                 'priceChangeLabel': 'Fiyat Değişimi',
@@ -5377,7 +5195,6 @@
                 
                 // Trends analysis
                 'trendsAnalysisTitle': 'Analyse des tendances',
-                'forecastAnalysisTitle': 'Analyse des prévisions',
                 
                 // Table headers for trends
                 'priceChangeLabel': 'Changement de prix',
@@ -5463,124 +5280,7 @@
                 'salePriceTooltip': 'Prix de vente',
                 'rentPriceTooltip': 'Prix de location',
                 'yourObjectLabel': 'Votre objet',
-                'andText': 'et',
-                
-                // Report language selection
-                'reportLanguageSelectionTitle': 'Sélectionnez la langue du rapport avant de sauvegarder',
-                'reportLanguageButtons': {
-                    'ru': 'Russe',
-                    'en': 'Anglais',
-                    'de': 'Allemand',
-                    'fr': 'Français',
-                    'tr': 'Turc'
-                },
-                'saveReportButton': 'Sauvegarder et partager le rapport',
-                'savingReport': 'Sauvegarde du rapport...',
-                'errorSaving': 'Erreur lors de la sauvegarde du rapport'
-            },
-            'tr': {
-                'slogan': 'Gayrimenkul Pazar İçgörüleri',
-                'pageTitle': 'Nesne Değerlendirmesi',
-                'pageDescription': 'Seçilen bölgede profesyonel mülk değerlendirmesi alın',
-                'countryLabel': 'Ülke:',
-                'cityLabel': 'Şehir:',
-                'countyLabel': 'İlçe/Bölge:',
-                'districtLabel': 'Mahalle:',
-                'countryPlaceholder': 'Ülke seçin',
-                'cityPlaceholder': 'Önce ülke seçin',
-                'countyPlaceholder': 'Önce şehir seçin',
-                'districtPlaceholder': 'Önce ilçe seçin',
-                'confirmButtonText': 'Seçimi Onayla',
-                'backButton': '← Ana menüye dön',
-                'selectedLocationTitle': 'Seçilen konum:',
-                'adminIdsTitle': 'Admin ID\'leri:',
-                'loading': 'Yükleniyor...',
-                'errorLoading': 'Veri yükleme hatası',
-                'dataSectionTitle': 'Bölge veri analizi',
-                'loadingText': 'Veriler yükleniyor...',
-                'errorText': 'Veri yükleme hatası',
-                'totalProperties': 'Toplam mülk:',
-                'averagePrice': 'Ortalama fiyat:',
-                'priceRange': 'Fiyat aralığı:',
-                'noDataAvailable': 'Veri mevcut değil',
-                'keyMetricsTitle': 'Temel göstergeler',
-                'avgSalePriceLabel': 'Ortalama satış fiyatı m² başına',
-                'avgRentPriceLabel': 'Ortalama kira fiyatı m² başına',
-                'listingPeriodSaleLabel': 'İlan süresi (satış)',
-                'listingPeriodRentLabel': 'İlan süresi (kira)',
-                'yieldLabel': 'Getiri',
-
-                'listingTypeTitle': 'Analiz için mülk türünü seçin:',
-                'houseTypeSubtitle': 'Yatak odası sayısı:',
-                'floorSegmentSubtitle': 'Kat:',
-                'ageDataSubtitle': 'Mülk yaşı:',
-                'heatingDataSubtitle': 'Isıtma türü:',
-                'priceObjectSubtitle': 'Mülk fiyatı:',
-                'areaObjectSubtitle': 'Mülk alanı (m²):',
-                'selectBedrooms': 'yatak odası sayısı',
-                'selectFloor': 'kat',
-                'selectAge': 'mülk yaşı',
-                'selectHeating': 'ısıtma türü',
-                'propertyTypesTitle': 'Seçilen mülk özellikleri:',
-                'bedroomsLabel': 'Yatak odası sayısı',
-                'floorLabel': 'Kat',
-                'ageLabel': 'Yaş',
-                'heatingLabel': 'Isıtma',
-                'priceLabel': 'Fiyat',
-                'areaLabel': 'Alan',
-                'euroSymbol': '€',
-                'squareMeters': 'm²',
-                'days': 'gün',
-                'years': 'yıl',
-                'percent': '%',
-                'marketIndicatorsTitle': 'Pazar göstergeleri',
-
-                // Object evaluation specific
-                'consolidatedAssessmentTitle': 'Pazar analizi',
-                'salePriceTitle': 'Satış fiyatı m² başına',
-                'rentPriceTitle': 'Kira fiyatı m² başına',
-                'yieldTitle': 'Getiri',
-                'consolidatedAverageLabel': 'Konsolide ortalama',
-                'bedroomsLabel': 'Yatak odaları',
-                'floorLabel': 'Kat',
-                'ageLabel': 'Yaş',
-                'heatingLabel': 'Isıtma',
-                'unit_square_meters': 'm²',
-
-                // Trends and forecasts
-                'trendsTitle': 'Pazar trendleri',
-                'forecastTitle': 'Fiyat tahmini',
-                'salePriceTrendLabel': 'Satış fiyatı trendi',
-                'rentPriceTrendLabel': 'Kira fiyatı trendi',
-                'currentPriceLabel': 'Mevcut fiyat',
-                'forecastPriceLabel': 'Tahmini fiyat',
-                'priceChangeLabel': 'Fiyat değişimi',
-                'monthsLabel': 'ay',
-                'growthLabel': 'büyüme',
-                'declineLabel': 'düşüş',
-                'stableLabel': 'sabit',
-                'generalTrendLabel': 'Genel trend',
-                
-                // Chart axis and tooltip labels
-                'salePriceAxisLabel': 'Satış Fiyatı (₺/m²)',
-                'rentPriceAxisLabel': 'Kira Fiyatı (₺/m²)',
-                'salePriceTooltip': 'Satış fiyatı',
-                'rentPriceTooltip': 'Kira fiyatı',
-                'yourObjectLabel': 'Sizin mülkünüz',
-                'andText': 've',
-                
-                // Report language selection
-                'reportLanguageSelectionTitle': 'Kaydetmeden önce rapor dilini seçin',
-                'reportLanguageButtons': {
-                    'ru': 'Rusça',
-                    'en': 'İngilizce',
-                    'de': 'Almanca',
-                    'fr': 'Fransızca',
-                    'tr': 'Türkçe'
-                },
-                'saveReportButton': 'Raporu kaydet ve paylaş',
-                'savingReport': 'Rapor kaydediliyor...',
-                'errorSaving': 'Rapor kaydedilirken hata'
+                'andText': 'et'
             }
         };
 
@@ -6806,8 +6506,18 @@
         
         // Generate analytical summary based on market data (только для админов)
                 async function generateAnalyticalSummary(summary) {
-            // Show analytical summary for all users (removed admin check)
-            console.log('📊 Generating analytical summary for all users');
+            // Check if user is admin
+            try {
+                const userAccess = await checkUserAccess();
+                if (!userAccess.hasAccess || userAccess.reason !== 'admin') {
+                    // User is not admin, return empty string to hide the block
+                    return '';
+                }
+            } catch (error) {
+                console.error('Error checking user access:', error);
+                // On error, hide the block
+                return '';
+            }
             
             let analysis = '<div class="analytical-summary">';
             analysis += '<h4 class="summary-title" data-i18n="reports.market_analysis">Анализ рынка</h4>';
@@ -8473,11 +8183,14 @@
             try {
                 console.log('🔍 Generating enhanced object summary...');
                 
-                // Получаем данные объекта из сохраненных переменных
-                const objectPrice = selectedListingTypes.price || 0;
-                const objectArea = selectedListingTypes.area || 0;
+                // Получаем данные объекта из формы
+                const objectPrice = parseFloat(document.getElementById('priceObjectInput')?.value) || 0;
+                const objectArea = parseFloat(document.getElementById('areaObjectInput')?.value) || 0;
                 const selectedCountry = selectedLocation.country_name || '';
-                const objectCurrency = selectedListingTypes.currency || 'EUR';
+                
+                // Получаем выбранную валюту из кнопок
+                const selectedCurrencyButton = document.querySelector('.currency-button.active');
+                const objectCurrency = selectedCurrencyButton ? selectedCurrencyButton.dataset.currency : 'EUR';
                 
                 console.log('📊 Object data:', {
                     price: objectPrice,
@@ -8861,31 +8574,31 @@
             // Формируем аналитический вывод на разных языках
             const analysisTexts = {
                 'ru': {
-                    'title': getText('forecastAnalysisTitle'),
+                    'title': 'Вывод прогноза',
                     'sale': `${getText('saleLabel')} ожидается стабильный рост цен с ${formatValue(firstSalePrice, 'price')}/м² в ${firstMonthName} ${firstMonth.property_year} до ${formatValue(lastSalePrice, 'price')}/м² в ${lastMonthName} ${lastMonth.property_year} (+${salePriceGrowth.toFixed(1)}% за ${forecastTrends.length} месяцев).`,
                     'rent': `${getText('rentLabel')} прогнозируется увеличение с ${formatValue(firstRentPrice, 'price')}/м² до ${formatValue(lastRentPrice, 'price')}/м² (+${rentPriceGrowth.toFixed(1)}%).`,
                     'yield': `${getText('yieldLabel')}: остаётся на уровне ${minYield.toFixed(1)}–${maxYield.toFixed(1)}%, с лёгким ${yieldTrend === 'снижение' ? 'снижением' : yieldTrend === 'рост' ? 'ростом' : 'изменением'} к ${lastMonthName} ${lastMonth.property_year} года.`
                 },
                 'en': {
-                    'title': getText('forecastAnalysisTitle'),
+                    'title': 'Forecast Analysis',
                     'sale': `Sales: stable price growth is expected from ${formatValue(firstSalePrice, 'price')}/m² in ${firstMonthName} ${firstMonth.property_year} to ${formatValue(lastSalePrice, 'price')}/m² in ${lastMonthName} ${lastMonth.property_year} (+${salePriceGrowth.toFixed(1)}% over ${forecastTrends.length} months).`,
                     'rent': `Rent: increase is forecasted from ${formatValue(firstRentPrice, 'price')}/m² to ${formatValue(lastRentPrice, 'price')}/m² (+${rentPriceGrowth.toFixed(1)}%).`,
                     'yield': `Yield: remains at ${minYield.toFixed(1)}–${maxYield.toFixed(1)}%, with a slight ${yieldTrend === 'снижение' ? 'decrease' : yieldTrend === 'рост' ? 'increase' : 'change'} by ${lastMonthName} ${lastMonth.property_year}.`
                 },
                 'de': {
-                    'title': getText('forecastAnalysisTitle'),
+                    'title': 'Prognose-Analyse',
                     'sale': `Verkauf: Stabile Preiserhöhung wird erwartet von ${formatValue(firstSalePrice, 'price')}/m² im ${firstMonthName} ${firstMonth.property_year} bis ${formatValue(lastSalePrice, 'price')}/m² im ${lastMonthName} ${lastMonth.property_year} (+${salePriceGrowth.toFixed(1)}% über ${forecastTrends.length} Monate).`,
                     'rent': `Miete: Anstieg wird prognostiziert von ${formatValue(firstRentPrice, 'price')}/m² auf ${formatValue(lastRentPrice, 'price')}/m² (+${rentPriceGrowth.toFixed(1)}%).`,
                     'yield': `Rendite: bleibt bei ${minYield.toFixed(1)}–${maxYield.toFixed(1)}%, mit leichter ${yieldTrend === 'снижение' ? 'Abnahme' : yieldTrend === 'рост' ? 'Zunahme' : 'Änderung'} bis ${lastMonthName} ${lastMonth.property_year}.`
                 },
                 'fr': {
-                    'title': getText('forecastAnalysisTitle'),
+                    'title': 'Analyse des prévisions',
                     'sale': `Vente: une croissance stable des prix est attendue de ${formatValue(firstSalePrice, 'price')}/m² en ${firstMonthName} ${firstMonth.property_year} à ${formatValue(lastSalePrice, 'price')}/m² en ${lastMonthName} ${lastMonth.property_year} (+${salePriceGrowth.toFixed(1)}% sur ${forecastTrends.length} mois).`,
                     'rent': `Location: une augmentation est prévue de ${formatValue(firstRentPrice, 'price')}/m² à ${formatValue(lastRentPrice, 'price')}/m² (+${rentPriceGrowth.toFixed(1)}%).`,
                     'yield': `Rendement: reste à ${minYield.toFixed(1)}–${maxYield.toFixed(1)}%, avec une légère ${yieldTrend === 'снижение' ? 'diminution' : yieldTrend === 'рост' ? 'augmentation' : 'variation'} d'ici ${lastMonthName} ${lastMonth.property_year}.`
                 },
                 'tr': {
-                    'title': getText('forecastAnalysisTitle'),
+                    'title': 'Tahmin Analizi',
                     'sale': `Satış: ${firstMonthName} ${firstMonth.property_year}'de ${formatValue(firstSalePrice, 'price')}/m²'den ${lastMonthName} ${lastMonth.property_year}'de ${formatValue(lastSalePrice, 'price')}/m²'ye kararlı fiyat artışı bekleniyor (+${salePriceGrowth.toFixed(1)}% ${forecastTrends.length} ay boyunca).`,
                     'rent': `Kiralama: ${formatValue(firstRentPrice, 'price')}/m²'den ${formatValue(lastRentPrice, 'price')}/m²'ye artış öngörülüyor (+${rentPriceGrowth.toFixed(1)}%).`,
                     'yield': `Getiri: ${minYield.toFixed(1)}–${maxYield.toFixed(1)}% seviyesinde kalıyor, ${lastMonthName} ${lastMonth.property_year}'ye kadar hafif ${yieldTrend === 'снижение' ? 'azalma' : yieldTrend === 'рост' ? 'artış' : 'değişim'} ile.`
@@ -9459,8 +9172,18 @@
         async function generateConsolidatedAssessment(data) {
             if (!data) return '';
             
-            // Show consolidated assessment for all users (removed admin check)
-            console.log('🏗️ Generating consolidated assessment for all users');
+            // Check if user is admin
+            try {
+                const userAccess = await checkUserAccess();
+                if (!userAccess.hasAccess || userAccess.reason !== 'admin') {
+                    // User is not admin, return empty string to hide the block
+                    return '';
+                }
+            } catch (error) {
+                console.error('Error checking user access:', error);
+                // On error, hide the block
+                return '';
+            }
             
             // Define coefficients for each category
             const coefficients = {
@@ -10431,30 +10154,6 @@
                 return '<p>Отчет не найден</p>';
             }
             
-            // Debug: Log all sections present in DOM before extraction
-            console.log('📋 Sections present in DOM before extraction:');
-            const sections = [
-                { id: 'summaryDataSection', name: 'Market Indicators' },
-                { id: 'propertyTrendsSection', name: 'Property Trends' },
-                { class: 'consolidated-assessment-section', name: 'Consolidated Assessment' },
-                { class: 'market-comparison-block', name: 'Market Comparison' },
-                { class: 'analytical-summary', name: 'Analytical Summary' },
-                { class: 'object-summary-section', name: 'Object Summary' },
-                { class: 'forecast-table-section', name: 'Forecast Table' },
-                { class: 'trends-analysis-section', name: 'Trends Analysis' },
-                { class: 'forecast-analysis-section', name: 'Forecast Analysis' }
-            ];
-            
-            sections.forEach(section => {
-                let element;
-                if (section.id) {
-                    element = dataContent.querySelector(`#${section.id}`);
-                } else if (section.class) {
-                    element = dataContent.querySelector(`.${section.class}`);
-                }
-                console.log(`  ${section.name}: ${element ? '✅ Found' : '❌ Missing'}`);
-            });
-            
             // Clone the content to avoid modifying the original
             const clonedContent = dataContent.cloneNode(true);
             
@@ -10997,425 +10696,11 @@
         function showSaveButton() {
             const saveButton = document.getElementById('saveShareButton');
             if (saveButton) {
-                // Hide the original save button since we're using language selection
-                saveButton.style.display = 'none';
-            }
-            
-            // Show the language selection block instead
-            showReportLanguageSelection();
-        }
-
-        // Variables for report language selection
-        let selectedReportLanguage = null;
-        let originalUserLanguage = null;
-
-        // Show report language selection block
-        function showReportLanguageSelection() {
-            const languageSelectionBlock = document.getElementById('reportLanguageSelection');
-            if (languageSelectionBlock) {
-                languageSelectionBlock.style.display = 'block';
-                updateLanguageSelectionText();
+                saveButton.style.display = 'block';
             }
         }
 
-        // Update language selection text based on current UI language
-        function updateLanguageSelectionText() {
-            const titleElement = document.getElementById('reportLangTitle');
-            if (titleElement) {
-                titleElement.textContent = getText('reportLanguageSelectionTitle');
-            }
 
-            // Update button texts
-            const buttons = document.querySelectorAll('.report-lang-btn');
-            buttons.forEach(button => {
-                const lang = button.getAttribute('data-lang');
-                const langButtons = getText('reportLanguageButtons');
-                if (langButtons && langButtons[lang]) {
-                    button.innerHTML = langButtons[lang];
-                }
-            });
-
-            // Update save button text
-            const saveBtn = document.getElementById('saveReportWithLangBtnText');
-            if (saveBtn) {
-                saveBtn.textContent = getText('saveReportButton');
-            }
-        }
-
-        // Get flag emoji for language
-        function getLanguageFlag(lang) {
-            const flags = {
-                'ru': '🇷🇺',
-                'en': '🇺🇸', 
-                'de': '🇩🇪',
-                'fr': '🇫🇷',
-                'tr': '🇹🇷'
-            };
-            return flags[lang] || '🌐';
-        }
-
-        // Select report language
-        function selectReportLanguage(lang) {
-            console.log('Selecting report language:', lang);
-            
-            // Save original user language if not already saved
-            if (!originalUserLanguage) {
-                originalUserLanguage = currentLanguage;
-            }
-            
-            selectedReportLanguage = lang;
-            
-            // Update visual state of buttons
-            document.querySelectorAll('.report-lang-btn').forEach(btn => {
-                btn.classList.remove('selected');
-            });
-            
-            const selectedBtn = document.querySelector(`[data-lang="${lang}"]`);
-            if (selectedBtn) {
-                selectedBtn.classList.add('selected');
-            }
-            
-            // Show save button
-            const saveBtn = document.getElementById('saveReportWithLangBtn');
-            if (saveBtn) {
-                saveBtn.style.display = 'block';
-            }
-            
-            // Regenerate report in selected language
-            regenerateReportWithLanguage(lang);
-        }
-
-        // Regenerate report with selected language
-        function regenerateReportWithLanguage(lang) {
-            console.log('Regenerating report with language:', lang);
-            
-            // Temporarily change language for report generation
-            const previousLang = currentLanguage;
-            currentLanguage = lang;
-            
-            try {
-                // Update all text elements in the report
-                updateReportLanguageElements();
-                
-                // Regenerate summary table with new language
-                if (window.currentSummaryData) {
-                    generateSummaryTable(window.currentSummaryData);
-                }
-                
-                // Regenerate trends table with new language
-                if (window.currentTrendsData) {
-                    regenerateTrendsSection(window.currentTrendsData);
-                }
-                
-                // Regenerate charts with new language
-                regenerateChartsWithLanguage(lang);
-                
-                // Update consolidated assessment with new language
-                regenerateConsolidatedAssessment();
-                
-                // Show success message
-                const langButtons = getText('reportLanguageButtons');
-                const langName = langButtons && langButtons[lang] ? langButtons[lang] : lang;
-                showToast(`Отчет перегенерирован на ${langName}`, 'success');
-                
-            } catch (error) {
-                console.error('Error regenerating report:', error);
-                showToast('Ошибка при перегенерации отчета', 'error');
-                
-                // Restore previous language on error
-                currentLanguage = previousLang;
-            }
-        }
-
-        // Regenerate trends section with new language
-        async function regenerateTrendsSection(trends) {
-            const existingSection = document.getElementById('propertyTrendsSection');
-            if (!existingSection || !trends) return;
-            
-            // Get base prices from the existing data
-            let basePrices = null;
-            if (window.currentBasePrices) {
-                basePrices = window.currentBasePrices;
-            }
-            
-            // Group trends by type
-            const groupedTrends = groupTrendsByType(trends);
-            
-            // Regenerate the trends section HTML
-            existingSection.innerHTML = `
-                <h3 class="data-section-title">${getText('marketTrendsTitle')}</h3>
-                <div class="data-section-content">
-                    <div class="trends-grid">
-                        ${Object.entries(groupedTrends).map(([type, typeTrends]) => {
-                            // Find trend for current month and year
-                            const currentTrend = findCurrentMonthTrend(typeTrends);
-                            if (!currentTrend) return '';
-                            
-                            // Use base prices if available, otherwise use original data
-                            let displayValue = currentTrend.trend_value;
-                            if (basePrices && type === 'price_trend') {
-                                displayValue = basePrices.sale_price;
-                            }
-                            
-                            return `
-                                <div class="trend-card trend-card-${type}">
-                                    <div class="trend-title">${formatTrendType(type)}</div>
-                                    <div class="trend-value">${formatTrendValue(displayValue, type)}</div>
-                                    <div class="trend-details">
-                                        <div class="trend-change">
-                                            ${currentTrend.price_change_sale ? `${getText('saleLabel')} ${formatPercentage(currentTrend.price_change_sale)}` : ''}
-                                            ${currentTrend.price_change_rent ? `${getText('rentLabel')} ${formatPercentage(currentTrend.price_change_rent)}` : ''}
-                                            ${formatCurrentMonthDate(currentTrend)}
-                                        </div>
-                                    </div>
-                                </div>
-                            `;
-                        }).join('')}
-                    </div>
-                    
-                    <!-- Таблица со всеми записями трендов -->
-                    <div class="trends-table-section">
-                        <h4 class="trends-table-title">${getText('detailedTrendsDataTitle')}</h4>
-                        <div class="trends-table-container" id="trendsTableContainer">
-                            <!-- Тренды будут загружены асинхронно -->
-                        </div>
-                    </div>
-                    
-                    <!-- График трендов будет добавлен в generateTrendsTable -->
-                </div>
-            `;
-            
-            // Regenerate trends table
-            const trendsTableContainer = document.getElementById('trendsTableContainer');
-            if (trendsTableContainer) {
-                const trendsTableHtml = await generateTrendsTable(trends);
-                trendsTableContainer.innerHTML = trendsTableHtml;
-                
-                // Regenerate chart if exists
-                if (window.currentTrendsData && document.getElementById('trendsChart')) {
-                    createTrendsChart(window.currentTrendsData, 'sale');
-                }
-            }
-        }
-
-        // Update report language elements
-        function updateReportLanguageElements() {
-            // Update market indicators title
-            const summaryTitle = document.getElementById('summaryDataTitle');
-            if (summaryTitle) {
-                summaryTitle.textContent = getText('marketIndicatorsTitle');
-            }
-            
-            // Update consolidated assessment sections
-            const assessmentTitles = document.querySelectorAll('.consolidated-assessment-title');
-            assessmentTitles.forEach(title => {
-                title.textContent = getText('consolidatedAssessmentTitle');
-            });
-            
-            // Update category titles
-            const categoryTitles = document.querySelectorAll('.assessment-category-title');
-            categoryTitles.forEach((title, index) => {
-                if (index === 0) title.textContent = getText('salePriceTitle');
-                else if (index === 1) title.textContent = getText('rentPriceTitle');
-                else if (index === 2) title.textContent = getText('yieldTitle');
-            });
-            
-            // Update consolidated average labels
-            const consolidatedLabels = document.querySelectorAll('.assessment-consolidated-label');
-            consolidatedLabels.forEach(label => {
-                label.textContent = getText('consolidatedAverageLabel');
-            });
-
-            // Update assessment labels
-            const bedroomsLabels = document.querySelectorAll('.assessment-label');
-            bedroomsLabels.forEach(label => {
-                const labelText = label.textContent;
-                if (labelText.includes('Спальни') || labelText.includes('Bedrooms') || labelText.includes('Schlafzimmer') || labelText.includes('Chambres') || labelText.includes('Yatak odası')) {
-                    const parts = labelText.split(' ');
-                    if (parts.length >= 2) {
-                        label.textContent = `${getText('bedroomsLabel')} ${parts[parts.length - 1]}`;
-                    }
-                } else if (labelText.includes('Этаж') || labelText.includes('Floor') || labelText.includes('Etage') || labelText.includes('Kat')) {
-                    const parts = labelText.split(' ');
-                    if (parts.length >= 2) {
-                        label.textContent = `${getText('floorLabel')} ${parts[parts.length - 1]}`;
-                    }
-                } else if (labelText.includes('Возраст') || labelText.includes('Age') || labelText.includes('Alter') || labelText.includes('Âge') || labelText.includes('Yaş')) {
-                    const parts = labelText.split(' ');
-                    if (parts.length >= 2) {
-                        label.textContent = `${getText('ageLabel')} ${parts[parts.length - 1]}`;
-                    }
-                } else if (labelText.includes('Отопление') || labelText.includes('Heating') || labelText.includes('Heizung') || labelText.includes('Chauffage') || labelText.includes('Isıtma')) {
-                    const parts = labelText.split(' ');
-                    if (parts.length >= 2) {
-                        label.textContent = `${getText('heatingLabel')} ${parts[parts.length - 1]}`;
-                    }
-                }
-            });
-        }
-
-        // Regenerate consolidated assessment with new language
-        function regenerateConsolidatedAssessment() {
-            // Find consolidated assessment section
-            const assessmentSection = document.querySelector('.consolidated-assessment-section');
-            if (assessmentSection && window.currentAssessmentData) {
-                // Regenerate the consolidated assessment HTML with new language
-                const newHtml = generateConsolidatedAssessmentHTML(window.currentAssessmentData);
-                assessmentSection.outerHTML = newHtml;
-            }
-        }
-
-        // Regenerate charts with new language
-        function regenerateChartsWithLanguage(lang) {
-            // Regenerate trends chart
-            if (window.currentTrendsData && document.getElementById('trendsChart')) {
-                const trendsCanvas = document.getElementById('trendsChart');
-                const existingChart = Chart.getChart(trendsCanvas);
-                if (existingChart) {
-                    existingChart.destroy();
-                }
-                
-                // Create new chart with updated language
-                createTrendsChart(window.currentTrendsData, 'sale');
-            }
-            
-            // Regenerate forecast chart
-            if (window.currentForecastData && document.getElementById('forecastChart')) {
-                const forecastCanvas = document.getElementById('forecastChart');
-                const existingChart = Chart.getChart(forecastCanvas);
-                if (existingChart) {
-                    existingChart.destroy();
-                }
-                
-                // Create new chart with updated language
-                createForecastChart(window.currentForecastData, 'sale');
-            }
-        }
-
-        // Save report with selected language
-        async function saveReportWithSelectedLanguage() {
-            if (!selectedReportLanguage) {
-                showToast('Пожалуйста, выберите язык отчета', 'warning');
-                return;
-            }
-            
-            const saveBtn = document.getElementById('saveReportWithLangBtn');
-            const originalText = saveBtn.innerHTML;
-            
-            try {
-                // Disable button and show loading
-                saveBtn.disabled = true;
-                saveBtn.innerHTML = `<span>${getText('savingReport')}</span>`;
-                
-                // Get report content
-                const reportContent = extractReportContent();
-                
-                // Get location info
-                const locationInfo = getLocationInfo();
-                
-                // Get additional report data
-                const reportData = getReportData();
-                
-                // Add selected language to report data
-                reportData.report_language = selectedReportLanguage;
-                
-                // Get telegram_id 
-                let telegramId = null;
-                if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe) {
-                    telegramId = window.Telegram.WebApp.initDataUnsafe.user?.id;
-                }
-                
-                // Save report via API
-                const response = await fetch('/api/save_html_report', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        telegram_id: telegramId,
-                        report_content: reportContent,
-                        location_info: locationInfo,
-                        report_data: reportData
-                    })
-                });
-                
-                const result = await response.json();
-                
-                if (result.success) {
-                    // Show modal with link
-                    showShareModal(result.report_url);
-                    
-                    // Show success message
-                    showToast(`Отчет сохранен на ${getText('reportLanguageButtons')[selectedReportLanguage]}`, 'success');
-                } else {
-                    throw new Error(result.error || 'Unknown error');
-                }
-                
-            } catch (error) {
-                console.error('Error saving report:', error);
-                showToast(getText('errorSaving'), 'error');
-            } finally {
-                // Re-enable button
-                saveBtn.disabled = false;
-                saveBtn.innerHTML = originalText;
-                
-                // DON'T restore original language - keep the report in selected language
-                // The report should remain in the selected language after saving
-                console.log('Report saved successfully in language:', selectedReportLanguage);
-            }
-        }
-
-        // Show toast notification
-        function showToast(message, type = 'info') {
-            // Create toast element
-            const toast = document.createElement('div');
-            toast.className = `toast toast-${type}`;
-            toast.style.cssText = `
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                background: ${type === 'success' ? '#28a745' : type === 'error' ? '#dc3545' : '#17a2b8'};
-                color: white;
-                padding: 15px 20px;
-                border-radius: 8px;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-                z-index: 10000;
-                font-size: 14px;
-                font-weight: 500;
-                animation: slideInRight 0.3s ease-out;
-                max-width: 300px;
-            `;
-            toast.textContent = message;
-            
-            // Add animation styles
-            const style = document.createElement('style');
-            style.textContent = `
-                @keyframes slideInRight {
-                    from { transform: translateX(100%); opacity: 0; }
-                    to { transform: translateX(0); opacity: 1; }
-                }
-                @keyframes slideOutRight {
-                    from { transform: translateX(0); opacity: 1; }
-                    to { transform: translateX(100%); opacity: 0; }
-                }
-            `;
-            document.head.appendChild(style);
-            
-            document.body.appendChild(toast);
-            
-            // Remove toast after 3 seconds
-            setTimeout(() => {
-                toast.style.animation = 'slideOutRight 0.3s ease-in';
-                setTimeout(() => {
-                    if (toast.parentNode) {
-                        toast.parentNode.removeChild(toast);
-                    }
-                    if (style.parentNode) {
-                        style.parentNode.removeChild(style);
-                    }
-                }, 300);
-            }, 3000);
-        }
 
         // Close modal when clicking outside
         document.addEventListener('click', function(event) {

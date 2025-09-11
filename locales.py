@@ -162,22 +162,7 @@ locales = {
         },
         'unit_days': 'дней',
         'unit_years': 'лет',
-        'unit_square_meters': 'м²',
-        
-        # Report language selection
-        'report_language_selection': {
-            'title': 'Выберите язык отчета перед сохранением',
-            'language_buttons': {
-                'ru': 'Русский',
-                'en': 'Английский',
-                'de': 'Немецкий',
-                'fr': 'Французский',
-                'tr': 'Турецкий'
-            },
-            'save_report': 'Сохранить и поделиться отчетом',
-            'saving_report': 'Сохранение отчета...',
-            'error_saving': 'Ошибка при сохранении отчета'
-        }
+        'unit_square_meters': 'м²'
     },
     'en': {
         'welcome_new': 'Welcome to Aaadvisor: instant real estate analytics reports with price and profitability forecasts',
@@ -342,22 +327,7 @@ locales = {
         },
         'unit_days': 'days',
         'unit_years': 'years',
-        'unit_square_meters': 'm²',
-        
-        # Report language selection
-        'report_language_selection': {
-            'title': 'Select report language before saving',
-            'language_buttons': {
-                'ru': 'Russian',
-                'en': 'English',
-                'de': 'German',
-                'fr': 'French',
-                'tr': 'Turkish'
-            },
-            'save_report': 'Save and Share Report',
-            'saving_report': 'Saving report...',
-            'error_saving': 'Error saving report'
-        }
+        'unit_square_meters': 'm²'
     },
     'de': {
         'welcome_new': 'Willkommen bei Aaadvisor: Sofortige Immobilien-Analyseberichte mit Preis- und Rentabilitätsprognosen',
@@ -522,22 +492,7 @@ locales = {
         },
         'unit_days': 'Tage',
         'unit_years': 'Jahre',
-        'unit_square_meters': 'm²',
-        
-        # Report language selection
-        'report_language_selection': {
-            'title': 'Berichtssprache vor dem Speichern auswählen',
-            'language_buttons': {
-                'ru': 'Russisch',
-                'en': 'Englisch',
-                'de': 'Deutsch',
-                'fr': 'Französisch',
-                'tr': 'Türkisch'
-            },
-            'save_report': 'Bericht speichern und teilen',
-            'saving_report': 'Bericht wird gespeichert...',
-            'error_saving': 'Fehler beim Speichern des Berichts'
-        }
+        'unit_square_meters': 'm²'
     },
     'fr': {
         'welcome_new': 'Bienvenue sur Aaadvisor : rapports analytiques immobiliers instantanés avec prévisions de prix et de rentabilité',
@@ -702,22 +657,7 @@ locales = {
         },
         'unit_days': 'jours',
         'unit_years': 'ans',
-        'unit_square_meters': 'm²',
-        
-        # Report language selection
-        'report_language_selection': {
-            'title': 'Sélectionnez la langue du rapport avant de sauvegarder',
-            'language_buttons': {
-                'ru': 'Russe',
-                'en': 'Anglais',
-                'de': 'Allemand',
-                'fr': 'Français',
-                'tr': 'Turc'
-            },
-            'save_report': 'Sauvegarder et partager le rapport',
-            'saving_report': 'Sauvegarde du rapport...',
-            'error_saving': 'Erreur lors de la sauvegarde du rapport'
-        }
+        'unit_square_meters': 'm²'
     },
     'tr': {
         'welcome_new': 'Aaadvisor\'a hoş geldiniz: Anında gayrimenkul analiz raporları, fiyat ve kârlılık tahminleriyle',
@@ -876,21 +816,6 @@ locales = {
         },
         'unit_days': 'gün',
         'unit_years': 'yıl',
-        'unit_square_meters': 'm²',
-        
-        # Report language selection
-        'report_language_selection': {
-            'title': 'Kaydetmeden önce rapor dilini seçin',
-            'language_buttons': {
-                'ru': 'Rusça',
-                'en': 'İngilizce',
-                'de': 'Almanca',
-                'fr': 'Fransızca',
-                'tr': 'Türkçe'
-            },
-            'save_report': 'Raporu kaydet ve paylaş',
-            'saving_report': 'Rapor kaydediliyor...',
-            'error_saving': 'Rapor kaydedilirken hata'
-        }
+        'unit_square_meters': 'm²'
     }
 } 
