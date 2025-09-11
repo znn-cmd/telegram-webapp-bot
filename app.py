@@ -5149,6 +5149,15 @@ def api_save_html_report():
     logger.info(f"=== SAVING HTML REPORT === Data keys: {list(data.keys())}")
     telegram_id_raw = data.get('telegram_id')
     logger.info(f"Telegram ID: {telegram_id_raw}")
+    
+    # Логируем состояние property_info
+    include_property_info = data.get('include_property_info', False)
+    property_info = data.get('property_info')
+    logger.info(f"Include property info: {include_property_info}")
+    logger.info(f"Property info: {property_info}")
+    if property_info:
+        logger.info(f"Property info photos count: {len(property_info.get('photos', []))}")
+        logger.info(f"Property info URL: {property_info.get('url', 'No URL')}")
     if telegram_id_raw is None:
         return jsonify({'error': 'Invalid telegram_id'}), 400
     try:
@@ -5414,7 +5423,9 @@ def api_save_html_report():
             '''
         
         def generate_property_section(property_info, report_data=None):
+            logger.info(f"🏠 generate_property_section called with property_info: {property_info}")
             if not property_info or (not property_info.get('photos') and not property_info.get('url')):
+                logger.info(f"🚫 Property section skipped: no photos or URL")
                 return ""
             
             # Обрабатываем и сохраняем фотографии
@@ -5597,6 +5608,11 @@ def api_save_html_report():
         </div>
                 '''
             return ""
+        
+        # Логируем перед генерацией HTML
+        logger.info(f"🔧 Generating HTML template with include_property_info={include_property_info}")
+        if include_property_info:
+            logger.info(f"🔧 Will call generate_property_section with property_info={property_info}")
         
         # Создаем корпоративный HTML отчет
         html_template = f"""<!DOCTYPE html>
@@ -6597,7 +6613,7 @@ def api_save_html_report():
         </div>
 
         <!-- Информация об объекте (если включена) -->
-        {generate_property_section(property_info, report_data) if include_property_info else ''}
+        {generate_property_section(property_info, report_data) if include_property_info else '<!-- Property section not included -->'}
 
         <!-- Основной контент отчета -->
                         <div class="report-content">
