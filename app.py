@@ -5175,6 +5175,7 @@ def api_save_html_report():
             user_id = telegram_id  # Используем telegram_id как fallback
         
         # Подготавливаем данные для сохранения в БД
+        report_language = report_data.get('report_language', 'ru')  # По умолчанию русский
         db_report_data = {
             'user_id': user_id,
             'report_type': 'property_evaluation',
@@ -5193,6 +5194,7 @@ def api_save_html_report():
                 'content': report_content,
                 'location_info': location_info,
                 'report_number': report_number,
+                'report_language': report_language,
                 'generated_at': datetime.now().isoformat()
             }
         }
@@ -5239,7 +5241,7 @@ def api_save_html_report():
         
         # Создаем корпоративный HTML отчет
         html_template = f"""<!DOCTYPE html>
-<html lang="ru">
+<html lang="{report_language}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
