@@ -5266,6 +5266,7 @@ def api_save_html_report():
             company_name = user_info.get('company_name', 'RealtyCompany')
             about_me = user_info.get('about_me', 'Опытный риэлтор с многолетним стажем работы на рынке недвижимости.')
             phone = user_info.get('phone', '')
+            email = user_info.get('email', '')
             website_url = user_info.get('website_url', '')
             whatsapp_link = user_info.get('whatsapp_link', '')
             telegram_link = user_info.get('telegram_link', '')
@@ -5274,8 +5275,14 @@ def api_save_html_report():
             
             # Генерируем фото риэлтора
             photo_html = ''
-            if user_info.get('avatar_path') or user_info.get('photo_url'):
-                photo_url = user_info.get('avatar_path') or user_info.get('photo_url')
+            if user_info.get('avatar_filename') or user_info.get('photo_url'):
+                # Используем avatar_filename из БД (соответствует структуре таблицы)
+                photo_url = user_info.get('avatar_filename') or user_info.get('photo_url')
+                # Если avatar_filename - это только имя файла, добавляем правильный путь
+                if photo_url and not photo_url.startswith('http'):
+                    # Используем правильный путь согласно API /user/<telegram_id>/<filename>
+                    telegram_id = user_info.get('telegram_id', '')
+                    photo_url = f"/user/{telegram_id}/{photo_url}"
                 photo_html = f'<img src="{photo_url}" alt="{full_name}" class="realtor-photo">'
             else:
                 # Дефолтное фото
@@ -5291,6 +5298,18 @@ def api_save_html_report():
                     </svg>
                     <div class="contact-text">
                         <a href="tel:{phone}" class="contact-link">{phone}</a>
+                    </div>
+                </div>
+                '''
+            
+            if email:
+                contacts_html += f'''
+                <div class="contact-item">
+                    <svg class="contact-icon" viewBox="0 0 24 24" fill="#3498db">
+                        <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+                    </svg>
+                    <div class="contact-text">
+                        <a href="mailto:{email}" class="contact-link">{email}</a>
                     </div>
                 </div>
                 '''
