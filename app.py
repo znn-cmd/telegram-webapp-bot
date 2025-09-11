@@ -5407,7 +5407,7 @@ def api_save_html_report():
         </div>
             '''
         
-        def generate_property_section(property_info):
+        def generate_property_section(property_info, report_data=None):
             if not property_info or (not property_info.get('photos') and not property_info.get('url')):
                 return ""
             
@@ -5457,6 +5457,7 @@ def api_save_html_report():
             # Генерируем блок фотографий
             photos_html = ''
             if saved_photos:
+                # Используем сохраненные фотографии
                 photos_slides = ''
                 photos_dots = ''
                 for i, photo in enumerate(saved_photos):
@@ -5464,6 +5465,36 @@ def api_save_html_report():
                     photos_slides += f'''
                         <div class="photo-slide {active_class}">
                             <img src="{photo['path']}" alt="{photo['name']}">
+                        </div>
+                    '''
+                    photos_dots += f'<span class="carousel-dot {active_class}" onclick="currentSlide({i+1})"></span>'
+                
+                photos_html = f'''
+                    <div class="photos-container">
+                        <div class="photo-carousel" id="photoCarousel">
+                            {photos_slides}
+                            
+                            <!-- Навигация карусели -->
+                            <button class="carousel-nav carousel-prev" onclick="changeSlide(-1)">‹</button>
+                            <button class="carousel-nav carousel-next" onclick="changeSlide(1)">›</button>
+                            
+                            <!-- Индикаторы -->
+                            <div class="carousel-controls">
+                                {photos_dots}
+                            </div>
+                        </div>
+                    </div>
+                '''
+            elif property_info.get('photos'):
+                # Если фотографии не сохранились, но есть в данных - используем base64
+                photos_slides = ''
+                photos_dots = ''
+                for i, photo in enumerate(property_info['photos']):
+                    active_class = 'active' if i == 0 else ''
+                    photo_data = photo.get('data', '')
+                    photos_slides += f'''
+                        <div class="photo-slide {active_class}">
+                            <img src="{photo_data}" alt="Фото объекта {i+1}">
                         </div>
                     '''
                     photos_dots += f'<span class="carousel-dot {active_class}" onclick="currentSlide({i+1})"></span>'
@@ -5499,19 +5530,45 @@ def api_save_html_report():
                     </div>
                 '''
             
-            if photos_html or property_link_html:
+            # Генерируем карту с координатами
+            map_html = ''
+            if report_data and report_data.get('latitude') and report_data.get('longitude'):
+                lat = report_data['latitude']
+                lng = report_data['longitude']
+                # Создаем границы карты (примерно 0.01 градуса в каждую сторону)
+                bbox_west = lng - 0.01
+                bbox_south = lat - 0.01  
+                bbox_east = lng + 0.01
+                bbox_north = lat + 0.01
+                
+                map_html = f'''
+                <div class="map-container">
+                    <iframe 
+                        src="https://www.openstreetmap.org/export/embed.html?bbox={bbox_west}%2C{bbox_south}%2C{bbox_east}%2C{bbox_north}&layer=mapnik&marker={lat}%2C{lng}"
+                        width="100%" 
+                        height="100%" 
+                        frameborder="0">
+                    </iframe>
+                </div>
+                '''
+            else:
+                map_html = '''
+                <div class="map-container">
+                    <div style="display: flex; align-items: center; justify-content: center; height: 100%; background: #f8f9fa; color: #6c757d;">
+                        📍 Карта локации
+                    </div>
+                </div>
+                '''
+
+            if photos_html or property_link_html or map_html:
                 return f'''
         <!-- Блок карты и фотографий -->
         <div class="location-visual-section">
             <h3 class="location-visual-title">Расположение и фотографии объекта</h3>
             
             <div class="location-visual-grid">
-                <!-- Карта (заглушка) -->
-                <div class="map-container">
-                    <div style="display: flex; align-items: center; justify-content: center; height: 100%; background: #f8f9fa; color: #6c757d;">
-                        📍 Карта локации
-                    </div>
-                </div>
+                <!-- Карта -->
+                {map_html}
                 
                 <!-- Карусель фотографий -->
                 {photos_html}
@@ -6518,7 +6575,7 @@ def api_save_html_report():
         </div>
 
         <!-- Информация об объекте (если включена) -->
-        {generate_property_section(property_info) if include_property_info else ''}
+        {generate_property_section(property_info, report_data) if include_property_info else ''}
 
         <!-- Основной контент отчета -->
                         <div class="report-content">
