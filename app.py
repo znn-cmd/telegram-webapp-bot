@@ -308,9 +308,21 @@ def serve_logo_flt():
     return send_from_directory('.', 'logo-flt.png')
 
 @app.route('/reports/<filename>')
-def serve_report(filename):
-    """Доступ к сохраненным отчетам"""
+def serve_report_legacy(filename):
+    """Доступ к сохраненным отчетам (legacy для старых отчетов)"""
     return send_from_directory('reports', filename)
+
+@app.route('/reports/<int:telegram_id>/<report_id>/<filename>')
+def serve_report(telegram_id, report_id, filename):
+    """Доступ к сохраненным отчетам в новой структуре папок"""
+    report_dir = os.path.join('reports', str(telegram_id), report_id)
+    return send_from_directory(report_dir, filename)
+
+@app.route('/reports/<int:telegram_id>/<report_id>/photos/<photo_filename>')
+def serve_report_photo(telegram_id, report_id, photo_filename):
+    """Доступ к фотографиям отчета"""
+    photos_dir = os.path.join('reports', str(telegram_id), report_id, 'photos')
+    return send_from_directory(photos_dir, photo_filename)
 
 def determine_user_language(user, telegram_language_code):
     """
@@ -5158,10 +5170,20 @@ def api_save_html_report():
         random_suffix = ''.join(random.choices(string.digits, k=5))
         report_number = f"RPT-{timestamp}-{random_suffix}"
         
-        # Генерируем уникальное имя файла только цифрами
-        file_id = ''.join(random.choices(string.digits, k=12))
-        filename = f"{file_id}.html"
-        file_path = os.path.join('reports', filename)
+        # Генерируем уникальный ID отчета для папки
+        report_folder_id = ''.join(random.choices(string.digits, k=12))
+        
+        # Создаем структуру папок: reports/{telegram_id}/{report_folder_id}/
+        user_reports_dir = os.path.join('reports', str(telegram_id))
+        report_dir = os.path.join(user_reports_dir, report_folder_id)
+        
+        # Создаем папки если их нет
+        os.makedirs(report_dir, exist_ok=True)
+        
+        # Пути для файлов
+        filename = f"{report_folder_id}.html"
+        file_path = os.path.join(report_dir, filename)
+        photos_dir = os.path.join(report_dir, 'photos')
         
         # Получаем информацию о пользователе из таблицы users
         user_info = None
@@ -5203,7 +5225,7 @@ def api_save_html_report():
             'price_range_max': report_data.get('price_range_max'),
             'price': report_data.get('price'),
             'area': report_data.get('area'),
-            'report_url': f"/reports/{filename}",
+            'report_url': f"/reports/{telegram_id}/{report_folder_id}/{filename}",
             'full_report': {
                 'content': report_content,
                 'location_info': location_info,
@@ -5249,7 +5271,7 @@ def api_save_html_report():
             report_id = None
         
         # Генерируем QR-код для верификации
-        verification_url = f"{request.host_url.rstrip('/')}/reports/{filename}"
+        verification_url = f"{request.host_url.rstrip('/')}/reports/{telegram_id}/{report_folder_id}/{filename}"
         qr_code_svg = generate_qr_code_svg(verification_url)
         
         # Функции для генерации дополнительного контента
@@ -5389,16 +5411,59 @@ def api_save_html_report():
             if not property_info or (not property_info.get('photos') and not property_info.get('url')):
                 return ""
             
+            # Обрабатываем и сохраняем фотографии
+            saved_photos = []
+            if property_info.get('photos'):
+                # Создаем папку для фотографий
+                os.makedirs(photos_dir, exist_ok=True)
+                
+                for i, photo in enumerate(property_info['photos']):
+                    try:
+                        # Декодируем base64 изображение
+                        if photo.get('data') and photo['data'].startswith('data:image/'):
+                            # Извлекаем данные изображения
+                            header, encoded = photo['data'].split(',', 1)
+                            image_data = base64.b64decode(encoded)
+                            
+                            # Определяем расширение файла
+                            if 'jpeg' in header or 'jpg' in header:
+                                ext = '.jpg'
+                            elif 'png' in header:
+                                ext = '.png'
+                            elif 'webp' in header:
+                                ext = '.webp'
+                            else:
+                                ext = '.jpg'  # по умолчанию
+                            
+                            # Генерируем имя файла
+                            photo_filename = f"property_{i+1}{ext}"
+                            photo_path = os.path.join(photos_dir, photo_filename)
+                            
+                            # Сохраняем файл
+                            with open(photo_path, 'wb') as f:
+                                f.write(image_data)
+                            
+                            # Сохраняем относительный путь для HTML
+                            relative_photo_path = f"photos/{photo_filename}"
+                            saved_photos.append({
+                                'path': relative_photo_path,
+                                'name': photo.get('name', f'Фото {i+1}')
+                            })
+                            
+                    except Exception as e:
+                        logger.error(f"Error saving photo {i}: {e}")
+                        continue
+            
             # Генерируем блок фотографий
             photos_html = ''
-            if property_info.get('photos'):
+            if saved_photos:
                 photos_slides = ''
                 photos_dots = ''
-                for i, photo in enumerate(property_info['photos']):
+                for i, photo in enumerate(saved_photos):
                     active_class = 'active' if i == 0 else ''
                     photos_slides += f'''
                         <div class="photo-slide {active_class}">
-                            <img src="{photo.get('data', '')}" alt="Фото объекта {i+1}">
+                            <img src="{photo['path']}" alt="{photo['name']}">
                         </div>
                     '''
                     photos_dots += f'<span class="carousel-dot {active_class}" onclick="currentSlide({i+1})"></span>'
