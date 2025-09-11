@@ -5225,7 +5225,7 @@ def api_save_html_report():
             'price_range_max': report_data.get('price_range_max'),
             'price': report_data.get('price'),
             'area': report_data.get('area'),
-            'report_url': f"/reports/{telegram_id}/{report_folder_id}/{filename}",
+            'report_url': f"{request.host_url.rstrip('/')}/reports/{telegram_id}/{report_folder_id}/{filename}",
             'full_report': {
                 'content': report_content,
                 'location_info': location_info,
@@ -6862,7 +6862,7 @@ def api_save_html_report():
         
         # Генерируем ссылку
         base_url = request.host_url.rstrip('/')
-        report_url = f"{base_url}/reports/{filename}"
+        report_url = f"{base_url}/reports/{telegram_id}/{report_folder_id}/{filename}"
         
         return jsonify({
             'success': True,
