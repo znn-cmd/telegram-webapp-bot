@@ -5427,6 +5427,8 @@ def api_save_html_report():
                 
                 for i, photo in enumerate(property_info['photos']):
                     try:
+                        logger.info(f"Processing photo {i+1}: has_data={bool(photo.get('data'))}, data_length={len(photo.get('data', ''))}")
+                        
                         # Декодируем base64 изображение
                         if photo.get('data') and photo['data'].startswith('data:image/'):
                             # Извлекаем данные изображения
@@ -5459,9 +5461,13 @@ def api_save_html_report():
                                 'path': relative_photo_path,
                                 'name': photo.get('name', f'Фото {i+1}')
                             })
+                        else:
+                            logger.warning(f"Photo {i+1} skipped: invalid data format. Data starts with: {photo.get('data', '')[:50]}")
                             
                     except Exception as e:
-                        logger.error(f"Error saving photo {i}: {e}")
+                        logger.error(f"Error saving photo {i+1}: {e}")
+                        import traceback
+                        logger.error(f"Traceback: {traceback.format_exc()}")
                         continue
             
             logger.info(f"Successfully saved {len(saved_photos)} photos")

@@ -10410,6 +10410,10 @@
                 // Get additional report data
                 const reportData = getReportData();
                 
+                // Debug: log property info
+                console.log('Property Info before sending:', propertyInfo);
+                console.log('Number of photos:', propertyInfo.photos ? propertyInfo.photos.length : 0);
+                
                 // Get telegram_id 
                 let telegramId = null;
                 if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe) {
@@ -11027,6 +11031,12 @@
         function savePropertyInfo() {
             const urlInput = document.getElementById('propertyUrl');
             propertyInfo.url = urlInput.value;
+            
+            console.log('Saving property info:', {
+                url: propertyInfo.url,
+                photosCount: propertyInfo.photos.length
+            });
+            
             closePropertyInfoModal();
             
             // Uncheck the checkbox since we've handled the modal
@@ -11080,6 +11090,7 @@
                             name: file.name,
                             data: e.target.result
                         });
+                        console.log(`Added photo: ${file.name}, total photos: ${propertyInfo.photos.length}`);
                         updatePhotoPreview();
                     };
                     reader.readAsDataURL(file);
