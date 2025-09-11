@@ -3177,23 +3177,25 @@
         }
 
         .save-report-with-lang-btn {
-            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            width: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
             border-radius: 12px;
-            padding: 15px 30px;
+            padding: 15px 20px;
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.2);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
             animation: fadeIn 0.5s ease-out;
+            text-align: center;
         }
 
         .save-report-with-lang-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(40, 167, 69, 0.3);
-            background: linear-gradient(135deg, #218838 0%, #1e7e34 100%);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
+            background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
         }
 
         .save-report-with-lang-btn:disabled {
@@ -3921,23 +3923,23 @@
             </div>
             <div class="report-lang-buttons" id="reportLangButtons">
                 <button class="report-lang-btn" data-lang="ru" onclick="selectReportLanguage('ru')">
-                    🇷🇺 Русский
+                    Русский
                 </button>
                 <button class="report-lang-btn" data-lang="en" onclick="selectReportLanguage('en')">
-                    🇺🇸 Английский
+                    Английский
                 </button>
                 <button class="report-lang-btn" data-lang="de" onclick="selectReportLanguage('de')">
-                    🇩🇪 Немецкий
+                    Немецкий
                 </button>
                 <button class="report-lang-btn" data-lang="fr" onclick="selectReportLanguage('fr')">
-                    🇫🇷 Французский
+                    Французский
                 </button>
                 <button class="report-lang-btn" data-lang="tr" onclick="selectReportLanguage('tr')">
-                    🇹🇷 Турецкий
+                    Турецкий
                 </button>
             </div>
             <button class="save-report-with-lang-btn" id="saveReportWithLangBtn" onclick="saveReportWithSelectedLanguage()" style="display: none;">
-                <span id="saveReportWithLangBtnText">Сохранить отчет</span>
+                <span id="saveReportWithLangBtnText">Сохранить и поделиться отчетом</span>
             </button>
         </div>
 
@@ -4266,7 +4268,7 @@
                     'fr': 'Французский',
                     'tr': 'Турецкий'
                 },
-                'saveReportButton': 'Сохранить отчет',
+                'saveReportButton': 'Сохранить и поделиться отчетом',
                 'savingReport': 'Сохранение отчета...',
                 'errorSaving': 'Ошибка при сохранении отчета'
             },
@@ -4525,7 +4527,7 @@
                     'fr': 'French',
                     'tr': 'Turkish'
                 },
-                'saveReportButton': 'Save Report',
+                'saveReportButton': 'Save and Share Report',
                 'savingReport': 'Saving report...',
                 'errorSaving': 'Error saving report'
             },
@@ -4784,7 +4786,7 @@
                     'fr': 'Französisch',
                     'tr': 'Türkisch'
                 },
-                'saveReportButton': 'Bericht speichern',
+                'saveReportButton': 'Bericht speichern und teilen',
                 'savingReport': 'Bericht wird gespeichert...',
                 'errorSaving': 'Fehler beim Speichern des Berichts'
             },
@@ -5465,7 +5467,7 @@
                     'fr': 'Français',
                     'tr': 'Turc'
                 },
-                'saveReportButton': 'Sauvegarder le rapport',
+                'saveReportButton': 'Sauvegarder et partager le rapport',
                 'savingReport': 'Sauvegarde du rapport...',
                 'errorSaving': 'Erreur lors de la sauvegarde du rapport'
             },
@@ -5569,7 +5571,7 @@
                     'fr': 'Fransızca',
                     'tr': 'Türkçe'
                 },
-                'saveReportButton': 'Raporu kaydet',
+                'saveReportButton': 'Raporu kaydet ve paylaş',
                 'savingReport': 'Rapor kaydediliyor...',
                 'errorSaving': 'Rapor kaydedilirken hata'
             }
@@ -11021,8 +11023,7 @@
                 const lang = button.getAttribute('data-lang');
                 const langButtons = getText('reportLanguageButtons');
                 if (langButtons && langButtons[lang]) {
-                    const flag = getLanguageFlag(lang);
-                    button.innerHTML = `${flag} ${langButtons[lang]}`;
+                    button.innerHTML = langButtons[lang];
                 }
             });
 
@@ -11091,8 +11092,13 @@
                 // Regenerate charts with new language
                 regenerateChartsWithLanguage(lang);
                 
+                // Update consolidated assessment with new language
+                regenerateConsolidatedAssessment();
+                
                 // Show success message
-                showToast(`Отчет перегенерирован на ${getText('reportLanguageButtons')[lang]}`, 'success');
+                const langButtons = getText('reportLanguageButtons');
+                const langName = langButtons && langButtons[lang] ? langButtons[lang] : lang;
+                showToast(`Отчет перегенерирован на ${langName}`, 'success');
                 
             } catch (error) {
                 console.error('Error regenerating report:', error);
@@ -11130,6 +11136,44 @@
             consolidatedLabels.forEach(label => {
                 label.textContent = getText('consolidatedAverageLabel');
             });
+
+            // Update assessment labels
+            const bedroomsLabels = document.querySelectorAll('.assessment-label');
+            bedroomsLabels.forEach(label => {
+                const labelText = label.textContent;
+                if (labelText.includes('Спальни') || labelText.includes('Bedrooms') || labelText.includes('Schlafzimmer') || labelText.includes('Chambres') || labelText.includes('Yatak odası')) {
+                    const parts = labelText.split(' ');
+                    if (parts.length >= 2) {
+                        label.textContent = `${getText('bedroomsLabel')} ${parts[parts.length - 1]}`;
+                    }
+                } else if (labelText.includes('Этаж') || labelText.includes('Floor') || labelText.includes('Etage') || labelText.includes('Kat')) {
+                    const parts = labelText.split(' ');
+                    if (parts.length >= 2) {
+                        label.textContent = `${getText('floorLabel')} ${parts[parts.length - 1]}`;
+                    }
+                } else if (labelText.includes('Возраст') || labelText.includes('Age') || labelText.includes('Alter') || labelText.includes('Âge') || labelText.includes('Yaş')) {
+                    const parts = labelText.split(' ');
+                    if (parts.length >= 2) {
+                        label.textContent = `${getText('ageLabel')} ${parts[parts.length - 1]}`;
+                    }
+                } else if (labelText.includes('Отопление') || labelText.includes('Heating') || labelText.includes('Heizung') || labelText.includes('Chauffage') || labelText.includes('Isıtma')) {
+                    const parts = labelText.split(' ');
+                    if (parts.length >= 2) {
+                        label.textContent = `${getText('heatingLabel')} ${parts[parts.length - 1]}`;
+                    }
+                }
+            });
+        }
+
+        // Regenerate consolidated assessment with new language
+        function regenerateConsolidatedAssessment() {
+            // Find consolidated assessment section
+            const assessmentSection = document.querySelector('.consolidated-assessment-section');
+            if (assessmentSection && window.currentAssessmentData) {
+                // Regenerate the consolidated assessment HTML with new language
+                const newHtml = generateConsolidatedAssessmentHTML(window.currentAssessmentData);
+                assessmentSection.outerHTML = newHtml;
+            }
         }
 
         // Regenerate charts with new language
@@ -11222,15 +11266,13 @@
                 console.error('Error saving report:', error);
                 showToast(getText('errorSaving'), 'error');
             } finally {
-                // Re-enable button and restore original language
+                // Re-enable button
                 saveBtn.disabled = false;
                 saveBtn.innerHTML = originalText;
                 
-                // Restore original user language for UI
-                if (originalUserLanguage) {
-                    currentLanguage = originalUserLanguage;
-                    updatePageText(); // Update UI back to user's language
-                }
+                // DON'T restore original language - keep the report in selected language
+                // The report should remain in the selected language after saving
+                console.log('Report saved successfully in language:', selectedReportLanguage);
             }
         }
 

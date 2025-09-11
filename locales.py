@@ -174,7 +174,7 @@ locales = {
                 'fr': 'Французский',
                 'tr': 'Турецкий'
             },
-            'save_report': 'Сохранить отчет',
+            'save_report': 'Сохранить и поделиться отчетом',
             'saving_report': 'Сохранение отчета...',
             'error_saving': 'Ошибка при сохранении отчета'
         }
@@ -354,7 +354,7 @@ locales = {
                 'fr': 'French',
                 'tr': 'Turkish'
             },
-            'save_report': 'Save Report',
+            'save_report': 'Save and Share Report',
             'saving_report': 'Saving report...',
             'error_saving': 'Error saving report'
         }
@@ -534,7 +534,7 @@ locales = {
                 'fr': 'Französisch',
                 'tr': 'Türkisch'
             },
-            'save_report': 'Bericht speichern',
+            'save_report': 'Bericht speichern und teilen',
             'saving_report': 'Bericht wird gespeichert...',
             'error_saving': 'Fehler beim Speichern des Berichts'
         }
@@ -714,7 +714,7 @@ locales = {
                 'fr': 'Français',
                 'tr': 'Turc'
             },
-            'save_report': 'Sauvegarder le rapport',
+            'save_report': 'Sauvegarder et partager le rapport',
             'saving_report': 'Sauvegarde du rapport...',
             'error_saving': 'Erreur lors de la sauvegarde du rapport'
         }
@@ -888,7 +888,7 @@ locales = {
                 'fr': 'Fransızca',
                 'tr': 'Türkçe'
             },
-            'save_report': 'Raporu kaydet',
+            'save_report': 'Raporu kaydet ve paylaş',
             'saving_report': 'Rapor kaydediliyor...',
             'error_saving': 'Rapor kaydedilirken hata'
         }
