@@ -4172,6 +4172,7 @@
                 
                 // Trends analysis
                 'trendsAnalysisTitle': 'Вывод по тренду',
+                'forecastAnalysisTitle': 'Вывод прогноза',
                 
                 // Table headers for trends
                 'priceChangeLabel': 'Изм-ие цены',
@@ -4431,6 +4432,7 @@
                 
                 // Trends analysis
                 'trendsAnalysisTitle': 'Trend Analysis',
+                'forecastAnalysisTitle': 'Forecast Analysis',
                 
                 // Table headers for trends
                 'priceChangeLabel': 'Price Change',
@@ -4613,6 +4615,7 @@
                 
                 // Trends analysis
                 'trendsAnalysisTitle': 'Trendanalyse',
+                'forecastAnalysisTitle': 'Prognose-Analyse',
                 
                 // Keys for market analysis text
                 'marketAnalysisTitle': 'Marktanalyse',
@@ -4690,6 +4693,7 @@
                 
                 // Trends analysis
                 'trendsAnalysisTitle': 'Trendanalyse',
+                'forecastAnalysisTitle': 'Prognose-Analyse',
                 
                 // Table headers for trends
                 'priceChangeLabel': 'Preisänderung',
@@ -4901,6 +4905,7 @@
                 
                 // Trends analysis
                 'trendsAnalysisTitle': 'Analyse des tendances',
+                'forecastAnalysisTitle': 'Analyse des prévisions',
                 
                 // Table headers for trends
                 'priceChangeLabel': 'Changement de prix',
@@ -5107,6 +5112,7 @@
                 
                 // Trends analysis
                 'trendsAnalysisTitle': 'Trend Analizi',
+                'forecastAnalysisTitle': 'Tahmin Analizi',
                 
                 // Table headers for trends
                 'priceChangeLabel': 'Fiyat Değişimi',
@@ -5371,6 +5377,7 @@
                 
                 // Trends analysis
                 'trendsAnalysisTitle': 'Analyse des tendances',
+                'forecastAnalysisTitle': 'Analyse des prévisions',
                 
                 // Table headers for trends
                 'priceChangeLabel': 'Changement de prix',
@@ -8867,31 +8874,31 @@
             // Формируем аналитический вывод на разных языках
             const analysisTexts = {
                 'ru': {
-                    'title': 'Вывод прогноза',
+                    'title': getText('forecastAnalysisTitle'),
                     'sale': `${getText('saleLabel')} ожидается стабильный рост цен с ${formatValue(firstSalePrice, 'price')}/м² в ${firstMonthName} ${firstMonth.property_year} до ${formatValue(lastSalePrice, 'price')}/м² в ${lastMonthName} ${lastMonth.property_year} (+${salePriceGrowth.toFixed(1)}% за ${forecastTrends.length} месяцев).`,
                     'rent': `${getText('rentLabel')} прогнозируется увеличение с ${formatValue(firstRentPrice, 'price')}/м² до ${formatValue(lastRentPrice, 'price')}/м² (+${rentPriceGrowth.toFixed(1)}%).`,
                     'yield': `${getText('yieldLabel')}: остаётся на уровне ${minYield.toFixed(1)}–${maxYield.toFixed(1)}%, с лёгким ${yieldTrend === 'снижение' ? 'снижением' : yieldTrend === 'рост' ? 'ростом' : 'изменением'} к ${lastMonthName} ${lastMonth.property_year} года.`
                 },
                 'en': {
-                    'title': 'Forecast Analysis',
+                    'title': getText('forecastAnalysisTitle'),
                     'sale': `Sales: stable price growth is expected from ${formatValue(firstSalePrice, 'price')}/m² in ${firstMonthName} ${firstMonth.property_year} to ${formatValue(lastSalePrice, 'price')}/m² in ${lastMonthName} ${lastMonth.property_year} (+${salePriceGrowth.toFixed(1)}% over ${forecastTrends.length} months).`,
                     'rent': `Rent: increase is forecasted from ${formatValue(firstRentPrice, 'price')}/m² to ${formatValue(lastRentPrice, 'price')}/m² (+${rentPriceGrowth.toFixed(1)}%).`,
                     'yield': `Yield: remains at ${minYield.toFixed(1)}–${maxYield.toFixed(1)}%, with a slight ${yieldTrend === 'снижение' ? 'decrease' : yieldTrend === 'рост' ? 'increase' : 'change'} by ${lastMonthName} ${lastMonth.property_year}.`
                 },
                 'de': {
-                    'title': 'Prognose-Analyse',
+                    'title': getText('forecastAnalysisTitle'),
                     'sale': `Verkauf: Stabile Preiserhöhung wird erwartet von ${formatValue(firstSalePrice, 'price')}/m² im ${firstMonthName} ${firstMonth.property_year} bis ${formatValue(lastSalePrice, 'price')}/m² im ${lastMonthName} ${lastMonth.property_year} (+${salePriceGrowth.toFixed(1)}% über ${forecastTrends.length} Monate).`,
                     'rent': `Miete: Anstieg wird prognostiziert von ${formatValue(firstRentPrice, 'price')}/m² auf ${formatValue(lastRentPrice, 'price')}/m² (+${rentPriceGrowth.toFixed(1)}%).`,
                     'yield': `Rendite: bleibt bei ${minYield.toFixed(1)}–${maxYield.toFixed(1)}%, mit leichter ${yieldTrend === 'снижение' ? 'Abnahme' : yieldTrend === 'рост' ? 'Zunahme' : 'Änderung'} bis ${lastMonthName} ${lastMonth.property_year}.`
                 },
                 'fr': {
-                    'title': 'Analyse des prévisions',
+                    'title': getText('forecastAnalysisTitle'),
                     'sale': `Vente: une croissance stable des prix est attendue de ${formatValue(firstSalePrice, 'price')}/m² en ${firstMonthName} ${firstMonth.property_year} à ${formatValue(lastSalePrice, 'price')}/m² en ${lastMonthName} ${lastMonth.property_year} (+${salePriceGrowth.toFixed(1)}% sur ${forecastTrends.length} mois).`,
                     'rent': `Location: une augmentation est prévue de ${formatValue(firstRentPrice, 'price')}/m² à ${formatValue(lastRentPrice, 'price')}/m² (+${rentPriceGrowth.toFixed(1)}%).`,
                     'yield': `Rendement: reste à ${minYield.toFixed(1)}–${maxYield.toFixed(1)}%, avec une légère ${yieldTrend === 'снижение' ? 'diminution' : yieldTrend === 'рост' ? 'augmentation' : 'variation'} d'ici ${lastMonthName} ${lastMonth.property_year}.`
                 },
                 'tr': {
-                    'title': 'Tahmin Analizi',
+                    'title': getText('forecastAnalysisTitle'),
                     'sale': `Satış: ${firstMonthName} ${firstMonth.property_year}'de ${formatValue(firstSalePrice, 'price')}/m²'den ${lastMonthName} ${lastMonth.property_year}'de ${formatValue(lastSalePrice, 'price')}/m²'ye kararlı fiyat artışı bekleniyor (+${salePriceGrowth.toFixed(1)}% ${forecastTrends.length} ay boyunca).`,
                     'rent': `Kiralama: ${formatValue(firstRentPrice, 'price')}/m²'den ${formatValue(lastRentPrice, 'price')}/m²'ye artış öngörülüyor (+${rentPriceGrowth.toFixed(1)}%).`,
                     'yield': `Getiri: ${minYield.toFixed(1)}–${maxYield.toFixed(1)}% seviyesinde kalıyor, ${lastMonthName} ${lastMonth.property_year}'ye kadar hafif ${yieldTrend === 'снижение' ? 'azalma' : yieldTrend === 'рост' ? 'artış' : 'değişim'} ile.`
@@ -11089,6 +11096,16 @@
                 // Update all text elements in the report
                 updateReportLanguageElements();
                 
+                // Regenerate summary table with new language
+                if (window.currentSummaryData) {
+                    generateSummaryTable(window.currentSummaryData);
+                }
+                
+                // Regenerate trends table with new language
+                if (window.currentTrendsData) {
+                    regenerateTrendsSection(window.currentTrendsData);
+                }
+                
                 // Regenerate charts with new language
                 regenerateChartsWithLanguage(lang);
                 
@@ -11106,6 +11123,77 @@
                 
                 // Restore previous language on error
                 currentLanguage = previousLang;
+            }
+        }
+
+        // Regenerate trends section with new language
+        async function regenerateTrendsSection(trends) {
+            const existingSection = document.getElementById('propertyTrendsSection');
+            if (!existingSection || !trends) return;
+            
+            // Get base prices from the existing data
+            let basePrices = null;
+            if (window.currentBasePrices) {
+                basePrices = window.currentBasePrices;
+            }
+            
+            // Group trends by type
+            const groupedTrends = groupTrendsByType(trends);
+            
+            // Regenerate the trends section HTML
+            existingSection.innerHTML = `
+                <h3 class="data-section-title">${getText('marketTrendsTitle')}</h3>
+                <div class="data-section-content">
+                    <div class="trends-grid">
+                        ${Object.entries(groupedTrends).map(([type, typeTrends]) => {
+                            // Find trend for current month and year
+                            const currentTrend = findCurrentMonthTrend(typeTrends);
+                            if (!currentTrend) return '';
+                            
+                            // Use base prices if available, otherwise use original data
+                            let displayValue = currentTrend.trend_value;
+                            if (basePrices && type === 'price_trend') {
+                                displayValue = basePrices.sale_price;
+                            }
+                            
+                            return `
+                                <div class="trend-card trend-card-${type}">
+                                    <div class="trend-title">${formatTrendType(type)}</div>
+                                    <div class="trend-value">${formatTrendValue(displayValue, type)}</div>
+                                    <div class="trend-details">
+                                        <div class="trend-change">
+                                            ${currentTrend.price_change_sale ? `${getText('saleLabel')} ${formatPercentage(currentTrend.price_change_sale)}` : ''}
+                                            ${currentTrend.price_change_rent ? `${getText('rentLabel')} ${formatPercentage(currentTrend.price_change_rent)}` : ''}
+                                            ${formatCurrentMonthDate(currentTrend)}
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                    
+                    <!-- Таблица со всеми записями трендов -->
+                    <div class="trends-table-section">
+                        <h4 class="trends-table-title">${getText('detailedTrendsDataTitle')}</h4>
+                        <div class="trends-table-container" id="trendsTableContainer">
+                            <!-- Тренды будут загружены асинхронно -->
+                        </div>
+                    </div>
+                    
+                    <!-- График трендов будет добавлен в generateTrendsTable -->
+                </div>
+            `;
+            
+            // Regenerate trends table
+            const trendsTableContainer = document.getElementById('trendsTableContainer');
+            if (trendsTableContainer) {
+                const trendsTableHtml = await generateTrendsTable(trends);
+                trendsTableContainer.innerHTML = trendsTableHtml;
+                
+                // Regenerate chart if exists
+                if (window.currentTrendsData && document.getElementById('trendsChart')) {
+                    createTrendsChart(window.currentTrendsData, 'sale');
+                }
             }
         }
 
