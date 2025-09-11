@@ -305,6 +305,82 @@
         /* Toast с автоисчезновением и анимацией */
         .toast.fade-out { opacity: 0; transition: opacity 0.4s; }
         #modal-info.fade-out, #modal-confirm.fade-out, #modal-topup.fade-out, #topup-modal.fade-out { opacity: 0; transition: opacity 0.35s; }
+        
+        /* Стили для блока выбора языка отчета */
+        .report-lang-block {
+            background: #f4f7ff;
+            border-radius: 12px;
+            padding: 20px 16px;
+            margin-bottom: 18px;
+            box-shadow: 0 2px 8px rgba(102,126,234,0.08);
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        .report-lang-title {
+            font-size: 17px;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+        
+        .report-lang-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 15px;
+        }
+        
+        .report-lang-btn {
+            background: white;
+            color: #333;
+            border: 2px solid #ddd;
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            min-width: 80px;
+        }
+        
+        .report-lang-btn:hover {
+            transform: scale(1.05) !important;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            border-color: #667eea;
+        }
+        
+        .report-lang-btn.selected {
+            background: #28a745 !important;
+            color: white !important;
+            border-color: #28a745 !important;
+            box-shadow: 0 3px 12px rgba(40,167,69,0.3);
+        }
+        
+        .report-lang-btn.selected:hover {
+            background: #218838 !important;
+            border-color: #218838 !important;
+        }
+        
+        .report-save-btn {
+            width: 100% !important;
+            font-size: 16px !important;
+            padding: 14px 0 !important;
+            animation: fadeIn 0.3s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { 
+                opacity: 0; 
+                transform: translateY(-10px); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0); 
+            }
+        }
     </style>
 </head>
 <body>
@@ -486,6 +562,18 @@
                         'client_username_placeholder': 'Telegram username (без @)',
                         'cancel': 'Отмена',
                         'send': 'Отправить'
+                    },
+                    'report_language_selection': {
+                        'title': 'Выберите язык отчета перед сохранением',
+                        'language_buttons': {
+                            'ru': 'Русский',
+                            'en': 'Английский', 
+                            'de': 'Немецкий',
+                            'fr': 'Французский',
+                            'tr': 'Турецкий'
+                        },
+                        'save_report': 'Сохранить отчет',
+                        'language_selected': 'Язык выбран: '
                     }
                 },
                 'en': {
@@ -516,6 +604,18 @@
                         'client_username_placeholder': 'Telegram username (without @)',
                         'cancel': 'Cancel',
                         'send': 'Send'
+                    },
+                    'report_language_selection': {
+                        'title': 'Select report language before saving',
+                        'language_buttons': {
+                            'ru': 'Russian',
+                            'en': 'English', 
+                            'de': 'German',
+                            'fr': 'French',
+                            'tr': 'Turkish'
+                        },
+                        'save_report': 'Save Report',
+                        'language_selected': 'Language selected: '
                     }
                 },
                 'de': {
@@ -546,6 +646,18 @@
                         'client_username_placeholder': 'Telegram-Benutzername (ohne @)',
                         'cancel': 'Abbrechen',
                         'send': 'Senden'
+                    },
+                    'report_language_selection': {
+                        'title': 'Berichtssprache vor dem Speichern auswählen',
+                        'language_buttons': {
+                            'ru': 'Russisch',
+                            'en': 'Englisch', 
+                            'de': 'Deutsch',
+                            'fr': 'Französisch',
+                            'tr': 'Türkisch'
+                        },
+                        'save_report': 'Bericht Speichern',
+                        'language_selected': 'Sprache ausgewählt: '
                     }
                 },
                 'fr': {
@@ -576,6 +688,18 @@
                         'client_username_placeholder': 'Nom d\'utilisateur Telegram (sans @)',
                         'cancel': 'Annuler',
                         'send': 'Envoyer'
+                    },
+                    'report_language_selection': {
+                        'title': 'Sélectionnez la langue du rapport avant de sauvegarder',
+                        'language_buttons': {
+                            'ru': 'Russe',
+                            'en': 'Anglais', 
+                            'de': 'Allemand',
+                            'fr': 'Français',
+                            'tr': 'Turc'
+                        },
+                        'save_report': 'Sauvegarder le Rapport',
+                        'language_selected': 'Langue sélectionnée: '
                     }
                 },
                 'tr': {
@@ -606,6 +730,18 @@
                         'client_username_placeholder': 'Telegram kullanıcı adı (@ olmadan)',
                         'cancel': 'İptal',
                         'send': 'Gönder'
+                    },
+                    'report_language_selection': {
+                        'title': 'Kaydetmeden önce rapor dilini seçin',
+                        'language_buttons': {
+                            'ru': 'Rusça',
+                            'en': 'İngilizce', 
+                            'de': 'Almanca',
+                            'fr': 'Fransızca',
+                            'tr': 'Türkçe'
+                        },
+                        'save_report': 'Raporu Kaydet',
+                        'language_selected': 'Seçilen dil: '
                     }
                 }
             };
@@ -1412,8 +1548,11 @@
             // Итог/summary
             html += `<div style='background:#f4f7ff;border-radius:12px;padding:14px 12px 10px 12px;margin-bottom:14px;box-shadow:0 2px 8px rgba(102,126,234,0.06);font-size:15px;color:#222;'>${report.summary}</div>`;
             
-            // Кнопки действий
-            html += `<div style="margin-bottom:10px;">
+            // Блок выбора языка отчета
+            html += generateReportLanguageSelectionBlock();
+            
+            // Кнопки действий (изначально скрыты)
+            html += `<div id="pdf-download-section" style="margin-bottom:10px; display:none;">
                 <button class="btn btn-primary" style="width:100%;font-size:17px;" onclick="downloadPDF()">Скачать PDF</button>
             </div>`;
             
@@ -1584,7 +1723,8 @@
                     add_realtor_contacts: false,
                     add_client_name: false,
                     report_id: currentReportData.id,
-                    telegram_id: getTelegramId()
+                    telegram_id: getTelegramId(),
+                    report_language: selectedReportLanguage || 'ru'
                 })
             })
             .then(res => res.json())
@@ -1707,7 +1847,74 @@
             return false;
         }
 
-
+        // ===== ФУНКЦИИ ВЫБОРА ЯЗЫКА ОТЧЕТА =====
+        
+        // Глобальная переменная для хранения выбранного языка отчета
+        let selectedReportLanguage = 'ru';
+        let originalReportData = null;
+        
+        // Генерирует HTML-блок выбора языка отчета
+        function generateReportLanguageSelectionBlock() {
+            const title = getLocalizedText('report_language_selection.title');
+            const languages = ['ru', 'en', 'de', 'fr', 'tr'];
+            
+            let html = `<div id="report-language-selection" class="report-lang-block">`;
+            html += `<div class="report-lang-title">${title}</div>`;
+            html += `<div class="report-lang-buttons">`;
+            
+            languages.forEach(lang => {
+                const langName = getLocalizedText(`report_language_selection.language_buttons.${lang}`);
+                html += `<button class="report-lang-btn" data-lang="${lang}" onclick="selectReportLanguage('${lang}')">${langName}</button>`;
+            });
+            
+            html += `</div>`;
+            html += `<div id="save-report-section" style="display:none; margin-top:15px;">`;
+            html += `<button class="btn btn-success report-save-btn" onclick="saveReportWithSelectedLanguage()">${getLocalizedText('report_language_selection.save_report')}</button>`;
+            html += `</div>`;
+            html += `</div>`;
+            
+            return html;
+        }
+        
+        // Обрабатывает выбор языка пользователем
+        function selectReportLanguage(lang) {
+            console.log('🌐 Выбран язык отчета:', lang);
+            selectedReportLanguage = lang;
+            
+            // Обновляем визуальное состояние кнопок
+            document.querySelectorAll('.report-lang-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            document.querySelector(`[data-lang="${lang}"]`).classList.add('selected');
+            
+            // Показываем кнопку сохранения отчета
+            document.getElementById('save-report-section').style.display = 'block';
+            
+            showToast(getLocalizedText('report_language_selection.language_selected') + getLocalizedText(`report_language_selection.language_buttons.${lang}`), 'success');
+        }
+        
+        // Сохраняет отчет с информацией о выбранном языке
+        function saveReportWithSelectedLanguage() {
+            if (!selectedReportLanguage) {
+                showToast('Пожалуйста, выберите язык отчета', 'warning');
+                return;
+            }
+            
+            console.log('💾 Сохранение отчета на языке:', selectedReportLanguage);
+            
+            // Добавляем информацию о языке к данным отчета
+            if (currentReportData && currentReportData.report) {
+                currentReportData.report.report_language = selectedReportLanguage;
+            }
+            
+            // Показываем кнопку скачивания PDF
+            document.getElementById('pdf-download-section').style.display = 'block';
+            
+            // Скрываем блок выбора языка
+            document.getElementById('report-language-selection').style.display = 'none';
+            
+            showToast('Отчет готов к сохранению на ' + getLocalizedText(`report_language_selection.language_buttons.${selectedReportLanguage}`), 'success');
+        }
 
         // Инициализация
         showStep('address');
