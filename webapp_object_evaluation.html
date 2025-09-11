@@ -6806,18 +6806,8 @@
         
         // Generate analytical summary based on market data (только для админов)
                 async function generateAnalyticalSummary(summary) {
-            // Check if user is admin
-            try {
-                const userAccess = await checkUserAccess();
-                if (!userAccess.hasAccess || userAccess.reason !== 'admin') {
-                    // User is not admin, return empty string to hide the block
-                    return '';
-                }
-            } catch (error) {
-                console.error('Error checking user access:', error);
-                // On error, hide the block
-                return '';
-            }
+            // Show analytical summary for all users (removed admin check)
+            console.log('📊 Generating analytical summary for all users');
             
             let analysis = '<div class="analytical-summary">';
             analysis += '<h4 class="summary-title" data-i18n="reports.market_analysis">Анализ рынка</h4>';
@@ -8483,14 +8473,11 @@
             try {
                 console.log('🔍 Generating enhanced object summary...');
                 
-                // Получаем данные объекта из формы
-                const objectPrice = parseFloat(document.getElementById('priceObjectInput')?.value) || 0;
-                const objectArea = parseFloat(document.getElementById('areaObjectInput')?.value) || 0;
+                // Получаем данные объекта из сохраненных переменных
+                const objectPrice = selectedListingTypes.price || 0;
+                const objectArea = selectedListingTypes.area || 0;
                 const selectedCountry = selectedLocation.country_name || '';
-                
-                // Получаем выбранную валюту из кнопок
-                const selectedCurrencyButton = document.querySelector('.currency-button.active');
-                const objectCurrency = selectedCurrencyButton ? selectedCurrencyButton.dataset.currency : 'EUR';
+                const objectCurrency = selectedListingTypes.currency || 'EUR';
                 
                 console.log('📊 Object data:', {
                     price: objectPrice,
@@ -9472,18 +9459,8 @@
         async function generateConsolidatedAssessment(data) {
             if (!data) return '';
             
-            // Check if user is admin
-            try {
-                const userAccess = await checkUserAccess();
-                if (!userAccess.hasAccess || userAccess.reason !== 'admin') {
-                    // User is not admin, return empty string to hide the block
-                    return '';
-                }
-            } catch (error) {
-                console.error('Error checking user access:', error);
-                // On error, hide the block
-                return '';
-            }
+            // Show consolidated assessment for all users (removed admin check)
+            console.log('🏗️ Generating consolidated assessment for all users');
             
             // Define coefficients for each category
             const coefficients = {
@@ -10453,6 +10430,30 @@
             if (!dataContent) {
                 return '<p>Отчет не найден</p>';
             }
+            
+            // Debug: Log all sections present in DOM before extraction
+            console.log('📋 Sections present in DOM before extraction:');
+            const sections = [
+                { id: 'summaryDataSection', name: 'Market Indicators' },
+                { id: 'propertyTrendsSection', name: 'Property Trends' },
+                { class: 'consolidated-assessment-section', name: 'Consolidated Assessment' },
+                { class: 'market-comparison-block', name: 'Market Comparison' },
+                { class: 'analytical-summary', name: 'Analytical Summary' },
+                { class: 'object-summary-section', name: 'Object Summary' },
+                { class: 'forecast-table-section', name: 'Forecast Table' },
+                { class: 'trends-analysis-section', name: 'Trends Analysis' },
+                { class: 'forecast-analysis-section', name: 'Forecast Analysis' }
+            ];
+            
+            sections.forEach(section => {
+                let element;
+                if (section.id) {
+                    element = dataContent.querySelector(`#${section.id}`);
+                } else if (section.class) {
+                    element = dataContent.querySelector(`.${section.class}`);
+                }
+                console.log(`  ${section.name}: ${element ? '✅ Found' : '❌ Missing'}`);
+            });
             
             // Clone the content to avoid modifying the original
             const clonedContent = dataContent.cloneNode(true);
