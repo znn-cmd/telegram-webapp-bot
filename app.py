@@ -5175,18 +5175,52 @@ def api_save_html_report():
     # Извлекаем координаты из report_data если они есть
     # Координаты могут приходить в разных форматах
     if 'latitude' not in report_data and 'longitude' not in report_data:
-        # Попробуем найти координаты в других полях
+        # Попробуем найти координаты в других полях или location_info
         coordinates_text = report_data.get('coordinates', '')
-        if coordinates_text and '×' in coordinates_text:
-            # Формат: "207.43 × 22.39" - широта × долгота
+        
+        # Если нет в report_data, попробуем найти в location_info
+        if not coordinates_text and location_info:
+            # Попробуем извлечь из строки локации координаты
+            # Формат может быть разный, попробуем несколько вариантов
+            import re
+            coord_match = re.search(r'(\d+\.?\d*)\s*[×x,]\s*(\d+\.?\d*)', str(location_info))
+            if coord_match:
+                coordinates_text = f"{coord_match.group(1)} × {coord_match.group(2)}"
+        
+        if coordinates_text and ('×' in coordinates_text or 'x' in coordinates_text or ',' in coordinates_text):
+            # Формат: "207.43 × 22.39" или "36.6, 32.0" - широта, долгота
             try:
-                parts = coordinates_text.replace(' ', '').split('×')
+                # Заменяем разделители на единообразный
+                coordinates_text = coordinates_text.replace('×', ',').replace('x', ',').replace(' ', '')
+                parts = coordinates_text.split(',')
                 if len(parts) == 2:
-                    report_data['latitude'] = float(parts[1])  # второе значение - широта
-                    report_data['longitude'] = float(parts[0])  # первое значение - долгота
+                    # Для Турции: широта ~36-42, долгота ~26-45
+                    # Определяем, что есть что по диапазону
+                    coord1 = float(parts[0])
+                    coord2 = float(parts[1])
+                    
+                    if 26 <= coord1 <= 45 and 35 <= coord2 <= 43:
+                        # coord1 = долгота, coord2 = широта
+                        report_data['longitude'] = coord1
+                        report_data['latitude'] = coord2
+                    elif 35 <= coord1 <= 43 and 26 <= coord2 <= 45:
+                        # coord1 = широта, coord2 = долгота  
+                        report_data['latitude'] = coord1
+                        report_data['longitude'] = coord2
+                    else:
+                        # Используем стандартный порядок: широта, долгота
+                        report_data['latitude'] = coord1
+                        report_data['longitude'] = coord2
+                        
                     logger.info(f"📍 Extracted coordinates: lat={report_data['latitude']}, lng={report_data['longitude']}")
             except (ValueError, IndexError) as e:
                 logger.warning(f"⚠️ Failed to parse coordinates from '{coordinates_text}': {e}")
+        
+        # Если все еще нет координат, используем координаты Анталии по умолчанию
+        if 'latitude' not in report_data and 'Antalya' in str(location_info):
+            report_data['latitude'] = 36.8969
+            report_data['longitude'] = 30.7133
+            logger.info(f"📍 Using default Antalya coordinates: lat=36.8969, lng=30.7133")
     
     if not report_content:
         return jsonify({'error': 'Report content required'}), 400
@@ -6524,6 +6558,191 @@ def api_save_html_report():
         .contact-link:hover {{
             color: #2980b9;
             text-decoration: underline;
+        }}
+
+        /* Блок карты и фотографий */
+        .location-visual-section {{
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            margin: 0;
+            padding: 25px 30px;
+        }}
+
+        .location-visual-title {{
+            font-size: 18px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            text-align: center;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }}
+
+        .location-visual-grid {{
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }}
+
+        .map-container {{
+            background: #ffffff;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            height: 300px;
+        }}
+
+        .map-container iframe {{
+            width: 100%;
+            height: 100%;
+            border: none;
+        }}
+
+        .photos-container {{
+            background: #ffffff;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            height: 300px;
+            position: relative;
+        }}
+
+        .photo-carousel {{
+            position: relative;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }}
+
+        .photo-slide {{
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }}
+
+        .photo-slide.active {{
+            opacity: 1;
+        }}
+
+        .photo-slide img {{
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: cover;
+            border-radius: 4px;
+        }}
+
+        .carousel-controls {{
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 5px;
+            z-index: 10;
+        }}
+
+        .carousel-dot {{
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }}
+
+        .carousel-dot.active {{
+            background: #3498db;
+        }}
+
+        .carousel-nav {{
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(52, 152, 219, 0.8);
+            color: white;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: bold;
+            transition: background 0.3s ease;
+            z-index: 10;
+        }}
+
+        .carousel-nav:hover {{
+            background: rgba(52, 152, 219, 1);
+        }}
+
+        .carousel-prev {{
+            left: 10px;
+        }}
+
+        .carousel-next {{
+            right: 10px;
+        }}
+
+        .property-link-section {{
+            text-align: center;
+            margin-top: 20px;
+            padding: 15px;
+            background: #ffffff;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+        }}
+
+        .property-link-title {{
+            font-size: 14px;
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 10px;
+        }}
+
+        .property-link {{
+            display: inline-block;
+            background: #3498db;
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 13px;
+            transition: background 0.3s ease;
+        }}
+
+        .property-link:hover {{
+            background: #2980b9;
+            color: white;
+            text-decoration: none;
+        }}
+
+        /* Адаптивность */
+        @media (max-width: 768px) {{
+            .location-visual-grid {{
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }}
+            
+            .map-container,
+            .photos-container {{
+                height: 250px;
+            }}
         }}
 
         @media print {{
