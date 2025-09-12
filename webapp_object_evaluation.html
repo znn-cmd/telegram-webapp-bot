@@ -3652,9 +3652,16 @@
         }
 
         .listing-type-input:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
+            outline: none !important;
+            border-color: #667eea !important;
+            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1) !important;
+            background: #fff !important;
+        }
+        
+        .listing-type-input:not(:disabled):not(:read-only) {
+            cursor: text !important;
+            user-select: text !important;
+            pointer-events: auto !important;
         }
 
         /* Currency Buttons Styles */
@@ -9406,10 +9413,49 @@
             setupCheckboxHandlers();
             initPhotoUpload();
             
+            // Дополнительная проверка полей ввода
+            setTimeout(() => {
+                const priceField = document.getElementById('priceObjectInput');
+                const areaField = document.getElementById('areaObjectInput');
+                
+                console.log('🔍 Checking input fields after init:');
+                console.log('Price field:', {
+                    exists: !!priceField,
+                    disabled: priceField?.disabled,
+                    readonly: priceField?.readOnly,
+                    pointerEvents: priceField?.style.pointerEvents,
+                    cursor: priceField?.style.cursor
+                });
+                console.log('Area field:', {
+                    exists: !!areaField,
+                    disabled: areaField?.disabled,
+                    readonly: areaField?.readOnly,
+                    pointerEvents: areaField?.style.pointerEvents,
+                    cursor: areaField?.style.cursor
+                });
+            }, 100);
+            
             // Initialize price input
             const priceInput = document.getElementById('priceObjectInput');
             if (priceInput) {
+                // Принудительно активируем поле
+                priceInput.removeAttribute('disabled');
+                priceInput.removeAttribute('readonly');
+                priceInput.style.pointerEvents = 'auto';
+                priceInput.style.cursor = 'text';
+                
+                // Добавляем отладочные обработчики
+                priceInput.addEventListener('click', function() {
+                    console.log('🖱️ Price input clicked');
+                    this.focus();
+                });
+                
+                priceInput.addEventListener('focus', function() {
+                    console.log('🎯 Price input focused');
+                });
+                
                 priceInput.addEventListener('input', function() {
+                    console.log('⌨️ Price input changed:', this.value);
                     selectedListingTypes.price = this.value ? parseFloat(this.value) : null;
                     updateConfirmButton();
                     
@@ -9424,7 +9470,24 @@
             // Initialize area input
             const areaInput = document.getElementById('areaObjectInput');
             if (areaInput) {
+                // Принудительно активируем поле
+                areaInput.removeAttribute('disabled');
+                areaInput.removeAttribute('readonly');
+                areaInput.style.pointerEvents = 'auto';
+                areaInput.style.cursor = 'text';
+                
+                // Добавляем отладочные обработчики
+                areaInput.addEventListener('click', function() {
+                    console.log('🖱️ Area input clicked');
+                    this.focus();
+                });
+                
+                areaInput.addEventListener('focus', function() {
+                    console.log('🎯 Area input focused');
+                });
+                
                 areaInput.addEventListener('input', function() {
+                    console.log('⌨️ Area input changed:', this.value);
                     selectedListingTypes.area = this.value ? parseInt(this.value) : null;
                     updateConfirmButton();
                     
