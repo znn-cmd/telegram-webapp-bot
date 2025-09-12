@@ -5656,13 +5656,26 @@ def api_save_html_report():
             <!-- Ссылка на объявление -->
             {property_link_html}
         </div>
-                '''
+'''
             return ""
         
         # Логируем перед генерацией HTML
         logger.info(f"🔧 Generating HTML template with include_property_info={include_property_info}")
+        
+        # Генерируем секцию объекта заранее, чтобы избежать ошибок в f-строке
+        property_section_html = ''
         if include_property_info:
             logger.info(f"🔧 Will call generate_property_section with property_info={property_info}")
+            try:
+                property_section_html = generate_property_section(property_info, report_data)
+                logger.info(f"✅ Property section generated successfully")
+            except Exception as e:
+                logger.error(f"❌ Error generating property section: {e}")
+                import traceback
+                logger.error(f"Traceback: {traceback.format_exc()}")
+                property_section_html = '<!-- Property section failed to generate -->'
+        else:
+            property_section_html = '<!-- Property section not included -->'
         
         # Создаем корпоративный HTML отчет
         html_template = f"""<!DOCTYPE html>
@@ -6848,7 +6861,7 @@ def api_save_html_report():
         </div>
 
         <!-- Информация об объекте (если включена) -->
-        {generate_property_section(property_info, report_data) if include_property_info else '<!-- Property section not included -->'}
+        {property_section_html}
 
         <!-- Основной контент отчета -->
                         <div class="report-content">
