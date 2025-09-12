@@ -5473,10 +5473,16 @@ def api_save_html_report():
             '''
         
         def generate_property_section(property_info, report_data=None):
-            logger.info(f"🏠 generate_property_section called with property_info: {property_info}")
+            logger.info(f"🏠 generate_property_section called")
+            logger.info(f"🏠 property_info type: {type(property_info)}")
+            logger.info(f"🏠 property_info keys: {list(property_info.keys()) if isinstance(property_info, dict) else 'Not a dict'}")
+            logger.info(f"🏠 report_data type: {type(report_data)}")
+            
             if not property_info or (not property_info.get('photos') and not property_info.get('url')):
                 logger.info(f"🚫 Property section skipped: no photos or URL")
                 return ""
+            
+            logger.info("🏠 Property section validation passed, starting processing...")
             
             # Обрабатываем и сохраняем фотографии
             saved_photos = []
@@ -5665,20 +5671,27 @@ def api_save_html_report():
         # Генерируем секцию объекта заранее, чтобы избежать ошибок в f-строке
         property_section_html = ''
         if include_property_info:
-            logger.info(f"🔧 Will call generate_property_section with property_info={property_info}")
+            logger.info(f"🔧 Will call generate_property_section with property_info keys: {list(property_info.keys()) if property_info else 'None'}")
+            logger.info(f"🔧 Report data keys: {list(report_data.keys()) if report_data else 'None'}")
             try:
+                logger.info("🔧 Starting generate_property_section call...")
                 property_section_html = generate_property_section(property_info, report_data)
-                logger.info(f"✅ Property section generated successfully")
+                logger.info(f"✅ Property section generated successfully, length: {len(property_section_html)}")
             except Exception as e:
                 logger.error(f"❌ Error generating property section: {e}")
                 import traceback
                 logger.error(f"Traceback: {traceback.format_exc()}")
                 property_section_html = '<!-- Property section failed to generate -->'
         else:
+            logger.info("🔧 Property section not included")
             property_section_html = '<!-- Property section not included -->'
         
+        logger.info("🔧 Property section handling completed, starting HTML template generation...")
+        
         # Создаем корпоративный HTML отчет
-        html_template = f"""<!DOCTYPE html>
+        logger.info("🔧 Creating HTML template with f-string...")
+        try:
+            html_template = f"""<!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
@@ -7198,10 +7211,36 @@ def api_save_html_report():
     </script>
 </body>
 </html>"""
+            logger.info("✅ HTML template created successfully")
+        except Exception as e:
+            logger.error(f"❌ Error creating HTML template: {e}")
+            import traceback
+            logger.error(f"Traceback: {traceback.format_exc()}")
+            # Создаем простой fallback HTML
+            html_template = f"""<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Отчет по недвижимости</title>
+</head>
+<body>
+    <h1>Аналитический отчет по недвижимости</h1>
+    <p>Локация: {location_info}</p>
+    <div>{report_content}</div>
+    <p><em>Отчет сгенерирован в упрощенном режиме из-за технических проблем.</em></p>
+</body>
+</html>"""
+            logger.info("⚠️ Used fallback HTML template")
         
+        logger.info("🔧 Starting file save operation...")
         # Сохраняем файл
-        with open(file_path, 'w', encoding='utf-8') as f:
-            f.write(html_template)
+        try:
+            with open(file_path, 'w', encoding='utf-8') as f:
+                f.write(html_template)
+            logger.info(f"✅ File saved successfully to: {file_path}")
+        except Exception as e:
+            logger.error(f"❌ Error saving file: {e}")
+            raise
         
         # Генерируем ссылку
         base_url = request.host_url.rstrip('/')
