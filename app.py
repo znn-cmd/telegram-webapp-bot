@@ -5142,6 +5142,60 @@ def api_save_user_report():
         logger.error(f"Error saving user report: {e}")
         return jsonify({'error': 'Internal error'}), 500
 
+def geocode_location_string(location_string):
+    """
+    Получает координаты для строки локации через геокодинг
+    
+    Args:
+        location_string: строка вида "Türkiye, Antalya, Alanya, Avsallar"
+    
+    Returns:
+        dict с координатами или None
+    """
+    try:
+        logger.info(f"🌍 Geocoding location: {location_string}")
+        
+        # Пробуем через Nominatim (OpenStreetMap)
+        import requests
+        import urllib.parse
+        
+        # Кодируем строку для URL
+        encoded_location = urllib.parse.quote(location_string)
+        
+        # Запрос к Nominatim
+        nominatim_url = f"https://nominatim.openstreetmap.org/search?q={encoded_location}&format=json&limit=1&addressdetails=1"
+        
+        headers = {
+            'User-Agent': 'Aaadviser Real Estate App/1.0'
+        }
+        
+        response = requests.get(nominatim_url, headers=headers, timeout=10)
+        
+        if response.status_code == 200:
+            data = response.json()
+            if data and len(data) > 0:
+                result = data[0]
+                latitude = float(result['lat'])
+                longitude = float(result['lon'])
+                
+                # Проверяем, что координаты в разумных пределах для Турции
+                if 35 <= latitude <= 43 and 26 <= longitude <= 45:
+                    logger.info(f"✅ Geocoded successfully: lat={latitude}, lng={longitude}")
+                    return {
+                        'latitude': latitude,
+                        'longitude': longitude,
+                        'source': 'nominatim'
+                    }
+                else:
+                    logger.warning(f"⚠️ Geocoded coordinates outside Turkey bounds: lat={latitude}, lng={longitude}")
+        
+        logger.warning(f"⚠️ Geocoding failed for: {location_string}")
+        return None
+        
+    except Exception as e:
+        logger.error(f"❌ Geocoding error: {e}")
+        return None
+
 @app.route('/api/save_html_report', methods=['POST'])
 def api_save_html_report():
     """Сохраняет отчет как HTML файл в корпоративном стиле и возвращает ссылку"""
@@ -5216,11 +5270,40 @@ def api_save_html_report():
             except (ValueError, IndexError) as e:
                 logger.warning(f"⚠️ Failed to parse coordinates from '{coordinates_text}': {e}")
         
-        # Если все еще нет координат, используем координаты Анталии по умолчанию
-        if 'latitude' not in report_data and 'Antalya' in str(location_info):
-            report_data['latitude'] = 36.8969
-            report_data['longitude'] = 30.7133
-            logger.info(f"📍 Using default Antalya coordinates: lat=36.8969, lng=30.7133")
+        # Если все еще нет координат, получаем их через геокодинг
+        if 'latitude' not in report_data:
+            # Сначала пробуем построить точную строку локации из отдельных названий
+            geocoding_string = location_info
+            
+            # Если есть отдельные названия в report_data, используем их для более точного геокодинга
+            if report_data.get('country_name') or report_data.get('city_name') or report_data.get('county_name') or report_data.get('district_name'):
+                location_parts = []
+                if report_data.get('country_name'):
+                    location_parts.append(report_data['country_name'])
+                if report_data.get('city_name'):
+                    location_parts.append(report_data['city_name'])
+                if report_data.get('county_name'):
+                    location_parts.append(report_data['county_name'])
+                if report_data.get('district_name'):
+                    location_parts.append(report_data['district_name'])
+                
+                if location_parts:
+                    geocoding_string = ', '.join(location_parts)
+                    logger.info(f"🔍 Built precise geocoding string from report_data: {geocoding_string}")
+            
+            if geocoding_string:
+                logger.info(f"🔍 Attempting geocoding for: {geocoding_string}")
+                coordinates = geocode_location_string(geocoding_string)
+                if coordinates:
+                    report_data['latitude'] = coordinates['latitude']
+                    report_data['longitude'] = coordinates['longitude']
+                    logger.info(f"📍 Got coordinates from geocoding: lat={coordinates['latitude']}, lng={coordinates['longitude']}")
+                else:
+                    # Только если геокодинг не сработал, используем координаты Анталии
+                    if 'Antalya' in str(location_info):
+                        report_data['latitude'] = 36.8969
+                        report_data['longitude'] = 30.7133
+                        logger.info(f"📍 Using default Antalya coordinates as fallback: lat=36.8969, lng=30.7133")
     
     if not report_content:
         return jsonify({'error': 'Report content required'}), 400
