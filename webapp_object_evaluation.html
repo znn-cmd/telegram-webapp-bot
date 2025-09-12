@@ -11039,10 +11039,10 @@
             
             closePropertyInfoModal();
             
-            // Uncheck the checkbox since we've handled the modal
+            // CHECK the checkbox since we've saved the data
             const checkbox = document.getElementById('includePropertyInfo');
             if (checkbox) {
-                checkbox.checked = false;
+                checkbox.checked = true; // Устанавливаем галочку после сохранения
             }
         }
 

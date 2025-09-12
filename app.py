@@ -318,11 +318,11 @@ def serve_report(telegram_id, report_id, filename):
     report_dir = os.path.join('reports', str(telegram_id), report_id)
     return send_from_directory(report_dir, filename)
 
-@app.route('/reports/<int:telegram_id>/<report_id>/photos/<photo_filename>')
-def serve_report_photo(telegram_id, report_id, photo_filename):
-    """Доступ к фотографиям отчета"""
-    photos_dir = os.path.join('reports', str(telegram_id), report_id, 'photos')
-    return send_from_directory(photos_dir, photo_filename)
+@app.route('/reports/<int:telegram_id>/<report_id>/<photo_filename>')
+def serve_report_file(telegram_id, report_id, photo_filename):
+    """Доступ к файлам отчета (HTML и фотографии)"""
+    report_dir = os.path.join('reports', str(telegram_id), report_id)
+    return send_from_directory(report_dir, photo_filename)
 
 def determine_user_language(user, telegram_language_code):
     """
@@ -5172,6 +5172,22 @@ def api_save_html_report():
     include_property_info = data.get('include_property_info', False)
     property_info = data.get('property_info', {})
     
+    # Извлекаем координаты из report_data если они есть
+    # Координаты могут приходить в разных форматах
+    if 'latitude' not in report_data and 'longitude' not in report_data:
+        # Попробуем найти координаты в других полях
+        coordinates_text = report_data.get('coordinates', '')
+        if coordinates_text and '×' in coordinates_text:
+            # Формат: "207.43 × 22.39" - широта × долгота
+            try:
+                parts = coordinates_text.replace(' ', '').split('×')
+                if len(parts) == 2:
+                    report_data['latitude'] = float(parts[1])  # второе значение - широта
+                    report_data['longitude'] = float(parts[0])  # первое значение - долгота
+                    logger.info(f"📍 Extracted coordinates: lat={report_data['latitude']}, lng={report_data['longitude']}")
+            except (ValueError, IndexError) as e:
+                logger.warning(f"⚠️ Failed to parse coordinates from '{coordinates_text}': {e}")
+    
     if not report_content:
         return jsonify({'error': 'Report content required'}), 400
     
@@ -5198,7 +5214,7 @@ def api_save_html_report():
         # Пути для файлов
         filename = f"{report_folder_id}.html"
         file_path = os.path.join(report_dir, filename)
-        photos_dir = os.path.join(report_dir, 'photos')
+        photos_dir = report_dir  # Сохраняем фотографии прямо в папку отчета
         
         # Получаем информацию о пользователе из таблицы users
         user_info = None
@@ -5467,7 +5483,7 @@ def api_save_html_report():
                             logger.info(f"Saved photo: {photo_path} ({len(image_data)} bytes)")
                             
                             # Сохраняем относительный путь для HTML
-                            relative_photo_path = f"photos/{photo_filename}"
+                            relative_photo_path = photo_filename
                             saved_photos.append({
                                 'path': relative_photo_path,
                                 'name': photo.get('name', f'Фото {i+1}')
