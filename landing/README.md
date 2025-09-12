@@ -315,7 +315,7 @@ netlify deploy --prod --dir=landing
 
 ### Контакты для поддержки:
 - Telegram: https://t.me/Aaadviser_support
-- Email: support@aaadvisor.com
+- Email: support@aaadviser.pro
 
 ## 📝 Чек-лист развертывания
 

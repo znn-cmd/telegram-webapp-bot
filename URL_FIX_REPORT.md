@@ -3,12 +3,12 @@
 ## 🐛 Проблема
 В модальном окне после сохранения отчета отображалась неправильная ссылка:
 ```
-http://aaadvisor-zaicevn.amvera.io/reports/826174261573.html
+http://aaadviser.pro/reports/826174261573.html
 ```
 
 Вместо правильной структуры:
 ```
-http://aaadvisor-zaicevn.amvera.io/reports/{telegram_id}/{report_id}/{filename}
+http://aaadviser.pro/reports/{telegram_id}/{report_id}/{filename}
 ```
 
 ## 🔍 Причина
@@ -44,7 +44,7 @@ report_url = f"{base_url}/reports/{telegram_id}/{report_folder_id}/{filename}"
 ## 🎯 Результат
 Теперь в модальном окне отображается правильная ссылка:
 ```
-http://aaadvisor-zaicevn.amvera.io/reports/123456789/847392058473/847392058473.html
+http://aaadviser.pro/reports/123456789/847392058473/847392058473.html
 ```
 
 Которая соответствует:

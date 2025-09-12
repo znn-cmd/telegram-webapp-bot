@@ -86,7 +86,7 @@ if not TOKEN:
     raise RuntimeError("TELEGRAM_BOT_TOKEN должен быть задан в переменных окружения!")
 
 # URL вашего WebApp (замените на ваш домен после деплоя)
-WEBAPP_URL = "https://aaadvisor-zaicevn.amvera.io/webapp"
+WEBAPP_URL = "https://aaadviser.pro/webapp"
 
 # Google Maps API ключ
 GOOGLE_MAPS_API_KEY = "AIzaSyBrDkDpNKNAIyY147MQ78hchBkeyCAxhEw"
