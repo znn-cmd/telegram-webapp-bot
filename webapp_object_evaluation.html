@@ -7859,95 +7859,116 @@
             // Создаем кэш для рассчитанных цен
             const priceCache = new Map();
             
-            // Обрабатываем тренды в обратном порядке (от новых к старым)
-            for (let i = 0; i < sortedTrends.length; i++) {
-                const trend = sortedTrends[i];
+            // Сначала обрабатываем текущий месяц
+            const currentTrend = sortedTrends.find(t => t.property_year === currentYear && t.property_month === currentMonth);
+            if (currentTrend) {
+                const cacheKey = `${currentYear}-${currentMonth}`;
+                priceCache.set(cacheKey, {
+                    salePrice: basePrices.sale_price,
+                    rentPrice: basePrices.rent_price,
+                    isCalculated: true
+                });
+                console.log(`💰 Base prices for current month ${currentYear}-${currentMonth}: sale ${basePrices.sale_price} ₺/m², rent ${basePrices.rent_price} ₺/m²`);
+            }
+            
+            // Затем обрабатываем будущие месяцы в хронологическом порядке
+            const futureTrends = sortedTrends.filter(trend => {
+                const year = trend.property_year;
+                const month = trend.property_month;
+                return year > currentYear || (year === currentYear && month > currentMonth);
+            }).sort((a, b) => {
+                if (a.property_year !== b.property_year) {
+                    return a.property_year - b.property_year;
+                }
+                return a.property_month - b.property_month;
+            });
+            
+            for (const trend of futureTrends) {
                 const year = trend.property_year;
                 const month = trend.property_month;
                 const cacheKey = `${year}-${month}`;
                 
-                // Определяем тип месяца
-                const isCurrentMonth = year === currentYear && month === currentMonth;
-                const isFutureMonth = year > currentYear || (year === currentYear && month > currentMonth);
-                const isHistoricalMonth = year < currentYear || (year === currentYear && month < currentMonth);
+                let calculatedSalePrice = parseFloat(trend.unit_price_for_sale) || 0;
+                let calculatedRentPrice = parseFloat(trend.unit_price_for_rent) || 0;
                 
-                if (isCurrentMonth) {
-                    // Для текущего месяца используем БАЗОВЫЕ ЦЕНЫ из 4 таблиц
-                    priceCache.set(cacheKey, {
-                        salePrice: basePrices.sale_price,
-                        rentPrice: basePrices.rent_price,
-                        isCalculated: true // Помечаем как рассчитанное
-                    });
-                    console.log(`💰 Base prices for current month ${year}-${month}: sale ${basePrices.sale_price} ₺/m², rent ${basePrices.rent_price} ₺/m²`);
-                    
-                } else if (isFutureMonth) {
-                    // Для будущих месяцев рассчитываем ПРОГРЕССИВНО
-                    let calculatedSalePrice = parseFloat(trend.unit_price_for_sale) || 0;
-                    let calculatedRentPrice = parseFloat(trend.unit_price_for_rent) || 0;
-                    
-                    // Ищем предыдущий месяц для расчета
-                    let prevMonthKey = null;
-                    if (month === 1) {
-                        prevMonthKey = `${year - 1}-12`;
+                // Ищем предыдущий месяц для расчета
+                let prevMonthKey = null;
+                if (month === 1) {
+                    prevMonthKey = `${year - 1}-12`;
                 } else {
-                        prevMonthKey = `${year}-${month - 1}`;
-                    }
-                    
-                    const prevMonthData = priceCache.get(prevMonthKey);
-                    if (prevMonthData && trend.price_change_sale && trend.price_change_rent) {
-                        // Формула: Цена_месяца = Цена_предыдущего_месяца × (1 + процент_изменения)
-                        calculatedSalePrice = calculateFuturePrice(
-                            prevMonthData.salePrice, 
-                            trend.price_change_sale
-                        );
-                        calculatedRentPrice = calculateFuturePrice(
-                            prevMonthData.rentPrice, 
-                            trend.price_change_rent
-                        );
-                        
-                        console.log(`🚀 Progressive calculation for ${year}-${month}: sale ${calculatedSalePrice} ₺/m², rent ${calculatedRentPrice} ₺/m²`);
-                    }
-                    
-                    priceCache.set(cacheKey, {
-                        salePrice: calculatedSalePrice,
-                        rentPrice: calculatedRentPrice,
-                        isCalculated: true
-                    });
-                    
-                } else if (isHistoricalMonth) {
-                    // Для исторических месяцев рассчитываем РЕКУРСИВНО
-                    let calculatedSalePrice = parseFloat(trend.unit_price_for_sale) || 0;
-                    let calculatedRentPrice = parseFloat(trend.unit_price_for_rent) || 0;
-                    
-                    // Ищем следующий месяц для расчета
-                    let nextMonthKey = null;
-                    if (month === 12) {
-                        nextMonthKey = `${year + 1}-1`;
-                    } else {
-                        nextMonthKey = `${year}-${month + 1}`;
-                    }
-                    
-                    const nextMonthData = priceCache.get(nextMonthKey);
-                    if (nextMonthData && trend.price_change_sale && trend.price_change_rent) {
-                        // Формула: Цена_месяца = Цена_следующего_месяца ÷ (1 + процент_изменения)
-                        calculatedSalePrice = calculateHistoricalPrice(
-                            nextMonthData.salePrice, 
-                            trend.price_change_sale
-                        );
-                        calculatedRentPrice = calculateHistoricalPrice(
-                            nextMonthData.rentPrice, 
-                            trend.price_change_rent
-                        );
-                        
-                        console.log(`⏪ Recursive calculation for ${year}-${month}: sale ${calculatedSalePrice} ₺/m², rent ${calculatedRentPrice} ₺/m²`);
-                    }
-                    
-                    priceCache.set(cacheKey, {
-                        salePrice: calculatedSalePrice,
-                        rentPrice: calculatedRentPrice,
-                        isCalculated: true
-                    });
+                    prevMonthKey = `${year}-${month - 1}`;
                 }
+                
+                const prevMonthData = priceCache.get(prevMonthKey);
+                if (prevMonthData && trend.price_change_sale && trend.price_change_rent) {
+                    // Формула: Цена_месяца = Цена_предыдущего_месяца × (1 + процент_изменения)
+                    calculatedSalePrice = calculateFuturePrice(
+                        prevMonthData.salePrice, 
+                        trend.price_change_sale
+                    );
+                    calculatedRentPrice = calculateFuturePrice(
+                        prevMonthData.rentPrice, 
+                        trend.price_change_rent
+                    );
+                    
+                    console.log(`🚀 Progressive calculation for ${year}-${month}: sale ${calculatedSalePrice} ₺/m², rent ${calculatedRentPrice} ₺/m²`);
+                }
+                
+                priceCache.set(cacheKey, {
+                    salePrice: calculatedSalePrice,
+                    rentPrice: calculatedRentPrice,
+                    isCalculated: true
+                });
+            }
+            
+            // Затем обрабатываем исторические месяцы в обратном хронологическом порядке
+            const historicalTrends = sortedTrends.filter(trend => {
+                const year = trend.property_year;
+                const month = trend.property_month;
+                return year < currentYear || (year === currentYear && month < currentMonth);
+            }).sort((a, b) => {
+                if (a.property_year !== b.property_year) {
+                    return b.property_year - a.property_year;
+                }
+                return b.property_month - a.property_month;
+            });
+            
+            for (const trend of historicalTrends) {
+                const year = trend.property_year;
+                const month = trend.property_month;
+                const cacheKey = `${year}-${month}`;
+                
+                let calculatedSalePrice = parseFloat(trend.unit_price_for_sale) || 0;
+                let calculatedRentPrice = parseFloat(trend.unit_price_for_rent) || 0;
+                
+                // Ищем следующий месяц для расчета
+                let nextMonthKey = null;
+                if (month === 12) {
+                    nextMonthKey = `${year + 1}-1`;
+                } else {
+                    nextMonthKey = `${year}-${month + 1}`;
+                }
+                
+                const nextMonthData = priceCache.get(nextMonthKey);
+                if (nextMonthData && trend.price_change_sale && trend.price_change_rent) {
+                    // Формула: Цена_месяца = Цена_следующего_месяца ÷ (1 + процент_изменения)
+                    calculatedSalePrice = calculateHistoricalPrice(
+                        nextMonthData.salePrice, 
+                        trend.price_change_sale
+                    );
+                    calculatedRentPrice = calculateHistoricalPrice(
+                        nextMonthData.rentPrice, 
+                        trend.price_change_rent
+                    );
+                    
+                    console.log(`⏪ Recursive calculation for ${year}-${month}: sale ${calculatedSalePrice} ₺/m², rent ${calculatedRentPrice} ₺/m²`);
+                }
+                
+                priceCache.set(cacheKey, {
+                    salePrice: calculatedSalePrice,
+                    rentPrice: calculatedRentPrice,
+                    isCalculated: true
+                });
             }
             
             // Обновляем тренды с рассчитанными ценами
