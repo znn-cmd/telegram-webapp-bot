@@ -6050,6 +6050,9 @@
             // Update the display of selected property types
             updateSelectedPropertyTypesDisplay();
             
+            // Очищаем кэш при изменении параметров объекта
+            clearTrendsCalculationCache();
+            
             updateConfirmButton();
             
             // Check if all listing types are selected
@@ -6429,6 +6432,9 @@
                 property_price_eur: priceInEUR,
                 property_area: selectedListingTypes.area
             };
+            
+            // Очищаем кэш расчетов при изменении локации
+            clearTrendsCalculationCache();
             
             console.log('📍 Selected location for data loading:', {
                 country_id: countryId,
@@ -7780,9 +7786,38 @@
             return basePrice / changeMultiplier;
         }
 
+        // Кэш для рассчитанных трендов
+        let trendsCalculationCache = null;
+        let trendsCalculationCacheKey = null;
+
         // Prepare trends data with calculated historical prices
         async function prepareTrendsWithHistoricalPrices(trends) {
             if (!trends || trends.length === 0) return [];
+            
+            // Создаем ключ кэша на основе входных данных
+            const cacheKey = JSON.stringify({
+                trends: trends.map(t => ({
+                    year: t.property_year,
+                    month: t.property_month,
+                    sale_price: t.unit_price_for_sale,
+                    rent_price: t.unit_price_for_rent,
+                    price_change_sale: t.price_change_sale,
+                    price_change_rent: t.price_change_rent
+                })),
+                location: selectedLocation ? {
+                    country_id: selectedLocation.country_id,
+                    city_id: selectedLocation.city_id,
+                    county_id: selectedLocation.county_id,
+                    district_id: selectedLocation.district_id
+                } : null
+            });
+            
+            // Проверяем кэш
+            if (trendsCalculationCache && trendsCalculationCacheKey === cacheKey) {
+                console.log('💰 Using cached trends calculation result');
+                console.log('💰 Cache hit - returning cached data for consistency between table and chart');
+                return trendsCalculationCache;
+            }
             
             console.log('💰 Starting price calculation with new logic: base prices from 4 tables');
             
@@ -7935,6 +7970,12 @@
             });
             
             console.log('📊 Trends with new calculation logic:', updatedTrends.length, 'records');
+            
+            // Сохраняем результат в кэш
+            trendsCalculationCache = updatedTrends;
+            trendsCalculationCacheKey = cacheKey;
+            console.log('💰 Trends calculation result cached');
+            
             return updatedTrends;
         }
         
@@ -7942,6 +7983,13 @@
         function getSelectedLocation() {
             return selectedLocation && selectedLocation.country_id && selectedLocation.city_id && 
                    selectedLocation.county_id && selectedLocation.district_id ? selectedLocation : null;
+        }
+        
+        // Функция для очистки кэша расчетов
+        function clearTrendsCalculationCache() {
+            trendsCalculationCache = null;
+            trendsCalculationCacheKey = null;
+            console.log('💰 Trends calculation cache cleared - ensuring fresh data for next calculation');
         }
         
         // Функция для получения базовых цен из 4 таблиц
