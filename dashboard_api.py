@@ -11,6 +11,17 @@ load_dotenv()
 SUPABASE_URL = os.getenv('SUPABASE_URL')
 SUPABASE_ANON_KEY = os.getenv('SUPABASE_ANON_KEY')
 
+def convert_datetime_to_string(obj):
+    """Конвертирует объекты datetime в строки для JSON сериализации"""
+    if isinstance(obj, datetime):
+        return obj.isoformat()
+    elif isinstance(obj, dict):
+        return {key: convert_datetime_to_string(value) for key, value in obj.items()}
+    elif isinstance(obj, list):
+        return [convert_datetime_to_string(item) for item in obj]
+    else:
+        return obj
+
 class DashboardAPI:
     def __init__(self):
         self.headers = {
@@ -187,10 +198,11 @@ class DashboardAPI:
             
             if response.status_code == 200:
                 latest_rates = response.json()[0] if response.json() else {}
-                return {
+                result = {
                     'latest_rates': latest_rates,
                     'timestamp': latest_rates.get('created_at', 'N/A')
                 }
+                return convert_datetime_to_string(result)
             else:
                 return {'error': 'Failed to fetch currency data'}
         except Exception as e:
@@ -266,16 +278,58 @@ class DashboardAPI:
         except Exception as e:
             return {'error': str(e)}
     
+    def get_regions_stats(self) -> Dict[str, Any]:
+        """Получение статистики отчетов по регионам"""
+        try:
+            # Получаем все отчеты с адресами
+            url = f"{SUPABASE_URL}/rest/v1/user_reports?select=address&address=not.is.null"
+            response = requests.get(url, headers=self.headers)
+            
+            if response.status_code != 200:
+                return {'error': 'Failed to fetch reports data'}
+            
+            reports = response.json()
+            
+            # Подсчитываем количество отчетов по регионам
+            region_counts = {}
+            for report in reports:
+                address = report.get('address', '').strip()
+                if address:
+                    # Извлекаем регион из адреса (берем первую часть до запятой)
+                    region = address.split(',')[0].strip()
+                    if region:
+                        region_counts[region] = region_counts.get(region, 0) + 1
+            
+            # Сортируем по количеству отчетов
+            sorted_regions = sorted(region_counts.items(), key=lambda x: x[1], reverse=True)
+            
+            # Топ 100 регионов
+            top_100_regions = sorted_regions[:100]
+            
+            # Топ 10 регионов для графика
+            top_10_regions = sorted_regions[:10]
+            
+            return {
+                'top_100_regions': top_100_regions,
+                'top_10_regions': top_10_regions,
+                'total_regions': len(region_counts),
+                'total_reports_with_address': len(reports)
+            }
+        except Exception as e:
+            return {'error': str(e)}
+    
     def get_all_stats(self) -> Dict[str, Any]:
         """Получение всех статистик для дашборда"""
-        return {
+        stats = {
             'users': self.get_users_stats(),
             'reports': self.get_reports_stats(),
             'payments': self.get_payments_stats(),
             'currency': self.get_currency_stats(),
             'locations': self.get_locations_stats(),
-            'daily': self.get_daily_stats()
+            'daily': self.get_daily_stats(),
+            'regions': self.get_regions_stats()
         }
+        return convert_datetime_to_string(stats)
 
 # Создаем экземпляр для использования в API
 dashboard_api = DashboardAPI()

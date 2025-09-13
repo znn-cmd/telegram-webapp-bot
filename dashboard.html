@@ -224,12 +224,95 @@
             display: inline-block;
         }
 
+        /* Стили для секции регионов */
+        .regions-section {
+            margin-bottom: 30px;
+        }
+
+        .regions-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        .regions-table-container h3,
+        .regions-chart-container h3 {
+            color: #667eea;
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .table-scroll {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #eee;
+            border-radius: 8px;
+        }
+
+        .regions-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .regions-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #667eea;
+            padding: 12px 8px;
+            text-align: left;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .regions-table td {
+            padding: 10px 8px;
+            border-bottom: 1px solid #eee;
+            font-size: 0.9rem;
+        }
+
+        .regions-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .regions-table td:first-child {
+            font-weight: bold;
+            color: #667eea;
+            text-align: center;
+            width: 50px;
+        }
+
+        .regions-table td:nth-child(3) {
+            text-align: center;
+            font-weight: bold;
+            color: #28a745;
+        }
+
+        .regions-chart-container {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .regions-chart-container .chart-wrapper {
+            flex: 1;
+            min-height: 300px;
+        }
+
         @media (max-width: 768px) {
             .container {
                 padding: 10px;
             }
             
             .charts-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .regions-container {
                 grid-template-columns: 1fr;
             }
             
@@ -307,16 +390,33 @@
                         <canvas id="languagesChart"></canvas>
                     </div>
                 </div>
-                <div class="chart-container">
-                    <h3>📊 Типы отчетов</h3>
-                    <div class="chart-wrapper">
-                        <canvas id="reportTypesChart"></canvas>
+            </div>
+
+            <!-- Статистика по регионам -->
+            <div class="regions-section">
+                <div class="regions-container">
+                    <div class="regions-table-container">
+                        <h3>📍 Топ-100 регионов по количеству отчетов</h3>
+                        <div class="table-scroll">
+                            <table class="regions-table">
+                                <thead>
+                                    <tr>
+                                        <th>№</th>
+                                        <th>Регион</th>
+                                        <th>Количество отчетов</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="regionsTableBody">
+                                    <!-- Заполняется JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
-                </div>
-                <div class="chart-container">
-                    <h3>💱 Статусы платежей</h3>
-                    <div class="chart-wrapper">
-                        <canvas id="paymentStatusChart"></canvas>
+                    <div class="regions-chart-container">
+                        <h3>📊 Топ-10 регионов</h3>
+                        <div class="chart-wrapper">
+                            <canvas id="regionsChart"></canvas>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -385,6 +485,7 @@
         function updateDashboard() {
             updateStatsCards();
             updateCharts();
+            updateRegionsTable();
             updateDetailedStats();
         }
 
@@ -428,8 +529,7 @@
         function updateCharts() {
             updateDailyChart();
             updateLanguagesChart();
-            updateReportTypesChart();
-            updatePaymentStatusChart();
+            updateRegionsChart();
         }
 
         // График ежедневной динамики
@@ -524,24 +624,24 @@
             });
         }
 
-        // График типов отчетов
-        function updateReportTypesChart() {
-            const ctx = document.getElementById('reportTypesChart').getContext('2d');
+        // График регионов
+        function updateRegionsChart() {
+            const ctx = document.getElementById('regionsChart').getContext('2d');
             
-            if (charts.reportTypes) {
-                charts.reportTypes.destroy();
+            if (charts.regions) {
+                charts.regions.destroy();
             }
 
-            const reportTypes = dashboardData.reports?.report_types || {};
-            const labels = Object.keys(reportTypes);
-            const data = Object.values(reportTypes);
+            const top10Regions = dashboardData.regions?.top_10_regions || [];
+            const labels = top10Regions.map(item => item[0]);
+            const data = top10Regions.map(item => item[1]);
 
-            charts.reportTypes = new Chart(ctx, {
+            charts.regions = new Chart(ctx, {
                 type: 'bar',
                 data: {
                     labels: labels,
                     datasets: [{
-                        label: 'Количество',
+                        label: 'Количество отчетов',
                         data: data,
                         backgroundColor: '#667eea',
                         borderColor: '#667eea',
@@ -554,6 +654,12 @@
                     scales: {
                         y: {
                             beginAtZero: true
+                        },
+                        x: {
+                            ticks: {
+                                maxRotation: 45,
+                                minRotation: 0
+                            }
                         }
                     },
                     plugins: {
@@ -565,41 +671,21 @@
             });
         }
 
-        // График статусов платежей
-        function updatePaymentStatusChart() {
-            const ctx = document.getElementById('paymentStatusChart').getContext('2d');
+        // Обновление таблицы регионов
+        function updateRegionsTable() {
+            const tbody = document.getElementById('regionsTableBody');
+            tbody.innerHTML = '';
+
+            const top100Regions = dashboardData.regions?.top_100_regions || [];
             
-            if (charts.paymentStatus) {
-                charts.paymentStatus.destroy();
-            }
-
-            const statuses = dashboardData.payments?.statuses || {};
-            const labels = Object.keys(statuses);
-            const data = Object.values(statuses);
-
-            charts.paymentStatus = new Chart(ctx, {
-                type: 'pie',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        data: data,
-                        backgroundColor: [
-                            '#28a745',
-                            '#ffc107',
-                            '#dc3545',
-                            '#17a2b8'
-                        ]
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'bottom'
-                        }
-                    }
-                }
+            top100Regions.forEach((region, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${region[0]}</td>
+                    <td>${region[1]}</td>
+                `;
+                tbody.appendChild(row);
             });
         }
 
@@ -614,7 +700,9 @@
                 { label: 'Средняя цена отчета', value: `€${(dashboardData.reports?.avg_price || 0).toFixed(2)}`, desc: 'Средняя стоимость сгенерированного отчета' },
                 { label: 'Отчеты за месяц', value: dashboardData.reports?.reports_30d || 0, desc: 'Количество отчетов за последние 30 дней' },
                 { label: 'Общий доход', value: `€${(dashboardData.payments?.total_revenue || 0).toFixed(2)}`, desc: 'Общая сумма всех платежей' },
-                { label: 'Платежи за месяц', value: dashboardData.payments?.payments_30d || 0, desc: 'Количество платежей за последние 30 дней' }
+                { label: 'Платежи за месяц', value: dashboardData.payments?.payments_30d || 0, desc: 'Количество платежей за последние 30 дней' },
+                { label: 'Всего регионов', value: dashboardData.regions?.total_regions || 0, desc: 'Уникальные регионы с отчетами' },
+                { label: 'Отчеты с адресом', value: dashboardData.regions?.total_reports_with_address || 0, desc: 'Отчеты с указанным адресом' }
             ];
 
             stats.forEach(stat => {

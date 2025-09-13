@@ -10544,6 +10544,19 @@ def dashboard_daily():
         logger.error(f"❌ Ошибка получения ежедневной статистики: {e}")
         return jsonify({'error': str(e)}), 500
 
+@app.route('/api/dashboard/regions', methods=['GET'])
+def dashboard_regions():
+    """Получение статистики по регионам"""
+    try:
+        if dashboard_api is None:
+            return jsonify({'error': 'Dashboard API not available'}), 500
+        
+        stats = dashboard_api.get_regions_stats()
+        return jsonify(stats)
+    except Exception as e:
+        logger.error(f"❌ Ошибка получения статистики регионов: {e}")
+        return jsonify({'error': str(e)}), 500
+
 @app.route('/dashboard', methods=['GET'])
 def dashboard_page():
     """Страница дашборда"""
