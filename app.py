@@ -324,6 +324,62 @@ def serve_report_file(telegram_id, report_id, photo_filename):
     report_dir = os.path.join('reports', str(telegram_id), report_id)
     return send_from_directory(report_dir, photo_filename)
 
+def check_user_trial_period(telegram_id):
+    """Проверяет статус пробного периода пользователя"""
+    try:
+        result = safe_db_operation(
+            lambda: supabase.table('users').select('period_start, period_end, user_status, last_activity').eq('telegram_id', telegram_id).execute()
+        )
+        
+        if result is None or not result.data:
+            return None
+            
+        user = result.data[0]
+        period_end = user.get('period_end')
+        user_status = user.get('user_status')
+        
+        if not period_end:
+            return {'status': 'no_trial', 'message': 'Пробный период не установлен'}
+            
+        period_end_date = datetime.strptime(period_end, '%Y-%m-%d').date() if isinstance(period_end, str) else period_end
+        today = datetime.now().date()
+        
+        if today > period_end_date:
+            return {'status': 'expired', 'message': 'Пробный период истек', 'days_expired': (today - period_end_date).days}
+        elif today == period_end_date:
+            return {'status': 'last_day', 'message': 'Последний день пробного периода'}
+        else:
+            days_left = (period_end_date - today).days
+            return {'status': 'active', 'message': f'Пробный период активен', 'days_left': days_left}
+            
+    except Exception as e:
+        logger.error(f"Error checking trial period for user {telegram_id}: {e}")
+        return None
+
+@app.route('/api/user/trial_status', methods=['POST'])
+def api_user_trial_status():
+    """API endpoint для проверки статуса пробного периода пользователя"""
+    try:
+        data = request.json or {}
+        telegram_id = data.get('telegram_id')
+        
+        if not telegram_id:
+            return jsonify({'success': False, 'error': 'telegram_id required'}), 400
+            
+        trial_status = check_user_trial_period(telegram_id)
+        
+        if trial_status is None:
+            return jsonify({'success': False, 'error': 'User not found or database error'}), 404
+            
+        return jsonify({
+            'success': True,
+            'trial_status': trial_status
+        })
+        
+    except Exception as e:
+        logger.error(f"Error in trial status API: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
 def determine_user_language(user, telegram_language_code):
     """
     Определяет язык пользователя согласно новой логике:
@@ -386,6 +442,16 @@ def api_user():
         # Определяем язык согласно новой логике
         lang = determine_user_language(user, language_code)
         
+        # Обновляем last_activity для существующего пользователя
+        try:
+            update_result = safe_db_operation(
+                lambda: supabase.table('users').update({'last_activity': datetime.now()}).eq('telegram_id', telegram_id).execute()
+            )
+            if update_result is None:
+                logger.warning(f"⚠️ Не удалось обновить last_activity для пользователя {telegram_id}")
+        except Exception as e:
+            logger.error(f"Error updating last_activity for user {telegram_id}: {e}")
+        
         # Логируем для отладки
         logger.info(f"👤 Пользователь {telegram_id}: user_status={user.get('user_status')}, "
                    f"telegram_lang={language_code}, determined_lang={lang}")
@@ -405,6 +471,9 @@ def api_user():
             'telegram_id': user.get('telegram_id'),
             'user_status': user.get('user_status', None),
             'avatar_filename': user.get('avatar_filename'),
+            'period_start': user.get('period_start'),
+            'period_end': user.get('period_end'),
+            'last_activity': user.get('last_activity'),
             'language_determined': True  # Флаг что язык уже определен
         })
     else:
@@ -412,7 +481,8 @@ def api_user():
         lang = language_code[:2] if language_code[:2] in locales else 'en'
         
         # Логируем для отладки
-        logger.info(f"🆕 Новый пользователь {telegram_id}: telegram_lang={language_code}, determined_lang={lang}")
+        logger.info(f"🆕 Новый пользователь {telegram_id}: telegram_lang={language_code}, determined_lang={lang}, "
+                   f"period_start={period_start}, period_end={period_end}, full_name={full_name}")
         
         # Генерация уникального invite_code
         def generate_invite_code():
@@ -423,14 +493,30 @@ def api_user():
             code_check = supabase.table('users').select('invite_code').eq('invite_code', invite_code).execute()
             if not code_check.data:
                 break
+        # Получаем текущую дату и время
+        now = datetime.now()
+        period_start = now.date()
+        period_end = (now + timedelta(days=14)).date()
+        
+        # Формируем полное имя
+        full_name = f"{first_name} {last_name}".strip() if last_name else first_name
+        
         user_data = {
             'telegram_id': telegram_id,
             'username': username,
             'tg_name': first_name,
             'last_name': last_name,
+            'first_name': first_name,
+            'full_name': full_name,
             'language': lang,  # Сохраняем определенный язык
             'balance': 0,
-            'invite_code': invite_code
+            'invite_code': invite_code,
+            'period_start': period_start,
+            'period_end': period_end,
+            'registration_date': now,
+            'last_activity': now,
+            'total_reports': 0,
+            'total_spent': 0
         }
         if referal:
             user_data['referal'] = referal
@@ -454,6 +540,10 @@ def api_user():
             'balance': 0,
             'telegram_id': telegram_id,
             'invite_code': invite_code,
+            'period_start': period_start.isoformat(),
+            'period_end': period_end.isoformat(),
+            'registration_date': now.isoformat(),
+            'full_name': full_name,
             'language_determined': True  # Флаг что язык уже определен
         })
 
