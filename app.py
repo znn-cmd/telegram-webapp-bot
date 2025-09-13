@@ -253,6 +253,18 @@ def webapp():
     with open('webapp_main.html', 'r', encoding='utf-8') as f:
         return f.read()
 
+@app.route('/telegram-check.js')
+def telegram_check_js():
+    """Скрипт проверки Telegram WebApp"""
+    with open('telegram-check.js', 'r', encoding='utf-8') as f:
+        return f.read(), 200, {'Content-Type': 'application/javascript'}
+
+@app.route('/test-telegram-check')
+def test_telegram_check():
+    """Тестовая страница для проверки функциональности перенаправления"""
+    with open('test_telegram_check.html', 'r', encoding='utf-8') as f:
+        return f.read()
+
 @app.route('/webapp_main')
 def webapp_main():
     """Главное меню WebApp (альтернативный маршрут)"""
@@ -9480,6 +9492,30 @@ def save_interpretations_to_database(country_code, interpretations, calculations
         calculations (dict): Детальные расчеты
     """
     try:
+        # Функция для безопасной сериализации JSON с обработкой datetime
+        def safe_json_dumps(data):
+            """Безопасно сериализует данные в JSON, конвертируя datetime в строки"""
+            if data is None:
+                return '[]'
+            
+            # Рекурсивно обрабатываем данные для конвертации datetime объектов
+            def convert_datetime(obj):
+                if isinstance(obj, datetime):
+                    return obj.isoformat()
+                elif isinstance(obj, dict):
+                    return {k: convert_datetime(v) for k, v in obj.items()}
+                elif isinstance(obj, list):
+                    return [convert_datetime(item) for item in obj]
+                else:
+                    return obj
+            
+            try:
+                converted_data = convert_datetime(data)
+                return json.dumps(converted_data, ensure_ascii=False)
+            except Exception as e:
+                logger.error(f"Error serializing data to JSON: {e}")
+                return '[]'
+        
         # Обновляем записи в таблице imf_economic_data
         for indicator in ['NGDP_RPCH', 'PCPIPCH']:
             supabase.table('imf_economic_data').update({
@@ -9498,8 +9534,8 @@ def save_interpretations_to_database(country_code, interpretations, calculations
                 'recent_comparison_interpretation_tr': interpretations.get('tr', {}).get('recent_comparison', ''),
                 'recent_comparison_interpretation_fr': interpretations.get('fr', {}).get('recent_comparison', ''),
                 'recent_comparison_interpretation_de': interpretations.get('de', {}).get('recent_comparison', ''),
-                'gdp_calculation_details': json.dumps(calculations.get('gdp_calculations', [])),
-                'inflation_calculation_details': json.dumps(calculations.get('inflation_calculation_details', []))
+                'gdp_calculation_details': safe_json_dumps(calculations.get('gdp_calculations', [])),
+                'inflation_calculation_details': safe_json_dumps(calculations.get('inflation_calculations', []))
             }).eq('country_code', country_code).eq('indicator_code', indicator).execute()
             
         logger.info(f"Interpretations saved to database for country {country_code}")
@@ -9534,11 +9570,29 @@ def load_interpretations_from_database(country_code):
                         'recent_comparison': record.get(f'recent_comparison_interpretation_{lang}', '')
                     }
                 
-                # Загружаем детальные расчеты
-                calculations = {
-                    'gdp_calculations': json.loads(record.get('gdp_calculation_details', '[]')),
-                    'inflation_calculations': json.loads(record.get('inflation_calculation_details', '[]'))
-                }
+                # Загружаем детальные расчеты с безопасной обработкой JSON
+                calculations = {}
+                try:
+                    gdp_details = record.get('gdp_calculation_details', '[]')
+                    inflation_details = record.get('inflation_calculation_details', '[]')
+                    
+                    # Проверяем, что данные не являются datetime объектами
+                    if isinstance(gdp_details, str):
+                        calculations['gdp_calculations'] = json.loads(gdp_details)
+                    else:
+                        calculations['gdp_calculations'] = []
+                        
+                    if isinstance(inflation_details, str):
+                        calculations['inflation_calculations'] = json.loads(inflation_details)
+                    else:
+                        calculations['inflation_calculations'] = []
+                        
+                except (json.JSONDecodeError, TypeError) as e:
+                    logger.error(f"Error parsing calculation details from database: {e}")
+                    calculations = {
+                        'gdp_calculations': [],
+                        'inflation_calculations': []
+                    }
                 
                 logger.info(f"Interpretations loaded from database for country {country_code}")
                 return interpretations, calculations
