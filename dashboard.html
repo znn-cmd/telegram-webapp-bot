@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aaadviser - Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/date-fns@2.29.3/index.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .header h1 {
+            color: #667eea;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+        }
+
+        .stat-card h3 {
+            color: #667eea;
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .stat-change {
+            font-size: 0.9rem;
+            padding: 4px 8px;
+            border-radius: 20px;
+            font-weight: 500;
+        }
+
+        .stat-change.positive {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .stat-change.negative {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .stat-change.neutral {
+            background: #e2e3e5;
+            color: #383d41;
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .chart-container {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        .chart-container h3 {
+            color: #667eea;
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .chart-wrapper {
+            position: relative;
+            height: 300px;
+        }
+
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 200px;
+            font-size: 1.1rem;
+            color: #666;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            text-align: center;
+        }
+
+        .refresh-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: transform 0.2s ease;
+            margin: 10px;
+        }
+
+        .refresh-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .refresh-btn:active {
+            transform: scale(0.95);
+        }
+
+        .controls {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .controls select {
+            padding: 8px 12px;
+            border: 2px solid #667eea;
+            border-radius: 6px;
+            font-size: 1rem;
+            margin: 0 10px;
+            background: white;
+        }
+
+        .table-container {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .table-container h3 {
+            color: #667eea;
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #667eea;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        .icon {
+            width: 20px;
+            height: 20px;
+            display: inline-block;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .chart-wrapper {
+                height: 250px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .stat-value {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 Aaadviser Dashboard</h1>
+            <p>Аналитика и статистика приложения</p>
+            <div class="controls">
+                <button class="refresh-btn" onclick="loadDashboard()">🔄 Обновить данные</button>
+                <select id="periodSelect" onchange="loadDashboard()">
+                    <option value="7">Последние 7 дней</option>
+                    <option value="30" selected>Последние 30 дней</option>
+                    <option value="90">Последние 90 дней</option>
+                </select>
+            </div>
+        </div>
+
+        <div id="loading" class="loading">
+            Загрузка данных...
+        </div>
+
+        <div id="error" class="error" style="display: none;"></div>
+
+        <div id="dashboard" style="display: none;">
+            <!-- Основные метрики -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3>👥 Пользователи</h3>
+                    <div class="stat-value" id="totalUsers">-</div>
+                    <div class="stat-change" id="usersChange">-</div>
+                </div>
+                <div class="stat-card">
+                    <h3>📄 Отчеты</h3>
+                    <div class="stat-value" id="totalReports">-</div>
+                    <div class="stat-change" id="reportsChange">-</div>
+                </div>
+                <div class="stat-card">
+                    <h3>💰 Доходы</h3>
+                    <div class="stat-value" id="totalRevenue">-</div>
+                    <div class="stat-change" id="revenueChange">-</div>
+                </div>
+                <div class="stat-card">
+                    <h3>💳 Платежи</h3>
+                    <div class="stat-value" id="totalPayments">-</div>
+                    <div class="stat-change" id="paymentsChange">-</div>
+                </div>
+            </div>
+
+            <!-- Графики -->
+            <div class="charts-grid">
+                <div class="chart-container">
+                    <h3>📈 Динамика пользователей и отчетов</h3>
+                    <div class="chart-wrapper">
+                        <canvas id="dailyChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <h3>🌍 Распределение по языкам</h3>
+                    <div class="chart-wrapper">
+                        <canvas id="languagesChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <h3>📊 Типы отчетов</h3>
+                    <div class="chart-wrapper">
+                        <canvas id="reportTypesChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <h3>💱 Статусы платежей</h3>
+                    <div class="chart-wrapper">
+                        <canvas id="paymentStatusChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Таблицы с детальной информацией -->
+            <div class="table-container">
+                <h3>📋 Детальная статистика</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Метрика</th>
+                            <th>Значение</th>
+                            <th>Описание</th>
+                        </tr>
+                    </thead>
+                    <tbody id="detailedStats">
+                        <!-- Заполняется JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let charts = {};
+        let dashboardData = {};
+
+        // Загрузка данных дашборда
+        async function loadDashboard() {
+            const loading = document.getElementById('loading');
+            const error = document.getElementById('error');
+            const dashboard = document.getElementById('dashboard');
+            
+            loading.style.display = 'block';
+            error.style.display = 'none';
+            dashboard.style.display = 'none';
+
+            try {
+                const period = document.getElementById('periodSelect').value;
+                const response = await fetch(`/api/dashboard/stats`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                dashboardData = await response.json();
+                
+                if (dashboardData.error) {
+                    throw new Error(dashboardData.error);
+                }
+                
+                updateDashboard();
+                
+                loading.style.display = 'none';
+                dashboard.style.display = 'block';
+                
+            } catch (err) {
+                console.error('Ошибка загрузки данных:', err);
+                loading.style.display = 'none';
+                error.style.display = 'block';
+                error.textContent = `Ошибка загрузки данных: ${err.message}`;
+            }
+        }
+
+        // Обновление дашборда
+        function updateDashboard() {
+            updateStatsCards();
+            updateCharts();
+            updateDetailedStats();
+        }
+
+        // Обновление карточек статистики
+        function updateStatsCards() {
+            const users = dashboardData.users || {};
+            const reports = dashboardData.reports || {};
+            const payments = dashboardData.payments || {};
+
+            // Пользователи
+            document.getElementById('totalUsers').textContent = users.total_users || 0;
+            const usersChange = users.new_users_7d || 0;
+            const usersChangeEl = document.getElementById('usersChange');
+            usersChangeEl.textContent = `+${usersChange} за неделю`;
+            usersChangeEl.className = `stat-change ${usersChange > 0 ? 'positive' : 'neutral'}`;
+
+            // Отчеты
+            document.getElementById('totalReports').textContent = reports.total_reports || 0;
+            const reportsChange = reports.reports_7d || 0;
+            const reportsChangeEl = document.getElementById('reportsChange');
+            reportsChangeEl.textContent = `+${reportsChange} за неделю`;
+            reportsChangeEl.className = `stat-change ${reportsChange > 0 ? 'positive' : 'neutral'}`;
+
+            // Доходы
+            const revenue = payments.total_revenue || 0;
+            document.getElementById('totalRevenue').textContent = `€${revenue.toFixed(2)}`;
+            const revenueChange = payments.payments_30d || 0;
+            const revenueChangeEl = document.getElementById('revenueChange');
+            revenueChangeEl.textContent = `${revenueChange} платежей за месяц`;
+            revenueChangeEl.className = `stat-change ${revenueChange > 0 ? 'positive' : 'neutral'}`;
+
+            // Платежи
+            document.getElementById('totalPayments').textContent = payments.total_payments || 0;
+            const paymentsChange = payments.payments_7d || 0;
+            const paymentsChangeEl = document.getElementById('paymentsChange');
+            paymentsChangeEl.textContent = `+${paymentsChange} за неделю`;
+            paymentsChangeEl.className = `stat-change ${paymentsChange > 0 ? 'positive' : 'neutral'}`;
+        }
+
+        // Обновление графиков
+        function updateCharts() {
+            updateDailyChart();
+            updateLanguagesChart();
+            updateReportTypesChart();
+            updatePaymentStatusChart();
+        }
+
+        // График ежедневной динамики
+        function updateDailyChart() {
+            const ctx = document.getElementById('dailyChart').getContext('2d');
+            
+            if (charts.daily) {
+                charts.daily.destroy();
+            }
+
+            const dailyData = dashboardData.daily?.daily_stats || [];
+            const labels = dailyData.map(item => {
+                const date = new Date(item.date);
+                return date.toLocaleDateString('ru-RU', { month: 'short', day: 'numeric' });
+            }).reverse();
+
+            charts.daily = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Пользователи',
+                            data: dailyData.map(item => item.users).reverse(),
+                            borderColor: '#667eea',
+                            backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                            tension: 0.4
+                        },
+                        {
+                            label: 'Отчеты',
+                            data: dailyData.map(item => item.reports).reverse(),
+                            borderColor: '#764ba2',
+                            backgroundColor: 'rgba(118, 75, 162, 0.1)',
+                            tension: 0.4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        }
+                    }
+                }
+            });
+        }
+
+        // График языков
+        function updateLanguagesChart() {
+            const ctx = document.getElementById('languagesChart').getContext('2d');
+            
+            if (charts.languages) {
+                charts.languages.destroy();
+            }
+
+            const languages = dashboardData.users?.languages || {};
+            const labels = Object.keys(languages);
+            const data = Object.values(languages);
+
+            charts.languages = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: [
+                            '#667eea',
+                            '#764ba2',
+                            '#f093fb',
+                            '#f5576c',
+                            '#4facfe',
+                            '#00f2fe'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+
+        // График типов отчетов
+        function updateReportTypesChart() {
+            const ctx = document.getElementById('reportTypesChart').getContext('2d');
+            
+            if (charts.reportTypes) {
+                charts.reportTypes.destroy();
+            }
+
+            const reportTypes = dashboardData.reports?.report_types || {};
+            const labels = Object.keys(reportTypes);
+            const data = Object.values(reportTypes);
+
+            charts.reportTypes = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Количество',
+                        data: data,
+                        backgroundColor: '#667eea',
+                        borderColor: '#667eea',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+        }
+
+        // График статусов платежей
+        function updatePaymentStatusChart() {
+            const ctx = document.getElementById('paymentStatusChart').getContext('2d');
+            
+            if (charts.paymentStatus) {
+                charts.paymentStatus.destroy();
+            }
+
+            const statuses = dashboardData.payments?.statuses || {};
+            const labels = Object.keys(statuses);
+            const data = Object.values(statuses);
+
+            charts.paymentStatus = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: [
+                            '#28a745',
+                            '#ffc107',
+                            '#dc3545',
+                            '#17a2b8'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+
+        // Обновление детальной статистики
+        function updateDetailedStats() {
+            const tbody = document.getElementById('detailedStats');
+            tbody.innerHTML = '';
+
+            const stats = [
+                { label: 'Активные пользователи', value: dashboardData.users?.active_users || 0, desc: 'Пользователи с активностью за последние 7 дней' },
+                { label: 'Пользователи с балансом', value: dashboardData.users?.users_with_balance || 0, desc: 'Пользователи с положительным балансом' },
+                { label: 'Средняя цена отчета', value: `€${(dashboardData.reports?.avg_price || 0).toFixed(2)}`, desc: 'Средняя стоимость сгенерированного отчета' },
+                { label: 'Отчеты за месяц', value: dashboardData.reports?.reports_30d || 0, desc: 'Количество отчетов за последние 30 дней' },
+                { label: 'Общий доход', value: `€${(dashboardData.payments?.total_revenue || 0).toFixed(2)}`, desc: 'Общая сумма всех платежей' },
+                { label: 'Платежи за месяц', value: dashboardData.payments?.payments_30d || 0, desc: 'Количество платежей за последние 30 дней' }
+            ];
+
+            stats.forEach(stat => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${stat.label}</td>
+                    <td><strong>${stat.value}</strong></td>
+                    <td>${stat.desc}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Автоматическое обновление каждые 5 минут
+        setInterval(loadDashboard, 300000);
+
+        // Загрузка при старте
+        document.addEventListener('DOMContentLoaded', loadDashboard);
+    </script>
+</body>
+</html>

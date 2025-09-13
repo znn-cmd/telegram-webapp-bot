@@ -47,6 +47,14 @@ except ImportError as e:
     calculate_3month_forecast = None
     format_chart_data = None
 
+# Импорт модуля dashboard_api
+try:
+    from dashboard_api import dashboard_api
+    logger.info("✅ Модуль dashboard_api успешно импортирован")
+except ImportError as e:
+    logger.error(f"❌ Ошибка импорта модуля dashboard_api: {e}")
+    dashboard_api = None
+
 # Условный импорт openai
 try:
     import openai
@@ -10414,6 +10422,78 @@ def api_test_api_keys():
         import traceback
         logger.error(f"❌ Traceback: {traceback.format_exc()}")
         return jsonify({'success': False, 'error': str(e)}), 500
+
+# Dashboard API endpoints
+@app.route('/api/dashboard/stats', methods=['GET'])
+def dashboard_stats():
+    """Получение всех статистик для дашборда"""
+    try:
+        if dashboard_api is None:
+            return jsonify({'error': 'Dashboard API not available'}), 500
+        
+        stats = dashboard_api.get_all_stats()
+        return jsonify(stats)
+    except Exception as e:
+        logger.error(f"❌ Ошибка получения статистик дашборда: {e}")
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/dashboard/users', methods=['GET'])
+def dashboard_users():
+    """Получение статистики пользователей"""
+    try:
+        if dashboard_api is None:
+            return jsonify({'error': 'Dashboard API not available'}), 500
+        
+        stats = dashboard_api.get_users_stats()
+        return jsonify(stats)
+    except Exception as e:
+        logger.error(f"❌ Ошибка получения статистики пользователей: {e}")
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/dashboard/reports', methods=['GET'])
+def dashboard_reports():
+    """Получение статистики отчетов"""
+    try:
+        if dashboard_api is None:
+            return jsonify({'error': 'Dashboard API not available'}), 500
+        
+        stats = dashboard_api.get_reports_stats()
+        return jsonify(stats)
+    except Exception as e:
+        logger.error(f"❌ Ошибка получения статистики отчетов: {e}")
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/dashboard/payments', methods=['GET'])
+def dashboard_payments():
+    """Получение статистики платежей"""
+    try:
+        if dashboard_api is None:
+            return jsonify({'error': 'Dashboard API not available'}), 500
+        
+        stats = dashboard_api.get_payments_stats()
+        return jsonify(stats)
+    except Exception as e:
+        logger.error(f"❌ Ошибка получения статистики платежей: {e}")
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/dashboard/daily', methods=['GET'])
+def dashboard_daily():
+    """Получение ежедневной статистики"""
+    try:
+        if dashboard_api is None:
+            return jsonify({'error': 'Dashboard API not available'}), 500
+        
+        days = request.args.get('days', 30, type=int)
+        stats = dashboard_api.get_daily_stats(days)
+        return jsonify(stats)
+    except Exception as e:
+        logger.error(f"❌ Ошибка получения ежедневной статистики: {e}")
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/dashboard', methods=['GET'])
+def dashboard_page():
+    """Страница дашборда"""
+    return send_file('dashboard.html')
 
 
 if __name__ == '__main__':
