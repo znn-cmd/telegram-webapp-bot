@@ -6975,7 +6975,7 @@ def api_save_html_report():
     <div class="document">
         <!-- Корпоративный заголовок -->
         <div class="corporate-header">
-            <img src="logo-flt.png" alt="Aaadviser" class="company-logo" />
+            <img src="../../logo-flt.png" alt="Aaadviser" class="company-logo" />
             <div class="document-title">Аналитический отчет по недвижимости</div>
             <div class="document-subtitle">{location_info}</div>
         </div>
