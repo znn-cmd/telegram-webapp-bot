@@ -710,6 +710,14 @@ def api_user():
         period_start = now.date()
         period_end = (now + timedelta(days=14)).date()
         
+        # Проверяем и устанавливаем значения по умолчанию для обязательных полей
+        if not first_name or first_name.strip() == '':
+            first_name = f"User_{telegram_id}"  # Значение по умолчанию
+        if not last_name:
+            last_name = ''
+        if not username:
+            username = ''
+            
         # Формируем полное имя
         full_name = f"{first_name} {last_name}".strip() if last_name else first_name
         
@@ -730,7 +738,7 @@ def api_user():
         user_data = {
             'telegram_id': telegram_id,
             'username': username,
-            'tg_name': first_name,
+            'tg_name': first_name,  # Теперь гарантированно не null
             'last_name': last_name,
             'first_name': first_name,
             'full_name': full_name,
