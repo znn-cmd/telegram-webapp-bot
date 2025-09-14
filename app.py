@@ -80,6 +80,7 @@ from httpx import TimeoutException, ConnectTimeout
 try:
     # Создаем кастомный HTTP клиент с оптимизированными таймаутами
     import httpx
+    from supabase.lib.client_options import ClientOptions
     
     # Настройки HTTP клиента для лучшей производительности
     http_client = httpx.Client(
@@ -98,13 +99,18 @@ try:
         verify=True  # Проверяем SSL сертификаты
     )
     
+    # Создаем опции клиента
+    options = ClientOptions()
+    options.headers.update({
+        "apikey": supabase_key,
+        "Authorization": f"Bearer {supabase_key}"
+    })
+    
     # Создаем Supabase клиент с кастомным HTTP клиентом
     supabase: Client = create_client(
         supabase_url, 
         supabase_key,
-        options={
-            'client': http_client
-        }
+        options=options
     )
     logger.info("✅ Supabase клиент создан успешно с оптимизированными настройками")
 except Exception as e:
