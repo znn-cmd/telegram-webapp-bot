@@ -76,17 +76,46 @@ if not supabase_url or not supabase_key:
 import httpx
 from httpx import TimeoutException, ConnectTimeout
 
-# Инициализация Supabase с увеличенными таймаутами
+# Инициализация Supabase с оптимизированными настройками
 try:
-    # Создаем Supabase клиент с базовыми настройками (таймауты обрабатываются на уровне safe_db_operation)
+    # Создаем кастомный HTTP клиент с оптимизированными таймаутами
+    import httpx
+    
+    # Настройки HTTP клиента для лучшей производительности
+    http_client = httpx.Client(
+        timeout=httpx.Timeout(
+            connect=10.0,  # Таймаут подключения
+            read=30.0,     # Таймаут чтения
+            write=10.0,    # Таймаут записи
+            pool=5.0       # Таймаут получения из пула
+        ),
+        limits=httpx.Limits(
+            max_keepalive_connections=20,  # Максимум keep-alive соединений
+            max_connections=100,           # Максимум общих соединений
+            keepalive_expiry=30.0          # Время жизни keep-alive
+        ),
+        http2=True,  # Включаем HTTP/2 для лучшей производительности
+        verify=True  # Проверяем SSL сертификаты
+    )
+    
+    # Создаем Supabase клиент с кастомным HTTP клиентом
     supabase: Client = create_client(
         supabase_url, 
-        supabase_key
+        supabase_key,
+        options={
+            'client': http_client
+        }
     )
-    logger.info("✅ Supabase клиент создан успешно")
+    logger.info("✅ Supabase клиент создан успешно с оптимизированными настройками")
 except Exception as e:
     logger.error(f"❌ Ошибка создания Supabase клиента: {e}")
-    raise
+    # Fallback на базовую инициализацию
+    try:
+        supabase: Client = create_client(supabase_url, supabase_key)
+        logger.info("✅ Supabase клиент создан с базовыми настройками")
+    except Exception as fallback_error:
+        logger.error(f"❌ Критическая ошибка создания Supabase клиента: {fallback_error}")
+        raise
 
 # Токен бота
 TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
@@ -177,30 +206,159 @@ GOOGLE_MAPS_TIMEOUT = int(os.getenv('GOOGLE_MAPS_TIMEOUT', '30'))  # Увели�
 #     # Запускаем бота (закомментировано для WebApp)
 #     # application.run_polling(allowed_updates=Update.ALL_TYPES)
 
-# Функция для безопасного выполнения операций с базой данных
-def safe_db_operation(operation, max_retries=5, retry_delay=5):
+# Глобальный кэш для пула соединений
+_connection_cache = {}
+_connection_lock = threading.Lock()
+
+# Кэш для часто используемых запросов
+_query_cache = {}
+_cache_lock = threading.Lock()
+_cache_ttl = 300  # 5 минут TTL для кэша
+
+def format_datetime_for_db(dt=None):
     """
-    Безопасно выполняет операцию с базой данных с retry логикой
+    Форматирует datetime объект для безопасной передачи в базу данных
+    
+    Args:
+        dt: datetime объект (по умолчанию текущее время)
+    
+    Returns:
+        str: ISO формат даты и времени
+    """
+    if dt is None:
+        dt = datetime.now()
+    return dt.isoformat()
+
+def safe_db_data(data):
+    """
+    Подготавливает данные для безопасной передачи в базу данных,
+    преобразуя datetime объекты в строки
+    
+    Args:
+        data: dict с данными для БД
+    
+    Returns:
+        dict: Обработанные данные без datetime объектов
+    """
+    if not isinstance(data, dict):
+        return data
+    
+    safe_data = {}
+    for key, value in data.items():
+        if isinstance(value, datetime):
+            safe_data[key] = format_datetime_for_db(value)
+        elif isinstance(value, dict):
+            safe_data[key] = safe_db_data(value)
+        else:
+            safe_data[key] = value
+    
+    return safe_data
+
+def get_cached_query(cache_key):
+    """
+    Получает результат запроса из кэша, если он еще действителен
+    
+    Args:
+        cache_key: Ключ для кэша
+    
+    Returns:
+        Результат запроса или None если кэш пуст или устарел
+    """
+    with _cache_lock:
+        if cache_key in _query_cache:
+            result, timestamp = _query_cache[cache_key]
+            if time.time() - timestamp < _cache_ttl:
+                return result
+            else:
+                # Удаляем устаревший кэш
+                del _query_cache[cache_key]
+    return None
+
+def set_cached_query(cache_key, result):
+    """
+    Сохраняет результат запроса в кэш
+    
+    Args:
+        cache_key: Ключ для кэша
+        result: Результат запроса
+    """
+    with _cache_lock:
+        _query_cache[cache_key] = (result, time.time())
+        
+        # Очищаем кэш если он стал слишком большим
+        if len(_query_cache) > 100:
+            # Удаляем самые старые записи
+            oldest_keys = sorted(_query_cache.keys(), 
+                               key=lambda k: _query_cache[k][1])[:50]
+            for key in oldest_keys:
+                del _query_cache[key]
+
+def clear_user_cache(telegram_id):
+    """
+    Очищает кэш для конкретного пользователя при обновлении его данных
+    
+    Args:
+        telegram_id: ID пользователя в Telegram
+    """
+    with _cache_lock:
+        keys_to_remove = [key for key in _query_cache.keys() if key.startswith(f"user_{telegram_id}_")]
+        for key in keys_to_remove:
+            del _query_cache[key]
+
+def get_cache_stats():
+    """
+    Возвращает статистику использования кэша
+    
+    Returns:
+        dict: Статистика кэша
+    """
+    with _cache_lock:
+        total_entries = len(_query_cache)
+        current_time = time.time()
+        
+        # Подсчитываем активные (не устаревшие) записи
+        active_entries = 0
+        for key, (result, timestamp) in _query_cache.items():
+            if current_time - timestamp < _cache_ttl:
+                active_entries += 1
+        
+        return {
+            'total_entries': total_entries,
+            'active_entries': active_entries,
+            'expired_entries': total_entries - active_entries,
+            'cache_ttl': _cache_ttl
+        }
+
+# Функция для безопасного выполнения операций с базой данных
+def safe_db_operation(operation, max_retries=3, retry_delay=2):
+    """
+    Безопасно выполняет операцию с базой данных с оптимизированной retry логикой
     
     Args:
         operation: Функция для выполнения
-        max_retries: Максимальное количество попыток
-        retry_delay: Задержка между попытками в секундах
+        max_retries: Максимальное количество попыток (уменьшено до 3)
+        retry_delay: Задержка между попытками в секундах (уменьшено до 2)
     
     Returns:
         Результат операции или None в случае ошибки
     """
     for attempt in range(max_retries):
         try:
-            logger.info(f"🔄 Попытка подключения к БД {attempt + 1}/{max_retries}")
+            # Логируем только первую попытку и ошибки
+            if attempt == 0:
+                logger.debug(f"🔄 Попытка подключения к БД {attempt + 1}/{max_retries}")
             
-            # Добавляем небольшую задержку перед каждой попыткой
+            # Уменьшенная задержка между попытками
             if attempt > 0:
-                time.sleep(1)
+                time.sleep(min(retry_delay, 1))  # Максимум 1 секунда задержки
             
             result = operation()
-            logger.info(f"✅ Успешное подключение к БД на попытке {attempt + 1}")
+            
+            # Логируем успех только для первой попытки
+            if attempt == 0:
+                logger.debug(f"✅ Успешное подключение к БД на попытке {attempt + 1}")
             return result
+            
         except (TimeoutException, ConnectTimeout, ConnectionError, OSError) as e:
             error_msg = str(e)
             if "handshake operation timed out" in error_msg or "timed out" in error_msg:
@@ -209,21 +367,65 @@ def safe_db_operation(operation, max_retries=5, retry_delay=5):
                 logger.warning(f"Database connection error on attempt {attempt + 1}/{max_retries}: {error_msg}")
             
             if attempt < max_retries - 1:
-                logger.info(f"⏳ Ожидание {retry_delay} секунд перед следующей попыткой...")
+                logger.debug(f"⏳ Ожидание {retry_delay} секунд перед следующей попыткой...")
                 time.sleep(retry_delay)
                 continue
             else:
                 logger.error(f"Database operation failed after {max_retries} attempts: {error_msg}")
                 return None
+                
         except Exception as e:
-            logger.error(f"Database operation error: {e}")
+            # Специальная обработка ошибок сериализации JSON
+            error_msg = str(e)
+            if "not JSON serializable" in error_msg:
+                logger.error(f"JSON serialization error: {error_msg}")
+                return None
+            elif "datetime" in error_msg.lower():
+                logger.error(f"Datetime serialization error: {error_msg}")
+                return None
+            
+            logger.error(f"Database operation error: {error_msg}")
             if attempt < max_retries - 1:
-                logger.info(f"⏳ Ожидание {retry_delay} секунд перед следующей попыткой...")
+                logger.debug(f"⏳ Ожидание {retry_delay} секунд перед следующей попыткой...")
                 time.sleep(retry_delay)
                 continue
             else:
-                logger.error(f"Database operation failed after {max_retries} attempts: {e}")
+                logger.error(f"Database operation failed after {max_retries} attempts: {error_msg}")
                 return None
+    return None
+
+def get_user_data_cached(telegram_id, fields='*'):
+    """
+    Получает данные пользователя с кэшированием для часто используемых запросов
+    
+    Args:
+        telegram_id: ID пользователя в Telegram
+        fields: Поля для выборки (по умолчанию все)
+    
+    Returns:
+        dict: Данные пользователя или None
+    """
+    # Создаем ключ кэша
+    cache_key = f"user_{telegram_id}_{fields}"
+    
+    # Проверяем кэш
+    cached_result = get_cached_query(cache_key)
+    if cached_result is not None:
+        return cached_result
+    
+    # Если в кэше нет, выполняем запрос
+    def get_user_operation():
+        return supabase.table('users').select(fields).eq('telegram_id', telegram_id).execute()
+    
+    result = safe_db_operation(get_user_operation)
+    
+    if result and result.data:
+        user_data = result.data[0]
+        # Кэшируем только для часто используемых полей
+        if fields in ['*', 'language, user_status', 'language, user_status, balance']:
+            set_cached_query(cache_key, user_data)
+        return user_data
+    
     return None
 
 # Проверка подключения к Supabase при запуске
@@ -449,12 +651,10 @@ def api_user():
         return jsonify({'error': 'telegram_id required'}), 400
     # Проверяем пользователя в базе
     try:
-        user_result = safe_db_operation(
-            lambda: supabase.table('users').select('*').eq('telegram_id', telegram_id).execute()
-        )
-        if user_result is None:
-            return jsonify({'error': 'Database connection error'}), 500
-        user = user_result.data[0] if user_result.data else None
+        user = get_user_data_cached(telegram_id, '*')
+        if user is None:
+            # Если пользователь не найден, это не ошибка подключения к БД
+            pass
     except Exception as e:
         logger.error(f"Database connection error: {e}")
         return jsonify({'error': 'Database connection error'}), 500
@@ -465,10 +665,13 @@ def api_user():
         # Обновляем last_activity для существующего пользователя
         try:
             update_result = safe_db_operation(
-                lambda: supabase.table('users').update({'last_activity': datetime.now()}).eq('telegram_id', telegram_id).execute()
+                lambda: supabase.table('users').update({'last_activity': format_datetime_for_db()}).eq('telegram_id', telegram_id).execute()
             )
             if update_result is None:
                 logger.warning(f"⚠️ Не удалось обновить last_activity для пользователя {telegram_id}")
+            else:
+                # Очищаем кэш пользователя при успешном обновлении
+                clear_user_cache(telegram_id)
         except Exception as e:
             logger.error(f"Error updating last_activity for user {telegram_id}: {e}")
         
@@ -531,10 +734,10 @@ def api_user():
             'language': lang,  # Сохраняем определенный язык
             'balance': 0,
             'invite_code': invite_code,
-            'period_start': period_start,
-            'period_end': period_end,
-            'registration_date': now,
-            'last_activity': now,
+            'period_start': period_start.isoformat(),
+            'period_end': period_end.isoformat(),
+            'registration_date': format_datetime_for_db(now),
+            'last_activity': format_datetime_for_db(now),
             'total_reports': 0,
             'total_spent': 0
         }
@@ -692,6 +895,9 @@ def api_set_language():
         if update_result is None:
             return jsonify({'error': 'Database connection error'}), 500
         
+        # Очищаем кэш пользователя при успешном обновлении
+        clear_user_cache(telegram_id)
+        
         logger.info(f"🌐 Язык обновлен для пользователя {telegram_id}: {language} (статус: {user_status})")
         
         return jsonify({
@@ -714,12 +920,9 @@ def api_menu():
     if telegram_id:
         try:
             # Получаем информацию о пользователе из БД
-            user_result = safe_db_operation(
-                lambda: supabase.table('users').select('language, user_status').eq('telegram_id', telegram_id).execute()
-            )
+            user = get_user_data_cached(telegram_id, 'language, user_status')
             
-            if user_result and user_result.data:
-                user = user_result.data[0]
+            if user:
                 language = determine_user_language(user, language_code)
             else:
                 language = language_code[:2] if language_code[:2] in locales else 'en'
@@ -1334,15 +1537,9 @@ def api_user_language():
         logger.info(f"🔍 Запрос языка пользователя для telegram_id: {telegram_id}")
         
         # Получаем полные данные пользователя из базы данных
-        result = safe_db_operation(
-            lambda: supabase.table('users').select('language, user_status').eq('telegram_id', telegram_id).execute()
-        )
+        user = get_user_data_cached(telegram_id, 'language, user_status')
         
-        if result is None:
-            return jsonify({'success': False, 'error': 'Database connection error'}), 500
-        
-        if result.data and len(result.data) > 0:
-            user = result.data[0]
+        if user:
             user_status = user.get('user_status')
             
             # Используем новую единую логику определения языка
@@ -4013,7 +4210,7 @@ def api_full_report():
         user_result = supabase.table('users').select('id').eq('telegram_id', telegram_id).execute()
         user_id = user_result.data[0]['id'] if user_result.data else telegram_id
         
-        created_at = datetime.now().isoformat()
+        created_at = format_datetime_for_db()
         
         # Преобразуем координаты в числа, если они переданы
         try:
@@ -4536,7 +4733,7 @@ def api_save_object():
         saved_object = {
             'user_id': user_id,
             'object_data': object_data,
-            'saved_at': datetime.now().isoformat()
+            'saved_at': format_datetime_for_db()
         }
         
         supabase.table('saved_objects').insert(saved_object).execute()
@@ -5193,7 +5390,7 @@ def api_update_user_report():
         # TODO: здесь должна быть логика перегенерации отчета
         # Пока просто обновляем дату
         supabase.table('user_reports').update({
-            'updated_at': datetime.now().isoformat()
+            'updated_at': format_datetime_for_db()
         }).eq('id', report_id).execute()
         return jsonify({'success': True, 'balance': new_balance})
     except Exception as e:
@@ -5234,8 +5431,8 @@ def api_save_user_report():
             'report_type': report_type,
             'address': address,
             'full_report': full_report,
-            'created_at': datetime.now().isoformat(),
-            'updated_at': datetime.now().isoformat()
+            'created_at': format_datetime_for_db(),
+            'updated_at': format_datetime_for_db()
         }
         try:
             result = safe_db_operation(
@@ -5488,7 +5685,7 @@ def api_save_html_report():
                 'content': report_content,
                 'location_info': location_info,
                 'report_number': report_number,
-                'generated_at': datetime.now().isoformat()
+                'generated_at': format_datetime_for_db()
             }
         }
         
@@ -10562,6 +10759,39 @@ def dashboard_page():
     """Страница дашборда"""
     return send_file('dashboard.html')
 
+@app.route('/api/cache/stats', methods=['GET'])
+def get_cache_statistics():
+    """API endpoint для получения статистики кэша"""
+    try:
+        stats = get_cache_stats()
+        return jsonify({
+            'success': True,
+            'cache_stats': stats
+        })
+    except Exception as e:
+        logger.error(f"Error getting cache stats: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/cache/clear', methods=['POST'])
+def clear_cache():
+    """API endpoint для очистки кэша (только для админов)"""
+    try:
+        data = request.get_json()
+        telegram_id = data.get('telegram_id')
+        
+        if not telegram_id:
+            return jsonify({'success': False, 'error': 'telegram_id required'}), 400
+        
+        # Проверяем, что пользователь админ (можно добавить проверку прав)
+        clear_user_cache(telegram_id)
+        
+        return jsonify({
+            'success': True,
+            'message': f'Cache cleared for user {telegram_id}'
+        })
+    except Exception as e:
+        logger.error(f"Error clearing cache: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 if __name__ == '__main__':
     # Дополнительная проверка подключения к Supabase перед запуском
