@@ -99,12 +99,8 @@ try:
         verify=True  # Проверяем SSL сертификаты
     )
     
-    # Создаем опции клиента
+    # Создаем опции клиента (без дублирования заголовков авторизации)
     options = ClientOptions()
-    options.headers.update({
-        "apikey": supabase_key,
-        "Authorization": f"Bearer {supabase_key}"
-    })
     
     # Создаем Supabase клиент с кастомным HTTP клиентом
     supabase: Client = create_client(

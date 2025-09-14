@@ -8,7 +8,7 @@ import json
 from datetime import datetime, timedelta
 
 # URL вашего приложения (замените на актуальный)
-BASE_URL = "http://localhost:5000"  # или ваш URL
+BASE_URL = "http://localhost:8080"  # или ваш URL
 
 def test_user_registration():
     """Тестирует регистрацию нового пользователя"""
