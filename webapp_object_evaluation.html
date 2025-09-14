@@ -9635,39 +9635,74 @@
             }
         }
 
+        // Get user language from API (same as region analytics)
+        async function getUserLanguage() {
+            try {
+                // Get telegram_id from Telegram WebApp
+                const telegramId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id;
+                if (!telegramId) {
+                    console.log('No telegram_id available, using default language: ru');
+                    return 'ru';
+                }
+                
+                // Сначала попробуем получить язык через /api/user (основной endpoint)
+                try {
+                    const userResponse = await fetch('/api/user', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ 
+                            telegram_id: telegramId,
+                            language_code: window.Telegram?.WebApp?.initDataUnsafe?.user?.language_code
+                        })
+                    });
+                    
+                    if (userResponse.ok) {
+                        const userData = await userResponse.json();
+                        if (userData.language_determined) {
+                            userLanguage = userData.language;
+                            console.log(`🌐 User language loaded from /api/user: ${userLanguage}`);
+                            return userLanguage;
+                        }
+                    }
+                } catch (error) {
+                    console.log('Failed to get language from /api/user, trying fallback...');
+                }
+                
+                // Fallback: используем /api/user/language
+                const response = await fetch('/api/user/language', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ 
+                        telegram_id: telegramId,
+                        language_code: window.Telegram?.WebApp?.initDataUnsafe?.user?.language_code
+                    })
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    userLanguage = data.language;
+                    console.log(`🌐 User language loaded from fallback: ${userLanguage} (status: ${data.user_status})`);
+                    return userLanguage;
+                } else {
+                    console.log(`❌ Failed to get language: ${data.error}`);
+                    return 'ru'; // Fallback на русский
+                }
+            } catch (error) {
+                console.error('❌ Error getting user language:', error);
+                return 'ru'; // Fallback на русский
+            }
+        }
+
         // Initialize user language
         async function initializeLanguage() {
             try {
-                // Получаем язык пользователя из Telegram
-                if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initData) {
-                    const initData = window.Telegram.WebApp.initData;
-                    const urlParams = new URLSearchParams(initData);
-                    const userParam = urlParams.get('user');
-                    
-                    if (userParam) {
-                        const user = JSON.parse(decodeURIComponent(userParam));
-                        if (user.language_code) {
-                            userLanguage = user.language_code;
-                            console.log('🌐 User language from Telegram:', userLanguage);
-                        }
-                    }
-                }
-                
-                // Определяем текущий язык
-                if (userLanguage === 'tr') {
-                    currentLanguage = 'tr';
-                } else if (userLanguage === 'en') {
-                    currentLanguage = 'en';
-                } else if (userLanguage === 'de') {
-                    currentLanguage = 'de';
-                } else if (userLanguage === 'fr') {
-                    currentLanguage = 'fr';
-                } else {
-                    currentLanguage = 'ru'; // По умолчанию русский
-                }
-                
-                console.log('🌐 Final language:', currentLanguage);
-                
+                userLanguage = await getUserLanguage();
+                currentLanguage = userLanguage;
+                console.log(`🌐 Final language: ${currentLanguage}`);
             } catch (error) {
                 console.error('❌ Error initializing language:', error);
                 currentLanguage = 'ru'; // Fallback
