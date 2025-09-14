@@ -6,7 +6,80 @@
     <title>Aaadviser - <span data-i18n="main.title">Главное меню</span></title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="/telegram-check.js"></script>
-    <script src="/i18n-manager.js"></script>
+    <script>
+        // Упрощенная система локализации
+        const translations = {
+            'ru': {
+                'welcome.title': 'Добро пожаловать',
+                'welcome.description': 'Инсайды рынка недвижимости Турции, Испании и Португалии - Aaadviser 2.0',
+                'welcome.main_description': '<p><strong>Aaadviser</strong> — это аналитическая система оценки недвижимости Турции, Испании и Португалии, которая ориентируется на данные с 2018 года.</p><p>При первом использовании рекомендуем заполнить контактные данные в разделе <strong>Профиль</strong>, добавив аватар и контактные данные о себе.</p><p><strong>Отчет по региону</strong> — это текущая ситуация региона.<br><strong>Аналитика объекта</strong> — это текущая оценка и прогноз на год конкретного объекта недвижимости.<br><strong>Мои отчеты</strong> — это сохраненные отчеты, которые можно просмотреть, переслать или удалить.</p><p>В будущем будет открыта реферальная программа для пользователей и биржа заявок от клиентов на покупку недвижимости.</p>',
+                'welcome.trial_info': 'Вам активированы 14 дней безлимитного использования Aaadviser 2.0',
+                'welcome.get_started': 'Быстрый старт'
+            },
+            'en': {
+                'welcome.title': 'Welcome',
+                'welcome.description': 'Real estate market insights for Turkey, Spain and Portugal - Aaadviser 2.0',
+                'welcome.main_description': '<p><strong>Aaadviser</strong> is an analytical real estate evaluation system for Turkey, Spain and Portugal, based on data since 2018.</p><p>For first-time use, we recommend filling in your contact details in the <strong>Profile</strong> section, adding an avatar and contact information about yourself.</p><p><strong>Region Report</strong> — current regional situation.<br><strong>Object Analytics</strong> — current evaluation and year forecast for a specific real estate object.<br><strong>My Reports</strong> — saved reports that can be viewed, forwarded or deleted.</p><p>In the future, a referral program for users and a marketplace for client purchase requests will be opened.</p>',
+                'welcome.trial_info': 'You have 14 days of unlimited Aaadviser 2.0 usage activated',
+                'welcome.get_started': 'Quick Start'
+            },
+            'de': {
+                'welcome.title': 'Willkommen',
+                'welcome.description': 'Immobilienmarkt-Einblicke für die Türkei, Spanien und Portugal - Aaadviser 2.0',
+                'welcome.main_description': '<p><strong>Aaadviser</strong> ist ein analytisches Immobilienbewertungssystem für die Türkei, Spanien und Portugal, basierend auf Daten seit 2018.</p><p>Bei der ersten Nutzung empfehlen wir, Ihre Kontaktdaten im <strong>Profil</strong>-Bereich auszufüllen und ein Avatar sowie Kontaktinformationen über sich hinzuzufügen.</p><p><strong>Regionsbericht</strong> — aktuelle regionale Situation.<br><strong>Objekt-Analytics</strong> — aktuelle Bewertung und Jahresprognose für ein bestimmtes Immobilienobjekt.<br><strong>Meine Berichte</strong> — gespeicherte Berichte, die angesehen, weitergeleitet oder gelöscht werden können.</p><p>In Zukunft wird ein Empfehlungsprogramm für Benutzer und ein Marktplatz für Kundenkaufanfragen eröffnet.</p>',
+                'welcome.trial_info': 'Sie haben 14 Tage unbegrenzte Aaadviser 2.0-Nutzung aktiviert',
+                'welcome.get_started': 'Schnellstart'
+            },
+            'fr': {
+                'welcome.title': 'Bienvenue',
+                'welcome.description': 'Insights du marché immobilier pour la Turquie, l\'Espagne et le Portugal - Aaadviser 2.0',
+                'welcome.main_description': '<p><strong>Aaadviser</strong> est un système analytique d\'évaluation immobilière pour la Turquie, l\'Espagne et le Portugal, basé sur des données depuis 2018.</p><p>Pour une première utilisation, nous recommandons de remplir vos coordonnées dans la section <strong>Profil</strong>, en ajoutant un avatar et vos informations de contact.</p><p><strong>Rapport Régional</strong> — situation régionale actuelle.<br><strong>Analytics d\'Objet</strong> — évaluation actuelle et prévision annuelle pour un objet immobilier spécifique.<br><strong>Mes Rapports</strong> — rapports sauvegardés qui peuvent être consultés, transférés ou supprimés.</p><p>À l\'avenir, un programme de parrainage pour les utilisateurs et un marché pour les demandes d\'achat de clients seront ouverts.</p>',
+                'welcome.trial_info': 'Vous avez 14 jours d\'utilisation illimitée d\'Aaadviser 2.0 activés',
+                'welcome.get_started': 'Démarrage Rapide'
+            },
+            'tr': {
+                'welcome.title': 'Hoş Geldiniz',
+                'welcome.description': 'Türkiye, İspanya ve Portekiz için gayrimenkul pazarı içgörüleri - Aaadviser 2.0',
+                'welcome.main_description': '<p><strong>Aaadviser</strong>, 2018\'den beri verilere dayalı olarak Türkiye, İspanya ve Portekiz için analitik gayrimenkul değerlendirme sistemidir.</p><p>İlk kullanımda, <strong>Profil</strong> bölümünde iletişim bilgilerinizi doldurmanızı, avatar ve kendiniz hakkında iletişim bilgileri eklemenizi öneriyoruz.</p><p><strong>Bölge Raporu</strong> — mevcut bölgesel durum.<br><strong>Nesne Analitiği</strong> — belirli bir gayrimenkul nesnesi için mevcut değerlendirme ve yıllık tahmin.<br><strong>Raporlarım</strong> — görüntülenebilen, iletilen veya silinebilen kaydedilmiş raporlar.</p><p>Gelecekte kullanıcılar için referans programı ve müşteri satın alma talepleri için pazar yeri açılacak.</p>',
+                'welcome.trial_info': '14 günlük sınırsız Aaadviser 2.0 kullanımınız aktif edildi',
+                'welcome.get_started': 'Hızlı Başlangıç'
+            }
+        };
+
+        // Получаем язык из Telegram WebApp
+        function getTelegramLanguage() {
+            if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe && window.Telegram.WebApp.initDataUnsafe.user) {
+                const langCode = window.Telegram.WebApp.initDataUnsafe.user.language_code;
+                if (langCode) {
+                    const lang = langCode.substring(0, 2);
+                    if (translations[lang]) {
+                        return lang;
+                    }
+                }
+            }
+            return 'en'; // Fallback на английский
+        }
+
+        // Применяем переводы
+        function applyTranslations() {
+            const language = getTelegramLanguage();
+            const langTranslations = translations[language];
+            
+            if (langTranslations) {
+                document.querySelectorAll('[data-i18n]').forEach(element => {
+                    const key = element.getAttribute('data-i18n');
+                    const translation = langTranslations[key];
+                    if (translation) {
+                        if (translation.includes('<p>') || translation.includes('<br>') || translation.includes('<strong>')) {
+                            element.innerHTML = translation;
+                        } else {
+                            element.textContent = translation;
+                        }
+                    }
+                });
+            }
+        }
+    </script>
     <style>
         * {
             margin: 0;
@@ -1461,18 +1534,8 @@
             const modal = document.getElementById('welcomeModal');
             modal.style.display = 'flex';
             
-            // Применяем переводы к модальному окну после его показа
-            if (window.i18nManager) {
-                // Проверяем, загружены ли переводы
-                if (window.i18nManager.translations && Object.keys(window.i18nManager.translations).length > 0) {
-                    window.i18nManager.applyTranslations();
-                } else {
-                    // Если переводы не загружены, загружаем их
-                    window.i18nManager.loadTranslations().then(() => {
-                        window.i18nManager.applyTranslations();
-                    });
-                }
-            }
+            // Применяем переводы сразу после показа модального окна
+            applyTranslations();
         }
 
         function closeWelcomeModal() {
@@ -1536,6 +1599,9 @@
             
             // Обновляем текст страницы с правильной локализацией
             updatePageText();
+            
+            // Применяем переводы для модального окна
+            applyTranslations();
             
             // Загружаем данные пользователя
             await loadUserData();

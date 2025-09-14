@@ -475,6 +475,14 @@ def webapp_main():
     with open('webapp_main.html', 'r', encoding='utf-8') as f:
         return f.read()
 
+@app.route('/<path:filename>')
+def serve_static(filename):
+    """Обслуживание статических файлов"""
+    try:
+        return send_from_directory('.', filename)
+    except FileNotFoundError:
+        return "File not found", 404
+
 @app.route('/webapp_help')
 def webapp_help():
     with open('webapp_help.html', 'r', encoding='utf-8') as f:
