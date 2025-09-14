@@ -10,7 +10,7 @@ class I18nManager {
         this.currentLanguage = await this.getInitialLanguage();
         await this.loadTranslations();
         this.applyTranslations();
-        this.addLanguageSelector();
+        // this.addLanguageSelector(); // Отключено по запросу пользователя
     }
 
     async getInitialLanguage() {

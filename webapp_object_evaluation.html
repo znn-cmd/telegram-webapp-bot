@@ -5749,6 +5749,25 @@
             if (closeButtonText) {
                 closeButtonText.textContent = getText('closeButtonText');
             }
+            
+            // Update report options elements
+            const reportOptionsTitle = document.getElementById('reportOptions');
+            if (reportOptionsTitle) {
+                const titleElement = reportOptionsTitle.querySelector('.report-options-title');
+                if (titleElement) {
+                    titleElement.textContent = getText('reportOptionsTitle');
+                }
+            }
+            
+            const includeRealtorInfo = document.querySelector('#includeRealtorInfo + .checkbox-label');
+            if (includeRealtorInfo) {
+                includeRealtorInfo.textContent = getText('includeRealtorInfo');
+            }
+            
+            const includePropertyInfo = document.querySelector('#includePropertyInfo + .checkbox-label');
+            if (includePropertyInfo) {
+                includePropertyInfo.textContent = getText('includePropertyInfo');
+            }
         }
 
         // Load countries from API
@@ -6638,7 +6657,7 @@
             document.getElementById('dataContent').style.display = 'block';
             
             // Show save button after data is loaded
-            showSaveButton();
+            await showSaveButton();
         }
 
 
@@ -11143,14 +11162,26 @@
         }
 
         // Show save button when report is loaded
-        function showSaveButton() {
+        async function showSaveButton() {
             const saveButton = document.getElementById('saveShareButton');
             const reportOptions = document.getElementById('reportOptions');
+            
+            // Проверяем доступ пользователя к премиум функциям
+            const userAccess = await checkUserAccess();
+            console.log('🔍 User access check for report options:', userAccess);
+            
             if (saveButton) {
                 saveButton.style.display = 'block';
             }
+            
+            // Показываем опции отчета только для пользователей с активной подпиской или админов
             if (reportOptions) {
-                reportOptions.style.display = 'block';
+                if (userAccess.hasAccess) {
+                    reportOptions.style.display = 'block';
+                } else {
+                    reportOptions.style.display = 'none';
+                    console.log('⚠️ Report options hidden - user subscription expired');
+                }
             }
         }
 
