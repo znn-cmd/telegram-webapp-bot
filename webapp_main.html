@@ -6,6 +6,7 @@
     <title>Aaadviser - <span data-i18n="main.title">Главное меню</span></title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="/telegram-check.js"></script>
+    <script src="/i18n-manager.js"></script>
     <style>
         * {
             margin: 0;
@@ -1457,7 +1458,21 @@
 
         // Функции модального окна приветствия
         function showWelcomeModal() {
-            document.getElementById('welcomeModal').style.display = 'flex';
+            const modal = document.getElementById('welcomeModal');
+            modal.style.display = 'flex';
+            
+            // Применяем переводы к модальному окну после его показа
+            if (window.i18nManager) {
+                // Проверяем, загружены ли переводы
+                if (window.i18nManager.translations && Object.keys(window.i18nManager.translations).length > 0) {
+                    window.i18nManager.applyTranslations();
+                } else {
+                    // Если переводы не загружены, загружаем их
+                    window.i18nManager.loadTranslations().then(() => {
+                        window.i18nManager.applyTranslations();
+                    });
+                }
+            }
         }
 
         function closeWelcomeModal() {
@@ -1468,9 +1483,10 @@
         function checkWelcomeModal(userInfo) {
             // Показываем модальное окно только для новых пользователей
             if (userInfo.is_new_user) {
+                // Увеличиваем задержку, чтобы система локализации успела загрузиться
                 setTimeout(() => {
                     showWelcomeModal();
-                }, 1000); // Задержка для плавности
+                }, 2000); // Увеличена задержка для загрузки переводов
             }
         }
 
