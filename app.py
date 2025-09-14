@@ -5750,15 +5750,32 @@ def api_save_html_report():
                 if not url:
                     return ''
                 try:
+                    import re
                     url = str(url).strip()
-                    # Убираем дублирующиеся https:// если есть
-                    while url.startswith('https://https://'):
-                        url = url[8:]  # убираем первый https://
-                    while url.startswith('http://http://'):
-                        url = url[7:]  # убираем первый http://
                     
-                    if url and not url.startswith(('http://', 'https://')):
+                    # Убираем все дублирования протоколов с помощью регулярных выражений
+                    # Убираем повторяющиеся https://
+                    url = re.sub(r'^https://(https://)+', 'https://', url)
+                    # Убираем повторяющиеся http://
+                    url = re.sub(r'^http://(http://)+', 'http://', url)
+                    # Убираем смешанные случаи
+                    url = re.sub(r'^https://(http://)+', 'http://', url)
+                    url = re.sub(r'^http://(https://)+', 'https://', url)
+                    
+                    # Убираем случаи с неправильными слешами
+                    url = re.sub(r'^https://https//', 'https://', url)
+                    url = re.sub(r'^http://http//', 'http://', url)
+                    url = re.sub(r'^https://https/', 'https://', url)
+                    url = re.sub(r'^http://http/', 'http://', url)
+                    
+                    # Если после очистки URL пустой, возвращаем пустую строку
+                    if not url:
+                        return ''
+                    
+                    # Добавляем протокол если его нет
+                    if not url.startswith(('http://', 'https://')):
                         return f'https://{url}'
+                    
                     return url
                 except Exception:
                     return ''
