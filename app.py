@@ -5749,10 +5749,19 @@ def api_save_html_report():
             def fix_social_url(url):
                 if not url:
                     return ''
-                url = url.strip()
-                if url and not url.startswith(('http://', 'https://')):
-                    return f'https://{url}'
-                return url
+                try:
+                    url = str(url).strip()
+                    # Убираем дублирующиеся https:// если есть
+                    while url.startswith('https://https://'):
+                        url = url[8:]  # убираем первый https://
+                    while url.startswith('http://http://'):
+                        url = url[7:]  # убираем первый http://
+                    
+                    if url and not url.startswith(('http://', 'https://')):
+                        return f'https://{url}'
+                    return url
+                except Exception:
+                    return ''
             
             whatsapp_link = fix_social_url(user_info.get('whatsapp_link', ''))
             telegram_link = fix_social_url(user_info.get('telegram_link', ''))
