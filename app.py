@@ -5754,7 +5754,7 @@ def api_save_html_report():
                     url = str(url).strip()
                     
                     # Убираем все дублирования протоколов с помощью регулярных выражений
-                    # Убираем повторяющиеся https://
+                    # Убираем повторяющиеся https:// (включая случаи с двойным https://)
                     url = re.sub(r'^https://(https://)+', 'https://', url)
                     # Убираем повторяющиеся http://
                     url = re.sub(r'^http://(http://)+', 'http://', url)
@@ -5767,6 +5767,10 @@ def api_save_html_report():
                     url = re.sub(r'^http://http//', 'http://', url)
                     url = re.sub(r'^https://https/', 'https://', url)
                     url = re.sub(r'^http://http/', 'http://', url)
+                    
+                    # Дополнительная проверка на двойной https://
+                    url = re.sub(r'^https://https://', 'https://', url)
+                    url = re.sub(r'^http://http://', 'http://', url)
                     
                     # Если после очистки URL пустой, возвращаем пустую строку
                     if not url:
