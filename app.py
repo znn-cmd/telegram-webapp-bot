@@ -705,6 +705,14 @@ def api_user():
         # Новый пользователь - используем язык из Telegram
         lang = language_code[:2] if language_code[:2] in locales else 'en'
         
+        # Получаем текущую дату и время
+        now = datetime.now()
+        period_start = now.date()
+        period_end = (now + timedelta(days=14)).date()
+        
+        # Формируем полное имя
+        full_name = f"{first_name} {last_name}".strip() if last_name else first_name
+        
         # Логируем для отладки
         logger.info(f"🆕 Новый пользователь {telegram_id}: telegram_lang={language_code}, determined_lang={lang}, "
                    f"period_start={period_start}, period_end={period_end}, full_name={full_name}")
@@ -718,13 +726,6 @@ def api_user():
             code_check = supabase.table('users').select('invite_code').eq('invite_code', invite_code).execute()
             if not code_check.data:
                 break
-        # Получаем текущую дату и время
-        now = datetime.now()
-        period_start = now.date()
-        period_end = (now + timedelta(days=14)).date()
-        
-        # Формируем полное имя
-        full_name = f"{first_name} {last_name}".strip() if last_name else first_name
         
         user_data = {
             'telegram_id': telegram_id,
