@@ -5745,10 +5745,19 @@ def api_save_html_report():
             phone = user_info.get('phone', '')
             email = user_info.get('email', '')
             website_url = user_info.get('website_url', '')
-            whatsapp_link = user_info.get('whatsapp_link', '')
-            telegram_link = user_info.get('telegram_link', '')
-            facebook_link = user_info.get('facebook_link', '')
-            instagram_link = user_info.get('instagram_link', '')
+            # Функция для исправления URL-ов (добавляет https:// если нет протокола)
+            def fix_social_url(url):
+                if not url:
+                    return ''
+                url = url.strip()
+                if url and not url.startswith(('http://', 'https://')):
+                    return f'https://{url}'
+                return url
+            
+            whatsapp_link = fix_social_url(user_info.get('whatsapp_link', ''))
+            telegram_link = fix_social_url(user_info.get('telegram_link', ''))
+            facebook_link = fix_social_url(user_info.get('facebook_link', ''))
+            instagram_link = fix_social_url(user_info.get('instagram_link', ''))
             
             # Генерируем фото риэлтора
             photo_html = ''
