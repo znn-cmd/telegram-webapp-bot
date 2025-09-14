@@ -150,6 +150,21 @@ class I18nManager {
                     'settings': 'Настройки', 'statistics': 'Статистика', 'user_management': 'Управление пользователями',
                     'content_management': 'Управление контентом', 'system_settings': 'Системные настройки',
                     'backup': 'Резервное копирование', 'logs': 'Логи', 'security': 'Безопасность'
+                },
+                'object_evaluation': {
+                    'slogan': 'Инсайты рынка недвижимости',
+                    'pageTitle': 'Оценка объекта',
+                    'pageDescription': 'Получите профессиональную оценку стоимости недвижимости в выбранном регионе',
+                    'countryLabel': 'Страна:',
+                    'cityLabel': 'Город:',
+                    'countyLabel': 'Область/Регион:',
+                    'districtLabel': 'Район:',
+                    'countryPlaceholder': 'Выберите страну',
+                    'cityPlaceholder': 'Сначала выберите страну',
+                    'countyPlaceholder': 'Сначала выберите город',
+                    'districtPlaceholder': 'Сначала выберите область',
+                    'confirmButtonText': 'Подтвердить выбор',
+                    'backButton': '← Вернуться в главное меню'
                 }
             },
             'en': {
@@ -225,6 +240,21 @@ class I18nManager {
                     'settings': 'Settings', 'statistics': 'Statistics', 'user_management': 'User Management',
                     'content_management': 'Content Management', 'system_settings': 'System Settings',
                     'backup': 'Backup', 'logs': 'Logs', 'security': 'Security'
+                },
+                'object_evaluation': {
+                    'slogan': 'Real Estate Market Insights',
+                    'pageTitle': 'Object Evaluation',
+                    'pageDescription': 'Get a professional valuation of real estate in the selected region',
+                    'countryLabel': 'Country:',
+                    'cityLabel': 'City:',
+                    'countyLabel': 'Region/Area:',
+                    'districtLabel': 'District:',
+                    'countryPlaceholder': 'Select country',
+                    'cityPlaceholder': 'First select country',
+                    'countyPlaceholder': 'First select city',
+                    'districtPlaceholder': 'First select region',
+                    'confirmButtonText': 'Confirm selection',
+                    'backButton': '← Return to main menu'
                 }
             },
             'de': {
@@ -453,6 +483,21 @@ class I18nManager {
                     'settings': 'Ayarlar', 'statistics': 'İstatistikler', 'user_management': 'Kullanıcı yönetimi',
                     'content_management': 'İçerik yönetimi', 'system_settings': 'Sistem ayarları',
                     'backup': 'Yedekleme', 'logs': 'Günlükler', 'security': 'Güvenlik'
+                },
+                'object_evaluation': {
+                    'slogan': 'Emlak Piyası İçgörüleri',
+                    'pageTitle': 'Nesne Değerlendirmesi',
+                    'pageDescription': 'Seçilen bölgede emlak için profesyonel değerleme alın',
+                    'countryLabel': 'Ülke:',
+                    'cityLabel': 'Şehir:',
+                    'countyLabel': 'Bölge/Alan:',
+                    'districtLabel': 'İlçe:',
+                    'countryPlaceholder': 'Ülke seçin',
+                    'cityPlaceholder': 'Önce ülke seçin',
+                    'countyPlaceholder': 'Önce şehir seçin',
+                    'districtPlaceholder': 'Önce bölge seçin',
+                    'confirmButtonText': 'Seçimi onayla',
+                    'backButton': '← Ana menüye dön'
                 }
             }
         };

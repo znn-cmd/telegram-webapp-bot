@@ -6,7 +6,7 @@
     <title>Aaadviser - <span data-i18n="pageTitle">Оценка объекта</span></title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="/telegram-check.js"></script>
-    <!-- <script src="/i18n-manager.js"></script> --> <!-- Отключено для этой страницы -->
+    <script src="/i18n-manager.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         * {
@@ -3911,40 +3911,40 @@
         <!-- Логотип -->
         <div style="display:flex;flex-direction:column;align-items:center;margin-top:18px;margin-bottom:10px;">
             <img src="logo-flt.png" alt="Aaadviser Logo" style="width:110px;height:auto;display:block;margin-bottom:8px;cursor:pointer;" onclick="goToMainMenu()" />
-            <div style="font-size:15px;color:#888;font-style:italic;" id="slogan" data-i18n="slogan">Инсайты рынка недвижимости</div>
+            <div style="font-size:15px;color:#888;font-style:italic;" id="slogan" data-i18n="object_evaluation.slogan">Инсайты рынка недвижимости</div>
         </div>
 
         <!-- Заголовок страницы -->
-        <div class="page-title" id="pageTitle" data-i18n="pageTitle">Оценка объекта</div>
-        <div class="page-description" id="pageDescription" data-i18n="pageDescription">Получите профессиональную оценку стоимости недвижимости в выбранном регионе</div>
+        <div class="page-title" id="pageTitle" data-i18n="object_evaluation.pageTitle">Оценка объекта</div>
+        <div class="page-description" id="pageDescription" data-i18n="object_evaluation.pageDescription">Получите профессиональную оценку стоимости недвижимости в выбранном регионе</div>
 
         <!-- Форма выбора локации -->
         <div class="location-form" id="locationForm">
             <div class="form-group">
-                <label for="countrySelect" id="countryLabel" data-i18n="countryLabel">Страна:</label>
+                <label for="countrySelect" id="countryLabel" data-i18n="object_evaluation.countryLabel">Страна:</label>
                 <select id="countrySelect" onchange="onCountryChange()">
-                    <option value="" id="countryPlaceholder" data-i18n="countryPlaceholder">Выберите страну</option>
+                    <option value="" id="countryPlaceholder" data-i18n="object_evaluation.countryPlaceholder">Выберите страну</option>
                 </select>
             </div>
 
             <div class="form-group">
-                <label for="citySelect" id="cityLabel" data-i18n="cityLabel">Город:</label>
+                <label for="citySelect" id="cityLabel" data-i18n="object_evaluation.cityLabel">Город:</label>
                 <select id="citySelect" disabled onchange="onCityChange()">
-                    <option value="" id="cityPlaceholder" data-i18n="cityPlaceholder">Сначала выберите страну</option>
+                    <option value="" id="cityPlaceholder" data-i18n="object_evaluation.cityPlaceholder">Сначала выберите страну</option>
                 </select>
             </div>
 
             <div class="form-group">
-                <label for="countySelect" id="countyLabel" data-i18n="countyLabel">Область/Регион:</label>
+                <label for="countySelect" id="countyLabel" data-i18n="object_evaluation.countyLabel">Область/Регион:</label>
                 <select id="countySelect" disabled onchange="onCountyChange()">
-                    <option value="" id="countyPlaceholder" data-i18n="countyPlaceholder">Сначала выберите город</option>
+                    <option value="" id="countyPlaceholder" data-i18n="object_evaluation.countyPlaceholder">Сначала выберите город</option>
                 </select>
             </div>
 
             <div class="form-group">
-                <label for="districtSelect" id="districtLabel" data-i18n="districtLabel">Район:</label>
+                <label for="districtSelect" id="districtLabel" data-i18n="object_evaluation.districtLabel">Район:</label>
                 <select id="districtSelect" disabled onchange="onDistrictChange()">
-                    <option value="" id="districtPlaceholder" data-i18n="districtPlaceholder">Сначала выберите область</option>
+                    <option value="" id="districtPlaceholder" data-i18n="object_evaluation.districtPlaceholder">Сначала выберите область</option>
                 </select>
             </div>
 
@@ -4014,7 +4014,7 @@
                 </div>
 
             <button class="confirm-button" id="confirmButton" onclick="confirmLocation()" disabled>
-                <span id="confirmButtonText" data-i18n="confirmButtonText">Подтвердить выбор</span>
+                <span id="confirmButtonText" data-i18n="object_evaluation.confirmButtonText">Подтвердить выбор</span>
             </button>
         </div>
 
@@ -4082,7 +4082,7 @@
         </div>
 
         <!-- Back Button -->
-        <a href="/webapp_main" class="back-button" id="backButton">← Вернуться в главное меню</a>
+        <a href="/webapp_main" class="back-button" id="backButton" data-i18n="object_evaluation.backButton">← Вернуться в главное меню</a>
 
         <!-- Modal for sharing report -->
         <div class="modal-overlay" id="shareModal">
@@ -5774,8 +5774,12 @@
         async function loadCountries() {
             try {
                 console.log('🔄 Loading countries from API...');
+                console.log('🌐 Current URL:', window.location.href);
+                console.log('🔗 Making request to:', '/api/locations/countries');
+                
                 const response = await fetch('/api/locations/countries');
                 console.log('📡 Countries API response status:', response.status);
+                console.log('📡 Countries API response headers:', response.headers);
                 
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
@@ -5787,7 +5791,8 @@
                 if (data.success) {
                     const countrySelect = document.getElementById('countrySelect');
                     if (countrySelect) {
-                        countrySelect.innerHTML = `<option value="">${getText('countryPlaceholder')}</option>`;
+                        const placeholder = window.i18nManager ? window.i18nManager.getTranslation('object_evaluation.countryPlaceholder') : 'Выберите страну';
+                        countrySelect.innerHTML = `<option value="">${placeholder}</option>`;
                         
                         if (data.countries && Array.isArray(data.countries)) {
                             data.countries.forEach(([id, name]) => {
@@ -5840,7 +5845,8 @@
                 if (data.success) {
                     const citySelect = document.getElementById('citySelect');
                     if (citySelect) {
-                        citySelect.innerHTML = `<option value="">${getText('cityPlaceholder')}</option>`;
+                        const placeholder = window.i18nManager ? window.i18nManager.getTranslation('object_evaluation.cityPlaceholder') : 'Сначала выберите страну';
+                        citySelect.innerHTML = `<option value="">${placeholder}</option>`;
                         
                         if (data.cities && Array.isArray(data.cities)) {
                             data.cities.forEach(([id, name]) => {
@@ -6679,7 +6685,7 @@
                 console.log('📊 API response:', data);
                 
                 if (data.success) {
-                    displayRegionData(data);
+                    await displayRegionData(data);
                 } else {
                     throw new Error(data.error || 'Failed to load region data');
                 }
@@ -6690,7 +6696,7 @@
         }
 
         // Display region data
-        function displayRegionData(data) {
+        async function displayRegionData(data) {
             console.log('📊 Processing received data:', data);
             console.log('🔍 Data structure:', {
                 hasGeneralData: !!data.general_data,
@@ -9558,14 +9564,18 @@
         async function init() {
             console.log('🚀 Initializing page...');
             
-            // Получаем язык пользователя через API с учетом новой логики
-            await getUserLanguage();
-            currentLanguage = userLanguage;
-            
-            console.log(`🌐 Initializing page with language: ${currentLanguage}`);
-            
-            // Обновляем тексты на странице
-            updatePageText();
+            // Ждем инициализации i18n-manager
+            await new Promise(resolve => {
+                const checkI18n = () => {
+                    if (window.i18nManager && window.i18nManager.currentLanguage) {
+                        console.log(`🌐 I18n Manager initialized with language: ${window.i18nManager.currentLanguage}`);
+                        resolve();
+                    } else {
+                        setTimeout(checkI18n, 100);
+                    }
+                };
+                checkI18n();
+            });
             
             // Загружаем страны
             await loadCountries();
@@ -9692,7 +9702,15 @@
         }
 
         // Start initialization when page loads
-        document.addEventListener('DOMContentLoaded', init);
+        document.addEventListener('DOMContentLoaded', async () => {
+            console.log('🚀 DOM Content Loaded, starting initialization...');
+            try {
+                await init();
+                console.log('✅ Initialization completed successfully');
+            } catch (error) {
+                console.error('❌ Initialization failed:', error);
+            }
+        });
 
         // Generate consolidated assessment block with market analysis (только для админов)
         async function generateConsolidatedAssessment(data) {
