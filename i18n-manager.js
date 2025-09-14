@@ -464,7 +464,12 @@ class I18nManager {
             const key = element.getAttribute('data-i18n');
             const translation = this.getTranslation(key);
             if (translation) {
-                element.textContent = translation;
+                // Проверяем, содержит ли перевод HTML теги
+                if (translation.includes('<p>') || translation.includes('<br>') || translation.includes('<strong>')) {
+                    element.innerHTML = translation;
+                } else {
+                    element.textContent = translation;
+                }
             }
         });
 

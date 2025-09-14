@@ -3,6 +3,13 @@ locales = {
         'welcome_new': 'Добро пожаловать в Aaadvisor: мгновенные аналитические отчеты по недвижимости с прогнозами цены и рентабельности',
         'welcome_back': 'С возвращением!',
         'choose_language': 'Пожалуйста, выберите язык для дальнейшего общения:',
+        'welcome': {
+            'title': 'Добро пожаловать',
+            'description': 'Инсайды рынка недвижимости Турции, Испании и Португалии - Aaadviser 2.0',
+            'main_description': '<p><strong>Aaadviser</strong> — это аналитическая система оценки недвижимости Турции, Испании и Португалии, которая ориентируется на данные с 2018 года.</p><p>При первом использовании рекомендуем заполнить контактные данные в разделе <strong>Профиль</strong>, добавив аватар и контактные данные о себе.</p><p><strong>Отчет по региону</strong> — это текущая ситуация региона.<br><strong>Аналитика объекта</strong> — это текущая оценка и прогноз на год конкретного объекта недвижимости.<br><strong>Мои отчеты</strong> — это сохраненные отчеты, которые можно просмотреть, переслать или удалить.</p><p>В будущем будет открыта реферальная программа для пользователей и биржа заявок от клиентов на покупку недвижимости.</p>',
+            'trial_info': 'Вам активированы 14 дней безлимитного использования Aaadviser 2.0',
+            'get_started': 'Быстрый старт'
+        },
         'menu': {
             'title': 'Главное меню',
             'region_analytics': 'Аналитика региона',
@@ -178,6 +185,13 @@ locales = {
         'welcome_new': 'Welcome to Aaadvisor: instant real estate analytics reports with price and profitability forecasts',
         'welcome_back': 'Welcome back!',
         'choose_language': 'Please select your preferred language:',
+        'welcome': {
+            'title': 'Welcome',
+            'description': 'Real estate market insights for Turkey, Spain and Portugal - Aaadviser 2.0',
+            'main_description': '<p><strong>Aaadviser</strong> is an analytical real estate evaluation system for Turkey, Spain and Portugal, based on data since 2018.</p><p>For first-time use, we recommend filling in your contact details in the <strong>Profile</strong> section, adding an avatar and contact information about yourself.</p><p><strong>Region Report</strong> — current regional situation.<br><strong>Object Analytics</strong> — current evaluation and year forecast for a specific real estate object.<br><strong>My Reports</strong> — saved reports that can be viewed, forwarded or deleted.</p><p>In the future, a referral program for users and a marketplace for client purchase requests will be opened.</p>',
+            'trial_info': 'You have 14 days of unlimited Aaadviser 2.0 usage activated',
+            'get_started': 'Quick Start'
+        },
         'menu': {
             'title': 'Main Menu',
             'region_analytics': 'Region Analytics',
@@ -353,6 +367,13 @@ locales = {
         'welcome_new': 'Willkommen bei Aaadvisor: Sofortige Immobilien-Analyseberichte mit Preis- und Rentabilitätsprognosen',
         'welcome_back': 'Willkommen zurück!',
         'choose_language': 'Bitte wählen Sie Ihre bevorzugte Sprache:',
+        'welcome': {
+            'title': 'Willkommen',
+            'description': 'Immobilienmarkt-Einblicke für die Türkei, Spanien und Portugal - Aaadviser 2.0',
+            'main_description': '<p><strong>Aaadviser</strong> ist ein analytisches Immobilienbewertungssystem für die Türkei, Spanien und Portugal, basierend auf Daten seit 2018.</p><p>Bei der ersten Nutzung empfehlen wir, Ihre Kontaktdaten im <strong>Profil</strong>-Bereich auszufüllen und ein Avatar sowie Kontaktinformationen über sich hinzuzufügen.</p><p><strong>Regionsbericht</strong> — aktuelle regionale Situation.<br><strong>Objekt-Analytics</strong> — aktuelle Bewertung und Jahresprognose für ein bestimmtes Immobilienobjekt.<br><strong>Meine Berichte</strong> — gespeicherte Berichte, die angesehen, weitergeleitet oder gelöscht werden können.</p><p>In Zukunft wird ein Empfehlungsprogramm für Benutzer und ein Marktplatz für Kundenkaufanfragen eröffnet.</p>',
+            'trial_info': 'Sie haben 14 Tage unbegrenzte Aaadviser 2.0-Nutzung aktiviert',
+            'get_started': 'Schnellstart'
+        },
         'menu': {
             'title': 'Hauptmenü',
             'region_analytics': 'Regionsanalyse',
@@ -528,6 +549,13 @@ locales = {
         'welcome_new': 'Bienvenue sur Aaadvisor : rapports analytiques immobiliers instantanés avec prévisions de prix et de rentabilité',
         'welcome_back': 'Bon retour !',
         'choose_language': 'Veuillez choisir votre langue préférée :',
+        'welcome': {
+            'title': 'Bienvenue',
+            'description': 'Insights du marché immobilier pour la Turquie, l\'Espagne et le Portugal - Aaadviser 2.0',
+            'main_description': '<p><strong>Aaadviser</strong> est un système analytique d\'évaluation immobilière pour la Turquie, l\'Espagne et le Portugal, basé sur des données depuis 2018.</p><p>Pour une première utilisation, nous recommandons de remplir vos coordonnées dans la section <strong>Profil</strong>, en ajoutant un avatar et vos informations de contact.</p><p><strong>Rapport Régional</strong> — situation régionale actuelle.<br><strong>Analytics d\'Objet</strong> — évaluation actuelle et prévision annuelle pour un objet immobilier spécifique.<br><strong>Mes Rapports</strong> — rapports sauvegardés qui peuvent être consultés, transférés ou supprimés.</p><p>À l\'avenir, un programme de parrainage pour les utilisateurs et un marché pour les demandes d\'achat de clients seront ouverts.</p>',
+            'trial_info': 'Vous avez 14 jours d\'utilisation illimitée d\'Aaadviser 2.0 activés',
+            'get_started': 'Démarrage Rapide'
+        },
         'menu': {
             'title': 'Menu Principal',
             'region_analytics': 'Analyse de Région',
@@ -703,6 +731,13 @@ locales = {
         'welcome_new': 'Aaadvisor\'a hoş geldiniz: Anında gayrimenkul analiz raporları, fiyat ve kârlılık tahminleriyle',
         'welcome_back': 'Tekrar hoş geldiniz!',
         'choose_language': 'Lütfen tercih ettiğiniz dili seçin:',
+        'welcome': {
+            'title': 'Hoş Geldiniz',
+            'description': 'Türkiye, İspanya ve Portekiz için gayrimenkul pazarı içgörüleri - Aaadviser 2.0',
+            'main_description': '<p><strong>Aaadviser</strong>, 2018\'den beri verilere dayalı olarak Türkiye, İspanya ve Portekiz için analitik gayrimenkul değerlendirme sistemidir.</p><p>İlk kullanımda, <strong>Profil</strong> bölümünde iletişim bilgilerinizi doldurmanızı, avatar ve kendiniz hakkında iletişim bilgileri eklemenizi öneriyoruz.</p><p><strong>Bölge Raporu</strong> — mevcut bölgesel durum.<br><strong>Nesne Analitiği</strong> — belirli bir gayrimenkul nesnesi için mevcut değerlendirme ve yıllık tahmin.<br><strong>Raporlarım</strong> — görüntülenebilen, iletilen veya silinebilen kaydedilmiş raporlar.</p><p>Gelecekte kullanıcılar için referans programı ve müşteri satın alma talepleri için pazar yeri açılacak.</p>',
+            'trial_info': '14 günlük sınırsız Aaadviser 2.0 kullanımınız aktif edildi',
+            'get_started': 'Hızlı Başlangıç'
+        },
         'menu': {
             'title': 'Ana Menü',
             'region_analytics': 'Bölge Analizi',

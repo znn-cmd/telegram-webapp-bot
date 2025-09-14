@@ -570,10 +570,52 @@
             line-height: 1.4;
         }
 
+        .welcome-modal-description {
+            margin: 20px 0;
+        }
+
+        .welcome-description-content {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            border-left: 4px solid #6c5ce7;
+        }
+
+        .welcome-description-content p {
+            margin: 0 0 15px 0;
+            line-height: 1.6;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .welcome-description-content p:last-child {
+            margin-bottom: 0;
+        }
+
+        .welcome-description-content strong {
+            color: #6c5ce7;
+            font-weight: 600;
+        }
+
+        .welcome-modal-trial {
+            margin: 20px 0;
+        }
+
+        .welcome-trial-content {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 14px;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
         .welcome-modal-actions {
             display: flex;
-            gap: 15px;
             justify-content: center;
+            margin-top: 25px;
         }
 
         .welcome-btn {
@@ -743,52 +785,35 @@
         <div class="welcome-modal-content">
             <div class="welcome-modal-header">
                 <img src="logo-flt.png" alt="Aaadviser" class="welcome-modal-logo">
-                <h2 class="welcome-modal-title" data-i18n="welcome.title">Добро пожаловать в Aaadviser 2.0</h2>
+                <h2 class="welcome-modal-title" data-i18n="welcome.title">Добро пожаловать</h2>
             </div>
             <div class="welcome-modal-body">
                 <p class="welcome-modal-text" data-i18n="welcome.description">
-                    Система аналитики и данных для оценки недвижимости Турции, Испании и Португалии. 
-                    Главная цель - дать информацию о рынках и помочь продавать, давая экспертную оценку.
+                    Инсайды рынка недвижимости Турции, Испании и Португалии - Aaadviser 2.0
                 </p>
-                <div class="welcome-modal-features">
-                    <div class="welcome-feature">
-                        <span class="welcome-feature-icon">👤</span>
-                        <div class="welcome-feature-text">
-                            <strong data-i18n="welcome.profile_title">Личный профиль</strong>
-                            <p data-i18n="welcome.profile_desc">Заполните профиль с фото и контактными данными</p>
-                        </div>
-                    </div>
-                    <div class="welcome-feature">
-                        <span class="welcome-feature-icon">🗺️</span>
-                        <div class="welcome-feature-text">
-                            <strong data-i18n="welcome.analytics_title">Аналитика региона</strong>
-                            <p data-i18n="welcome.analytics_desc">Отчет дающий общее представление о текущей ситуации в конкретном районе страны</p>
-                        </div>
-                    </div>
-                    <div class="welcome-feature">
-                        <span class="welcome-feature-icon">🏠</span>
-                        <div class="welcome-feature-text">
-                            <strong data-i18n="welcome.evaluation_title">Оценка объекта</strong>
-                            <p data-i18n="welcome.evaluation_desc">Аналитика и прогноз цены аренды и продажи для одного объекта на год вперед</p>
-                        </div>
-                    </div>
-                    <div class="welcome-feature">
-                        <span class="welcome-feature-icon">📋</span>
-                        <div class="welcome-feature-text">
-                            <strong data-i18n="welcome.reports_title">Мои отчеты</strong>
-                            <p data-i18n="welcome.reports_desc">Сохраненные отчеты где можно их снова получить, просмотреть или удалить</p>
-                        </div>
+                
+                <div class="welcome-modal-description">
+                    <div class="welcome-description-content" data-i18n="welcome.main_description">
+                        <p><strong>Aaadviser</strong> — это аналитическая система оценки недвижимости Турции, Испании и Португалии, которая ориентируется на данные с 2018 года.</p>
+                        
+                        <p>При первом использовании рекомендуем заполнить контактные данные в разделе <strong>Профиль</strong>, добавив аватар и контактные данные о себе.</p>
+                        
+                        <p><strong>Отчет по региону</strong> — это текущая ситуация региона.<br>
+                        <strong>Аналитика объекта</strong> — это текущая оценка и прогноз на год конкретного объекта недвижимости.<br>
+                        <strong>Мои отчеты</strong> — это сохраненные отчеты, которые можно просмотреть, переслать или удалить.</p>
+                        
+                        <p>В будущем будет открыта реферальная программа для пользователей и биржа заявок от клиентов на покупку недвижимости.</p>
                     </div>
                 </div>
-                <div class="welcome-modal-development">
-                    <p data-i18n="welcome.development">
-                        В разработке находится реферальная программа для пользователей и биржа заявок клиентов на покупку. 
-                        В скором времени будут обновления с новым функционалом.
-                    </p>
+                
+                <div class="welcome-modal-trial">
+                    <div class="welcome-trial-content" data-i18n="welcome.trial_info">
+                        Вам активированы 14 дней безлимитного использования Aaadviser 2.0
+                    </div>
                 </div>
+                
                 <div class="welcome-modal-actions">
                     <button class="welcome-btn welcome-btn-primary" onclick="closeWelcomeModal()" data-i18n="welcome.get_started">Быстрый старт</button>
-                    <button class="welcome-btn welcome-btn-secondary" onclick="closeWelcomeModal()" data-i18n="welcome.close">Закрыть</button>
                 </div>
             </div>
         </div>
