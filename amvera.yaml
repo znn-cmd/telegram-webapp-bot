@@ -13,7 +13,7 @@ run:
 
 env:
   - name: TELEGRAM_BOT_TOKEN
-    value: 7215676549:AAFS86JbRCqwzTKQG-dF96JX-C1aWNvBoLo
+    value: 7215676549:AAESuoYqLeYSNP02E2kuLvh9B5l2RwhRe0I
   - name: SUPABASE_URL
     value: https://dzllnnohurlzjyabgsft.supabase.co
   - name: SUPABASE_ANON_KEY
