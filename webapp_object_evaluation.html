@@ -6,7 +6,7 @@
     <title>Aaadviser - <span data-i18n="pageTitle">Оценка объекта</span></title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="/telegram-check.js"></script>
-    <script src="/i18n-manager.js"></script>
+    <!-- <script src="/i18n-manager.js"></script> --> <!-- Отключено для этой страницы -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         * {
@@ -5773,30 +5773,53 @@
         // Load countries from API
         async function loadCountries() {
             try {
+                console.log('🔄 Loading countries from API...');
                 const response = await fetch('/api/locations/countries');
+                console.log('📡 Countries API response status:', response.status);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
                 const data = await response.json();
+                console.log('📊 Countries API data:', data);
                 
                 if (data.success) {
                     const countrySelect = document.getElementById('countrySelect');
-                    countrySelect.innerHTML = `<option value="">${getText('countryPlaceholder')}</option>`;
-                    
-                    data.countries.forEach(([id, name]) => {
-                        const option = document.createElement('option');
-                        option.value = id;
-                        option.textContent = name;
-                        countrySelect.appendChild(option);
-                    });
+                    if (countrySelect) {
+                        countrySelect.innerHTML = `<option value="">${getText('countryPlaceholder')}</option>`;
+                        
+                        if (data.countries && Array.isArray(data.countries)) {
+                            data.countries.forEach(([id, name]) => {
+                                const option = document.createElement('option');
+                                option.value = id;
+                                option.textContent = name;
+                                countrySelect.appendChild(option);
+                            });
+                            console.log('✅ Countries loaded successfully:', data.countries.length);
+                        } else {
+                            console.warn('⚠️ No countries data in response');
+                        }
+                    } else {
+                        console.error('❌ Country select element not found');
+                    }
                 } else {
-                    console.error('Failed to load countries:', data.error);
+                    console.error('❌ Failed to load countries:', data.error);
                 }
             } catch (error) {
-                console.error('Error loading countries:', error);
+                console.error('❌ Error loading countries:', error);
+                // Показываем сообщение об ошибке пользователю
+                const countrySelect = document.getElementById('countrySelect');
+                if (countrySelect) {
+                    countrySelect.innerHTML = `<option value="">Ошибка загрузки стран</option>`;
+                }
             }
         }
 
         // Load cities based on selected country
         async function loadCities(countryId) {
             try {
+                console.log('🔄 Loading cities for country_id:', countryId);
                 const response = await fetch('/api/locations/cities', {
                     method: 'POST',
                     headers: {
@@ -5805,25 +5828,45 @@
                     body: JSON.stringify({ country_id: countryId })
                 });
                 
+                console.log('📡 Cities API response status:', response.status);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
                 const data = await response.json();
+                console.log('📊 Cities API data:', data);
                 
                 if (data.success) {
                     const citySelect = document.getElementById('citySelect');
-                    citySelect.innerHTML = `<option value="">${getText('cityPlaceholder')}</option>`;
-                    
-                    data.cities.forEach(([id, name]) => {
-                        const option = document.createElement('option');
-                        option.value = id;
-                        option.textContent = name;
-                        citySelect.appendChild(option);
-                    });
-                    
-                    citySelect.disabled = false;
+                    if (citySelect) {
+                        citySelect.innerHTML = `<option value="">${getText('cityPlaceholder')}</option>`;
+                        
+                        if (data.cities && Array.isArray(data.cities)) {
+                            data.cities.forEach(([id, name]) => {
+                                const option = document.createElement('option');
+                                option.value = id;
+                                option.textContent = name;
+                                citySelect.appendChild(option);
+                            });
+                            console.log('✅ Cities loaded successfully:', data.cities.length);
+                        } else {
+                            console.warn('⚠️ No cities data in response');
+                        }
+                        
+                        citySelect.disabled = false;
+                    } else {
+                        console.error('❌ City select element not found');
+                    }
                 } else {
-                    console.error('Failed to load cities:', data.error);
+                    console.error('❌ Failed to load cities:', data.error);
                 }
             } catch (error) {
-                console.error('Error loading cities:', error);
+                console.error('❌ Error loading cities:', error);
+                const citySelect = document.getElementById('citySelect');
+                if (citySelect) {
+                    citySelect.innerHTML = `<option value="">Ошибка загрузки городов</option>`;
+                }
             }
         }
 
@@ -6556,8 +6599,12 @@
         // Get user language
         async function getUserLanguage() {
             try {
+                console.log('🌐 Getting user language...');
+                
                 if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe && window.Telegram.WebApp.initDataUnsafe.user) {
                     const user = window.Telegram.WebApp.initDataUnsafe.user;
+                    console.log('👤 Telegram user found:', user.id, 'language_code:', user.language_code);
+                    
                     if (user && user.id) {
                         const response = await fetch('/api/user/language', {
                             method: 'POST',
@@ -6570,17 +6617,37 @@
                             })
                         });
                         
-                        const data = await response.json();
-                        if (data.success) {
-                            userLanguage = data.language;
-                            currentLanguage = data.language;
-                            console.log(`🌐 User language loaded: ${userLanguage} (status: ${data.user_status})`);
-                            updatePageText();
+                        if (response.ok) {
+                            const data = await response.json();
+                            console.log('📊 Language API response:', data);
+                            
+                            if (data.success) {
+                                userLanguage = data.language;
+                                currentLanguage = data.language;
+                                console.log(`✅ User language loaded: ${userLanguage} (status: ${data.user_status})`);
+                                return;
+                            } else {
+                                console.warn('⚠️ Language API returned error:', data.error);
+                            }
+                        } else {
+                            console.warn('⚠️ Language API request failed:', response.status);
                         }
                     }
+                } else {
+                    console.log('📱 Telegram WebApp not available, using default language');
                 }
+                
+                // Fallback to default language
+                userLanguage = 'ru'; // Default to Russian
+                currentLanguage = 'ru';
+                console.log(`🔧 Using default language: ${userLanguage}`);
+                
             } catch (error) {
-                console.error('Error getting user language:', error);
+                console.error('❌ Error getting user language:', error);
+                // Fallback to default language
+                userLanguage = 'ru';
+                currentLanguage = 'ru';
+                console.log(`🔧 Using fallback language: ${userLanguage}`);
             }
         }
 
@@ -9489,14 +9556,19 @@
 
         // Initialize page
         async function init() {
+            console.log('🚀 Initializing page...');
+            
             // Получаем язык пользователя через API с учетом новой логики
             await getUserLanguage();
             currentLanguage = userLanguage;
             
             console.log(`🌐 Initializing page with language: ${currentLanguage}`);
             
+            // Обновляем тексты на странице
             updatePageText();
-            loadCountries();
+            
+            // Загружаем страны
+            await loadCountries();
             
             // Initialize additional components
             setupCheckboxHandlers();
