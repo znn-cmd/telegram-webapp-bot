@@ -9569,6 +9569,11 @@
                 const checkI18n = () => {
                     if (window.i18nManager && window.i18nManager.currentLanguage) {
                         console.log(`🌐 I18n Manager initialized with language: ${window.i18nManager.currentLanguage}`);
+                        // Принудительно применяем переводы
+                        if (window.i18nManager.applyTranslations) {
+                            window.i18nManager.applyTranslations();
+                            console.log('✅ Translations applied manually');
+                        }
                         resolve();
                     } else {
                         setTimeout(checkI18n, 100);
@@ -9579,6 +9584,12 @@
             
             // Загружаем страны
             await loadCountries();
+            
+            // Дополнительно применяем переводы после загрузки данных
+            if (window.i18nManager && window.i18nManager.applyTranslations) {
+                window.i18nManager.applyTranslations();
+                console.log('✅ Translations applied after data loading');
+            }
             
             // Initialize additional components
             setupCheckboxHandlers();

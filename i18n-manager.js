@@ -240,7 +240,7 @@ class I18nManager {
                     'settings': 'Settings', 'statistics': 'Statistics', 'user_management': 'User Management',
                     'content_management': 'Content Management', 'system_settings': 'System Settings',
                     'backup': 'Backup', 'logs': 'Logs', 'security': 'Security'
-                },
+                    image.png                },
                 'object_evaluation': {
                     'slogan': 'Real Estate Market Insights',
                     'pageTitle': 'Object Evaluation',

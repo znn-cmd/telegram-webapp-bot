@@ -179,7 +179,22 @@ locales = {
         'photoUploadText': 'Нажмите или перетащите фотографии сюда',
         'selectPhotos': 'Выбрать фото',
         'save': 'Сохранить',
-        'cancel': 'Отмена'
+        'cancel': 'Отмена',
+        'object_evaluation': {
+            'slogan': 'Инсайты рынка недвижимости',
+            'pageTitle': 'Оценка объекта',
+            'pageDescription': 'Получите профессиональную оценку стоимости недвижимости в выбранном регионе',
+            'countryLabel': 'Страна:',
+            'cityLabel': 'Город:',
+            'countyLabel': 'Область/Регион:',
+            'districtLabel': 'Район:',
+            'countryPlaceholder': 'Выберите страну',
+            'cityPlaceholder': 'Сначала выберите страну',
+            'countyPlaceholder': 'Сначала выберите город',
+            'districtPlaceholder': 'Сначала выберите область',
+            'confirmButtonText': 'Подтвердить выбор',
+            'backButton': '← Вернуться в главное меню'
+        }
     },
     'en': {
         'welcome_new': 'Welcome to Aaadvisor: instant real estate analytics reports with price and profitability forecasts',
@@ -901,6 +916,21 @@ locales = {
         'photoUploadText': 'Fotoğrafları buraya tıklayın veya sürükleyin',
         'selectPhotos': 'Fotoğraf seç',
         'save': 'Kaydet',
-        'cancel': 'İptal'
+        'cancel': 'İptal',
+        'object_evaluation': {
+            'slogan': 'Emlak Piyası İçgörüleri',
+            'pageTitle': 'Nesne Değerlendirmesi',
+            'pageDescription': 'Seçilen bölgede emlak için profesyonel değerleme alın',
+            'countryLabel': 'Ülke:',
+            'cityLabel': 'Şehir:',
+            'countyLabel': 'Bölge/Alan:',
+            'districtLabel': 'İlçe:',
+            'countryPlaceholder': 'Ülke seçin',
+            'cityPlaceholder': 'Önce ülke seçin',
+            'countyPlaceholder': 'Önce şehir seçin',
+            'districtPlaceholder': 'Önce bölge seçin',
+            'confirmButtonText': 'Seçimi onayla',
+            'backButton': '← Ana menüye dön'
+        }
     }
 } 
