@@ -443,6 +443,201 @@
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(255, 193, 7, 0.3);
         }
+
+        /* Welcome Modal Styles */
+        .welcome-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            backdrop-filter: blur(5px);
+        }
+
+        .welcome-modal-content {
+            background: white;
+            border-radius: 20px;
+            max-width: 500px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            animation: modalSlideIn 0.3s ease;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9) translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .welcome-modal-header {
+            text-align: center;
+            padding: 30px 30px 20px 30px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .welcome-modal-logo {
+            width: 80px;
+            height: auto;
+            margin-bottom: 15px;
+        }
+
+        .welcome-modal-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            margin: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .welcome-modal-body {
+            padding: 30px;
+        }
+
+        .welcome-modal-text {
+            font-size: 16px;
+            line-height: 1.6;
+            color: #666;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .welcome-modal-features {
+            margin-bottom: 25px;
+        }
+
+        .welcome-feature {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            border-left: 4px solid #667eea;
+        }
+
+        .welcome-feature-icon {
+            font-size: 24px;
+            margin-right: 15px;
+            margin-top: 2px;
+        }
+
+        .welcome-feature-text {
+            flex: 1;
+        }
+
+        .welcome-feature-text strong {
+            display: block;
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .welcome-feature-text p {
+            font-size: 14px;
+            color: #666;
+            margin: 0;
+            line-height: 1.4;
+        }
+
+        .welcome-modal-development {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 25px;
+        }
+
+        .welcome-modal-development p {
+            font-size: 14px;
+            color: #856404;
+            margin: 0;
+            line-height: 1.4;
+        }
+
+        .welcome-modal-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .welcome-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 120px;
+        }
+
+        .welcome-btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .welcome-btn-primary:hover {
+            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .welcome-btn-secondary {
+            background: #f8f9fa;
+            color: #666;
+            border: 1px solid #dee2e6;
+        }
+
+        .welcome-btn-secondary:hover {
+            background: #e9ecef;
+            color: #333;
+        }
+
+        @media (max-width: 480px) {
+            .welcome-modal {
+                padding: 10px;
+            }
+            
+            .welcome-modal-content {
+                border-radius: 15px;
+            }
+            
+            .welcome-modal-header {
+                padding: 20px 20px 15px 20px;
+            }
+            
+            .welcome-modal-body {
+                padding: 20px;
+            }
+            
+            .welcome-modal-title {
+                font-size: 20px;
+            }
+            
+            .welcome-modal-actions {
+                flex-direction: column;
+            }
+            
+            .welcome-btn {
+                width: 100%;
+            }
+        }
     </style>
 </head>
 <body>
@@ -463,8 +658,8 @@
             </div>
             <div class="user-name" id="userName" data-i18n="common.loading">Загрузка...</div>
             <div class="user-balance">
-                <span data-i18n="balance">Баланс:</span>
-                <span class="balance-amount" id="userBalance">$0</span>
+                <span data-i18n="subscription">Срок подписки до:</span>
+                <span class="balance-amount" id="userBalance">-</span>
             </div>
         </div>
 
@@ -543,6 +738,62 @@
     <!-- Toast container -->
     <div class="toast-container" id="toastContainer"></div>
 
+    <!-- Welcome Modal -->
+    <div id="welcomeModal" class="welcome-modal" style="display: none;">
+        <div class="welcome-modal-content">
+            <div class="welcome-modal-header">
+                <img src="logo-flt.png" alt="Aaadviser" class="welcome-modal-logo">
+                <h2 class="welcome-modal-title" data-i18n="welcome.title">Добро пожаловать в Aaadviser 2.0</h2>
+            </div>
+            <div class="welcome-modal-body">
+                <p class="welcome-modal-text" data-i18n="welcome.description">
+                    Система аналитики и данных для оценки недвижимости Турции, Испании и Португалии. 
+                    Главная цель - дать информацию о рынках и помочь продавать, давая экспертную оценку.
+                </p>
+                <div class="welcome-modal-features">
+                    <div class="welcome-feature">
+                        <span class="welcome-feature-icon">👤</span>
+                        <div class="welcome-feature-text">
+                            <strong data-i18n="welcome.profile_title">Личный профиль</strong>
+                            <p data-i18n="welcome.profile_desc">Заполните профиль с фото и контактными данными</p>
+                        </div>
+                    </div>
+                    <div class="welcome-feature">
+                        <span class="welcome-feature-icon">🗺️</span>
+                        <div class="welcome-feature-text">
+                            <strong data-i18n="welcome.analytics_title">Аналитика региона</strong>
+                            <p data-i18n="welcome.analytics_desc">Отчет дающий общее представление о текущей ситуации в конкретном районе страны</p>
+                        </div>
+                    </div>
+                    <div class="welcome-feature">
+                        <span class="welcome-feature-icon">🏠</span>
+                        <div class="welcome-feature-text">
+                            <strong data-i18n="welcome.evaluation_title">Оценка объекта</strong>
+                            <p data-i18n="welcome.evaluation_desc">Аналитика и прогноз цены аренды и продажи для одного объекта на год вперед</p>
+                        </div>
+                    </div>
+                    <div class="welcome-feature">
+                        <span class="welcome-feature-icon">📋</span>
+                        <div class="welcome-feature-text">
+                            <strong data-i18n="welcome.reports_title">Мои отчеты</strong>
+                            <p data-i18n="welcome.reports_desc">Сохраненные отчеты где можно их снова получить, просмотреть или удалить</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="welcome-modal-development">
+                    <p data-i18n="welcome.development">
+                        В разработке находится реферальная программа для пользователей и биржа заявок клиентов на покупку. 
+                        В скором времени будут обновления с новым функционалом.
+                    </p>
+                </div>
+                <div class="welcome-modal-actions">
+                    <button class="welcome-btn welcome-btn-primary" onclick="closeWelcomeModal()" data-i18n="welcome.get_started">Быстрый старт</button>
+                    <button class="welcome-btn welcome-btn-secondary" onclick="closeWelcomeModal()" data-i18n="welcome.close">Закрыть</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         let tg = window.Telegram.WebApp;
         tg.expand();
@@ -609,6 +860,8 @@
                 'slogan': 'Инсайты рынка недвижимости',
                 'loading': 'Загрузка...',
                 'balance': 'Баланс: ',
+                'subscription': 'Срок подписки до:',
+                'no_subscription': 'Не указано',
                 'common.help': 'Помощь',
                 'languageTitle': 'Выберите язык',
                 'menuTitle': 'Главное меню',
@@ -622,6 +875,21 @@
                 'objectEvaluationDesc': 'Оценка недвижимости',
                 'myReportsBtn': 'Мои отчеты',
                 'myReportsDesc': 'Ваши созданные отчеты',
+                
+                // Welcome modal
+                'welcome.title': 'Добро пожаловать в Aaadviser 2.0',
+                'welcome.description': 'Система аналитики и данных для оценки недвижимости Турции, Испании и Португалии. Главная цель - дать информацию о рынках и помочь продавать, давая экспертную оценку.',
+                'welcome.profile_title': 'Личный профиль',
+                'welcome.profile_desc': 'Заполните профиль с фото и контактными данными',
+                'welcome.analytics_title': 'Аналитика региона',
+                'welcome.analytics_desc': 'Отчет дающий общее представление о текущей ситуации в конкретном районе страны',
+                'welcome.evaluation_title': 'Оценка объекта',
+                'welcome.evaluation_desc': 'Аналитика и прогноз цены аренды и продажи для одного объекта на год вперед',
+                'welcome.reports_title': 'Мои отчеты',
+                'welcome.reports_desc': 'Сохраненные отчеты где можно их снова получить, просмотреть или удалить',
+                'welcome.development': 'В разработке находится реферальная программа для пользователей и биржа заявок клиентов на покупку. В скором времени будут обновления с новым функционалом.',
+                'welcome.get_started': 'Быстрый старт',
+                'welcome.close': 'Закрыть',
                 
                 // Новая структура меню
                 'menu': {
@@ -655,6 +923,8 @@
                 'slogan': 'Real Estate Market Insights',
                 'loading': 'Loading...',
                 'balance': 'Balance: ',
+                'subscription': 'Subscription until:',
+                'no_subscription': 'Not specified',
                 'common.help': 'Help',
                 'languageTitle': 'Select language',
                 'menuTitle': 'Main menu',
@@ -668,6 +938,21 @@
                 'objectEvaluationDesc': 'Property Evaluation',
                 'myReportsBtn': 'My Reports',
                 'myReportsDesc': 'Your created reports',
+                
+                // Welcome modal
+                'welcome.title': 'Welcome to Aaadviser 2.0',
+                'welcome.description': 'Analytics and data system for real estate evaluation in Turkey, Spain and Portugal. Main goal - provide market information and help sell by giving expert evaluation.',
+                'welcome.profile_title': 'Personal Profile',
+                'welcome.profile_desc': 'Fill out your profile with photo and contact information',
+                'welcome.analytics_title': 'Region Analytics',
+                'welcome.analytics_desc': 'Report providing general overview of current situation in specific area of the country',
+                'welcome.evaluation_title': 'Object Evaluation',
+                'welcome.evaluation_desc': 'Analytics and forecast of rental and sale prices for one object for a year ahead',
+                'welcome.reports_title': 'My Reports',
+                'welcome.reports_desc': 'Saved reports where you can get them again, view or delete',
+                'welcome.development': 'In development: referral program for users and client request marketplace for purchases. Updates with new functionality coming soon.',
+                'welcome.get_started': 'Quick Start',
+                'welcome.close': 'Close',
                 
                 // Новая структура меню
                 'menu': {
@@ -701,6 +986,8 @@
                 'slogan': 'Immobilienmarkt-Einblicke',
                 'loading': 'Laden...',
                 'balance': 'Kontostand: ',
+                'subscription': 'Abonnement bis:',
+                'no_subscription': 'Nicht angegeben',
                 'common.help': 'Hilfe',
                 'languageTitle': 'Sprache auswählen',
                 'menuTitle': 'Hauptmenü',
@@ -714,6 +1001,21 @@
                 'objectEvaluationDesc': 'Immobilienbewertung',
                 'myReportsBtn': 'Meine Berichte',
                 'myReportsDesc': 'Ihre erstellten Berichte',
+                
+                // Welcome modal
+                'welcome.title': 'Willkommen bei Aaadviser 2.0',
+                'welcome.description': 'Analytics- und Datensystem für Immobilienbewertung in der Türkei, Spanien und Portugal. Hauptziel - Marktinformationen bereitstellen und beim Verkauf durch Expertenbewertung helfen.',
+                'welcome.profile_title': 'Persönliches Profil',
+                'welcome.profile_desc': 'Füllen Sie Ihr Profil mit Foto und Kontaktdaten aus',
+                'welcome.analytics_title': 'Regionsanalyse',
+                'welcome.analytics_desc': 'Bericht mit allgemeinem Überblick über die aktuelle Situation in einem bestimmten Gebiet des Landes',
+                'welcome.evaluation_title': 'Objektbewertung',
+                'welcome.evaluation_desc': 'Analytics und Prognose von Miet- und Verkaufspreisen für ein Objekt für ein Jahr im Voraus',
+                'welcome.reports_title': 'Meine Berichte',
+                'welcome.reports_desc': 'Gespeicherte Berichte, die Sie erneut abrufen, anzeigen oder löschen können',
+                'welcome.development': 'In Entwicklung: Empfehlungsprogramm für Benutzer und Marktplatz für Kundenanfragen zum Kauf. Updates mit neuer Funktionalität kommen bald.',
+                'welcome.get_started': 'Schnellstart',
+                'welcome.close': 'Schließen',
                 
                 // Новая структура меню
                 'menu': {
@@ -747,6 +1049,8 @@
                 'slogan': 'Aperçus du marché immobilier',
                 'loading': 'Chargement...',
                 'balance': 'Solde: ',
+                'subscription': 'Abonnement jusqu\'au:',
+                'no_subscription': 'Non spécifié',
                 'common.help': 'Aide',
                 'languageTitle': 'Sélectionner la langue',
                 'menuTitle': 'Menu principal',
@@ -793,6 +1097,8 @@
                 'slogan': 'Gayrimenkul Piyasası İçgörüleri',
                 'loading': 'Yükleniyor...',
                 'balance': 'Bakiye: ',
+                'subscription': 'Abonelik süresi:',
+                'no_subscription': 'Belirtilmemiş',
                 'common.help': 'Yardım',
                 'languageTitle': 'Dil seçin',
                 'menuTitle': 'Ana menü',
@@ -888,10 +1194,10 @@
             setElementText('adminBtn', 'menu.admin_panel');
             setElementText('adminDesc', 'menu.admin_panel_desc');
             
-            // Обновляем элементы баланса
-            const balanceLabel = document.querySelector('.balance-label');
+            // Обновляем элементы баланса/подписки
+            const balanceLabel = document.querySelector('.user-balance span[data-i18n="subscription"]');
             if (balanceLabel) {
-                balanceLabel.textContent = getText('balance');
+                balanceLabel.textContent = getText('subscription');
             }
             
             // Приветственное сообщение обновляется отдельно в loadUserData()
@@ -1064,13 +1370,21 @@
                     const welcomeMessage = getText('welcome_back');
                     document.getElementById('userName').textContent = welcomeMessage;
 
-                    // Баланс с цветовой индикацией
-                    const balanceElement = document.getElementById('userBalance');
-                    balanceElement.textContent = `$${userInfo.balance}`;
-                    if (userInfo.balance < 5) {
-                        balanceElement.classList.add('balance-low');
+                    // Отображение даты подписки
+                    const subscriptionElement = document.getElementById('userBalance');
+                    if (userInfo.period_end) {
+                        // Форматируем дату для отображения
+                        const date = new Date(userInfo.period_end);
+                        const formattedDate = date.toLocaleDateString('ru-RU', {
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric'
+                        });
+                        subscriptionElement.textContent = formattedDate;
+                        subscriptionElement.classList.remove('balance-low');
                     } else {
-                        balanceElement.classList.remove('balance-low');
+                        subscriptionElement.textContent = getText('no_subscription') || 'Не указано';
+                        subscriptionElement.classList.add('balance-low');
                     }
 
                     // Отображение аватара пользователя
@@ -1079,6 +1393,8 @@
                     // Показываем приветственное сообщение только для новых пользователей
                     if (userInfo.is_new_user) {
                         showToast(getText('success_welcome'), 'success');
+                        // Показываем модальное окно приветствия для новых пользователей
+                        checkWelcomeModal(userInfo);
                     }
                 } else {
                     const err = await response.json();
@@ -1114,9 +1430,23 @@
             });
         }
 
-        // Функции меню
-        function showProfile() {
-            window.location.href = '/webapp_profile';
+        // Функции модального окна приветствия
+        function showWelcomeModal() {
+            document.getElementById('welcomeModal').style.display = 'flex';
+        }
+
+        function closeWelcomeModal() {
+            document.getElementById('welcomeModal').style.display = 'none';
+        }
+
+        // Проверяем, нужно ли показать модальное окно приветствия
+        function checkWelcomeModal(userInfo) {
+            // Показываем модальное окно только для новых пользователей
+            if (userInfo.is_new_user) {
+                setTimeout(() => {
+                    showWelcomeModal();
+                }, 1000); // Задержка для плавности
+            }
         }
 
         function showHelp() {

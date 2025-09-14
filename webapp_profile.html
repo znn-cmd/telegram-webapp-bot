@@ -282,17 +282,16 @@
 
         <!-- Profile content -->
         <div id="profileContent" class="hidden">
-            <!-- Balance Block -->
+            <!-- Subscription Block -->
             <div id="balance-block" class="profile-balance-block">
-                <div class="profile-balance-name" data-i18n="profile.balance">Баланс</div>
+                <div class="profile-balance-name" data-i18n="profile.subscription">Срок подписки до</div>
                 <div class="profile-balance-sum">
-                    <span data-i18n="profile.balance_amount">Баланс: $</span>
-                    <span class="profile-balance-amount" id="balanceAmount">0</span>
+                    <span class="profile-balance-amount" id="subscriptionDate">-</span>
                 </div>
             </div>
 
             <!-- Profile Buttons -->
-            <button class="profile-btn" onclick="goToReferral()">
+            <button class="profile-btn" onclick="goToReferral()" style="display: none;">
                 <span class="profile-btn-icon">🎁</span>
                 <span data-i18n="profile.referral_program">Реферальная программа</span>
             </button>
@@ -369,6 +368,7 @@
                 'profile.title': 'Личный кабинет',
                 'profile.balance': 'Баланс',
                 'profile.balance_amount': 'Баланс: $',
+                'profile.subscription': 'Срок подписки до',
                 'profile.referral_program': 'Реферальная программа',
                 'profile.edit_profile': 'Редактировать профиль',
                 'profile.language_settings': 'Язык интерфейса',
@@ -387,6 +387,7 @@
                 'profile.title': 'Personal Account',
                 'profile.balance': 'Balance',
                 'profile.balance_amount': 'Balance: $',
+                'profile.subscription': 'Subscription until',
                 'profile.referral_program': 'Referral Program',
                 'profile.edit_profile': 'Edit Profile',
                 'profile.language_settings': 'Interface Language',
@@ -405,6 +406,7 @@
                 'profile.title': 'Persönlicher Bereich',
                 'profile.balance': 'Guthaben',
                 'profile.balance_amount': 'Guthaben: $',
+                'profile.subscription': 'Abonnement bis',
                 'profile.referral_program': 'Empfehlungsprogramm',
                 'profile.edit_profile': 'Profil bearbeiten',
                 'profile.language_settings': 'Oberflächensprache',
@@ -423,6 +425,7 @@
                 'profile.title': 'Compte Personnel',
                 'profile.balance': 'Solde',
                 'profile.balance_amount': 'Solde: $',
+                'profile.subscription': 'Abonnement jusqu\'au',
                 'profile.referral_program': 'Programme de Parrainage',
                 'profile.edit_profile': 'Modifier le Profil',
                 'profile.language_settings': 'Langue de l\'Interface',
@@ -441,6 +444,7 @@
                 'profile.title': 'Kişisel Hesap',
                 'profile.balance': 'Bakiye',
                 'profile.balance_amount': 'Bakiye: $',
+                'profile.subscription': 'Abonelik süresi',
                 'profile.referral_program': 'Referans Programı',
                 'profile.edit_profile': 'Profili Düzenle',
                 'profile.language_settings': 'Arayüz Dili',
@@ -580,7 +584,20 @@
 
         // Отображаем данные профиля
         function displayProfileData(userInfo) {
-            document.getElementById('balanceAmount').textContent = userInfo.balance || 0;
+            // Отображаем дату подписки
+            const subscriptionDateElement = document.getElementById('subscriptionDate');
+            if (userInfo.period_end) {
+                // Форматируем дату для отображения
+                const date = new Date(userInfo.period_end);
+                const formattedDate = date.toLocaleDateString('ru-RU', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+                subscriptionDateElement.textContent = formattedDate;
+            } else {
+                subscriptionDateElement.textContent = getText('profile.no_subscription') || 'Не указано';
+            }
             
             // Check if user is admin and show/hide admin-only elements
             const profileContent = document.getElementById('profileContent');
