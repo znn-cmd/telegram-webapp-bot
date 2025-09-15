@@ -1017,6 +1017,7 @@
                 'toast_region_analytics': 'Переход к аналитике региона...',
                 'toast_object_evaluation': 'Переход к оценке объекта...',
                 'toast_my_reports': 'Переход к вашим отчетам...',
+                'toast_profile': 'Переход в личный кабинет...',
                 'success_welcome': 'Добро пожаловать!',
                 
                 // Admin panel
@@ -1080,6 +1081,7 @@
                 'toast_region_analytics': 'Transitioning to region analytics...',
                 'toast_object_evaluation': 'Transitioning to object evaluation...',
                 'toast_my_reports': 'Transitioning to your reports...',
+                'toast_profile': 'Transitioning to profile...',
                 'success_welcome': 'Welcome!',
                 
                 // Admin panel
@@ -1143,6 +1145,7 @@
                 'toast_region_analytics': 'Übergang zur Regionalanalyse...',
                 'toast_object_evaluation': 'Übergang zur Objektbewertung...',
                 'toast_my_reports': 'Übergang zu Ihren Berichten...',
+                'toast_profile': 'Übergang zum Profil...',
                 'success_welcome': 'Willkommen!',
                 
                 // Admin panel
@@ -1191,6 +1194,7 @@
                 'toast_region_analytics': 'Transition vers l\'analyse régionale...',
                 'toast_object_evaluation': 'Transition vers l\'évaluation d\'objet...',
                 'toast_my_reports': 'Transition vers vos rapports...',
+                'toast_profile': 'Transition vers le profil...',
                 'success_welcome': 'Bienvenue!',
                 
                 // Admin panel
@@ -1239,6 +1243,7 @@
                 'toast_region_analytics': 'Bölge analizine geçiliyor...',
                 'toast_object_evaluation': 'Nesne değerlendirmesine geçiliyor...',
                 'toast_my_reports': 'Raporlarınıza geçiliyor...',
+                'toast_profile': 'Profile geçiliyor...',
                 'success_welcome': 'Hoş geldiniz!',
                 
                 // Admin panel
@@ -1663,6 +1668,13 @@
             showLoading();
             showToast(getText('toast_my_reports'), 'info');
             window.location.href = '/webapp_my_reports';
+        }
+
+        // Функция перехода в личный кабинет
+        function showProfile() {
+            showLoading();
+            showToast(getText('toast_profile'), 'info');
+            window.location.href = '/webapp_profile';
         }
 
         // Инициализация
