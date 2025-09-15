@@ -136,7 +136,7 @@
             align-items: center;
             height: 200px;
             font-size: 1.1rem;
-            color: #666;
+            color: #fafafa;
         }
 
         .error {
@@ -333,7 +333,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>📊 Aaadviser Dashboard</h1>
+            <h1>📊 Aaadviser 2.0 Dashboard</h1>
             <p>Аналитика и статистика приложения</p>
             <div class="controls">
                 <button class="refresh-btn" onclick="loadDashboard()">🔄 Обновить данные</button>
@@ -376,8 +376,38 @@
                 </div>
             </div>
 
+            <!-- Статистика подписок и активности -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3>✅ Активные подписки</h3>
+                    <div class="stat-value" id="activeSubscriptions">-</div>
+                    <div class="stat-change" id="activeSubscriptionsChange">-</div>
+                </div>
+                <div class="stat-card">
+                    <h3>❌ Истекшие подписки</h3>
+                    <div class="stat-value" id="expiredSubscriptions">-</div>
+                    <div class="stat-change" id="expiredSubscriptionsChange">-</div>
+                </div>
+                <div class="stat-card">
+                    <h3>🟢 Активные пользователи</h3>
+                    <div class="stat-value" id="activeUsers">-</div>
+                    <div class="stat-change" id="activeUsersChange">-</div>
+                </div>
+                <div class="stat-card">
+                    <h3>🔴 Неактивные пользователи</h3>
+                    <div class="stat-value" id="inactiveUsers">-</div>
+                    <div class="stat-change" id="inactiveUsersChange">-</div>
+                </div>
+            </div>
+
             <!-- Графики -->
             <div class="charts-grid">
+                <div class="chart-container">
+                    <h3>📊 Статистика подписок</h3>
+                    <div class="chart-wrapper">
+                        <canvas id="subscriptionsChart"></canvas>
+                    </div>
+                </div>
                 <div class="chart-container">
                     <h3>📈 Динамика пользователей и отчетов</h3>
                     <div class="chart-wrapper">
@@ -416,6 +446,119 @@
                         <h3>📊 Топ-10 регионов</h3>
                         <div class="chart-wrapper">
                             <canvas id="regionsChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Детальная статистика по географическим уровням -->
+            <div class="regions-section">
+                <div class="regions-container">
+                    <div class="regions-table-container">
+                        <h3>🌍 Топ-10 стран</h3>
+                        <div class="table-scroll">
+                            <table class="regions-table">
+                                <thead>
+                                    <tr>
+                                        <th>№</th>
+                                        <th>Страна</th>
+                                        <th>Количество отчетов</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="countriesTableBody">
+                                    <!-- Заполняется JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="regions-chart-container">
+                        <h3>📊 Топ-10 стран</h3>
+                        <div class="chart-wrapper">
+                            <canvas id="countriesChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="regions-section">
+                <div class="regions-container">
+                    <div class="regions-table-container">
+                        <h3>🏛️ Топ-10 областей/штатов</h3>
+                        <div class="table-scroll">
+                            <table class="regions-table">
+                                <thead>
+                                    <tr>
+                                        <th>№</th>
+                                        <th>Область/Штат</th>
+                                        <th>Количество отчетов</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="statesTableBody">
+                                    <!-- Заполняется JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="regions-chart-container">
+                        <h3>📊 Топ-10 областей/штатов</h3>
+                        <div class="chart-wrapper">
+                            <canvas id="statesChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="regions-section">
+                <div class="regions-container">
+                    <div class="regions-table-container">
+                        <h3>🏙️ Топ-10 городов</h3>
+                        <div class="table-scroll">
+                            <table class="regions-table">
+                                <thead>
+                                    <tr>
+                                        <th>№</th>
+                                        <th>Город</th>
+                                        <th>Количество отчетов</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="citiesTableBody">
+                                    <!-- Заполняется JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="regions-chart-container">
+                        <h3>📊 Топ-10 городов</h3>
+                        <div class="chart-wrapper">
+                            <canvas id="citiesChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="regions-section">
+                <div class="regions-container">
+                    <div class="regions-table-container">
+                        <h3>🏘️ Топ-10 районов</h3>
+                        <div class="table-scroll">
+                            <table class="regions-table">
+                                <thead>
+                                    <tr>
+                                        <th>№</th>
+                                        <th>Район</th>
+                                        <th>Количество отчетов</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="districtsTableBody">
+                                    <!-- Заполняется JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="regions-chart-container">
+                        <h3>📊 Топ-10 районов</h3>
+                        <div class="chart-wrapper">
+                            <canvas id="districtsChart"></canvas>
                         </div>
                     </div>
                 </div>
@@ -486,6 +629,10 @@
             updateStatsCards();
             updateCharts();
             updateRegionsTable();
+            updateCountriesTable();
+            updateStatesTable();
+            updateCitiesTable();
+            updateDistrictsTable();
             updateDetailedStats();
         }
 
@@ -523,13 +670,95 @@
             const paymentsChangeEl = document.getElementById('paymentsChange');
             paymentsChangeEl.textContent = `+${paymentsChange} за неделю`;
             paymentsChangeEl.className = `stat-change ${paymentsChange > 0 ? 'positive' : 'neutral'}`;
+
+            // Активные подписки
+            document.getElementById('activeSubscriptions').textContent = users.active_subscriptions || 0;
+            const activeSubscriptionsChangeEl = document.getElementById('activeSubscriptionsChange');
+            activeSubscriptionsChangeEl.textContent = 'Действующие подписки';
+            activeSubscriptionsChangeEl.className = 'stat-change positive';
+
+            // Истекшие подписки
+            document.getElementById('expiredSubscriptions').textContent = users.expired_subscriptions || 0;
+            const expiredSubscriptionsChangeEl = document.getElementById('expiredSubscriptionsChange');
+            expiredSubscriptionsChangeEl.textContent = 'Истекшие подписки';
+            expiredSubscriptionsChangeEl.className = 'stat-change negative';
+
+            // Активные пользователи
+            document.getElementById('activeUsers').textContent = users.active_users || 0;
+            const activeUsersChangeEl = document.getElementById('activeUsersChange');
+            activeUsersChangeEl.textContent = 'За последние 7 дней';
+            activeUsersChangeEl.className = 'stat-change positive';
+
+            // Неактивные пользователи
+            document.getElementById('inactiveUsers').textContent = users.inactive_users || 0;
+            const inactiveUsersChangeEl = document.getElementById('inactiveUsersChange');
+            inactiveUsersChangeEl.textContent = 'Более 30 дней назад';
+            inactiveUsersChangeEl.className = 'stat-change negative';
         }
 
         // Обновление графиков
         function updateCharts() {
+            updateSubscriptionsChart();
             updateDailyChart();
             updateLanguagesChart();
             updateRegionsChart();
+            updateCountriesChart();
+            updateStatesChart();
+            updateCitiesChart();
+            updateDistrictsChart();
+        }
+
+        // График статистики подписок
+        function updateSubscriptionsChart() {
+            const ctx = document.getElementById('subscriptionsChart').getContext('2d');
+            
+            if (charts.subscriptions) {
+                charts.subscriptions.destroy();
+            }
+
+            const users = dashboardData.users || {};
+            const activeSubscriptions = users.active_subscriptions || 0;
+            const expiredSubscriptions = users.expired_subscriptions || 0;
+            const totalSubscriptions = activeSubscriptions + expiredSubscriptions;
+
+            charts.subscriptions = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Активные подписки', 'Истекшие подписки'],
+                    datasets: [{
+                        data: [activeSubscriptions, expiredSubscriptions],
+                        backgroundColor: [
+                            '#28a745',
+                            '#dc3545'
+                        ],
+                        borderColor: [
+                            '#28a745',
+                            '#dc3545'
+                        ],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.label || '';
+                                    const value = context.parsed;
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+                                    return `${label}: ${value} (${percentage}%)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
         }
 
         // График ежедневной динамики
@@ -671,6 +900,194 @@
             });
         }
 
+        // График стран
+        function updateCountriesChart() {
+            const ctx = document.getElementById('countriesChart').getContext('2d');
+            
+            if (charts.countries) {
+                charts.countries.destroy();
+            }
+
+            const top10Countries = dashboardData.regions?.top_10_countries || [];
+            const labels = top10Countries.map(item => item[0]);
+            const data = top10Countries.map(item => item[1]);
+
+            charts.countries = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Количество отчетов',
+                        data: data,
+                        backgroundColor: '#4facfe',
+                        borderColor: '#4facfe',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        },
+                        x: {
+                            ticks: {
+                                maxRotation: 45,
+                                minRotation: 0
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+        }
+
+        // График областей/штатов
+        function updateStatesChart() {
+            const ctx = document.getElementById('statesChart').getContext('2d');
+            
+            if (charts.states) {
+                charts.states.destroy();
+            }
+
+            const top10States = dashboardData.regions?.top_10_states || [];
+            const labels = top10States.map(item => item[0]);
+            const data = top10States.map(item => item[1]);
+
+            charts.states = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Количество отчетов',
+                        data: data,
+                        backgroundColor: '#00f2fe',
+                        borderColor: '#00f2fe',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        },
+                        x: {
+                            ticks: {
+                                maxRotation: 45,
+                                minRotation: 0
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+        }
+
+        // График городов
+        function updateCitiesChart() {
+            const ctx = document.getElementById('citiesChart').getContext('2d');
+            
+            if (charts.cities) {
+                charts.cities.destroy();
+            }
+
+            const top10Cities = dashboardData.regions?.top_10_cities || [];
+            const labels = top10Cities.map(item => item[0]);
+            const data = top10Cities.map(item => item[1]);
+
+            charts.cities = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Количество отчетов',
+                        data: data,
+                        backgroundColor: '#f093fb',
+                        borderColor: '#f093fb',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        },
+                        x: {
+                            ticks: {
+                                maxRotation: 45,
+                                minRotation: 0
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+        }
+
+        // График районов
+        function updateDistrictsChart() {
+            const ctx = document.getElementById('districtsChart').getContext('2d');
+            
+            if (charts.districts) {
+                charts.districts.destroy();
+            }
+
+            const top10Districts = dashboardData.regions?.top_10_districts || [];
+            const labels = top10Districts.map(item => item[0]);
+            const data = top10Districts.map(item => item[1]);
+
+            charts.districts = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Количество отчетов',
+                        data: data,
+                        backgroundColor: '#f5576c',
+                        borderColor: '#f5576c',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        },
+                        x: {
+                            ticks: {
+                                maxRotation: 45,
+                                minRotation: 0
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+        }
+
         // Обновление таблицы регионов
         function updateRegionsTable() {
             const tbody = document.getElementById('regionsTableBody');
@@ -689,6 +1106,78 @@
             });
         }
 
+        // Обновление таблицы стран
+        function updateCountriesTable() {
+            const tbody = document.getElementById('countriesTableBody');
+            tbody.innerHTML = '';
+
+            const top10Countries = dashboardData.regions?.top_10_countries || [];
+            
+            top10Countries.forEach((country, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${country[0]}</td>
+                    <td>${country[1]}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Обновление таблицы областей/штатов
+        function updateStatesTable() {
+            const tbody = document.getElementById('statesTableBody');
+            tbody.innerHTML = '';
+
+            const top10States = dashboardData.regions?.top_10_states || [];
+            
+            top10States.forEach((state, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${state[0]}</td>
+                    <td>${state[1]}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Обновление таблицы городов
+        function updateCitiesTable() {
+            const tbody = document.getElementById('citiesTableBody');
+            tbody.innerHTML = '';
+
+            const top10Cities = dashboardData.regions?.top_10_cities || [];
+            
+            top10Cities.forEach((city, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${city[0]}</td>
+                    <td>${city[1]}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Обновление таблицы районов
+        function updateDistrictsTable() {
+            const tbody = document.getElementById('districtsTableBody');
+            tbody.innerHTML = '';
+
+            const top10Districts = dashboardData.regions?.top_10_districts || [];
+            
+            top10Districts.forEach((district, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${district[0]}</td>
+                    <td>${district[1]}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
         // Обновление детальной статистики
         function updateDetailedStats() {
             const tbody = document.getElementById('detailedStats');
@@ -697,11 +1186,18 @@
             const stats = [
                 { label: 'Активные пользователи', value: dashboardData.users?.active_users || 0, desc: 'Пользователи с активностью за последние 7 дней' },
                 { label: 'Пользователи с балансом', value: dashboardData.users?.users_with_balance || 0, desc: 'Пользователи с положительным балансом' },
+                { label: 'Активные подписки', value: dashboardData.users?.active_subscriptions || 0, desc: 'Пользователи с действующей подпиской' },
+                { label: 'Истекшие подписки', value: dashboardData.users?.expired_subscriptions || 0, desc: 'Пользователи с истекшей подпиской' },
+                { label: 'Неактивные пользователи', value: dashboardData.users?.inactive_users || 0, desc: 'Пользователи без активности более 30 дней' },
                 { label: 'Средняя цена отчета', value: `€${(dashboardData.reports?.avg_price || 0).toFixed(2)}`, desc: 'Средняя стоимость сгенерированного отчета' },
                 { label: 'Отчеты за месяц', value: dashboardData.reports?.reports_30d || 0, desc: 'Количество отчетов за последние 30 дней' },
                 { label: 'Общий доход', value: `€${(dashboardData.payments?.total_revenue || 0).toFixed(2)}`, desc: 'Общая сумма всех платежей' },
                 { label: 'Платежи за месяц', value: dashboardData.payments?.payments_30d || 0, desc: 'Количество платежей за последние 30 дней' },
                 { label: 'Всего регионов', value: dashboardData.regions?.total_regions || 0, desc: 'Уникальные регионы с отчетами' },
+                { label: 'Всего стран', value: dashboardData.regions?.total_countries || 0, desc: 'Уникальные страны с отчетами' },
+                { label: 'Всего областей', value: dashboardData.regions?.total_states || 0, desc: 'Уникальные области/штаты с отчетами' },
+                { label: 'Всего городов', value: dashboardData.regions?.total_cities || 0, desc: 'Уникальные города с отчетами' },
+                { label: 'Всего районов', value: dashboardData.regions?.total_districts || 0, desc: 'Уникальные районы с отчетами' },
                 { label: 'Отчеты с адресом', value: dashboardData.regions?.total_reports_with_address || 0, desc: 'Отчеты с указанным адресом' }
             ];
 

@@ -33,32 +33,116 @@ class DashboardAPI:
     def get_users_stats(self) -> Dict[str, Any]:
         """Получение статистики пользователей"""
         try:
-            # Общее количество пользователей
-            url = f"{SUPABASE_URL}/rest/v1/users?select=count"
+            # Общее количество уникальных пользователей (по telegram_id)
+            url = f"{SUPABASE_URL}/rest/v1/users?select=telegram_id"
             response = requests.get(url, headers=self.headers)
-            total_users = len(response.json()) if response.status_code == 200 else 0
+            if response.status_code == 200:
+                telegram_ids = set()
+                for user in response.json():
+                    telegram_id = user.get('telegram_id')
+                    if telegram_id:
+                        telegram_ids.add(telegram_id)
+                total_users = len(telegram_ids)
+            else:
+                total_users = 0
             
             # Пользователи за последние 30 дней
             thirty_days_ago = (datetime.now() - timedelta(days=30)).isoformat()
-            url = f"{SUPABASE_URL}/rest/v1/users?created_at=gte.{thirty_days_ago}&select=count"
+            url = f"{SUPABASE_URL}/rest/v1/users?created_at=gte.{thirty_days_ago}&select=telegram_id"
             response = requests.get(url, headers=self.headers)
-            new_users_30d = len(response.json()) if response.status_code == 200 else 0
+            if response.status_code == 200:
+                telegram_ids = set()
+                for user in response.json():
+                    telegram_id = user.get('telegram_id')
+                    if telegram_id:
+                        telegram_ids.add(telegram_id)
+                new_users_30d = len(telegram_ids)
+            else:
+                new_users_30d = 0
             
             # Пользователи за последние 7 дней
             seven_days_ago = (datetime.now() - timedelta(days=7)).isoformat()
-            url = f"{SUPABASE_URL}/rest/v1/users?created_at=gte.{seven_days_ago}&select=count"
+            url = f"{SUPABASE_URL}/rest/v1/users?created_at=gte.{seven_days_ago}&select=telegram_id"
             response = requests.get(url, headers=self.headers)
-            new_users_7d = len(response.json()) if response.status_code == 200 else 0
+            if response.status_code == 200:
+                telegram_ids = set()
+                for user in response.json():
+                    telegram_id = user.get('telegram_id')
+                    if telegram_id:
+                        telegram_ids.add(telegram_id)
+                new_users_7d = len(telegram_ids)
+            else:
+                new_users_7d = 0
             
             # Активные пользователи (с активностью за последние 7 дней)
-            url = f"{SUPABASE_URL}/rest/v1/users?last_activity=gte.{seven_days_ago}&select=count"
+            url = f"{SUPABASE_URL}/rest/v1/users?last_activity=gte.{seven_days_ago}&select=telegram_id"
             response = requests.get(url, headers=self.headers)
-            active_users = len(response.json()) if response.status_code == 200 else 0
+            if response.status_code == 200:
+                telegram_ids = set()
+                for user in response.json():
+                    telegram_id = user.get('telegram_id')
+                    if telegram_id:
+                        telegram_ids.add(telegram_id)
+                active_users = len(telegram_ids)
+            else:
+                active_users = 0
             
             # Пользователи с балансом
-            url = f"{SUPABASE_URL}/rest/v1/users?balance=gt.0&select=count"
+            url = f"{SUPABASE_URL}/rest/v1/users?balance=gt.0&select=telegram_id"
             response = requests.get(url, headers=self.headers)
-            users_with_balance = len(response.json()) if response.status_code == 200 else 0
+            if response.status_code == 200:
+                telegram_ids = set()
+                for user in response.json():
+                    telegram_id = user.get('telegram_id')
+                    if telegram_id:
+                        telegram_ids.add(telegram_id)
+                users_with_balance = len(telegram_ids)
+            else:
+                users_with_balance = 0
+            
+            # Статистика подписок
+            today = datetime.now().isoformat()
+            
+            # Пользователи с действующей подпиской (period_end > сегодня)
+            url = f"{SUPABASE_URL}/rest/v1/users?period_end=gt.{today}&select=telegram_id"
+            response = requests.get(url, headers=self.headers)
+            if response.status_code == 200:
+                telegram_ids = set()
+                for user in response.json():
+                    telegram_id = user.get('telegram_id')
+                    if telegram_id:
+                        telegram_ids.add(telegram_id)
+                active_subscriptions = len(telegram_ids)
+            else:
+                active_subscriptions = 0
+            
+            # Пользователи с истекшей подпиской (period_end < сегодня)
+            url = f"{SUPABASE_URL}/rest/v1/users?period_end=lt.{today}&period_end=not.is.null&select=telegram_id"
+            response = requests.get(url, headers=self.headers)
+            if response.status_code == 200:
+                telegram_ids = set()
+                for user in response.json():
+                    telegram_id = user.get('telegram_id')
+                    if telegram_id:
+                        telegram_ids.add(telegram_id)
+                expired_subscriptions = len(telegram_ids)
+            else:
+                expired_subscriptions = 0
+            
+            # Неактивные пользователи (last_activity < периода отчета)
+            # Используем фиксированный период 30 дней, так как request недоступен в этом контексте
+            period_days_ago = (datetime.now() - timedelta(days=30)).isoformat()
+            url = f"{SUPABASE_URL}/rest/v1/users?last_activity=lt.{period_days_ago}&select=telegram_id"
+            response = requests.get(url, headers=self.headers)
+            if response.status_code == 200:
+                telegram_ids = set()
+                for user in response.json():
+                    telegram_id = user.get('telegram_id')
+                    if telegram_id:
+                        telegram_ids.add(telegram_id)
+                inactive_users = len(telegram_ids)
+            else:
+                inactive_users = 0
             
             # Топ языки пользователей
             url = f"{SUPABASE_URL}/rest/v1/users?select=language"
@@ -75,6 +159,9 @@ class DashboardAPI:
                 'new_users_7d': new_users_7d,
                 'active_users': active_users,
                 'users_with_balance': users_with_balance,
+                'active_subscriptions': active_subscriptions,
+                'expired_subscriptions': expired_subscriptions,
+                'inactive_users': inactive_users,
                 'languages': languages
             }
         except Exception as e:
@@ -83,22 +170,46 @@ class DashboardAPI:
     def get_reports_stats(self) -> Dict[str, Any]:
         """Получение статистики отчетов"""
         try:
-            # Общее количество отчетов
-            url = f"{SUPABASE_URL}/rest/v1/user_reports?select=count"
+            # Общее количество уникальных отчетов (по id)
+            url = f"{SUPABASE_URL}/rest/v1/user_reports?select=id"
             response = requests.get(url, headers=self.headers)
-            total_reports = len(response.json()) if response.status_code == 200 else 0
+            if response.status_code == 200:
+                report_ids = set()
+                for report in response.json():
+                    report_id = report.get('id')
+                    if report_id:
+                        report_ids.add(report_id)
+                total_reports = len(report_ids)
+            else:
+                total_reports = 0
             
             # Отчеты за последние 30 дней
             thirty_days_ago = (datetime.now() - timedelta(days=30)).isoformat()
-            url = f"{SUPABASE_URL}/rest/v1/user_reports?created_at=gte.{thirty_days_ago}&select=count"
+            url = f"{SUPABASE_URL}/rest/v1/user_reports?created_at=gte.{thirty_days_ago}&select=id"
             response = requests.get(url, headers=self.headers)
-            reports_30d = len(response.json()) if response.status_code == 200 else 0
+            if response.status_code == 200:
+                report_ids = set()
+                for report in response.json():
+                    report_id = report.get('id')
+                    if report_id:
+                        report_ids.add(report_id)
+                reports_30d = len(report_ids)
+            else:
+                reports_30d = 0
             
             # Отчеты за последние 7 дней
             seven_days_ago = (datetime.now() - timedelta(days=7)).isoformat()
-            url = f"{SUPABASE_URL}/rest/v1/user_reports?created_at=gte.{seven_days_ago}&select=count"
+            url = f"{SUPABASE_URL}/rest/v1/user_reports?created_at=gte.{seven_days_ago}&select=id"
             response = requests.get(url, headers=self.headers)
-            reports_7d = len(response.json()) if response.status_code == 200 else 0
+            if response.status_code == 200:
+                report_ids = set()
+                for report in response.json():
+                    report_id = report.get('id')
+                    if report_id:
+                        report_ids.add(report_id)
+                reports_7d = len(report_ids)
+            else:
+                reports_7d = 0
             
             # Статистика по типам отчетов
             url = f"{SUPABASE_URL}/rest/v1/user_reports?select=report_type"
@@ -292,16 +403,58 @@ class DashboardAPI:
             
             # Подсчитываем количество отчетов по регионам
             region_counts = {}
+            country_counts = {}
+            state_counts = {}
+            city_counts = {}
+            district_counts = {}
+            
             for report in reports:
                 address = report.get('address', '').strip()
                 if address:
-                    # Извлекаем регион из адреса (берем первую часть до запятой)
+                    # Разбиваем адрес на части (обычно формат: район, город, область, страна)
+                    parts = [part.strip() for part in address.split(',')]
+                    
+                    # Если есть хотя бы одна часть
+                    if parts:
+                        # Первая часть - обычно район или город
+                        district = parts[0]
+                        if district:
+                            district_counts[district] = district_counts.get(district, 0) + 1
+                        
+                        # Вторая часть - обычно город
+                        if len(parts) > 1:
+                            city = parts[1]
+                            if city:
+                                city_counts[city] = city_counts.get(city, 0) + 1
+                        
+                        # Третья часть - обычно область/штат
+                        if len(parts) > 2:
+                            state = parts[2]
+                            if state:
+                                state_counts[state] = state_counts.get(state, 0) + 1
+                        
+                        # Последняя часть - обычно страна
+                        if len(parts) > 3:
+                            country = parts[-1]
+                            if country:
+                                country_counts[country] = country_counts.get(country, 0) + 1
+                        elif len(parts) == 3:
+                            # Если только 3 части, то последняя может быть страной
+                            country = parts[2]
+                            if country:
+                                country_counts[country] = country_counts.get(country, 0) + 1
+                    
+                    # Также считаем общий регион (первая часть адреса)
                     region = address.split(',')[0].strip()
                     if region:
                         region_counts[region] = region_counts.get(region, 0) + 1
             
             # Сортируем по количеству отчетов
             sorted_regions = sorted(region_counts.items(), key=lambda x: x[1], reverse=True)
+            sorted_countries = sorted(country_counts.items(), key=lambda x: x[1], reverse=True)
+            sorted_states = sorted(state_counts.items(), key=lambda x: x[1], reverse=True)
+            sorted_cities = sorted(city_counts.items(), key=lambda x: x[1], reverse=True)
+            sorted_districts = sorted(district_counts.items(), key=lambda x: x[1], reverse=True)
             
             # Топ 100 регионов
             top_100_regions = sorted_regions[:100]
@@ -309,10 +462,24 @@ class DashboardAPI:
             # Топ 10 регионов для графика
             top_10_regions = sorted_regions[:10]
             
+            # Топ 10 по каждой категории
+            top_10_countries = sorted_countries[:10]
+            top_10_states = sorted_states[:10]
+            top_10_cities = sorted_cities[:10]
+            top_10_districts = sorted_districts[:10]
+            
             return {
                 'top_100_regions': top_100_regions,
                 'top_10_regions': top_10_regions,
+                'top_10_countries': top_10_countries,
+                'top_10_states': top_10_states,
+                'top_10_cities': top_10_cities,
+                'top_10_districts': top_10_districts,
                 'total_regions': len(region_counts),
+                'total_countries': len(country_counts),
+                'total_states': len(state_counts),
+                'total_cities': len(city_counts),
+                'total_districts': len(district_counts),
                 'total_reports_with_address': len(reports)
             }
         except Exception as e:
