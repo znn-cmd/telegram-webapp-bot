@@ -11730,10 +11730,17 @@
             
             // Проверяем доступ пользователя к премиум функциям
             const userAccess = await checkUserAccess();
-            console.log('🔍 User access check for report options:', userAccess);
+            console.log('🔍 User access check for save button and report options:', userAccess);
             
+            // Показываем кнопку сохранения только для пользователей с активной подпиской или админов
             if (saveButton) {
-                saveButton.style.display = 'block';
+                if (userAccess.hasAccess) {
+                    saveButton.style.display = 'block';
+                    console.log('✅ Save button shown - user has active subscription');
+                } else {
+                    saveButton.style.display = 'none';
+                    console.log('⚠️ Save button hidden - user subscription expired');
+                }
             }
             
             // Показываем опции отчета только для пользователей с активной подпиской или админов
