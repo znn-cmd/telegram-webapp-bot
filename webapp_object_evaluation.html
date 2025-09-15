@@ -6165,60 +6165,116 @@
         }
 
         // Load countries from API
+        // Debouncing utility для оптимизации запросов
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        // Ленивая загрузка с кэшированием
+        let countriesCache = null;
+        let citiesCache = new Map();
+        
         async function loadCountries() {
             try {
+                // Проверяем кэш
+                if (countriesCache) {
+                    console.log('🚀 Loading countries from cache:', countriesCache.length);
+                    populateCountriesSelect(countriesCache);
+                    return;
+                }
+                
                 console.log('🔄 Loading countries from API...');
-                console.log('🌐 Current URL:', window.location.href);
-                console.log('🔗 Making request to:', '/api/locations/countries');
+                const startTime = performance.now();
                 
                 const response = await fetch('/api/locations/countries');
-                console.log('📡 Countries API response status:', response.status);
-                console.log('📡 Countries API response headers:', response.headers);
                 
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 
                 const data = await response.json();
-                console.log('📊 Countries API data:', data);
+                const loadTime = performance.now() - startTime;
+                
+                console.log(`📊 Countries loaded in ${loadTime.toFixed(2)}ms, cached: ${data.cached || false}`);
                 
                 if (data.success) {
-                    const countrySelect = document.getElementById('countrySelect');
-                    if (countrySelect) {
-                        const placeholder = getText('countryPlaceholder');
-                        countrySelect.innerHTML = `<option value="">${placeholder}</option>`;
-                        
-                        if (data.countries && Array.isArray(data.countries)) {
-                            data.countries.forEach(([id, name]) => {
-                                const option = document.createElement('option');
-                                option.value = id;
-                                option.textContent = name;
-                                countrySelect.appendChild(option);
-                            });
-                            console.log('✅ Countries loaded successfully:', data.countries.length);
-                        } else {
-                            console.warn('⚠️ No countries data in response');
-                        }
-                    } else {
-                        console.error('❌ Country select element not found');
-                    }
+                    // Сохраняем в кэш
+                    countriesCache = data.countries;
+                    populateCountriesSelect(data.countries);
+                    console.log(`✅ Countries loaded successfully: ${data.countries.length} countries`);
                 } else {
                     console.error('❌ Failed to load countries:', data.error);
+                    showErrorMessage(getText('errorLoadingCountries') || 'Failed to load countries');
                 }
             } catch (error) {
                 console.error('❌ Error loading countries:', error);
-                // Показываем сообщение об ошибке пользователю
-                const countrySelect = document.getElementById('countrySelect');
-                if (countrySelect) {
-                    countrySelect.innerHTML = `<option value="">Ошибка загрузки стран</option>`;
-                }
+                showErrorMessage(getText('errorLoadingCountries') || 'Error loading countries');
             }
         }
+        
+        function populateCountriesSelect(countries) {
+            const countrySelect = document.getElementById('countrySelect');
+            if (countrySelect) {
+                const placeholder = getText('countryPlaceholder');
+                countrySelect.innerHTML = `<option value="">${placeholder}</option>`;
+                
+                countries.forEach(([id, name]) => {
+                    const option = document.createElement('option');
+                    option.value = id;
+                    option.textContent = name;
+                    countrySelect.appendChild(option);
+                });
+            }
+        }
+        
+        function showErrorMessage(message) {
+            // Показываем уведомление об ошибке пользователю
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error-message';
+            errorDiv.textContent = message;
+            errorDiv.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #ff4444;
+                color: white;
+                padding: 12px 20px;
+                border-radius: 8px;
+                z-index: 1000;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            `;
+            
+            document.body.appendChild(errorDiv);
+            
+            // Автоматически убираем через 5 секунд
+            setTimeout(() => {
+                if (errorDiv.parentNode) {
+                    errorDiv.parentNode.removeChild(errorDiv);
+                }
+            }, 5000);
+        }
 
-        // Load cities based on selected country
-        async function loadCities(countryId) {
+        // Load cities based on selected country with lazy loading
+        const loadCitiesDebounced = debounce(async function(countryId) {
             try {
+                // Проверяем кэш
+                if (citiesCache.has(countryId)) {
+                    console.log('🚀 Loading cities from cache for country_id:', countryId);
+                    populateCitiesSelect(citiesCache.get(countryId));
+                    return;
+                }
+                
                 console.log('🔄 Loading cities for country_id:', countryId);
+                const startTime = performance.now();
+                
                 const response = await fetch('/api/locations/cities', {
                     method: 'POST',
                     headers: {
@@ -6227,46 +6283,70 @@
                     body: JSON.stringify({ country_id: countryId })
                 });
                 
-                console.log('📡 Cities API response status:', response.status);
-                
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 
                 const data = await response.json();
-                console.log('📊 Cities API data:', data);
+                const loadTime = performance.now() - startTime;
+                
+                console.log(`📊 Cities loaded in ${loadTime.toFixed(2)}ms, cached: ${data.cached || false}`);
                 
                 if (data.success) {
-                    const citySelect = document.getElementById('citySelect');
-                    if (citySelect) {
-                        const placeholder = getText('cityPlaceholder');
-                        citySelect.innerHTML = `<option value="">${placeholder}</option>`;
-                        
-                        if (data.cities && Array.isArray(data.cities)) {
-                            data.cities.forEach(([id, name]) => {
-                                const option = document.createElement('option');
-                                option.value = id;
-                                option.textContent = name;
-                                citySelect.appendChild(option);
-                            });
-                            console.log('✅ Cities loaded successfully:', data.cities.length);
-                        } else {
-                            console.warn('⚠️ No cities data in response');
-                        }
-                        
-                        citySelect.disabled = false;
-                    } else {
-                        console.error('❌ City select element not found');
-                    }
+                    // Сохраняем в кэш
+                    citiesCache.set(countryId, data.cities);
+                    populateCitiesSelect(data.cities);
+                    console.log(`✅ Cities loaded successfully: ${data.cities.length} cities`);
                 } else {
                     console.error('❌ Failed to load cities:', data.error);
+                    showErrorMessage(getText('errorLoadingCities') || 'Failed to load cities');
                 }
             } catch (error) {
                 console.error('❌ Error loading cities:', error);
-                const citySelect = document.getElementById('citySelect');
-                if (citySelect) {
-                    citySelect.innerHTML = `<option value="">Ошибка загрузки городов</option>`;
+                showErrorMessage(getText('errorLoadingCities') || 'Error loading cities');
+            }
+        }, 300); // Debounce 300ms
+        
+        async function loadCities(countryId) {
+            // Очищаем зависимые списки
+            clearDependentSelects(['citySelect', 'countySelect', 'districtSelect']);
+            
+            // Загружаем города с debouncing
+            await loadCitiesDebounced(countryId);
+        }
+        
+        function populateCitiesSelect(cities) {
+            const citySelect = document.getElementById('citySelect');
+            if (citySelect) {
+                const placeholder = getText('cityPlaceholder');
+                citySelect.innerHTML = `<option value="">${placeholder}</option>`;
+                
+                cities.forEach(([id, name]) => {
+                    const option = document.createElement('option');
+                    option.value = id;
+                    option.textContent = name;
+                    citySelect.appendChild(option);
+                });
+                
+                citySelect.disabled = false;
+            }
+        }
+        
+        function clearDependentSelects(selectIds) {
+            selectIds.forEach(id => {
+                const select = document.getElementById(id);
+                if (select) {
+                    select.innerHTML = `<option value="">${getText(id.replace('Select', 'Placeholder')) || 'Select...'}</option>`;
+                    select.disabled = true;
                 }
+            });
+        }
+        
+        // Load cities based on selected country (legacy function for compatibility)
+        async function loadCitiesLegacy(countryId) {
+            const citySelect = document.getElementById('citySelect');
+            if (citySelect) {
+                citySelect.innerHTML = `<option value="">Ошибка загрузки городов</option>`;
             }
         }
 
@@ -7018,12 +7098,12 @@
                         });
                         
                         if (response.ok) {
-                            const data = await response.json();
+                        const data = await response.json();
                             console.log('📊 Language API response:', data);
                             
-                            if (data.success) {
-                                userLanguage = data.language;
-                                currentLanguage = data.language;
+                        if (data.success) {
+                            userLanguage = data.language;
+                            currentLanguage = data.language;
                                 console.log(`✅ User language loaded: ${userLanguage} (status: ${data.user_status})`);
                                 return;
                             } else {
@@ -11735,18 +11815,18 @@
             // Показываем кнопку сохранения только для пользователей с активной подпиской или админов
             if (saveButton) {
                 if (userAccess.hasAccess) {
-                    saveButton.style.display = 'block';
+                saveButton.style.display = 'block';
                     console.log('✅ Save button shown - user has active subscription');
                 } else {
                     saveButton.style.display = 'none';
                     console.log('⚠️ Save button hidden - user subscription expired');
-                }
+            }
             }
             
             // Показываем опции отчета только для пользователей с активной подпиской или админов
             if (reportOptions) {
                 if (userAccess.hasAccess) {
-                    reportOptions.style.display = 'block';
+                reportOptions.style.display = 'block';
                 } else {
                     reportOptions.style.display = 'none';
                     console.log('⚠️ Report options hidden - user subscription expired');

@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 import threading
 import asyncio
 from locales import locales
+from cache_manager import cache_manager
 import requests
 from datetime import datetime, timedelta
 from fpdf import FPDF
@@ -962,9 +963,17 @@ def api_menu():
 
 @app.route('/api/locations/countries', methods=['GET'])
 def api_locations_countries():
-    """Получение списка стран из таблицы locations"""
+    """Получение списка стран из таблицы locations с кэшированием"""
     try:
         logger.info("🔍 Запрос списка стран")
+        
+        # Пытаемся получить данные из кэша
+        cached_countries = cache_manager.get_countries()
+        if cached_countries:
+            logger.info(f"🚀 Данные стран получены из кэша: {len(cached_countries)} стран")
+            return jsonify({'success': True, 'countries': cached_countries, 'cached': True})
+        
+        logger.info("📡 Кэш пуст, загружаем данные из БД")
         
         # Получаем все записи с помощью пагинации
         all_records = []
@@ -1003,7 +1012,12 @@ def api_locations_countries():
             
             # Сортируем по названию, игнорируя None
             countries.sort(key=lambda x: x[1] if x[1] is not None else '')
-            return jsonify({'success': True, 'countries': countries})
+            
+            # Сохраняем в кэш на 24 часа
+            cache_manager.set_countries(countries, ttl_hours=24)
+            logger.info(f"💾 Данные стран сохранены в кэш на 24 часа")
+            
+            return jsonify({'success': True, 'countries': countries, 'cached': False})
         else:
             logger.warning("⚠️ Страны не найдены")
             return jsonify({'success': False, 'error': 'No countries found'})
@@ -1013,7 +1027,7 @@ def api_locations_countries():
 
 @app.route('/api/locations/cities', methods=['POST'])
 def api_locations_cities():
-    """Получение списка городов по country_id"""
+    """Получение списка городов по country_id с кэшированием"""
     data = request.json or {}
     country_id = data.get('country_id')
     
@@ -1022,6 +1036,14 @@ def api_locations_cities():
     
     try:
         logger.info(f"🔍 Запрос городов для country_id: {country_id}")
+        
+        # Пытаемся получить данные из кэша
+        cached_cities = cache_manager.get_cities(country_id)
+        if cached_cities:
+            logger.info(f"🚀 Данные городов получены из кэша: {len(cached_cities)} городов")
+            return jsonify({'success': True, 'cities': cached_cities, 'cached': True})
+        
+        logger.info("📡 Кэш пуст, загружаем данные из БД")
         
         # Получаем все записи с помощью пагинации
         all_records = []
@@ -1060,13 +1082,39 @@ def api_locations_cities():
             
             # Сортируем по названию, игнорируя None
             cities.sort(key=lambda x: x[1] if x[1] is not None else '')
-            return jsonify({'success': True, 'cities': cities})
+            
+            # Сохраняем в кэш на 24 часа
+            cache_manager.set_cities(country_id, cities, ttl_hours=24)
+            logger.info(f"💾 Данные городов сохранены в кэш на 24 часа")
+            
+            return jsonify({'success': True, 'cities': cities, 'cached': False})
         else:
             logger.warning(f"⚠️ Города для country_id {country_id} не найдены")
             return jsonify({'success': False, 'error': 'No cities found'})
     except Exception as e:
         logger.error(f"❌ Ошибка при получении городов: {e}")
         logger.error(f"📋 Данные запроса: country_id={country_id}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/cache/stats', methods=['GET'])
+def api_cache_stats():
+    """Получение статистики кэша"""
+    try:
+        stats = cache_manager.get_cache_stats()
+        return jsonify({'success': True, 'stats': stats})
+    except Exception as e:
+        logger.error(f"❌ Ошибка при получении статистики кэша: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/cache/clear', methods=['POST'])
+def api_cache_clear():
+    """Очистка кэша географических данных"""
+    try:
+        cleared_count = cache_manager.clear_locations_cache()
+        logger.info(f"🧹 Очищено {cleared_count} ключей из кэша")
+        return jsonify({'success': True, 'cleared_keys': cleared_count})
+    except Exception as e:
+        logger.error(f"❌ Ошибка при очистке кэша: {e}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
 @app.route('/api/locations/counties', methods=['POST'])

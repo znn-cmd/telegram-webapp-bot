@@ -1,56 +1,35 @@
-# Альтернативный Dockerfile для Amvera (без GUI зависимостей)
+# Dockerfile для Amvera с Redis
 FROM python:3.11-slim
 
-# Установка только необходимых системных зависимостей
+# Устанавливаем системные зависимости
 RUN apt-get update && apt-get install -y \
-    libgomp1 \
-    libgcc-s1 \
-    libstdc++6 \
-    libc6 \
-    libz1 \
-    libjpeg62-turbo \
-    libpng16-16 \
-    libfreetype6 \
-    libfontconfig1 \
-    libx11-6 \
-    libxext6 \
-    libxrender1 \
-    libxrandr2 \
-    libxfixes3 \
-    libxcb1 \
-    libxau6 \
-    libxdmcp6 \
-    libxss1 \
-    libxtst6 \
-    libxi6 \
-    libxcomposite1 \
-    libxcursor1 \
-    libxdamage1 \
-    libx11-xcb1 \
-    libxcb-dri3-0 \
+    redis-server \
+    supervisor \
     && rm -rf /var/lib/apt/lists/*
 
-# Установка рабочей директории
+# Создаем директорию приложения
 WORKDIR /app
 
-# Копирование конфигурации pip
-COPY pip.conf /etc/pip.conf
-
-# Копирование файлов зависимостей
+# Копируем файлы приложения
 COPY requirements.txt .
+COPY requirements-minimal.txt .
 
-# Установка Python зависимостей
-RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir -r requirements.txt
+# Устанавливаем Python зависимости
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Копирование исходного кода
+# Копируем остальные файлы
 COPY . .
 
-# Установка прав на выполнение
-RUN chmod +x app.py
+# Создаем конфигурацию supervisor для Redis
+RUN mkdir -p /var/log/supervisor
+COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
-# Открытие порта
-EXPOSE 8080
+# Создаем директории для Redis
+RUN mkdir -p /var/lib/redis
+RUN chown redis:redis /var/lib/redis
 
-# Команда запуска
-CMD ["python", "app.py"]
+# Открываем порты
+EXPOSE 8080 6379
+
+# Запускаем через supervisor
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
