@@ -4082,7 +4082,12 @@
         </div>
 
         <!-- Back Button -->
-        <a href="/webapp_main" class="back-button" id="backButton" data-i18n="backButton">← Вернуться в главное меню</a>
+        <a href="/webapp_main" class="back-button" id="backButton" data-i18n="backButton" onclick="handleBackButtonClick(event)">← Вернуться в главное меню</a>
+        
+        <!-- Alternative Back Button for Testing -->
+        <button class="back-button" id="alternativeBackButton" onclick="goToMainMenu()" style="background: linear-gradient(135deg, #dc3545 0%, #fd7e14 100%);">
+            🔄 Альтернативный переход (JavaScript)
+        </button>
 
         <!-- Modal for sharing report -->
         <div class="modal-overlay" id="shareModal">
@@ -10067,7 +10072,64 @@
 
         // Function to go to main menu
         function goToMainMenu() {
+            console.log('🚀 goToMainMenu() called');
             window.location.href = '/webapp_main';
+        }
+
+        // Test navigation function for debugging
+        function testNavigation() {
+            console.log('🧪 Testing navigation...');
+            console.log('📍 Current URL:', window.location.href);
+            console.log('🎯 Target URL: /webapp_main');
+            
+            // Test if we can change location
+            try {
+                window.location.href = '/webapp_main';
+                console.log('✅ Navigation command sent successfully');
+            } catch (error) {
+                console.error('❌ Navigation failed:', error);
+            }
+        }
+
+        // Make test function available globally for console debugging
+        window.testNavigation = testNavigation;
+
+        // Handle back button click with debugging
+        function handleBackButtonClick(event) {
+            console.log('🖱️ Back button clicked!', event);
+            console.log('📍 Current location:', window.location.href);
+            console.log('🎯 Target location: /webapp_main');
+            
+            // Prevent default to handle navigation manually
+            event.preventDefault();
+            
+            // Try multiple navigation methods
+            try {
+                console.log('🔄 Attempting navigation...');
+                
+                // Method 1: Direct location change
+                window.location.href = '/webapp_main';
+                
+                // Method 2: If that doesn't work, try with timeout
+                setTimeout(() => {
+                    if (window.location.pathname !== '/webapp_main') {
+                        console.log('⚠️ Navigation failed, trying alternative method...');
+                        window.location.assign('/webapp_main');
+                    }
+                }, 500);
+                
+                // Method 3: Telegram WebApp navigation
+                if (window.Telegram && window.Telegram.WebApp) {
+                    console.log('📱 Telegram WebApp detected, trying Telegram navigation...');
+                    window.Telegram.WebApp.ready();
+                    window.Telegram.WebApp.expand();
+                }
+                
+            } catch (error) {
+                console.error('❌ Navigation error:', error);
+                // Fallback: force reload with new URL
+                window.location.replace('/webapp_main');
+            }
         }
 
         // Function to convert currency to EUR (base currency)
