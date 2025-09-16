@@ -1117,9 +1117,20 @@ def api_cache_clear():
         logger.error(f"❌ Ошибка при очистке кэша: {e}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
+@app.route('/api/cache/refresh', methods=['POST'])
+def api_cache_refresh():
+    """Ручное обновление кэша географических данных"""
+    try:
+        logger.info("🔄 Запуск ручного обновления кэша...")
+        refresh_locations_cache()
+        return jsonify({'success': True, 'message': 'Cache refreshed successfully'})
+    except Exception as e:
+        logger.error(f"❌ Ошибка при ручном обновлении кэша: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
 @app.route('/api/locations/counties', methods=['POST'])
 def api_locations_counties():
-    """Получение списка областей/регионов по city_id"""
+    """Получение списка областей/регионов по city_id с кэшированием"""
     data = request.json or {}
     city_id = data.get('city_id')
     
@@ -1128,6 +1139,14 @@ def api_locations_counties():
     
     try:
         logger.info(f"🔍 Запрос областей для city_id: {city_id}")
+        
+        # Пытаемся получить данные из кэша
+        cached_counties = cache_manager.get_counties(city_id)
+        if cached_counties:
+            logger.info(f"🚀 Данные областей получены из кэша: {len(cached_counties)} областей")
+            return jsonify({'success': True, 'counties': cached_counties, 'cached': True})
+        
+        logger.info("📡 Кэш пуст, загружаем данные из БД")
         
         # Получаем все записи с помощью пагинации
         all_records = []
@@ -1166,7 +1185,12 @@ def api_locations_counties():
             
             # Сортируем по названию, игнорируя None
             counties.sort(key=lambda x: x[1] if x[1] is not None else '')
-            return jsonify({'success': True, 'counties': counties})
+            
+            # Сохраняем в кэш на 24 часа
+            cache_manager.set_counties(city_id, counties, ttl_hours=24)
+            logger.info(f"💾 Данные областей сохранены в кэш на 24 часа")
+            
+            return jsonify({'success': True, 'counties': counties, 'cached': False})
         else:
             logger.warning(f"⚠️ Области для city_id {city_id} не найдены")
             return jsonify({'success': False, 'error': 'No counties found'})
@@ -1177,7 +1201,7 @@ def api_locations_counties():
 
 @app.route('/api/locations/districts', methods=['POST'])
 def api_locations_districts():
-    """Получение списка районов по county_id"""
+    """Получение списка районов по county_id с кэшированием"""
     data = request.json or {}
     county_id = data.get('county_id')
     
@@ -1186,6 +1210,14 @@ def api_locations_districts():
     
     try:
         logger.info(f"🔍 Запрос районов для county_id: {county_id}")
+        
+        # Пытаемся получить данные из кэша
+        cached_districts = cache_manager.get_districts(county_id)
+        if cached_districts:
+            logger.info(f"🚀 Данные районов получены из кэша: {len(cached_districts)} районов")
+            return jsonify({'success': True, 'districts': cached_districts, 'cached': True})
+        
+        logger.info("📡 Кэш пуст, загружаем данные из БД")
         
         # Получаем все записи с помощью пагинации
         all_records = []
@@ -1224,7 +1256,12 @@ def api_locations_districts():
             
             # Сортируем по названию, игнорируя None
             districts.sort(key=lambda x: x[1] if x[1] is not None else '')
-            return jsonify({'success': True, 'districts': districts})
+            
+            # Сохраняем в кэш на 24 часа
+            cache_manager.set_districts(county_id, districts, ttl_hours=24)
+            logger.info(f"💾 Данные районов сохранены в кэш на 24 часа")
+            
+            return jsonify({'success': True, 'districts': districts, 'cached': False})
         else:
             logger.warning(f"⚠️ Районы для county_id {county_id} не найдены")
             return jsonify({'success': False, 'error': 'No districts found'})
@@ -10899,6 +10936,153 @@ def clear_cache():
         logger.error(f"Error clearing cache: {e}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
+def refresh_locations_cache():
+    """Функция для обновления кэша всех географических данных"""
+    try:
+        logger.info("🔄 Начинаем автоматическое обновление кэша локаций...")
+        
+        # Очищаем старый кэш
+        cleared_count = cache_manager.clear_locations_cache()
+        logger.info(f"🧹 Очищено {cleared_count} ключей из старого кэша")
+        
+        # Обновляем кэш стран
+        logger.info("🌍 Обновляем кэш стран...")
+        all_records = []
+        page = 0
+        page_size = 1000
+        
+        while True:
+            result = supabase.table('locations').select('country_id, country_name').range(page * page_size, (page + 1) * page_size - 1).execute()
+            
+            if not result.data:
+                break
+                
+            all_records.extend(result.data)
+            page += 1
+            
+            # Защита от бесконечного цикла
+            if page > 10:  # Максимум 10 страниц
+                break
+        
+        if all_records:
+            # Убираем дубликаты, фильтруем None значения и сортируем
+            countries = []
+            seen = set()
+            for item in all_records:
+                if item['country_id'] is not None and item['country_name'] is not None:
+                    country_tuple = (item['country_id'], item['country_name'])
+                    if country_tuple not in seen:
+                        countries.append(country_tuple)
+                        seen.add(country_tuple)
+            
+            # Сортируем по названию
+            countries.sort(key=lambda x: x[1] if x[1] is not None else '')
+            
+            # Сохраняем в кэш на 24 часа
+            cache_manager.set_countries(countries, ttl_hours=24)
+            logger.info(f"✅ Кэш стран обновлен: {len(countries)} стран сохранено")
+        
+        # Обновляем кэш городов для каждой страны
+        logger.info("🏙️ Обновляем кэш городов...")
+        unique_countries = list(set([item['country_id'] for item in all_records if item['country_id'] is not None]))
+        
+        for country_id in unique_countries:
+            try:
+                # Получаем города для этой страны
+                cities_result = supabase.table('locations').select('city_id, city_name').eq('country_id', country_id).execute()
+                
+                if cities_result.data:
+                    cities = []
+                    seen = set()
+                    for item in cities_result.data:
+                        if item['city_id'] is not None and item['city_name'] is not None:
+                            city_tuple = (item['city_id'], item['city_name'])
+                            if city_tuple not in seen:
+                                cities.append(city_tuple)
+                                seen.add(city_tuple)
+                    
+                    cities.sort(key=lambda x: x[1] if x[1] is not None else '')
+                    cache_manager.set_cities(country_id, cities, ttl_hours=24)
+                    logger.info(f"✅ Кэш городов обновлен для страны {country_id}: {len(cities)} городов")
+                    
+            except Exception as e:
+                logger.error(f"❌ Ошибка при обновлении кэша городов для страны {country_id}: {e}")
+        
+        # Обновляем кэш областей для каждого города
+        logger.info("🏘️ Обновляем кэш областей...")
+        unique_cities = list(set([item['city_id'] for item in all_records if item['city_id'] is not None]))
+        
+        for city_id in unique_cities:
+            try:
+                # Получаем области для этого города
+                counties_result = supabase.table('locations').select('county_id, county_name').eq('city_id', city_id).execute()
+                
+                if counties_result.data:
+                    counties = []
+                    seen = set()
+                    for item in counties_result.data:
+                        if item['county_id'] is not None and item['county_name'] is not None:
+                            county_tuple = (item['county_id'], item['county_name'])
+                            if county_tuple not in seen:
+                                counties.append(county_tuple)
+                                seen.add(county_tuple)
+                    
+                    counties.sort(key=lambda x: x[1] if x[1] is not None else '')
+                    cache_manager.set_counties(city_id, counties, ttl_hours=24)
+                    logger.info(f"✅ Кэш областей обновлен для города {city_id}: {len(counties)} областей")
+                    
+            except Exception as e:
+                logger.error(f"❌ Ошибка при обновлении кэша областей для города {city_id}: {e}")
+        
+        # Обновляем кэш районов для каждой области
+        logger.info("🏡 Обновляем кэш районов...")
+        unique_counties = list(set([item['county_id'] for item in all_records if item['county_id'] is not None]))
+        
+        for county_id in unique_counties:
+            try:
+                # Получаем районы для этой области
+                districts_result = supabase.table('locations').select('district_id, district_name').eq('county_id', county_id).execute()
+                
+                if districts_result.data:
+                    districts = []
+                    seen = set()
+                    for item in districts_result.data:
+                        if item['district_id'] is not None and item['district_name'] is not None:
+                            district_tuple = (item['district_id'], item['district_name'])
+                            if district_tuple not in seen:
+                                districts.append(district_tuple)
+                                seen.add(district_tuple)
+                    
+                    districts.sort(key=lambda x: x[1] if x[1] is not None else '')
+                    cache_manager.set_districts(county_id, districts, ttl_hours=24)
+                    logger.info(f"✅ Кэш районов обновлен для области {county_id}: {len(districts)} районов")
+                    
+            except Exception as e:
+                logger.error(f"❌ Ошибка при обновлении кэша районов для области {county_id}: {e}")
+        
+        logger.info("🎉 Автоматическое обновление кэша локаций завершено успешно")
+        
+    except Exception as e:
+        logger.error(f"❌ Ошибка при автоматическом обновлении кэша: {e}")
+
+def start_cache_refresh_scheduler():
+    """Запуск планировщика обновления кэша"""
+    def scheduler():
+        while True:
+            try:
+                # Ждем 24 часа (86400 секунд)
+                time.sleep(86400)
+                refresh_locations_cache()
+            except Exception as e:
+                logger.error(f"❌ Ошибка в планировщике кэша: {e}")
+                # При ошибке ждем час перед следующей попыткой
+                time.sleep(3600)
+    
+    # Запускаем планировщик в отдельном потоке
+    scheduler_thread = threading.Thread(target=scheduler, daemon=True)
+    scheduler_thread.start()
+    logger.info("⏰ Планировщик автоматического обновления кэша запущен (обновление каждые 24 часа)")
+
 if __name__ == '__main__':
     # Дополнительная проверка подключения к Supabase перед запуском
     logger.info("🔍 Финальная проверка подключения к Supabase...")
@@ -10909,5 +11093,12 @@ if __name__ == '__main__':
         logger.info("✅ Финальная проверка подключения к Supabase успешна")
     else:
         logger.error("❌ Финальная проверка подключения к Supabase не удалась")
+    
+    # Запускаем планировщик автоматического обновления кэша
+    start_cache_refresh_scheduler()
+    
+    # Выполняем первичное обновление кэша при запуске
+    logger.info("🚀 Выполняем первичное обновление кэша при запуске...")
+    refresh_locations_cache()
     
     run_flask()
