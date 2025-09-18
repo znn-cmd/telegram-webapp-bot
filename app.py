@@ -11010,55 +11010,87 @@ def refresh_locations_cache():
         
         # Обновляем кэш областей для каждого города
         logger.info("🏘️ Обновляем кэш областей...")
-        unique_cities = list(set([item['city_id'] for item in all_records if item['city_id'] is not None]))
         
-        for city_id in unique_cities:
-            try:
-                # Получаем области для этого города
-                counties_result = supabase.table('locations').select('county_id, county_name').eq('city_id', city_id).execute()
-                
-                if counties_result.data:
-                    counties = []
-                    seen = set()
-                    for item in counties_result.data:
-                        if item['county_id'] is not None and item['county_name'] is not None:
-                            county_tuple = (item['county_id'], item['county_name'])
-                            if county_tuple not in seen:
-                                counties.append(county_tuple)
-                                seen.add(county_tuple)
+        # Получаем все уникальные города из базы данных
+        all_cities_result = supabase.table('locations').select('city_id, city_name').not_.is_('city_id', 'null').execute()
+        
+        if all_cities_result.data:
+            unique_cities = []
+            seen_cities = set()
+            for item in all_cities_result.data:
+                if item['city_id'] is not None and item['city_name'] is not None:
+                    city_tuple = (item['city_id'], item['city_name'])
+                    if city_tuple not in seen_cities:
+                        unique_cities.append(item['city_id'])
+                        seen_cities.add(city_tuple)
+            
+            logger.info(f"📊 Найдено {len(unique_cities)} уникальных городов для обновления областей")
+            
+            for city_id in unique_cities:
+                try:
+                    # Получаем области для этого города
+                    counties_result = supabase.table('locations').select('county_id, county_name').eq('city_id', city_id).execute()
                     
-                    counties.sort(key=lambda x: x[1] if x[1] is not None else '')
-                    cache_manager.set_counties(city_id, counties, ttl_hours=24)
-                    logger.info(f"✅ Кэш областей обновлен для города {city_id}: {len(counties)} областей")
-                    
-            except Exception as e:
-                logger.error(f"❌ Ошибка при обновлении кэша областей для города {city_id}: {e}")
+                    if counties_result.data:
+                        counties = []
+                        seen = set()
+                        for item in counties_result.data:
+                            if item['county_id'] is not None and item['county_name'] is not None:
+                                county_tuple = (item['county_id'], item['county_name'])
+                                if county_tuple not in seen:
+                                    counties.append(county_tuple)
+                                    seen.add(county_tuple)
+                        
+                        counties.sort(key=lambda x: x[1] if x[1] is not None else '')
+                        cache_manager.set_counties(city_id, counties, ttl_hours=24)
+                        logger.info(f"✅ Кэш областей обновлен для города {city_id}: {len(counties)} областей")
+                        
+                except Exception as e:
+                    logger.error(f"❌ Ошибка при обновлении кэша областей для города {city_id}: {e}")
+        else:
+            logger.warning("⚠️ Не найдено городов для обновления областей")
         
         # Обновляем кэш районов для каждой области
         logger.info("🏡 Обновляем кэш районов...")
-        unique_counties = list(set([item['county_id'] for item in all_records if item['county_id'] is not None]))
         
-        for county_id in unique_counties:
-            try:
-                # Получаем районы для этой области
-                districts_result = supabase.table('locations').select('district_id, district_name').eq('county_id', county_id).execute()
-                
-                if districts_result.data:
-                    districts = []
-                    seen = set()
-                    for item in districts_result.data:
-                        if item['district_id'] is not None and item['district_name'] is not None:
-                            district_tuple = (item['district_id'], item['district_name'])
-                            if district_tuple not in seen:
-                                districts.append(district_tuple)
-                                seen.add(district_tuple)
+        # Получаем все уникальные области из базы данных
+        all_counties_result = supabase.table('locations').select('county_id, county_name').not_.is_('county_id', 'null').execute()
+        
+        if all_counties_result.data:
+            unique_counties = []
+            seen_counties = set()
+            for item in all_counties_result.data:
+                if item['county_id'] is not None and item['county_name'] is not None:
+                    county_tuple = (item['county_id'], item['county_name'])
+                    if county_tuple not in seen_counties:
+                        unique_counties.append(item['county_id'])
+                        seen_counties.add(county_tuple)
+            
+            logger.info(f"📊 Найдено {len(unique_counties)} уникальных областей для обновления районов")
+            
+            for county_id in unique_counties:
+                try:
+                    # Получаем районы для этой области
+                    districts_result = supabase.table('locations').select('district_id, district_name').eq('county_id', county_id).execute()
                     
-                    districts.sort(key=lambda x: x[1] if x[1] is not None else '')
-                    cache_manager.set_districts(county_id, districts, ttl_hours=24)
-                    logger.info(f"✅ Кэш районов обновлен для области {county_id}: {len(districts)} районов")
-                    
-            except Exception as e:
-                logger.error(f"❌ Ошибка при обновлении кэша районов для области {county_id}: {e}")
+                    if districts_result.data:
+                        districts = []
+                        seen = set()
+                        for item in districts_result.data:
+                            if item['district_id'] is not None and item['district_name'] is not None:
+                                district_tuple = (item['district_id'], item['district_name'])
+                                if district_tuple not in seen:
+                                    districts.append(district_tuple)
+                                    seen.add(district_tuple)
+                        
+                        districts.sort(key=lambda x: x[1] if x[1] is not None else '')
+                        cache_manager.set_districts(county_id, districts, ttl_hours=24)
+                        logger.info(f"✅ Кэш районов обновлен для области {county_id}: {len(districts)} районов")
+                        
+                except Exception as e:
+                    logger.error(f"❌ Ошибка при обновлении кэша районов для области {county_id}: {e}")
+        else:
+            logger.warning("⚠️ Не найдено областей для обновления районов")
         
         logger.info("🎉 Автоматическое обновление кэша локаций завершено успешно")
         
