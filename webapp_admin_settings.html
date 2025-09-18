@@ -48,6 +48,9 @@
         
         <!-- Секция управления странами -->
         <div class="admin-title" data-i18n="admin.country_settings_title">Управление странами</div>
+        <button class="settings-btn" onclick="initializeCountrySettings()" style="margin-bottom: 10px;">
+            🔄 Инициализировать настройки стран
+        </button>
         <div class="settings-list" id="countrySettingsList" data-i18n="common.loading">Загрузка...</div>
         <div class="nav-btn-row">
             <button class="nav-btn" onclick="goBack()" data-i18n="common.back">Назад</button>
@@ -269,26 +272,34 @@
         
         // Функции для управления странами
         function loadCountrySettings() {
+            console.log('🔄 Загрузка настроек стран...');
             fetch('/api/admin/country_settings')
-                .then(res => res.json())
+                .then(res => {
+                    console.log('📡 Ответ сервера:', res.status);
+                    return res.json();
+                })
                 .then(data => {
+                    console.log('📊 Данные настроек стран:', data);
                     if (data.success) {
                         displayCountrySettings(data.settings);
                     } else {
-                        document.getElementById('countrySettingsList').innerHTML = getText('admin.load_keys_error');
-                        showToast(getText('admin.load_keys_error'), 'error');
+                        const errorMsg = data.error || 'Неизвестная ошибка';
+                        console.error('❌ Ошибка загрузки настроек стран:', errorMsg);
+                        document.getElementById('countrySettingsList').innerHTML = `<div style="text-align: center; color: #dc3545; padding: 20px;">Ошибка: ${errorMsg}</div>`;
+                        showToast(`Ошибка загрузки настроек: ${errorMsg}`, 'error');
                     }
                 })
-                .catch(() => { 
-                    document.getElementById('countrySettingsList').innerHTML = getText('admin.network_error'); 
-                    showToast(getText('admin.network_error'), 'error'); 
+                .catch(error => { 
+                    console.error('❌ Ошибка сети при загрузке настроек стран:', error);
+                    document.getElementById('countrySettingsList').innerHTML = '<div style="text-align: center; color: #dc3545; padding: 20px;">Ошибка сети при загрузке настроек стран</div>'; 
+                    showToast('Ошибка сети при загрузке настроек стран', 'error'); 
                 });
         }
         
         function displayCountrySettings(settings) {
             const container = document.getElementById('countrySettingsList');
             if (!settings || settings.length === 0) {
-                container.innerHTML = getText('admin.no_keys');
+                container.innerHTML = '<div style="text-align: center; color: #666; padding: 20px;">Нет настроек стран</div>';
                 return;
             }
             
@@ -328,6 +339,31 @@
         
         // Загружаем настройки стран при инициализации
         document.addEventListener('DOMContentLoaded', loadCountrySettings);
+        
+        // Функция принудительной инициализации настроек стран
+        function initializeCountrySettings() {
+            console.log('🔄 Принудительная инициализация настроек стран...');
+            document.getElementById('countrySettingsList').innerHTML = '<div style="text-align: center; color: #666; padding: 20px;">Инициализация...</div>';
+            
+            fetch('/api/admin/country_settings')
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        console.log('✅ Настройки стран успешно инициализированы');
+                        displayCountrySettings(data.settings);
+                        showToast('Настройки стран успешно инициализированы!', 'success');
+                    } else {
+                        console.error('❌ Ошибка инициализации:', data.error);
+                        document.getElementById('countrySettingsList').innerHTML = `<div style="text-align: center; color: #dc3545; padding: 20px;">Ошибка инициализации: ${data.error}</div>`;
+                        showToast(`Ошибка инициализации: ${data.error}`, 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('❌ Ошибка сети при инициализации:', error);
+                    document.getElementById('countrySettingsList').innerHTML = '<div style="text-align: center; color: #dc3545; padding: 20px;">Ошибка сети при инициализации</div>';
+                    showToast('Ошибка сети при инициализации', 'error');
+                });
+        }
     </script>
 </body>
 </html> 

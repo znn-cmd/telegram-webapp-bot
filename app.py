@@ -1063,7 +1063,45 @@ def api_admin_country_settings():
             return jsonify({'success': True, 'settings': result.data})
         else:
             logger.warning("⚠️ Настройки стран не найдены")
-            return jsonify({'success': False, 'error': 'No country settings found'})
+            # Если таблица пустая, попробуем создать настройки из существующих стран
+            try:
+                logger.info("🔄 Попытка инициализации настроек стран из таблицы locations")
+                locations_result = supabase.table('locations').select('country_id, country_name').not_.is_('country_id', 'null').not_.is_('country_name', 'null').execute()
+                
+                if locations_result.data:
+                    # Получаем уникальные страны
+                    countries = {}
+                    for item in locations_result.data:
+                        country_id = item['country_id']
+                        country_name = item['country_name']
+                        if country_id not in countries:
+                            countries[country_id] = country_name
+                    
+                    # Создаем настройки для каждой страны
+                    settings_data = []
+                    for country_id, country_name in countries.items():
+                        settings_data.append({
+                            'country_id': country_id,
+                            'country_name': country_name,
+                            'is_enabled': True
+                        })
+                    
+                    # Вставляем настройки в базу
+                    insert_result = supabase.table('country_settings').insert(settings_data).execute()
+                    
+                    if insert_result.data:
+                        logger.info(f"✅ Создано настроек стран: {len(insert_result.data)}")
+                        return jsonify({'success': True, 'settings': insert_result.data})
+                    else:
+                        logger.error("❌ Не удалось создать настройки стран")
+                        return jsonify({'success': False, 'error': 'Failed to create country settings'})
+                else:
+                    logger.error("❌ Не найдены страны в таблице locations")
+                    return jsonify({'success': False, 'error': 'No countries found in locations table'})
+                    
+            except Exception as init_error:
+                logger.error(f"❌ Ошибка инициализации настроек стран: {init_error}")
+                return jsonify({'success': False, 'error': f'Initialization failed: {str(init_error)}'})
             
     except Exception as e:
         logger.error(f"❌ Ошибка при получении настроек стран: {e}")
@@ -1304,13 +1342,25 @@ def api_region_data():
         if district_id and district_id != 'none':
             conditions['district_id'] = district_id
         
-        # Получаем общие данные
+        # Получаем общие данные (только максимально свежие по trend_date)
         general_result = supabase.table('general_data').select('*').eq('country_id', country_id).eq('city_id', city_id).eq('county_id', county_id)
         if district_id and district_id != 'none':
             general_result = general_result.eq('district_id', district_id)
         general_data = general_result.execute()
         
-        # Получаем данные по типам домов
+        # Фильтруем записи с валидными датами и берем самую свежую
+        general_data_filtered = []
+        if general_data.data:
+            valid_records = [r for r in general_data.data if r.get('trend_date')]
+            if valid_records:
+                latest_record = max(valid_records, key=lambda x: x.get('trend_date', ''))
+                general_data_filtered = [latest_record]
+                logger.info(f"📊 general_data: выбрана самая свежая запись с датой {latest_record.get('trend_date')}")
+            else:
+                general_data_filtered = general_data.data[:1] if general_data.data else []
+                logger.warning("⚠️ Все записи general_data имеют пустые даты")
+        
+        # Получаем данные по типам домов (максимально свежие по trend_date для каждого listing_type)
         house_type_result = supabase.table('house_type_data').select('*').eq('country_id', country_id).eq('city_id', city_id).eq('county_id', county_id)
         if district_id and district_id != 'none':
             house_type_result = house_type_result.eq('district_id', district_id)
@@ -1318,7 +1368,26 @@ def api_region_data():
             house_type_result = house_type_result.eq('listing_type', listing_types['house_type'])
         house_type_data = house_type_result.execute()
         
-        # Получаем данные по сегментам этажей
+        # Группируем записи по listing_type и берем самую свежую для каждого типа
+        house_type_data_filtered = []
+        if house_type_data.data:
+            records_by_type = {}
+            for record in house_type_data.data:
+                listing_type = record.get('listing_type')
+                if listing_type:
+                    if listing_type not in records_by_type:
+                        records_by_type[listing_type] = record
+                    else:
+                        # Если уже есть запись для этого типа, сравниваем даты
+                        existing_date = records_by_type[listing_type].get('trend_date', '')
+                        current_date = record.get('trend_date', '')
+                        if existing_date and current_date and current_date > existing_date:
+                            records_by_type[listing_type] = record
+            
+            house_type_data_filtered = list(records_by_type.values())
+            logger.info(f"📊 house_type_data: {len(house_type_data.data)} записей, сгруппированы по {len(records_by_type)} типам")
+        
+        # Получаем данные по сегментам этажей (максимально свежие по trend_date для каждого listing_type)
         floor_segment_result = supabase.table('floor_segment_data').select('*').eq('country_id', country_id).eq('city_id', city_id).eq('county_id', county_id)
         if district_id and district_id != 'none':
             floor_segment_result = floor_segment_result.eq('district_id', district_id)
@@ -1326,7 +1395,26 @@ def api_region_data():
             floor_segment_result = floor_segment_result.eq('listing_type', listing_types['floor_segment'])
         floor_segment_data = floor_segment_result.execute()
         
-        # Получаем данные по возрасту объектов
+        # Группируем записи по listing_type и берем самую свежую для каждого типа
+        floor_segment_data_filtered = []
+        if floor_segment_data.data:
+            records_by_type = {}
+            for record in floor_segment_data.data:
+                listing_type = record.get('listing_type')
+                if listing_type:
+                    if listing_type not in records_by_type:
+                        records_by_type[listing_type] = record
+                    else:
+                        # Если уже есть запись для этого типа, сравниваем даты
+                        existing_date = records_by_type[listing_type].get('trend_date', '')
+                        current_date = record.get('trend_date', '')
+                        if existing_date and current_date and current_date > existing_date:
+                            records_by_type[listing_type] = record
+            
+            floor_segment_data_filtered = list(records_by_type.values())
+            logger.info(f"📊 floor_segment_data: {len(floor_segment_data.data)} записей, сгруппированы по {len(records_by_type)} типам")
+        
+        # Получаем данные по возрасту объектов (максимально свежие по trend_date для каждого listing_type)
         age_result = supabase.table('age_data').select('*').eq('country_id', country_id).eq('city_id', city_id).eq('county_id', county_id)
         if district_id and district_id != 'none':
             age_result = age_result.eq('district_id', district_id)
@@ -1334,7 +1422,26 @@ def api_region_data():
             age_result = age_result.eq('listing_type', listing_types['age'])
         age_data = age_result.execute()
 
-        # Получаем данные по отоплению
+        # Группируем записи по listing_type и берем самую свежую для каждого типа
+        age_data_filtered = []
+        if age_data.data:
+            records_by_type = {}
+            for record in age_data.data:
+                listing_type = record.get('listing_type')
+                if listing_type:
+                    if listing_type not in records_by_type:
+                        records_by_type[listing_type] = record
+                    else:
+                        # Если уже есть запись для этого типа, сравниваем даты
+                        existing_date = records_by_type[listing_type].get('trend_date', '')
+                        current_date = record.get('trend_date', '')
+                        if existing_date and current_date and current_date > existing_date:
+                            records_by_type[listing_type] = record
+            
+            age_data_filtered = list(records_by_type.values())
+            logger.info(f"📊 age_data: {len(age_data.data)} записей, сгруппированы по {len(records_by_type)} типам")
+
+        # Получаем данные по отоплению (максимально свежие по trend_date для каждого listing_type)
         heating_result = supabase.table('heating_data').select('*').eq('country_id', country_id).eq('city_id', city_id).eq('county_id', county_id)
         if district_id and district_id != 'none':
             heating_result = heating_result.eq('district_id', district_id)
@@ -1342,7 +1449,26 @@ def api_region_data():
             heating_result = heating_result.eq('listing_type', listing_types['heating'])
         heating_data = heating_result.execute()
 
-        logger.info(f"📊 Получено данных: general={len(general_data.data) if general_data.data else 0}, house_type={len(house_type_data.data) if house_type_data.data else 0}, floor_segment={len(floor_segment_data.data) if floor_segment_data.data else 0}, age={len(age_data.data) if age_data.data else 0}, heating={len(heating_data.data) if heating_data.data else 0}")
+        # Группируем записи по listing_type и берем самую свежую для каждого типа
+        heating_data_filtered = []
+        if heating_data.data:
+            records_by_type = {}
+            for record in heating_data.data:
+                listing_type = record.get('listing_type')
+                if listing_type:
+                    if listing_type not in records_by_type:
+                        records_by_type[listing_type] = record
+                    else:
+                        # Если уже есть запись для этого типа, сравниваем даты
+                        existing_date = records_by_type[listing_type].get('trend_date', '')
+                        current_date = record.get('trend_date', '')
+                        if existing_date and current_date and current_date > existing_date:
+                            records_by_type[listing_type] = record
+            
+            heating_data_filtered = list(records_by_type.values())
+            logger.info(f"📊 heating_data: {len(heating_data.data)} записей, сгруппированы по {len(records_by_type)} типам")
+
+        logger.info(f"📊 Получено данных: general={len(general_data_filtered)}, house_type={len(house_type_data_filtered)}, floor_segment={len(floor_segment_data_filtered)}, age={len(age_data_filtered)}, heating={len(heating_data_filtered)}")
         
         # Проверяем и обновляем курсы валют при необходимости
         try:
@@ -1358,11 +1484,11 @@ def api_region_data():
         
         return jsonify({
             'success': True,
-            'general_data': general_data.data if general_data.data else [],
-            'house_type_data': house_type_data.data if house_type_data.data else [],
-            'floor_segment_data': floor_segment_data.data if floor_segment_data.data else [],
-            'age_data': age_data.data if age_data.data else [],
-            'heating_data': heating_data.data if heating_data.data else []
+            'general_data': general_data_filtered,
+            'house_type_data': house_type_data_filtered,
+            'floor_segment_data': floor_segment_data_filtered,
+            'age_data': age_data_filtered,
+            'heating_data': heating_data_filtered
         })
         
     except Exception as e:
