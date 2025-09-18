@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 import threading
 import asyncio
 from locales import locales
-from file_file_cache_manager import file_file_cache_manager
+from file_cache_manager import file_cache_manager
 import requests
 from datetime import datetime, timedelta
 from fpdf import FPDF
@@ -968,7 +968,7 @@ def api_locations_countries():
         logger.info("🔍 Запрос списка стран")
         
         # Пытаемся получить данные из кэша
-        cached_countries = file_file_cache_manager.get_countries()
+        cached_countries = file_cache_manager.get_countries()
         if cached_countries:
             logger.info(f"🚀 Данные стран получены из кэша: {len(cached_countries)} стран")
             return jsonify({'success': True, 'countries': cached_countries, 'cached': True})
@@ -1014,7 +1014,7 @@ def api_locations_countries():
             countries.sort(key=lambda x: x[1] if x[1] is not None else '')
             
             # Сохраняем в кэш на 24 часа
-            file_file_cache_manager.set_countries(countries, ttl_hours=24)
+            file_cache_manager.set_countries(countries, ttl_hours=24)
             logger.info(f"💾 Данные стран сохранены в кэш на 24 часа")
             
             return jsonify({'success': True, 'countries': countries, 'cached': False})
@@ -1038,7 +1038,7 @@ def api_locations_cities():
         logger.info(f"🔍 Запрос городов для country_id: {country_id}")
         
         # Пытаемся получить данные из кэша
-        cached_cities = file_file_cache_manager.get_cities(country_id)
+        cached_cities = file_cache_manager.get_cities(country_id)
         if cached_cities:
             logger.info(f"🚀 Данные городов получены из кэша: {len(cached_cities)} городов")
             return jsonify({'success': True, 'cities': cached_cities, 'cached': True})
