@@ -15,6 +15,15 @@
         .settings-btn { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; border: none; border-radius: 10px; padding: 14px 0; font-size: 1em; font-weight: 500; cursor: pointer; width: 100%; margin-bottom: 10px; transition: all 0.2s; box-shadow: 0 2px 8px rgba(102,126,234,0.15); }
         .settings-btn:hover { background: linear-gradient(135deg, #764ba2 0%, #667eea 100%); }
         .settings-list { background: #f8f9fa; border-radius: 10px; padding: 14px 12px; margin-bottom: 18px; color: #333; font-size: 1em; text-align: left; }
+        .country-setting { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #e0e0e0; }
+        .country-setting:last-child { border-bottom: none; }
+        .country-name { font-weight: 500; }
+        .country-toggle { position: relative; display: inline-block; width: 50px; height: 24px; }
+        .country-toggle input { opacity: 0; width: 0; height: 0; }
+        .country-slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 24px; }
+        .country-slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+        .country-toggle input:checked + .country-slider { background-color: #667eea; }
+        .country-toggle input:checked + .country-slider:before { transform: translateX(26px); }
         .nav-btn-row { display: flex; gap: 10px; margin-top: 18px; }
         .nav-btn { flex: 1; padding: 14px 0; border: none; border-radius: 10px; font-size: 1em; font-weight: 500; cursor: pointer; background: #f1f1f1; color: #333; transition: background 0.2s; }
         .nav-btn:hover { background: #e2e2e2; }
@@ -36,6 +45,10 @@
             <button class="settings-btn" type="submit" data-i18n="admin.add_key">Добавить ключ</button>
         </form>
         <div class="settings-list" id="keysList" data-i18n="common.loading">Загрузка...</div>
+        
+        <!-- Секция управления странами -->
+        <div class="admin-title" data-i18n="admin.country_settings_title">Управление странами</div>
+        <div class="settings-list" id="countrySettingsList" data-i18n="common.loading">Загрузка...</div>
         <div class="nav-btn-row">
             <button class="nav-btn" onclick="goBack()" data-i18n="common.back">Назад</button>
             <button class="nav-btn nav-btn-main" onclick="goToMainMenu()" data-i18n="common.main_menu">В главное меню</button>
@@ -61,7 +74,12 @@
                 'admin.add_key_error': 'Не удалось добавить ключ.',
                 'admin.network_error': 'Ошибка сети.',
                 'admin.load_keys_error': 'Ошибка загрузки ключей.',
-                'admin.no_keys': 'Нет новых ключей.'
+                'admin.no_keys': 'Нет новых ключей.',
+                'admin.country_settings_title': 'Управление странами',
+                'admin.country_enabled': 'Включено',
+                'admin.country_disabled': 'Выключено',
+                'admin.country_settings_updated': 'Настройки стран обновлены!',
+                'admin.country_settings_error': 'Ошибка обновления настроек стран.'
             },
             'en': {
                 'common.settings': 'Settings',
@@ -77,7 +95,12 @@
                 'admin.add_key_error': 'Failed to add key.',
                 'admin.network_error': 'Network error.',
                 'admin.load_keys_error': 'Error loading keys.',
-                'admin.no_keys': 'No new keys.'
+                'admin.no_keys': 'No new keys.',
+                'admin.country_settings_title': 'Country Management',
+                'admin.country_enabled': 'Enabled',
+                'admin.country_disabled': 'Disabled',
+                'admin.country_settings_updated': 'Country settings updated!',
+                'admin.country_settings_error': 'Error updating country settings.'
             },
             'de': {
                 'common.settings': 'Einstellungen',
@@ -93,7 +116,12 @@
                 'admin.add_key_error': 'Schlüssel konnte nicht hinzugefügt werden.',
                 'admin.network_error': 'Netzwerkfehler.',
                 'admin.load_keys_error': 'Fehler beim Laden der Schlüssel.',
-                'admin.no_keys': 'Keine neuen Schlüssel.'
+                'admin.no_keys': 'Keine neuen Schlüssel.',
+                'admin.country_settings_title': 'Länderverwaltung',
+                'admin.country_enabled': 'Aktiviert',
+                'admin.country_disabled': 'Deaktiviert',
+                'admin.country_settings_updated': 'Ländereinstellungen aktualisiert!',
+                'admin.country_settings_error': 'Fehler beim Aktualisieren der Ländereinstellungen.'
             },
             'fr': {
                 'common.settings': 'Paramètres',
@@ -109,7 +137,12 @@
                 'admin.add_key_error': 'Impossible d\'ajouter la clé.',
                 'admin.network_error': 'Erreur réseau.',
                 'admin.load_keys_error': 'Erreur lors du chargement des clés.',
-                'admin.no_keys': 'Aucune nouvelle clé.'
+                'admin.no_keys': 'Aucune nouvelle clé.',
+                'admin.country_settings_title': 'Gestion des pays',
+                'admin.country_enabled': 'Activé',
+                'admin.country_disabled': 'Désactivé',
+                'admin.country_settings_updated': 'Paramètres des pays mis à jour!',
+                'admin.country_settings_error': 'Erreur lors de la mise à jour des paramètres des pays.'
             },
             'tr': {
                 'common.settings': 'Ayarlar',
@@ -125,7 +158,12 @@
                 'admin.add_key_error': 'Anahtar eklenemedi.',
                 'admin.network_error': 'Ağ hatası.',
                 'admin.load_keys_error': 'Anahtarlar yüklenirken hata.',
-                'admin.no_keys': 'Yeni anahtar yok.'
+                'admin.no_keys': 'Yeni anahtar yok.',
+                'admin.country_settings_title': 'Ülke Yönetimi',
+                'admin.country_enabled': 'Etkin',
+                'admin.country_disabled': 'Devre dışı',
+                'admin.country_settings_updated': 'Ülke ayarları güncellendi!',
+                'admin.country_settings_error': 'Ülke ayarları güncellenirken hata.'
             }
         };
         
@@ -163,6 +201,7 @@
             document.querySelector('[data-i18n="admin.add_key"]').textContent = getText('admin.add_key');
             document.querySelector('[data-i18n="common.back"]').textContent = getText('common.back');
             document.querySelector('[data-i18n="common.main_menu"]').textContent = getText('common.main_menu');
+            document.querySelector('[data-i18n="admin.country_settings_title"]').textContent = getText('admin.country_settings_title');
         }
         
         // Инициализация страницы
@@ -227,6 +266,68 @@
                 .catch(() => { document.getElementById('keysList').innerHTML = getText('admin.network_error'); showToast(getText('admin.network_error'), 'error'); });
         }
         document.addEventListener('DOMContentLoaded', loadKeys);
+        
+        // Функции для управления странами
+        function loadCountrySettings() {
+            fetch('/api/admin/country_settings')
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        displayCountrySettings(data.settings);
+                    } else {
+                        document.getElementById('countrySettingsList').innerHTML = getText('admin.load_keys_error');
+                        showToast(getText('admin.load_keys_error'), 'error');
+                    }
+                })
+                .catch(() => { 
+                    document.getElementById('countrySettingsList').innerHTML = getText('admin.network_error'); 
+                    showToast(getText('admin.network_error'), 'error'); 
+                });
+        }
+        
+        function displayCountrySettings(settings) {
+            const container = document.getElementById('countrySettingsList');
+            if (!settings || settings.length === 0) {
+                container.innerHTML = getText('admin.no_keys');
+                return;
+            }
+            
+            container.innerHTML = settings.map(setting => `
+                <div class="country-setting">
+                    <span class="country-name">${setting.country_name}</span>
+                    <label class="country-toggle">
+                        <input type="checkbox" ${setting.is_enabled ? 'checked' : ''} 
+                               onchange="updateCountrySetting(${setting.country_id}, this.checked)">
+                        <span class="country-slider"></span>
+                    </label>
+                </div>
+            `).join('');
+        }
+        
+        function updateCountrySetting(countryId, isEnabled) {
+            fetch('/api/admin/country_settings', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    country_id: countryId, 
+                    is_enabled: isEnabled 
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    showToast(getText('admin.country_settings_updated'), 'success');
+                } else {
+                    showToast(getText('admin.country_settings_error') + ': ' + (data.error || ''), 'error');
+                }
+            })
+            .catch(() => { 
+                showToast(getText('admin.country_settings_error'), 'error'); 
+            });
+        }
+        
+        // Загружаем настройки стран при инициализации
+        document.addEventListener('DOMContentLoaded', loadCountrySettings);
     </script>
 </body>
 </html> 

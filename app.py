@@ -962,9 +962,24 @@ def api_menu():
 
 @app.route('/api/locations/countries', methods=['GET'])
 def api_locations_countries():
-    """Получение списка стран из таблицы locations"""
+    """Получение списка стран из таблицы locations с учетом роли пользователя"""
     try:
         logger.info("🔍 Запрос списка стран")
+        
+        # Получаем telegram_id из заголовков или параметров запроса
+        telegram_id = request.headers.get('X-Telegram-ID') or request.args.get('telegram_id')
+        
+        # Проверяем статус администратора
+        is_admin = False
+        if telegram_id:
+            try:
+                telegram_id = int(telegram_id)
+                user_result = supabase.table('users').select('user_status').eq('telegram_id', telegram_id).execute()
+                if user_result.data and user_result.data[0].get('user_status') == 'admin':
+                    is_admin = True
+                    logger.info(f"✅ Пользователь {telegram_id} имеет статус администратора")
+            except Exception as e:
+                logger.error(f"Ошибка проверки статуса администратора: {e}")
         
         # Получаем все записи с помощью пагинации
         all_records = []
@@ -1001,15 +1016,87 @@ def api_locations_countries():
             
             logger.info(f"✅ Отфильтровано стран: {len(countries)}")
             
+            # Если пользователь не админ, фильтруем по настройкам
+            if not is_admin:
+                try:
+                    # Получаем настройки стран
+                    settings_result = supabase.table('country_settings').select('country_id').eq('is_enabled', True).execute()
+                    enabled_country_ids = set()
+                    if settings_result.data:
+                        enabled_country_ids = {setting['country_id'] for setting in settings_result.data}
+                    
+                    # Фильтруем страны
+                    filtered_countries = []
+                    for country_id, country_name in countries:
+                        if country_id in enabled_country_ids:
+                            filtered_countries.append((country_id, country_name))
+                    
+                    countries = filtered_countries
+                    logger.info(f"🔒 Для обычного пользователя доступно стран: {len(countries)}")
+                    
+                except Exception as e:
+                    logger.error(f"Ошибка при фильтрации стран: {e}")
+                    # В случае ошибки показываем все страны (fallback)
+            
             # Сортируем по названию, игнорируя None
             countries.sort(key=lambda x: x[1] if x[1] is not None else '')
             
-            return jsonify({'success': True, 'countries': countries})
+            return jsonify({'success': True, 'countries': countries, 'is_admin': is_admin})
         else:
             logger.warning("⚠️ Страны не найдены")
             return jsonify({'success': False, 'error': 'No countries found'})
     except Exception as e:
         logger.error(f"❌ Ошибка при получении стран: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/admin/country_settings', methods=['GET'])
+def api_admin_country_settings():
+    """Получение настроек стран для админ панели"""
+    try:
+        logger.info("🔍 Запрос настроек стран для админ панели")
+        
+        # Получаем все настройки стран
+        result = supabase.table('country_settings').select('*').order('country_name').execute()
+        
+        if result.data:
+            logger.info(f"✅ Найдено настроек стран: {len(result.data)}")
+            return jsonify({'success': True, 'settings': result.data})
+        else:
+            logger.warning("⚠️ Настройки стран не найдены")
+            return jsonify({'success': False, 'error': 'No country settings found'})
+            
+    except Exception as e:
+        logger.error(f"❌ Ошибка при получении настроек стран: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/admin/country_settings', methods=['POST'])
+def api_admin_update_country_settings():
+    """Обновление настроек доступности стран"""
+    data = request.json or {}
+    country_id = data.get('country_id')
+    is_enabled = data.get('is_enabled')
+    
+    if country_id is None or is_enabled is None:
+        return jsonify({'error': 'country_id and is_enabled required'}), 400
+    
+    try:
+        logger.info(f"🔧 Обновление настройки страны {country_id}: is_enabled={is_enabled}")
+        
+        # Обновляем настройку
+        result = supabase.table('country_settings').update({
+            'is_enabled': is_enabled,
+            'updated_at': 'now()'
+        }).eq('country_id', country_id).execute()
+        
+        if result.data:
+            logger.info(f"✅ Настройка страны {country_id} обновлена")
+            return jsonify({'success': True, 'message': 'Country setting updated'})
+        else:
+            logger.warning(f"⚠️ Страна {country_id} не найдена в настройках")
+            return jsonify({'success': False, 'error': 'Country not found in settings'})
+            
+    except Exception as e:
+        logger.error(f"❌ Ошибка при обновлении настройки страны: {e}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
 @app.route('/api/locations/cities', methods=['POST'])

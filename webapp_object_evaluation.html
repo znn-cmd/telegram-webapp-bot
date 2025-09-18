@@ -6254,7 +6254,20 @@
                 console.log('🔄 Loading countries from API...');
                 const startTime = performance.now();
                 
-                const response = await fetch('/api/locations/countries');
+                // Получаем telegram_id пользователя
+                const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
+                let userData = tg && tg.initDataUnsafe && tg.initDataUnsafe.user ? tg.initDataUnsafe.user : null;
+                if (!userData) {
+                    try { userData = JSON.parse(localStorage.getItem('aaadviser_user')); } catch (e) { userData = null; }
+                }
+                
+                // Формируем URL с telegram_id
+                let url = '/api/locations/countries';
+                if (userData && userData.id) {
+                    url += `?telegram_id=${userData.id}`;
+                }
+                
+                const response = await fetch(url);
                 
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
@@ -6270,6 +6283,7 @@
                     countriesCache = data.countries;
                     populateCountriesSelect(data.countries);
                     console.log(`✅ Countries loaded successfully: ${data.countries.length} countries`);
+                    console.log(`👤 User is admin: ${data.is_admin || false}`);
                 } else {
                     console.error('❌ Failed to load countries:', data.error);
                     showErrorMessage(getText('errorLoadingCountries') || 'Failed to load countries');
