@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 import threading
 import asyncio
 from locales import locales
-from cache_manager import cache_manager
+from file_file_cache_manager import file_file_cache_manager
 import requests
 from datetime import datetime, timedelta
 from fpdf import FPDF
@@ -968,7 +968,7 @@ def api_locations_countries():
         logger.info("🔍 Запрос списка стран")
         
         # Пытаемся получить данные из кэша
-        cached_countries = cache_manager.get_countries()
+        cached_countries = file_file_cache_manager.get_countries()
         if cached_countries:
             logger.info(f"🚀 Данные стран получены из кэша: {len(cached_countries)} стран")
             return jsonify({'success': True, 'countries': cached_countries, 'cached': True})
@@ -1014,7 +1014,7 @@ def api_locations_countries():
             countries.sort(key=lambda x: x[1] if x[1] is not None else '')
             
             # Сохраняем в кэш на 24 часа
-            cache_manager.set_countries(countries, ttl_hours=24)
+            file_file_cache_manager.set_countries(countries, ttl_hours=24)
             logger.info(f"💾 Данные стран сохранены в кэш на 24 часа")
             
             return jsonify({'success': True, 'countries': countries, 'cached': False})
@@ -1038,7 +1038,7 @@ def api_locations_cities():
         logger.info(f"🔍 Запрос городов для country_id: {country_id}")
         
         # Пытаемся получить данные из кэша
-        cached_cities = cache_manager.get_cities(country_id)
+        cached_cities = file_file_cache_manager.get_cities(country_id)
         if cached_cities:
             logger.info(f"🚀 Данные городов получены из кэша: {len(cached_cities)} городов")
             return jsonify({'success': True, 'cities': cached_cities, 'cached': True})
@@ -1084,7 +1084,7 @@ def api_locations_cities():
             cities.sort(key=lambda x: x[1] if x[1] is not None else '')
             
             # Сохраняем в кэш на 24 часа
-            cache_manager.set_cities(country_id, cities, ttl_hours=24)
+            file_cache_manager.set_cities(country_id, cities, ttl_hours=24)
             logger.info(f"💾 Данные городов сохранены в кэш на 24 часа")
             
             return jsonify({'success': True, 'cities': cities, 'cached': False})
@@ -1100,7 +1100,7 @@ def api_locations_cities():
 def api_cache_stats():
     """Получение статистики кэша"""
     try:
-        stats = cache_manager.get_cache_stats()
+        stats = file_cache_manager.get_cache_stats()
         return jsonify({'success': True, 'stats': stats})
     except Exception as e:
         logger.error(f"❌ Ошибка при получении статистики кэша: {e}")
@@ -1110,7 +1110,7 @@ def api_cache_stats():
 def api_cache_clear():
     """Очистка кэша географических данных"""
     try:
-        cleared_count = cache_manager.clear_locations_cache()
+        cleared_count = file_cache_manager.clear_locations_cache()
         logger.info(f"🧹 Очищено {cleared_count} ключей из кэша")
         return jsonify({'success': True, 'cleared_keys': cleared_count})
     except Exception as e:
@@ -1135,7 +1135,7 @@ def api_cache_refresh_simple():
         logger.info("🔄 Запуск простого обновления кэша...")
         
         # Очищаем старый кэш
-        cleared_count = cache_manager.clear_locations_cache()
+        cleared_count = file_cache_manager.clear_locations_cache()
         logger.info(f"🧹 Очищено {cleared_count} ключей из старого кэша")
         
         # Обновляем только страны и города (основные данные)
@@ -1171,7 +1171,7 @@ def refresh_countries_and_cities_only():
             countries.sort(key=lambda x: x[1] if x[1] is not None else '')
             
             # Сохраняем в кэш на 24 часа
-            cache_manager.set_countries(countries, ttl_hours=24)
+            file_cache_manager.set_countries(countries, ttl_hours=24)
             logger.info(f"✅ Кэш стран обновлен: {len(countries)} стран сохранено")
             
             # Небольшая пауза
@@ -1198,7 +1198,7 @@ def refresh_countries_and_cities_only():
                                     seen.add(city_tuple)
                         
                         cities.sort(key=lambda x: x[1] if x[1] is not None else '')
-                        cache_manager.set_cities(country_id, cities, ttl_hours=24)
+                        file_cache_manager.set_cities(country_id, cities, ttl_hours=24)
                         logger.info(f"✅ Кэш городов обновлен для страны {country_id}: {len(cities)} городов ({i+1}/{len(unique_countries)})")
                     
                     # Небольшая пауза между запросами
@@ -1230,7 +1230,7 @@ def api_locations_counties():
         logger.info(f"🔍 Запрос областей для city_id: {city_id}")
         
         # Пытаемся получить данные из кэша
-        cached_counties = cache_manager.get_counties(city_id)
+        cached_counties = file_cache_manager.get_counties(city_id)
         if cached_counties:
             logger.info(f"🚀 Данные областей получены из кэша: {len(cached_counties)} областей")
             return jsonify({'success': True, 'counties': cached_counties, 'cached': True})
@@ -1276,7 +1276,7 @@ def api_locations_counties():
             counties.sort(key=lambda x: x[1] if x[1] is not None else '')
             
             # Сохраняем в кэш на 24 часа
-            cache_manager.set_counties(city_id, counties, ttl_hours=24)
+            file_cache_manager.set_counties(city_id, counties, ttl_hours=24)
             logger.info(f"💾 Данные областей сохранены в кэш на 24 часа")
             
             return jsonify({'success': True, 'counties': counties, 'cached': False})
@@ -1301,7 +1301,7 @@ def api_locations_districts():
         logger.info(f"🔍 Запрос районов для county_id: {county_id}")
         
         # Пытаемся получить данные из кэша
-        cached_districts = cache_manager.get_districts(county_id)
+        cached_districts = file_cache_manager.get_districts(county_id)
         if cached_districts:
             logger.info(f"🚀 Данные районов получены из кэша: {len(cached_districts)} районов")
             return jsonify({'success': True, 'districts': cached_districts, 'cached': True})
@@ -1347,7 +1347,7 @@ def api_locations_districts():
             districts.sort(key=lambda x: x[1] if x[1] is not None else '')
             
             # Сохраняем в кэш на 24 часа
-            cache_manager.set_districts(county_id, districts, ttl_hours=24)
+            file_cache_manager.set_districts(county_id, districts, ttl_hours=24)
             logger.info(f"💾 Данные районов сохранены в кэш на 24 часа")
             
             return jsonify({'success': True, 'districts': districts, 'cached': False})
@@ -11033,7 +11033,7 @@ def refresh_locations_cache():
         logger.info("🔄 Начинаем автоматическое обновление кэша локаций...")
         
         # Очищаем старый кэш
-        cleared_count = cache_manager.clear_locations_cache()
+        cleared_count = file_cache_manager.clear_locations_cache()
         logger.info(f"🧹 Очищено {cleared_count} ключей из старого кэша")
         
         # Обновляем кэш стран
@@ -11057,7 +11057,7 @@ def refresh_locations_cache():
                 countries.sort(key=lambda x: x[1] if x[1] is not None else '')
                 
                 # Сохраняем в кэш на 24 часа
-                cache_manager.set_countries(countries, ttl_hours=24)
+                file_cache_manager.set_countries(countries, ttl_hours=24)
                 logger.info(f"✅ Кэш стран обновлен: {len(countries)} стран сохранено")
             else:
                 logger.warning("⚠️ Страны не найдены")
@@ -11095,7 +11095,7 @@ def refresh_locations_cache():
                                         seen.add(city_tuple)
                             
                             cities.sort(key=lambda x: x[1] if x[1] is not None else '')
-                            cache_manager.set_cities(country_id, cities, ttl_hours=24)
+                            file_cache_manager.set_cities(country_id, cities, ttl_hours=24)
                             logger.info(f"✅ Кэш городов обновлен для страны {country_id}: {len(cities)} городов ({i+1}/{len(unique_countries)})")
                         
                         # Небольшая пауза между запросами
@@ -11148,7 +11148,7 @@ def refresh_locations_cache():
                                         seen.add(county_tuple)
                             
                             counties.sort(key=lambda x: x[1] if x[1] is not None else '')
-                            cache_manager.set_counties(city_id, counties, ttl_hours=24)
+                            file_cache_manager.set_counties(city_id, counties, ttl_hours=24)
                             logger.info(f"✅ Кэш областей обновлен для города {city_id}: {len(counties)} областей ({i+1}/{len(unique_cities)})")
                         
                         # Небольшая пауза между запросами
@@ -11201,7 +11201,7 @@ def refresh_locations_cache():
                                         seen.add(district_tuple)
                             
                             districts.sort(key=lambda x: x[1] if x[1] is not None else '')
-                            cache_manager.set_districts(county_id, districts, ttl_hours=24)
+                            file_cache_manager.set_districts(county_id, districts, ttl_hours=24)
                             logger.info(f"✅ Кэш районов обновлен для области {county_id}: {len(districts)} районов ({i+1}/{len(unique_counties)})")
                         
                         # Небольшая пауза между запросами
