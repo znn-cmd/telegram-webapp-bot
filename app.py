@@ -7,7 +7,6 @@ from dotenv import load_dotenv
 import threading
 import asyncio
 from locales import locales
-from file_cache_manager import file_cache_manager
 import requests
 from datetime import datetime, timedelta
 from fpdf import FPDF
@@ -963,17 +962,9 @@ def api_menu():
 
 @app.route('/api/locations/countries', methods=['GET'])
 def api_locations_countries():
-    """Получение списка стран из таблицы locations с кэшированием"""
+    """Получение списка стран из таблицы locations"""
     try:
         logger.info("🔍 Запрос списка стран")
-        
-        # Пытаемся получить данные из кэша
-        cached_countries = file_cache_manager.get_countries()
-        if cached_countries:
-            logger.info(f"🚀 Данные стран получены из кэша: {len(cached_countries)} стран")
-            return jsonify({'success': True, 'countries': cached_countries, 'cached': True})
-        
-        logger.info("📡 Кэш пуст, загружаем данные из БД")
         
         # Получаем все записи с помощью пагинации
         all_records = []
@@ -1013,11 +1004,7 @@ def api_locations_countries():
             # Сортируем по названию, игнорируя None
             countries.sort(key=lambda x: x[1] if x[1] is not None else '')
             
-            # Сохраняем в кэш на 24 часа
-            file_cache_manager.set_countries(countries, ttl_hours=24)
-            logger.info(f"💾 Данные стран сохранены в кэш на 24 часа")
-            
-            return jsonify({'success': True, 'countries': countries, 'cached': False})
+            return jsonify({'success': True, 'countries': countries})
         else:
             logger.warning("⚠️ Страны не найдены")
             return jsonify({'success': False, 'error': 'No countries found'})
@@ -1027,7 +1014,7 @@ def api_locations_countries():
 
 @app.route('/api/locations/cities', methods=['POST'])
 def api_locations_cities():
-    """Получение списка городов по country_id с кэшированием"""
+    """Получение списка городов по country_id"""
     data = request.json or {}
     country_id = data.get('country_id')
     
@@ -1036,14 +1023,6 @@ def api_locations_cities():
     
     try:
         logger.info(f"🔍 Запрос городов для country_id: {country_id}")
-        
-        # Пытаемся получить данные из кэша
-        cached_cities = file_cache_manager.get_cities(country_id)
-        if cached_cities:
-            logger.info(f"🚀 Данные городов получены из кэша: {len(cached_cities)} городов")
-            return jsonify({'success': True, 'cities': cached_cities, 'cached': True})
-        
-        logger.info("📡 Кэш пуст, загружаем данные из БД")
         
         # Получаем все записи с помощью пагинации
         all_records = []
@@ -1083,11 +1062,7 @@ def api_locations_cities():
             # Сортируем по названию, игнорируя None
             cities.sort(key=lambda x: x[1] if x[1] is not None else '')
             
-            # Сохраняем в кэш на 24 часа
-            file_cache_manager.set_cities(country_id, cities, ttl_hours=24)
-            logger.info(f"💾 Данные городов сохранены в кэш на 24 часа")
-            
-            return jsonify({'success': True, 'cities': cities, 'cached': False})
+            return jsonify({'success': True, 'cities': cities})
         else:
             logger.warning(f"⚠️ Города для country_id {country_id} не найдены")
             return jsonify({'success': False, 'error': 'No cities found'})
@@ -1096,130 +1071,9 @@ def api_locations_cities():
         logger.error(f"📋 Данные запроса: country_id={country_id}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
-@app.route('/api/cache/stats', methods=['GET'])
-def api_cache_stats():
-    """Получение статистики кэша"""
-    try:
-        stats = file_cache_manager.get_cache_stats()
-        return jsonify({'success': True, 'stats': stats})
-    except Exception as e:
-        logger.error(f"❌ Ошибка при получении статистики кэша: {e}")
-        return jsonify({'success': False, 'error': str(e)}), 500
-
-@app.route('/api/cache/clear', methods=['POST'])
-def api_cache_clear():
-    """Очистка кэша географических данных"""
-    try:
-        cleared_count = file_cache_manager.clear_locations_cache()
-        logger.info(f"🧹 Очищено {cleared_count} ключей из кэша")
-        return jsonify({'success': True, 'cleared_keys': cleared_count})
-    except Exception as e:
-        logger.error(f"❌ Ошибка при очистке кэша: {e}")
-        return jsonify({'success': False, 'error': str(e)}), 500
-
-@app.route('/api/cache/refresh', methods=['POST'])
-def api_cache_refresh():
-    """Ручное обновление кэша географических данных"""
-    try:
-        logger.info("🔄 Запуск ручного обновления кэша...")
-        refresh_locations_cache()
-        return jsonify({'success': True, 'message': 'Cache refreshed successfully'})
-    except Exception as e:
-        logger.error(f"❌ Ошибка при ручном обновлении кэша: {e}")
-        return jsonify({'success': False, 'error': str(e)}), 500
-
-@app.route('/api/cache/refresh_simple', methods=['POST'])
-def api_cache_refresh_simple():
-    """Простое обновление кеша только для стран и городов (более устойчиво к сетевым проблемам)"""
-    try:
-        logger.info("🔄 Запуск простого обновления кэша...")
-        
-        # Очищаем старый кэш
-        cleared_count = file_cache_manager.clear_locations_cache()
-        logger.info(f"🧹 Очищено {cleared_count} ключей из старого кэша")
-        
-        # Обновляем только страны и города (основные данные)
-        refresh_countries_and_cities_only()
-        
-        return jsonify({'success': True, 'message': 'Simple cache refresh completed successfully'})
-    except Exception as e:
-        logger.error(f"❌ Ошибка при простом обновлении кэша: {e}")
-        return jsonify({'success': False, 'error': str(e)}), 500
-
-def refresh_countries_and_cities_only():
-    """Обновляет только кеш стран и городов (более быстро и надежно)"""
-    import time
-    
-    try:
-        logger.info("🌍 Обновляем кэш стран...")
-        
-        # Получаем все страны одним запросом
-        result = supabase.table('locations').select('country_id, country_name').not_.is_('country_id', 'null').execute()
-        
-        if result.data:
-            # Убираем дубликаты, фильтруем None значения и сортируем
-            countries = []
-            seen = set()
-            for item in result.data:
-                if item['country_id'] is not None and item['country_name'] is not None:
-                    country_tuple = (item['country_id'], item['country_name'])
-                    if country_tuple not in seen:
-                        countries.append(country_tuple)
-                        seen.add(country_tuple)
-            
-            # Сортируем по названию
-            countries.sort(key=lambda x: x[1] if x[1] is not None else '')
-            
-            # Сохраняем в кэш на 24 часа
-            file_cache_manager.set_countries(countries, ttl_hours=24)
-            logger.info(f"✅ Кэш стран обновлен: {len(countries)} стран сохранено")
-            
-            # Небольшая пауза
-            time.sleep(0.5)
-            
-            # Обновляем кэш городов для каждой страны
-            logger.info("🏙️ Обновляем кэш городов...")
-            unique_countries = list(set([item['country_id'] for item in result.data if item['country_id'] is not None]))
-            logger.info(f"📊 Найдено {len(unique_countries)} стран для обновления городов")
-            
-            for i, country_id in enumerate(unique_countries):
-                try:
-                    # Получаем города для этой страны
-                    cities_result = supabase.table('locations').select('city_id, city_name').eq('country_id', country_id).execute()
-                    
-                    if cities_result.data:
-                        cities = []
-                        seen = set()
-                        for item in cities_result.data:
-                            if item['city_id'] is not None and item['city_name'] is not None:
-                                city_tuple = (item['city_id'], item['city_name'])
-                                if city_tuple not in seen:
-                                    cities.append(city_tuple)
-                                    seen.add(city_tuple)
-                        
-                        cities.sort(key=lambda x: x[1] if x[1] is not None else '')
-                        file_cache_manager.set_cities(country_id, cities, ttl_hours=24)
-                        logger.info(f"✅ Кэш городов обновлен для страны {country_id}: {len(cities)} городов ({i+1}/{len(unique_countries)})")
-                    
-                    # Небольшая пауза между запросами
-                    if i < len(unique_countries) - 1:
-                        time.sleep(0.3)
-                        
-                except Exception as e:
-                    logger.error(f"❌ Ошибка при обновлении кэша городов для страны {country_id}: {e}")
-                    continue  # Продолжаем с следующей страной
-            
-            logger.info("🎉 Простое обновление кэша стран и городов завершено успешно")
-        else:
-            logger.warning("⚠️ Страны не найдены")
-            
-    except Exception as e:
-        logger.error(f"❌ Ошибка при простом обновлении кэша: {e}")
-        raise
-
 @app.route('/api/locations/counties', methods=['POST'])
 def api_locations_counties():
-    """Получение списка областей/регионов по city_id с кэшированием"""
+    """Получение списка областей/регионов по city_id"""
     data = request.json or {}
     city_id = data.get('city_id')
     
@@ -1228,14 +1082,6 @@ def api_locations_counties():
     
     try:
         logger.info(f"🔍 Запрос областей для city_id: {city_id}")
-        
-        # Пытаемся получить данные из кэша
-        cached_counties = file_cache_manager.get_counties(city_id)
-        if cached_counties:
-            logger.info(f"🚀 Данные областей получены из кэша: {len(cached_counties)} областей")
-            return jsonify({'success': True, 'counties': cached_counties, 'cached': True})
-        
-        logger.info("📡 Кэш пуст, загружаем данные из БД")
         
         # Получаем все записи с помощью пагинации
         all_records = []
@@ -1275,11 +1121,7 @@ def api_locations_counties():
             # Сортируем по названию, игнорируя None
             counties.sort(key=lambda x: x[1] if x[1] is not None else '')
             
-            # Сохраняем в кэш на 24 часа
-            file_cache_manager.set_counties(city_id, counties, ttl_hours=24)
-            logger.info(f"💾 Данные областей сохранены в кэш на 24 часа")
-            
-            return jsonify({'success': True, 'counties': counties, 'cached': False})
+            return jsonify({'success': True, 'counties': counties})
         else:
             logger.warning(f"⚠️ Области для city_id {city_id} не найдены")
             return jsonify({'success': False, 'error': 'No counties found'})
@@ -1290,7 +1132,7 @@ def api_locations_counties():
 
 @app.route('/api/locations/districts', methods=['POST'])
 def api_locations_districts():
-    """Получение списка районов по county_id с кэшированием"""
+    """Получение списка районов по county_id"""
     data = request.json or {}
     county_id = data.get('county_id')
     
@@ -1299,14 +1141,6 @@ def api_locations_districts():
     
     try:
         logger.info(f"🔍 Запрос районов для county_id: {county_id}")
-        
-        # Пытаемся получить данные из кэша
-        cached_districts = file_cache_manager.get_districts(county_id)
-        if cached_districts:
-            logger.info(f"🚀 Данные районов получены из кэша: {len(cached_districts)} районов")
-            return jsonify({'success': True, 'districts': cached_districts, 'cached': True})
-        
-        logger.info("📡 Кэш пуст, загружаем данные из БД")
         
         # Получаем все записи с помощью пагинации
         all_records = []
@@ -1346,11 +1180,7 @@ def api_locations_districts():
             # Сортируем по названию, игнорируя None
             districts.sort(key=lambda x: x[1] if x[1] is not None else '')
             
-            # Сохраняем в кэш на 24 часа
-            file_cache_manager.set_districts(county_id, districts, ttl_hours=24)
-            logger.info(f"💾 Данные районов сохранены в кэш на 24 часа")
-            
-            return jsonify({'success': True, 'districts': districts, 'cached': False})
+            return jsonify({'success': True, 'districts': districts})
         else:
             logger.warning(f"⚠️ Районы для county_id {county_id} не найдены")
             return jsonify({'success': False, 'error': 'No districts found'})

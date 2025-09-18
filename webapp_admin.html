@@ -48,10 +48,6 @@
             <span class="admin-btn-icon">⚙️</span>
             <span data-i18n="admin.settings">Настройки</span>
         </button>
-        <button class="admin-btn" onclick="refreshCache()">
-            <span class="admin-btn-icon">🔄</span>
-            <span data-i18n="admin.refresh_cache">Обновить кеш</span>
-        </button>
         <div class="nav-btn-row">
             <button class="nav-btn" onclick="goBack()" data-i18n="common.back">Назад</button>
             <button class="nav-btn nav-btn-main" onclick="goToMainMenu()" data-i18n="common.main_menu">В главное меню</button>
@@ -67,13 +63,10 @@
                 'admin.users': 'Пользователи',
                 'admin.publication': 'Публикация',
                 'admin.settings': 'Настройки',
-                'admin.refresh_cache': 'Обновить кеш',
                 'common.back': 'Назад',
                 'common.main_menu': 'В главное меню',
                 'admin.balance_updated': 'Баланс обновлён до 100',
                 'admin.balance_error': 'Ошибка обновления баланса',
-                'admin.cache_refreshed': 'Кеш успешно обновлён',
-                'admin.cache_error': 'Ошибка обновления кеша',
                 'admin.user_not_found': 'Пользователь не определён. Откройте WebApp из Telegram.'
             },
             'en': {
@@ -82,13 +75,10 @@
                 'admin.users': 'Users',
                 'admin.publication': 'Publication',
                 'admin.settings': 'Settings',
-                'admin.refresh_cache': 'Refresh Cache',
                 'common.back': 'Back',
                 'common.main_menu': 'To Main Menu',
                 'admin.balance_updated': 'Balance updated to 100',
                 'admin.balance_error': 'Error updating balance',
-                'admin.cache_refreshed': 'Cache refreshed successfully',
-                'admin.cache_error': 'Error refreshing cache',
                 'admin.user_not_found': 'User not identified. Open WebApp from Telegram.'
             },
             'de': {
@@ -97,13 +87,10 @@
                 'admin.users': 'Benutzer',
                 'admin.publication': 'Veröffentlichung',
                 'admin.settings': 'Einstellungen',
-                'admin.refresh_cache': 'Cache aktualisieren',
                 'common.back': 'Zurück',
                 'common.main_menu': 'Zum Hauptmenü',
                 'admin.balance_updated': 'Kontostand auf 100 aktualisiert',
                 'admin.balance_error': 'Fehler beim Aktualisieren des Kontostands',
-                'admin.cache_refreshed': 'Cache erfolgreich aktualisiert',
-                'admin.cache_error': 'Fehler beim Aktualisieren des Caches',
                 'admin.user_not_found': 'Benutzer nicht identifiziert. Öffnen Sie WebApp aus Telegram.'
             },
             'fr': {
@@ -112,13 +99,10 @@
                 'admin.users': 'Utilisateurs',
                 'admin.publication': 'Publication',
                 'admin.settings': 'Paramètres',
-                'admin.refresh_cache': 'Actualiser le Cache',
                 'common.back': 'Retour',
                 'common.main_menu': 'Au Menu Principal',
                 'admin.balance_updated': 'Solde mis à jour à 100',
                 'admin.balance_error': 'Erreur de mise à jour du solde',
-                'admin.cache_refreshed': 'Cache actualisé avec succès',
-                'admin.cache_error': 'Erreur lors de l\'actualisation du cache',
                 'admin.user_not_found': 'Utilisateur non identifié. Ouvrez WebApp depuis Telegram.'
             },
             'tr': {
@@ -127,13 +111,10 @@
                 'admin.users': 'Kullanıcılar',
                 'admin.publication': 'Yayın',
                 'admin.settings': 'Ayarlar',
-                'admin.refresh_cache': 'Önbelleği Yenile',
                 'common.back': 'Geri',
                 'common.main_menu': 'Ana Menüye',
                 'admin.balance_updated': 'Bakiye 100\'e güncellendi',
                 'admin.balance_error': 'Bakiye güncelleme hatası',
-                'admin.cache_refreshed': 'Önbellek başarıyla yenilendi',
-                'admin.cache_error': 'Önbellek yenileme hatası',
                 'admin.user_not_found': 'Kullanıcı tanımlanmadı. WebApp\'i Telegram\'dan açın.'
             }
         };
@@ -216,38 +197,6 @@
         function showUsersStats() { window.location.href = '/webapp_admin_users'; }
         function showPublication() { window.location.href = '/webapp_admin_publication'; }
         function showSettings() { window.location.href = '/webapp_admin_settings'; }
-        
-        function refreshCache() {
-            const btn = event.target.closest('button');
-            const originalText = btn.innerHTML;
-            btn.disabled = true;
-            btn.innerHTML = '<span class="admin-btn-icon">⏳</span><span>Обновление...</span>';
-            
-            fetch('/api/cache/refresh_simple', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' }
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    btn.innerHTML = '<span class="admin-btn-icon">✅</span><span data-i18n="admin.cache_refreshed">' + getText('admin.cache_refreshed') + '</span>';
-                    showToast(getText('admin.cache_refreshed'), 'success');
-                    setTimeout(() => { 
-                        btn.innerHTML = originalText;
-                        btn.disabled = false; 
-                    }, 3000);
-                } else {
-                    showToast(getText('admin.cache_error') + ': ' + (data.error || ''), 'error');
-                    btn.innerHTML = originalText;
-                    btn.disabled = false;
-                }
-            })
-            .catch(() => { 
-                showToast(getText('admin.cache_error'), 'error'); 
-                btn.innerHTML = originalText;
-                btn.disabled = false; 
-            });
-        }
 
         // Инициализация при загрузке страницы
         document.addEventListener('DOMContentLoaded', initLocalization);
