@@ -223,7 +223,7 @@
             btn.disabled = true;
             btn.innerHTML = '<span class="admin-btn-icon">⏳</span><span>Обновление...</span>';
             
-            fetch('/api/cache/refresh', {
+            fetch('/api/cache/refresh_simple', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' }
             })
